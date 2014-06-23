@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- Configuration of Cortix -->
+
+<cortixConfig version="0.1">
+
+<!-- Simulation definition -->
+<!-- NB: each simulation has only one application -->
+ <simulation name="headend-off-gas">
+
+  <workDir>/tmp/</workDir>
+
+  <!-- Simulation: tasks -->
+  <!--NB: each task combines parameters for one named application connectivity-->
+  <task name="solo-shear" >
+   <evolveTime unit="hour"> 12.0 </evolveTime>
+  </task>
+
+  <task name="solo-dissolve">
+   <evolveTime unit="hour">8.0</evolveTime>
+  </task>
+
+  <task name="shear-dissolve">
+   <evolveTime unit="day">1.0</evolveTime>
+  </task>
+
+  <!-- Simulation: application -->
+  <application name="shear_dissolve_off_gas">
+
+   <!-- Application: modules set -->
+   <module name="chopper">
+    <executableName>chopper.exec</executableName>
+    <executablePath>~/.</executablePath>
+    <configFileName>chopper.input</configFileName>
+    <configFilePath>~/.</configFilePath>
+    <port>product</port>
+    <port>off-gas</port>
+    <port>fines</port>
+   </module>
+
+   <module name="dissolver">
+    <executableName> main.m </executableName>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/dissolution/nitron/src/</executablePath>
+    <configFileName>nitron.input</configFileName>
+    <configFilePath>~/.</configFilePath>
+    <port>product</port>
+    <port>vapor</port>
+    <port>rinse-stream</port>
+    <port>solids</port>
+    <port>condenser-stream</port>
+    <port>steam</port>
+   </module>
+
+   <module name="pyplot">
+    <executableName> pyplot.py </executableName>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/pyplot/</executablePath>
+    <configFileName>pyplot.input</configFileName>
+    <configFilePath>~/.</configFilePath>
+    <port>time-series</port>
+   </module>
+
+   <!-- Application: networks -->
+   <!-- NB: each network has its own task definition above; with the same name -->
+   <!-- NB: the connect tag is ordered: *from* is the receiver; *to* is the provider-->
+
+   <!-- stand-alone module -->
+   <network name="solo-shear">
+    <connect fromModule="pyplot" fromPort="time-series" toModule="chopper" toPort="off-gas"/> 
+   </network>
+
+   <!-- stand-alone module -->
+   <network name="solo-dissolve">
+    <connect fromModule="pyplot" fromPort="time-series" toModule="dissolver" toPort="off-gas"/> 
+   </network>
+
+   <!-- connected modules -->
+   <network name="shear-dissolve">
+    <connect fromModule="dissolver" fromPort="solids" toModule="chopper" toPort="product"/> 
+    <connect fromModule="pyplot" fromPort="time-series" toModule="dissolver" toPort="vapor"/> 
+    <connect fromModule="pyplot" fromPort="time-series" toModule="chopper" toPort="off-gas"/> 
+   </network>
+
+  </application>
+
+ </simulation>
+
+</cortixConfig>
