@@ -7,3 +7,5 @@ modules/*/*.xml
 *.pdf
 *.patch
 *.gpg
+*.tar
+*.gz

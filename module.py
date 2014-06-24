@@ -61,7 +61,8 @@ class Module(object):
   param  = runtimeCortixParamFile
   comm   = runtimeCortixCommFile
 
-#  print( 'time '+ module + ' ' + input + ' ' + param + ' ' + comm )
+  print('\t\tCortix::Simulation::Application::Module:Execute() '+self.__executableName)
+  print( 'time '+ module + ' ' + input + ' ' + param + ' ' + comm )
   os.system( 'time '+ module + ' ' + input + ' ' + param + ' ' + comm )
 
   return
