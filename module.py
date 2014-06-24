@@ -49,12 +49,20 @@ class Module(object):
 
  def Execute(self, runtimeCortixParamFile, runtimeCortixCommFile ):
 
-  print('module:',self.__name)
-  print('input file:',self.__configFilePath+self.__configFileName)
-  print('param file:',runtimeCortixParamFile)
-  print('comm  file:',runtimeCortixCommFile)
+#  print('module:',self.__name)
+#  print('module executable: ',self.__executableName)
+#  print('module path      : ',self.__executablePath)
+#  print('input file       : ',self.__configFilePath+self.__configFileName)
+#  print('param file       : ',runtimeCortixParamFile)
+#  print('comm  file       : ',runtimeCortixCommFile)
+ 
+  module = self.__executablePath + self.__executableName
+  input  = self.__configFilePath + self.__configFileName
+  param  = runtimeCortixParamFile
+  comm   = runtimeCortixCommFile
 
-#  os.system( )
+#  print( 'time '+ module + ' ' + input + ' ' + param + ' ' + comm )
+  os.system( 'time '+ module + ' ' + input + ' ' + param + ' ' + comm )
 
   return
 
@@ -65,16 +73,16 @@ class Module(object):
 
   for child in self.__configNode.GetNodeChildren():
     (tag,items,text) = child
+    text = text.strip()
     if tag == 'executableName': self.__executableName = text
     if tag == 'executablePath': 
      if text[-1] != '/': text += '/'
      self.__executablePath = text
     if tag == 'configFileName': self.__configFileName = text
     if tag == 'configFilePath': 
-     print(text)
      if text[-1] != '/': text += '/'
      self.__configFilePath = text
-    if tag == 'port':           self.__ports.append(text)
+    if tag == 'port': self.__ports.append(text)
 
   print('\t\tCortix::Simulation::Application::Module: executableName',self.__executableName)
   print('\t\tCortix::Simulation::Application::Module: executablePath',self.__executablePath)

@@ -93,7 +93,7 @@ class Simulation(object):
     s = '<!-- Written by Cortix::Simulation -->\n'; fout.write(s)
     evolveTime     = task.GetEvolveTime()
     evolveTimeUnit = task.GetEvolveTimeUnit()
-    s = '<evolveTime unit='+evolveTimeUnit+'>'+str(evolveTime)+'</evolveTime>\n'
+    s = '<evolveTime unit="'+evolveTimeUnit+'"'+'>'+str(evolveTime)+'</evolveTime>\n'
     fout.write(s)
     fout.close()
     task.SetRuntimeCortixParamFile( taskFile )
@@ -119,7 +119,7 @@ class Simulation(object):
 
        fout = open( toModuleCommFile,'a' )
        # this is the cortix info for modules providing data           
-       s = '<providePort name='+toPort+' file='+toModuleWorkDir+toPort+'.xml/>\n'
+       s = '<providePort name="'+toPort+'" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
        fout.write(s)
 
        fout.close()
@@ -142,7 +142,7 @@ class Simulation(object):
 
        fout = open( fromModuleCommFile,'a' )
        # this is the cortix info for modules using data           
-       s = '<usePort name='+fromPort+' file='+toModuleWorkDir+toPort+'.xml/>\n'
+       s = '<usePort name="'+fromPort+'" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
        fout.write(s)
 
        fout.close()
