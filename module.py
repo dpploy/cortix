@@ -35,8 +35,6 @@ class Module(object):
   self.__configFilePath = 'null'
   self.__ports = list()
 
-  self.__runtimeCortixCommFile = 'null'
-
   self.__Setup()
 
 #---------------------------------------------------------------------------------
@@ -46,21 +44,15 @@ class Module(object):
  def GetName(self):
   return self.__name
 
- def SetRuntimeCortixCommFile(self, fullPath):
-   self.__runtimeCortixCommFile = fullPath
-
- def GetRuntimeCortixCommFile(self):
-   return self.__runtimeCortixCommFile
-
 #---------------------------------------------------------------------------------
 # Execute module            
 
- def Execute(self, runtimeCortixParamFile):
+ def Execute(self, runtimeCortixParamFile, runtimeCortixCommFile ):
 
   print('module:',self.__name)
   print('input file:',self.__configFilePath+self.__configFileName)
   print('param file:',runtimeCortixParamFile)
-  print('comm  file:',self.__runtimeCortixCommFile)
+  print('comm  file:',runtimeCortixCommFile)
 
 #  os.system( )
 

@@ -29,7 +29,10 @@ class Network(object):
   self.__name = self.__configNode.GetNodeName()
   print('\t\tCortix::Simulation::Application::Network: name:',self.__name)
 
-  self.__connectivity = list(dict())
+  self.__connectivity = list(dict()) # connectivity information of the network
+  self.__moduleNames = list()        # modules involved in the network
+
+  self.__runtimeCortixCommFile = dict() # cortix communication file for modules
 
   self.__Setup()
 
@@ -43,19 +46,38 @@ class Network(object):
  def GetConnectivity(self):
   return self.__connectivity
 
+ def GetModuleNames(self):
+  return self.__moduleNames
+
+ def SetRuntimeCortixCommFile(self, moduleName, fullPathFileName):
+  self.__runtimeCortixCommFile[moduleName] = fullPathFileName
+
+ def GetRuntimeCortixCommFile(self, moduleName):
+  return self.__runtimeCortixCommFile[moduleName] 
+
 #---------------------------------------------------------------------------------
 # Setup network             
 
  def __Setup(self):
 
   for child in self.__configNode.GetNodeChildren():
+
     (tag,items,text) = child
+
     tmp = dict()
+
     if tag == 'connect': 
      for (key,value) in items: tmp[key] = value
      self.__connectivity.append( tmp )
+     for key,val in tmp.items():
+       if key == 'fromModule': self.__runtimeCortixCommFile[ val ] = 'null'
+       if key == 'toModule'  : self.__runtimeCortixCommFile[ val ] = 'null'
 
   print('\t\tCortix::Simulation::Application::Network: connectivity',self.__connectivity)
+
+  self.__moduleNames = [ name for name in self.__runtimeCortixCommFile.keys()]
+
+  print('\t\tCortix::Simulation::Application::Network: modules',self.__moduleNames)
 
   return
 

@@ -98,7 +98,7 @@ class Simulation(object):
     fout.close()
     task.SetRuntimeCortixParamFile( taskFile )
 
-    # using the taks and network create the module directories
+    # using the taks and network create the module directories and comm files
     for net in networks:
      if net.GetName() == taskName:
       connect = net.GetConnectivity()
@@ -124,8 +124,8 @@ class Simulation(object):
 
        fout.close()
 
-       for mod in modules:
-        if mod.GetName() == toModule: mod.SetRuntimeCortixCommFile(toModuleCommFile)
+       # register the cortix-comm file for the network
+       net.SetRuntimeCortixCommFile( toModule, toModuleCommFile )
 
        fromModule = con['fromModule']
        fromPort   = con['fromPort']
@@ -147,8 +147,8 @@ class Simulation(object):
 
        fout.close()
 
-       for mod in modules:
-        if mod.GetName() == fromModule: mod.SetRuntimeCortixCommFile(fromModuleCommFile)
+       # register the cortix-comm file for the network
+       net.SetRuntimeCortixCommFile( fromModule, fromModuleCommFile )
 
 
   return

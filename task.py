@@ -61,13 +61,12 @@ class Task(object):
 
   network = application.GetNetwork( self.__name )
   
-  for con in network.GetConnectivity():
+  for modName in network.GetModuleNames():
 
-    mod = application.GetModule( con['toModule'] )
-    mod.Execute( self.__runtimeCortixParamFile )
-
-    mod = application.GetModule( con['fromModule'] )
-    mod.Execute( self.__runtimeCortixParamFile )
+    mod = application.GetModule( modName )
+    paramFile = self.__runtimeCortixParamFile
+    commFile  = network.GetRuntimeCortixCommFile( modName )
+    mod.Execute( paramFile, commFile )
 
   return 
 
