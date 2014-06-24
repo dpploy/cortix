@@ -16,7 +16,7 @@ def main():
 
  cortix = Cortix( "cortix-config.xml" )
 
- cortix.RunSimulations( taskName='solo-dissolve')
+ cortix.RunSimulations( taskName='solo-dissolve' )
 
 #*********************************************************************************
 # Usage: -> python cortix-main.py or ./cortix-main.py

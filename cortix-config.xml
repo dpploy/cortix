@@ -28,11 +28,11 @@
 
    <!-- Application: modules set -->
    <module name="chopper">
-    <executableName>chopper.exec</executableName>
-    <executablePath>~/.</executablePath>
+    <executableName>chopper.py</executableName>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/shearing/</executablePath>
     <configFileName>chopper.input</configFileName>
-    <configFilePath>~/.</configFilePath>
-    <port>product</port>
+    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/shearing</configFilePath>
+    <port>Fuel_Solid</port>
     <port>off-gas</port>
     <port>fines</port>
    </module>
@@ -54,7 +54,7 @@
     <executableName> pyplot.py </executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/pyplot/</executablePath>
     <configFileName>pyplot.input</configFileName>
-    <configFilePath>~/.</configFilePath>
+    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/pyplot/</configFilePath>
     <port>time-series</port>
    </module>
 

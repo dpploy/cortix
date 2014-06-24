@@ -2,3 +2,6 @@
 __pycache__
 notes
 .*.swp
+modules/*/*.xml
+.DS_Store
+*.pdf

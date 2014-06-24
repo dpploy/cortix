@@ -26,18 +26,18 @@ class Simulation(object):
                simConfigNode = ConfigTree()
              ):
 
-  logger = logging.getLogger('cortix.simulation')
-  self.__logger = logger
+#  logger = logging.getLogger('cortix.simulation')
+#  self.__logger = logger
 
   self.__name = simConfigNode.GetNodeName()
-  logger.info('simulation name:',self.__name)
+#  logger.info('simulation name:',self.__name)
 
   assert type(simConfigNode) == ConfigTree, '-> simConfigNode invalid.' 
   self.__configNode = simConfigNode
 
 # Application
   for appNode in self.__configNode.GetAllSubNodes('application'):
-    logger.info('appName:',appNode.get('name'))
+#    logger.info('appName:',appNode.get('name'))
     print('\tCortix::Simulation: appName:',appNode.get('name'))
 
     appConfigNode = ConfigTree( appNode )
