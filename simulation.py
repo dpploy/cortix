@@ -9,6 +9,7 @@ Tue Dec 10 11:21:30 EDT 2013
 #*********************************************************************************
 import os, sys, io
 import datetime
+import logging
 from configtree import ConfigTree
 from application import Application
 from task import Task
@@ -25,14 +26,18 @@ class Simulation(object):
                simConfigNode = ConfigTree()
              ):
 
+  logger = logging.getLogger('cortix.simulation')
+  self.__logger = logger
+
   self.__name = simConfigNode.GetNodeName()
-  print('\tCortix::Simulation: name:',self.__name)
+  logger.info('simulation name:',self.__name)
 
   assert type(simConfigNode) == ConfigTree, '-> simConfigNode invalid.' 
   self.__configNode = simConfigNode
 
 # Application
   for appNode in self.__configNode.GetAllSubNodes('application'):
+    logger.info('appName:',appNode.get('name'))
     print('\tCortix::Simulation: appName:',appNode.get('name'))
 
     appConfigNode = ConfigTree( appNode )
@@ -66,11 +71,6 @@ class Simulation(object):
 # create the cortix/simulation work directory
   wrkDir = cortixWorkDir 
   wrkDir += 'sim_' + self.__name + '/'
-
-  if not os.path.isdir(wrkDir):
-    os.system( 'mkdir -p ' + wrkDir )
-  else:
-    os.system( 'rm -rf ' + wrkDir )
 
   networks = self.__application.GetNetworks()
   modules  = self.__application.GetModules()
