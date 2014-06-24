@@ -26,7 +26,12 @@ def main(argv):
  cortexParamFullPathFileName = argv[2]
  tree.parse(cortexParamFullPathFileName)
  cortexParamXMLRootNode = tree.getroot()
- paramNode = cortexParamXMLRootNode 
+ node = cortexParamXMLRootNode.find('evolveTime')
+ evolveTimeUnit = node.get('unit')
+ evolveTime     = float(node.text)
+
+# print("chopper.py::main: evolveTime     = ", evolveTime)
+# print("chopper.py::main: evolveTimeUnit = ", evolveTimeUnit)
 
 # third command line argument is the Cortix communication file
  cortexCommFullPathFileName  = argv[3]

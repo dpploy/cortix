@@ -73,7 +73,6 @@ class Simulation(object):
   wrkDir += 'sim_' + self.__name + '/'
 
   networks = self.__application.GetNetworks()
-  modules  = self.__application.GetModules()
 
 # create subdirectories with task names
   for task in self.__tasks:
@@ -86,10 +85,12 @@ class Simulation(object):
     fout = open( taskFile,'w' )
     s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
     s = '<!-- Written by Cortix::Simulation -->\n'; fout.write(s)
+    s = '<cortixParam>\n'; fout.write(s)
     evolveTime     = task.GetEvolveTime()
     evolveTimeUnit = task.GetEvolveTimeUnit()
     s = '<evolveTime unit="'+evolveTimeUnit+'"'+'>'+str(evolveTime)+'</evolveTime>\n'
     fout.write(s)
+    s = '</cortixParam>'; fout.write(s)
     fout.close()
     task.SetRuntimeCortixParamFile( taskFile )
 
@@ -111,6 +112,7 @@ class Simulation(object):
          fout = open( toModuleCommFile,'w' )
          s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
          s = '<!-- Written by Cortix::Simulation -->\n'; fout.write(s)
+         s = '<cortixComm>\n'; fout.write(s)
 
        fout = open( toModuleCommFile,'a' )
        # this is the cortix info for modules providing data           
@@ -134,6 +136,7 @@ class Simulation(object):
          fout = open( fromModuleCommFile,'w' )
          s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
          s = '<!-- Written by Cortix::Simulation -->\n'; fout.write(s)
+         s = '<cortixComm>\n'; fout.write(s)
 
        fout = open( fromModuleCommFile,'a' )
        # this is the cortix info for modules using data           
@@ -145,6 +148,14 @@ class Simulation(object):
        # register the cortix-comm file for the network
        net.SetRuntimeCortixCommFile( fromModule, fromModuleCommFile )
 
+# finish forming the XML documents
+  for net in networks:
+   modNames = net.GetModuleNames()
+   for modName in modNames:
+    commFile = net.GetRuntimeCortixCommFile(modName)
+    fout = open( commFile,'a' )
+    s = '</cortixComm>'; fout.write(s)
+    fout.close()
 
   return
 

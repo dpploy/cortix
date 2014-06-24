@@ -29,9 +29,9 @@
    <!-- Application: modules set -->
    <module name="chopper">
     <executableName>chopper.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/shearing/</executablePath>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/chopper/</executablePath>
     <configFileName>chopper.input</configFileName>
-    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/shearing</configFilePath>
+    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/chopper/</configFilePath>
     <port>Fuel_Solid</port>
     <port>off-gas</port>
     <port>fines</port>
