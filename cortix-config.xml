@@ -3,11 +3,11 @@
 
 <cortixConfig version="0.1">
 
+ <workDir>/tmp/</workDir>
+
 <!-- Simulation definition -->
 <!-- NB: each simulation has only one application -->
  <simulation name="headend-off-gas">
-
-  <workDir>/tmp/</workDir>
 
   <!-- Simulation: tasks -->
   <!--NB: each task combines parameters for one named application connectivity-->

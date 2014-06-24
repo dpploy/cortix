@@ -21,6 +21,7 @@ class Simulation(object):
 # __slots__ = [
 
  def __init__( self,
+               cortixWorkDir = None,
                simConfigNode = ConfigTree()
              ):
 
@@ -29,9 +30,6 @@ class Simulation(object):
 
   assert type(simConfigNode) == ConfigTree, '-> simConfigNode invalid.' 
   self.__configNode = simConfigNode
-
-  self.__wrkDir = self.__configNode.GetWorkDir()
-  print('\tCortix::Simulation: wrkDir:',self.__wrkDir)
 
 # Application
   for appNode in self.__configNode.GetAllSubNodes('application'):
@@ -46,7 +44,7 @@ class Simulation(object):
   self.__tasks = list()
   self.__SetupTasks()
 
-  self.__Setup()
+  self.__Setup( cortixWorkDir )
 
 #---------------------------------------------------------------------------------
 # Execute  
@@ -63,14 +61,11 @@ class Simulation(object):
 #---------------------------------------------------------------------------------
 # Setup simulation          
 
- def __Setup(self):
+ def __Setup(self, cortixWorkDir):
 
 # create the cortix/simulation work directory
-  wrkDir = self.__wrkDir
-  if wrkDir[-1] != '/': wrkDir+'/'
-  wrkDir += 'cortix/sim_'+self.__name+'/'
-
-  self.__wrkDir = wrkDir
+  wrkDir = cortixWorkDir 
+  wrkDir += 'sim_' + self.__name + '/'
 
   if not os.path.isdir(wrkDir):
     os.system( 'mkdir -p ' + wrkDir )

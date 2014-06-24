@@ -66,14 +66,14 @@ class ConfigTree(object):
 # Helper internal methods
 
 #---------------------------------------------------------------------------------
-# Get work directory for simulation (unix system full path)
+# Get work directory for Cortix (unix system full path)
 
  def __GetWorkDir(self):
 
   nodes = self.__configTreeNode.findall('workDir')
-  assert len(nodes) == 1, 'multiple workDir found'
+  assert len(nodes) == 1, '-> multiple workDir found'
 
-  workDir = nodes[0].text
+  workDir = nodes[0].text.strip()
 
   return workDir
 #---------------------------------------------------------------------------------

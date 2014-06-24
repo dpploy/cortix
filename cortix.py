@@ -29,6 +29,11 @@ class Cortix(object):
 # create a configuration tree
     self.__configTree = ConfigTree( configFileName=self.__configFile )
 
+    wrkDir = self.__configTree.GetWorkDir()
+    if wrkDir[-1] != '/': wrkDir += '/'
+    self.__workDir = wrkDir + 'cortix-wrk/'
+    print('\tCortix:: wrkDir:',self.__workDir)
+
 # setup simulations
     self.__simulations = list()
     self.__SetupSimulations()
@@ -52,7 +57,7 @@ class Cortix(object):
     print('Cortix::__SetupSimulations(): ',sim.get('name'))
 
     simConfigTree = ConfigTree(sim)
-    simulation = Simulation( simConfigTree ) 
+    simulation = Simulation( self.__workDir, simConfigTree ) 
     self.__simulations.append( simulation )
 
   return
