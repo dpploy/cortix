@@ -52,6 +52,10 @@ class ConfigTree(object):
  def GetNodeName(self):
      return self.__configTreeNode.get('name')
 
+ def GetSubNode(self,tag):
+     assert type(tag) == str, 'tag invalid'
+     return self.__configTreeNode.find(tag)
+
  def GetAllSubNodes(self,tag):
      assert type(tag) == str, 'tag invalid'
      return self.__configTreeNode.findall(tag)
@@ -59,23 +63,9 @@ class ConfigTree(object):
  def GetNodeChildren(self):
      return self.__GetNodeChildren()
 
- def GetWorkDir(self):
-     return self.__GetWorkDir()
-
 #*********************************************************************************
 # Helper internal methods
 
-#---------------------------------------------------------------------------------
-# Get work directory for Cortix (unix system full path)
-
- def __GetWorkDir(self):
-
-  nodes = self.__configTreeNode.findall('workDir')
-  assert len(nodes) == 1, '-> multiple workDir found'
-
-  workDir = nodes[0].text.strip()
-
-  return workDir
 #---------------------------------------------------------------------------------
 # Get node children
 

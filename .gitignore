@@ -5,3 +5,5 @@ notes
 modules/*/*.xml
 .DS_Store
 *.pdf
+*.patch
+*.gpg

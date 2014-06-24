@@ -34,7 +34,8 @@ class Cortix(object):
     self.__configTree = ConfigTree( configFileName=self.__configFile )
 
 # create the work directory and logging
-    wrkDir = self.__configTree.GetWorkDir()
+    node  = self.__configTree.GetSubNode('workDir')
+    wrkDir = node.text.strip()
     if wrkDir[-1] != '/': wrkDir += '/'
     self.__workDir = wrkDir + 'cortix-wrk/'
 

@@ -25,12 +25,13 @@ def main(argv):
 # second command line argument is the Cortix parameter file
  cortexParamFullPathFileName = argv[2]
  tree.parse(cortexParamFullPathFileName)
- cortexParamTreeRoot = tree.getroot()
+ cortexParamXMLRootNode = tree.getroot()
+ paramNode = cortexParamXMLRootNode 
 
 # third command line argument is the Cortix communication file
  cortexCommFullPathFileName  = argv[3]
  tree.parse(cortexCommFullPathFileName)
- cortexCommTreeRoot = tree.getroot()
+ cortexCommXMLRootNode = tree.getroot()
 
 #*********************************************************************************
 # Usage: -> python pymain.py or ./pyplot.py
