@@ -37,8 +37,8 @@
    </module>
 
    <module name="dissolver">
-    <executableName> pymain.py </executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/dissolution/nitron/src/</executablePath>
+    <executableName> dissolver.py </executableName>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/dissolver/</executablePath>
     <configFileName>nitron.input</configFileName>
     <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/dissolution/nitron/src/</configFilePath>
     <port>product</port>

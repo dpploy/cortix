@@ -7,9 +7,11 @@ Cortix: a program for integrating systems level modules
 Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
-import os, sys, io
+import os, sys, io, time
 import datetime
 from configtree import ConfigTree
+from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import Element
 #*********************************************************************************
 
 #*********************************************************************************
@@ -60,15 +62,47 @@ class Task(object):
  def Execute(self, application ):
 
   network = application.GetNetwork( self.__name )
+
+  runtimeStatusFiles = dict()
   
   for modName in network.GetModuleNames():
 
     mod = application.GetModule( modName )
+
     paramFile = self.__runtimeCortixParamFile
     commFile  = network.GetRuntimeCortixCommFile( modName )
-    mod.Execute( paramFile, commFile )
+
+    statusFile = mod.Execute( paramFile, commFile )
+    assert statusFile != None, 'module launching failed.'
+
+    runtimeStatusFiles[ mod.GetName() ] = statusFile
+
+# monitor runtime status
+
+  status = self.__GetRuntimeStatus( runtimeStatusFiles )
+
+  while status == 'running': 
+   time.sleep(5)
+   status = self.__GetRuntimeStatus( runtimeStatusFiles )
 
   return 
+
+#---------------------------------------------------------------------------------
+# Check overall task status 
+
+ def __GetRuntimeStatus(self, runtimeStatusFiles):
+  
+  taskStatus = 'finished'
+
+  for (modName,statusFile) in runtimeStatusFiles.items():
+     tree = ElementTree()
+     tree.parse( statusFile )
+     statusFileXMLRootNode = tree.getroot()
+     node = statusFileXMLRootNode.find('status')
+     status = node.text.strip()
+     if status == 'running': taskStatus = 'running'
+  
+  return taskStatus
 
 #---------------------------------------------------------------------------------
 # Setup task                

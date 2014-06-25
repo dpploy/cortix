@@ -7,7 +7,7 @@ Cortix: a program for integrating systems level modules
 Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
-import os, sys, io
+import os, sys, io, time
 import datetime
 from configtree import ConfigTree
 #*********************************************************************************
@@ -61,9 +61,16 @@ class Module(object):
   param  = runtimeCortixParamFile
   comm   = runtimeCortixCommFile
 
+  runtimeModuleStatus = comm[:comm.rfind('/')]+'/'+'runtime-status.xml'
+  status = runtimeModuleStatus 
+
   print('\t\tCortix::Simulation::Application::Module:Execute() '+self.__executableName)
-  print( 'time '+ module + ' ' + input + ' ' + param + ' ' + comm )
-  os.system( 'time '+ module + ' ' + input + ' ' + param + ' ' + comm )
+  print( 'time '+ module + ' ' + input + ' ' + param + ' ' + comm + ' ' + status )
+  os.system( 'time '+ module + ' ' + input + ' ' + param + ' ' + comm + ' ' + status + ' &')
+
+  time.sleep(1)
+  if os.path.isfile( status ): return status
+  else:                        return None
 
   return
 

@@ -2,9 +2,9 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix module for plotting
+Cortix Nitron dissolver module wrapper 
 
-Tue Jun 24 12:13:50 EDT 2014
+Tue Jun 24 01:03:45 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time
@@ -15,12 +15,18 @@ from xml.etree.ElementTree import Element
 
 def main(argv):
 
- assert len(argv) == 5, 'missing command line input.'
+ assert len(argv) == 5, 'incomplete command line input.'
 
 # First command line argument is the module input file name with full path.
 # This input file is used by both the wrapper and the inner-code for 
 # communication.
  inputFullPathFileName = argv[1]
+
+ fin = open(inputFullPathFileName,'r')
+ for line in fin:
+  homeDir = line.strip()
+
+ print('dissolver.py: input dir: ',homeDir)
 
  tree = ElementTree()
 
@@ -37,11 +43,16 @@ def main(argv):
 # Fourth command line argument is the module runtime-status.xml file
  runtimeStatusFullPathFileName = argv[4]
 
-# Run PyPlot
+
+# Run Nitron 
+ runCommand = homeDir + 'main.m' + ' ' + inputFullPathFileName + ' &'
+ print( 'dissolver.py: run time ' + runCommand  )
+# os.system( 'time ' + runCommand  )
+
 
  fout = open( runtimeStatusFullPathFileName,'w' )
  s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
- s = '<!-- Written by PyPlot.py -->\n'; fout.write(s)
+ s = '<!-- Written by Dissolver.py -->\n'; fout.write(s)
  s = '<runtime>\n'; fout.write(s)
  s = '<status>running</status>\n'; fout.write(s)
  s = '</runtime>\n'; fout.write(s)
@@ -60,11 +71,11 @@ def main(argv):
  node = root.find('status')
  node.text = 'finished'
  a = Element('comment')
- a.text = 'Written by PyPlot.py'
+ a.text = 'Written by Dissolver.py'
  root.append(a)
  tree.write(runtimeStatusFullPathFileName,xml_declaration=True,encoding="UTF-8",method="xml")
 
 #*********************************************************************************
-# Usage: -> python pymain.py or ./pyplot.py
+# Usage: -> python pymain.py or ./pymain.py
 if __name__ == "__main__":
    main(sys.argv)
