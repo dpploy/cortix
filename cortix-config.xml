@@ -20,7 +20,7 @@
   </task>
 
   <task name="shear-dissolve">
-   <evolveTime unit="day">1.0</evolveTime>
+   <evolveTime unit="hour">24.0</evolveTime>
   </task>
 
   <!-- Simulation: application -->

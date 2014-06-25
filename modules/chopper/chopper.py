@@ -40,9 +40,6 @@ def main(argv):
  tree.parse(cortexCommFullPathFileName)
  cortexCommXMLRootNode = tree.getroot()
 
-# Fourth command line argument is the module runtime-status.xml file
- runtimeStatusFullPathFileName = argv[4]
-
 # Get useports
  nodes = cortexCommXMLRootNode.findall('usePort')
  assert len(nodes) == 0, 'active useports unsupported at this time.'
@@ -51,7 +48,7 @@ def main(argv):
    for node in nodes:
      usePortName = node.get('name')
      usePortFile = node.get('file')
-     userPorts.append( (usePortName, usePortFile) )
+     usePorts.append( (usePortName, usePortFile) )
  print('usePorts: ',usePorts)
 
 # Get provideports
@@ -63,6 +60,9 @@ def main(argv):
      providePortFile = node.get('file')
      providePorts.append( (providePortName, providePortFile) )
  print('providePorts: ',providePorts)
+
+# Fourth command line argument is the module runtime-status.xml file
+ runtimeStatusFullPathFileName = argv[4]
 
 # Simulate shearing and generate results
 # FAKE CODE RUNNING HERE
