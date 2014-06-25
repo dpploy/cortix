@@ -75,9 +75,8 @@ def main(argv):
  s = '</runtime>\n'; fout.write(s)
  fout.close()
 
- time.sleep(10)
+ resultsDir = os.path.dirname(__file__).strip()+'/'
 
- resultsDir = '/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/chopper/'
  results_fuel_solid  = ('Fuel_Solid','HeadEnd_Fuel_Solid.xml')
  results_gas_release = ('Gas_Release','HeadEnd_Gas_Release.xml')
 
@@ -89,6 +88,8 @@ def main(argv):
   if portName == results_gas_release[0]:
    print( 'cp -f ' + resultsDir + results_gas_release[1] + ' ' + portFile )
    os.system( 'cp -f ' + resultsDir + results_gas_release[1] + ' ' + portFile )
+
+ time.sleep(10)
 
 # produce plotting results
 # todo

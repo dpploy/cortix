@@ -12,9 +12,13 @@ import datetime
 from cortix import Cortix
 #*********************************************************************************
 
+
 def main():
 
- cortix = Cortix( "cortix-config.xml" )
+
+ pwd            = os.path.dirname(__file__)
+ fullpathconfig = os.path.join(pwd, 'cortix-config.xml')
+ cortix = Cortix( fullpathconfig )
 
 # cortix.RunSimulations( taskName='solo-dissolve' )
  cortix.RunSimulations( taskName='shear-dissolve' )
