@@ -87,10 +87,20 @@ def main(argv):
  elif  evolveTimeUnit == 'day':  evolveTime *= 24.0 * 60.0
  else: assert True, 'bad time unit.'
 
+# Connect to the use ports 
  for (portName,portFile) in usePorts:
    if portName == 'solids':
+      print('MODULE::dissolver.py using port: ',portName)
       fuelBucket = HoldingDrum(portFile)
+   if portName == 'condenser-stream':
+      print('MODULE::dissolver.py using port: ',portName)
 
+# Connect to the solids provide port
+ for (portName,portFile) in providePorts:
+   if portName == 'vapor':
+      print('MODULE::dissolver.py providing port: ',portName)
+
+# Evolve the dissolver; solids use port is used below
  dissolverMassLoadMax = 250.0 # grams
  isDissolverReady2Load = True
 #................................................................................
@@ -135,7 +145,10 @@ def main(argv):
                 if fuelMassLoad < dissolverMassLoadMax: 
                    fuelSegmentsLoad.append( fuelSegment )
 
-    # start dissolver here using fuelSegmentsLoad
+    # START  THE DISSOLVER; THIS IS A PLACE HOLDER
+    # Uses:     fuelSegmentsLoad
+    # Provides: vapor data in the appropriate portName
+    # THIS IS A PLACE HOLDER
 #    print('DISSOLVER start at time = ', evolTime)
     mass = 0.0
     for i in fuelSegmentsLoad: mass += i[1]

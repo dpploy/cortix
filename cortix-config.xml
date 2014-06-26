@@ -23,8 +23,12 @@
    <evolveTime unit="hour">24.0</evolveTime>
   </task>
 
+  <task name="demuth1">
+   <evolveTime unit="hour">24.0</evolveTime>
+  </task>
+
   <!-- Simulation: application -->
-  <application name="shear_dissolve_off_gas">
+  <application name="demo1">
 
    <!-- Application: modules set -->
    <module name="chopper">
@@ -47,6 +51,18 @@
     <port>solids</port>
     <port>condenser-stream</port>
     <port>steam</port>
+    <port>heat</port>
+   </module>
+
+   <module name="condenser">
+    <executableName> condenser.py </executableName>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/condenser/</executablePath>
+    <configFileName>condenser.input</configFileName>
+    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/condenser/</configFilePath>
+    <port>off-gas</port>
+    <port>vapor</port>
+    <port>condensate</port>
+    <port>cooling</port>
    </module>
 
    <module name="pyplot">
@@ -76,6 +92,15 @@
     <connect fromModule="dissolver" fromPort="solids" toModule="chopper" toPort="Fuel_Solid"/> 
     <connect fromModule="pyplot" fromPort="time-series" toModule="dissolver" toPort="vapor"/> 
     <connect fromModule="pyplot" fromPort="time-series" toModule="chopper" toPort="Gas_Release"/> 
+   </network>
+
+   <!-- connected modules -->
+   <network name="demuth1">
+    <connect fromModule="pyplot" fromPort="time-series" toModule="chopper" toPort="Gas_Release"/> 
+    <connect fromModule="dissolver" fromPort="solids" toModule="chopper" toPort="Fuel_Solid"/> 
+    <connect fromModule="condenser" fromPort="vapor" toModule="dissolver" toPort="vapor"/> 
+    <connect fromModule="dissolver" fromPort="condenser-stream" toModule="condenser" toPort="condensate"/> 
+    <connect fromModule="pyplot" fromPort="time-series" toModule="dissolver" toPort="vapor"/> 
    </network>
 
   </application>

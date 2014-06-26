@@ -46,6 +46,20 @@ class HoldingDrum(object):
   return mass
 
 #---------------------------------------------------------------------------------
+ def GetNSegments(self, timeStamp=None):
+ 
+  nSegments = 0
+
+  if timeStamp is None:
+      nSegments = len(self.__fuelSegments)
+
+  else:
+     for fuelSeg in self.__fuelSegments:
+      if fuelSeg[0] <= timeStamp: nSegments += 1
+
+  return nSegments
+
+#---------------------------------------------------------------------------------
  def GetLastTimeStamp(self):
  
   lastTimeStamp = 0.0
@@ -220,5 +234,7 @@ if __name__ == "__main__":
  print('Unit testing for SetupHoldingDrum')
  portFile = '/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/chopper/HeadEnd_Fuel_Solid.xml'
  bucket = HoldingDrum( portFile )
- print(' mass ', bucket.WithdrawFuelSegment( 0 )[1])
+ print(' total mass ', bucket.GetMass())
+ print(' mass segment at 0', bucket.WithdrawFuelSegment( 0 )[1])
  print(' last time stamp: ',bucket.GetLastTimeStamp())
+ print(' # of segments : ',bucket.GetNSegments())
