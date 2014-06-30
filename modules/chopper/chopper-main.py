@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix module wrapper for shearing 
+Cortix Shearing module wrapper
 
 Tue Jun 24 12:36:17 EDT 2014
 """
@@ -36,6 +36,7 @@ def main(argv):
  cortexParamFullPathFileName = argv[2]
  tree.parse(cortexParamFullPathFileName)
  cortexParamXMLRootNode = tree.getroot()
+
  node = cortexParamXMLRootNode.find('evolveTime')
 
  evolveTimeUnit = node.get('unit')
@@ -46,8 +47,15 @@ def main(argv):
  elif  evolveTimeUnit == 'day':  evolveTime *= 24.0 * 60.0
  else: assert True, 'time unit invalid.'
 
-# print("chopper.py::main: evolveTime     = ", evolveTime)
-# print("chopper.py::main: evolveTimeUnit = ", evolveTimeUnit)
+ node = cortexParamXMLRootNode.find('timeStep')
+
+ timeStepUnit = node.get('unit')
+ timeStep       = float(node.text.strip())
+
+ if    timeStepUnit == 'min':  timeStep *= 1.0
+ elif  timeStepUnit == 'hour': timeStep *= 60.0
+ elif  timeStepUnit == 'day':  timeStep *= 24.0 * 60.0
+ else: assert True, 'time unit invalid.'
 
 #.................................................................................
 # Third command line argument is the Cortix communication file: cortix-comm.xml
@@ -56,37 +64,17 @@ def main(argv):
  tree.parse(cortexCommFullPathFileName)
  cortexCommXMLRootNode = tree.getroot()
 
-# Setup inputports
- nodes = cortexCommXMLRootNode.findall('inputPort')
- assert len(nodes) == 0, 'active inputports unsupported at this time.'
- inputPorts = list()
+# Setup ports
+ nodes = cortexCommXMLRootNode.findall('port')
+ ports = list()
  if nodes is not None: 
    for node in nodes:
-     inputPortName = node.get('name')
-     inputPortFile = node.get('file')
-     inputPorts.append( (inputPortName, inputPortFile) )
- print('inputPorts: ',inputPorts)
+     portName = node.get('name')
+     portFile = node.get('file')
+     ports.append( (portName, portFile) )
+ print('chopper.py::ports: ',ports)
 
-# Setup useports
- nodes = cortexCommXMLRootNode.findall('usePort')
- assert len(nodes) == 0, 'active useports unsupported at this time.'
- usePorts = list()
- if nodes is not None: 
-   for node in nodes:
-     usePortName = node.get('name')
-     usePortFile = node.get('file')
-     usePorts.append( (usePortName, usePortFile) )
- print('usePorts: ',usePorts)
-
-# Setup provideports
- nodes = cortexCommXMLRootNode.findall('providePort')
- providePorts = list()
- if nodes is not None: 
-   for node in nodes:
-     providePortName = node.get('name')
-     providePortFile = node.get('file')
-     providePorts.append( (providePortName, providePortFile) )
- print('providePorts: ',providePorts)
+ tree = None
 
 #.................................................................................
 # Fourth command line argument is the module runtime-status.xml file

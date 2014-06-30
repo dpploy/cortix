@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix Nitron dissolver module wrapper 
+Cortix Nitron dissolver module 
 
 Tue Jun 24 01:03:45 EDT 2014
 """
@@ -14,7 +14,7 @@ from xml.etree.ElementTree import Element
 #*********************************************************************************
 
 #*********************************************************************************
-class FuelAccumulationArea(object):
+class Nitron(object):
 
 # Private member data
 # __slots__ = [

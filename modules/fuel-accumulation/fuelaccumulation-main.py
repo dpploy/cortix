@@ -74,7 +74,7 @@ def main(argv):
      portType = node.get('type')
      portFile = node.get('file')
      ports.append( (portName, portType, portFile) )
- print('Ports: ',ports)
+ print('fuel-accumulation.py::ports: ',ports)
 
  tree = None
 
@@ -86,25 +86,25 @@ def main(argv):
 # Run FuelAccumulation
 
 #................................................................................
-# Setup input
+# Setup input (this was used when debugging; need proper cortix-config.xml
 
- found = False
- for port in ports:
-  if port[0] == 'solids':
-   print( 'cp -f ' + inputData[0] + ' ' + port[2] )
-   os.system( 'cp -f ' + inputData[0] + ' ' + port[2] )
-   found = True
+# found = False
+# for port in ports:
+#  if port[0] == 'solids':
+#   print( 'cp -f ' + inputData[0] + ' ' + port[2] )
+#   os.system( 'cp -f ' + inputData[0] + ' ' + port[2] )
+#   found = True
 
- assert found, 'Input setup failed.'
+# assert found, 'Input setup failed.'
 
- found = False
- for port in ports:
-  if port[0] == 'withdrawal-request':
-   print( 'cp -f ' + inputData[1] + ' ' + port[2] )
-   os.system( 'cp -f ' + inputData[1] + ' ' + port[2] )
-   found = True
+# found = False
+# for port in ports:
+#  if port[0] == 'withdrawal-request':
+#   print( 'cp -f ' + inputData[1] + ' ' + port[2] )
+#   os.system( 'cp -f ' + inputData[1] + ' ' + port[2] )
+#   found = True
 
- assert found, 'Input setup failed.'
+# assert found, 'Input setup failed.'
 
 #................................................................................
 # Create a fuel holding drum
@@ -123,7 +123,7 @@ def main(argv):
   fuelDrum.UseData( usePortName='solids', evolTime=facilityTime  )
   fuelDrum.UseData( usePortName='withdrawal-request', evolTime=facilityTime  )
 
-  fuelDrum.ProvideData( providePort='fuel-segments', evolTime=facilityTime )
+  fuelDrum.ProvideData( providePortName='fuel-segments', evolTime=facilityTime )
 
   facilityTime += timeStep
 

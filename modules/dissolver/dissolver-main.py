@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix Nitron dissolver module wrapper 
+Cortix Dissolver module wrapper 
 
 Tue Jun 24 01:03:45 EDT 2014
 """
@@ -11,7 +11,7 @@ import os, sys, io, time
 import datetime
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import Element
-from holdingdrum import HoldingDrum
+from nitron import Nitron
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
@@ -92,6 +92,11 @@ def main(argv):
 # nothing for now
 
 #................................................................................
+# Create the dissolver equipment
+
+# nitron = Nitron( ports )
+
+#................................................................................
 # Evolve the dissolver program
 
  facilityTime = 0.0
@@ -101,90 +106,92 @@ def main(argv):
 
  while facilityTime <= evolveTime:
 
+  if isDissolverReady2Load == True: a = 1
+
 # wait until there is enough fuel in the bucket  
-  if isDissolverReady2Load == True:
-
-    if  fuelBucket.GetMass(facilityTime) < dissolverMassLoadMax and \
-        fuelBucket.GetLastTimeStamp() > facilityTime: continue
-
-    if  fuelBucket.GetMass(facilityTime) >= dissolverMassLoadMax:
-#        print('fuelBucket.GetMass(facilityTime) = ',fuelBucket.GetMass(facilityTime))
-        fuelMassLoad = 0.0
-        fuelSegmentsLoad = list()
-        while fuelMassLoad <= dissolverMassLoadMax:
-              fuelSegment = fuelBucket.WithdrawFuelSegment( facilityTime )
-#              print('fuelBucket.GetMass(facilityTime) = ',fuelBucket.GetMass(facilityTime))
-              mass = fuelSegment[1]
-#              print('mass ', mass)
-              fuelMassLoad += mass
-#              print('fuelMassLoad ', fuelMassLoad)
-              if fuelMassLoad <= dissolverMassLoadMax: 
-                 fuelSegmentsLoad.append( fuelSegment )
-              else: 
-                 fuelBucket.RestockFuelSegment( fuelSegment )
-
-    if  fuelBucket.GetMass(facilityTime) < dissolverMassLoadMax and \
-        fuelBucket.GetLastTimeStamp() <= facilityTime:
-        fuelMassLoad = 0.0
-        fuelSegmentsLoad = list()
-        isBucketEmpty = False
-        while fuelMassLoad < dissolverMassLoadMax and isBucketEmpty == False:
-              fuelSegment = fuelBucket.WithdrawFuelSegment( facilityTime )
-              if    fuelSegment is None: isBucketEmpty = True
-              else: 
-                mass = fuelSegment[1]
-#                print('mass ', mass)
-                fuelMassLoad += mass
-                if fuelMassLoad < dissolverMassLoadMax: 
-                   fuelSegmentsLoad.append( fuelSegment )
-
-    #*********************************************
-    # THIS IS A PLACE HOLDER
-    # START  THE DISSOLVER; THIS IS A PLACE HOLDER
-    # Uses:     fuelSegmentsLoad
-    # Provides: vapor data in the appropriate portName
-    runCommand = nitronHomeDir + 'main.m' + ' ' + inputFullPathFileName + ' &'
-    print( 'dissolver.py: time ' + runCommand  )
-    #os.system( 'time ' + runCommand  )
-    SetRuntimeStatus(runtimeStatusFullPathFileName, 'running') 
-    print('DISSOLVER start at time = ', facilityTime)
-    mass = 0.0
-    for i in fuelSegmentsLoad: mass += i[1]
-    print('DISSOLVER loaded mass = ', mass)
-    time.sleep(1)
-    #*********************************************
-
-    startDissolverTime    = facilityTime
-    isDissolverReady2Load = False
-
-  # allow for 120 min dissolution
-  if facilityTime >= startDissolverTime + 120: isDissolverReady2Load = True
-
- print('End of all dissolution; time = ',facilityTime)
- print('Fuel mass left over in the holding area = ', fuelBucket.GetMass())
-      
-#................................................................................
-# Communicate with Nitron to check running status
-
-#................................................................................
-
+#  if isDissolverReady2Load == True:
+#
+#    if  fuelBucket.GetMass(facilityTime) < dissolverMassLoadMax and \
+#        fuelBucket.GetLastTimeStamp() > facilityTime: continue
+#
+#    if  fuelBucket.GetMass(facilityTime) >= dissolverMassLoadMax:
+##        print('fuelBucket.GetMass(facilityTime) = ',fuelBucket.GetMass(facilityTime))
+#        fuelMassLoad = 0.0
+#        fuelSegmentsLoad = list()
+#        while fuelMassLoad <= dissolverMassLoadMax:
+#              fuelSegment = fuelBucket.WithdrawFuelSegment( facilityTime )
+##              print('fuelBucket.GetMass(facilityTime) = ',fuelBucket.GetMass(facilityTime))
+#              mass = fuelSegment[1]
+##              print('mass ', mass)
+#              fuelMassLoad += mass
+##              print('fuelMassLoad ', fuelMassLoad)
+#              if fuelMassLoad <= dissolverMassLoadMax: 
+#                 fuelSegmentsLoad.append( fuelSegment )
+#              else: 
+#                 fuelBucket.RestockFuelSegment( fuelSegment )
+#
+#    if  fuelBucket.GetMass(facilityTime) < dissolverMassLoadMax and \
+#        fuelBucket.GetLastTimeStamp() <= facilityTime:
+#        fuelMassLoad = 0.0
+#        fuelSegmentsLoad = list()
+#        isBucketEmpty = False
+#        while fuelMassLoad < dissolverMassLoadMax and isBucketEmpty == False:
+#              fuelSegment = fuelBucket.WithdrawFuelSegment( facilityTime )
+#              if    fuelSegment is None: isBucketEmpty = True
+#              else: 
+#                mass = fuelSegment[1]
+##                print('mass ', mass)
+#                fuelMassLoad += mass
+#                if fuelMassLoad < dissolverMassLoadMax: 
+#                   fuelSegmentsLoad.append( fuelSegment )
+#
+#    #*********************************************
+#    # THIS IS A PLACE HOLDER
+#    # START  THE DISSOLVER; THIS IS A PLACE HOLDER
+#    # Uses:     fuelSegmentsLoad
+#    # Provides: vapor data in the appropriate portName
+#    runCommand = nitronHomeDir + 'main.m' + ' ' + inputFullPathFileName + ' &'
+#    print( 'dissolver.py: time ' + runCommand  )
+#    #os.system( 'time ' + runCommand  )
+#    SetRuntimeStatus(runtimeStatusFullPathFileName, 'running') 
+#    print('DISSOLVER start at time = ', facilityTime)
+#    mass = 0.0
+#    for i in fuelSegmentsLoad: mass += i[1]
+#    print('DISSOLVER loaded mass = ', mass)
+#    time.sleep(1)
+#    #*********************************************
+#
+#    startDissolverTime    = facilityTime
+#    isDissolverReady2Load = False
+#
+#  # allow for 120 min dissolution
+#  if facilityTime >= startDissolverTime + 120: isDissolverReady2Load = True
+#
+# print('End of all dissolution; time = ',facilityTime)
+# print('Fuel mass left over in the holding area = ', fuelBucket.GetMass())
+#      
+##................................................................................
+## Communicate with Nitron to check running status
+#
+##................................................................................
+#
  facilityTime += timeStep 
-
-#---------------------------------------------------------------------------------
-# Shutdown 
-
- SetRuntimeStatus(runtimeStatusFullPathFileName, 'finished') 
-
-# tree.parse(runtimeStatusFullPathFileName)
-# runtimeStatusXMLRootNode = tree.getroot()
-# root = runtimeStatusXMLRootNode
-# node = root.find('status')
-# node.text = 'finished'
-# a = Element('comment')
-# a.text = 'Written by Dissolver.py'
-# root.append(a)
-# tree.write(runtimeStatusFullPathFileName,xml_declaration=True,encoding="UTF-8",method="xml")
-
+#
+##---------------------------------------------------------------------------------
+## Shutdown 
+#
+# SetRuntimeStatus(runtimeStatusFullPathFileName, 'finished') 
+#
+## tree.parse(runtimeStatusFullPathFileName)
+## runtimeStatusXMLRootNode = tree.getroot()
+## root = runtimeStatusXMLRootNode
+## node = root.find('status')
+## node.text = 'finished'
+## a = Element('comment')
+## a.text = 'Written by Dissolver.py'
+## root.append(a)
+## tree.write(runtimeStatusFullPathFileName,xml_declaration=True,encoding="UTF-8",method="xml")
+#
 #---------------------------------------------------------------------------------
 def SetRuntimeStatus(runtimeStatusFullPathFileName, status):
 
