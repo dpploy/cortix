@@ -11,7 +11,7 @@ import os, sys, io, time
 import datetime
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import Element
-from holdingdrum import HoldingDrum
+from fuelaccumulationarea import FuelAccumulationArea
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
@@ -25,12 +25,19 @@ def main(argv):
 # communication.
  inputFullPathFileName = argv[1]
 
+ fin = open(inputFullPathFileName,'r')
+ inputData = list()
+ for line in fin:
+  inputData.append(line.strip())
+ fin.close()
+
 #.................................................................................
 # Second command line argument is the Cortix parameter file: cortix-param.xml
  tree = ElementTree()
  cortexParamFullPathFileName = argv[2]
  tree.parse(cortexParamFullPathFileName)
  cortexParamXMLRootNode = tree.getroot()
+
  node = cortexParamXMLRootNode.find('evolveTime')
 
  evolveTimeUnit = node.get('unit')
@@ -41,6 +48,16 @@ def main(argv):
  elif  evolveTimeUnit == 'day':  evolveTime *= 24.0 * 60.0
  else: assert True, 'time unit invalid.'
 
+ node = cortexParamXMLRootNode.find('timeStep')
+
+ timeStepUnit = node.get('unit')
+ timeStep       = float(node.text.strip())
+
+ if    timeStepUnit == 'min':  timeStep *= 1.0
+ elif  timeStepUnit == 'hour': timeStep *= 60.0
+ elif  timeStepUnit == 'day':  timeStep *= 24.0 * 60.0
+ else: assert True, 'time unit invalid.'
+
 #.................................................................................
 # Third command line argument is the Cortix communication file: cortix-comm.xml
  tree = ElementTree()
@@ -48,123 +65,67 @@ def main(argv):
  tree.parse(cortexCommFullPathFileName)
  cortexCommXMLRootNode = tree.getroot()
 
-# Setup useports
- nodes = cortexCommXMLRootNode.findall('usePort')
- usePorts = list()
+# Setup ports
+ nodes = cortexCommXMLRootNode.findall('port')
+ ports = list()
  if nodes is not None: 
    for node in nodes:
-     usePortName = node.get('name')
-     usePortFile = node.get('file')
-     usePorts.append( (usePortName, usePortFile) )
- print('usePorts: ',usePorts)
+     portName = node.get('name')
+     portType = node.get('type')
+     portFile = node.get('file')
+     ports.append( (portName, portType, portFile) )
+ print('Ports: ',ports)
 
-# Setup provideports
- nodes = cortexCommXMLRootNode.findall('providePort')
- providePorts = list()
- if nodes is not None: 
-   for node in nodes:
-     providePortName = node.get('name')
-     providePortFile = node.get('file')
-     providePorts.append( (providePortName, providePortFile) )
- print('providePorts: ',providePorts)
+ tree = None
 
 #.................................................................................
 # Fourth command line argument is the module runtime-status.xml file
  runtimeStatusFullPathFileName = argv[4]
 
 #---------------------------------------------------------------------------------
-# Run Nitron 
+# Run FuelAccumulation
 
-# Connect to the use ports 
- for (portName,portFile) in usePorts:
-   if portName == 'solids':
-      print('MODULE::dissolver.py using port: ',portName)
-      fuelBucket = HoldingDrum(portFile)
-   if portName == 'condenser-stream':
-      print('MODULE::dissolver.py using port: ',portName)
-
-# Connect to the provide ports
- for (portName,portFile) in providePorts:
-   if portName == 'vapor':
-      print('MODULE::dissolver.py providing port: ',portName)
-   if portName == 'product':
-      print('MODULE::dissolver.py providing port: ',portName)
-   if portName == 'heat':
-      print('MODULE::dissolver.py providing port: ',portName)
-
-# Evolve the dissolver; solids use port is used below
- dissolverMassLoadMax = 250.0 # grams
- isDissolverReady2Load = True
 #................................................................................
- for evolTime in range(int(evolveTime)):
+# Setup input
 
-#  print('DISSOLVER time ',evolTime)
+ found = False
+ for port in ports:
+  if port[0] == 'solids':
+   print( 'cp -f ' + inputData[0] + ' ' + port[2] )
+   os.system( 'cp -f ' + inputData[0] + ' ' + port[2] )
+   found = True
 
-# wait until there is enough fuel in the bucket  
-  if isDissolverReady2Load == True:
+ assert found, 'Input setup failed.'
 
-    if  fuelBucket.GetMass(evolTime) < dissolverMassLoadMax and \
-        fuelBucket.GetLastTimeStamp() > evolTime: continue
+ found = False
+ for port in ports:
+  if port[0] == 'withdrawal-request':
+   print( 'cp -f ' + inputData[1] + ' ' + port[2] )
+   os.system( 'cp -f ' + inputData[1] + ' ' + port[2] )
+   found = True
 
-    if  fuelBucket.GetMass(evolTime) >= dissolverMassLoadMax:
-#        print('fuelBucket.GetMass(evolTime) = ',fuelBucket.GetMass(evolTime))
-        fuelMassLoad = 0.0
-        fuelSegmentsLoad = list()
-        while fuelMassLoad <= dissolverMassLoadMax:
-              fuelSegment = fuelBucket.WithdrawFuelSegment( evolTime )
-#              print('fuelBucket.GetMass(evolTime) = ',fuelBucket.GetMass(evolTime))
-              mass = fuelSegment[1]
-#              print('mass ', mass)
-              fuelMassLoad += mass
-#              print('fuelMassLoad ', fuelMassLoad)
-              if fuelMassLoad <= dissolverMassLoadMax: 
-                 fuelSegmentsLoad.append( fuelSegment )
-              else: 
-                 fuelBucket.RestockFuelSegment( fuelSegment )
+ assert found, 'Input setup failed.'
 
-    if  fuelBucket.GetMass(evolTime) < dissolverMassLoadMax and \
-        fuelBucket.GetLastTimeStamp() <= evolTime:
-        fuelMassLoad = 0.0
-        fuelSegmentsLoad = list()
-        isBucketEmpty = False
-        while fuelMassLoad < dissolverMassLoadMax and isBucketEmpty == False:
-              fuelSegment = fuelBucket.WithdrawFuelSegment( evolTime )
-              if    fuelSegment is None: isBucketEmpty = True
-              else: 
-                mass = fuelSegment[1]
-#                print('mass ', mass)
-                fuelMassLoad += mass
-                if fuelMassLoad < dissolverMassLoadMax: 
-                   fuelSegmentsLoad.append( fuelSegment )
-
-    #*********************************************
-    # THIS IS A PLACE HOLDER
-    # START  THE DISSOLVER; THIS IS A PLACE HOLDER
-    # Uses:     fuelSegmentsLoad
-    # Provides: vapor data in the appropriate portName
-    runCommand = nitronHomeDir + 'main.m' + ' ' + inputFullPathFileName + ' &'
-    print( 'dissolver.py: time ' + runCommand  )
-    #os.system( 'time ' + runCommand  )
-    SetRuntimeStatus(runtimeStatusFullPathFileName, 'running') 
-    print('DISSOLVER start at time = ', evolTime)
-    mass = 0.0
-    for i in fuelSegmentsLoad: mass += i[1]
-    print('DISSOLVER loaded mass = ', mass)
-    time.sleep(1)
-    #*********************************************
-
-    startDissolverTime    = evolTime
-    isDissolverReady2Load = False
-
-  # allow for 120 min dissolution
-  if evolTime >= startDissolverTime + 120: isDissolverReady2Load = True
-
- print('End of all dissolution; time = ',evolTime)
- print('Fuel mass left over in the holding area = ', fuelBucket.GetMass())
-      
 #................................................................................
+# Create a fuel holding drum
+ fuelDrum = FuelAccumulationArea( ports )
 
-# Communicate with Nitron to check running status
+#................................................................................
+# Evolve the fuel-accumulation program
+
+ SetRuntimeStatus( runtimeStatusFullPathFileName, 'running' )
+
+ facilityTime = 0.0
+
+ while facilityTime <= evolveTime:
+  print(facilityTime)
+
+  fuelDrum.UseData( usePortName='solids', evolTime=facilityTime  )
+  fuelDrum.UseData( usePortName='withdrawal-request', evolTime=facilityTime  )
+
+  fuelDrum.ProvideData( providePort='fuel-segments', evolTime=facilityTime )
+
+  facilityTime += timeStep
 
 #---------------------------------------------------------------------------------
 # Shutdown 
@@ -196,6 +157,6 @@ def SetRuntimeStatus(runtimeStatusFullPathFileName, status):
  fout.close()
 
 #*********************************************************************************
-# Usage: -> python dissolver.py or ./dissolver.py
+# Usage: -> python fuel-accumulation.py or ./fuel-accumulation.py
 if __name__ == "__main__":
    main(sys.argv)
