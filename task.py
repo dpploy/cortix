@@ -73,7 +73,7 @@ class Task(object):
     commFile  = network.GetRuntimeCortixCommFile( modName )
 
     statusFile = mod.Execute( paramFile, commFile )
-    assert statusFile != None, 'module launching failed.'
+    assert statusFile is not None, 'module launching failed.'
 
     runtimeStatusFiles[ mod.GetName() ] = statusFile
 
@@ -84,6 +84,7 @@ class Task(object):
   while status == 'running': 
    time.sleep(5)
    status = self.__GetRuntimeStatus( runtimeStatusFiles )
+   print('Task runtime check: ', status)
 
   return 
 
@@ -95,6 +96,10 @@ class Task(object):
   taskStatus = 'finished'
 
   for (modName,statusFile) in runtimeStatusFiles.items():
+
+     if not os.path.isfile(statusFile): time.sleep(10)
+     assert os.path.isfile(statusFile), 'runtime status file %r not found.' % statusFile
+
      tree = ElementTree()
      tree.parse( statusFile )
      statusFileXMLRootNode = tree.getroot()

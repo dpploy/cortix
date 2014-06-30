@@ -53,7 +53,9 @@ class Network(object):
   self.__runtimeCortixCommFile[moduleName] = fullPathFileName
 
  def GetRuntimeCortixCommFile(self, moduleName):
-  return self.__runtimeCortixCommFile[moduleName] 
+     if moduleName in self.__runtimeCortixCommFile: 
+        return self.__runtimeCortixCommFile[moduleName]
+     return None
 
 #---------------------------------------------------------------------------------
 # Setup network             
@@ -62,14 +64,21 @@ class Network(object):
 
   for child in self.__configNode.GetNodeChildren():
 
-    (tag,items,text) = child
+    ( tag, attributes, text ) = child
+
+    assert text is None, 'non empty text in %r network: ' % self.__name
 
     tmp = dict()
 
     if tag == 'connect': 
-     for (key,value) in items: tmp[key] = value
+
+     for (key,value) in attributes: 
+          assert key not in tmp.keys(), 'repeaded key in attribute of %r network' % self.__name
+          tmp[key] = value
+
      self.__connectivity.append( tmp )
-     for key,val in tmp.items():
+
+     for (key,val) in tmp.items():
        if key == 'fromModule': self.__runtimeCortixCommFile[ val ] = 'null'
        if key == 'toModule'  : self.__runtimeCortixCommFile[ val ] = 'null'
 

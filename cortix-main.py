@@ -15,13 +15,14 @@ from cortix import Cortix
 
 def main():
 
-
  pwd            = os.path.dirname(__file__)
  fullpathconfig = os.path.join(pwd, 'cortix-config.xml')
+
  cortix = Cortix( fullpathconfig )
 
 # cortix.RunSimulations( taskName='solo-dissolve' )
  cortix.RunSimulations( taskName='shear-dissolve' )
+# cortix.RunSimulations( taskName='demuth1' )
 
 #*********************************************************************************
 # Usage: -> python cortix-main.py or ./cortix-main.py

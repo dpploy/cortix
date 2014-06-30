@@ -44,6 +44,29 @@ class Module(object):
  def GetName(self):
   return self.__name
 
+ def GetPorts(self):
+  return self.__ports
+
+ def GetPortType(self, portName):
+     portType = None
+     for port in self.__ports:
+       if port[0] == portName:
+          portType = port[1] 
+
+     return portType        
+
+ def GetPortNames(self):
+     portNames = list()
+     for port in self.__ports:
+        portNames.append( port[0] )
+
+     return portNames
+
+ def IsPortName(self, portName):
+     for port in self.__ports:
+       if port[0] == portName: return True
+
+     return False
 #---------------------------------------------------------------------------------
 # Execute module            
 
@@ -61,18 +84,16 @@ class Module(object):
   param  = runtimeCortixParamFile
   comm   = runtimeCortixCommFile
 
-  runtimeModuleStatus = comm[:comm.rfind('/')]+'/'+'runtime-status.xml'
-  status = runtimeModuleStatus 
+  fullPathCommDir = comm[:comm.rfind('/')]+'/'
+  runtimeModuleStatusFile = fullPathCommDir + 'runtime-status.xml'
+
+  status = runtimeModuleStatusFile
 
   print('\t\tCortix::Simulation::Application::Module:Execute() '+self.__executableName)
   print( 'time '+ module + ' ' + input + ' ' + param + ' ' + comm + ' ' + status )
   os.system( 'time '+ module + ' ' + input + ' ' + param + ' ' + comm + ' ' + status + ' &')
 
-  time.sleep(1)
-  if os.path.isfile( status ): return status
-  else:                        return None
-
-  return
+  return runtimeModuleStatusFile
 
 #---------------------------------------------------------------------------------
 # Setup module              
@@ -80,17 +101,27 @@ class Module(object):
  def __Setup(self):
 
   for child in self.__configNode.GetNodeChildren():
-    (tag,items,text) = child
+
+    (tag,attributes,text) = child
     text = text.strip()
+
     if tag == 'executableName': self.__executableName = text
     if tag == 'executablePath': 
      if text[-1] != '/': text += '/'
      self.__executablePath = text
+
     if tag == 'configFileName': self.__configFileName = text
     if tag == 'configFilePath': 
      if text[-1] != '/': text += '/'
      self.__configFilePath = text
-    if tag == 'port': self.__ports.append(text)
+
+    if tag == 'port': 
+       assert len(attributes) == 1, 'only 1 attribute allowed/required at this moment.'
+       key = attributes[0][0]
+       val = attributes[0][1].strip()
+       assert key == 'type', 'port attribute key must be "type".'
+       assert val=='use' or val=='provide' or val=='input', 'port attribute value invalid.'
+       self.__ports.append( (text, attributes[0][1].strip()) )
 
   print('\t\tCortix::Simulation::Application::Module: executableName',self.__executableName)
   print('\t\tCortix::Simulation::Application::Module: executablePath',self.__executablePath)

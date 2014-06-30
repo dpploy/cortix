@@ -2,9 +2,9 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix Nitron dissolver module wrapper 
+Cortix Fuel Accumulation module wrapper 
 
-Tue Jun 24 01:03:45 EDT 2014
+Sun Jun 29 21:34:18 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time
@@ -24,13 +24,6 @@ def main(argv):
 # This input file may be used by both the wrapper and the inner-code for 
 # communication.
  inputFullPathFileName = argv[1]
-
- fin = open(inputFullPathFileName,'r')
- for line in fin:
-  nitronHomeDir = line.strip()
- fin.close()
-
- print('dissolver.py: input dir: ',nitronHomeDir)
 
 #.................................................................................
 # Second command line argument is the Cortix parameter file: cortix-param.xml

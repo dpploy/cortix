@@ -91,8 +91,14 @@ class HoldingDrum(object):
 #---------------------------------------------------------------------------------
  def __SetupHoldingDrum( self, portFile ):
 
-  if os.path.isfile(portFile) is False: time.sleep(5)
-  assert os.path.isfile(portFile) is True, 'porFile not available'
+  maxNTrials = 5
+  nTrials   = 0
+  while not os.path.isfile(portFile) and nTrials < maxNTrials:
+    nTrials += 1
+    print('Dissolver::HoldingDrum: waiting for port:',portFile)
+    time.sleep(5)
+
+  assert os.path.isfile(portFile) is True, 'portFile %r not available' % portFile
 
   tree = ElementTree()
 

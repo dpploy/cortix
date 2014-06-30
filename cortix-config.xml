@@ -36,41 +36,58 @@
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/chopper/</executablePath>
     <configFileName>chopper.input</configFileName>
     <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/chopper/</configFilePath>
-    <port>Fuel_Solid</port>
-    <port>Gas_Release</port>
+    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
+    <!-- The *input* type allows for module self-connection; see network section  -->
+    <port type="provide">Fuel_Solid</port>
+    <port type="provide">Gas_Release</port>
+   </module>
+
+   <module name="fuel-accumulation">
+    <executableName>holdingdrum.py</executableName>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/fuel-accumulation/</executablePath>
+    <configFileName>holdingdrum.input</configFileName>
+    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/fuel-accumulation/</configFilePath>
+    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
+    <!-- The *input* type allows for module self-connection; see network section  -->
+    <port type="use">solids</port>
+    <port type="provide">fuel-segments</port>
    </module>
 
    <module name="dissolver">
-    <executableName> dissolver.py </executableName>
+    <executableName>dissolver.py</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/dissolver/</executablePath>
     <configFileName>nitron.input</configFileName>
     <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/dissolution/nitron/src/</configFilePath>
-    <port>product</port>
-    <port>vapor</port>
-    <port>rinse-stream</port>
-    <port>solids</port>
-    <port>condenser-stream</port>
-    <port>steam</port>
-    <port>heat</port>
+    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
+    <!-- The *input* type allows for module self-connection; see network section  -->
+    <port type="use">solids</port>
+    <port type="use">condenser-stream</port>
+    <port type="provide">product</port>
+    <port type="provide">vapor</port>
+    <port type="provide">heat</port>
    </module>
 
    <module name="condenser">
-    <executableName> condenser.py </executableName>
+    <executableName>condenser.py</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/condenser/</executablePath>
     <configFileName>condenser.input</configFileName>
     <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/condenser/</configFilePath>
-    <port>off-gas</port>
-    <port>vapor</port>
-    <port>condensate</port>
-    <port>cooling</port>
+    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
+    <!-- The *input* type allows for module self-connection; see network section  -->
+    <port type="use">vapor</port>
+    <port type="provide">off-gas</port>
+    <port type="provide">condensate</port>
+    <port type="provide">cooling</port>
    </module>
 
    <module name="pyplot">
-    <executableName> pyplot.py </executableName>
+    <executableName>pyplot.py</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/pyplot/</executablePath>
     <configFileName>pyplot.input</configFileName>
     <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/pyplot/</configFilePath>
-    <port>time-series</port>
+    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
+    <!-- The *input* type allows for module self-connection; see network section  -->
+    <port type="use">time-series</port>
    </module>
 
    <!-- Application: networks -->
@@ -79,16 +96,19 @@
 
    <!-- stand-alone module -->
    <network name="solo-shear">
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <connect fromModule="pyplot" fromPort="time-series" toModule="chopper" toPort="Gas_Release"/> 
    </network>
 
    <!-- stand-alone module -->
    <network name="solo-dissolve">
-    <connect fromModule="pyplot" fromPort="time-series" toModule="dissolver" toPort="off-gas"/> 
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <connect fromModule="pyplot" fromPort="time-series" toModule="dissolver" toPort="vapor"/> 
    </network>
 
    <!-- connected modules -->
    <network name="shear-dissolve">
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <connect fromModule="dissolver" fromPort="solids" toModule="chopper" toPort="Fuel_Solid"/> 
     <connect fromModule="pyplot" fromPort="time-series" toModule="dissolver" toPort="vapor"/> 
     <connect fromModule="pyplot" fromPort="time-series" toModule="chopper" toPort="Gas_Release"/> 
@@ -96,8 +116,9 @@
 
    <!-- connected modules -->
    <network name="demuth1">
-    <connect fromModule="pyplot" fromPort="time-series" toModule="chopper" toPort="Gas_Release"/> 
-    <connect fromModule="dissolver" fromPort="solids" toModule="chopper" toPort="Fuel_Solid"/> 
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <connect fromModule="fuel-accumulation" fromPort="solids" toModule="chopper" toPort="Fuel_Solid"/> 
+    <connect fromModule="dissolver" fromPort="solids" toModule="fuel-accumulation" toPort="fuel-segments"/> 
     <connect fromModule="condenser" fromPort="vapor" toModule="dissolver" toPort="vapor"/> 
     <connect fromModule="dissolver" fromPort="condenser-stream" toModule="condenser" toPort="condensate"/> 
     <connect fromModule="pyplot" fromPort="time-series" toModule="dissolver" toPort="vapor"/> 

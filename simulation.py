@@ -96,39 +96,68 @@ class Simulation(object):
 
     # using the taks and network create the module directories and comm files
     for net in networks:
-     if net.GetName() == taskName:
+
+     if net.GetName() == taskName: # Warning: net and task name must match
+
       connect = net.GetConnectivity()
+
+      toPorts_visited   = list()
+      fromPorts_visited = list()
+
       for con in connect:
 
-       toModule   = con['toModule']
-       toPort     = con['toPort']
+       toModule = con['toModule']
+       toPort   = con['toPort']
 
-       # "to" is who receives the "call", hence the provider
-       toModuleWorkDir    = taskWorkDir + toModule + '/'
-       toModuleCommFile = toModuleWorkDir + 'cortix-comm.xml'
-       if not os.path.isdir( toModuleWorkDir ):
-         os.system( 'mkdir -p '+ toModuleWorkDir )
-       if not os.path.isfile( toModuleCommFile ):
-         fout = open( toModuleCommFile,'w' )
-         s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-         s = '<!-- Written by Cortix::Simulation -->\n'; fout.write(s)
-         s = '<cortixComm>\n'; fout.write(s)
+       module = self.__application.GetModule(toModule)
 
-       fout = open( toModuleCommFile,'a' )
-       # this is the cortix info for modules providing data           
-       s = '<providePort name="'+toPort+'" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
-       fout.write(s)
+       assert module.IsPortName( toPort ), 'module %r does not have port %r.' % (module.GetName(), toPort )
+       assert module.GetPortType(toPort) is not None, 'port type invalid or no port.'
 
-       fout.close()
+       if module.GetPortType(toPort) != 'input':
 
-       # register the cortix-comm file for the network
-       net.SetRuntimeCortixCommFile( toModule, toModuleCommFile )
+          assert module.GetPortType(toPort) == 'provide', 'port type %r invalid. Module %r, port %r' % (module.GetPortType(toPort), module.GetName(), toPort)
+
+          # skip provide ports already inserted in the comm file 
+          if toPort not in toPorts_visited:
+
+            # "to" is who receives the "call", hence the provider
+            toModuleWorkDir  = taskWorkDir + toModule + '/'
+            toModuleCommFile = toModuleWorkDir + 'cortix-comm.xml'
+            if not os.path.isdir( toModuleWorkDir ):
+              os.system( 'mkdir -p ' + toModuleWorkDir )
+            if not os.path.isfile( toModuleCommFile ):
+              fout = open( toModuleCommFile,'w' )
+              s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
+              s = '<!-- Written by Cortix::Simulation -->\n'; fout.write(s)
+              s = '<cortixComm>\n'; fout.write(s)
+ 
+            fout = open( toModuleCommFile,'a' )
+            # this is the cortix info for modules providing data           
+            s = '<providePort name="'+toPort+'" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
+            fout.write(s)
+
+            fout.close()
+
+            toPorts_visited.append( toPort )
+  
+            # register the cortix-comm file for the network
+            net.SetRuntimeCortixCommFile( toModule, toModuleCommFile )
 
        fromModule = con['fromModule']
        fromPort   = con['fromPort']
 
+       module = self.__application.GetModule(fromModule)
+
+       assert module.IsPortName( fromPort ), 'module %r has no port %r' % (fromModule, fromPort)
+       assert module.GetPortType(fromPort) == 'use' , 'module %r: invalid type for port %r' % (fromModule, fromPort)
+
+#       print(fromPort)
+#       print(fromPorts_visited)
+#       assert fromPort not in fromPorts_visited, 'error in cortix-config connect.'
+
        # "from" is who makes the "call", hence the user        
-       fromModuleWorkDir = taskWorkDir + fromModule + '/'
+       fromModuleWorkDir  = taskWorkDir + fromModule + '/'
        fromModuleCommFile = fromModuleWorkDir + 'cortix-comm.xml'
        if not os.path.isdir( fromModuleWorkDir ):
          os.system( 'mkdir -p '+ fromModuleWorkDir )
@@ -140,15 +169,22 @@ class Simulation(object):
 
        fout = open( fromModuleCommFile,'a' )
        # this is the cortix info for modules using data           
-       s = '<usePort name="'+fromPort+'" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
+       if module.GetPortType(fromPort) == 'input':
+         s = '<inputPort name="'+fromPort+'" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
+       else:
+         s = '<usePort name="'+fromPort+'" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
        fout.write(s)
 
        fout.close()
 
+#       fromPorts_visited.append( fromPort )
+
        # register the cortix-comm file for the network
        net.SetRuntimeCortixCommFile( fromModule, fromModuleCommFile )
 
-# finish forming the XML documents
+#  modules  = self.__application.GetModules()
+
+# finish forming the XML documents test for port types
   for net in networks:
    modNames = net.GetModuleNames()
    for modName in modNames:
