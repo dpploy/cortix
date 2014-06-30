@@ -90,6 +90,10 @@ class Simulation(object):
     evolveTimeUnit = task.GetEvolveTimeUnit()
     s = '<evolveTime unit="'+evolveTimeUnit+'"'+'>'+str(evolveTime)+'</evolveTime>\n'
     fout.write(s)
+    timeStep       = task.GetTimeStep()
+    timeStepUnit   = task.GetTimeStepUnit()
+    s = '<timeStep unit="'+timeStepUnit+'"'+'>'+str(timeStep)+'</timeStep>\n'
+    fout.write(s)
     s = '</cortixParam>'; fout.write(s)
     fout.close()
     task.SetRuntimeCortixParamFile( taskFile )
@@ -106,6 +110,7 @@ class Simulation(object):
 
       for con in connect:
 
+       # Start with the ports that will function as a provide port or input port
        toModule = con['toModule']
        toPort   = con['toPort']
 
@@ -134,7 +139,7 @@ class Simulation(object):
  
             fout = open( toModuleCommFile,'a' )
             # this is the cortix info for modules providing data           
-            s = '<providePort name="'+toPort+'" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
+            s = '<port name="'+toPort+'" type="provide" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
             fout.write(s)
 
             fout.close()
@@ -143,7 +148,11 @@ class Simulation(object):
   
             # register the cortix-comm file for the network
             net.SetRuntimeCortixCommFile( toModule, toModuleCommFile )
+       else:
+            toModuleWorkDir  = taskWorkDir + toModule + '/'
 
+
+       # Now do the ports that will function as use ports
        fromModule = con['fromModule']
        fromPort   = con['fromPort']
 
@@ -169,10 +178,8 @@ class Simulation(object):
 
        fout = open( fromModuleCommFile,'a' )
        # this is the cortix info for modules using data           
-       if module.GetPortType(fromPort) == 'input':
-         s = '<inputPort name="'+fromPort+'" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
-       else:
-         s = '<usePort name="'+fromPort+'" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
+       assert module.GetPortType(fromPort) == 'use', 'fromPort must be use type.'
+       s = '<port name="'+fromPort+'" type="use" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
        fout.write(s)
 
        fout.close()

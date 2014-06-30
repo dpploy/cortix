@@ -38,6 +38,7 @@ def main(argv):
  cortexParamFullPathFileName = argv[2]
  tree.parse(cortexParamFullPathFileName)
  cortexParamXMLRootNode = tree.getroot()
+
  node = cortexParamXMLRootNode.find('evolveTime')
 
  evolveTimeUnit = node.get('unit')
@@ -48,6 +49,16 @@ def main(argv):
  elif  evolveTimeUnit == 'day':  evolveTime *= 24.0 * 60.0
  else: assert True, 'time unit invalid.'
 
+ node = cortexParamXMLRootNode.find('timeStep')
+
+ timeStepUnit = node.get('unit')
+ timeStep       = float(node.text.strip())
+
+ if    timeStepUnit == 'min':  timeStep *= 1.0
+ elif  timeStepUnit == 'hour': timeStep *= 60.0
+ elif  timeStepUnit == 'day':  timeStep *= 24.0 * 60.0
+ else: assert True, 'time unit invalid.'
+
 #.................................................................................
 # Third command line argument is the Cortix communication file: cortix-comm.xml
  tree = ElementTree()
@@ -55,25 +66,18 @@ def main(argv):
  tree.parse(cortexCommFullPathFileName)
  cortexCommXMLRootNode = tree.getroot()
 
-# Setup useports
- nodes = cortexCommXMLRootNode.findall('usePort')
- usePorts = list()
+# Setup ports
+ nodes = cortexCommXMLRootNode.findall('port')
+ ports = list()
  if nodes is not None: 
    for node in nodes:
-     usePortName = node.get('name')
-     usePortFile = node.get('file')
-     usePorts.append( (usePortName, usePortFile) )
- print('usePorts: ',usePorts)
+     portName = node.get('name')
+     portType = node.get('type')
+     portFile = node.get('file')
+     ports.append( (portName, portType, portFile) )
+ print('ports: ',ports)
 
-# Setup provideports
- nodes = cortexCommXMLRootNode.findall('providePort')
- providePorts = list()
- if nodes is not None: 
-   for node in nodes:
-     providePortName = node.get('name')
-     providePortFile = node.get('file')
-     providePorts.append( (providePortName, providePortFile) )
- print('providePorts: ',providePorts)
+ tree = None
 
 #.................................................................................
 # Fourth command line argument is the module runtime-status.xml file
@@ -82,44 +86,34 @@ def main(argv):
 #---------------------------------------------------------------------------------
 # Run Nitron 
 
-# Connect to the use ports 
- for (portName,portFile) in usePorts:
-   if portName == 'solids':
-      print('MODULE::dissolver.py using port: ',portName)
-      fuelBucket = HoldingDrum(portFile)
-   if portName == 'condenser-stream':
-      print('MODULE::dissolver.py using port: ',portName)
-
-# Connect to the provide ports
- for (portName,portFile) in providePorts:
-   if portName == 'vapor':
-      print('MODULE::dissolver.py providing port: ',portName)
-   if portName == 'product':
-      print('MODULE::dissolver.py providing port: ',portName)
-   if portName == 'heat':
-      print('MODULE::dissolver.py providing port: ',portName)
-
-# Evolve the dissolver; solids use port is used below
- dissolverMassLoadMax = 250.0 # grams
- isDissolverReady2Load = True
 #................................................................................
- for evolTime in range(int(evolveTime)):
+# Setup input
 
-#  print('DISSOLVER time ',evolTime)
+# nothing for now
+
+#................................................................................
+# Evolve the dissolver program
+
+ facilityTime = 0.0
+
+ dissolverMassLoadMax  = 250.0 # grams
+ isDissolverReady2Load = True
+
+ while facilityTime <= evolveTime:
 
 # wait until there is enough fuel in the bucket  
   if isDissolverReady2Load == True:
 
-    if  fuelBucket.GetMass(evolTime) < dissolverMassLoadMax and \
-        fuelBucket.GetLastTimeStamp() > evolTime: continue
+    if  fuelBucket.GetMass(facilityTime) < dissolverMassLoadMax and \
+        fuelBucket.GetLastTimeStamp() > facilityTime: continue
 
-    if  fuelBucket.GetMass(evolTime) >= dissolverMassLoadMax:
-#        print('fuelBucket.GetMass(evolTime) = ',fuelBucket.GetMass(evolTime))
+    if  fuelBucket.GetMass(facilityTime) >= dissolverMassLoadMax:
+#        print('fuelBucket.GetMass(facilityTime) = ',fuelBucket.GetMass(facilityTime))
         fuelMassLoad = 0.0
         fuelSegmentsLoad = list()
         while fuelMassLoad <= dissolverMassLoadMax:
-              fuelSegment = fuelBucket.WithdrawFuelSegment( evolTime )
-#              print('fuelBucket.GetMass(evolTime) = ',fuelBucket.GetMass(evolTime))
+              fuelSegment = fuelBucket.WithdrawFuelSegment( facilityTime )
+#              print('fuelBucket.GetMass(facilityTime) = ',fuelBucket.GetMass(facilityTime))
               mass = fuelSegment[1]
 #              print('mass ', mass)
               fuelMassLoad += mass
@@ -129,13 +123,13 @@ def main(argv):
               else: 
                  fuelBucket.RestockFuelSegment( fuelSegment )
 
-    if  fuelBucket.GetMass(evolTime) < dissolverMassLoadMax and \
-        fuelBucket.GetLastTimeStamp() <= evolTime:
+    if  fuelBucket.GetMass(facilityTime) < dissolverMassLoadMax and \
+        fuelBucket.GetLastTimeStamp() <= facilityTime:
         fuelMassLoad = 0.0
         fuelSegmentsLoad = list()
         isBucketEmpty = False
         while fuelMassLoad < dissolverMassLoadMax and isBucketEmpty == False:
-              fuelSegment = fuelBucket.WithdrawFuelSegment( evolTime )
+              fuelSegment = fuelBucket.WithdrawFuelSegment( facilityTime )
               if    fuelSegment is None: isBucketEmpty = True
               else: 
                 mass = fuelSegment[1]
@@ -153,25 +147,28 @@ def main(argv):
     print( 'dissolver.py: time ' + runCommand  )
     #os.system( 'time ' + runCommand  )
     SetRuntimeStatus(runtimeStatusFullPathFileName, 'running') 
-    print('DISSOLVER start at time = ', evolTime)
+    print('DISSOLVER start at time = ', facilityTime)
     mass = 0.0
     for i in fuelSegmentsLoad: mass += i[1]
     print('DISSOLVER loaded mass = ', mass)
     time.sleep(1)
     #*********************************************
 
-    startDissolverTime    = evolTime
+    startDissolverTime    = facilityTime
     isDissolverReady2Load = False
 
   # allow for 120 min dissolution
-  if evolTime >= startDissolverTime + 120: isDissolverReady2Load = True
+  if facilityTime >= startDissolverTime + 120: isDissolverReady2Load = True
 
- print('End of all dissolution; time = ',evolTime)
+ print('End of all dissolution; time = ',facilityTime)
  print('Fuel mass left over in the holding area = ', fuelBucket.GetMass())
       
 #................................................................................
-
 # Communicate with Nitron to check running status
+
+#................................................................................
+
+ facilityTime += timeStep 
 
 #---------------------------------------------------------------------------------
 # Shutdown 

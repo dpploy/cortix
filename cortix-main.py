@@ -20,6 +20,7 @@ def main():
 
  cortix = Cortix( fullpathconfig )
 
+# cortix.RunSimulations( taskName='solo-fuel-accum' )
 # cortix.RunSimulations( taskName='solo-dissolve' )
  cortix.RunSimulations( taskName='shear-dissolve' )
 # cortix.RunSimulations( taskName='demuth1' )

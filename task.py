@@ -33,6 +33,9 @@ class Task(object):
   self.__evolveTime     = 0.0
   self.__evolveTimeUnit = 'null'
 
+  self.__timeStep     = 0.0
+  self.__timeStepUnit = 'null'
+
   self.__runtimeCortixParamFile = 'null'
 
   self.__Setup()
@@ -49,6 +52,12 @@ class Task(object):
 
  def GetEvolveTimeUnit(self):
   return self.__evolveTimeUnit
+
+ def GetTimeStep(self):
+  return self.__timeStep
+
+ def GetTimeStepUnit(self):
+  return self.__timeStepUnit
 
  def SetRuntimeCortixParamFile(self, fullPath):
   self.__runtimeCortixParamFile = fullPath
@@ -115,12 +124,17 @@ class Task(object):
  def __Setup(self):
 
   for child in self.__configNode.GetNodeChildren():
-    (tag,items,text) = child
+    (tag, items, text) = child
     if tag == 'evolveTime':
        for (key,value) in items:
         if key == 'unit' : self.__evolveTimeUnit = value
        
-       self.__evolveTime = float(text)
+       self.__evolveTime = float(text.strip())
+    if tag == 'timeStep':
+       for (key,value) in items:
+        if key == 'unit' : self.__timeStepUnit = value
+       
+       self.__timeStep = float(text.strip())
 
   print('\t\tCortix::Simulation::Task: evolveTime(value):',self.__evolveTime)
   print('\t\tCortix::Simulation::Task: evolveTime(unit) :',self.__evolveTimeUnit)
