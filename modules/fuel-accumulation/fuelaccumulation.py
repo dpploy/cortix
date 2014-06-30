@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix FuelAccumulationArea module 
+Cortix FuelAccumulation module wrapper
 
 Tue Jun 24 01:03:45 EDT 2014
 """
@@ -14,7 +14,7 @@ from xml.etree.ElementTree import Element
 #*********************************************************************************
 
 #*********************************************************************************
-class FuelAccumulationArea(object):
+class FuelAccumulation(object):
 
 # Private member data
 # __slots__ = [
@@ -105,7 +105,7 @@ class FuelAccumulationArea(object):
     nTrials    = 0
     while not os.path.isfile(portFile) and nTrials < maxNTrials:
       nTrials += 1
-      print('FuelAccumulationArea::__GetPortFile: waiting for port:',portFile)
+      print('FuelAccumulation::__GetPortFile: waiting for port:',portFile)
       time.sleep(5)
 
     assert os.path.isfile(portFile) is True, 'portFile %r not available' % portFile
@@ -262,8 +262,8 @@ class FuelAccumulationArea(object):
   else:
      self.__withdrawMass = 0.0
 
-  print('FuelAccumulationArea::__GetWithdrawalRequest(): mass ', self.__withdrawMass) 
-  print('FuelAccumulationArea::__GetWithdrawalRequest(): unit ', massUnit) 
+  print('FuelAccumulation::__GetWithdrawalRequest(): mass ', self.__withdrawMass) 
+  print('FuelAccumulation::__GetWithdrawalRequest(): unit ', massUnit) 
 
   return 
 
@@ -314,7 +314,7 @@ class FuelAccumulationArea(object):
     fout = open( portFile, 'w')
 
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by FuelAccumulationArea.py -->\n'; fout.write(s)
+  s = '<!-- Written by FuelAccumulation.py -->\n'; fout.write(s)
   s = '<fuelsegments>\n'; fout.write(s)
   s = '<timeStamp unit="minute">'+str(evolTime)+'</timeStamp>\n'; fout.write(s)
 
@@ -362,6 +362,6 @@ class FuelAccumulationArea(object):
   self.__fuelSegments.insert(0,fuelSegment)
 
 #*********************************************************************************
-# Usage: -> python fuelaccumulationarea.py
+# Usage: -> python fuelaccumulation.py
 if __name__ == "__main__":
- print('Unit testing for FuelAccumulationArea')
+ print('Unit testing for FuelAccumulation')

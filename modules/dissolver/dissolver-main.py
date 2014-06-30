@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix Dissolver module wrapper 
+Cortix Dissolver module executable
 
 Tue Jun 24 01:03:45 EDT 2014
 """

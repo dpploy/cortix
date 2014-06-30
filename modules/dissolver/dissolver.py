@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix Nitron dissolver module 
+Cortix Dissolver module wrapper
 
 Tue Jun 24 01:03:45 EDT 2014
 """

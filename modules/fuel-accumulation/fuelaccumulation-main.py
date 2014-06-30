@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix Fuel Accumulation module wrapper 
+Cortix FuelAccumulation module executable
 
 Sun Jun 29 21:34:18 EDT 2014
 """
@@ -11,7 +11,7 @@ import os, sys, io, time
 import datetime
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import Element
-from fuelaccumulationarea import FuelAccumulationArea
+from fuelaccumulation import FuelAccumulation
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ def main(argv):
 
 #................................................................................
 # Create a fuel holding drum
- fuelDrum = FuelAccumulationArea( ports )
+ fuelDrum = FuelAccumulation( ports )
 
 #................................................................................
 # Evolve the fuel-accumulation program

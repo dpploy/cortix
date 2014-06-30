@@ -54,7 +54,7 @@
    <module name="fuel-accumulation">
     <executableName>fuelaccumulation-main.py</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/fuel-accumulation/</executablePath>
-    <configFileName>fuel-accumulation.input</configFileName>
+    <configFileName>fuelaccumulation.input</configFileName>
     <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/fuel-accumulation/</configFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->

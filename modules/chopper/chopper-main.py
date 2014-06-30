@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix Shearing module wrapper
+Cortix Chopping module wrapper
 
 Tue Jun 24 12:36:17 EDT 2014
 """
