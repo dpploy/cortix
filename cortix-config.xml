@@ -41,7 +41,7 @@
 
    <!-- Application: modules set -->
    <module name="chopper">
-    <executableName>chopper.py</executableName>
+    <executableName>chopper-main.py</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/chopper/</executablePath>
     <configFileName>chopper.input</configFileName>
     <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/chopper/</configFilePath>
@@ -52,7 +52,7 @@
    </module>
 
    <module name="fuel-accumulation">
-    <executableName>fuel-accumulation.py</executableName>
+    <executableName>fuelaccumulation-main.py</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/fuel-accumulation/</executablePath>
     <configFileName>fuel-accumulation.input</configFileName>
     <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/fuel-accumulation/</configFilePath>
@@ -67,7 +67,7 @@
    </module>
 
    <module name="dissolver">
-    <executableName>dissolver.py</executableName>
+    <executableName>dissolver-main.py</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/dissolver/</executablePath>
     <configFileName>nitron.input</configFileName>
     <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/dissolution/nitron/src/</configFilePath>
@@ -82,7 +82,7 @@
    </module>
 
    <module name="condenser">
-    <executableName>condenser.py</executableName>
+    <executableName>condenser-main.py</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/condenser/</executablePath>
     <configFileName>condenser.input</configFileName>
     <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/condenser/</configFilePath>
@@ -95,7 +95,7 @@
    </module>
 
    <module name="pyplot">
-    <executableName>pyplot.py</executableName>
+    <executableName>pyplot-main.py</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/pyplot/</executablePath>
     <configFileName>pyplot.input</configFileName>
     <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/pyplot/</configFilePath>
