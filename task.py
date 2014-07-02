@@ -24,7 +24,7 @@ class Task(object):
                taskConfigNode = ConfigTree()
              ):
 
-  assert type(taskConfigNode) == ConfigTree, '-> taskConfigNode not a ConfigTree.' 
+  assert type(taskConfigNode) is ConfigTree, '-> taskConfigNode not a ConfigTree.' 
   self.__configNode = taskConfigNode
 
   self.__name = self.__configNode.GetNodeName()
@@ -81,6 +81,7 @@ class Task(object):
     paramFile = self.__runtimeCortixParamFile
     commFile  = network.GetRuntimeCortixCommFile( modName )
 
+    # Run module in the background
     statusFile = mod.Execute( paramFile, commFile )
     assert statusFile is not None, 'module launching failed.'
 

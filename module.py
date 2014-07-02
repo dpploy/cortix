@@ -22,7 +22,7 @@ class Module(object):
                modConfigNode = ConfigTree()
              ):
 
-  assert type(modConfigNode) == ConfigTree, '-> modConfigNode is invalid.' 
+  assert type(modConfigNode) is ConfigTree, '-> modConfigNode is invalid.' 
 
   self.__configNode = modConfigNode
 
@@ -62,7 +62,7 @@ class Module(object):
 
      return portNames
 
- def IsPortName(self, portName):
+ def HasPortName(self, portName):
      for port in self.__ports:
        if port[0] == portName: return True
 
@@ -120,7 +120,7 @@ class Module(object):
        key = attributes[0][0]
        val = attributes[0][1].strip()
        assert key == 'type', 'port attribute key must be "type".'
-       assert val=='use' or val=='provide' or val=='input', 'port attribute value invalid.'
+       assert val == 'use' or val == 'provide' or val == 'input', 'port attribute value invalid.'
        self.__ports.append( (text, attributes[0][1].strip()) )
 
   print('\t\tCortix::Simulation::Application::Module: executableName',self.__executableName)

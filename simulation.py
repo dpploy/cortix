@@ -32,10 +32,12 @@ class Simulation(object):
   self.__name = simConfigNode.GetNodeName()
 #  logger.info('simulation name:',self.__name)
 
-  assert type(simConfigNode) == ConfigTree, '-> simConfigNode invalid.' 
+  assert type(simConfigNode) is ConfigTree, '-> simConfigNode invalid.' 
   self.__configNode = simConfigNode
 
+#------------
 # Application
+#------------
   for appNode in self.__configNode.GetAllSubNodes('application'):
 #    logger.info('appName:',appNode.get('name'))
     print('\tCortix::Simulation: appName:',appNode.get('name'))
@@ -45,7 +47,9 @@ class Simulation(object):
 
     self.__application = Application( appConfigNode )
 
+#------------
 # Tasks
+#------------
   self.__tasks = list()
   self.__SetupTasks()
 
@@ -56,7 +60,7 @@ class Simulation(object):
 
  def Execute(self, taskName=None):
 
-  if taskName != None: 
+  if taskName is not None: 
      for task in self.__tasks:
        if task.GetName() == taskName: 
          task.Execute( self.__application )
@@ -84,7 +88,7 @@ class Simulation(object):
     taskFile = taskWorkDir + 'cortix-param.xml'
     fout = open( taskFile,'w' )
     s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<!-- Written by Cortix::Simulation -->\n'; fout.write(s)
+    s = '<!-- Written by Cortix::Simulation::__Setup() -->\n'; fout.write(s)
     s = '<cortixParam>\n'; fout.write(s)
     evolveTime     = task.GetEvolveTime()
     evolveTimeUnit = task.GetEvolveTimeUnit()
@@ -116,8 +120,8 @@ class Simulation(object):
 
        module = self.__application.GetModule(toModule)
 
-       assert module.IsPortName( toPort ), 'module %r does not have port %r.' % (module.GetName(), toPort )
-       assert module.GetPortType(toPort) is not None, 'port type invalid or no port.'
+       assert module.HasPortName( toPort ), 'module %r does not have port %r.' % (module.GetName(), toPort )
+       assert module.GetPortType(toPort) is not None, 'network name: %r, module name: %r, toPort: %r port type invalid %r' % (net.GetName(), module.GetName(), toPort, type(module.GetPortType(toPort)))
 
        if module.GetPortType(toPort) != 'input':
 
@@ -158,7 +162,7 @@ class Simulation(object):
 
        module = self.__application.GetModule(fromModule)
 
-       assert module.IsPortName( fromPort ), 'module %r has no port %r' % (fromModule, fromPort)
+       assert module.HasPortName( fromPort ), 'module %r has no port %r' % (fromModule, fromPort)
        assert module.GetPortType(fromPort) == 'use' , 'module %r: invalid type for port %r' % (fromModule, fromPort)
 
 #       print(fromPort)

@@ -9,8 +9,7 @@ Sun Jun 29 21:34:18 EDT 2014
 #*********************************************************************************
 import os, sys, io, time
 import datetime
-from xml.etree.ElementTree import ElementTree
-from xml.etree.ElementTree import Element
+import xml.etree.ElementTree as ElementTree
 from fuelaccumulation import FuelAccumulation
 #*********************************************************************************
 
@@ -33,9 +32,8 @@ def main(argv):
 
 #.................................................................................
 # Second command line argument is the Cortix parameter file: cortix-param.xml
- tree = ElementTree()
  cortexParamFullPathFileName = argv[2]
- tree.parse(cortexParamFullPathFileName)
+ tree = ElementTree.parse(cortexParamFullPathFileName)
  cortexParamXMLRootNode = tree.getroot()
 
  node = cortexParamXMLRootNode.find('evolveTime')
@@ -60,9 +58,8 @@ def main(argv):
 
 #.................................................................................
 # Third command line argument is the Cortix communication file: cortix-comm.xml
- tree = ElementTree()
  cortexCommFullPathFileName = argv[3]
- tree.parse(cortexCommFullPathFileName)
+ tree = ElementTree.parse(cortexCommFullPathFileName)
  cortexCommXMLRootNode = tree.getroot()
 
 # Setup ports
@@ -74,7 +71,7 @@ def main(argv):
      portType = node.get('type')
      portFile = node.get('file')
      ports.append( (portName, portType, portFile) )
- print('fuel-accumulation.py::ports: ',ports)
+ print('fuelaccumulation-main.py::ports: ',ports)
 
  tree = None
 
@@ -90,7 +87,7 @@ def main(argv):
 
 # found = False
 # for port in ports:
-#  if port[0] == 'solids':
+#  if port[0] is 'solids':
 #   print( 'cp -f ' + inputData[0] + ' ' + port[2] )
 #   os.system( 'cp -f ' + inputData[0] + ' ' + port[2] )
 #   found = True
@@ -99,7 +96,7 @@ def main(argv):
 
 # found = False
 # for port in ports:
-#  if port[0] == 'withdrawal-request':
+#  if port[0] is 'withdrawal-request':
 #   print( 'cp -f ' + inputData[1] + ' ' + port[2] )
 #   os.system( 'cp -f ' + inputData[1] + ' ' + port[2] )
 #   found = True
@@ -111,14 +108,13 @@ def main(argv):
  fuelDrum = FuelAccumulation( ports )
 
 #................................................................................
-# Evolve the fuel-accumulation program
+# Evolve the fuel accumulation
 
  SetRuntimeStatus( runtimeStatusFullPathFileName, 'running' )
 
  facilityTime = 0.0
 
  while facilityTime <= evolveTime:
-  print(facilityTime)
 
   fuelDrum.UseData( usePortName='solids', evolTime=facilityTime  )
   fuelDrum.UseData( usePortName='withdrawal-request', evolTime=facilityTime  )
@@ -150,7 +146,7 @@ def SetRuntimeStatus(runtimeStatusFullPathFileName, status):
 
  fout = open( runtimeStatusFullPathFileName,'w' )
  s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
- s = '<!-- Written by Dissolver.py -->\n'; fout.write(s)
+ s = '<!-- Written by fuelaccumulation-main.py -->\n'; fout.write(s)
  s = '<runtime>\n'; fout.write(s)
  s = '<status>'+status+'</status>\n'; fout.write(s)
  s = '</runtime>\n'; fout.write(s)

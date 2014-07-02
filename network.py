@@ -22,7 +22,7 @@ class Network(object):
                netConfigNode = ConfigTree()
              ):
 
-  assert type(netConfigNode) == ConfigTree, '-> netConfigNode is invalid.' 
+  assert type(netConfigNode) is ConfigTree, '-> netConfigNode is invalid.' 
 
   self.__configNode = netConfigNode
 
@@ -50,11 +50,11 @@ class Network(object):
   return self.__moduleNames
 
  def SetRuntimeCortixCommFile(self, moduleName, fullPathFileName):
-  self.__runtimeCortixCommFile[moduleName] = fullPathFileName
+  self.__runtimeCortixCommFile[ moduleName ] = fullPathFileName
 
  def GetRuntimeCortixCommFile(self, moduleName):
      if moduleName in self.__runtimeCortixCommFile: 
-        return self.__runtimeCortixCommFile[moduleName]
+        return self.__runtimeCortixCommFile[ moduleName ]
      return None
 
 #---------------------------------------------------------------------------------

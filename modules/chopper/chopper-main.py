@@ -70,9 +70,10 @@ def main(argv):
  if nodes is not None: 
    for node in nodes:
      portName = node.get('name')
+     portType = node.get('type')
      portFile = node.get('file')
-     ports.append( (portName, portFile) )
- print('chopper.py::ports: ',ports)
+     ports.append( (portName, portType, portFile) )
+ print('chopper-main.py::ports: ',ports)
 
  tree = None
 
@@ -83,15 +84,18 @@ def main(argv):
 #---------------------------------------------------------------------------------
 # Run Chopper
 
-# Connect to the provide ports 
- for (portName,portFile) in providePorts:
-   if portName == 'Fuel_Solid':
-      print('MODULE::chopper.py providing port: ',portName)
-   if portName == 'Gas_Release':
-      print('MODULE::chopper.py providing port: ',portName)
+#................................................................................
+# Setup input
 
-# Evolve the chopper
+# nothing for now
+
+#................................................................................
+# Create the chopper equipment
+
+# nothing for now
+
 #.................................................................................
+# Evolve the chopper
 
  SetRuntimeStatus(runtimeStatusFullPathFileName, 'running')
 
@@ -99,9 +103,9 @@ def main(argv):
 
  resultsDir = os.path.dirname(__file__).strip()+'/'
 
- for providePort in providePorts:
+ for port in ports:
 
-  (portName,portFile) = providePort
+  (portName,portType,portFile) = port
 
   if portName == 'Fuel_Solid':
    print( 'cp -f ' + resultsDir + inputDataFileNames[0] + ' ' + portFile )

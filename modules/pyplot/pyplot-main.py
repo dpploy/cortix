@@ -65,6 +65,6 @@ def main(argv):
  tree.write(runtimeStatusFullPathFileName,xml_declaration=True,encoding="UTF-8",method="xml")
 
 #*********************************************************************************
-# Usage: -> python pymain.py or ./pyplot.py
+# Usage: -> python pyplot.py or ./pyplot.py
 if __name__ == "__main__":
    main(sys.argv)

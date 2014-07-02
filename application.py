@@ -26,17 +26,21 @@ class Application(object):
                appConfigNode = ConfigTree()
              ):
 
-  assert type(appConfigNode) == ConfigTree, '-> appConfigNode invalid' 
+  assert type(appConfigNode) is ConfigTree, '-> appConfigNode invalid' 
   self.__configNode = appConfigNode
 
   self.__name = self.__configNode.GetNodeName()
   print('\t\tCortix::Simulation::Application: name:',self.__name)
 
+#--------
 # modules        
+#--------
   self.__modules = list()
   self.__SetupModules()
 
+#--------
 # networks
+#--------
   self.__networks = list()
   self.__SetupNetworks()
 
@@ -77,14 +81,14 @@ class Application(object):
  def __SetupModules(self):
 
   for modNode in self.__configNode.GetAllSubNodes('module'):
-   print('\t\tCortix::Simulation::Application: module:',modNode.get('name'))
+     print('\t\tCortix::Simulation::Application: module:',modNode.get('name'))
 
-   modConfigNode = ConfigTree( modNode )
-   assert modConfigNode.GetNodeName() == modNode.get('name'), 'check failed'
+     modConfigNode = ConfigTree( modNode )
+     assert modConfigNode.GetNodeName() == modNode.get('name'), 'check failed'
 
-   module = Module( modConfigNode )
+     module = Module( modConfigNode )
 
-   self.__modules.append( module )
+     self.__modules.append( module )
 
   return
 

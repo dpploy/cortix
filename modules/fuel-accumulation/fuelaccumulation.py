@@ -9,8 +9,7 @@ Tue Jun 24 01:03:45 EDT 2014
 #*********************************************************************************
 import os, sys, io, time
 import datetime
-from xml.etree.ElementTree import ElementTree
-from xml.etree.ElementTree import Element
+import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
@@ -23,7 +22,7 @@ class FuelAccumulation(object):
                ports 
              ):
 
-  assert type(ports) == list, '-> ports type %r is invalid.' % type(ports)
+  assert type(ports) is list, '-> ports type %r is invalid.' % type(ports)
 
   self.__ports = ports
 
@@ -87,7 +86,7 @@ class FuelAccumulation(object):
   portFile = self.__GetPortFile( providePortName = providePortName )
 
 # Send data to port files
-  if providePortName == 'fuel-segments': self.__ProvideSegments( portFile, evolTime )
+  if providePortName == 'fuel-segments': self.__ProvideFuelSegments( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -96,7 +95,7 @@ class FuelAccumulation(object):
 
   if usePortName is not None:
 
-    assert providePortName == None
+    assert providePortName is None
 
     for port in self.__ports:
      if port[0] == usePortName and port[1] == 'use': portFile = port[2]
@@ -112,10 +111,10 @@ class FuelAccumulation(object):
 
   if providePortName is not None:
 
-    assert usePortName == None
+    assert usePortName is None
 
     for port in self.__ports:
-     if port[0] == usePortName and port[1] == 'provide': portFile = port[2]
+     if port[0] == providePortName and port[1] == 'provide': portFile = port[2]
  
 
   assert portFile is not None, 'portFile is invalid.'
@@ -123,11 +122,10 @@ class FuelAccumulation(object):
   return portFile
 
 #---------------------------------------------------------------------------------
+# This uses a use portFile which is guaranteed at this point
  def __GetSolids( self, portFile, evolTime ):
 
-  tree = ElementTree()
-
-  tree.parse(portFile)
+  tree = ElementTree.parse(portFile)
   rootNode = tree.getroot()
   durationNode = rootNode.find('Duration')
   timeStep = float(durationNode.get('timeStep'))
@@ -167,7 +165,7 @@ class FuelAccumulation(object):
 #   print('Time index = ',timeIndex)
      n = timeNode.find('Segment_Length')
  
-     if n is None: continue  # to the next timeNode
+     if n is None: continue # to the next timeNode
  
      segmentLength = float(n.get('length'))
      n = timeNode.find('Segment_Outside_Diameter')
@@ -239,31 +237,43 @@ class FuelAccumulation(object):
 #  for s in self.__fuelSegments:
 #   print(s[0],s[1],s[2])
 
+  return
+
 #---------------------------------------------------------------------------------
+# This uses a use portFile which is guaranteed at this point
  def __GetWithdrawalRequest( self, portFile, evolTime ):
 
-  tree = ElementTree()
-
-  tree.parse(portFile)
+  print('FuelAccumulation::__GetWithdrawalRequest: getting withdrawal request')
+  tree = ElementTree.parse(portFile)
   rootNode = tree.getroot()
 
-  n = rootNode.find('timeStamp')
-  timeStamp     = float(n.text.strip())
+  n             = rootNode.find('timeStamp')
+  timeStamp     = float(n.get('value').strip())
+
+  if timeStamp != evolTime: 
+     trial += 1
+     time.sleep(2)
+
+  assert timeStamp == evolTime, 'timeStamp = %r, evolTime = %r' % (timeStamp,evolTime)
+
   timeStampUnit = n.get('unit').strip()
   assert timeStampUnit == "minute"
 
-  n = rootNode.find('fuelLoad')
-  mass     = float(n.text.strip())
-  massUnit = n.get('unit').strip()
-  assert massUnit == "gram"
-
-  if timeStamp == evolTime:
+  mass = 0.0
+  subn = n.find('fuelLoad')
+  if subn is not None:
+     mass     = float(subn.text.strip())
+     massUnit = subn.get('unit').strip()
+     assert massUnit == "gram"
      self.__withdrawMass = mass
   else:
      self.__withdrawMass = 0.0
 
-  print('FuelAccumulation::__GetWithdrawalRequest(): mass ', self.__withdrawMass) 
-  print('FuelAccumulation::__GetWithdrawalRequest(): unit ', massUnit) 
+#  print('FuelAccumulation::__GetWithdrawalRequest(): mass ', self.__withdrawMass) 
+#  print('FuelAccumulation::__GetWithdrawalRequest(): unit ', massUnit) 
+
+# remove the request
+  os.system( 'rm -f ' + portFile )
 
   return 
 
@@ -287,9 +297,20 @@ class FuelAccumulation(object):
 
   withdrawMass = self.__withdrawMass
 
-  if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ):
+  fout = open( portFile, 'w')
 
-     return
+  s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
+  s = '<!-- Written by FuelAccumulation.py -->\n'; fout.write(s)
+  s = '<fuelsegments>\n'; fout.write(s)
+  s = ' <timeStamp value="'+str(evolTime)+'" unit="minute">'; fout.write(s)
+
+  if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
+
+   s = '</timeStamp>\n'; fout.write(s)
+   s = '</fuelsegments>\n'; fout.write(s)
+   fout.close()
+   self.__withdrawMass = 0.0
+   return
 
   else:  
 
@@ -297,49 +318,42 @@ class FuelAccumulation(object):
    fuelMassLoad = 0.0
 
    while fuelMassLoad <= withdrawMass:
-         fuelSegment = self.__WithdrawFuelSegment( evolTime )
-         if fuelSegment is None: break # no segments left with time stamp <= evolTime
+         fuelSegmentCandidate = self.__WithdrawFuelSegment( evolTime )
+         if fuelSegmentCandidate is None: break # no segments left with time stamp <= evolTime
          mass          = fuelSegmentCandidate[1]
          fuelMassLoad += mass
          if fuelMassLoad <= withdrawMass:
-            fuelSegmentsLoad.append( fuelSegment )
+            fuelSegmentsLoad.append( fuelSegmentCandidate )
          else:
-            self.__RestockFuelSegment( fuelSegment )
+            self.__RestockFuelSegment( fuelSegmentCandidate )
 
-  if len(fuelSegmentsLoad) == 0: return
+   assert len(fuelSegmentsLoad) != 0
 
-  if os.path.isfile(portFile):
-    fout = open( portFile, 'a')
-  else:
-    fout = open( portFile, 'w')
+   for fuelSeg in fuelSegmentsLoad:
+    s = ' <fuelSegment>\n'; fout.write(s)
+    timeStamp = fuelSeg[0]
+    mass      = fuelSeg[1]
+    length    = fuelSeg[2]
+    segID     = fuelSeg[3]
+    massU     = fuelSeg[4]
+    massPu    = fuelSeg[5]
+    massI     = fuelSeg[6]
+    massFP    = fuelSeg[7]
+    s = '  <timeStamp     unit="minute">'+str(timeStamp)+'</timeStamp>\n'; fout.write(s)
+    s = '  <mass          unit="gram">'+str(mass)+'</mass>\n';fout.write(s)
+    s = '  <length        unit="m">'+str(length)+'</length>\n';fout.write(s)
+    s = '  <innerDiameter unit="m">'+str(segID)+'</innerDiameter>\n';fout.write(s)
+    s = '  <U  unit="gram">'+str(massU)+'</U>\n';fout.write(s)
+    s = '  <Pu unit="gram">'+str(massPu)+'</Pu>\n';fout.write(s)
+    s = '  <I  unit="gram">'+str(massI)+'</I>\n';fout.write(s)
+    s = '  <FP unit="gram">'+str(massFP)+'</FP>\n';fout.write(s)
+    s = '</fuelSegment>\n';      fout.write(s)
+ 
+   s = '</timeStamp>\n'; fout.write(s)
+   s = '</fuelsegments>\n'; fout.write(s)
+   fout.close()
 
-  s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by FuelAccumulation.py -->\n'; fout.write(s)
-  s = '<fuelsegments>\n'; fout.write(s)
-  s = '<timeStamp unit="minute">'+str(evolTime)+'</timeStamp>\n'; fout.write(s)
-
-  for fuelSeg in fuelSegmentsLoad:
-   s = '<fuelsegment>\n'; fout.write(s)
-   timeStamp = fuelSeg[0]
-   mass      = fuelSeg[1]
-   length    = fuelSeg[2]
-   segID     = fuelSeg[3]
-   massU     = fuelSeg[4]
-   massPu    = fuelSeg[5]
-   massI     = fuelSeg[6]
-   massFP    = fuelSeg[7]
-   s = ' <timeStamp     unit="minute">'+str(timeStamp)+'</timeStamp>\n'; fout.write(s)
-   s = ' <mass          unit="gram">'+str(mass)+'</mass>\n';fout.write(s)
-   s = ' <length        unit="m">'+str(length)+'</length>\n';fout.write(s)
-   s = ' <innerDiameter unit="m">'+str(segID)+'</innerDiameter>\n';fout.write(s)
-   s = ' <U             unit="gram">'+str(massU)+'</U>\n';fout.write(s)
-   s = ' <Pu            unit="gram">'+str(massPu)+'</Pu>\n';fout.write(s)
-   s = ' <I             unit="gram">'+str(massI)+'</I>\n';fout.write(s)
-   s = ' <FP            unit="gram">'+str(massFP)+'</FP>\n';fout.write(s)
-   s = '</fuelsegment>\n';      fout.write(s)
-
-  s = '</fuelsegments>\n'; fout.write(s)
-  fout.close()
+  return
 
 #---------------------------------------------------------------------------------
  def __WithdrawFuelSegment(self, evolTime ):

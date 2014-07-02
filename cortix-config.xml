@@ -27,7 +27,7 @@
   </task>
 
   <task name="shear-dissolve">
-   <evolveTime unit="hour">24.0</evolveTime>
+   <evolveTime unit="hour">12.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
@@ -69,7 +69,7 @@
    <module name="dissolver">
     <executableName>dissolver-main.py</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/dissolver/</executablePath>
-    <configFileName>nitron.input</configFileName>
+    <configFileName>dissolution.input</configFileName>
     <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/dissolution/nitron/src/</configFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->

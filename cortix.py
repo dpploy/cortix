@@ -27,7 +27,7 @@ class Cortix(object):
                configFile = 'cortix-config.xml'
              ):
 
-    assert type(configFile) == str, '-> configFile Not a str.' 
+    assert type(configFile) is str, '-> configFile Not a str.' 
     self.__configFile = configFile
 
 # create a configuration tree
@@ -80,7 +80,9 @@ class Cortix(object):
     self.__logger.info('simulation name: '+sim.get('name'))
 
     simConfigTree = ConfigTree(sim)
+
     simulation = Simulation( self.__workDir, simConfigTree ) 
+
     self.__simulations.append( simulation )
 
   return

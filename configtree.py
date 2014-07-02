@@ -30,12 +30,12 @@ class ConfigTree(object):
                configFileName = None
              ):
 
-    if configTreeNode != None: 
-       assert type(configTreeNode) == Element, '-> configTreeNode invalid .' 
+    if configTreeNode is not None: 
+       assert type(configTreeNode) is Element, '-> configTreeNode invalid .' 
        self.__configTreeNode = configTreeNode
 
-    if configFileName != None:
-       assert type(configFileName) == str, '-> configFileName not a str.' 
+    if configFileName is not None:
+       assert type(configFileName) is str, '-> configFileName not a str.' 
 
        self.__ReadConfigTree( configFileName )
 
@@ -53,11 +53,11 @@ class ConfigTree(object):
      return self.__configTreeNode.get('name')
 
  def GetSubNode(self,tag):
-     assert type(tag) == str, 'tag invalid'
+     assert type(tag) is str, 'tag invalid'
      return self.__configTreeNode.find(tag)
 
  def GetAllSubNodes(self,tag):
-     assert type(tag) == str, 'tag invalid'
+     assert type(tag) is str, 'tag invalid'
      return self.__configTreeNode.findall(tag)
 
  def GetNodeChildren(self):
@@ -72,7 +72,10 @@ class ConfigTree(object):
  def __GetNodeChildren(self):
 
   children = list()
+
   for child in self.__configTreeNode:
+
+   # NB: child.items() is a list of pairs: (key, val)
    children.append( (child.tag, child.items(), child.text) )
 
   return children
