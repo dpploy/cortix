@@ -8,9 +8,12 @@ Tue Jun 24 01:03:45 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time
-import datetime
+import logging
 import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
+
+# create log for this python module; unlikely to be used; leave as reference
+pymodule_log = logging.getLogger('main.fuelacc')
 
 #*********************************************************************************
 class FuelAccumulation(object):
@@ -30,6 +33,9 @@ class FuelAccumulation(object):
 
   self.__withdrawMass = 0.0
 
+  self.__log = logging.getLogger('main.fuelacc')
+  self.__log.info('initializing an instance of FuelAccumulation')
+
 #---------------------------------------------------------------------------------
  def CallPorts(self, evolTime=0.0):
 
@@ -42,19 +48,15 @@ class FuelAccumulation(object):
 #---------------------------------------------------------------------------------
  def Execute( self, evolTime=0.0, timeStep=1.0 ):
 
-  print('\n')
-  print('************************************************')
-  print('FuelAccumulation::Execute: evolTime       = ',evolTime )
-  print('FuelAccumulation::Execute: # of segments  = ', len(self.__fuelSegments))
-  print('FuelAccumulation::Execute: total mass [g] = ', self.__GetMass())
-  print('************************************************')
+  s = 'Execute(): facility time [min] = ' + str(evolTime)
+  self.__log.info(s)
+  s = 'Execute(): total mass [g] = ' + str(self.__GetMass())
+  self.__log.info(s)
+  s = 'Execute(): # of segments  = '+str(len(self.__fuelSegments))
+  self.__log.debug(s)
 
 #---------------------------------------------------------------------------------
- def GetMass(self, timeStamp=None):
-  return self.__GetMass( timeStamp )
-
-#---------------------------------------------------------------------------------
- def GetNSegments(self, timeStamp=None):
+ def __GetNSegments(self, timeStamp=None):
  
   nSegments = 0
 
@@ -125,14 +127,22 @@ class FuelAccumulation(object):
  def __GetSolids( self, portFile, evolTime ):
 
   tree = ElementTree.parse(portFile)
+
   rootNode = tree.getroot()
+
   durationNode = rootNode.find('Duration')
+
   timeStep = float(durationNode.get('timeStep'))
-#  print('timeStep = ',timeStep)
+  s = '__GetSolids(): timeStep='+str(timeStep)
+  self.__log.debug(s)
+
   streamNode = rootNode.find('Stream')
-#  print(streamNode.get('name'))
+  s = '__GetSolids(): streamNode='+streamNode.get('name')
+  self.__log.debug(s)
+
   timeNodes = streamNode.findall('Time')
-#  print(len(timeNodes))
+  s = '__GetSolids(): # time nodes ='+str(len(timeNodes))
+  self.__log.debug(s)
 
 #.................................................................................
   for timeNode in timeNodes:
@@ -153,14 +163,23 @@ class FuelAccumulation(object):
    FP   = 0.0
 
    timeIndex = int(timeNode.get('index'))
+   s = '__GetSolids(): timeIndex='+str(timeIndex)
+   self.__log.debug(s)
+
    timeStamp = timeStep*timeIndex          
 
+   s = '__GetSolids(): timeStamp='+str(timeStamp)
+   self.__log.debug(s)
+
    if timeStamp == evolTime: 
+
+     s = '__GetSolids(): timeStamp='+str(timeStamp)+';'+' evolTime='+str(evolTime)
+     self.__log.debug(s)
 
 #   print('Time index = ',timeIndex)
      n = timeNode.find('Segment_Length')
  
-     if n is None: continue # to the next timeNode
+     if not ElementTree.iselement(n): continue # to the next timeNode
  
      segmentLength = float(n.get('length'))
      n = timeNode.find('Segment_Outside_Diameter')
@@ -208,15 +227,15 @@ class FuelAccumulation(object):
 #  print('mass FP     = ', FP)
 
      for seg in range(1,int(nSegments)+1):
-      segMass   = mass / int(nSegments)
+      segMass   = totalMass / int(nSegments)
       segLength = segmentLength
       segID     = iD
       U         = U  / int(nSegments)
       Pu        = Pu / int(nSegments)
       I         = I  / int(nSegments)
       FP        = FP / int(nSegments)
-      segment   = ( timeStamp, segMass, segLength, segID, U, Pu,
-                    I, FP )
+      segment   = ( timeStamp, segMass, segLength, segID, 
+                    U, Pu, I, FP )
 
       self.__fuelSegments.append( segment )
   
@@ -235,7 +254,7 @@ class FuelAccumulation(object):
 #  for s in self.__fuelSegments:
 #   print(s[0],s[1],s[2])
 
-   break
+     break
 
   return
 

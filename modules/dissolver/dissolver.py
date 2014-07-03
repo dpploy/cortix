@@ -8,9 +8,12 @@ Tue Jun 24 01:03:45 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time
-import datetime
+import logging
 import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
+
+# create log for this python module; unlikely to be used; leave as reference
+pymodule_log = logging.getLogger('main.dissolv')
 
 #*********************************************************************************
 class Dissolver(object):
@@ -34,6 +37,9 @@ class Dissolver(object):
 
   self.__startDissolveTime = 0.0
 
+  self.__log = logging.getLogger('main.dissolv')
+  self.__log.info('initializing an instance of Dissolver')
+
 #---------------------------------------------------------------------------------
  def CallPorts( self, evolTime=0.0 ):
 
@@ -46,14 +52,15 @@ class Dissolver(object):
 
 #  print('Dissolver::Execute: start dissolve time = ', self.__startDissolveTime)
 
+  s = 'Execute(): facility time [min] = ' + str(evolTime)
+  self.__log.info(s)
+
   if len(self.__fuelSegmentsLoad) != 0:
 
-     print('\n')
-     print('********************************************************')
-     print('Dissolver::Execute: evolTime = ',evolTime )
-     print('Dissolver::Execute: ready to load? = ', self.__ready2LoadFuel)
-     print('Dissolver::Execute: fuel load: # fuel segments = ', len(self.__fuelSegmentsLoad) )
-     print('********************************************************')
+     s = 'Execute(): fuel load: # fuel segments = ' + str(len(self.__fuelSegmentsLoad))
+     self.__log.debug(s)
+     s = 'Execute(): ready to load? = ' + str(self.__ready2LoadFuel)
+     self.__log.debug(s)
 
      if self.__startDissolveTime != 0.0:
         assert evolTime >= self.__startDissolveTime + self.__dutyPeriod

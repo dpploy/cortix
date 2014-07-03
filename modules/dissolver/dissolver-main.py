@@ -9,12 +9,16 @@ Tue Jun 24 01:03:45 EDT 2014
 #*********************************************************************************
 import os, sys, io, time
 import datetime
+import logging
 import xml.etree.ElementTree as ElementTree
 from dissolver import Dissolver
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
 def main(argv):
+
+#---------------------------------------------------------------------------------
+# Read and process the command prompt arguments
 
  assert len(argv) == 5, 'incomplete command line input.'
 
@@ -74,7 +78,28 @@ def main(argv):
  runtimeStatusFullPathFileName = argv[4]
 
 #---------------------------------------------------------------------------------
+# Create logger for main and class 
+ log = logging.getLogger('main')
+ log.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages
+
+ fullPathTaskDir = cortexParamFullPathFileName[:cortexParamFullPathFileName.rfind('/')]+'/'
+ fh = logging.FileHandler(fullPathTaskDir+'dissolver.log')
+ fh.setLevel(logging.DEBUG)
+# create console handler with a higher log level
+ ch = logging.StreamHandler()
+ ch.setLevel(logging.ERROR)
+# create formatter and add it to the handlers
+ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ fh.setFormatter(formatter)
+ ch.setFormatter(formatter)
+# add the handlers to the logger
+ log.addHandler(fh)
+ log.addHandler(ch)
+
+#---------------------------------------------------------------------------------
 # Run Dissolver
+ log.info('entered Run FuelAccumulation section')
 
 #.................................................................................
 # Setup input
@@ -83,13 +108,14 @@ def main(argv):
 
 #.................................................................................
 # Create the dissolver equipment
-
  nitron = Dissolver( ports )
+ log.info("nitron = Dissolver( ports )")
 
 #.................................................................................
 # Evolve the dissolver
 
  SetRuntimeStatus( runtimeStatusFullPathFileName, 'running' )  
+ log.info("SetRuntimeStatus( runtimeStatusFullPathFileName, 'running' )")
 
  facilityTime = 0.0
 
@@ -105,6 +131,7 @@ def main(argv):
 # Shutdown 
 
  SetRuntimeStatus( runtimeStatusFullPathFileName, 'finished' )  
+ log.info("SetRuntimeStatus(runtimeStatusFullPathFileName, 'finished')")
  
 #---------------------------------------------------------------------------------
 def SetRuntimeStatus(runtimeStatusFullPathFileName, status):

@@ -17,6 +17,9 @@ from fuelaccumulation import FuelAccumulation
 #---------------------------------------------------------------------------------
 def main(argv):
 
+#---------------------------------------------------------------------------------
+# Read and process the command prompt arguments
+
  assert len(argv) == 5, 'incomplete command line input.'
 
 #.................................................................................
@@ -81,9 +84,10 @@ def main(argv):
  runtimeStatusFullPathFileName = argv[4]
 
 #---------------------------------------------------------------------------------
-# create logger 
- logger = logging.getLogger('FuelAccumulation')
- logger.setLevel(logging.DEBUG)
+# Create logger for main and class
+
+ log = logging.getLogger('main')
+ log.setLevel(logging.DEBUG)
 # create file handler which logs even debug messages
 
  fullPathTaskDir = cortexParamFullPathFileName[:cortexParamFullPathFileName.rfind('/')]+'/'
@@ -97,12 +101,12 @@ def main(argv):
  fh.setFormatter(formatter)
  ch.setFormatter(formatter)
 # add the handlers to the logger
- logger.addHandler(fh)
- logger.addHandler(ch)
+ log.addHandler(fh)
+ log.addHandler(ch)
 
 #---------------------------------------------------------------------------------
 # Run FuelAccumulation
- logger.info('entered Run FuelAccumulation section')
+ log.info('entered Run FuelAccumulation section')
 
 #................................................................................
 # Left here as an example; vfda
@@ -129,13 +133,13 @@ def main(argv):
 #................................................................................
 # Create a fuel holding drum
  fuelDrum = FuelAccumulation( ports )
- logger.info("fuelDrum = FuelAccumulation( ports )")
+ log.info("fuelDrum = FuelAccumulation( ports )")
 
 #................................................................................
 # Evolve the fuel accumulation
 
  SetRuntimeStatus( runtimeStatusFullPathFileName, 'running' )
- logger.info("SetRuntimeStatus( runtimeStatusFullPathFileName, 'running' )")
+ log.info("SetRuntimeStatus( runtimeStatusFullPathFileName, 'running' )")
 
  facilityTime = 0.0
 
@@ -151,6 +155,7 @@ def main(argv):
 # Shutdown 
 
  SetRuntimeStatus(runtimeStatusFullPathFileName, 'finished') 
+ log.info("SetRuntimeStatus(runtimeStatusFullPathFileName, 'finished')")
 
 #---------------------------------------------------------------------------------
 def SetRuntimeStatus(runtimeStatusFullPathFileName, status):
