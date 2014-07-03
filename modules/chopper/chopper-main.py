@@ -99,7 +99,7 @@ def main(argv):
 
  SetRuntimeStatus(runtimeStatusFullPathFileName, 'running')
 
- time.sleep(5) # fake running time for the chopper
+ time.sleep(1) # fake running time for the chopper
 
  resultsDir = os.path.dirname(__file__).strip()+'/'
 
@@ -118,16 +118,6 @@ def main(argv):
 # Shutdown 
 
  SetRuntimeStatus(runtimeStatusFullPathFileName, 'finished')
-
-# tree.parse(runtimeStatusFullPathFileName)
-# runtimeStatusXMLRootNode = tree.getroot()
-# root = runtimeStatusXMLRootNode
-# node = root.find('status')
-# node.text = 'finished'
-# a = Element('comment')
-# a.text = 'Written by Chopper.py'
-# root.append(a)
-# tree.write(runtimeStatusFullPathFileName,xml_declaration=True,encoding="UTF-8",method="xml")
 
 #---------------------------------------------------------------------------------
 def SetRuntimeStatus(runtimeStatusFullPathFileName, status):

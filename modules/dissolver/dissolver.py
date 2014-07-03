@@ -27,15 +27,49 @@ class Dissolver(object):
   self.__ports = ports
 
   self.__solidsMassLoadMax = 250.0 # gram
-  self.__dutyPeriod = 120.0 # minute
-  self.__ready2LoadFuel = True 
+  self.__dutyPeriod        = 120.0 # minute
+  self.__ready2LoadFuel    = True 
 
   self.__fuelSegmentsLoad = list()
 
   self.__startDissolveTime = 0.0
 
 #---------------------------------------------------------------------------------
- def UseData( self, usePortName=None, evolTime=0.0 ):
+ def CallPorts( self, evolTime=0.0 ):
+
+  self.__ProvideData( providePortName='solids-request', evolTime=evolTime )     
+
+  self.__UseData( usePortName='solids', evolTime=evolTime )     
+
+#---------------------------------------------------------------------------------
+ def Execute( self, evolTime=0.0, timeStep=1.0 ):
+
+#  print('Dissolver::Execute: start dissolve time = ', self.__startDissolveTime)
+
+  if len(self.__fuelSegmentsLoad) != 0:
+
+     print('\n')
+     print('********************************************************')
+     print('Dissolver::Execute: evolTime = ',evolTime )
+     print('Dissolver::Execute: ready to load? = ', self.__ready2LoadFuel)
+     print('Dissolver::Execute: fuel load: # fuel segments = ', len(self.__fuelSegmentsLoad) )
+     print('********************************************************')
+
+     if self.__startDissolveTime != 0.0:
+        assert evolTime >= self.__startDissolveTime + self.__dutyPeriod
+
+     self.__ready2LoadFuel = False
+     self.__startDissolveTime = evolTime
+
+     time.sleep(1) # RUN the Dissolver for a "timeStep" time; place holder
+
+     self.__fuelSegmentsLoad = list()
+
+  if evolTime >= self.__startDissolveTime + self.__dutyPeriod: 
+     self.__ready2LoadFuel = True
+
+#---------------------------------------------------------------------------------
+ def __UseData( self, usePortName=None, evolTime=0.0 ):
 
 # Access the port file
   portFile = self.__GetPortFile( usePortName = usePortName )
@@ -45,36 +79,13 @@ class Dissolver(object):
      self.__fuelSegmentsLoad = self.__GetSolids( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
- def ProvideData( self, providePortName=None, evolTime=0.0 ):
+ def __ProvideData( self, providePortName=None, evolTime=0.0 ):
 
 # Access the port file
   portFile = self.__GetPortFile( providePortName = providePortName )
 
 # Send data to port files
   if providePortName == 'solids-request': self.__ProvideSolidsRequest( portFile, evolTime )
-
-#---------------------------------------------------------------------------------
- def Dissolve( self, evolTime=0.0 ):
-
-  print('Dissolver::Dissolve: evolTime = ',evolTime)
-  print('Dissolver::Dissolve: fuel load: # fuel segments = ', len(self.__fuelSegmentsLoad))
-  print('Dissolver::Dissolve: ready to load? = ', self.__ready2LoadFuel)
-  print('Dissolver::Dissolve: start dissolve time = ', self.__startDissolveTime)
-
-  if len(self.__fuelSegmentsLoad) != 0:
-
-     if self.__startDissolveTime != 0.0:
-        assert evolTime >= self.__startDissolveTime + self.__dutyPeriod
-
-     self.__ready2LoadFuel = False
-     self.__startDissolveTime = evolTime
-
-     time.sleep(10) # RUN the Dissolver for a "timeStep" time; place holder
-
-     self.__fuelSegmentsLoad = list()
-
-  if evolTime >= self.__startDissolveTime + self.__dutyPeriod: 
-     self.__ready2LoadFuel = True
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -92,8 +103,8 @@ class Dissolver(object):
     nTrials    = 0
     while not os.path.isfile(portFile) and nTrials < maxNTrials:
       nTrials += 1
-      print('Dissolver::__GetPortFile: waiting for port:',portFile)
-      time.sleep(5)
+#      print('Dissolver::__GetPortFile: waiting for port:',portFile)
+      time.sleep(1)
 
     assert os.path.isfile(portFile) is True, 'portFile %r not available' % portFile
     time.sleep(1) # allow for file to finish writing
@@ -119,8 +130,8 @@ class Dissolver(object):
   s = '<dissolutionFuelRequest>\n'; fout.write(s)
   s = ' <timeStamp value="'+str(evolTime)+'" unit="minute">\n'; fout.write(s)
 
-  print('Dissolver::__ProvideSolidsRequest(): evolTime = ',evolTime)
-  print('Dissolver::__ProvideSolidsRequest(): ready to load = ',self.__ready2LoadFuel)
+#  print('Dissolver::__ProvideSolidsRequest(): evolTime = ',evolTime)
+#  print('Dissolver::__ProvideSolidsRequest(): ready to load = ',self.__ready2LoadFuel)
 
   if  self.__ready2LoadFuel is True:
  
@@ -151,8 +162,8 @@ class Dissolver(object):
 
   tree = ElementTree.parse( portFile )
 
-  print('Dissolver::__GetSolids: dumping the solids obtained at this point')
-  ElementTree.dump(tree)
+#  print('Dissolver::__GetSolids: dumping the solids obtained at this point')
+#  ElementTree.dump(tree)
 
   rootNode = tree.getroot()
 
@@ -235,7 +246,7 @@ class Dissolver(object):
 #  os.system( 'cp ' + portFile + ' /tmp/.')
   os.system( 'rm -f ' + portFile )
 
-  print('Dissolver::__GetSolids: len(fuelSegmentsLoad)',len(fuelSegmentsLoad))
+#  print('Dissolver::__GetSolids: len(fuelSegmentsLoad)',len(fuelSegmentsLoad))
 
   return  fuelSegmentsLoad
 

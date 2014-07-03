@@ -95,13 +95,10 @@ def main(argv):
 
  while facilityTime <= evolveTime:
 
-  nitron.ProvideData( providePortName='solids-request', evolTime=facilityTime )
-  nitron.UseData( usePortName='solids', evolTime=facilityTime )
+  nitron.CallPorts( facilityTime )
 
-  nitron.Dissolve( facilityTime )
+  nitron.Execute( facilityTime, timeStep )
 
-#.................................................................................
-#
   facilityTime += timeStep 
 #
 #---------------------------------------------------------------------------------

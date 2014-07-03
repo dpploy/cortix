@@ -31,6 +31,25 @@ class FuelAccumulation(object):
   self.__withdrawMass = 0.0
 
 #---------------------------------------------------------------------------------
+ def CallPorts(self, evolTime=0.0):
+
+  self.__UseData( usePortName='solids', evolTime=evolTime  )
+ 
+  self.__UseData( usePortName='withdrawal-request', evolTime=evolTime  )
+
+  self.__ProvideData( providePortName='fuel-segments', evolTime=evolTime )
+
+#---------------------------------------------------------------------------------
+ def Execute( self, evolTime=0.0, timeStep=1.0 ):
+
+  print('\n')
+  print('************************************************')
+  print('FuelAccumulation::Execute: evolTime       = ',evolTime )
+  print('FuelAccumulation::Execute: # of segments  = ', len(self.__fuelSegments))
+  print('FuelAccumulation::Execute: total mass [g] = ', self.__GetMass())
+  print('************************************************')
+
+#---------------------------------------------------------------------------------
  def GetMass(self, timeStamp=None):
   return self.__GetMass( timeStamp )
 
@@ -49,27 +68,7 @@ class FuelAccumulation(object):
   return nSegments
 
 #---------------------------------------------------------------------------------
- def GetLastTimeStamp(self):
- 
-  lastTimeStamp = 0.0
-  for fuelSeg in self.__fuelSegments:
-     lastTimeStamp = max(lastTimeStamp,fuelSeg[0])
-
-  return lastTimeStamp
-
-#---------------------------------------------------------------------------------
- def WithdrawFuelSegment(self, evolTime ):
-
-  fuelSegment = self.__WithdrawFuelSegment( evolTime )
-
-  return fuelSegment # if None, it is empty 
-#---------------------------------------------------------------------------------
- def RestockFuelSegment( self, fuelSegment ):
-
-  self.__RestockFuelSegment( fuelSegment )
-
-#---------------------------------------------------------------------------------
- def UseData( self, usePortName=None, evolTime=0.0 ):
+ def __UseData( self, usePortName=None, evolTime=0.0 ):
 
 # Access the port file
   portFile = self.__GetPortFile( usePortName = usePortName )
@@ -80,7 +79,7 @@ class FuelAccumulation(object):
   if usePortName == 'withdrawal-request': self.__GetWithdrawalRequest( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
- def ProvideData( self, providePortName=None, evolTime=0.0 ):
+ def __ProvideData( self, providePortName=None, evolTime=0.0 ):
 
 # Access the port file
   portFile = self.__GetPortFile( providePortName = providePortName )
@@ -104,8 +103,8 @@ class FuelAccumulation(object):
     nTrials    = 0
     while not os.path.isfile(portFile) and nTrials < maxNTrials:
       nTrials += 1
-      print('FuelAccumulation::__GetPortFile: waiting for port:',portFile)
-      time.sleep(5)
+#      print('FuelAccumulation::__GetPortFile: waiting for port:',portFile)
+      time.sleep(1)
 
     assert os.path.isfile(portFile) is True, 'portFile %r not available' % portFile
 
@@ -135,27 +134,23 @@ class FuelAccumulation(object):
   timeNodes = streamNode.findall('Time')
 #  print(len(timeNodes))
 
-  totalMass = 0.0
-  totalNSegments = 0.0
-  totalU    = 0.0
-  totalPu   = 0.0
-  totalCs   = 0.0
-  totalI    = 0.0
-  totalO    = 0.0
-  totalN    = 0.0
-  totalFP   = 0.0
-
 #.................................................................................
   for timeNode in timeNodes:
 
-   timeMass = 0.0
-   timeU    = 0.0
-   timePu   = 0.0
-   timeCs   = 0.0
-   timeI    = 0.0
-   timeO    = 0.0
-   timeN    = 0.0
-   timeFP   = 0.0
+   totalMass = 0.0
+
+   U    = 0.0
+   Pu   = 0.0
+   Cs   = 0.0
+   Sr   = 0.0
+   I    = 0.0
+   Kr   = 0.0
+   Xe   = 0.0
+   3H   = 0.0
+   Ru   = 0.0
+   O    = 0.0
+   N    = 0.0
+   FP   = 0.0
 
    timeIndex = int(timeNode.get('index'))
    timeStamp = timeStep*timeIndex          
@@ -183,42 +178,45 @@ class FuelAccumulation(object):
            if child.tag == 'Mass': 
               mass = float(child.text.strip())
               totalMass += mass
-              timeMass  += mass
-              if element.get('key') == 'U' : timeU  += mass; totalU  += mass
-              if element.get('key') == 'Pu': timePu += mass; totalPu += mass
-              if element.get('key') == 'Cs': timeCs += mass; totalCs += mass
-              if element.get('key') == 'I' : timeI  += mass; totalI  += mass
-              if element.get('key') == 'O' : timeO  += mass; totalO  += mass
-              if element.get('key') == 'N' : timeN  += mass; totalN  += mass
+              if element.get('key') == 'U' : U  += mass; 
+              if element.get('key') == 'Pu': Pu += mass; 
+              if element.get('key') == 'Cs': Cs += mass; 
+              if element.get('key') == 'Sr': Sr += mass; 
+              if element.get('key') == 'I' : I  += mass; 
+              if element.get('key') == 'Kr': Kr += mass; 
+              if element.get('key') == 'Kr': Xe += mass; 
+              if element.get('key') == 'H' : 3H += mass; 
+              if element.get('key') == 'Ru': Ru += mass; 
+              if element.get('key') == 'O' : O  += mass; 
+              if element.get('key') == 'N' : N  += mass; 
 
-#  print('mass     [g]= ', timeMass)
+#  print('mass     [g]= ', mass)
 #  print('#segments   = ', nSegments)
 #  print('length      = ', segmentLength)
 #  print('OD          = ', oD)
 #  print('ID          = ', iD)
 
-     timeFP   = timeMass - (timeU + timePu + timeI)
-     totalFP += timeFP
-     totalNSegments += nSegments
+     FP = totalMass - (U + Pu + I + Kr + Xe + 3H)
+#     totalNSegments += nSegments
 
-#  print('mass U      = ', timeU)
-#  print('mass Pu     = ', timePu)
-#  print('mass Cs     = ', timeCs)
-#  print('mass I      = ', timeI)
-#  print('mass O      = ', timeO)
-#  print('mass N      = ', timeN)
-#  print('mass FP     = ', timeFP)
+#  print('mass U      = ', U)
+#  print('mass Pu     = ', Pu)
+#  print('mass Cs     = ', Cs)
+#  print('mass I      = ', I)
+#  print('mass O      = ', O)
+#  print('mass N      = ', N)
+#  print('mass FP     = ', FP)
 
      for seg in range(1,int(nSegments)+1):
-      segMass   = timeMass / int(nSegments)
+      segMass   = mass / int(nSegments)
       segLength = segmentLength
       segID     = iD
-      massU     = timeU  / int(nSegments)
-      massPu    = timePu / int(nSegments)
-      massI     = timeI  / int(nSegments)
-      massFP    = timeFP / int(nSegments)
-      segment   = ( timeStamp, segMass, segLength, segID, massU, massPu,
-                    massI, massFP )
+      U         = U  / int(nSegments)
+      Pu        = Pu / int(nSegments)
+      I         = I  / int(nSegments)
+      FP        = timeFP / int(nSegments)
+      segment   = ( timeStamp, segMass, segLength, segID, U, Pu,
+                    I, FP )
 
       self.__fuelSegments.append( segment )
   
@@ -237,22 +235,20 @@ class FuelAccumulation(object):
 #  for s in self.__fuelSegments:
 #   print(s[0],s[1],s[2])
 
+   break
+
   return
 
 #---------------------------------------------------------------------------------
 # This uses a use portFile which is guaranteed at this point
  def __GetWithdrawalRequest( self, portFile, evolTime ):
 
-  print('FuelAccumulation::__GetWithdrawalRequest: getting withdrawal request')
+#  print('FuelAccumulation::__GetWithdrawalRequest: getting withdrawal request')
   tree = ElementTree.parse(portFile)
   rootNode = tree.getroot()
 
   n             = rootNode.find('timeStamp')
   timeStamp     = float(n.get('value').strip())
-
-  if timeStamp != evolTime: 
-     trial += 1
-     time.sleep(2)
 
   assert timeStamp == evolTime, 'timeStamp = %r, evolTime = %r' % (timeStamp,evolTime)
 

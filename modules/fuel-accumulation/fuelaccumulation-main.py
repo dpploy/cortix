@@ -83,6 +83,7 @@ def main(argv):
 # Run FuelAccumulation
 
 #................................................................................
+# Left here as an example; vfda
 # Setup input (this was used when debugging; need proper cortix-config.xml
 
 # found = False
@@ -116,10 +117,9 @@ def main(argv):
 
  while facilityTime <= evolveTime:
 
-  fuelDrum.UseData( usePortName='solids', evolTime=facilityTime  )
-  fuelDrum.UseData( usePortName='withdrawal-request', evolTime=facilityTime  )
+  fuelDrum.CallPorts( facilityTime )
 
-  fuelDrum.ProvideData( providePortName='fuel-segments', evolTime=facilityTime )
+  fuelDrum.Execute( facilityTime, timeStep )
 
   facilityTime += timeStep
 
@@ -127,16 +127,6 @@ def main(argv):
 # Shutdown 
 
  SetRuntimeStatus(runtimeStatusFullPathFileName, 'finished') 
-
-# tree.parse(runtimeStatusFullPathFileName)
-# runtimeStatusXMLRootNode = tree.getroot()
-# root = runtimeStatusXMLRootNode
-# node = root.find('status')
-# node.text = 'finished'
-# a = Element('comment')
-# a.text = 'Written by Dissolver.py'
-# root.append(a)
-# tree.write(runtimeStatusFullPathFileName,xml_declaration=True,encoding="UTF-8",method="xml")
 
 #---------------------------------------------------------------------------------
 def SetRuntimeStatus(runtimeStatusFullPathFileName, status):
