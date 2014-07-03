@@ -9,6 +9,7 @@ Sun Jun 29 21:34:18 EDT 2014
 #*********************************************************************************
 import os, sys, io, time
 import datetime
+import logging
 import xml.etree.ElementTree as ElementTree
 from fuelaccumulation import FuelAccumulation
 #*********************************************************************************
@@ -80,7 +81,28 @@ def main(argv):
  runtimeStatusFullPathFileName = argv[4]
 
 #---------------------------------------------------------------------------------
+# create logger 
+ logger = logging.getLogger('FuelAccumulation')
+ logger.setLevel(logging.DEBUG)
+# create file handler which logs even debug messages
+
+ fullPathTaskDir = cortexParamFullPathFileName[:cortexParamFullPathFileName.rfind('/')]+'/'
+ fh = logging.FileHandler(fullPathTaskDir+'fuelaccumulation.log')
+ fh.setLevel(logging.DEBUG)
+# create console handler with a higher log level
+ ch = logging.StreamHandler()
+ ch.setLevel(logging.ERROR)
+# create formatter and add it to the handlers
+ formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ fh.setFormatter(formatter)
+ ch.setFormatter(formatter)
+# add the handlers to the logger
+ logger.addHandler(fh)
+ logger.addHandler(ch)
+
+#---------------------------------------------------------------------------------
 # Run FuelAccumulation
+ logger.info('entered Run FuelAccumulation section')
 
 #................................................................................
 # Left here as an example; vfda
@@ -107,11 +129,13 @@ def main(argv):
 #................................................................................
 # Create a fuel holding drum
  fuelDrum = FuelAccumulation( ports )
+ logger.info("fuelDrum = FuelAccumulation( ports )")
 
 #................................................................................
 # Evolve the fuel accumulation
 
  SetRuntimeStatus( runtimeStatusFullPathFileName, 'running' )
+ logger.info("SetRuntimeStatus( runtimeStatusFullPathFileName, 'running' )")
 
  facilityTime = 0.0
 

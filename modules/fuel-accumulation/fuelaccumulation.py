@@ -146,7 +146,7 @@ class FuelAccumulation(object):
    I    = 0.0
    Kr   = 0.0
    Xe   = 0.0
-   3H   = 0.0
+   a3H  = 0.0
    Ru   = 0.0
    O    = 0.0
    N    = 0.0
@@ -178,17 +178,17 @@ class FuelAccumulation(object):
            if child.tag == 'Mass': 
               mass = float(child.text.strip())
               totalMass += mass
-              if element.get('key') == 'U' : U  += mass; 
-              if element.get('key') == 'Pu': Pu += mass; 
-              if element.get('key') == 'Cs': Cs += mass; 
-              if element.get('key') == 'Sr': Sr += mass; 
-              if element.get('key') == 'I' : I  += mass; 
-              if element.get('key') == 'Kr': Kr += mass; 
-              if element.get('key') == 'Kr': Xe += mass; 
-              if element.get('key') == 'H' : 3H += mass; 
-              if element.get('key') == 'Ru': Ru += mass; 
-              if element.get('key') == 'O' : O  += mass; 
-              if element.get('key') == 'N' : N  += mass; 
+              if element.get('key') == 'U' :  U  += mass; 
+              if element.get('key') == 'Pu':  Pu += mass; 
+              if element.get('key') == 'Cs':  Cs += mass; 
+              if element.get('key') == 'Sr':  Sr += mass; 
+              if element.get('key') == 'I' :  I  += mass; 
+              if element.get('key') == 'Kr':  Kr += mass; 
+              if element.get('key') == 'Kr':  Xe += mass; 
+              if element.get('key') == 'H' : a3H += mass; 
+              if element.get('key') == 'Ru':  Ru += mass; 
+              if element.get('key') == 'O' :  O  += mass; 
+              if element.get('key') == 'N' :  N  += mass; 
 
 #  print('mass     [g]= ', mass)
 #  print('#segments   = ', nSegments)
@@ -196,7 +196,7 @@ class FuelAccumulation(object):
 #  print('OD          = ', oD)
 #  print('ID          = ', iD)
 
-     FP = totalMass - (U + Pu + I + Kr + Xe + 3H)
+     FP = totalMass - (U + Pu + I + Kr + Xe + a3H)
 #     totalNSegments += nSegments
 
 #  print('mass U      = ', U)
@@ -214,7 +214,7 @@ class FuelAccumulation(object):
       U         = U  / int(nSegments)
       Pu        = Pu / int(nSegments)
       I         = I  / int(nSegments)
-      FP        = timeFP / int(nSegments)
+      FP        = FP / int(nSegments)
       segment   = ( timeStamp, segMass, segLength, segID, U, Pu,
                     I, FP )
 
