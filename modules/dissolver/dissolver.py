@@ -57,9 +57,13 @@ class Dissolver(object):
 
   if len(self.__fuelSegmentsLoad) != 0:
 
-     s = 'Execute(): fuel load: # fuel segments = ' + str(len(self.__fuelSegmentsLoad))
+     s = 'Execute(): start new duty cycle at '+str(evolTime)+' [min]'
      self.__log.debug(s)
      s = 'Execute(): ready to load? = ' + str(self.__ready2LoadFuel)
+     self.__log.debug(s)
+     s = 'Execute(): loaded mass '+str(self.__GetFuelLoadMass())
+     self.__log.debug(s)
+     s = 'Execute(): new fuel load # segments = ' + str(len(self.__fuelSegmentsLoad))
      self.__log.debug(s)
 
      if self.__startDissolveTime != 0.0:
@@ -73,7 +77,15 @@ class Dissolver(object):
      self.__fuelSegmentsLoad = list()
 
   if evolTime >= self.__startDissolveTime + self.__dutyPeriod: 
+     s = 'Execute(): signal new duty cycle at '+str(evolTime)+' [min]'
+     self.__log.debug(s)
+     s = 'Execute(): loaded mass '+str(self.__GetFuelLoadMass())
+     self.__log.debug(s)
+
      self.__ready2LoadFuel = True
+
+     s = 'Execute(): ready to load? = ' + str(self.__ready2LoadFuel)
+     self.__log.debug(s)
 
 #---------------------------------------------------------------------------------
  def __UseData( self, usePortName=None, evolTime=0.0 ):
@@ -236,6 +248,24 @@ class Dissolver(object):
           assert len(attributes) == 1
           assert attributes[0][0] == 'unit'
           segIUnit = attributes[0][1]
+       if child.tag == 'Kr':
+          segKr            = float(child.text.strip())
+          attributes       = child.items()
+          assert len(attributes) == 1
+          assert attributes[0][0] == 'unit'
+          segKrUnit = attributes[0][1]
+       if child.tag == 'Xe':
+          segXe            = float(child.text.strip())
+          attributes       = child.items()
+          assert len(attributes) == 1
+          assert attributes[0][0] == 'unit'
+          segXeUnit = attributes[0][1]
+       if child.tag == 'a3H':
+          seg3H             = float(child.text.strip())
+          attributes       = child.items()
+          assert len(attributes) == 1
+          assert attributes[0][0] == 'unit'
+          seg3HUnit = attributes[0][1]
        if child.tag == 'FP':
           segFP            = float(child.text.strip())
           attributes       = child.items()
@@ -245,7 +275,8 @@ class Dissolver(object):
 
 #     os.system( 'cp ' + portFile + ' /tmp/.')
      fuelSegment = ( segTimeStamp, segMass, segLength, segID, 
-                     segU,         segPu,   segI,      segFP  )
+                     segU,         segPu,   segI,      segKr,
+                     segXe,        seg3H,   segFP  )
 
      fuelSegmentsLoad.append( fuelSegment )
 
@@ -256,6 +287,14 @@ class Dissolver(object):
 #  print('Dissolver::__GetSolids: len(fuelSegmentsLoad)',len(fuelSegmentsLoad))
 
   return  fuelSegmentsLoad
+
+#---------------------------------------------------------------------------------
+ def __GetFuelLoadMass( self ):
+
+  mass = 0.0
+  for seg in self.__fuelSegmentsLoad: mass += seg[1]
+  
+  return mass 
 
 #*********************************************************************************
 # Usage: -> python dissolver.py

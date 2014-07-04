@@ -36,6 +36,8 @@ class FuelAccumulation(object):
   self.__log = logging.getLogger('main.fuelacc')
   self.__log.info('initializing an instance of FuelAccumulation')
 
+  self.__gramDecimals = 3 # milligram significant digits
+
 #---------------------------------------------------------------------------------
  def CallPorts(self, evolTime=0.0):
 
@@ -233,9 +235,12 @@ class FuelAccumulation(object):
       U         = U  / int(nSegments)
       Pu        = Pu / int(nSegments)
       I         = I  / int(nSegments)
+      Kr        = Kr / int(nSegments)
+      Xe        = Xe / int(nSegments)
+      a3H       = a3H/ int(nSegments)
       FP        = FP / int(nSegments)
       segment   = ( timeStamp, segMass, segLength, segID, 
-                    U, Pu, I, FP )
+                    U, Pu, I, Kr, Xe, a3H, FP )
 
       self.__fuelSegments.append( segment )
   
@@ -310,6 +315,8 @@ class FuelAccumulation(object):
 #---------------------------------------------------------------------------------
  def __ProvideFuelSegments( self, portFile, evolTime ):
 
+  gDec = self.__gramDecimals
+
   withdrawMass = self.__withdrawMass
 
   fout = open( portFile, 'w')
@@ -350,18 +357,24 @@ class FuelAccumulation(object):
     mass      = fuelSeg[1]
     length    = fuelSeg[2]
     segID     = fuelSeg[3]
-    massU     = fuelSeg[4]
-    massPu    = fuelSeg[5]
-    massI     = fuelSeg[6]
-    massFP    = fuelSeg[7]
+    U         = fuelSeg[4]
+    Pu        = fuelSeg[5]
+    I         = fuelSeg[6]
+    Kr        = fuelSeg[7]
+    Xe        = fuelSeg[8]
+    a3H       = fuelSeg[9]
+    FP        = fuelSeg[10]
     s = '  <timeStamp     unit="minute">'+str(timeStamp)+'</timeStamp>\n'; fout.write(s)
     s = '  <mass          unit="gram">'+str(mass)+'</mass>\n';fout.write(s)
     s = '  <length        unit="m">'+str(length)+'</length>\n';fout.write(s)
     s = '  <innerDiameter unit="m">'+str(segID)+'</innerDiameter>\n';fout.write(s)
-    s = '  <U  unit="gram">'+str(massU)+'</U>\n';fout.write(s)
-    s = '  <Pu unit="gram">'+str(massPu)+'</Pu>\n';fout.write(s)
-    s = '  <I  unit="gram">'+str(massI)+'</I>\n';fout.write(s)
-    s = '  <FP unit="gram">'+str(massFP)+'</FP>\n';fout.write(s)
+    s = '  <U  unit="gram">'+str(round(U,gDec))+'</U>\n';fout.write(s)
+    s = '  <Pu unit="gram">'+str(round(Pu,gDec))+'</Pu>\n';fout.write(s)
+    s = '  <I  unit="gram">'+str(round(I,gDec))+'</I>\n';fout.write(s)
+    s = '  <Kr unit="gram">'+str(round(Kr,gDec))+'</Kr>\n';fout.write(s)
+    s = '  <Xe unit="gram">'+str(round(Xe,gDec))+'</Xe>\n';fout.write(s)
+    s = '  <a3H unit="gram">'+str(round(a3H,gDec))+'</a3H>\n';fout.write(s)
+    s = '  <FP unit="gram">'+str(round(FP,gDec))+'</FP>\n';fout.write(s)
     s = '</fuelSegment>\n';      fout.write(s)
  
    s = '</timeStamp>\n'; fout.write(s)

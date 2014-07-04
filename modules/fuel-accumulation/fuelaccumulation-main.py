@@ -88,19 +88,18 @@ def main(argv):
 
  log = logging.getLogger('main')
  log.setLevel(logging.DEBUG)
-# create file handler which logs even debug messages
-
+ # create file handler which logs even debug messages
  fullPathTaskDir = cortexParamFullPathFileName[:cortexParamFullPathFileName.rfind('/')]+'/'
  fh = logging.FileHandler(fullPathTaskDir+'fuelaccumulation.log')
  fh.setLevel(logging.DEBUG)
-# create console handler with a higher log level
+ # create console handler with a higher log level
  ch = logging.StreamHandler()
  ch.setLevel(logging.ERROR)
-# create formatter and add it to the handlers
+ # create formatter and add it to the handlers
  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
  fh.setFormatter(formatter)
  ch.setFormatter(formatter)
-# add the handlers to the logger
+ # add the handlers to the logger
  log.addHandler(fh)
  log.addHandler(ch)
 

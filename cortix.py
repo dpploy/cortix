@@ -10,12 +10,13 @@ Tue Dec 10 11:21:30 EDT 2013
 import os, sys, io
 import datetime
 import logging
-#import logging.config
 from configtree import ConfigTree
 from simulation import Simulation
 #*********************************************************************************
 
-#logging.config.fileConfig('cortix-log.conf')
+# Create log for this python module and those that include this module
+log = logging.getLogger('cortix')
+log.setLevel(logging.DEBUG)
 
 #*********************************************************************************
 class Cortix(object):
@@ -30,10 +31,10 @@ class Cortix(object):
     assert type(configFile) is str, '-> configFile Not a str.' 
     self.__configFile = configFile
 
-# create a configuration tree
+# Create a configuration tree
     self.__configTree = ConfigTree( configFileName=self.__configFile )
 
-# create the work directory and logging
+# Create the work directory 
     node  = self.__configTree.GetSubNode('workDir')
     wrkDir = node.text.strip()
     if wrkDir[-1] != '/': wrkDir += '/'
@@ -44,18 +45,23 @@ class Cortix(object):
 
     os.system( 'mkdir -p ' + self.__workDir )
 
-    logging.basicConfig( filename=self.__workDir+'cortix.log' )
-    logger = logging.getLogger('cortix')
-    logger.setLevel(logging.DEBUG)
-    fh = logging.FileHandler( self.__workDir+'cortix.log' )
+# Create logging
+    self.__log = logging.getLogger('cortix')
+    # file handler
+    fh = logging.FileHandler(self.__workDir+'cortix.log')
     fh.setLevel(logging.DEBUG)
+    # console handler
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.ERROR)
+    # formatter added to handlers
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
-    logger.addHandler(fh)
+    ch.setFormatter(formatter)
+    # add handlers to logger
+    log.addHandler(fh)
+    log.addHandler(ch)
 
-    logger.info('work directory:'+self.__workDir)
-
-    self.__logger = logger
+    log.info('work directory:'+self.__workDir)
 
 # setup simulations
     self.__simulations = list()
@@ -77,7 +83,8 @@ class Cortix(object):
 
   for sim in self.__configTree.GetAllSubNodes('simulation'):
  
-    self.__logger.info('simulation name: '+sim.get('name'))
+    s = '__SetupSimulations(): simulation name: '+sim.get('name')
+    self.__log.debug(s)
 
     simConfigTree = ConfigTree(sim)
 
