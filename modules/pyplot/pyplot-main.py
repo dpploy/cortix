@@ -7,18 +7,17 @@ Cortix module for plotting
 Tue Jun 24 12:13:50 EDT 2014
 """
 #*********************************************************************************
-import os, sys, io, time
-import datetime
+import os, sys, io, time, datetime
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import Element
 #*********************************************************************************
 
-def main(argv):
+def Main(argv):
 
  assert len(argv) == 5, 'missing command line input.'
 
 # First command line argument is the module input file name with full path.
-# This input file is used by both the wrapper and the inner-code for 
+# This input file is used by both the wrapper and the host code for 
 # communication.
  inputFullPathFileName = argv[1]
 
@@ -67,4 +66,4 @@ def main(argv):
 #*********************************************************************************
 # Usage: -> python pyplot.py or ./pyplot.py
 if __name__ == "__main__":
-   main(sys.argv)
+   Main(sys.argv)

@@ -14,7 +14,7 @@ from fuelaccumulation import FuelAccumulation
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
-def main(argv):
+def Main(argv):
 
 #---------------------------------------------------------------------------------
 # Read and process the command prompt arguments
@@ -23,7 +23,7 @@ def main(argv):
 
 #.................................................................................
 # First command line argument is the module input file name with full path.
-# This input file may be used by both the wrapper and the inner-code for 
+# This input file may be used by both the wrapper and the host code for 
 # communication.
  inputFullPathFileName = argv[1]
 
@@ -180,4 +180,4 @@ def SetRuntimeStatus(runtimeStatusFullPathFileName, status):
 #*********************************************************************************
 # Usage: -> python fuelaccumulation-main.py or ./fuelaccumulation-main.py
 if __name__ == "__main__":
-   main(sys.argv)
+   Main(sys.argv)

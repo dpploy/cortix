@@ -2,25 +2,27 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix Chopping module wrapper
+Cortix Chopping module executable
 
 Tue Jun 24 12:36:17 EDT 2014
 """
 #*********************************************************************************
-import os, sys, io, time
-import datetime
+import os, sys, io, time, datetime
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import Element
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
-def main(argv):
+def Main(argv):
+
+#---------------------------------------------------------------------------------
+# Read and process the command prompt arguments
 
  assert len(argv) == 5, 'missing command line input.'
 
 #.................................................................................
 # First command line argument is the module input file name with full path.
-# This input file may be used by both the wrapper and the inner-code for 
+# This input file may be used by both the wrapper and the host code for 
 # communication.
  inputFullPathFileName = argv[1]
 
@@ -136,4 +138,4 @@ def SetRuntimeStatus(runtimeStatusFullPathFileName, status):
 #*********************************************************************************
 # Usage: -> python pymain.py or ./pyplot.py
 if __name__ == "__main__":
-   main(sys.argv)
+   Main(sys.argv)

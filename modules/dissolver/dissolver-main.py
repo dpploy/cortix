@@ -14,7 +14,7 @@ from dissolver import Dissolver
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
-def main(argv):
+def Main(argv):
 
 #---------------------------------------------------------------------------------
 # Read and process the command prompt arguments
@@ -23,7 +23,7 @@ def main(argv):
 
 #.................................................................................
 # First command line argument is the module input file name with full path.
-# This input file may be used by both the wrapper and the inner-code for 
+# This input file may be used by both the wrapper and the host code for 
 # communication.
  inputFullPathFileName = argv[1]
 
@@ -46,7 +46,7 @@ def main(argv):
  node = cortexParamXMLRootNode.find('timeStep')
 
  timeStepUnit = node.get('unit')
- timeStep       = float(node.text.strip())
+ timeStep     = float(node.text.strip())
 
  if    timeStepUnit == 'min':  timeStep *= 1.0
  elif  timeStepUnit == 'hour': timeStep *= 60.0
@@ -155,4 +155,4 @@ def SetRuntimeStatus(runtimeStatusFullPathFileName, status):
 #*********************************************************************************
 # Usage: -> python dissolver-main.py or ./dissolver-main.py
 if __name__ == "__main__":
-   main(sys.argv)
+   Main(sys.argv)
