@@ -66,7 +66,8 @@ class Network(object):
 
     ( tag, attributes, text ) = child
 
-    assert text is None, 'non empty text in %r network: ' % self.__name
+    if tag == 'connect':
+     assert text is None, 'non empty text, %r, in %r network: ' % (text,self.__name)
 
     tmp = dict()
 

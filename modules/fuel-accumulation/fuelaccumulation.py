@@ -7,7 +7,7 @@ Cortix FuelAccumulation module wrapper
 Tue Jun 24 01:03:45 EDT 2014
 """
 #*********************************************************************************
-import os, sys, io, time
+import os, sys, io, time, datetime
 import logging
 import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
@@ -118,7 +118,6 @@ class FuelAccumulation(object):
 
     for port in self.__ports:
      if port[0] == providePortName and port[1] == 'provide': portFile = port[2]
- 
 
   assert portFile is not None, 'portFile is invalid.'
 
@@ -323,12 +322,15 @@ class FuelAccumulation(object):
 
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
   s = '<!-- Written by FuelAccumulation.py -->\n'; fout.write(s)
+  today = datetime.datetime.today()
+  s = '<!-- '+str(today)+' -->\n'; fout.write(s)
+
   s = '<fuelsegments>\n'; fout.write(s)
-  s = ' <timeStamp value="'+str(evolTime)+'" unit="minute">'; fout.write(s)
+  s = ' <timeStamp value="'+str(evolTime)+'" unit="minute">\n'; fout.write(s)
 
   if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
 
-   s = '</timeStamp>\n'; fout.write(s)
+   s = ' </timeStamp>\n'; fout.write(s)
    s = '</fuelsegments>\n'; fout.write(s)
    fout.close()
    self.__withdrawMass = 0.0
@@ -352,7 +354,7 @@ class FuelAccumulation(object):
    assert len(fuelSegmentsLoad) != 0
 
    for fuelSeg in fuelSegmentsLoad:
-    s = ' <fuelSegment>\n'; fout.write(s)
+    s = '  <fuelSegment>\n'; fout.write(s)
     timeStamp = fuelSeg[0]
     mass      = fuelSeg[1]
     length    = fuelSeg[2]
@@ -364,20 +366,20 @@ class FuelAccumulation(object):
     Xe        = fuelSeg[8]
     a3H       = fuelSeg[9]
     FP        = fuelSeg[10]
-    s = '  <timeStamp     unit="minute">'+str(timeStamp)+'</timeStamp>\n'; fout.write(s)
-    s = '  <mass          unit="gram">'+str(mass)+'</mass>\n';fout.write(s)
-    s = '  <length        unit="m">'+str(length)+'</length>\n';fout.write(s)
-    s = '  <innerDiameter unit="m">'+str(segID)+'</innerDiameter>\n';fout.write(s)
-    s = '  <U  unit="gram">'+str(round(U,gDec))+'</U>\n';fout.write(s)
-    s = '  <Pu unit="gram">'+str(round(Pu,gDec))+'</Pu>\n';fout.write(s)
-    s = '  <I  unit="gram">'+str(round(I,gDec))+'</I>\n';fout.write(s)
-    s = '  <Kr unit="gram">'+str(round(Kr,gDec))+'</Kr>\n';fout.write(s)
-    s = '  <Xe unit="gram">'+str(round(Xe,gDec))+'</Xe>\n';fout.write(s)
-    s = '  <a3H unit="gram">'+str(round(a3H,gDec))+'</a3H>\n';fout.write(s)
-    s = '  <FP unit="gram">'+str(round(FP,gDec))+'</FP>\n';fout.write(s)
-    s = '</fuelSegment>\n';      fout.write(s)
+    s = '   <timeStamp     unit="minute">'+str(timeStamp)+'</timeStamp>\n'; fout.write(s)
+    s = '   <mass          unit="gram">'+str(round(mass,gDec))+'</mass>\n';fout.write(s)
+    s = '   <length        unit="m">'+str(length)+'</length>\n';fout.write(s)
+    s = '   <innerDiameter unit="m">'+str(segID)+'</innerDiameter>\n';fout.write(s)
+    s = '   <U  unit="gram">'+str(round(U,gDec))+'</U>\n';fout.write(s)
+    s = '   <Pu unit="gram">'+str(round(Pu,gDec))+'</Pu>\n';fout.write(s)
+    s = '   <I  unit="gram">'+str(round(I,gDec))+'</I>\n';fout.write(s)
+    s = '   <Kr unit="gram">'+str(round(Kr,gDec))+'</Kr>\n';fout.write(s)
+    s = '   <Xe unit="gram">'+str(round(Xe,gDec))+'</Xe>\n';fout.write(s)
+    s = '   <a3H unit="gram">'+str(round(a3H,gDec))+'</a3H>\n';fout.write(s)
+    s = '   <FP unit="gram">'+str(round(FP,gDec))+'</FP>\n';fout.write(s)
+    s = '  </fuelSegment>\n';      fout.write(s)
  
-   s = '</timeStamp>\n'; fout.write(s)
+   s = ' </timeStamp>\n'; fout.write(s)
    s = '</fuelsegments>\n'; fout.write(s)
    fout.close()
 

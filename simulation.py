@@ -8,7 +8,6 @@ Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
 import os, sys, io
-import datetime
 import logging
 from configtree import ConfigTree
 from application import Application
@@ -22,68 +21,155 @@ class Simulation(object):
 # __slots__ = [
 
  def __init__( self,
-               cortixWorkDir = None,
+               parentWorkDir = None,
                simConfigNode = ConfigTree()
              ):
 
-  log = logging.getLogger('cortix.simulation')
-  self.__logger = log
+  assert type(parentWorkDir) is str, '-> parentWorkDir invalid.' 
 
-  self.__name = simConfigNode.GetNodeName()
-  s = 'creating simulation: '+self.__name
-  log.info(s)
-
+# Inherit a configuration tree
   assert type(simConfigNode) is ConfigTree, '-> simConfigNode invalid.' 
   self.__configNode = simConfigNode
+
+# Read the simulation name
+  self.__name = simConfigNode.GetNodeName()
+
+# Create the cortix/simulation work directory
+  wrkDir = parentWorkDir 
+  wrkDir += 'sim_' + self.__name + '/'
+  self.__workDir = wrkDir
+
+  os.system( 'mkdir -p ' + self.__workDir )
+
+# Create the logging facility for each object
+
+  node = simConfigNode.GetSubNode('logger')
+  loggerName = self.__name
+  log = logging.getLogger(loggerName)
+  log.setLevel(logging.NOTSET)
+
+  loggerLevel = node.get('level').strip()
+  if   loggerLevel == 'DEBUG': log.setLevel(logging.DEBUG)
+  elif loggerLevel == 'INFO':  log.setLevel(logging.INFO)
+  elif loggerLevel == 'WARN':  log.setLevel(logging.WARN)
+  elif loggerLevel == 'ERROR':  log.setLevel(logging.ERROR)
+  elif loggerLevel == 'CRITICAL':  log.setLevel(logging.CRITICAL)
+  elif loggerLevel == 'FATAL':  log.setLevel(logging.FATAL)
+  else:
+    assert True, 'logger level for %r: %r invalid' % (loggerName, loggerLevel)
+
+  self.__log = log
+
+  fh = logging.FileHandler(self.__workDir+'sim.log')
+  fh.setLevel(logging.NOTSET)
+
+  ch = logging.StreamHandler()
+  ch.setLevel(logging.NOTSET)
+
+  for child in node:
+   if child.tag == 'fileHandler':
+      # file handler
+      fhLevel = child.get('level').strip()
+      if   fhLevel == 'DEBUG': fh.setLevel(logging.DEBUG)
+      elif fhLevel == 'INFO': fh.setLevel(logging.INFO)
+      elif fhLevel == 'WARN': fh.setLevel(logging.WARN)
+      elif fhLevel == 'ERROR': fh.setLevel(logging.ERROR)
+      elif fhLevel == 'CRITICAL': fh.setLevel(logging.CRITICAL)
+      elif fhLevel == 'FATAL': fh.setLevel(logging.FATAL)
+      else:
+        assert True, 'file handler log level for %r: %r invalid' % (loggerName, fhLevel)
+   if child.tag == 'consoleHandler':
+      # console handler
+      chLevel = child.get('level').strip()
+      if   chLevel == 'DEBUG': ch.setLevel(logging.DEBUG)
+      elif chLevel == 'INFO': ch.setLevel(logging.INFO)
+      elif chLevel == 'WARN': ch.setLevel(logging.WARN)
+      elif chLevel == 'ERROR': ch.setLevel(logging.ERROR)
+      elif chLevel == 'CRITICAL': ch.setLevel(logging.CRITICAL)
+      elif chLevel == 'FATAL': ch.setLevel(logging.FATAL)
+      else:
+        assert True, 'console handler log level for %r: %r invalid' % (loggerName, chLevel)
+  # formatter added to handlers
+  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+  fh.setFormatter(formatter)
+  ch.setFormatter(formatter)
+  # add handlers to logger
+  log.addHandler(fh)
+  log.addHandler(ch)
+
+  s = 'created logger: '+self.__name
+  self.__log.info(s)
+
+  s = 'logger level: '+loggerLevel
+  self.__log.debug(s)
+  s = 'logger file handler level: '+fhLevel
+  self.__log.debug(s)
+  s = 'logger console handler level: '+chLevel
+  self.__log.debug(s)
 
 #------------
 # Application
 #------------
   for appNode in self.__configNode.GetAllSubNodes('application'):
-    s = 'appName: '+appNode.get('name')
-    log.debug(s)
 
     appConfigNode = ConfigTree( appNode )
     assert appConfigNode.GetNodeName() == appNode.get('name'), 'check failed'
 
-    self.__application = Application( appConfigNode )
+    self.__application = Application( self.__workDir, appConfigNode )
+
+    s = 'created application: '+appNode.get('name')
+    self.__log.debug(s)
 
 #------------
 # Tasks
 #------------
   self.__tasks = list()
+
   self.__SetupTasks()
 
-  self.__Setup( cortixWorkDir )
+# Finish object initialization 
+  self.__Setup()
+
+  s = 'created simulation: '+self.__name
+  self.__log.info(s)
 
 #---------------------------------------------------------------------------------
 # Execute  
 
  def Execute(self, taskName=None):
 
+  s = 'start Execute('+taskName+')'
+  self.__log.debug(s)
+
   if taskName is not None: 
      for task in self.__tasks:
        if task.GetName() == taskName: 
+
+         s = 'called task.Execute() on task ' + taskName
+         self.__log.debug(s)
+
          task.Execute( self.__application )
+
+  s = 'end Execute('+taskName+')'
+  self.__log.debug(s)
 
   return
 
 #---------------------------------------------------------------------------------
 # Setup simulation          
 
- def __Setup(self, cortixWorkDir):
+ def __Setup( self ):
 
-# create the cortix/simulation work directory
-  wrkDir = cortixWorkDir 
-  wrkDir += 'sim_' + self.__name + '/'
+  s = 'start __Setup()'
+  self.__log.debug(s)
 
   networks = self.__application.GetNetworks()
 
 # create subdirectories with task names
   for task in self.__tasks:
     taskName = task.GetName()
-    taskWorkDir = wrkDir + 'task_' + taskName + '/'
-    os.system( 'mkdir -p ' + taskWorkDir )
+    taskWorkDir = task.GetWorkDir()
+    assert os.path.isdir( taskWorkDir ), 'directory %r invalid.' % taskWorkDir
 
     # set the parameters for the task in the cortix param file 
     taskFile = taskWorkDir + 'cortix-param.xml'
@@ -205,6 +291,9 @@ class Simulation(object):
     s = '</cortixComm>'; fout.write(s)
     fout.close()
 
+  s = 'end __Setup()'
+  self.__log.debug(s)
+
   return
 
 #---------------------------------------------------------------------------------
@@ -212,13 +301,21 @@ class Simulation(object):
 
  def __SetupTasks(self):
 
+  s = 'start __SetupTasks()'
+  self.__log.debug(s)
+
   for taskNode in self.__configNode.GetAllSubNodes('task'):
-   print('\tCortix::Simulation: task:',taskNode.get('name'))
 
    taskConfigNode = ConfigTree( taskNode )
-   task = Task( taskConfigNode )
+   task = Task( self.__workDir, taskConfigNode )
 
    self.__tasks.append( task )
+
+   s = 'appended task: '+taskNode.get('name')
+   self.__log.debug(s)
+
+  s = 'end __SetupTasks()'
+  self.__log.debug(s)
 
   return
 

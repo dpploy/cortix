@@ -7,8 +7,7 @@ Cortix FuelAccumulation module executable
 Sun Jun 29 21:34:18 EDT 2014
 """
 #*********************************************************************************
-import os, sys, io, time
-import datetime
+import os, sys, io, time, datetime
 import logging
 import xml.etree.ElementTree as ElementTree
 from fuelaccumulation import FuelAccumulation
@@ -88,13 +87,13 @@ def main(argv):
 
  log = logging.getLogger('main')
  log.setLevel(logging.DEBUG)
- # create file handler which logs even debug messages
- fullPathTaskDir = cortexParamFullPathFileName[:cortexParamFullPathFileName.rfind('/')]+'/'
+ # create file handler for logs
+ fullPathTaskDir = cortexCommFullPathFileName[:cortexCommFullPathFileName.rfind('/')]+'/'
  fh = logging.FileHandler(fullPathTaskDir+'fuelaccumulation.log')
  fh.setLevel(logging.DEBUG)
  # create console handler with a higher log level
  ch = logging.StreamHandler()
- ch.setLevel(logging.ERROR)
+ ch.setLevel(logging.WARN)
  # create formatter and add it to the handlers
  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
  fh.setFormatter(formatter)
@@ -102,6 +101,12 @@ def main(argv):
  # add the handlers to the logger
  log.addHandler(fh)
  log.addHandler(ch)
+
+ s = 'created logger: main'
+ log.info(s)
+
+ s = 'ports: '+str(ports)
+ log.debug(s)
 
 #---------------------------------------------------------------------------------
 # Run FuelAccumulation
@@ -130,9 +135,9 @@ def main(argv):
 # assert found, 'Input setup failed.'
 
 #................................................................................
-# Create a fuel holding drum
- fuelDrum = FuelAccumulation( ports )
- log.info("fuelDrum = FuelAccumulation( ports )")
+# Create the host code          
+ host = FuelAccumulation( ports )
+ log.info("host = FuelAccumulation( ports )")
 
 #................................................................................
 # Evolve the fuel accumulation
@@ -144,9 +149,9 @@ def main(argv):
 
  while facilityTime <= evolveTime:
 
-  fuelDrum.CallPorts( facilityTime )
+  host.CallPorts( facilityTime )
 
-  fuelDrum.Execute( facilityTime, timeStep )
+  host.Execute( facilityTime, timeStep )
 
   facilityTime += timeStep
 
@@ -165,12 +170,14 @@ def SetRuntimeStatus(runtimeStatusFullPathFileName, status):
  fout = open( runtimeStatusFullPathFileName,'w' )
  s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
  s = '<!-- Written by fuelaccumulation-main.py -->\n'; fout.write(s)
+ today = datetime.datetime.today()
+ s = '<!-- '+str(today)+' -->\n'; fout.write(s)
  s = '<runtime>\n'; fout.write(s)
  s = '<status>'+status+'</status>\n'; fout.write(s)
  s = '</runtime>\n'; fout.write(s)
  fout.close()
 
 #*********************************************************************************
-# Usage: -> python fuel-accumulation.py or ./fuel-accumulation.py
+# Usage: -> python fuelaccumulation-main.py or ./fuelaccumulation-main.py
 if __name__ == "__main__":
    main(sys.argv)

@@ -7,7 +7,7 @@ Cortix Dissolver module wrapper
 Tue Jun 24 01:03:45 EDT 2014
 """
 #*********************************************************************************
-import os, sys, io, time
+import os, sys, io, time, datetime
 import logging
 import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
@@ -37,6 +37,8 @@ class Dissolver(object):
 
   self.__startDissolveTime = 0.0
 
+  self.__stateHistory = list(dict())
+
   self.__log = logging.getLogger('main.dissolv')
   self.__log.info('initializing an instance of Dissolver')
 
@@ -61,7 +63,7 @@ class Dissolver(object):
      self.__log.debug(s)
      s = 'Execute(): ready to load? = ' + str(self.__ready2LoadFuel)
      self.__log.debug(s)
-     s = 'Execute(): loaded mass '+str(self.__GetFuelLoadMass())
+     s = 'Execute(): loaded mass [g] = '+str(round(self.__GetFuelLoadMass(),3))
      self.__log.debug(s)
      s = 'Execute(): new fuel load # segments = ' + str(len(self.__fuelSegmentsLoad))
      self.__log.debug(s)
@@ -72,14 +74,12 @@ class Dissolver(object):
      self.__ready2LoadFuel = False
      self.__startDissolveTime = evolTime
 
-     time.sleep(1) # RUN the Dissolver for a "timeStep" time; place holder
-
-     self.__fuelSegmentsLoad = list()
+     self.__Dissolve( )
 
   if evolTime >= self.__startDissolveTime + self.__dutyPeriod: 
      s = 'Execute(): signal new duty cycle at '+str(evolTime)+' [min]'
      self.__log.debug(s)
-     s = 'Execute(): loaded mass '+str(self.__GetFuelLoadMass())
+     s = 'Execute(): loaded mass '+str(round(self.__GetFuelLoadMass(),3))
      self.__log.debug(s)
 
      self.__ready2LoadFuel = True
@@ -120,10 +120,13 @@ class Dissolver(object):
 
     maxNTrials = 5
     nTrials    = 0
-    while not os.path.isfile(portFile) and nTrials < maxNTrials:
+    while os.path.isfile(portFile) is False and nTrials <= maxNTrials:
       nTrials += 1
-#      print('Dissolver::__GetPortFile: waiting for port:',portFile)
       time.sleep(1)
+
+    if nTrials >= 2:
+      s = '__GetPortFile(): waited ' + str(nTrials) + ' trials for port: ' + portFile
+      self.__log.warn(s)
 
     assert os.path.isfile(portFile) is True, 'portFile %r not available' % portFile
     time.sleep(1) # allow for file to finish writing
@@ -135,7 +138,6 @@ class Dissolver(object):
     for port in self.__ports:
      if port[0] == providePortName and port[1] == 'provide': portFile = port[2]
  
-
   assert portFile is not None, 'portFile is invalid.'
 
   return portFile
@@ -146,11 +148,15 @@ class Dissolver(object):
   fout = open( portFile, 'w')
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
   s = '<!-- Written by Dissolver.py -->\n'; fout.write(s)
+  today = datetime.datetime.today()
+  s = '<!-- '+str(today)+' -->\n'; fout.write(s)
   s = '<dissolutionFuelRequest>\n'; fout.write(s)
   s = ' <timeStamp value="'+str(evolTime)+'" unit="minute">\n'; fout.write(s)
 
-#  print('Dissolver::__ProvideSolidsRequest(): evolTime = ',evolTime)
-#  print('Dissolver::__ProvideSolidsRequest(): ready to load = ',self.__ready2LoadFuel)
+  s = '__ProvideSolidsRequest(): evolTime = '+str(evolTime)
+  self.__log.debug(s)
+  s = '__ProvideSolidsRequest(): ready to load = '+str(self.__ready2LoadFuel)
+  self.__log.debug(s)
 
   if  self.__ready2LoadFuel is True:
  
@@ -261,7 +267,7 @@ class Dissolver(object):
           assert attributes[0][0] == 'unit'
           segXeUnit = attributes[0][1]
        if child.tag == 'a3H':
-          seg3H             = float(child.text.strip())
+          seg3H            = float(child.text.strip())
           attributes       = child.items()
           assert len(attributes) == 1
           assert attributes[0][0] == 'unit'
@@ -273,7 +279,7 @@ class Dissolver(object):
           assert attributes[0][0] == 'unit'
           segFPUnit = attributes[0][1]
 
-#     os.system( 'cp ' + portFile + ' /tmp/.')
+ #    os.system( 'cp ' + portFile + ' /tmp/.')
      fuelSegment = ( segTimeStamp, segMass, segLength, segID, 
                      segU,         segPu,   segI,      segKr,
                      segXe,        seg3H,   segFP  )
@@ -292,9 +298,21 @@ class Dissolver(object):
  def __GetFuelLoadMass( self ):
 
   mass = 0.0
-  for seg in self.__fuelSegmentsLoad: mass += seg[1]
+  for seg in self.__fuelSegmentsLoad: 
+    mass += seg[1]
   
   return mass 
+
+#---------------------------------------------------------------------------------
+ def __Dissolve( self ):
+
+#  self.__DissolverSetupSolids()
+
+#  self.__stateHistory
+  
+  self.__fuelSegmentsLoad = list()
+
+  return
 
 #*********************************************************************************
 # Usage: -> python dissolver.py

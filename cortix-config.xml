@@ -3,35 +3,73 @@
 
 <cortixConfig version="0.1">
 
+<!-- Cortix instantiation definition -->
+<!-- NB: XML elements in this level must be unique across other configuration files if
+         multiple Cortix objects are used in the cortix-main.py program.
+         If this rule is not followed, there will be collision with file in/outputs;
+         including results files and logging files.-->
+
+ <name>cortix1</name>
+
+ <logger level="DEBUG">
+  <fileHandler level="DEBUG"> </fileHandler>
+  <consoleHandler level="INFO"> </consoleHandler>
+ </logger>
+
  <workDir>/tmp/</workDir>
 
 <!-- Simulation definition -->
 <!-- NB: each simulation has only one application -->
  <simulation name="headend-off-gas">
 
+  <logger level="DEBUG">
+   <fileHandler level="DEBUG"> </fileHandler>
+   <consoleHandler level="INFO"> </consoleHandler>
+  </logger>
+
   <!-- Simulation: tasks -->
   <!--NB: each task combines parameters for one named application connectivity-->
   <task name="solo-shear" >
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
    <evolveTime unit="hour">12.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
   <task name="solo-fuel-accum" >
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
    <evolveTime unit="hour">24.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
   <task name="solo-dissolve">
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
    <evolveTime unit="hour">8.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
   <task name="shear-dissolve">
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
    <evolveTime unit="hour">12.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
   <task name="demuth1">
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
    <evolveTime unit="hour">24.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
   </task>
@@ -39,8 +77,17 @@
   <!-- Simulation: application -->
   <application name="demo1">
 
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
+
    <!-- Application: modules set -->
    <module name="chopper">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
     <executableName>chopper-main.py</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/chopper/</executablePath>
     <configFileName>chopper.input</configFileName>
@@ -52,6 +99,10 @@
    </module>
 
    <module name="fuel-accumulation">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
     <executableName>fuelaccumulation-main.py</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/fuel-accumulation/</executablePath>
     <configFileName>fuelaccumulation.input</configFileName>
@@ -67,6 +118,10 @@
    </module>
 
    <module name="dissolver">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
     <executableName>dissolver-main.py</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/dissolver/</executablePath>
     <configFileName>dissolution.input</configFileName>
@@ -82,6 +137,10 @@
    </module>
 
    <module name="condenser">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
     <executableName>condenser-main.py</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/condenser/</executablePath>
     <configFileName>condenser.input</configFileName>
@@ -95,6 +154,10 @@
    </module>
 
    <module name="pyplot">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
     <executableName>pyplot-main.py</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/pyplot/</executablePath>
     <configFileName>pyplot.input</configFileName>
@@ -110,11 +173,19 @@
 
    <!-- stand-alone module -->
    <network name="solo-shear">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <connect fromModule="pyplot" fromPort="time-series" toModule="chopper" toPort="Gas_Release"/> 
    </network>
 
    <network name="solo-fuel-accum">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <connect fromModule="fuel-accumulation" fromPort="solids" toModule="fuel-accumulation" toPort="chopper-data-test"/> 
     <connect fromModule="fuel-accumulation" fromPort="withdrawal-request" toModule="fuel-accumulation" toPort="dissolver-data-test"/> 
@@ -122,12 +193,20 @@
 
    <!-- stand-alone module -->
    <network name="solo-dissolve">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <connect fromModule="pyplot" fromPort="time-series" toModule="dissolver" toPort="vapor"/> 
    </network>
 
    <!-- connected modules -->
    <network name="shear-dissolve">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <connect fromModule="fuel-accumulation" fromPort="solids" toModule="chopper" toPort="Fuel_Solid"/> 
     <connect fromModule="fuel-accumulation" fromPort="withdrawal-request" toModule="dissolver" toPort="solids-request"/> 
@@ -136,6 +215,10 @@
 
    <!-- connected modules -->
    <network name="demuth1">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <connect fromModule="fuel-accumulation" fromPort="solids" toModule="chopper" toPort="Fuel_Solid"/> 
     <connect fromModule="dissolver" fromPort="solids" toModule="fuel-accumulation" toPort="fuel-segments"/> 

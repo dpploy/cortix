@@ -7,8 +7,7 @@ Cortix Dissolver module executable
 Tue Jun 24 01:03:45 EDT 2014
 """
 #*********************************************************************************
-import os, sys, io, time
-import datetime
+import os, sys, io, time, datetime
 import logging
 import xml.etree.ElementTree as ElementTree
 from dissolver import Dissolver
@@ -69,7 +68,6 @@ def main(argv):
      portType = node.get('type')
      portFile = node.get('file')
      ports.append( (portName, portType, portFile) )
- print('dissolver-main.py::ports: ',ports)
 
  tree = None
 
@@ -78,17 +76,16 @@ def main(argv):
  runtimeStatusFullPathFileName = argv[4]
 
 #---------------------------------------------------------------------------------
-# Create logger for main and class 
+# Create logger for this main and its imported pymodule 
  log = logging.getLogger('main')
  log.setLevel(logging.DEBUG)
-# create file handler which logs even debug messages
-
- fullPathTaskDir = cortexParamFullPathFileName[:cortexParamFullPathFileName.rfind('/')]+'/'
+# create file handler for logs
+ fullPathTaskDir = cortexCommFullPathFileName[:cortexCommFullPathFileName.rfind('/')]+'/'
  fh = logging.FileHandler(fullPathTaskDir+'dissolver.log')
  fh.setLevel(logging.DEBUG)
 # create console handler with a higher log level
  ch = logging.StreamHandler()
- ch.setLevel(logging.ERROR)
+ ch.setLevel(logging.WARN)
 # create formatter and add it to the handlers
  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
  fh.setFormatter(formatter)
@@ -96,6 +93,12 @@ def main(argv):
 # add the handlers to the logger
  log.addHandler(fh)
  log.addHandler(ch)
+
+ s = 'created logger: main'
+ log.info(s)
+
+ s = 'ports: '+str(ports)
+ log.debug(s)
 
 #---------------------------------------------------------------------------------
 # Run Dissolver
@@ -107,9 +110,9 @@ def main(argv):
 # vfda: nothing for now
 
 #.................................................................................
-# Create the dissolver equipment
- nitron = Dissolver( ports )
- log.info("nitron = Dissolver( ports )")
+# Create the host code             
+ host = Dissolver( ports )
+ log.info("host = Dissolver( ports )")
 
 #.................................................................................
 # Evolve the dissolver
@@ -121,9 +124,9 @@ def main(argv):
 
  while facilityTime <= evolveTime:
 
-  nitron.CallPorts( facilityTime )
+  host.CallPorts( facilityTime )
 
-  nitron.Execute( facilityTime, timeStep )
+  host.Execute( facilityTime, timeStep )
 
   facilityTime += timeStep 
 #
@@ -142,12 +145,14 @@ def SetRuntimeStatus(runtimeStatusFullPathFileName, status):
  fout = open( runtimeStatusFullPathFileName,'w' )
  s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
  s = '<!-- Written by Dissolver.py -->\n'; fout.write(s)
+ today = datetime.datetime.today()
+ s = '<!-- '+str(today)+' -->\n'; fout.write(s)
  s = '<runtime>\n'; fout.write(s)
  s = '<status>'+status+'</status>\n'; fout.write(s)
  s = '</runtime>\n'; fout.write(s)
  fout.close()
 
 #*********************************************************************************
-# Usage: -> python dissolver.py or ./dissolver.py
+# Usage: -> python dissolver-main.py or ./dissolver-main.py
 if __name__ == "__main__":
    main(sys.argv)

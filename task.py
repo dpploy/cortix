@@ -8,7 +8,7 @@ Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
 import os, sys, io, time
-import datetime
+import logging
 from configtree import ConfigTree
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import Element
@@ -21,14 +21,87 @@ class Task(object):
 # __slots__ = [
 
  def __init__( self,
+               parentWorkDir = None,
                taskConfigNode = ConfigTree()
              ):
 
+  assert type(parentWorkDir) is str, '-> parentWorkDir invalid.' 
+
+# Inherit a configuration tree
   assert type(taskConfigNode) is ConfigTree, '-> taskConfigNode not a ConfigTree.' 
   self.__configNode = taskConfigNode
 
+# Read the simulation name
   self.__name = self.__configNode.GetNodeName()
-  print('\t\tCortix::Simulation::Task: name:',self.__name)
+
+# Set the work directory (previously created)
+  assert os.path.isdir( parentWorkDir ), 'work directory not available.'
+  self.__workDir = parentWorkDir + 'task_' + self.__name + '/'
+  os.system( 'mkdir -p ' + self.__workDir )
+
+# Create the logging facility for the object
+  node = taskConfigNode.GetSubNode('logger')
+  loggerName = self.__name
+  log = logging.getLogger(loggerName)
+  log.setLevel(logging.NOTSET)
+
+  loggerLevel = node.get('level').strip()
+  if   loggerLevel == 'DEBUG': log.setLevel(logging.DEBUG)
+  elif loggerLevel == 'INFO':  log.setLevel(logging.INFO)
+  elif loggerLevel == 'WARN':  log.setLevel(logging.WARN)
+  elif loggerLevel == 'ERROR':  log.setLevel(logging.ERROR)
+  elif loggerLevel == 'CRITICAL':  log.setLevel(logging.CRITICAL)
+  elif loggerLevel == 'FATAL':  log.setLevel(logging.FATAL)
+  else:
+    assert True, 'logger level for %r: %r invalid' % (loggerName, loggerLevel)
+
+  self.__log = log
+
+  fh = logging.FileHandler(self.__workDir+'task.log')
+  fh.setLevel(logging.NOTSET)
+
+  ch = logging.StreamHandler()
+  ch.setLevel(logging.NOTSET)
+
+  for child in node:
+   if child.tag == 'fileHandler':
+      # file handler
+      fhLevel = child.get('level').strip()
+      if   fhLevel == 'DEBUG': fh.setLevel(logging.DEBUG)
+      elif fhLevel == 'INFO': fh.setLevel(logging.INFO)
+      elif fhLevel == 'WARN': fh.setLevel(logging.WARN)
+      elif fhLevel == 'ERROR': fh.setLevel(logging.ERROR)
+      elif fhLevel == 'CRITICAL': fh.setLevel(logging.CRITICAL)
+      elif fhLevel == 'FATAL': fh.setLevel(logging.FATAL)
+      else:
+        assert True, 'file handler log level for %r: %r invalid' % (loggerName, fhLevel)
+   if child.tag == 'consoleHandler':
+      # console handler
+      chLevel = child.get('level').strip()
+      if   chLevel == 'DEBUG': ch.setLevel(logging.DEBUG)
+      elif chLevel == 'INFO': ch.setLevel(logging.INFO)
+      elif chLevel == 'WARN': ch.setLevel(logging.WARN)
+      elif chLevel == 'ERROR': ch.setLevel(logging.ERROR)
+      elif chLevel == 'CRITICAL': ch.setLevel(logging.CRITICAL)
+      elif chLevel == 'FATAL': ch.setLevel(logging.FATAL)
+      else:
+        assert True, 'console handler log level for %r: %r invalid' % (loggerName, chLevel)
+  # formatter added to handlers
+  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+  fh.setFormatter(formatter)
+  ch.setFormatter(formatter)
+  # add handlers to logger
+  log.addHandler(fh)
+  log.addHandler(ch)
+
+  s = 'created logger: '+self.__name
+  self.__log.info(s)
+  s = 'logger level: '+loggerLevel
+  self.__log.debug(s)
+  s = 'logger file handler level: '+fhLevel
+  self.__log.debug(s)
+  s = 'logger console handler level: '+chLevel
+  self.__log.debug(s)
 
   self.__evolveTime     = 0.0
   self.__evolveTimeUnit = 'null'
@@ -38,7 +111,11 @@ class Task(object):
 
   self.__runtimeCortixParamFile = 'null'
 
+# Setup this object
   self.__Setup()
+
+  s = 'created task: '+self.__name
+  self.__log.info(s)
 
 #---------------------------------------------------------------------------------
 # Accessors (note: all accessors of member data can potentially change the
@@ -46,6 +123,9 @@ class Task(object):
 
  def GetName(self): 
   return self.__name
+
+ def GetWorkDir(self): 
+  return self.__workDir
 
  def GetEvolveTime(self):
   return self.__evolveTime
@@ -92,9 +172,13 @@ class Task(object):
   status = self.__GetRuntimeStatus( runtimeStatusFiles )
 
   while status == 'running': 
-   time.sleep(5)
+
+   time.sleep(10)
+
    status = self.__GetRuntimeStatus( runtimeStatusFiles )
-   print('Task runtime check: ', status)
+
+   s = 'runtime status: '+status
+   self.__log.info(s)
 
   return 
 
@@ -124,6 +208,9 @@ class Task(object):
 
  def __Setup(self):
 
+  s = 'start __Setup()'
+  self.__log.debug(s)
+
   for child in self.__configNode.GetNodeChildren():
     (tag, items, text) = child
     if tag == 'evolveTime':
@@ -137,8 +224,13 @@ class Task(object):
        
        self.__timeStep = float(text.strip())
 
-  print('\t\tCortix::Simulation::Task: evolveTime(value):',self.__evolveTime)
-  print('\t\tCortix::Simulation::Task: evolveTime(unit) :',self.__evolveTimeUnit)
+  s = 'evolveTime value = '+str(self.__evolveTime)
+  self.__log.debug(s)
+  s = 'evolveTime unit  = '+str(self.__evolveTimeUnit)
+  self.__log.debug(s)
+
+  s = 'end __Setup()'
+  self.__log.debug(s)
 
   return
 

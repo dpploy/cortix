@@ -8,7 +8,7 @@ Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
 import os, sys, io, time
-import datetime
+import logging  
 from configtree import ConfigTree
 #*********************************************************************************
 
@@ -19,20 +19,24 @@ class Module(object):
 # __slots__ = [
 
  def __init__( self,
+               parentWorkDir = None,
                modConfigNode = ConfigTree()
              ):
 
-  assert type(modConfigNode) is ConfigTree, '-> modConfigNode is invalid.' 
+  assert type(parentWorkDir) is str, '-> parentWorkDir is invalid.' 
 
+# Inherit a configuration tree
+  assert type(modConfigNode) is ConfigTree, '-> modConfigNode is invalid.' 
   self.__configNode = modConfigNode
 
+# Read the module name
   self.__name = self.__configNode.GetNodeName()
-  print('\t\tCortix::Simulation::Application::Module: name:',self.__name)
 
   self.__executableName = 'null'
   self.__executablePath = 'null'
   self.__configFileName = 'null'
   self.__configFilePath = 'null'
+
   self.__ports = list()
 
   self.__Setup()

@@ -2,7 +2,8 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix: a program for integrating system-level modules
+Cortix: a program for system-level modules: integration, coupling, execution, 
+        and analysis.
 
 Tue Dec 10 11:21:30 EDT 2013
 """
@@ -15,15 +16,18 @@ from cortix import Cortix
 
 def main():
 
- pwd            = os.path.dirname(__file__)
- fullpathconfig = os.path.join(pwd, 'cortix-config.xml')
+ pwd                = os.path.dirname(__file__)
+ fullPathConfigFile = os.path.join(pwd, 'cortix-config.xml')
 
- cortix = Cortix( fullpathconfig )
+ # NB: if another instantiation of Cortix occur, the cortix wrk directory specified
+ #     in the cortix configuration file must be different, else the logging facility 
+ #     will have log file collision.
+ cortix1 = Cortix( 'cortix1', fullPathConfigFile )
 
-# cortix.RunSimulations( taskName='solo-fuel-accum' )
-# cortix.RunSimulations( taskName='solo-dissolve' )
- cortix.RunSimulations( taskName='shear-dissolve' )
-# cortix.RunSimulations( taskName='demuth1' )
+# cortix1.RunSimulations( taskName='solo-fuel-accum' )
+# cortix1.RunSimulations( taskName='solo-dissolve' )
+ cortix1.RunSimulations( taskName='shear-dissolve' )
+# cortix1.RunSimulations( taskName='demuth1' )
 
 #*********************************************************************************
 # Usage: -> python cortix-main.py or ./cortix-main.py
