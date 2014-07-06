@@ -27,7 +27,7 @@ class Network(object):
   self.__configNode = netConfigNode
 
   self.__name = self.__configNode.GetNodeName()
-  print('\t\tCortix::Simulation::Application::Network: name:',self.__name)
+#  print('\t\tCortix::Simulation::Application::Network: name:',self.__name)
 
   self.__connectivity = list(dict()) # connectivity information of the network
   self.__moduleNames = list()        # modules involved in the network
@@ -83,11 +83,11 @@ class Network(object):
        if key == 'fromModule': self.__runtimeCortixCommFile[ val ] = 'null'
        if key == 'toModule'  : self.__runtimeCortixCommFile[ val ] = 'null'
 
-  print('\t\tCortix::Simulation::Application::Network: connectivity',self.__connectivity)
+#  print('\t\tCortix::Simulation::Application::Network: connectivity',self.__connectivity)
 
   self.__moduleNames = [ name for name in self.__runtimeCortixCommFile.keys()]
 
-  print('\t\tCortix::Simulation::Application::Network: modules',self.__moduleNames)
+#  print('\t\tCortix::Simulation::Application::Network: modules',self.__moduleNames)
 
   return
 

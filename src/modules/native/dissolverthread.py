@@ -171,7 +171,7 @@ class DissolverThread(Thread):
 
   fout = open( self.__runtimeStatusFullPathFileName,'w' )
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by Dissolver.py -->\n'; fout.write(s)
+  s = '<!-- Written by DissolverThread.py -->\n'; fout.write(s)
   today = datetime.datetime.today()
   s = '<!-- '+str(today)+' -->\n'; fout.write(s)
   s = '<runtime>\n'; fout.write(s)

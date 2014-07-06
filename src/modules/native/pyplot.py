@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native FuelAccumulation module
+Cortix native PyPlot module 
 
 Tue Jun 24 01:03:45 EDT 2014
 """
@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
-class FuelAccumulation(object):
+class PyPlot(object):
 
 # Private member data
 # __slots__ = [
@@ -30,20 +30,16 @@ class FuelAccumulation(object):
 
   self.__withdrawMass = 0.0
 
-  self.__log = logging.getLogger('fuelaccumulation')
-  self.__log.info('initializing an instance of FuelAccumulation')
+  self.__log = logging.getLogger('pyplot')
+  self.__log.info('initializing an instance of PyPlot')
 
   self.__gramDecimals = 3 # milligram significant digits
 
 #---------------------------------------------------------------------------------
  def CallPorts(self, evolTime=0.0):
 
-  self.__UseData( usePortName='solids', evolTime=evolTime  )
+  self.__UseData( usePortName='time-series', evolTime=evolTime  )
  
-  self.__UseData( usePortName='withdrawal-request', evolTime=evolTime  )
-
-  self.__ProvideData( providePortName='fuel-segments', evolTime=evolTime )
-
 #---------------------------------------------------------------------------------
  def Execute( self, evolTime=0.0, timeStep=1.0 ):
 
@@ -51,22 +47,6 @@ class FuelAccumulation(object):
   self.__log.info(s)
   s = 'Execute(): total mass [g] = ' + str(round(self.__GetMass(),3))
   self.__log.info(s)
-  s = 'Execute(): # of segments  = '+str(len(self.__fuelSegments))
-  self.__log.debug(s)
-
-#---------------------------------------------------------------------------------
- def __GetNSegments(self, timeStamp=None):
- 
-  nSegments = 0
-
-  if timeStamp is None:
-      nSegments = len(self.__fuelSegments)
-
-  else:
-     for fuelSeg in self.__fuelSegments:
-      if fuelSeg[0] <= timeStamp: nSegments += 1
-
-  return nSegments
 
 #---------------------------------------------------------------------------------
  def __UseData( self, usePortName=None, evolTime=0.0 ):
@@ -75,9 +55,7 @@ class FuelAccumulation(object):
   portFile = self.__GetPortFile( usePortName = usePortName )
 
 # Get data from port files
-  if usePortName == 'solids': self.__GetSolids( portFile, evolTime )
-
-  if usePortName == 'withdrawal-request': self.__GetWithdrawalRequest( portFile, evolTime )
+  if usePortName == 'time-series': self.__TimeSeries( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
  def __ProvideData( self, providePortName=None, evolTime=0.0 ):
@@ -125,7 +103,7 @@ class FuelAccumulation(object):
 
 #---------------------------------------------------------------------------------
 # This uses a use portFile which is guaranteed at this point
- def __GetSolids( self, portFile, evolTime ):
+ def __GetTineSeries( self, portFile, evolTime ):
 
   tree = ElementTree.parse(portFile)
 
@@ -262,158 +240,7 @@ class FuelAccumulation(object):
 
   return
 
-#---------------------------------------------------------------------------------
-# This uses a use portFile which is guaranteed at this point
- def __GetWithdrawalRequest( self, portFile, evolTime ):
-
-  tree = ElementTree.parse(portFile)
-  rootNode = tree.getroot()
-
-  n             = rootNode.find('timeStamp')
-  timeStamp     = float(n.get('value').strip())
-
-  assert timeStamp == evolTime, 'timeStamp = %r, evolTime = %r' % (timeStamp,evolTime)
-
-  timeStampUnit = n.get('unit').strip()
-  assert timeStampUnit == "minute"
-
-  mass = 0.0
-  subn = n.find('fuelLoad')
-  if subn is not None:
-     mass     = float(subn.text.strip())
-     massUnit = subn.get('unit').strip()
-     assert massUnit == "gram"
-     self.__withdrawMass = mass
-  else:
-     self.__withdrawMass = 0.0
-
-  s = '__GetWithdrawalRequest(): received withdrawal message at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
-  self.__log.debug(s)
-
-#  print('FuelAccumulation::__GetWithdrawalRequest(): mass ', self.__withdrawMass) 
-#  print('FuelAccumulation::__GetWithdrawalRequest(): unit ', massUnit) 
-
-# remove the request
-  os.system( 'rm -f ' + portFile )
-
-  return 
-
-#---------------------------------------------------------------------------------
- def __GetMass(self, timeStamp=None):
- 
-  mass = 0.0
-
-  if timeStamp is None:
-     for fuelSeg in self.__fuelSegments:
-      mass += fuelSeg[1]
-
-  else:
-     for fuelSeg in self.__fuelSegments:
-      if fuelSeg[0] <= timeStamp: mass += fuelSeg[1]
-
-  return mass
-
-#---------------------------------------------------------------------------------
- def __ProvideFuelSegments( self, portFile, evolTime ):
-
-  gDec = self.__gramDecimals
-
-  withdrawMass = self.__withdrawMass
-
-  fout = open( portFile, 'w')
-
-  s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by FuelAccumulation.py -->\n'; fout.write(s)
-  today = datetime.datetime.today()
-  s = '<!-- '+str(today)+' -->\n'; fout.write(s)
-
-  s = '<fuelsegments>\n'; fout.write(s)
-  s = ' <timeStamp value="'+str(evolTime)+'" unit="minute">\n'; fout.write(s)
-
-  if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
-
-   s = ' </timeStamp>\n'; fout.write(s)
-   s = '</fuelsegments>\n'; fout.write(s)
-   fout.close()
-   self.__withdrawMass = 0.0
-
-   s = '__ProvideFuelSegments(): providing no fuel at '+str(evolTime)+' [min]'
-   self.__log.debug(s)
-   return
-
-  else:  
-
-   fuelSegmentsLoad = list()
-   fuelMassLoad = 0.0
-
-   while fuelMassLoad <= withdrawMass:
-         fuelSegmentCandidate = self.__WithdrawFuelSegment( evolTime )
-         if fuelSegmentCandidate is None: break # no segments left with time stamp <= evolTime
-         mass          = fuelSegmentCandidate[1]
-         fuelMassLoad += mass
-         if fuelMassLoad <= withdrawMass:
-            fuelSegmentsLoad.append( fuelSegmentCandidate )
-         else:
-            self.__RestockFuelSegment( fuelSegmentCandidate )
-
-   assert len(fuelSegmentsLoad) != 0
-
-   for fuelSeg in fuelSegmentsLoad:
-    s = '  <fuelSegment>\n'; fout.write(s)
-    timeStamp = fuelSeg[0]
-    mass      = fuelSeg[1]
-    length    = fuelSeg[2]
-    segID     = fuelSeg[3]
-    U         = fuelSeg[4]
-    Pu        = fuelSeg[5]
-    I         = fuelSeg[6]
-    Kr        = fuelSeg[7]
-    Xe        = fuelSeg[8]
-    a3H       = fuelSeg[9]
-    FP        = fuelSeg[10]
-    s = '   <timeStamp     unit="minute">'+str(timeStamp)+'</timeStamp>\n'; fout.write(s)
-    s = '   <mass          unit="gram">'+str(round(mass,gDec))+'</mass>\n';fout.write(s)
-    s = '   <length        unit="m">'+str(length)+'</length>\n';fout.write(s)
-    s = '   <innerDiameter unit="m">'+str(segID)+'</innerDiameter>\n';fout.write(s)
-    s = '   <U  unit="gram">'+str(round(U,gDec))+'</U>\n';fout.write(s)
-    s = '   <Pu unit="gram">'+str(round(Pu,gDec))+'</Pu>\n';fout.write(s)
-    s = '   <I  unit="gram">'+str(round(I,gDec))+'</I>\n';fout.write(s)
-    s = '   <Kr unit="gram">'+str(round(Kr,gDec))+'</Kr>\n';fout.write(s)
-    s = '   <Xe unit="gram">'+str(round(Xe,gDec))+'</Xe>\n';fout.write(s)
-    s = '   <a3H unit="gram">'+str(round(a3H,gDec))+'</a3H>\n';fout.write(s)
-    s = '   <FP unit="gram">'+str(round(FP,gDec))+'</FP>\n';fout.write(s)
-    s = '  </fuelSegment>\n';      fout.write(s)
- 
-   s = ' </timeStamp>\n'; fout.write(s)
-   s = '</fuelsegments>\n'; fout.write(s)
-   fout.close()
-
-   s = '__ProvideFuelSegments(): providing '+str(len(fuelSegmentsLoad))+' fuel segments at '+str(evolTime)+' [min].'
-   self.__log.debug(s)
-
-  return
-
-#---------------------------------------------------------------------------------
- def __WithdrawFuelSegment(self, evolTime ):
-
-  fuelSegment = None
-
-  for fuelSeg in self.__fuelSegments:
-     if fuelSeg[0] <= evolTime:
-      fuelSegment = fuelSeg
-      self.__fuelSegments.remove(fuelSeg)
-      break 
-
-#  print('WithdrawFuelSegment:: fuelSegment',fuelSegment, ' evolTime=',evolTime)
-
-  return fuelSegment # if None, it is an empty drum
-
-#---------------------------------------------------------------------------------
- def __RestockFuelSegment( self, fuelSegment ):
-
-  self.__fuelSegments.insert(0,fuelSegment)
-
 #*********************************************************************************
-# Usage: -> python fuelaccumulation.py
+# Usage: -> python pyplot.py
 if __name__ == "__main__":
- print('Unit testing for FuelAccumulation')
+ print('Unit testing for PyPlot')

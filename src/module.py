@@ -32,7 +32,7 @@ class Module(object):
   assert type(modConfigNode) is ConfigTree, '-> modConfigNode is invalid.' 
   self.__configNode = modConfigNode
 
-# Read the module name
+# Read the module name and type
   self.__name = self.__configNode.GetNodeName()
   self.__type = self.__configNode.GetNodeType()
 
@@ -114,6 +114,9 @@ class Module(object):
     if name == 'dissolver-native':        
        t = DissolverThread( input, param, comm, status )
        t.start()
+    if name == 'pyplot-native':        
+       t = PyPlotThread( input, param, comm, status )
+       t.start()
 
 # Wrapped modules run on threads and external system call of their own with IO comm
   elif self.__type == 'wrapped':
@@ -158,11 +161,11 @@ class Module(object):
        self.__ports.append( (text, attributes[0][1].strip()) ) # (portName, portType)
 
 # 
-  print('\t\tCortix::Simulation::Application::Module: executableName',self.__executableName)
-  print('\t\tCortix::Simulation::Application::Module: executablePath',self.__executablePath)
-  print('\t\tCortix::Simulation::Application::Module: inputFileName',self.__inputFileName)
-  print('\t\tCortix::Simulation::Application::Module: inputFilePath',self.__inputFilePath)
-  print('\t\tCortix::Simulation::Application::Module: ports',self.__ports)
+#  print('\t\tCortix::Simulation::Application::Module: executableName',self.__executableName)
+#  print('\t\tCortix::Simulation::Application::Module: executablePath',self.__executablePath)
+#  print('\t\tCortix::Simulation::Application::Module: inputFileName',self.__inputFileName)
+#  print('\t\tCortix::Simulation::Application::Module: inputFilePath',self.__inputFilePath)
+#  print('\t\tCortix::Simulation::Application::Module: ports',self.__ports)
 
   return
 

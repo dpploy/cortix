@@ -2,19 +2,20 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native Chopper module thread 
+Cortix native PyPlot module thread
 
-Tue Jun 24 12:36:17 EDT 2014
+Sun Jun 29 21:34:18 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
+from src.modules.native.pyplot import PyPlot
 #*********************************************************************************
 
 #*********************************************************************************
-class ChopperThread(Thread):
+class PyPlotThread(Thread):
 
  def __init__( self, inputFullPathFileName, 
                      cortexParamFullPathFileName,
@@ -25,8 +26,8 @@ class ChopperThread(Thread):
     self.__cortexParamFullPathFileName   = cortexParamFullPathFileName 
     self.__cortexCommFullPathFileName    = cortexCommFullPathFileName 
     self.__runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
-  
-    super(ChopperThread, self).__init__()
+
+    super(PyPlotThread, self).__init__()
 
 #---------------------------------------------------------------------------------
  def run(self):
@@ -34,20 +35,20 @@ class ChopperThread(Thread):
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
 
-  log = logging.getLogger('chopper')
+  log = logging.getLogger('pyplot')
   log.setLevel(logging.DEBUG)
-# create file handler for logs
+  # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'chopper.log')
+  fh = logging.FileHandler(fullPathTaskDir+'pyplot.log')
   fh.setLevel(logging.DEBUG)
-# create console handler with a higher log level
+  # create console handler with a higher log level
   ch = logging.StreamHandler()
   ch.setLevel(logging.WARN)
-# create formatter and add it to the handlers
+  # create formatter and add it to the handlers
   formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
   fh.setFormatter(formatter)
   ch.setFormatter(formatter)
-# add the handlers to the logger
+  # add the handlers to the logger
   log.addHandler(fh)
   log.addHandler(ch)
 
@@ -68,13 +69,7 @@ class ChopperThread(Thread):
 # This input file may be empty or used by this driver and/or the native module.
 # inputFullPathFileName 
 
-  assert os.path.isfile(self.__inputFullPathFileName), 'file %r not available;stop.' % self.__inputFullPathFileName
-
-  fin = open(self.__inputFullPathFileName,'r')
-  inputDataFullPathFileNames = list()
-  for line in fin:
-   inputDataFullPathFileNames.append(line.strip())
-  fin.close()
+#  assert os.path.isfile(self.__inputFullPathFileName), 'file %r not available;stop.' % self.__inputFullPathFileName
 
 #.................................................................................
 # Second command line argument is the Cortix parameter file: cortix-param.xml
@@ -131,68 +126,78 @@ class ChopperThread(Thread):
 
 #.................................................................................
 # Fourth command line argument is the module runtime-status.xml file
-# runtimeStatusFullPathFileName 
+# runtimeStatusFullPathFileName
 
-
-#.................................................................................
-# Run Chopper
-  log.info('entered Run Chopper section')
-
+#---------------------------------------------------------------------------------
+# Run PyPlot          
+  log.info('entered Run PyPlot section')
 
 #................................................................................
-# Setup input
+# Left here as an example; vfda
+# Setup input (this was used when debugging; need proper cortix-config.xml
 
-# vfda: nothing for now
+# found = False
+# for port in ports:
+#  if port[0] is 'solids':
+#   print( 'cp -f ' + inputData[0] + ' ' + port[2] )
+#   os.system( 'cp -f ' + inputData[0] + ' ' + port[2] )
+#   found = True
+
+# assert found, 'Input setup failed.'
+
+# found = False
+# for port in ports:
+#  if port[0] is 'withdrawal-request':
+#   print( 'cp -f ' + inputData[1] + ' ' + port[2] )
+#   os.system( 'cp -f ' + inputData[1] + ' ' + port[2] )
+#   found = True
+
+# assert found, 'Input setup failed.'
 
 #................................................................................
 # Create the host code          
+  host = PyPlot( ports )
+  log.info("host = PyPlot( ports )")
 
-# nothing for now
-  log.info("host = Chopper( ports )")
-
-#.................................................................................
-# Evolve the chopper
+#................................................................................
+# Evolve the pyplot              
 
   self.__SetRuntimeStatus('running')
   log.info("SetRuntimeStatus('running')")
 
-  time.sleep(1) # fake running time for the chopper
+  facilityTime = 0.0
 
-  for port in ports:
+  while facilityTime <= evolveTime:
 
-   (portName,portType,portFile) = port
+   host.CallPorts( facilityTime )
 
-   if portName == 'Fuel_Solid':
-    s = 'cp -f ' + inputDataFullPathFileNames[0] + ' ' + portFile 
-    log.debug(s)
-    os.system(s)
-   if portName == 'Gas_Release':
-    s = 'cp -f ' + resultsDir + inputDataFullPathFileNames[1] + ' ' + portFile 
-    log.debug(s)
-    os.system(s)
+   host.Execute( facilityTime, timeStep )
 
-#.................................................................................
+   facilityTime += timeStep
+
+#---------------------------------------------------------------------------------
 # Shutdown 
 
   self.__SetRuntimeStatus('finished')
   log.info("SetRuntimeStatus('finished')")
 
 #---------------------------------------------------------------------------------
- def __SetRuntimeStatus(self, status):
+ def __SetRuntimeStatus( self, status ):
 
   status = status.strip()
-  assert status == 'running' or status == 'finished', 'status %r invalid.' % status
+  assert status == 'running' or status == 'finished', 'status invalid.'
 
   fout = open( self.__runtimeStatusFullPathFileName,'w' )
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by ChopperThread.py -->\n'; fout.write(s)
+  s = '<!-- Written by PyPlotThread.py -->\n'; fout.write(s)
   today = datetime.datetime.today()
+  s = '<!-- '+str(today)+' -->\n'; fout.write(s)
   s = '<runtime>\n'; fout.write(s)
   s = '<status>'+status+'</status>\n'; fout.write(s)
   s = '</runtime>\n'; fout.write(s)
   fout.close()
 
 #*********************************************************************************
-# Usage: -> python chopperthread.py or ./chopperthread.py
+# Usage: -> python pyplotthread.py or ./pyplotthread.py
 if __name__ == "__main__":
-  ChopperThread()
+   PyPlotThread()
