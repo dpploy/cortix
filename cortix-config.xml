@@ -98,15 +98,15 @@
     <port type="provide">Gas_Release</port>
    </module>
 
-   <module name="fuel-accumulation">
+   <module name="fuelaccumulation">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <executableName>fuelaccumulation-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/fuel-accumulation/</executablePath>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/fuelaccumulation/</executablePath>
     <configFileName>fuelaccumulation.input</configFileName>
-    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/fuel-accumulation/</configFilePath>
+    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/fuelaccumulation/</configFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="input">chopper-data-test</port>
@@ -187,8 +187,8 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModule="fuel-accumulation" fromPort="solids" toModule="fuel-accumulation" toPort="chopper-data-test"/> 
-    <connect fromModule="fuel-accumulation" fromPort="withdrawal-request" toModule="fuel-accumulation" toPort="dissolver-data-test"/> 
+    <connect fromModule="fuelaccumulation" fromPort="solids" toModule="fuelaccumulation" toPort="chopper-data-test"/> 
+    <connect fromModule="fuelaccumulation" fromPort="withdrawal-request" toModule="fuelaccumulation" toPort="dissolver-data-test"/> 
    </network>
 
    <!-- stand-alone module -->
@@ -208,9 +208,9 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModule="fuel-accumulation" fromPort="solids" toModule="chopper" toPort="Fuel_Solid"/> 
-    <connect fromModule="fuel-accumulation" fromPort="withdrawal-request" toModule="dissolver" toPort="solids-request"/> 
-    <connect fromModule="dissolver" fromPort="solids" toModule="fuel-accumulation" toPort="fuel-segments"/> 
+    <connect fromModule="fuelaccumulation" fromPort="solids" toModule="chopper" toPort="Fuel_Solid"/> 
+    <connect fromModule="fuelaccumulation" fromPort="withdrawal-request" toModule="dissolver" toPort="solids-request"/> 
+    <connect fromModule="dissolver" fromPort="solids" toModule="fuelaccumulation" toPort="fuel-segments"/> 
    </network>
 
    <!-- connected modules -->
@@ -220,8 +220,8 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModule="fuel-accumulation" fromPort="solids" toModule="chopper" toPort="Fuel_Solid"/> 
-    <connect fromModule="dissolver" fromPort="solids" toModule="fuel-accumulation" toPort="fuel-segments"/> 
+    <connect fromModule="fuelaccumulation" fromPort="solids" toModule="chopper" toPort="Fuel_Solid"/> 
+    <connect fromModule="dissolver" fromPort="solids" toModule="fuelaccumulation" toPort="fuel-segments"/> 
     <connect fromModule="condenser" fromPort="vapor" toModule="dissolver" toPort="vapor"/> 
     <connect fromModule="dissolver" fromPort="condenser-stream" toModule="condenser" toPort="condensate"/> 
     <connect fromModule="pyplot" fromPort="time-series" toModule="dissolver" toPort="vapor"/> 

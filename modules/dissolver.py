@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix Dissolver module wrapper
+Cortix native Dissolver module 
 
 Tue Jun 24 01:03:45 EDT 2014
 """
@@ -12,9 +12,6 @@ import logging
 import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
-# create log for this python module; unlikely to be used; leave as reference
-pymodule_log = logging.getLogger('main.dissolv')
-
 #*********************************************************************************
 class Dissolver(object):
 
@@ -22,12 +19,18 @@ class Dissolver(object):
 # __slots__ = [
 
  def __init__( self,
-               ports 
+               hostExec, input, param, comm
              ):
 
-  assert type(ports) is list, '-> ports type %r is invalid.' % type(ports)
+# Sanity test
+  assert type(hostExec) is str, '-> host executable pathname %r is invalid.' % type(hostExec)
+  assert type(input) is str, '-> input file pathname %r is invalid.' % type(input)
+  assert type(param) is str, '-> parameter pathfile %r is invalid.' % type(param)
+  assert type(comm) is str,  '-> communication pathfile %r is invalid.' % type(comm)
 
-  self.__ports = ports
+# Member data 
+
+  self.__ports = list()
 
   self.__solidsMassLoadMax = 250.0 # gram
   self.__dutyPeriod        = 120.0 # minute
@@ -39,8 +42,10 @@ class Dissolver(object):
 
   self.__stateHistory = list(dict())
 
-  self.__log = logging.getLogger('main.dissolv')
-  self.__log.info('initializing an instance of Dissolver')
+#  self.__log = logging.getLogger('mod.dissolv')
+#  self.__log.info('initializing an instance of Dissolver')
+
+  self.__Setup( input, param, comm )
 
 #---------------------------------------------------------------------------------
  def CallPorts( self, evolTime=0.0 ):
@@ -59,11 +64,11 @@ class Dissolver(object):
 
   if len(self.__fuelSegmentsLoad) != 0:
 
-     s = 'Execute(): start new duty cycle at '+str(evolTime)+' [min]'
+     s = 'Execute(): start new duty cycle at ' + str(evolTime) + ' [min]'
      self.__log.debug(s)
      s = 'Execute(): ready to load? = ' + str(self.__ready2LoadFuel)
      self.__log.debug(s)
-     s = 'Execute(): loaded mass [g] = '+str(round(self.__GetFuelLoadMass(),3))
+     s = 'Execute(): loaded mass [g] = ' + str(round(self.__GetFuelLoadMass(),3))
      self.__log.debug(s)
      s = 'Execute(): new fuel load # segments = ' + str(len(self.__fuelSegmentsLoad))
      self.__log.debug(s)
@@ -71,15 +76,15 @@ class Dissolver(object):
      if self.__startDissolveTime != 0.0:
         assert evolTime >= self.__startDissolveTime + self.__dutyPeriod
 
-     self.__ready2LoadFuel = False
+     self.__ready2LoadFuel    = False
      self.__startDissolveTime = evolTime
 
      self.__Dissolve( )
 
   if evolTime >= self.__startDissolveTime + self.__dutyPeriod: 
-     s = 'Execute(): signal new duty cycle at '+str(evolTime)+' [min]'
+     s = 'Execute(): signal new duty cycle at ' + str(evolTime)+' [min]'
      self.__log.debug(s)
-     s = 'Execute(): loaded mass '+str(round(self.__GetFuelLoadMass(),3))
+     s = 'Execute(): loaded mass ' + str(round(self.__GetFuelLoadMass(),3))
      self.__log.debug(s)
 
      self.__ready2LoadFuel = True

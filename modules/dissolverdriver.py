@@ -14,22 +14,20 @@ from dissolver import Dissolver
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
-def Main(argv):
-
-#---------------------------------------------------------------------------------
-# Read and process the command prompt arguments
-
- assert len(argv) == 5, 'incomplete command line input.'
+def DissolverDriver( inputFullPathFileName, 
+                     cortexParamFullPathFileName,
+                     cortexCommFullPathFileName,
+                     runtimeStatusFullPathFileName ):
 
 #.................................................................................
-# First command line argument is the module input file name with full path.
+# First argument is the module input file name with full path.
 # This input file may be used by both the wrapper and the host code for 
 # communication.
- inputFullPathFileName = argv[1]
+# inputFullPathFileName 
 
 #.................................................................................
-# Second command line argument is the Cortix parameter file: cortix-param.xml
- cortexParamFullPathFileName = argv[2]
+# Second argument is the Cortix parameter file: cortix-param.xml
+# cortexParamFullPathFileName 
  tree = ElementTree.parse(cortexParamFullPathFileName)
  cortexParamXMLRootNode = tree.getroot()
 
@@ -54,8 +52,8 @@ def Main(argv):
  else: assert True, 'time unit invalid.'
 
 #.................................................................................
-# Third command line argument is the Cortix communication file: cortix-comm.xml
- cortexCommFullPathFileName = argv[3]
+# Third argument is the Cortix communication file: cortix-comm.xml
+# cortexCommFullPathFileName 
  tree = ElementTree.parse(cortexCommFullPathFileName)
  cortexCommXMLRootNode = tree.getroot()
 
@@ -72,12 +70,12 @@ def Main(argv):
  tree = None
 
 #.................................................................................
-# Fourth command line argument is the module runtime-status.xml file
- runtimeStatusFullPathFileName = argv[4]
+# Fourth argument is the module runtime-status.xml file
+# runtimeStatusFullPathFileName = argv[4]
 
 #---------------------------------------------------------------------------------
-# Create logger for this main and its imported pymodule 
- log = logging.getLogger('main')
+# Create logger for this driver and its imported pymodule 
+ log = logging.getLogger('drv')
  log.setLevel(logging.DEBUG)
 # create file handler for logs
  fullPathTaskDir = cortexCommFullPathFileName[:cortexCommFullPathFileName.rfind('/')]+'/'
@@ -155,4 +153,4 @@ def SetRuntimeStatus(runtimeStatusFullPathFileName, status):
 #*********************************************************************************
 # Usage: -> python dissolver-main.py or ./dissolver-main.py
 if __name__ == "__main__":
-   Main(sys.argv)
+   DissolverDriver(sys.argv)

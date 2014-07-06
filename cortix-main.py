@@ -14,7 +14,7 @@ from cortix import Cortix
 #*********************************************************************************
 
 
-def main():
+def Main():
 
  pwd                = os.path.dirname(__file__)
  fullPathConfigFile = os.path.join(pwd, 'cortix-config.xml')
@@ -32,4 +32,4 @@ def main():
 #*********************************************************************************
 # Usage: -> python cortix-main.py or ./cortix-main.py
 if __name__ == "__main__":
-  main()
+  Main()

@@ -10,6 +10,9 @@ Tue Dec 10 11:21:30 EDT 2013
 import os, sys, io, time
 import logging  
 from configtree import ConfigTree
+#from modules.chopper import Chopper
+from modules.fuelaccumulation import FuelAccumulation
+from modules.dissolverdriver import DissolverDriver
 #*********************************************************************************
 
 #*********************************************************************************
@@ -83,19 +86,34 @@ class Module(object):
 #  print('param file       : ',runtimeCortixParamFile)
 #  print('comm  file       : ',runtimeCortixCommFile)
  
-  module = self.__executablePath + self.__executableName
-  input  = self.__configFilePath + self.__configFileName
-  param  = runtimeCortixParamFile
-  comm   = runtimeCortixCommFile
+  hostExec = self.__executablePath + self.__executableName
+  input    = self.__configFilePath + self.__configFileName
+  param    = runtimeCortixParamFile
+  comm     = runtimeCortixCommFile
 
   fullPathCommDir = comm[:comm.rfind('/')]+'/'
   runtimeModuleStatusFile = fullPathCommDir + 'runtime-status.xml'
 
   status = runtimeModuleStatusFile
 
-  print('\t\tCortix::Simulation::Application::Module:Execute() '+self.__executableName)
-  print( 'time '+ module + ' ' + input + ' ' + param + ' ' + comm + ' ' + status )
-  os.system( 'time '+ module + ' ' + input + ' ' + param + ' ' + comm + ' ' + status + ' &')
+  if self.__hostCodeType == 'stand-alone':
+     os.system( 'time '+ hostExec + ' ' + 
+                input + ' ' + param + ' ' + comm + ' ' + status + ' &' )
+
+  elif self.__hostCodeType == 'native':
+    name = self.__name 
+#    if name == 'chopper':          host = Chopper( ports )
+#    if name == 'fuelaccumulation': host = FuelAccumulation( ports )
+    if name == 'dissolver':        host = DissolverDriver( input, param, comm, status )
+
+  elif self.__hostCodeType == 'wrapped':
+     assert True, 'hostCodeType not implemented.'
+  else: 
+     assert True, 'hostCodeType invalid.'
+
+#  print('\t\tCortix::Simulation::Application::Module:Execute() '+self.__executableName)
+#  print( 'time '+ hostExec + ' ' + input + ' ' + param + ' ' + comm + ' ' + status )
+#  os.system( 'time '+ hostExec + ' ' + input + ' ' + param + ' ' + comm + ' ' + status + ' &')
 
   return runtimeModuleStatusFile
 
@@ -104,9 +122,10 @@ class Module(object):
 
  def __Setup(self):
 
+# Save config data
   for child in self.__configNode.GetNodeChildren():
 
-    (tag,attributes,text) = child
+    ( tag, attributes, text ) = child
     text = text.strip()
 
     if tag == 'executableName': self.__executableName = text
@@ -125,8 +144,9 @@ class Module(object):
        val = attributes[0][1].strip()
        assert key == 'type', 'port attribute key must be "type".'
        assert val == 'use' or val == 'provide' or val == 'input', 'port attribute value invalid.'
-       self.__ports.append( (text, attributes[0][1].strip()) )
+       self.__ports.append( (text, attributes[0][1].strip()) ) # (portName, portType)
 
+# 
   print('\t\tCortix::Simulation::Application::Module: executableName',self.__executableName)
   print('\t\tCortix::Simulation::Application::Module: executablePath',self.__executablePath)
   print('\t\tCortix::Simulation::Application::Module: configFileName',self.__configFileName)
