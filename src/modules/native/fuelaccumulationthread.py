@@ -11,7 +11,7 @@ import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
-from modules.fuelaccumulation import FuelAccumulation
+from src.modules.native.fuelaccumulation import FuelAccumulation
 #*********************************************************************************
 
 #*********************************************************************************
@@ -33,9 +33,43 @@ class FuelAccumulationThread(Thread):
  def run(self):
 
 #.................................................................................
+# Create logger for this driver and its imported pymodule 
+
+  log = logging.getLogger('fuelaccumulation')
+  log.setLevel(logging.DEBUG)
+  # create file handler for logs
+  fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
+  fh = logging.FileHandler(fullPathTaskDir+'fuelaccumulation.log')
+  fh.setLevel(logging.DEBUG)
+  # create console handler with a higher log level
+  ch = logging.StreamHandler()
+  ch.setLevel(logging.WARN)
+  # create formatter and add it to the handlers
+  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+  fh.setFormatter(formatter)
+  ch.setFormatter(formatter)
+  # add the handlers to the logger
+  log.addHandler(fh)
+  log.addHandler(ch)
+
+  s = 'created logger: drv'
+  log.info(s)
+
+  s = 'input file: ' + self.__inputFullPathFileName
+  log.debug(s)
+
+  s = 'param file: ' + self.__cortexParamFullPathFileName
+  log.debug(s)
+
+  s = 'comm file: ' + self.__cortexCommFullPathFileName
+  log.debug(s)
+
+#.................................................................................
 # First argument is the module input file name with full path.
 # This input file may be empty or used by this driver and/or the native module.
 # inputFullPathFileName 
+
+  assert os.path.isfile(self.__inputFullPathFileName), 'file %r not available;stop.' % self.__inputFullPathFileName
 
   fin = open(self.__inputFullPathFileName,'r')
   inputData = list()
@@ -46,6 +80,9 @@ class FuelAccumulationThread(Thread):
 #.................................................................................
 # Second command line argument is the Cortix parameter file: cortix-param.xml
 # cortexParamFullPathFileName 
+
+  assert os.path.isfile(self.__cortexParamFullPathFileName), 'file %r not available;stop.' % cortexParamFullPathFileName
+
   tree = ElementTree.parse(self.__cortexParamFullPathFileName)
   cortexParamXMLRootNode = tree.getroot()
 
@@ -72,6 +109,9 @@ class FuelAccumulationThread(Thread):
 #.................................................................................
 # Third command line argument is the Cortix communication file: cortix-comm.xml
 # cortexCommFullPathFileName 
+
+  assert os.path.isfile(self.__cortexCommFullPathFileName), 'file %r not available;stop.' % self.__cortexCommFullPathFileName
+
   tree = ElementTree.parse(self.__cortexCommFullPathFileName)
   cortexCommXMLRootNode = tree.getroot()
 
@@ -87,35 +127,12 @@ class FuelAccumulationThread(Thread):
 
   tree = None
 
+  s = 'ports: '+str(ports)
+  log.debug(s)
+
 #.................................................................................
 # Fourth command line argument is the module runtime-status.xml file
 # runtimeStatusFullPathFileName
-
-#---------------------------------------------------------------------------------
-# Create logger for this driver and its imported pymodule 
-
-  log = logging.getLogger('fuelaccumulation')
-  log.setLevel(logging.DEBUG)
-  # create file handler for logs
-  fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'fuelaccumulation.log')
-  fh.setLevel(logging.DEBUG)
-  # create console handler with a higher log level
-  ch = logging.StreamHandler()
-  ch.setLevel(logging.WARN)
-  # create formatter and add it to the handlers
-  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-  fh.setFormatter(formatter)
-  ch.setFormatter(formatter)
-  # add the handlers to the logger
-  log.addHandler(fh)
-  log.addHandler(ch)
-
-  s = 'created logger: drv'
-  log.info(s)
-
-  s = 'ports: '+str(ports)
-  log.debug(s)
 
 #---------------------------------------------------------------------------------
 # Run FuelAccumulation

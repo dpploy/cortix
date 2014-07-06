@@ -32,19 +32,56 @@ class ChopperThread(Thread):
  def run(self):
 
 #.................................................................................
+# Create logger for this driver and its imported pymodule 
+
+  log = logging.getLogger('chopper')
+  log.setLevel(logging.DEBUG)
+# create file handler for logs
+  fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
+  fh = logging.FileHandler(fullPathTaskDir+'chopper.log')
+  fh.setLevel(logging.DEBUG)
+# create console handler with a higher log level
+  ch = logging.StreamHandler()
+  ch.setLevel(logging.WARN)
+# create formatter and add it to the handlers
+  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+  fh.setFormatter(formatter)
+  ch.setFormatter(formatter)
+# add the handlers to the logger
+  log.addHandler(fh)
+  log.addHandler(ch)
+
+  s = 'created logger: drv'
+  log.info(s)
+
+  s = 'input file: ' + self.__inputFullPathFileName
+  log.debug(s)
+
+  s = 'param file: ' + self.__cortexParamFullPathFileName
+  log.debug(s)
+
+  s = 'comm file: ' + self.__cortexCommFullPathFileName
+  log.debug(s)
+
+#.................................................................................
 # First argument is the module input file name with full path.
 # This input file may be empty or used by this driver and/or the native module.
 # inputFullPathFileName 
 
+  assert os.path.isfile(self.__inputFullPathFileName), 'file %r not available;stop.' % self.__inputFullPathFileName
+
   fin = open(self.__inputFullPathFileName,'r')
-  inputDataFileNames = list()
+  inputDataFullPathFileNames = list()
   for line in fin:
-   inputDataFileNames.append(line.strip())
+   inputDataFullPathFileNames.append(line.strip())
   fin.close()
 
 #.................................................................................
 # Second command line argument is the Cortix parameter file: cortix-param.xml
 # cortexParamFullPathFileName 
+
+  assert os.path.isfile(self.__cortexParamFullPathFileName), 'file %r not available;stop.' % cortexParamFullPathFileName
+
   tree = ElementTree.parse(self.__cortexParamFullPathFileName)
   cortexParamXMLRootNode = tree.getroot()
 
@@ -71,6 +108,9 @@ class ChopperThread(Thread):
 #.................................................................................
 # Third command line argument is the Cortix communication file: cortix-comm.xml
 # cortexCommFullPathFileName 
+
+  assert os.path.isfile(self.__cortexCommFullPathFileName), 'file %r not available;stop.' % self.__cortexCommFullPathFileName
+
   tree = ElementTree.parse(self.__cortexCommFullPathFileName)
   cortexCommXMLRootNode = tree.getroot()
 
@@ -86,35 +126,13 @@ class ChopperThread(Thread):
 
   tree = None
 
+  s = 'ports: '+str(ports)
+  log.debug(s)
+
 #.................................................................................
 # Fourth command line argument is the module runtime-status.xml file
 # runtimeStatusFullPathFileName 
 
-#.................................................................................
-# Create logger for this driver and its imported pymodule 
-
-  log = logging.getLogger('chopper')
-  log.setLevel(logging.DEBUG)
-# create file handler for logs
-  fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'chopper.log')
-  fh.setLevel(logging.DEBUG)
-# create console handler with a higher log level
-  ch = logging.StreamHandler()
-  ch.setLevel(logging.WARN)
-# create formatter and add it to the handlers
-  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-  fh.setFormatter(formatter)
-  ch.setFormatter(formatter)
-# add the handlers to the logger
-  log.addHandler(fh)
-  log.addHandler(ch)
-
-  s = 'created logger: drv'
-  log.info(s)
-
-  s = 'ports: '+str(ports)
-  log.debug(s)
 
 #.................................................................................
 # Run Chopper
@@ -132,7 +150,6 @@ class ChopperThread(Thread):
 # nothing for now
   log.info("host = Chopper( ports )")
 
-
 #.................................................................................
 # Evolve the chopper
 
@@ -141,18 +158,16 @@ class ChopperThread(Thread):
 
   time.sleep(1) # fake running time for the chopper
 
-  resultsDir = os.path.dirname(__file__).strip()+'/chopper/'
-
   for port in ports:
 
    (portName,portType,portFile) = port
 
    if portName == 'Fuel_Solid':
-    s = 'cp -f ' + resultsDir + inputDataFileNames[0] + ' ' + portFile 
+    s = 'cp -f ' + inputDataFullPathFileNames[0] + ' ' + portFile 
     log.debug(s)
     os.system(s)
    if portName == 'Gas_Release':
-    s = 'cp -f ' + resultsDir + inputDataFileNames[1] + ' ' + portFile 
+    s = 'cp -f ' + resultsDir + inputDataFullPathFileNames[1] + ' ' + portFile 
     log.debug(s)
     os.system(s)
 

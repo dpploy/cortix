@@ -11,7 +11,7 @@ import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
-from modules.dissolver import Dissolver
+from src.modules.native.dissolver import Dissolver
 #*********************************************************************************
 
 #*********************************************************************************
@@ -33,13 +33,49 @@ class DissolverThread(Thread):
  def run(self):
 
 #.................................................................................
+# Create logger for this driver and its imported pymodule 
+  log = logging.getLogger('dissolver')
+  log.setLevel(logging.DEBUG)
+# create file handler for logs
+  fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
+  fh = logging.FileHandler(fullPathTaskDir+'dissolver.log')
+  fh.setLevel(logging.DEBUG)
+# create console handler with a higher log level
+  ch = logging.StreamHandler()
+  ch.setLevel(logging.WARN)
+# create formatter and add it to the handlers
+  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+  fh.setFormatter(formatter)
+  ch.setFormatter(formatter)
+# add the handlers to the logger
+  log.addHandler(fh)
+  log.addHandler(ch)
+
+  s = 'created logger: main'
+  log.info(s)
+
+  s = 'input file: ' + self.__inputFullPathFileName
+  log.debug(s)
+
+  s = 'param file: ' + self.__cortexParamFullPathFileName
+  log.debug(s)
+
+  s = 'comm file: ' + self.__cortexCommFullPathFileName
+  log.debug(s)
+
+#.................................................................................
 # First argument is the module input file name with full path.
 # This input file may be empty or used by this driver and/or the native module.
 # inputFullPathFileName 
 
+  assert os.path.isfile(self.__inputFullPathFileName), 'file %r not available;stop.' % self.__inputFullPathFileName
+
 #.................................................................................
 # Second argument is the Cortix parameter file: cortix-param.xml
 # cortexParamFullPathFileName 
+
+  assert os.path.isfile(self.__cortexParamFullPathFileName), 'file %r not available;stop.' % cortexParamFullPathFileName
+
   tree = ElementTree.parse(self.__cortexParamFullPathFileName)
   cortexParamXMLRootNode = tree.getroot()
 
@@ -66,6 +102,9 @@ class DissolverThread(Thread):
 #.................................................................................
 # Third argument is the Cortix communication file: cortix-comm.xml
 # cortexCommFullPathFileName 
+
+  assert os.path.isfile(self.__cortexCommFullPathFileName), 'file %r not available;stop.' % self.__cortexCommFullPathFileName
+
   tree = ElementTree.parse(self.__cortexCommFullPathFileName)
   cortexCommXMLRootNode = tree.getroot()
 
@@ -81,34 +120,12 @@ class DissolverThread(Thread):
 
   tree = None
 
+  s = 'ports: '+str(ports)
+  log.debug(s)
+
 #.................................................................................
 # Fourth argument is the module runtime-status.xml file
 # runtimeStatusFullPathFileName = argv[4]
-
-#---------------------------------------------------------------------------------
-# Create logger for this driver and its imported pymodule 
-  log = logging.getLogger('dissolver')
-  log.setLevel(logging.DEBUG)
-# create file handler for logs
-  fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'dissolver.log')
-  fh.setLevel(logging.DEBUG)
-# create console handler with a higher log level
-  ch = logging.StreamHandler()
-  ch.setLevel(logging.WARN)
-# create formatter and add it to the handlers
-  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-  fh.setFormatter(formatter)
-  ch.setFormatter(formatter)
-# add the handlers to the logger
-  log.addHandler(fh)
-  log.addHandler(ch)
-
-  s = 'created logger: main'
-  log.info(s)
-
-  s = 'orts: '+str(ports)
-  log.debug(s)
 
 #---------------------------------------------------------------------------------
 # Run Dissolver

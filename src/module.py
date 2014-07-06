@@ -38,8 +38,8 @@ class Module(object):
 
   self.__executableName = 'null'
   self.__executablePath = 'null'
-  self.__configFileName = 'null'
-  self.__configFilePath = 'null'
+  self.__inputFileName = 'null'
+  self.__inputFilePath = 'null'
 
   self.__ports = list()
 
@@ -83,12 +83,12 @@ class Module(object):
 #  print('module:',self.__name)
 #  print('module executable: ',self.__executableName)
 #  print('module path      : ',self.__executablePath)
-#  print('input file       : ',self.__configFilePath+self.__configFileName)
+#  print('input file       : ',self.__inputFilePath+self.__inputFileName)
 #  print('param file       : ',runtimeCortixParamFile)
 #  print('comm  file       : ',runtimeCortixCommFile)
  
   hostExec = self.__executablePath + self.__executableName
-  input    = self.__configFilePath + self.__configFileName
+  input    = self.__inputFilePath + self.__inputFileName
   param    = runtimeCortixParamFile
   comm     = runtimeCortixCommFile
 
@@ -105,13 +105,13 @@ class Module(object):
 # Native modules run on threads using file IO communication
   elif self.__type == 'native':
     name = self.__name 
-    if name == 'chopper':          
+    if name == 'chopper-native':          
        t = ChopperThread( input, param, comm, status )
        t.start()
-    if name == 'fuelaccumulation': 
+    if name == 'fuelaccumulation-native': 
        t = FuelAccumulationThread( input, param, comm, status )
        t.start()
-    if name == 'dissolver':        
+    if name == 'dissolver-native':        
        t = DissolverThread( input, param, comm, status )
        t.start()
 
@@ -138,15 +138,16 @@ class Module(object):
     ( tag, attributes, text ) = child
     text = text.strip()
 
-    if tag == 'executableName': self.__executableName = text
-    if tag == 'executablePath': 
-     if text[-1] != '/': text += '/'
-     self.__executablePath = text
+    if self.__type != 'native':
+       if tag == 'executableName': self.__executableName = text
+       if tag == 'executablePath': 
+        if text[-1] != '/': text += '/'
+        self.__executablePath = text
 
-    if tag == 'configFileName': self.__configFileName = text
-    if tag == 'configFilePath': 
+    if tag == 'inputFileName': self.__inputFileName = text
+    if tag == 'inputFilePath': 
      if text[-1] != '/': text += '/'
-     self.__configFilePath = text
+     self.__inputFilePath = text
 
     if tag == 'port': 
        assert len(attributes) == 1, 'only 1 attribute allowed/required at this moment.'
@@ -159,8 +160,8 @@ class Module(object):
 # 
   print('\t\tCortix::Simulation::Application::Module: executableName',self.__executableName)
   print('\t\tCortix::Simulation::Application::Module: executablePath',self.__executablePath)
-  print('\t\tCortix::Simulation::Application::Module: configFileName',self.__configFileName)
-  print('\t\tCortix::Simulation::Application::Module: configFilePath',self.__configFilePath)
+  print('\t\tCortix::Simulation::Application::Module: inputFileName',self.__inputFileName)
+  print('\t\tCortix::Simulation::Application::Module: inputFilePath',self.__inputFilePath)
   print('\t\tCortix::Simulation::Application::Module: ports',self.__ports)
 
   return
