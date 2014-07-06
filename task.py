@@ -169,15 +169,15 @@ class Task(object):
 
 # monitor runtime status
 
-  status = self.__GetRuntimeStatus( runtimeStatusFiles )
+  status = 'running'
 
   while status == 'running': 
 
    time.sleep(10)
 
-   status = self.__GetRuntimeStatus( runtimeStatusFiles )
+   (status,modNames) = self.__GetRuntimeStatus( runtimeStatusFiles )
 
-   s = 'runtime status: '+status
+   s = 'runtime status: '+status+' modules: '+str(modNames)
    self.__log.info(s)
 
   return 
@@ -188,6 +188,7 @@ class Task(object):
  def __GetRuntimeStatus(self, runtimeStatusFiles):
   
   taskStatus = 'finished'
+  runningModuleNames = list()
 
   for (modName,statusFile) in runtimeStatusFiles.items():
 
@@ -199,9 +200,11 @@ class Task(object):
      statusFileXMLRootNode = tree.getroot()
      node = statusFileXMLRootNode.find('status')
      status = node.text.strip()
-     if status == 'running': taskStatus = 'running'
+     if status == 'running': 
+       taskStatus = 'running'
+       runningModuleNames.append(modName)
   
-  return taskStatus
+  return (taskStatus, runningModuleNames)
 
 #---------------------------------------------------------------------------------
 # Setup task                

@@ -106,7 +106,7 @@ class FuelAccumulation(object):
       nTrials += 1
       time.sleep(1)
 
-    if nTrials >= 2:
+    if nTrials >= 10:
       s = '__GetPortFile(): waited ' + str(nTrials) + ' trials for port: ' + portFile
       self.__log.warn(s)
 
