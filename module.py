@@ -10,9 +10,9 @@ Tue Dec 10 11:21:30 EDT 2013
 import os, sys, io, time
 import logging  
 from configtree import ConfigTree
-from modules.chopperdriver import ChopperDriver
-from modules.fuelaccumulationdriver import FuelAccumulationDriver
-from modules.dissolverdriver import DissolverDriver
+from modules.chopperthread import ChopperThread
+from modules.fuelaccumulationthread import FuelAccumulationThread
+from modules.dissolverthread import DissolverThread
 #*********************************************************************************
 
 #*********************************************************************************
@@ -104,11 +104,14 @@ class Module(object):
   elif self.__type == 'native':
     name = self.__name 
     if name == 'chopper':          
-       host = ChopperDriver( input, param, comm, status )
+       t = ChopperThread( input, param, comm, status )
+       t.start()
     if name == 'fuelaccumulation': 
-       host = FuelAccumulationDriver( input, param, comm, status )
+       t = FuelAccumulationThread( input, param, comm, status )
+       t.start()
     if name == 'dissolver':        
-       host = DissolverDriver( input, param, comm, status )
+       t = DissolverThread( input, param, comm, status )
+       t.start()
 
   elif self.__type == 'wrapped':
      assert True, 'module type not implemented.'

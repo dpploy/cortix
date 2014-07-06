@@ -30,7 +30,7 @@ class FuelAccumulation(object):
 
   self.__withdrawMass = 0.0
 
-  self.__log = logging.getLogger('drv.fuelacc')
+  self.__log = logging.getLogger('fuelaccumulation')
   self.__log.info('initializing an instance of FuelAccumulation')
 
   self.__gramDecimals = 3 # milligram significant digits
@@ -100,14 +100,17 @@ class FuelAccumulation(object):
     for port in self.__ports:
      if port[0] == usePortName and port[1] == 'use': portFile = port[2]
 
-    maxNTrials = 5
+    maxNTrials = 50
     nTrials    = 0
     while not os.path.isfile(portFile) and nTrials < maxNTrials:
       nTrials += 1
-#      print('FuelAccumulation::__GetPortFile: waiting for port:',portFile)
       time.sleep(1)
 
-    assert os.path.isfile(portFile) is True, 'portFile %r not available' % portFile
+    if nTrials >= 2:
+      s = '__GetPortFile(): waited ' + str(nTrials) + ' trials for port: ' + portFile
+      self.__log.warn(s)
+
+    assert os.path.isfile(portFile) is True, 'portFile %r not available; stop.' % portFile
 
   if providePortName is not None:
 
@@ -263,7 +266,6 @@ class FuelAccumulation(object):
 # This uses a use portFile which is guaranteed at this point
  def __GetWithdrawalRequest( self, portFile, evolTime ):
 
-#  print('FuelAccumulation::__GetWithdrawalRequest: getting withdrawal request')
   tree = ElementTree.parse(portFile)
   rootNode = tree.getroot()
 
@@ -284,6 +286,9 @@ class FuelAccumulation(object):
      self.__withdrawMass = mass
   else:
      self.__withdrawMass = 0.0
+
+  s = '__GetWithdrawalRequest(): received withdrawal message at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
+  self.__log.debug(s)
 
 #  print('FuelAccumulation::__GetWithdrawalRequest(): mass ', self.__withdrawMass) 
 #  print('FuelAccumulation::__GetWithdrawalRequest(): unit ', massUnit) 
@@ -331,6 +336,9 @@ class FuelAccumulation(object):
    s = '</fuelsegments>\n'; fout.write(s)
    fout.close()
    self.__withdrawMass = 0.0
+
+   s = '__ProvideFuelSegments(): providing no fuel at '+str(evolTime)+' [min]'
+   self.__log.debug(s)
    return
 
   else:  
@@ -379,6 +387,9 @@ class FuelAccumulation(object):
    s = ' </timeStamp>\n'; fout.write(s)
    s = '</fuelsegments>\n'; fout.write(s)
    fout.close()
+
+   s = '__ProvideFuelSegments(): providing '+str(len(fuelSegmentsLoad))+' fuel segments at '+str(evolTime)+' [min].'
+   self.__log.debug(s)
 
   return
 

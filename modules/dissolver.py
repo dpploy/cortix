@@ -39,7 +39,7 @@ class Dissolver(object):
 
   self.__stateHistory = list(dict())
 
-  self.__log = logging.getLogger('drv.dissolv')
+  self.__log = logging.getLogger('dissolver')
   self.__log.info('initializing an instance of Dissolver')
 
 #---------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ class Dissolver(object):
     for port in self.__ports:
      if port[0] == usePortName and port[1] == 'use': portFile = port[2]
 
-    maxNTrials = 5
+    maxNTrials = 50
     nTrials    = 0
     while os.path.isfile(portFile) is False and nTrials <= maxNTrials:
       nTrials += 1
@@ -128,7 +128,7 @@ class Dissolver(object):
       s = '__GetPortFile(): waited ' + str(nTrials) + ' trials for port: ' + portFile
       self.__log.warn(s)
 
-    assert os.path.isfile(portFile) is True, 'portFile %r not available' % portFile
+    assert os.path.isfile(portFile) is True, 'portFile %r not available; stop' % portFile
     time.sleep(1) # allow for file to finish writing
 
   if providePortName is not None:
@@ -158,12 +158,14 @@ class Dissolver(object):
   s = '__ProvideSolidsRequest(): ready to load = '+str(self.__ready2LoadFuel)
   self.__log.debug(s)
 
+
   if  self.__ready2LoadFuel is True:
  
     if self.__startDissolveTime != 0.0:
       assert evolTime >= self.__startDissolveTime + self.__dutyPeriod
 
     s = '  <fuelLoad unit="gram">'+str(self.__solidsMassLoadMax)+'</fuelLoad>\n';fout.write(s)
+
 
   s = ' </timeStamp>\n'; fout.write(s)
   s = '</dissolutionFuelRequest>\n'; fout.write(s)
@@ -286,11 +288,17 @@ class Dissolver(object):
 
      fuelSegmentsLoad.append( fuelSegment )
 
-  # remove the data file after reading it 
-#  os.system( 'cp ' + portFile + ' /tmp/.')
-  os.system( 'rm -f ' + portFile )
 
-#  print('Dissolver::__GetSolids: len(fuelSegmentsLoad)',len(fuelSegmentsLoad))
+#  os.system( 'cp ' + portFile + ' /tmp/.')
+
+  s = '__GetSolids(): got fuel load at '+str(evolTime)+' [min], with '+str(len(fuelSegmentsLoad))+' segments'
+  self.__log.debug(s)
+
+  # remove the data file after reading it 
+  s = 'rm -f ' + portFile 
+  os.system(s)
+  self.__log.debug('__GetSolids(): '+s)
+
 
   return  fuelSegmentsLoad
 
