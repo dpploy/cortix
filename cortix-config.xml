@@ -89,9 +89,9 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <executableName>chopper-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/chopper/</executablePath>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/chopper/</executablePath>
     <configFileName>chopper.input</configFileName>
-    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/chopper/</configFilePath>
+    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/chopper/</configFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="provide">Fuel_Solid</port>
@@ -104,9 +104,9 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <executableName>fuelaccumulation-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/fuelaccumulation/</executablePath>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/fuelaccumulation/</executablePath>
     <configFileName>fuelaccumulation.input</configFileName>
-    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/fuelaccumulation/</configFilePath>
+    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/fuelaccumulation/</configFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="input">chopper-data-test</port>
@@ -123,7 +123,7 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <executableName>dissolver-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/dissolver/</executablePath>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/dissolver/</executablePath>
     <configFileName>dissolution.input</configFileName>
     <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/dissolution/nitron/src/</configFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
@@ -142,9 +142,9 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <executableName>condenser-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/condenser/</executablePath>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/condenser/</executablePath>
     <configFileName>condenser.input</configFileName>
-    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/condenser/</configFilePath>
+    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/condenser/</configFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="use">vapor</port>
@@ -159,9 +159,9 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <executableName>pyplot-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/pyplot/</executablePath>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/pyplot/</executablePath>
     <configFileName>pyplot.input</configFileName>
-    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/pyplot/</configFilePath>
+    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/pyplot/</configFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="use">time-series</port>
