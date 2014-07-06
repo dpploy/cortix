@@ -83,30 +83,30 @@
    </logger>
 
    <!-- Application: modules set -->
-   <module name="chopper">
+   <module name="chopper" type="native">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <executableName>chopper-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/chopper/</executablePath>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/chopper/</executablePath>
     <configFileName>chopper.input</configFileName>
-    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/chopper/</configFilePath>
+    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/chopper/</configFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="provide">Fuel_Solid</port>
     <port type="provide">Gas_Release</port>
    </module>
 
-   <module name="fuelaccumulation">
+   <module name="fuelaccumulation" type="native">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <executableName>fuelaccumulation-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/fuelaccumulation/</executablePath>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/fuelaccumulation/</executablePath>
     <configFileName>fuelaccumulation.input</configFileName>
-    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/fuelaccumulation/</configFilePath>
+    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/fuelaccumulation/</configFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="input">chopper-data-test</port>
@@ -117,13 +117,13 @@
     <port type="provide">off-gas</port>
    </module>
 
-   <module name="dissolver">
+   <module name="dissolver" type="native">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <executableName>dissolver-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/dissolver/</executablePath>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/dissolver/</executablePath>
     <configFileName>dissolution.input</configFileName>
     <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/dissolution/nitron/src/</configFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
@@ -136,15 +136,15 @@
     <port type="provide">heat</port>
    </module>
 
-   <module name="condenser">
+   <module name="condenser" type="native">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <executableName>condenser-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/condenser/</executablePath>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/condenser/</executablePath>
     <configFileName>condenser.input</configFileName>
-    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/condenser/</configFilePath>
+    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/condenser/</configFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="use">vapor</port>
@@ -153,15 +153,15 @@
     <port type="provide">cooling</port>
    </module>
 
-   <module name="pyplot">
+   <module name="pyplot" type="native">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <executableName>pyplot-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/pyplot/</executablePath>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/pyplot/</executablePath>
     <configFileName>pyplot.input</configFileName>
-    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/pyplot/</configFilePath>
+    <configFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix-newbranch/modules/pyplot/</configFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="use">time-series</port>

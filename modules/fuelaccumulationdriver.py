@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix FuelAccumulation module executable
+Cortix native FuelAccumulation module driver
 
 Sun Jun 29 21:34:18 EDT 2014
 """
@@ -10,22 +10,19 @@ Sun Jun 29 21:34:18 EDT 2014
 import os, sys, io, time, datetime
 import logging
 import xml.etree.ElementTree as ElementTree
-from fuelaccumulation import FuelAccumulation
+from modules.fuelaccumulation import FuelAccumulation
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
-def Main(argv):
-
-#---------------------------------------------------------------------------------
-# Read and process the command prompt arguments
-
- assert len(argv) == 5, 'incomplete command line input.'
+def FuelAccumulationDriver( inputFullPathFileName, 
+                            cortexParamFullPathFileName,
+                            cortexCommFullPathFileName,
+                            runtimeStatusFullPathFileName ):
 
 #.................................................................................
-# First command line argument is the module input file name with full path.
-# This input file may be used by both the wrapper and the host code for 
-# communication.
- inputFullPathFileName = argv[1]
+# First argument is the module input file name with full path.
+# This input file may be empty or used by this driver and/or the native module.
+# inputFullPathFileName 
 
  fin = open(inputFullPathFileName,'r')
  inputData = list()
@@ -35,7 +32,7 @@ def Main(argv):
 
 #.................................................................................
 # Second command line argument is the Cortix parameter file: cortix-param.xml
- cortexParamFullPathFileName = argv[2]
+# cortexParamFullPathFileName 
  tree = ElementTree.parse(cortexParamFullPathFileName)
  cortexParamXMLRootNode = tree.getroot()
 
@@ -61,7 +58,7 @@ def Main(argv):
 
 #.................................................................................
 # Third command line argument is the Cortix communication file: cortix-comm.xml
- cortexCommFullPathFileName = argv[3]
+# cortexCommFullPathFileName 
  tree = ElementTree.parse(cortexCommFullPathFileName)
  cortexCommXMLRootNode = tree.getroot()
 
@@ -74,18 +71,17 @@ def Main(argv):
      portType = node.get('type')
      portFile = node.get('file')
      ports.append( (portName, portType, portFile) )
- print('fuelaccumulation-main.py::ports: ',ports)
 
  tree = None
 
 #.................................................................................
 # Fourth command line argument is the module runtime-status.xml file
- runtimeStatusFullPathFileName = argv[4]
+# runtimeStatusFullPathFileName
 
 #---------------------------------------------------------------------------------
-# Create logger for main and class
+# Create logger for this driver and its imported pymodule 
 
- log = logging.getLogger('main')
+ log = logging.getLogger('drv')
  log.setLevel(logging.DEBUG)
  # create file handler for logs
  fullPathTaskDir = cortexCommFullPathFileName[:cortexCommFullPathFileName.rfind('/')]+'/'
@@ -102,7 +98,7 @@ def Main(argv):
  log.addHandler(fh)
  log.addHandler(ch)
 
- s = 'created logger: main'
+ s = 'created logger: drv'
  log.info(s)
 
  s = 'ports: '+str(ports)
@@ -180,4 +176,4 @@ def SetRuntimeStatus(runtimeStatusFullPathFileName, status):
 #*********************************************************************************
 # Usage: -> python fuelaccumulation-main.py or ./fuelaccumulation-main.py
 if __name__ == "__main__":
-   Main(sys.argv)
+   FuelAccumulationDriver(sys.argv)

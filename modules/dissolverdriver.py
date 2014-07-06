@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix Dissolver module executable
+Cortix native Dissolver module driver
 
 Tue Jun 24 01:03:45 EDT 2014
 """
@@ -10,7 +10,7 @@ Tue Jun 24 01:03:45 EDT 2014
 import os, sys, io, time, datetime
 import logging
 import xml.etree.ElementTree as ElementTree
-from dissolver import Dissolver
+from modules.dissolver import Dissolver
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
@@ -21,8 +21,7 @@ def DissolverDriver( inputFullPathFileName,
 
 #.................................................................................
 # First argument is the module input file name with full path.
-# This input file may be used by both the wrapper and the host code for 
-# communication.
+# This input file may be empty or used by this driver and/or the native module.
 # inputFullPathFileName 
 
 #.................................................................................
@@ -95,12 +94,12 @@ def DissolverDriver( inputFullPathFileName,
  s = 'created logger: main'
  log.info(s)
 
- s = 'ports: '+str(ports)
+ s = 'orts: '+str(ports)
  log.debug(s)
 
 #---------------------------------------------------------------------------------
 # Run Dissolver
- log.info('entered Run FuelAccumulation section')
+ log.info('entered Run Dissolver section')
 
 #.................................................................................
 # Setup input

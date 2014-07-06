@@ -52,6 +52,9 @@ class ConfigTree(object):
  def GetNodeName(self):
      return self.__configTreeNode.get('name')
 
+ def GetNodeType(self):
+     return self.__configTreeNode.get('type')
+
  def GetSubNode(self,tag):
      assert type(tag) is str, 'tag invalid'
      return self.__configTreeNode.find(tag)

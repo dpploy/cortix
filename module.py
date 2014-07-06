@@ -10,8 +10,8 @@ Tue Dec 10 11:21:30 EDT 2013
 import os, sys, io, time
 import logging  
 from configtree import ConfigTree
-#from modules.chopper import Chopper
-from modules.fuelaccumulation import FuelAccumulation
+from modules.chopperdriver import ChopperDriver
+from modules.fuelaccumulationdriver import FuelAccumulationDriver
 from modules.dissolverdriver import DissolverDriver
 #*********************************************************************************
 
@@ -34,6 +34,7 @@ class Module(object):
 
 # Read the module name
   self.__name = self.__configNode.GetNodeName()
+  self.__type = self.__configNode.GetNodeType()
 
   self.__executableName = 'null'
   self.__executablePath = 'null'
@@ -96,20 +97,23 @@ class Module(object):
 
   status = runtimeModuleStatusFile
 
-  if self.__hostCodeType == 'stand-alone':
+  if self.__type == 'stand-alone':
      os.system( 'time '+ hostExec + ' ' + 
                 input + ' ' + param + ' ' + comm + ' ' + status + ' &' )
 
-  elif self.__hostCodeType == 'native':
+  elif self.__type == 'native':
     name = self.__name 
-#    if name == 'chopper':          host = Chopper( ports )
-#    if name == 'fuelaccumulation': host = FuelAccumulation( ports )
-    if name == 'dissolver':        host = DissolverDriver( input, param, comm, status )
+    if name == 'chopper':          
+       host = ChopperDriver( input, param, comm, status )
+    if name == 'fuelaccumulation': 
+       host = FuelAccumulationDriver( input, param, comm, status )
+    if name == 'dissolver':        
+       host = DissolverDriver( input, param, comm, status )
 
-  elif self.__hostCodeType == 'wrapped':
-     assert True, 'hostCodeType not implemented.'
+  elif self.__type == 'wrapped':
+     assert True, 'module type not implemented.'
   else: 
-     assert True, 'hostCodeType invalid.'
+     assert True, 'module type invalid.'
 
 #  print('\t\tCortix::Simulation::Application::Module:Execute() '+self.__executableName)
 #  print( 'time '+ hostExec + ' ' + input + ' ' + param + ' ' + comm + ' ' + status )

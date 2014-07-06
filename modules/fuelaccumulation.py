@@ -12,9 +12,6 @@ import logging
 import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
-# create log for this python module; unlikely to be used; leave as reference
-pymodule_log = logging.getLogger('main.fuelacc')
-
 #*********************************************************************************
 class FuelAccumulation(object):
 
@@ -33,7 +30,7 @@ class FuelAccumulation(object):
 
   self.__withdrawMass = 0.0
 
-  self.__log = logging.getLogger('main.fuelacc')
+  self.__log = logging.getLogger('drv.fuelacc')
   self.__log.info('initializing an instance of FuelAccumulation')
 
   self.__gramDecimals = 3 # milligram significant digits
@@ -52,7 +49,7 @@ class FuelAccumulation(object):
 
   s = 'Execute(): facility time [min] = ' + str(evolTime)
   self.__log.info(s)
-  s = 'Execute(): total mass [g] = ' + str(self.__GetMass())
+  s = 'Execute(): total mass [g] = ' + str(round(self.__GetMass(),3))
   self.__log.info(s)
   s = 'Execute(): # of segments  = '+str(len(self.__fuelSegments))
   self.__log.debug(s)

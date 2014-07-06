@@ -19,18 +19,15 @@ class Dissolver(object):
 # __slots__ = [
 
  def __init__( self,
-               hostExec, input, param, comm
+               ports
              ):
 
 # Sanity test
-  assert type(hostExec) is str, '-> host executable pathname %r is invalid.' % type(hostExec)
-  assert type(input) is str, '-> input file pathname %r is invalid.' % type(input)
-  assert type(param) is str, '-> parameter pathfile %r is invalid.' % type(param)
-  assert type(comm) is str,  '-> communication pathfile %r is invalid.' % type(comm)
+  assert type(ports) is list, '-> ports type %r is invalid.' % type(ports)
 
 # Member data 
 
-  self.__ports = list()
+  self.__ports = ports
 
   self.__solidsMassLoadMax = 250.0 # gram
   self.__dutyPeriod        = 120.0 # minute
@@ -42,10 +39,8 @@ class Dissolver(object):
 
   self.__stateHistory = list(dict())
 
-#  self.__log = logging.getLogger('mod.dissolv')
-#  self.__log.info('initializing an instance of Dissolver')
-
-  self.__Setup( input, param, comm )
+  self.__log = logging.getLogger('drv.dissolv')
+  self.__log.info('initializing an instance of Dissolver')
 
 #---------------------------------------------------------------------------------
  def CallPorts( self, evolTime=0.0 ):
@@ -143,7 +138,7 @@ class Dissolver(object):
     for port in self.__ports:
      if port[0] == providePortName and port[1] == 'provide': portFile = port[2]
  
-  assert portFile is not None, 'portFile is invalid.'
+  assert portFile is not None, 'portFile %r is invalid.' % portFile
 
   return portFile
 
@@ -315,6 +310,7 @@ class Dissolver(object):
 
 #  self.__stateHistory
   
+  time.sleep(5)
   self.__fuelSegmentsLoad = list()
 
   return
