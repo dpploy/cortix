@@ -97,10 +97,12 @@ class Module(object):
 
   status = runtimeModuleStatusFile
 
+# Stand-alone modules run with external system call using file IO communication
   if self.__type == 'stand-alone':
      os.system( 'time '+ hostExec + ' ' + 
                 input + ' ' + param + ' ' + comm + ' ' + status + ' &' )
 
+# Native modules run on threads using file IO communication
   elif self.__type == 'native':
     name = self.__name 
     if name == 'chopper':          
@@ -113,6 +115,7 @@ class Module(object):
        t = DissolverThread( input, param, comm, status )
        t.start()
 
+# Wrapped modules run on threads and external system call of their own with IO comm
   elif self.__type == 'wrapped':
      assert True, 'module type not implemented.'
   else: 
