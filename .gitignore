@@ -2,10 +2,10 @@
 __pycache__
 notes
 .*.swp
-modules/*/*.xml
 .DS_Store
 *.pdf
 *.patch
 *.gpg
 *.tar
 *.gz
+*.xml

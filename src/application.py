@@ -11,9 +11,9 @@ Tue Dec 10 11:21:30 EDT 2013
 #*********************************************************************************
 import os, sys, io
 import logging
-from configtree import ConfigTree
-from module import Module
-from network import Network
+from src.configtree import ConfigTree
+from src.module import Module
+from src.network import Network
 #*********************************************************************************
 
 #*********************************************************************************

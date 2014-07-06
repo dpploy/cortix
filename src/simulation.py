@@ -9,9 +9,9 @@ Tue Dec 10 11:21:30 EDT 2013
 #*********************************************************************************
 import os, sys, io
 import logging
-from configtree import ConfigTree
-from application import Application
-from task import Task
+from src.configtree import ConfigTree
+from src.application import Application
+from src.task import Task
 #*********************************************************************************
 
 #*********************************************************************************
