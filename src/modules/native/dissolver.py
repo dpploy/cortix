@@ -166,7 +166,7 @@ class Dissolver(object):
       if self.__startDissolveTime != 0.0:
         assert evolTime >= self.__startDissolveTime + self.__dutyPeriod
 
-      s = '  <fuelLoad unit="gram">'+str(self.__solidsMassLoadMax)+'</fuelLoad>\n';fout.write(s)
+      s = '  <var value="'+str(self.__solidsMassLoadMax)+'" unit="gram">Fuel Mass Requested</var>\n';fout.write(s)
 
 
     s = ' </timeStamp>\n'; fout.write(s)
@@ -181,9 +181,10 @@ class Dissolver(object):
     a.set('value',str(evolTime))
     a.set('unit','minute')
     if  self.__ready2LoadFuel == True:
-      b = ElementTree.SubElement(a, 'fuelLoad')
+      b = ElementTree.SubElement(a, 'var')
+      b.set('value',str(self.__solidsMassLoadMax))
       b.set('unit','gram')
-      b.text = str(self.__solidsMassLoadMax)
+      b.text = 'Fuel Mass Requested'
     rootNode.append(a)
 
     tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )

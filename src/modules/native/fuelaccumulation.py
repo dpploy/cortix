@@ -266,9 +266,12 @@ class FuelAccumulation(object):
 # This uses a use portFile which is guaranteed to exist at this point
  def __GetWithdrawalRequest( self, portFile, evolTime ):
 
-  notFound = True
+  found = False
 
-  while notFound:
+  while found is False:
+
+    s = '__GetWithdrawalRequest(): checking for withdrawal message at '+str(evolTime)
+    self.__log.debug(s)
 
     tree = ElementTree.parse(portFile)
     rootNode = tree.getroot()
@@ -281,27 +284,28 @@ class FuelAccumulation(object):
      # must check for timeStamp though
      if timeStamp == evolTime:
 
-      notFound = False
+        found = True
 
-      timeStampUnit = n.get('unit').strip()
-      assert timeStampUnit == "minute"
+        timeStampUnit = n.get('unit').strip()
+        assert timeStampUnit == "minute"
 
-      mass = 0.0
-      subn = n.find('fuelLoad')
-      if subn is not None:
-         mass     = float(subn.text.strip())
-         massUnit = subn.get('unit').strip()
-         assert massUnit == "gram"
-         self.__withdrawMass = mass
-      else:
-         self.__withdrawMass = 0.0
+        mass = 0.0
+        subn = n.find('var')
+        if subn is not None:
+           mass     = float(subn.get('value').strip())
+           massUnit = subn.get('unit').strip()
+           assert massUnit == "gram"
+           title    = subn.text.strip()
+           self.__withdrawMass = mass
+        else:
+           self.__withdrawMass = 0.0
   
-      s = '__GetWithdrawalRequest(): received withdrawal message at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
-      self.__log.debug(s)
+        s = '__GetWithdrawalRequest(): received withdrawal message at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
+        self.__log.debug(s)
 
-    time.sleep(5)
-    s = '__GetWithdrawalRequest(): checking for withdrawal message at '+str(evolTime)
-    self.__log.debug(s)
+     else: 
+
+        time.sleep(1)
 
   return 
 

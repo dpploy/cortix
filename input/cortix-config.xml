@@ -288,6 +288,7 @@
     <connect fromModule="fuelaccumulation-native" fromPort="solids" toModule="chopper-native" toPort="Fuel_Solid"/> 
     <connect fromModule="fuelaccumulation-native" fromPort="withdrawal-request" toModule="dissolver-native" toPort="solids-request"/> 
     <connect fromModule="dissolver-native" fromPort="solids" toModule="fuelaccumulation-native" toPort="fuel-segments"/> 
+    <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="solids-request"/> 
    </network>
 
    <!-- connected modules -->

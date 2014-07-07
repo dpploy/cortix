@@ -10,6 +10,8 @@ Tue Jun 24 01:03:45 EDT 2014
 import os, sys, io, time, datetime
 import logging
 import xml.etree.ElementTree as ElementTree
+import numpy as np
+import matplotlib.pyplot as plt
 #*********************************************************************************
 
 #*********************************************************************************
@@ -26,9 +28,8 @@ class PyPlot(object):
 
   self.__ports = ports
 
-  self.__fuelSegments = list()
-
-  self.__withdrawMass = 0.0
+  self.__varValues = list()
+  self.__varName   = 'null'
 
   self.__log = logging.getLogger('pyplot')
   self.__log.info('initializing an instance of PyPlot')
@@ -46,6 +47,8 @@ class PyPlot(object):
   s = 'Execute(): facility time [min] = ' + str(evolTime)
   self.__log.info(s)
 
+  self.__PlotVar( evolTime )
+
 #---------------------------------------------------------------------------------
  def __UseData( self, usePortName=None, evolTime=0.0 ):
 
@@ -53,7 +56,7 @@ class PyPlot(object):
   portFile = self.__GetPortFile( usePortName = usePortName )
 
 # Get data from port files
-#  if usePortName == 'time-series': self.__GetTimeSeries( portFile, evolTime )
+  if usePortName == 'time-series': self.__GetTimeSeries( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
  def __ProvideData( self, providePortName=None, evolTime=0.0 ):
@@ -62,7 +65,7 @@ class PyPlot(object):
   portFile = self.__GetPortFile( providePortName = providePortName )
 
 # Send data to port files
-  if providePortName == 'fuel-segments': self.__ProvideFuelSegments( portFile, evolTime )
+#  if providePortName == 'fuel-segments': self.__ProvideFuelSegments( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -103,140 +106,68 @@ class PyPlot(object):
 # This uses a use portFile which is guaranteed at this point
  def __GetTimeSeries( self, portFile, evolTime ):
 
-  tree = ElementTree.parse(portFile)
-
-  rootNode = tree.getroot()
-
-  durationNode = rootNode.find('Duration')
-
-  timeStep = float(durationNode.get('timeStep'))
-  s = '__GetSolids(): timeStep='+str(timeStep)
+  s = '__GetTimeSeries(): will check file: '+portFile
   self.__log.debug(s)
+ 
+  found = False
 
-  streamNode = rootNode.find('Stream')
-  s = '__GetSolids(): streamNode='+streamNode.get('name')
-  self.__log.debug(s)
+  while found is False:
 
-  timeNodes = streamNode.findall('Time')
-  s = '__GetSolids(): # time nodes ='+str(len(timeNodes))
-  self.__log.debug(s)
+    s = '__GetTimeSeries(): checking for value at '+str(evolTime)
+    self.__log.debug(s)
 
-#.................................................................................
-  for timeNode in timeNodes:
+    tree = ElementTree.parse(portFile)
+    rootNode = tree.getroot()
 
-   totalMass = 0.0
+    nodes = rootNode.findall('timeStamp')
 
-   U    = 0.0
-   Pu   = 0.0
-   Cs   = 0.0
-   Sr   = 0.0
-   I    = 0.0
-   Kr   = 0.0
-   Xe   = 0.0
-   a3H  = 0.0
-   Ru   = 0.0
-   O    = 0.0
-   N    = 0.0
-   FP   = 0.0
+    for n in nodes:
+     timeStamp = float(n.get('value').strip())
 
-   timeIndex = int(timeNode.get('index'))
-   s = '__GetSolids(): timeIndex='+str(timeIndex)
-   self.__log.debug(s)
-
-   timeStamp = timeStep*timeIndex          
-
-   s = '__GetSolids(): timeStamp='+str(timeStamp)
-   self.__log.debug(s)
-
-   if timeStamp == evolTime: 
-
-     s = '__GetSolids(): timeStamp='+str(timeStamp)+';'+' evolTime='+str(evolTime)
+     s = '__GetTimeSeries(): timeStamp '+str(timeStamp)
      self.__log.debug(s)
-
-#   print('Time index = ',timeIndex)
-     n = timeNode.find('Segment_Length')
  
-     if not ElementTree.iselement(n): continue # to the next timeNode
- 
-     segmentLength = float(n.get('length'))
-     n = timeNode.find('Segment_Outside_Diameter')
-     oD = float(n.get('outside_diameter'))
-     n = timeNode.find('Segment_Inside_Diameter')
-     iD = float(n.get('inside_diameter'))
-     n = timeNode.find('Segments_Output_This_Timestep')
-     nSegments = float(n.get('segments_output'))
+     # must check for timeStamp though
+     if timeStamp == evolTime:
 
-     elements = timeNode.findall('Element')
-     for element in elements:
-       isotopes = element.findall('Isotope')
-       for isotope in isotopes:
-        for child in isotope:
-           if child.tag == 'Mass': 
-              mass = float(child.text.strip())
-              totalMass += mass
-              if element.get('key') == 'U' :  U  += mass; 
-              if element.get('key') == 'Pu':  Pu += mass; 
-              if element.get('key') == 'Cs':  Cs += mass; 
-              if element.get('key') == 'Sr':  Sr += mass; 
-              if element.get('key') == 'I' :  I  += mass; 
-              if element.get('key') == 'Kr':  Kr += mass; 
-              if element.get('key') == 'Kr':  Xe += mass; 
-              if element.get('key') == 'H' : a3H += mass; 
-              if element.get('key') == 'Ru':  Ru += mass; 
-              if element.get('key') == 'O' :  O  += mass; 
-              if element.get('key') == 'N' :  N  += mass; 
+        found = True  
 
-#  print('mass     [g]= ', mass)
-#  print('#segments   = ', nSegments)
-#  print('length      = ', segmentLength)
-#  print('OD          = ', oD)
-#  print('ID          = ', iD)
+        timeStampUnit = n.get('unit').strip()
+        assert timeStampUnit == "minute"
 
-     FP = totalMass - (U + Pu + I + Kr + Xe + a3H)
-#     totalNSegments += nSegments
+        var = 0.0
 
-#  print('mass U      = ', U)
-#  print('mass Pu     = ', Pu)
-#  print('mass Cs     = ', Cs)
-#  print('mass I      = ', I)
-#  print('mass O      = ', O)
-#  print('mass N      = ', N)
-#  print('mass FP     = ', FP)
+        subn = n.find('var')
+        if ElementTree.iselement(subn):
+           var     = float(subn.get('value').strip())
+           varUnit = subn.get('unit').strip()
+           title    = subn.text.strip()
+           self.__varName = title
 
-     for seg in range(1,int(nSegments)+1):
-      segMass   = totalMass / int(nSegments)
-      segLength = segmentLength
-      segID     = iD
-      U         = U  / int(nSegments)
-      Pu        = Pu / int(nSegments)
-      I         = I  / int(nSegments)
-      Kr        = Kr / int(nSegments)
-      Xe        = Xe / int(nSegments)
-      a3H       = a3H/ int(nSegments)
-      FP        = FP / int(nSegments)
-      segment   = ( timeStamp, segMass, segLength, segID, 
-                    U, Pu, I, Kr, Xe, a3H, FP )
+           s = '__GetTimeSeries(): '+title+' at '+str(evolTime)+' [min]; value ['+varUnit+'] = '+str(var)
+           self.__log.debug(s)
 
-      self.__fuelSegments.append( segment )
-  
-#  print('totalMass     [g]= ', totalMass)
-#  print('total # segments = ', totalNSegments)
-#  print('total # pieces   = ', len(self.__fuelSegments))
-#  print('total U       [g]= ', totalU)
-#  print('total Pu      [g]= ', totalPu)
-#  print('total Cs      [g]= ', totalCs)
-#  print('total I       [g]= ', totalI)
-#  print('total O       [g]= ', totalO)
-#  print('total N       [g]= ', totalN)
-#  print('total FP      [g]= ', totalFP)
-  
-#  print(self.__fuelSegments)
-#  for s in self.__fuelSegments:
-#   print(s[0],s[1],s[2])
+        self.__varValues.append( (evolTime, var))
 
-     break
+     else: 
+
+        time.sleep(1)
 
   return
+
+#---------------------------------------------------------------------------------
+ def __PlotVar( self, evolTime ):
+
+  s = self.__varName + ': ' + str(self.__varValues)
+  self.__log.debug(s)
+
+#  x = np.linspace(0, evolTime)
+#  line, = plt.plot(x, np.sin(x), '--', linewidth=2)
+
+#  dashes = [10, 5, 100, 5] # 10 points on, 5 off, 100 on, 5 off
+#  line.set_dashes(dashes)
+#
+#  plt.show()
 
 #*********************************************************************************
 # Usage: -> python pyplot.py
