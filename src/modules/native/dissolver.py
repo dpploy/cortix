@@ -144,45 +144,51 @@ class Dissolver(object):
 
 #---------------------------------------------------------------------------------
  def __ProvideSolidsRequest( self, portFile, evolTime ):
-
-  fout = open( portFile, 'w')
-  s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by Dissolver.py -->\n'; fout.write(s)
-  today = datetime.datetime.today()
-  s = '<!-- '+str(today)+' -->\n'; fout.write(s)
-  s = '<dissolutionFuelRequest>\n'; fout.write(s)
-  s = ' <timeStamp value="'+str(evolTime)+'" unit="minute">\n'; fout.write(s)
-
-  s = '__ProvideSolidsRequest(): evolTime = '+str(evolTime)
-  self.__log.debug(s)
-  s = '__ProvideSolidsRequest(): ready to load = '+str(self.__ready2LoadFuel)
-  self.__log.debug(s)
-
-
-  if  self.__ready2LoadFuel is True:
  
-    if self.__startDissolveTime != 0.0:
-      assert evolTime >= self.__startDissolveTime + self.__dutyPeriod
+  if evolTime == 0.0:
 
-    s = '  <fuelLoad unit="gram">'+str(self.__solidsMassLoadMax)+'</fuelLoad>\n';fout.write(s)
+    fout = open( portFile, 'w')
+    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
+    s = '<!-- Written by Dissolver.py -->\n'; fout.write(s)
+    today = datetime.datetime.today()
+    s = '<!-- '+str(today)+' -->\n'; fout.write(s)
+    s = '<dissolutionFuelRequest>\n'; fout.write(s)
+    s = ' <timeStamp value="'+str(evolTime)+'" unit="minute">\n'; fout.write(s)
+
+    s = '__ProvideSolidsRequest(): evolTime = '+str(evolTime)
+    self.__log.debug(s)
+    s = '__ProvideSolidsRequest(): ready to load = '+str(self.__ready2LoadFuel)
+    self.__log.debug(s)
 
 
-  s = ' </timeStamp>\n'; fout.write(s)
-  s = '</dissolutionFuelRequest>\n'; fout.write(s)
-  fout.close()
+    if  self.__ready2LoadFuel is True:
+ 
+      if self.__startDissolveTime != 0.0:
+        assert evolTime >= self.__startDissolveTime + self.__dutyPeriod
 
-#    tree = ElementTree.parse( portFile )
-#    rootNode = tree.getroot()
-#    a = ElementTree.Element('timeStamp')
-#    a.set('value',str(evolTime))
-#    a.set('unit','minute')
-#    if  self.__ready2LoadFuel == True:
-#      b = ElementTree.SubElement(a, 'fuelLoad')
-#      b.set('unit','gram')
-#      b.text = str(self.__solidsMassLoadMax)
-#    rootNode.append(a)
-#
-#    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+      s = '  <fuelLoad unit="gram">'+str(self.__solidsMassLoadMax)+'</fuelLoad>\n';fout.write(s)
+
+
+    s = ' </timeStamp>\n'; fout.write(s)
+    s = '</dissolutionFuelRequest>\n'; fout.write(s)
+    fout.close()
+
+  else:
+
+    tree = ElementTree.parse( portFile )
+    rootNode = tree.getroot()
+    a = ElementTree.Element('timeStamp')
+    a.set('value',str(evolTime))
+    a.set('unit','minute')
+    if  self.__ready2LoadFuel == True:
+      b = ElementTree.SubElement(a, 'fuelLoad')
+      b.set('unit','gram')
+      b.text = str(self.__solidsMassLoadMax)
+    rootNode.append(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+
+  return 
 
 #---------------------------------------------------------------------------------
  def __GetSolids( self, portFile, evolTime ):

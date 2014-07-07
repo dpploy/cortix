@@ -43,7 +43,7 @@ class FuelAccumulationThread(Thread):
   fh.setLevel(logging.DEBUG)
   # create console handler with a higher log level
   ch = logging.StreamHandler()
-  ch.setLevel(logging.WARN)
+  ch.setLevel(logging.INFO)
   # create formatter and add it to the handlers
   formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
   fh.setFormatter(formatter)
@@ -53,7 +53,7 @@ class FuelAccumulationThread(Thread):
   log.addHandler(ch)
 
   s = 'created logger: drv'
-  log.info(s)
+  log.debug(s)
 
   s = 'input file: ' + self.__inputFullPathFileName
   log.debug(s)
@@ -136,7 +136,7 @@ class FuelAccumulationThread(Thread):
 
 #---------------------------------------------------------------------------------
 # Run FuelAccumulation
-  log.info('entered Run FuelAccumulation section')
+  log.debug('entered Run FuelAccumulation section')
 
 #................................................................................
 # Left here as an example; vfda
@@ -163,13 +163,13 @@ class FuelAccumulationThread(Thread):
 #................................................................................
 # Create the host code          
   host = FuelAccumulation( ports )
-  log.info("host = FuelAccumulation( ports )")
+  log.debug("host = FuelAccumulation( ports )")
 
 #................................................................................
 # Evolve the fuel accumulation
 
   self.__SetRuntimeStatus('running')
-  log.info("SetRuntimeStatus('running')")
+  log.debug("SetRuntimeStatus('running')")
 
   facilityTime = 0.0
 
@@ -185,7 +185,7 @@ class FuelAccumulationThread(Thread):
 # Shutdown 
 
   self.__SetRuntimeStatus('finished')
-  log.info("SetRuntimeStatus('finished')")
+  log.debug("SetRuntimeStatus('finished')")
 
 #---------------------------------------------------------------------------------
  def __SetRuntimeStatus( self, status ):

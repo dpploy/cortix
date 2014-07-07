@@ -263,14 +263,58 @@ class FuelAccumulation(object):
   return
 
 #---------------------------------------------------------------------------------
-# This uses a use portFile which is guaranteed at this point
+# This uses a use portFile which is guaranteed to exist at this point
  def __GetWithdrawalRequest( self, portFile, evolTime ):
+
+  notFound = True
+
+  while notFound:
+
+    tree = ElementTree.parse(portFile)
+    rootNode = tree.getroot()
+
+    nodes = rootNode.findall('timeStamp')
+
+    for n in nodes:
+     timeStamp = float(n.get('value').strip())
+ 
+     # must check for timeStamp though
+     if timeStamp == evolTime:
+
+      notFound = False
+
+      timeStampUnit = n.get('unit').strip()
+      assert timeStampUnit == "minute"
+
+      mass = 0.0
+      subn = n.find('fuelLoad')
+      if subn is not None:
+         mass     = float(subn.text.strip())
+         massUnit = subn.get('unit').strip()
+         assert massUnit == "gram"
+         self.__withdrawMass = mass
+      else:
+         self.__withdrawMass = 0.0
+  
+      s = '__GetWithdrawalRequest(): received withdrawal message at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
+      self.__log.debug(s)
+
+    time.sleep(5)
+    s = '__GetWithdrawalRequest(): checking for withdrawal message at '+str(evolTime)
+    self.__log.debug(s)
+
+  return 
+
+#---------------------------------------------------------------------------------
+# This uses a use portFile which is guaranteed to exist at this point
+# Depreacted: this only read a file with a single time stamp on it.
+ def __GetWithdrawalRequest_DEPRECATED( self, portFile, evolTime ):
 
   tree = ElementTree.parse(portFile)
   rootNode = tree.getroot()
 
-  n             = rootNode.find('timeStamp')
-  timeStamp     = float(n.get('value').strip())
+  n         = rootNode.find('timeStamp')
+  timeStamp = float(n.get('value').strip())
 
   assert timeStamp == evolTime, 'timeStamp = %r, evolTime = %r' % (timeStamp,evolTime)
 
@@ -289,9 +333,6 @@ class FuelAccumulation(object):
 
   s = '__GetWithdrawalRequest(): received withdrawal message at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
   self.__log.debug(s)
-
-#  print('FuelAccumulation::__GetWithdrawalRequest(): mass ', self.__withdrawMass) 
-#  print('FuelAccumulation::__GetWithdrawalRequest(): unit ', massUnit) 
 
 # remove the request
   os.system( 'rm -f ' + portFile )

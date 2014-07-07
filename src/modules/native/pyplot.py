@@ -45,8 +45,6 @@ class PyPlot(object):
 
   s = 'Execute(): facility time [min] = ' + str(evolTime)
   self.__log.info(s)
-  s = 'Execute(): total mass [g] = ' + str(round(self.__GetMass(),3))
-  self.__log.info(s)
 
 #---------------------------------------------------------------------------------
  def __UseData( self, usePortName=None, evolTime=0.0 ):
@@ -55,7 +53,7 @@ class PyPlot(object):
   portFile = self.__GetPortFile( usePortName = usePortName )
 
 # Get data from port files
-  if usePortName == 'time-series': self.__TimeSeries( portFile, evolTime )
+#  if usePortName == 'time-series': self.__GetTimeSeries( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
  def __ProvideData( self, providePortName=None, evolTime=0.0 ):
@@ -103,7 +101,7 @@ class PyPlot(object):
 
 #---------------------------------------------------------------------------------
 # This uses a use portFile which is guaranteed at this point
- def __GetTineSeries( self, portFile, evolTime ):
+ def __GetTimeSeries( self, portFile, evolTime ):
 
   tree = ElementTree.parse(portFile)
 
