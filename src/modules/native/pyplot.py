@@ -12,6 +12,7 @@ import logging
 import xml.etree.ElementTree as ElementTree
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 #*********************************************************************************
 
 #*********************************************************************************
@@ -46,7 +47,7 @@ class PyPlot(object):
   s = 'Execute(): facility time [min] = ' + str(evolTime)
   self.__log.info(s)
 
-  self.__PlotTimeSeries( evolTime )
+  self.__PlotTimeSeries()
 
 #---------------------------------------------------------------------------------
  def __UseData( self, usePortName=None, evolTime=0.0 ):
@@ -117,7 +118,7 @@ class PyPlot(object):
 
     tree = ElementTree.parse(portFile)
 
-    time.sleep(1) # slow down the PyPlot module; file racing condition
+    time.sleep(1) # slow down the PyPlot module; to avoid file racing condition
 #    ElementTree.dump(tree)
 
     rootNode = tree.getroot()
@@ -163,10 +164,63 @@ class PyPlot(object):
   return
 
 #---------------------------------------------------------------------------------
- def __PlotTimeSeries( self, evolTime ):
+ def __PlotTimeSeries( self ):
 
-  s = '__PlotVarTimeSeries(): __timeSeriesData keys = '+str(self.__timeSeriesData.keys())
+#  s = '__PlotVarTimeSeries(): __timeSeriesData keys = '+str(self.__timeSeriesData.keys())
+#  self.__log.debug(s)
+  s = '__PlotVarTimeSeries(): __timeSeriesData keys = '+str(self.__timeSeriesData.items())
   self.__log.debug(s)
+
+  fig = plt.figure()
+
+  gs = gridspec.GridSpec(2,2)
+  gs.update(left=0.08,right=0.98,wspace=0.4,hspace=0.4)
+
+  axlst = list()
+  axlst.append(fig.add_subplot(gs[0, 0]))
+  axlst.append(fig.add_subplot(gs[0, 1]))
+  axlst.append(fig.add_subplot(gs[1, 0]))
+  axlst.append(fig.add_subplot(gs[1, 1]))
+
+  axes = np.array(axlst)
+
+  axis = axes[0]
+  axis.set_xlabel('Time [h]')
+  axis.set_ylabel('Fuel Mass Request [g]',fontsize=10)
+
+#  for l in axis.get_xticklabels(): l.set_fontsize('x-small')
+#  for l in axis.get_yticklabels(): l.set_fontsize('x-small')
+#  color  = parameters['plot-color']
+#  marker = parameters['plot-marker']+'-'
+#  axis.set_xlim(2e-3, 2)
+  axis.set_ylim(-10, 300)
+#  axis.set_aspect(1)
+#  axis.set_title("adjustable = box")
+#  legend = parameters['plot-legend']
+
+#  for key,value in self.__timeSeriesData.items():
+#   print(key)
+#   print(value)
+  data = self.__timeSeriesData[('Fuel Mass Request', 'gram', 'minute')]
+  data = np.array(data)
+  x = data[:,0]/60.0
+  y = data[:,1]
+  
+  
+  axis.plot( x, y, 's-', color='black', linewidth=0.5, markersize=2,  \
+              markeredgecolor='black', label='dissolver request' )
+
+# if index == 0:
+#    axis.set_xscale("log")
+#    axis.set_yscale("log")
+#    axis.plot( Q, haloI_fit, marker, color='red', linewidth=0.5, markersize=3, markeredgecolor=color, label=legend )
+
+  axis.legend( loc='best', prop={'size':8} )
+
+#  fig.show()
+ 
+  fig.savefig('pyplot.png',dpi=200,fomat='png')
+#  fig.savefig(outputfilename+'.png',dpi=200,fomat='png')
 
 #  x = np.linspace(0, evolTime)
 #  line, = plt.plot(x, np.sin(x), '--', linewidth=2)
