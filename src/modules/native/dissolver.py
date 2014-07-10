@@ -145,6 +145,55 @@ class Dissolver(object):
 #---------------------------------------------------------------------------------
  def __ProvideSolidsRequest( self, portFile, evolTime ):
  
+  # if the first time step, write the header of a time-series data file
+  if evolTime == 0.0:
+
+    fout = open( portFile, 'w')
+    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
+    s = '<time-series name="dissolutionFuelRequest">\n'; fout.write(s) 
+    s = ' <comment author="cortix.modules.native.dissolver" version="0.1"/>\n'; fout.write(s)
+    today = datetime.datetime.today()
+    s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
+    s = ' <time unit="minute"/>\n'; fout.write(s)
+    s = ' <var name="Fuel Mass Request" unit="gram"/>\n'; fout.write(s)
+
+    s = '__ProvideSolidsRequest(): evolTime = '+str(evolTime)
+    self.__log.debug(s)
+    s = '__ProvideSolidsRequest(): ready to load = '+str(self.__ready2LoadFuel)
+    self.__log.debug(s)
+
+    if  self.__ready2LoadFuel is True:
+ 
+      if self.__startDissolveTime != 0.0:
+        assert evolTime >= self.__startDissolveTime + self.__dutyPeriod
+
+      s = ' <timeStamp value="'+str(evolTime)+'">'+str(self.__solidsMassLoadMax)+'</timeStamp>\n';fout.write(s)
+
+    s = '</time-series>\n'; fout.write(s)
+    fout.close()
+
+  # if not the first time step then parse the existing history file and append
+  else:
+
+    tree = ElementTree.parse( portFile )
+    rootNode = tree.getroot()
+    a = ElementTree.Element('timeStamp')
+    a.set('value',str(evolTime))
+    if  self.__ready2LoadFuel == True:
+      a.text = str(self.__solidsMassLoadMax)
+    else:
+      a.text = '0'
+
+    rootNode.append(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+
+  return 
+
+
+#---------------------------------------------------------------------------------
+ def __ProvideSolidsRequest_DEPRECATED( self, portFile, evolTime ):
+ 
   # if the first time step, write a nice header
   if evolTime == 0.0:
 
@@ -479,7 +528,7 @@ class Dissolver(object):
 
 #  self.__stateHistory
   
-  time.sleep(5)
+  time.sleep(1)
   self.__fuelSegmentsLoad = list()
 
   return

@@ -28,8 +28,7 @@ class PyPlot(object):
 
   self.__ports = ports
 
-  self.__varValues = list()
-  self.__varName   = 'null'
+  self.__timeSeriesData = dict(list())
 
   self.__log = logging.getLogger('pyplot')
   self.__log.info('initializing an instance of PyPlot')
@@ -47,7 +46,7 @@ class PyPlot(object):
   s = 'Execute(): facility time [min] = ' + str(evolTime)
   self.__log.info(s)
 
-  self.__PlotVar( evolTime )
+  self.__PlotTimeSeries( evolTime )
 
 #---------------------------------------------------------------------------------
  def __UseData( self, usePortName=None, evolTime=0.0 ):
@@ -105,10 +104,10 @@ class PyPlot(object):
 #---------------------------------------------------------------------------------
 # This uses a use portFile which is guaranteed at this point
  def __GetTimeSeries( self, portFile, evolTime ):
-
+ 
   s = '__GetTimeSeries(): will check file: '+portFile
   self.__log.debug(s)
- 
+
   found = False
 
   while found is False:
@@ -117,37 +116,45 @@ class PyPlot(object):
     self.__log.debug(s)
 
     tree = ElementTree.parse(portFile)
+
+    time.sleep(1) # slow down the PyPlot module; file racing condition
+#    ElementTree.dump(tree)
+
     rootNode = tree.getroot()
+    assert rootNode.tag == 'time-series', 'invalid format.'
+  
+    node = rootNode.find('time')
+    timeUnit = node.get('unit').strip()
+
+    # vfda to do: fix this to allow for multiple variables!!!
+    node = rootNode.find('var')
+    varName = node.get('name').strip() 
+    varUnit = node.get('unit').strip() 
 
     nodes = rootNode.findall('timeStamp')
 
     for n in nodes:
+
      timeStamp = float(n.get('value').strip())
 
      s = '__GetTimeSeries(): timeStamp '+str(timeStamp)
      self.__log.debug(s)
  
-     # must check for timeStamp though
+     # must check for timeStamp 
      if timeStamp == evolTime:
 
         found = True  
 
-        timeStampUnit = n.get('unit').strip()
-        assert timeStampUnit == "minute"
+        if timeStamp == 0.0: self.__timeSeriesData[(varName,varUnit,timeUnit)] = list()
 
-        var = 0.0
+        data = self.__timeSeriesData[(varName,varUnit,timeUnit)]
 
-        subn = n.find('var')
-        if ElementTree.iselement(subn):
-           var     = float(subn.get('value').strip())
-           varUnit = subn.get('unit').strip()
-           title    = subn.text.strip()
-           self.__varName = title
+        varValue = float(n.text.strip())
 
-           s = '__GetTimeSeries(): '+title+' at '+str(evolTime)+' [min]; value ['+varUnit+'] = '+str(var)
-           self.__log.debug(s)
+        data.append( (evolTime, varValue) )
 
-        self.__varValues.append( (evolTime, var))
+        s = '__GetTimeSeries(): '+varName+' at '+str(evolTime)+' [min]; value ['+varUnit+'] = '+str(varValue)
+        self.__log.debug(s)
 
      else: 
 
@@ -156,9 +163,9 @@ class PyPlot(object):
   return
 
 #---------------------------------------------------------------------------------
- def __PlotVar( self, evolTime ):
+ def __PlotTimeSeries( self, evolTime ):
 
-  s = self.__varName + ': ' + str(self.__varValues)
+  s = '__PlotVarTimeSeries(): __timeSeriesData keys = '+str(self.__timeSeriesData.keys())
   self.__log.debug(s)
 
 #  x = np.linspace(0, evolTime)

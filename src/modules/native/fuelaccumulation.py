@@ -295,6 +295,56 @@ class FuelAccumulation(object):
     tree = ElementTree.parse(portFile)
 
     rootNode = tree.getroot()
+    assert rootNode.tag == 'time-series', 'invalid format.' 
+
+    node = rootNode.find('time')
+    timeUnit = node.get('unit').strip()
+    assert timeUnit == "minute"
+
+    # vfda to do: check for single var element
+    node = rootNode.find('var')
+    assert node.get('name').strip() == 'Fuel Mass Request', 'invalid variable.'
+    assert node.get('unit').strip() == 'gram', 'invalid mass unit'
+
+    nodes = rootNode.findall('timeStamp')
+
+    for n in nodes:
+
+     timeStamp = float(n.get('value').strip())
+ 
+     # must check for timeStamp 
+     if timeStamp == evolTime:
+
+        found = True
+
+        mass = 0.0
+        mass = float(n.text.strip())
+        self.__withdrawMass = mass
+
+        s = '__GetWithdrawalRequest(): received withdrawal message at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
+        self.__log.debug(s)
+
+     else: 
+
+        time.sleep(1)
+
+  return 
+
+
+#---------------------------------------------------------------------------------
+# This uses a use portFile which is guaranteed to exist at this point
+ def __GetWithdrawalRequest_DEPRECATED2( self, portFile, evolTime ):
+
+  found = False
+
+  while found is False:
+
+    s = '__GetWithdrawalRequest(): checking for withdrawal message at '+str(evolTime)
+    self.__log.debug(s)
+
+    tree = ElementTree.parse(portFile)
+
+    rootNode = tree.getroot()
 
     nodes = rootNode.findall('timeStamp')
 
@@ -332,7 +382,7 @@ class FuelAccumulation(object):
 #---------------------------------------------------------------------------------
 # This uses a use portFile which is guaranteed to exist at this point
 # Depreacted: this only read a file with a single time stamp on it.
- def __GetWithdrawalRequest_DEPRECATED( self, portFile, evolTime ):
+ def __GetWithdrawalRequest_DEPRECATED1( self, portFile, evolTime ):
 
   tree = ElementTree.parse(portFile)
   rootNode = tree.getroot()
