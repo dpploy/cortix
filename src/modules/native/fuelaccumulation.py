@@ -33,7 +33,8 @@ class FuelAccumulation(object):
   self.__log = logging.getLogger('fuelaccumulation')
   self.__log.info('initializing an instance of FuelAccumulation')
 
-  self.__gramDecimals = 3 # milligram significant digits
+  self.__gramDecimals   = 3 # milligram significant digits
+  self.__mmDecimals = 3 # micrometer significant digits
 
 #---------------------------------------------------------------------------------
  def CallPorts(self, evolTime=0.0):
@@ -183,10 +184,28 @@ class FuelAccumulation(object):
      if not ElementTree.iselement(n): continue # to the next timeNode
  
      segmentLength = float(n.get('length'))
+     segmentLengthUnit = n.get('unit')
+     if   segmentLengthUnit == 'm':  segmentLength *= 1000.0
+     elif segmentLengthUnit == 'cm': segmentLength *= 10.0
+     elif segmentLengthUnit == 'mm': segmentLength *= 1.0
+     else:                            assert True, 'invalid unit.'
+        
      n = timeNode.find('Segment_Outside_Diameter')
      oD = float(n.get('outside_diameter'))
+     oDUnit = n.get('unit')
+     if   oDUnit == 'm':  oD *= 1000.0
+     elif oDUnit == 'cm': oD *= 10.0
+     elif oDUnit == 'mm': oD *= 1.0
+     else:                assert True, 'invalid unit.'
+
      n = timeNode.find('Segment_Inside_Diameter')
      iD = float(n.get('inside_diameter'))
+     iDUnit = n.get('unit')
+     if   iDUnit == 'm':  iD *= 1000.0
+     elif iDUnit == 'cm': iD *= 10.0
+     elif iDUnit == 'mm': iD *= 1.0
+     else:                assert True, 'invalid unit.'
+
      n = timeNode.find('Segments_Output_This_Timestep')
      nSegments = float(n.get('segments_output'))
 
@@ -274,6 +293,7 @@ class FuelAccumulation(object):
     self.__log.debug(s)
 
     tree = ElementTree.parse(portFile)
+
     rootNode = tree.getroot()
 
     nodes = rootNode.findall('timeStamp')
@@ -281,7 +301,7 @@ class FuelAccumulation(object):
     for n in nodes:
      timeStamp = float(n.get('value').strip())
  
-     # must check for timeStamp though
+     # must check for timeStamp 
      if timeStamp == evolTime:
 
         found = True
@@ -359,7 +379,222 @@ class FuelAccumulation(object):
   return mass
 
 #---------------------------------------------------------------------------------
+# Provide the entire history data 
  def __ProvideFuelSegments( self, portFile, evolTime ):
+
+  gDec = self.__gramDecimals
+  mmDec = self.__mmDecimals
+
+  withdrawMass = self.__withdrawMass
+
+  #...........................................
+  # if the first time step write a nice header
+  #...........................................
+  if evolTime == 0.0:
+
+    fout = open( portFile, 'w')
+
+    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
+    s = '<!-- Written by FuelAccumulation.py -->\n'; fout.write(s)
+    today = datetime.datetime.today()
+    s = '<!-- '+str(today)+' -->\n'; fout.write(s)
+
+    s = '<fuelsegments>\n'; fout.write(s)
+    s = ' <timeStamp value="'+str(evolTime)+'" unit="minute">\n'; fout.write(s)
+
+    if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
+
+      s = ' </timeStamp>\n'; fout.write(s)
+      s = '</fuelsegments>\n'; fout.write(s)
+      fout.close()
+
+      self.__withdrawMass = 0.0
+
+      s = '__ProvideFuelSegments(): providing no fuel at '+str(evolTime)+' [min]'
+      self.__log.debug(s)
+
+      return
+
+    else: # of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
+
+      fuelSegmentsLoad = list()
+      fuelMassLoad = 0.0
+
+      # withdraw fuel elements
+      while fuelMassLoad <= withdrawMass:
+           fuelSegmentCandidate = self.__WithdrawFuelSegment( evolTime )
+           if fuelSegmentCandidate is None: break # no segments left with time stamp <= evolTime
+           mass          = fuelSegmentCandidate[1]
+           fuelMassLoad += mass
+           if fuelMassLoad <= withdrawMass:
+              fuelSegmentsLoad.append( fuelSegmentCandidate )
+           else:
+              self.__RestockFuelSegment( fuelSegmentCandidate )
+
+      assert len(fuelSegmentsLoad) != 0, 'sanity check.'
+
+      # Save in file data from withdrawal
+      for fuelSeg in fuelSegmentsLoad:
+
+        s = '  <fuelSegment>\n'; fout.write(s)
+        timeStamp = fuelSeg[0]
+        assert timeStamp <=  evolTime, 'sanity check.'
+        mass      = fuelSeg[1]
+        length    = fuelSeg[2]
+        segID     = fuelSeg[3]
+        U         = fuelSeg[4]
+        Pu        = fuelSeg[5]
+        I         = fuelSeg[6]
+        Kr        = fuelSeg[7]
+        Xe        = fuelSeg[8]
+        a3H       = fuelSeg[9]
+        FP        = fuelSeg[10]
+        s = '   <timeStamp     unit="minute">'+str(timeStamp)+'</timeStamp>\n'; fout.write(s)
+        s = '   <mass          unit="gram">'+str(round(mass,gDec))+'</mass>\n';fout.write(s)
+        s = '   <length        unit="mm">'+str(round(length,mmDec))+'</length>\n';fout.write(s)
+        s = '   <innerDiameter unit="mm">'+str(round(segID,mmDec))+'</innerDiameter>\n';fout.write(s)
+        s = '   <U  unit="gram">'+str(round(U,gDec))+'</U>\n';fout.write(s)
+        s = '   <Pu unit="gram">'+str(round(Pu,gDec))+'</Pu>\n';fout.write(s)
+        s = '   <I  unit="gram">'+str(round(I,gDec))+'</I>\n';fout.write(s)
+        s = '   <Kr unit="gram">'+str(round(Kr,gDec))+'</Kr>\n';fout.write(s)
+        s = '   <Xe unit="gram">'+str(round(Xe,gDec))+'</Xe>\n';fout.write(s)
+        s = '   <a3H unit="gram">'+str(round(a3H,gDec))+'</a3H>\n';fout.write(s)
+        s = '   <FP unit="gram">'+str(round(FP,gDec))+'</FP>\n';fout.write(s)
+        s = '  </fuelSegment>\n';      fout.write(s)
+  
+        s = ' </timeStamp>\n'; fout.write(s)
+        s = '</fuelsegments>\n'; fout.write(s)
+        fout.close()
+ 
+        s = '__ProvideFuelSegments(): providing '+str(len(fuelSegmentsLoad))+' fuel segments at '+str(evolTime)+' [min].'
+        self.__log.debug(s)
+
+      # endo of for fuelSeg in fuelSegmentsLoad:
+
+      return
+
+    # end of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
+
+  #...........................................................................
+  # if not the first time step then parse the existing history file and append
+  #...........................................................................
+  else: # of if evolTime == 0.0:
+
+    tree = ElementTree.parse( portFile )
+    rootNode = tree.getroot()
+
+    newTimeStamp = ElementTree.Element('timeStamp')
+    newTimeStamp.set('value',str(evolTime))
+    newTimeStamp.set('unit','minute')
+
+    if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
+ 
+      rootNode.append(newTimeStamp)
+      tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+
+      self.__withdrawMass = 0.0
+
+      s = '__ProvideFuelSegments(): providing no fuel at '+str(evolTime)+' [min]'
+      self.__log.debug(s)
+   
+      return
+
+    else: 
+
+      fuelSegmentsLoad = list()
+      fuelMassLoad = 0.0
+
+      while fuelMassLoad <= withdrawMass:
+           fuelSegmentCandidate = self.__WithdrawFuelSegment( evolTime )
+           if fuelSegmentCandidate is None: break # no segments left with time stamp <= evolTime
+           mass          = fuelSegmentCandidate[1]
+           fuelMassLoad += mass
+           if fuelMassLoad <= withdrawMass:
+              fuelSegmentsLoad.append( fuelSegmentCandidate )
+           else:
+              self.__RestockFuelSegment( fuelSegmentCandidate )
+
+      assert len(fuelSegmentsLoad) != 0
+
+      for fuelSeg in fuelSegmentsLoad:
+#       s = '  <fuelSegment>\n'; fout.write(s)
+       newFuelSeg = ElementTree.SubElement(newTimeStamp, 'fuelSegment')
+       timeStamp = fuelSeg[0]
+       mass      = fuelSeg[1]
+       length    = fuelSeg[2]
+       segID     = fuelSeg[3]
+       U         = fuelSeg[4]
+       Pu        = fuelSeg[5]
+       I         = fuelSeg[6]
+       Kr        = fuelSeg[7]
+       Xe        = fuelSeg[8]
+       a3H       = fuelSeg[9]
+       FP        = fuelSeg[10]
+#       s = '   <timeStamp     unit="minute">'+str(timeStamp)+'</timeStamp>\n'; fout.write(s)
+       e = ElementTree.SubElement(newFuelSeg, 'timeStamp')
+       e.set('unit','minute')
+       e.text = str(timeStamp)
+#       s = '   <mass          unit="gram">'+str(round(mass,gDec))+'</mass>\n';fout.write(s)
+       e = ElementTree.SubElement(newFuelSeg, 'mass')
+       e.set('unit','gram')
+       e.text = str(round(mass,gDec))
+#       s = '   <length        unit="m">'+str(length)+'</length>\n';fout.write(s)
+       e = ElementTree.SubElement(newFuelSeg, 'length')
+       e.set('unit','mm')
+       e.text = str(round(length,mmDec))
+#       s = '   <innerDiameter unit="m">'+str(segID)+'</innerDiameter>\n';fout.write(s)
+       e = ElementTree.SubElement(newFuelSeg, 'innerDiameter')
+       e.set('unit','mm')
+       e.text = str(round(segID,mmDec))
+#       s = '   <U  unit="gram">'+str(round(U,gDec))+'</U>\n';fout.write(s)
+       e = ElementTree.SubElement(newFuelSeg, 'U')
+       e.set('unit','gram')
+       e.text = str(round(U,gDec))
+#       s = '   <Pu unit="gram">'+str(round(Pu,gDec))+'</Pu>\n';fout.write(s)
+       e = ElementTree.SubElement(newFuelSeg, 'Pu')
+       e.set('unit','gram')
+       e.text = str(round(Pu,gDec))
+#       s = '   <I  unit="gram">'+str(round(I,gDec))+'</I>\n';fout.write(s)
+       e = ElementTree.SubElement(newFuelSeg, 'I')
+       e.set('unit','gram')
+       e.text = str(round(I,gDec))
+#       s = '   <Kr unit="gram">'+str(round(Kr,gDec))+'</Kr>\n';fout.write(s)
+       e = ElementTree.SubElement(newFuelSeg, 'Kr')
+       e.set('unit','gram')
+       e.text = str(round(Kr,gDec))
+#       s = '   <Xe unit="gram">'+str(round(Xe,gDec))+'</Xe>\n';fout.write(s)
+       e = ElementTree.SubElement(newFuelSeg, 'Xe')
+       e.set('unit','gram')
+       e.text = str(round(Xe,gDec))
+#       s = '   <a3H unit="gram">'+str(round(a3H,gDec))+'</a3H>\n';fout.write(s)
+       e = ElementTree.SubElement(newFuelSeg, 'a3H')
+       e.set('unit','gram')
+       e.text = str(round(a3H,gDec))
+#       s = '   <FP unit="gram">'+str(round(FP,gDec))+'</FP>\n';fout.write(s)
+       e = ElementTree.SubElement(newFuelSeg, 'FP')
+       e.set('unit','gram')
+       e.text = str(round(FP,gDec))
+#       s = '  </fuelSegment>\n';      fout.write(s)
+#      s = ' </timeStamp>\n'; fout.write(s)
+#      s = '</fuelsegments>\n'; fout.write(s)
+#      fout.close()
+
+      rootNode.append(newTimeStamp)
+      tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+
+      s = '__ProvideFuelSegments(): providing '+str(len(fuelSegmentsLoad))+' fuel segments at '+str(evolTime)+' [min].'
+      self.__log.debug(s)
+
+      return
+
+  # end of if evolTime == 0.0:
+
+  return
+
+
+#---------------------------------------------------------------------------------
+# This writes to file only a single time step data at a time
+ def __ProvideFuelSegments_DEPRECATED( self, portFile, evolTime ):
 
   gDec = self.__gramDecimals
 
