@@ -9,7 +9,7 @@ Tue Jun 24 01:03:45 EDT 2014
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
-import xml.etree.ElementTree as ElementTree
+import xml.etree.cElementTree as ElementTree
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -105,7 +105,7 @@ class PyPlot(object):
 #---------------------------------------------------------------------------------
 # This uses a use portFile which is guaranteed at this point
  def __GetTimeSeries( self, portFile, evolTime ):
- 
+
   s = '__GetTimeSeries(): will check file: '+portFile
   self.__log.debug(s)
 
@@ -220,6 +220,7 @@ class PyPlot(object):
 #  fig.show()
  
   fig.savefig('pyplot.png',dpi=200,fomat='png')
+  plt.close('all')
 #  fig.savefig(outputfilename+'.png',dpi=200,fomat='png')
 
 #  x = np.linspace(0, evolTime)

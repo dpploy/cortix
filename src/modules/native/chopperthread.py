@@ -10,7 +10,7 @@ Tue Jun 24 12:36:17 EDT 2014
 import os, sys, io, time, datetime
 import logging
 from threading import Thread
-import xml.etree.ElementTree as ElementTree
+import xml.etree.cElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
@@ -35,11 +35,11 @@ class ChopperThread(Thread):
 # Create logger for this driver and its imported pymodule 
 
   log = logging.getLogger('chopper')
-  log.setLevel(logging.DEBUG)
+  log.setLevel(logging.INFO)
 # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
   fh = logging.FileHandler(fullPathTaskDir+'chopper.log')
-  fh.setLevel(logging.DEBUG)
+  fh.setLevel(logging.INFO)
 # create console handler with a higher log level
   ch = logging.StreamHandler()
   ch.setLevel(logging.WARN)

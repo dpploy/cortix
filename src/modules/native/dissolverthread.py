@@ -10,7 +10,7 @@ Tue Jun 24 01:03:45 EDT 2014
 import os, sys, io, time, datetime
 import logging
 from threading import Thread
-import xml.etree.ElementTree as ElementTree
+import xml.etree.cElementTree as ElementTree
 from src.modules.native.dissolver import Dissolver
 #*********************************************************************************
 
@@ -35,11 +35,11 @@ class DissolverThread(Thread):
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
   log = logging.getLogger('dissolver')
-  log.setLevel(logging.DEBUG)
+  log.setLevel(logging.WARN)
 # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
   fh = logging.FileHandler(fullPathTaskDir+'dissolver.log')
-  fh.setLevel(logging.DEBUG)
+  fh.setLevel(logging.WARN)
 # create console handler with a higher log level
   ch = logging.StreamHandler()
   ch.setLevel(logging.WARN)

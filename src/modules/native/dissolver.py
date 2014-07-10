@@ -9,7 +9,7 @@ Tue Jun 24 01:03:45 EDT 2014
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
-import xml.etree.ElementTree as ElementTree
+import xml.etree.cElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************

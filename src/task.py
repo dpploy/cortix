@@ -10,8 +10,7 @@ Tue Dec 10 11:21:30 EDT 2013
 import os, sys, io, time
 import logging
 from src.configtree import ConfigTree
-from xml.etree.ElementTree import ElementTree
-from xml.etree.ElementTree import Element
+from xml.etree.cElementTree import ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
@@ -173,7 +172,7 @@ class Task(object):
 
   while status == 'running': 
 
-   time.sleep(10)
+   time.sleep(60)
 
    (status,modNames) = self.__GetRuntimeStatus( runtimeStatusFiles )
 
@@ -192,7 +191,7 @@ class Task(object):
 
   for (modName,statusFile) in runtimeStatusFiles.items():
 
-     if not os.path.isfile(statusFile): time.sleep(10)
+     if not os.path.isfile(statusFile): time.sleep(1)
      assert os.path.isfile(statusFile), 'runtime status file %r not found.' % statusFile
 
      tree = ElementTree()

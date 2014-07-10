@@ -36,11 +36,11 @@ class PyPlotThread(Thread):
 # Create logger for this driver and its imported pymodule 
 
   log = logging.getLogger('pyplot')
-  log.setLevel(logging.DEBUG)
+  log.setLevel(logging.WARN)
   # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
   fh = logging.FileHandler(fullPathTaskDir+'pyplot.log')
-  fh.setLevel(logging.DEBUG)
+  fh.setLevel(logging.WARN)
   # create console handler with a higher log level
   ch = logging.StreamHandler()
   ch.setLevel(logging.WARN)
