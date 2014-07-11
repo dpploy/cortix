@@ -9,7 +9,7 @@ Tue Jun 24 01:03:45 EDT 2014
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
-import xml.etree.cElementTree as ElementTree
+import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
@@ -165,20 +165,20 @@ class FuelAccumulation(object):
    FP   = 0.0
 
    timeIndex = int(timeNode.get('index'))
-   s = '__GetSolids(): timeIndex='+str(timeIndex)
-   self.__log.debug(s)
+
+#   s = '__GetSolids(): timeIndex='+str(timeIndex)
+#   self.__log.debug(s)
 
    timeStamp = timeStep*timeIndex          
 
-   s = '__GetSolids(): timeStamp='+str(timeStamp)
-   self.__log.debug(s)
+#   s = '__GetSolids(): timeStamp='+str(timeStamp)
+#   self.__log.debug(s)
 
    if timeStamp == evolTime: 
 
-     s = '__GetSolids(): timeStamp='+str(timeStamp)+';'+' evolTime='+str(evolTime)
-     self.__log.debug(s)
+#     s = '__GetSolids(): timeStamp='+str(timeStamp)+';'+' evolTime='+str(evolTime)
+#     self.__log.debug(s)
 
-#   print('Time index = ',timeIndex)
      n = timeNode.find('Segment_Length')
  
      if not ElementTree.iselement(n): continue # to the next timeNode
@@ -292,7 +292,12 @@ class FuelAccumulation(object):
     s = '__GetWithdrawalRequest(): checking for withdrawal message at '+str(evolTime)
     self.__log.debug(s)
 
-    tree = ElementTree.parse(portFile)
+    try:
+      tree = ElementTree.parse( portFile )
+    except ElementTree.ParseError as error:
+      s = '__GetWithdrawalRequest(): '+portFile+' unavailable. Error code: '+str(error.code)+' File position: '+str(error.position)+'. Retrying...'
+      self.__log.debug(s)
+      continue
 
     rootNode = tree.getroot()
     assert rootNode.tag == 'time-series', 'invalid format.' 
@@ -310,106 +315,25 @@ class FuelAccumulation(object):
 
     for n in nodes:
 
-     timeStamp = float(n.get('value').strip())
+      timeStamp = float(n.get('value').strip())
  
-     # must check for timeStamp 
-     if timeStamp == evolTime:
+      # get data at timeStamp evolTime
+      if timeStamp == evolTime:
 
-        found = True
+         found = True
 
-        mass = 0.0
-        mass = float(n.text.strip())
-        self.__withdrawMass = mass
+         mass = 0.0
+         mass = float(n.text.strip())
+         self.__withdrawMass = mass
 
-        s = '__GetWithdrawalRequest(): received withdrawal message at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
-        self.__log.debug(s)
+         s = '__GetWithdrawalRequest(): received withdrawal message at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
+         self.__log.debug(s)
 
-     else: 
+    # end for n in nodes:
 
-        time.sleep(1)
+    if found is False: time.sleep(1) 
 
-  return 
-
-
-#---------------------------------------------------------------------------------
-# This uses a use portFile which is guaranteed to exist at this point
- def __GetWithdrawalRequest_DEPRECATED2( self, portFile, evolTime ):
-
-  found = False
-
-  while found is False:
-
-    s = '__GetWithdrawalRequest(): checking for withdrawal message at '+str(evolTime)
-    self.__log.debug(s)
-
-    tree = ElementTree.parse(portFile)
-
-    rootNode = tree.getroot()
-
-    nodes = rootNode.findall('timeStamp')
-
-    for n in nodes:
-     timeStamp = float(n.get('value').strip())
- 
-     # must check for timeStamp 
-     if timeStamp == evolTime:
-
-        found = True
-
-        timeStampUnit = n.get('unit').strip()
-        assert timeStampUnit == "minute"
-
-        mass = 0.0
-        subn = n.find('var')
-        if subn is not None:
-           mass     = float(subn.get('value').strip())
-           massUnit = subn.get('unit').strip()
-           assert massUnit == "gram"
-           title    = subn.text.strip()
-           self.__withdrawMass = mass
-        else:
-           self.__withdrawMass = 0.0
-  
-        s = '__GetWithdrawalRequest(): received withdrawal message at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
-        self.__log.debug(s)
-
-     else: 
-
-        time.sleep(1)
-
-  return 
-
-#---------------------------------------------------------------------------------
-# This uses a use portFile which is guaranteed to exist at this point
-# Depreacted: this only read a file with a single time stamp on it.
- def __GetWithdrawalRequest_DEPRECATED1( self, portFile, evolTime ):
-
-  tree = ElementTree.parse(portFile)
-  rootNode = tree.getroot()
-
-  n         = rootNode.find('timeStamp')
-  timeStamp = float(n.get('value').strip())
-
-  assert timeStamp == evolTime, 'timeStamp = %r, evolTime = %r' % (timeStamp,evolTime)
-
-  timeStampUnit = n.get('unit').strip()
-  assert timeStampUnit == "minute"
-
-  mass = 0.0
-  subn = n.find('fuelLoad')
-  if subn is not None:
-     mass     = float(subn.text.strip())
-     massUnit = subn.get('unit').strip()
-     assert massUnit == "gram"
-     self.__withdrawMass = mass
-  else:
-     self.__withdrawMass = 0.0
-
-  s = '__GetWithdrawalRequest(): received withdrawal message at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
-  self.__log.debug(s)
-
-# remove the request
-  os.system( 'rm -f ' + portFile )
+  # end of while found is False:
 
   return 
 

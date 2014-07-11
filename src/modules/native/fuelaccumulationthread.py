@@ -10,7 +10,7 @@ Sun Jun 29 21:34:18 EDT 2014
 import os, sys, io, time, datetime
 import logging
 from threading import Thread
-import xml.etree.cElementTree as ElementTree
+import xml.etree.ElementTree as ElementTree
 from src.modules.native.fuelaccumulation import FuelAccumulation
 #*********************************************************************************
 
@@ -36,11 +36,11 @@ class FuelAccumulationThread(Thread):
 # Create logger for this driver and its imported pymodule 
 
   log = logging.getLogger('fuelaccumulation')
-  log.setLevel(logging.WARN)
+  log.setLevel(logging.DEBUG)
   # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
   fh = logging.FileHandler(fullPathTaskDir+'fuelaccumulation.log')
-  fh.setLevel(logging.WARN)
+  fh.setLevel(logging.DEBUG)
   # create console handler with a higher log level
   ch = logging.StreamHandler()
   ch.setLevel(logging.INFO)

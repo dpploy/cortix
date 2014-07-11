@@ -9,7 +9,7 @@ Tue Jun 24 01:03:45 EDT 2014
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
-import xml.etree.cElementTree as ElementTree
+import xml.etree.ElementTree as ElementTree
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -29,7 +29,7 @@ class PyPlot(object):
 
   self.__ports = ports
 
-  self.__timeSeriesData = dict(list())
+  self.__timeSeriesData = dict(list()) # [(varName,varUnit,timeUnit,title,legend)] = (time,varValue)
 
   self.__log = logging.getLogger('pyplot')
   self.__log.info('initializing an instance of PyPlot')
@@ -47,7 +47,7 @@ class PyPlot(object):
   s = 'Execute(): facility time [min] = ' + str(evolTime)
   self.__log.info(s)
 
-  self.__PlotTimeSeries()
+  if evolTime % 60.0 == 0.0: self.__PlotTimeSeries() # updata plot every 10 min
 
 #---------------------------------------------------------------------------------
  def __UseData( self, usePortName=None, evolTime=0.0 ):
@@ -116,10 +116,14 @@ class PyPlot(object):
     s = '__GetTimeSeries(): checking for value at '+str(evolTime)
     self.__log.debug(s)
 
-    tree = ElementTree.parse(portFile)
+#    tree = ElementTree.parse(portFile)
 
-    time.sleep(1) # slow down the PyPlot module; to avoid file racing condition
-#    ElementTree.dump(tree)
+    try:
+      tree = ElementTree.parse( portFile )
+    except ElementTree.ParseError as error:
+      s = '__GetTimeSeries(): '+portFile+' unavailable. Error code: '+str(error.code)+' File position: '+str(error.position)+'. Retrying...'
+      self.__log.debug(s)
+      continue
 
     rootNode = tree.getroot()
     assert rootNode.tag == 'time-series', 'invalid format.'
@@ -136,30 +140,36 @@ class PyPlot(object):
 
     for n in nodes:
 
-     timeStamp = float(n.get('value').strip())
+      timeStamp = float(n.get('value').strip())
 
-     s = '__GetTimeSeries(): timeStamp '+str(timeStamp)
-     self.__log.debug(s)
+#      s = '__GetTimeSeries(): timeStamp '+str(timeStamp)
+#      self.__log.debug(s)
  
-     # must check for timeStamp 
-     if timeStamp == evolTime:
+      # must check for timeStamp 
+      if timeStamp == evolTime:
 
-        found = True  
+         found = True  
 
-        if timeStamp == 0.0: self.__timeSeriesData[(varName,varUnit,timeUnit)] = list()
+         varSpec = (varName,varUnit,timeUnit)
 
-        data = self.__timeSeriesData[(varName,varUnit,timeUnit)]
+         if timeStamp == 0.0: self.__timeSeriesData[varSpec] = list()
 
-        varValue = float(n.text.strip())
+         data = self.__timeSeriesData[varSpec]
 
-        data.append( (evolTime, varValue) )
+         varValue = float(n.text.strip())
 
-        s = '__GetTimeSeries(): '+varName+' at '+str(evolTime)+' [min]; value ['+varUnit+'] = '+str(varValue)
-        self.__log.debug(s)
+         data.append( (evolTime, varValue) )
 
-     else: 
+#        s = '__GetTimeSeries(): '+varName+' at '+str(evolTime)+' [min]; value ['+varUnit+'] = '+str(varValue)
+#        self.__log.debug(s)
 
-        time.sleep(1)
+      # end of if timeStamp == evolTime:
+
+    # end of for n in nodes:
+
+    if found is False: time.sleep(1)
+
+  # while found is False:
 
   return
 
@@ -168,32 +178,65 @@ class PyPlot(object):
 
 #  s = '__PlotVarTimeSeries(): __timeSeriesData keys = '+str(self.__timeSeriesData.keys())
 #  self.__log.debug(s)
-  s = '__PlotVarTimeSeries(): __timeSeriesData keys = '+str(self.__timeSeriesData.items())
-  self.__log.debug(s)
+#  s = '__PlotVarTimeSeries(): __timeSeriesData keys = '+str(self.__timeSeriesData.items())
+#  self.__log.debug(s)
+
+  nVariables = len(self.__timeSeriesData.keys())
+
+  assert nVariables <= 9, 'exceeded # of variables'
 
   fig = plt.figure()
 
-  gs = gridspec.GridSpec(2,2)
+  gs = gridspec.GridSpec(3,3)
   gs.update(left=0.08,right=0.98,wspace=0.4,hspace=0.4)
 
   axlst = list()
   axlst.append(fig.add_subplot(gs[0, 0]))
   axlst.append(fig.add_subplot(gs[0, 1]))
+  axlst.append(fig.add_subplot(gs[0, 2]))
   axlst.append(fig.add_subplot(gs[1, 0]))
   axlst.append(fig.add_subplot(gs[1, 1]))
-
+  axlst.append(fig.add_subplot(gs[1, 2]))
+  axlst.append(fig.add_subplot(gs[2, 0]))
+  axlst.append(fig.add_subplot(gs[2, 1]))
+  axlst.append(fig.add_subplot(gs[2, 2]))
+  axes = np.array(axlst)
   axes = np.array(axlst)
 
-  axis = axes[0]
-  axis.set_xlabel('Time [h]')
-  axis.set_ylabel('Fuel Mass Request [g]',fontsize=10)
+  text = 'Cortix::PyPlot Module'
+  fig.text(.5,.95,text,horizontalalignment='center',fontsize=16)
+
+  for (varSpec,ax) in zip( self.__timeSeriesData , axes.flat ):
+
+    varName  = varSpec[0]
+    varUnit  = varSpec[1]; 
+
+    if varUnit == 'gram': 
+       varUnit = 'g'
+
+    timeUnit = varSpec[2]
+
+    data = self.__timeSeriesData[varSpec]
+    data = np.array(data)
+    x = data[:,0]/60.0
+    y = data[:,1]
+  
+    ax.set_xlabel('Time [h]',fontsize=10)
+    ax.set_ylabel(varName+' ['+varUnit+']',fontsize=10)
+
+    ymax  = y.max()
+    dy    = ymax * .1
+    ymax += dy
+    ymin  = y.min()
+    ymin -= dy
+
+    ax.set_ylim(ymin,ymax)
 
 #  for l in axis.get_xticklabels(): l.set_fontsize('x-small')
 #  for l in axis.get_yticklabels(): l.set_fontsize('x-small')
 #  color  = parameters['plot-color']
 #  marker = parameters['plot-marker']+'-'
 #  axis.set_xlim(2e-3, 2)
-  axis.set_ylim(-10, 300)
 #  axis.set_aspect(1)
 #  axis.set_title("adjustable = box")
 #  legend = parameters['plot-legend']
@@ -201,26 +244,26 @@ class PyPlot(object):
 #  for key,value in self.__timeSeriesData.items():
 #   print(key)
 #   print(value)
-  data = self.__timeSeriesData[('Fuel Mass Request', 'gram', 'minute')]
-  data = np.array(data)
-  x = data[:,0]/60.0
-  y = data[:,1]
+
   
-  
-  axis.plot( x, y, 's-', color='black', linewidth=0.5, markersize=2,  \
-              markeredgecolor='black', label='dissolver request' )
+    ax.plot( x, y, 's-', color='black', linewidth=0.5, markersize=2,  \
+             markeredgecolor='black' )
+#              markeredgecolor='black', label='dissolver request' )
 
 # if index == 0:
 #    axis.set_xscale("log")
 #    axis.set_yscale("log")
 #    axis.plot( Q, haloI_fit, marker, color='red', linewidth=0.5, markersize=3, markeredgecolor=color, label=legend )
 
-  axis.legend( loc='best', prop={'size':8} )
+#    ax.legend( loc='best', prop={'size':8} )
 
 #  fig.show()
  
+  # end of for (varSpec,ax) in zip( self.__timeSeriesData , axes.flat ):
+
   fig.savefig('pyplot.png',dpi=200,fomat='png')
   plt.close('all')
+
 #  fig.savefig(outputfilename+'.png',dpi=200,fomat='png')
 
 #  x = np.linspace(0, evolTime)

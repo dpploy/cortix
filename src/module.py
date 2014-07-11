@@ -128,7 +128,6 @@ class Module(object):
   else: 
      assert True, 'module type invalid.'
 
-
   return runtimeModuleStatusFile
 
 #---------------------------------------------------------------------------------

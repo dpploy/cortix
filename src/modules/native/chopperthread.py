@@ -10,7 +10,7 @@ Tue Jun 24 12:36:17 EDT 2014
 import os, sys, io, time, datetime
 import logging
 from threading import Thread
-import xml.etree.cElementTree as ElementTree
+import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************

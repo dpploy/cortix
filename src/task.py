@@ -172,7 +172,7 @@ class Task(object):
 
   while status == 'running': 
 
-   time.sleep(60)
+   time.sleep(20)
 
    (status,modNames) = self.__GetRuntimeStatus( runtimeStatusFiles )
 

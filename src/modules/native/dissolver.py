@@ -9,7 +9,7 @@ Tue Jun 24 01:03:45 EDT 2014
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
-import xml.etree.cElementTree as ElementTree
+import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
@@ -253,10 +253,12 @@ class Dissolver(object):
 
   while found is False:
 
-    tree = ElementTree.parse( portFile )
-
-#  print('Dissolver::__GetSolids: dumping the solids obtained at this point')
-#  ElementTree.dump(tree)
+    try:
+      tree = ElementTree.parse( portFile )
+    except ElementTree.ParseError as error:
+      s = '__GetSolids(): '+portFile+' unavailable. Error code: '+str(error.code)+' File position: '+str(error.position)+'. Retrying...'
+      self.__log.debug(s)
+      continue
 
     rootNode = tree.getroot()
 
@@ -266,14 +268,13 @@ class Dissolver(object):
 
       timeStamp = float(n.get('value').strip())
 
-      # must check for timeStamp
+      # get data at timeStamp evolTime
       if timeStamp == evolTime:
 
         found = True
 
         timeStampUnit = n.get('unit').strip()
         assert timeStampUnit == "minute"
-
 
         subn = n.findall('fuelSegment')
 
@@ -373,142 +374,19 @@ class Dissolver(object):
 
         # end of if len(subn) != 0:
 
-      else: # of if timeStamp == evolTime:
-
-        s = '__GetSolids(): did not find time stamp '+str(evolTime)+' [min] in '+portFile
-        self.__log.debug(s)
-
-        time.sleep(1)
-
       # end of if timeStamp == evolTime:
 
     # end of for n in nodes:
 
-#  os.system( 'cp ' + portFile + ' /tmp/.')
+    if found is False: 
+      time.sleep(1)
+      s = '__GetSolids(): did not find time stamp '+str(evolTime)+' [min] in '+portFile
+      self.__log.debug(s)
 
   # end of while found is False:
 
   s = '__GetSolids(): got fuel load at '+str(evolTime)+' [min], with '+str(len(fuelSegmentsLoad))+' segments'
   self.__log.debug(s)
-
-  return  fuelSegmentsLoad
-
-#---------------------------------------------------------------------------------
-# This reads only one time step data and removes the file.
- def __GetSolids_DEPRECATED( self, portFile, evolTime ):
-
-  tree = ElementTree.parse( portFile )
-
-#  print('Dissolver::__GetSolids: dumping the solids obtained at this point')
-#  ElementTree.dump(tree)
-
-  rootNode = tree.getroot()
-
-  n         = rootNode.find('timeStamp')
-  timeStamp = float(n.get('value').strip())
-
-  assert timeStamp == evolTime, 'timeStamp = %r, evolTime = %r' % (timeStamp,evolTime)
-
-  timeStampUnit = n.get('unit').strip()
-  assert timeStampUnit == "minute"
-
-  fuelSegmentsLoad = list()
-
-  subn = n.findall('fuelSegment')
-
-  if len(subn) != 0:
-
-   assert self.__ready2LoadFuel is True
-   if self.__startDissolveTime != 0.0:
-      assert evolTime >= self.__startDissolveTime + self.__dutyPeriod
-
-   for fuelSegment in subn:
-     for child in fuelSegment:
-       if child.tag == 'timeStamp':
-          segTimeStamp     = float(child.text.strip())
-          attributes       = child.items()
-          assert len(attributes) == 1
-          assert attributes[0][0] == 'unit'
-          segTimeStampUnit = attributes[0][1]
-       if child.tag == 'mass':
-          segMass          = float(child.text.strip())
-          attributes       = child.items()
-          assert len(attributes) == 1
-          assert attributes[0][0] == 'unit'
-          segMassUnit = attributes[0][1]
-       if child.tag == 'length':
-          segLength        = float(child.text.strip())
-          attributes       = child.items()
-          assert len(attributes) == 1
-          assert attributes[0][0] == 'unit'
-          segLengthUnit = attributes[0][1]
-       if child.tag == 'innerDiameter':
-          segID            = float(child.text.strip())
-          attributes       = child.items()
-          assert len(attributes) == 1
-          assert attributes[0][0] == 'unit'
-          segIDUnit = attributes[0][1]
-       if child.tag == 'U':
-          segU             = float(child.text.strip())
-          attributes       = child.items()
-          assert len(attributes) == 1
-          assert attributes[0][0] == 'unit'
-          segUUnit = attributes[0][1]
-       if child.tag == 'Pu':
-          segPu            = float(child.text.strip())
-          attributes       = child.items()
-          assert len(attributes) == 1
-          assert attributes[0][0] == 'unit'
-          segPuUnit = attributes[0][1]
-       if child.tag == 'I':
-          segI             = float(child.text.strip())
-          attributes       = child.items()
-          assert len(attributes) == 1
-          assert attributes[0][0] == 'unit'
-          segIUnit = attributes[0][1]
-       if child.tag == 'Kr':
-          segKr            = float(child.text.strip())
-          attributes       = child.items()
-          assert len(attributes) == 1
-          assert attributes[0][0] == 'unit'
-          segKrUnit = attributes[0][1]
-       if child.tag == 'Xe':
-          segXe            = float(child.text.strip())
-          attributes       = child.items()
-          assert len(attributes) == 1
-          assert attributes[0][0] == 'unit'
-          segXeUnit = attributes[0][1]
-       if child.tag == 'a3H':
-          seg3H            = float(child.text.strip())
-          attributes       = child.items()
-          assert len(attributes) == 1
-          assert attributes[0][0] == 'unit'
-          seg3HUnit = attributes[0][1]
-       if child.tag == 'FP':
-          segFP            = float(child.text.strip())
-          attributes       = child.items()
-          assert len(attributes) == 1
-          assert attributes[0][0] == 'unit'
-          segFPUnit = attributes[0][1]
-
- #    os.system( 'cp ' + portFile + ' /tmp/.')
-     fuelSegment = ( segTimeStamp, segMass, segLength, segID, 
-                     segU,         segPu,   segI,      segKr,
-                     segXe,        seg3H,   segFP  )
-
-     fuelSegmentsLoad.append( fuelSegment )
-
-
-#  os.system( 'cp ' + portFile + ' /tmp/.')
-
-  s = '__GetSolids(): got fuel load at '+str(evolTime)+' [min], with '+str(len(fuelSegmentsLoad))+' segments'
-  self.__log.debug(s)
-
-  # remove the data file after reading it 
-  s = 'rm -f ' + portFile 
-  os.system(s)
-  self.__log.debug('__GetSolids(): '+s)
-
 
   return  fuelSegmentsLoad
 
