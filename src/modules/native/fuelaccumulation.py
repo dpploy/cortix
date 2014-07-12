@@ -77,7 +77,6 @@ class FuelAccumulation(object):
 
 # Get data from port files
   if usePortName == 'solids': self.__GetSolids( portFile, evolTime )
-
   if usePortName == 'withdrawal-request': self.__GetWithdrawalRequest( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
@@ -89,11 +88,17 @@ class FuelAccumulation(object):
 # Send data to port files
   if providePortName == 'fuel-segments': self.__ProvideFuelSegments( portFile, evolTime )
 
+# Send data to port files
+  if providePortName == 'mass-inventory': self.__ProvideMassInventory( portFile, evolTime )
+
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
 
   portFile = None
 
+  #..........
+  # Use ports
+  #..........
   if usePortName is not None:
 
     assert providePortName is None
@@ -112,7 +117,9 @@ class FuelAccumulation(object):
       self.__log.warn(s)
 
     assert os.path.isfile(portFile) is True, 'portFile %r not available; stop.' % portFile
-
+  #..............
+  # Provide ports
+  #..............
   if providePortName is not None:
 
     assert usePortName is None
@@ -120,7 +127,9 @@ class FuelAccumulation(object):
     for port in self.__ports:
      if port[0] == providePortName and port[1] == 'provide': portFile = port[2]
 
+
   assert portFile is not None, 'portFile is invalid.'
+
 
   return portFile
 
@@ -356,6 +365,227 @@ class FuelAccumulation(object):
 # Provide the entire history data 
  def __ProvideFuelSegments( self, portFile, evolTime ):
 
+  gDec  = self.__gramDecimals
+  mmDec = self.__mmDecimals
+
+  vars1 = [('timeStamp','minute'),
+           ('mass','gram'),
+           ('length','mm'),
+           ('innerDiameter','mm')]
+
+  vars2 = [('U','gram'),
+           ('Pu','gram'),
+           ('I','gram'),
+           ('Kr','gram'),
+           ('Xe','gram'),
+           ('3H','gram'),
+           ('FP','gram')]
+
+  withdrawMass = self.__withdrawMass
+
+  #...........................................
+  # if the first time step write a nice header
+  #...........................................
+  if evolTime == 0.0:
+
+    fout = open( portFile, 'w')
+
+    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
+    s = '<time-variable-packet name="fuelSegments">\n'; fout.write(s) 
+    s = ' <comment author="cortix.modules.native.fuelaccumulation" version="0.1"/>\n'; fout.write(s)
+    today = datetime.datetime.today()
+    s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
+    s = ' <time unit="minute"/>\n'; fout.write(s)
+
+    # first packet
+    s = ' <pack1 name="Geometry">\n'; fout.write(s)
+    for var in vars1:
+      s = '  <var name="'+var[0]+'" unit="'+var[1]+'"/>\n'; fout.write(s)
+    s = ' </pack1>\n'; fout.write(s)
+
+    # second packet
+    s = ' <pack2 name="Composition">\n'; fout.write(s)
+    for var in vars2:
+      s = '  <var name="'+var[0]+'" unit="'+var[1]+'"/>\n'; fout.write(s)
+    s = ' </pack2>\n'; fout.write(s)
+
+    # time stamp
+    s = ' <timeStamp value="'+str(evolTime)+'">\n'; fout.write(s)
+
+    if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
+
+      s = ' </timeStamp>\n'; fout.write(s)
+
+      s = '</time-variable-packet>\n'; fout.write(s)
+      fout.close()
+
+      s = '__ProvideFuelSegments(): providing no fuel at '+str(evolTime)+' [min]'
+      self.__log.debug(s)
+
+      self.__withdrawMass = 0.0
+
+      return
+
+    else: # of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
+
+      fuelSegmentsLoad = list()
+      fuelMassLoad = 0.0
+
+      # withdraw fuel elements
+      while fuelMassLoad <= withdrawMass:
+           fuelSegmentCandidate = self.__WithdrawFuelSegment( evolTime )
+           if fuelSegmentCandidate is None: break # no segments left with time stamp <= evolTime
+           mass          = fuelSegmentCandidate[1]
+           fuelMassLoad += mass
+           if fuelMassLoad <= withdrawMass:
+              fuelSegmentsLoad.append( fuelSegmentCandidate )
+           else:
+              self.__RestockFuelSegment( fuelSegmentCandidate )
+
+      assert len(fuelSegmentsLoad) != 0, 'sanity check failed.'
+
+      # Save in file data from withdrawal
+      for fuelSeg in fuelSegmentsLoad:
+
+        timeStamp = fuelSeg[0]
+        assert timeStamp <=  evolTime, 'sanity check failed.'
+        mass      = fuelSeg[1]
+        length    = fuelSeg[2]
+        segID     = fuelSeg[3]
+        U         = fuelSeg[4]
+        Pu        = fuelSeg[5]
+        I         = fuelSeg[6]
+        Kr        = fuelSeg[7]
+        Xe        = fuelSeg[8]
+        a3H       = fuelSeg[9]
+        FP        = fuelSeg[10]
+
+        # first packet
+        s = '  <pack1>'
+        fuelSegVars1 = [timeStamp,mass,length,segID]
+        assert len(fuelSegVars1) == len(vars1)
+        for var in fuelSegVars1: 
+          s += str(var)+','
+        s = s[:-1] + '</pack1>\n'; fout.write(s)
+
+        # second packet
+        s = '  <pack2>'
+        fuelSegVars2 = [U,Pu,I,Kr,Xe,a3H,FP]
+        assert len(fuelSegVars2) == len(vars2)
+        for var in fuelSegVars2: 
+          s += str(var)+','
+        s = s[:-1] + '</pack2>\n'; fout.write(s)
+  
+        s = ' </timeStamp>\n'; fout.write(s)
+  
+        s = '</time-variable-packet>\n'; fout.write(s)
+        fout.close()
+
+        s = '__ProvideFuelSegments(): providing '+str(len(fuelSegmentsLoad))+' fuel segments at '+str(evolTime)+' [min].'
+        self.__log.debug(s)
+
+      # endo of for fuelSeg in fuelSegmentsLoad:
+
+      self.__withdrawMass = 0.0
+
+      return
+
+    # end of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
+
+  #...........................................................................
+  # if not the first time step then parse the existing history file and append
+  #...........................................................................
+  else: # of if evolTime == 0.0:
+
+    tree = ElementTree.parse( portFile )
+    rootNode = tree.getroot()
+
+    newTimeStamp = ElementTree.Element('timeStamp')
+    newTimeStamp.set('value',str(evolTime))
+
+    if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
+
+      rootNode.append(newTimeStamp)
+      tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+
+      self.__withdrawMass = 0.0
+
+      s = '__ProvideFuelSegments(): providing no fuel at '+str(evolTime)+' [min]'
+      self.__log.debug(s)
+   
+      return
+
+    else: # of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
+
+      fuelSegmentsLoad = list()
+      fuelMassLoad = 0.0
+
+      # withdraw fuel elements
+      while fuelMassLoad <= withdrawMass:
+           fuelSegmentCandidate = self.__WithdrawFuelSegment( evolTime )
+           if fuelSegmentCandidate is None: break # no segments left with time stamp <= evolTime
+           mass          = fuelSegmentCandidate[1]
+           fuelMassLoad += mass
+           if fuelMassLoad <= withdrawMass:
+              fuelSegmentsLoad.append( fuelSegmentCandidate )
+           else:
+              self.__RestockFuelSegment( fuelSegmentCandidate )
+
+      assert len(fuelSegmentsLoad) != 0, 'sanity check failed.'
+
+      for fuelSeg in fuelSegmentsLoad:
+
+        timeStamp = fuelSeg[0]
+        assert timeStamp <= evolTime, 'sanity check failed.'
+        mass      = round(fuelSeg[1],gDec)
+        length    = round(fuelSeg[2],mmDec)
+        segID     = round(fuelSeg[3],mmDec)
+        U         = round(fuelSeg[4],gDec)
+        Pu        = round(fuelSeg[5],gDec)
+        I         = round(fuelSeg[6],gDec)
+        Kr        = round(fuelSeg[7],gDec)
+        Xe        = round(fuelSeg[8],gDec)
+        a3H       = round(fuelSeg[9],gDec)
+        FP        = round(fuelSeg[10],gDec)
+ 
+        # first packet
+        a = ElementTree.SubElement(newTimeStamp, 'pack1')
+        fuelSegVars1 = [timeStamp,mass,length,segID]
+        assert len(fuelSegVars1) == len(vars1)
+        s = ''
+        for var in fuelSegVars1: 
+          s += str(var)+','
+        s = s[:-1] 
+        a.text = s
+
+        # second packet
+        b = ElementTree.SubElement(newTimeStamp, 'pack2')
+        fuelSegVars2 = [U,Pu,I,Kr,Xe,a3H,FP]
+        assert len(fuelSegVars2) == len(vars2)
+        s = ''
+        for var in fuelSegVars2: 
+          s += str(var)+','
+        s = s[:-1] 
+        b.text = s
+
+      rootNode.append(newTimeStamp)
+      tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+
+      s = '__ProvideFuelSegments(): providing '+str(len(fuelSegmentsLoad))+' fuel segments at '+str(evolTime)+' [min].'
+      self.__log.debug(s)
+
+      self.__withdrawMass = 0.0
+
+      return
+
+  # end of if evolTime == 0.0:
+
+  return
+
+#---------------------------------------------------------------------------------
+# Provide the entire history data 
+ def __ProvideFuelSegments_DEPRECATED( self, portFile, evolTime ):
+
   gDec = self.__gramDecimals
   mmDec = self.__mmDecimals
 
@@ -562,88 +792,6 @@ class FuelAccumulation(object):
       return
 
   # end of if evolTime == 0.0:
-
-  return
-
-
-#---------------------------------------------------------------------------------
-# This writes to file only a single time step data at a time
- def __ProvideFuelSegments_DEPRECATED( self, portFile, evolTime ):
-
-  gDec = self.__gramDecimals
-
-  withdrawMass = self.__withdrawMass
-
-  fout = open( portFile, 'w')
-
-  s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by FuelAccumulation.py -->\n'; fout.write(s)
-  today = datetime.datetime.today()
-  s = '<!-- '+str(today)+' -->\n'; fout.write(s)
-
-  s = '<fuelsegments>\n'; fout.write(s)
-  s = ' <timeStamp value="'+str(evolTime)+'" unit="minute">\n'; fout.write(s)
-
-  if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
-
-   s = ' </timeStamp>\n'; fout.write(s)
-   s = '</fuelsegments>\n'; fout.write(s)
-   fout.close()
-   self.__withdrawMass = 0.0
-
-   s = '__ProvideFuelSegments(): providing no fuel at '+str(evolTime)+' [min]'
-   self.__log.debug(s)
-   return
-
-  else:  
-
-   fuelSegmentsLoad = list()
-   fuelMassLoad = 0.0
-
-   while fuelMassLoad <= withdrawMass:
-         fuelSegmentCandidate = self.__WithdrawFuelSegment( evolTime )
-         if fuelSegmentCandidate is None: break # no segments left with time stamp <= evolTime
-         mass          = fuelSegmentCandidate[1]
-         fuelMassLoad += mass
-         if fuelMassLoad <= withdrawMass:
-            fuelSegmentsLoad.append( fuelSegmentCandidate )
-         else:
-            self.__RestockFuelSegment( fuelSegmentCandidate )
-
-   assert len(fuelSegmentsLoad) != 0
-
-   for fuelSeg in fuelSegmentsLoad:
-    s = '  <fuelSegment>\n'; fout.write(s)
-    timeStamp = fuelSeg[0]
-    mass      = fuelSeg[1]
-    length    = fuelSeg[2]
-    segID     = fuelSeg[3]
-    U         = fuelSeg[4]
-    Pu        = fuelSeg[5]
-    I         = fuelSeg[6]
-    Kr        = fuelSeg[7]
-    Xe        = fuelSeg[8]
-    a3H       = fuelSeg[9]
-    FP        = fuelSeg[10]
-    s = '   <timeStamp     unit="minute">'+str(timeStamp)+'</timeStamp>\n'; fout.write(s)
-    s = '   <mass          unit="gram">'+str(round(mass,gDec))+'</mass>\n';fout.write(s)
-    s = '   <length        unit="m">'+str(length)+'</length>\n';fout.write(s)
-    s = '   <innerDiameter unit="m">'+str(segID)+'</innerDiameter>\n';fout.write(s)
-    s = '   <U  unit="gram">'+str(round(U,gDec))+'</U>\n';fout.write(s)
-    s = '   <Pu unit="gram">'+str(round(Pu,gDec))+'</Pu>\n';fout.write(s)
-    s = '   <I  unit="gram">'+str(round(I,gDec))+'</I>\n';fout.write(s)
-    s = '   <Kr unit="gram">'+str(round(Kr,gDec))+'</Kr>\n';fout.write(s)
-    s = '   <Xe unit="gram">'+str(round(Xe,gDec))+'</Xe>\n';fout.write(s)
-    s = '   <a3H unit="gram">'+str(round(a3H,gDec))+'</a3H>\n';fout.write(s)
-    s = '   <FP unit="gram">'+str(round(FP,gDec))+'</FP>\n';fout.write(s)
-    s = '  </fuelSegment>\n';      fout.write(s)
- 
-   s = ' </timeStamp>\n'; fout.write(s)
-   s = '</fuelsegments>\n'; fout.write(s)
-   fout.close()
-
-   s = '__ProvideFuelSegments(): providing '+str(len(fuelSegmentsLoad))+' fuel segments at '+str(evolTime)+' [min].'
-   self.__log.debug(s)
 
   return
 

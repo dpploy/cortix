@@ -8,6 +8,7 @@ Tue Jun 24 01:03:45 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
+import math
 import logging
 import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
@@ -33,7 +34,7 @@ class Dissolver(object):
   self.__dutyPeriod        = 120.0 # minute
   self.__ready2LoadFuel    = True 
 
-  self.__fuelSegmentsLoad = list()
+  self.__fuelSegmentsLoad = None
 
   self.__startDissolveTime = 0.0
 
@@ -57,16 +58,21 @@ class Dissolver(object):
   s = 'Execute(): facility time [min] = ' + str(evolTime)
   self.__log.info(s)
 
-  if len(self.__fuelSegmentsLoad) != 0:
+  if self.__fuelSegmentsLoad is not None:
 
      s = 'Execute(): start new duty cycle at ' + str(evolTime) + ' [min]'
-     self.__log.debug(s)
+     self.__log.info(s)
      s = 'Execute(): ready to load? = ' + str(self.__ready2LoadFuel)
-     self.__log.debug(s)
-     s = 'Execute(): loaded mass [g] = ' + str(round(self.__GetFuelLoadMass(),3))
-     self.__log.debug(s)
-     s = 'Execute(): new fuel load # segments = ' + str(len(self.__fuelSegmentsLoad))
-     self.__log.debug(s)
+     self.__log.info(s)
+     (mass,unit) = self.__GetFuelLoadMass()
+     s = 'Execute(): loaded mass ' + str(round(mass,3)) + ' [' + unit + ']'
+     self.__log.info(s)
+     (volume,unit) = self.__GetFuelLoadVolume()
+     s = 'Execute(): loaded volume ' + str(round(volume,3)) + ' [' + unit + ']'
+     self.__log.info(s)
+     nSegments = len(self.__fuelSegmentsLoad[0])
+     s = 'Execute(): new fuel load # segments = ' + str(nSegments)
+     self.__log.info(s)
 
      if self.__startDissolveTime != 0.0:
         assert evolTime >= self.__startDissolveTime + self.__dutyPeriod
@@ -78,9 +84,9 @@ class Dissolver(object):
 
   if evolTime >= self.__startDissolveTime + self.__dutyPeriod: 
      s = 'Execute(): signal new duty cycle at ' + str(evolTime)+' [min]'
-     self.__log.debug(s)
-     s = 'Execute(): loaded mass ' + str(round(self.__GetFuelLoadMass(),3))
-     self.__log.debug(s)
+     self.__log.info(s)
+
+     assert self.__fuelSegmentsLoad is None
 
      self.__ready2LoadFuel = True
 
@@ -149,6 +155,7 @@ class Dissolver(object):
   if evolTime == 0.0:
 
     fout = open( portFile, 'w')
+
     s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
     s = '<time-series name="dissolutionFuelRequest">\n'; fout.write(s) 
     s = ' <comment author="cortix.modules.native.dissolver" version="0.1"/>\n'; fout.write(s)
@@ -246,6 +253,148 @@ class Dissolver(object):
 #---------------------------------------------------------------------------------
 # Reads the solids from an existing history file
  def __GetSolids( self, portFile, evolTime ):
+
+  fuelSegmentsLoad = None
+
+  found = False
+
+  while found is False:
+
+    try:
+      tree = ElementTree.parse( portFile )
+    except ElementTree.ParseError as error:
+      s = '__GetSolids(): '+portFile+' unavailable. Error code: '+str(error.code)+' File position: '+str(error.position)+'. Retrying...'
+      self.__log.debug(s)
+      continue
+
+    rootNode = tree.getroot()
+
+    nodes = rootNode.findall('timeStamp')
+
+    for n in nodes:
+
+      timeStamp = float(n.get('value').strip())
+
+      # get data at timeStamp evolTime
+      if timeStamp == evolTime:
+
+        #...........
+        found = True
+        #...........
+
+        # get data packs
+        pack1 = n.findall('pack1')
+        pack2 = n.findall('pack2')
+
+        # if there are data packs then read proceed with parsing
+        if len(pack1) != 0 or len(pack2) != 0:
+
+          assert self.__ready2LoadFuel is True, 'sanity check failed.'
+
+          if self.__startDissolveTime != 0.0:
+             assert evolTime >= self.__startDissolveTime + self.__dutyPeriod, 'sanity check failed.'
+
+          assert len(pack1) != 0 and len(pack2) != 0, 'sanity check failed.'
+          assert len(pack1) == len(pack2), 'sanity check failed.'
+
+          #............................
+          # read the header information
+          #............................
+
+          timeElem = rootNode.find('time')
+          timeStampUnit = timeElem.get('unit').strip()
+          assert timeStampUnit == "minute"
+
+          pack1Spec = rootNode.findall('pack1')
+          assert len(pack1Spec) == 1, 'sanity check failed.'
+          pack1Spec = rootNode.find('pack1')
+ 
+          pack1Name = pack1Spec.get('name').strip()
+          assert pack1Name == 'Geometry'
+
+          # [(name,unit),(name,unit),...]
+          segmentGeometrySpec = list()
+          for child in pack1Spec:
+            attributes = child.items()
+            assert len(attributes) == 2
+            for attribute in attributes:
+              if   attribute[0] == 'name': name = attribute[1]
+              elif attribute[0] == 'unit': unit = attribute[1]
+              else: assert True
+            segmentGeometrySpec.append( (name, unit) )
+
+          pack2Spec = rootNode.findall('pack2')
+          assert len(pack2Spec) == 1, 'sanity check failed.'
+          pack2Spec = rootNode.find('pack2')
+ 
+          pack2Name = pack2Spec.get('name').strip()
+          assert pack2Name == 'Composition'
+
+          # [(name,unit),(name,unit),...]
+          segmentCompositionSpec = list()
+          for child in pack2Spec:
+            attributes = child.items()
+            assert len(attributes) == 2
+            for attribute in attributes:
+              if   attribute[0] == 'name': name = attribute[1]
+              elif attribute[0] == 'unit': unit = attribute[1]
+              else: assert True
+            segmentCompositionSpec.append( (name,unit) )
+
+          #............................
+          # read the timeStamp data
+          #............................
+
+          # [ [(name,unit,val), (name,unit,val),...], [(name,unit,val),..], ... ]
+          segmentsGeometryData = list()
+          for pack in pack1:
+            packData = pack.text.strip().split(',')
+            assert len(packData) == len(segmentGeometrySpec)
+            for i in range(len(packData)): packData[i] = float(packData[i])
+            segGeomData = list()
+            for ((name,unit),val) in zip(segmentGeometrySpec,packData):
+              segGeomData.append( (name,unit,val) )
+            segmentsGeometryData.append( segGeomData )
+
+          # [ [(name,unit,val), (name,unit,val),...], [(name,unit,val),..], ... ]
+          segmentsCompositionData = list()
+          for pack in pack2:
+            packData = pack.text.strip().split(',')
+            assert len(packData) == len(segmentCompositionSpec)
+            for i in range(len(packData)): packData[i] = float(packData[i])
+            segCompData = list()
+            for ((name,unit),val) in zip(segmentCompositionSpec,packData):
+              segCompData.append( (name,unit,val) )
+            segmentsCompositionData.append( segCompData )
+
+          assert len(segmentsGeometryData) == len(segmentsCompositionData)
+
+          fuelSegmentsLoad = (segmentsGeometryData, segmentsCompositionData) 
+
+        # end of if len(pack1) != 0 or len(pack2) != 0:
+
+      # end of if timeStamp == evolTime:
+
+    # end of for n in nodes:
+
+    if found is False: 
+      time.sleep(1)
+      s = '__GetSolids(): did not find time stamp '+str(evolTime)+' [min] in '+portFile
+      self.__log.debug(s)
+
+  # end of while found is False:
+
+  if fuelSegmentsLoad is None: nSegments = 0
+  else:                        nSegments = len(fuelSegmentsLoad[0])
+
+  s = '__GetSolids(): got fuel load at '+str(evolTime)+' [min], with '+str(nSegments)+' segments'
+  self.__log.debug(s)
+
+  return  fuelSegmentsLoad
+
+#---------------------------------------------------------------------------------
+# Reads the solids from an existing history file
+ def __GetSolids_DEPRECATED( self, portFile, evolTime ):
 
   fuelSegmentsLoad = list()
 
@@ -394,10 +543,78 @@ class Dissolver(object):
  def __GetFuelLoadMass( self ):
 
   mass = 0.0
-  for seg in self.__fuelSegmentsLoad: 
-    mass += seg[1]
-  
-  return mass 
+  massUnit = 'null'
+
+  if self.__fuelSegmentsLoad is None: return
+
+  segmentsGeoData = self.__fuelSegmentsLoad[0]
+  for segmentData in segmentsGeoData:
+    for (name,unit,value) in segmentData:
+      if name=='mass': 
+        mass += value
+        massUnit = unit
+
+  return (mass,massUnit)
+
+#---------------------------------------------------------------------------------
+ def __GetFuelLoadVolume( self ):
+
+  volume = 0.0
+  volumeUnit = 'null'
+
+  if self.__fuelSegmentsLoad is None: return
+
+  segmentsGeoData = self.__fuelSegmentsLoad[0]
+  for segmentData in segmentsGeoData:
+    for (name,unit,value) in segmentData:
+      if name=='length': 
+        length = value
+        lengthUnit = unit
+      if name=='innerDiameter': 
+        iD = value
+        iDUnit = unit
+    volume += length * math.pi * iD
+
+  if lengthUnit=='mm' and iDUnit=='mm': 
+     volumeUnit = 'cc'
+     volume /= 1000.0
+  else:
+     assert True, 'invalid unit'
+
+  return (volume,volumeUnit)
+
+#---------------------------------------------------------------------------------
+ def __GetFuelLoadGasSpecies( self ):
+
+  gasSpecies = dict()
+
+  if self.__fuelSegmentsLoad is None: return
+ 
+  massI  = 0.0
+  massKr = 0.0
+  massXe = 0.0
+  mass3H = 0.0
+
+  segmentsCompData = self.__fuelSegmentsLoad[1]
+  for segmentData in segmentsCompData:
+    for (name,unit,value) in segmentData:
+      if name=='I': 
+         massI   += value
+         massIUnit = unit
+      if name=='Kr': 
+         massKr += value
+         massKrUnit = unit
+      if name=='Xe': 
+         massXe += value
+         massXeUnit = unit
+      if name=='3H': 
+         mass3H += value
+         mass3HUnit = unit
+
+  gasSpecies = {'I':(massI,massIUnit), 'Kr':(massKr,massKrUnit),
+                'Xe':(massXe,massXeUnit), '3H':(mass3H,mass3HUnit)}
+
+  return gasSpecies
 
 #---------------------------------------------------------------------------------
  def __Dissolve( self ):
@@ -406,8 +623,8 @@ class Dissolver(object):
 
 #  self.__stateHistory
   
-  time.sleep(1)
-  self.__fuelSegmentsLoad = list()
+  
+  self.__fuelSegmentsLoad = None
 
   return
 

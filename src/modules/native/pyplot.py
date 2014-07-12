@@ -47,7 +47,7 @@ class PyPlot(object):
   s = 'Execute(): facility time [min] = ' + str(evolTime)
   self.__log.info(s)
 
-  if evolTime % 60.0 == 0.0: self.__PlotTimeSeries() # updata plot every 10 min
+  if evolTime % 30.0 == 0.0: self.__PlotTimeSeries() # updata plot every 10 min
 
 #---------------------------------------------------------------------------------
  def __UseData( self, usePortName=None, evolTime=0.0 ):

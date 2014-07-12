@@ -129,6 +129,7 @@
     <port type="use">withdrawal-request</port>
     <port type="provide">fuel-segments</port>
     <port type="provide">off-gas</port>
+    <port type="provide">mass-inventory</port>
    </module>
 
    <module name="fuelaccumulation-standalone" type="stand-alone">
@@ -288,6 +289,7 @@
     <connect fromModule="fuelaccumulation-native" fromPort="solids" toModule="chopper-native" toPort="Fuel_Solid"/> 
     <connect fromModule="fuelaccumulation-native" fromPort="withdrawal-request" toModule="dissolver-native" toPort="solids-request"/> 
     <connect fromModule="dissolver-native" fromPort="solids" toModule="fuelaccumulation-native" toPort="fuel-segments"/> 
+    <connect fromModule="pyplot-native" fromPort="time-series" toModule="fuelaccumulation-native" toPort="mass-inventory"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="solids-request"/> 
    </network>
 
@@ -299,6 +301,7 @@
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <connect fromModule="fuelaccumulation-native" fromPort="solids" toModule="chopper-native" toPort="Fuel_Solid"/> 
+    <connect fromModule="fuelaccumulation-native" fromPort="withdrawal-request" toModule="dissolver-native" toPort="solids-request"/> 
     <connect fromModule="dissolver-native" fromPort="solids" toModule="fuelaccumulation-native" toPort="fuel-segments"/> 
     <connect fromModule="condenser-native" fromPort="vapor" toModule="dissolver-native" toPort="vapor"/> 
     <connect fromModule="dissolver-native" fromPort="condenser-stream" toModule="condenser-native" toPort="condensate"/> 
