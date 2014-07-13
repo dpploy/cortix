@@ -8,7 +8,7 @@ Tue Jun 24 01:03:45 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
-import math
+import math, random
 import logging
 import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
@@ -37,6 +37,8 @@ class Dissolver(object):
   self.__startDissolveTime = -1.0   # this is a major control variable
 
   self.__fuelSegmentsLoad = None
+  self.__loadedFuelMass   = None  # this is also a major control variable
+  self.__loadedFuelVolume = None  # this is also a major control variable
 
 #  self.__stateHistory = list(dict())
 
@@ -400,14 +402,17 @@ class Dissolver(object):
 #---------------------------------------------------------------------------------
  def __Dissolve( self, evolTime, timeStep ):
 
+  #..........
+  # new start
+  #..........
   if evolTime == self.__startDissolveTime: # this is the beginning of a duty cycle
 
     s = '__Dissolve(): starting new duty cycle at ' + str(evolTime) + ' [min]'
     self.__log.info(s)
-    (mass,unit) = self.__GetFuelLoadMass()
+    self.__loadedFuelMass = (mass,unit) = self.__GetFuelLoadMass()
     s = '__Dissolve(): loaded mass ' + str(round(mass,3)) + ' [' + unit + ']'
     self.__log.info(s)
-    (volume,unit) = self.__GetFuelLoadVolume()
+    self.__loadedFuelVolume = (volume,unit) = self.__GetFuelLoadVolume()
     s = '__Dissolve(): loaded volume ' + str(round(volume,3)) + ' [' + unit + ']'
     self.__log.info(s)
     nSegments = len(self.__fuelSegmentsLoad[0])
@@ -423,7 +428,10 @@ class Dissolver(object):
 
     self.__UpdateStateVariables( evolTime, timeStep )
 
-  elif evolTime > self.__startDissolveTime and self.__startDissolveTime >= 0:
+  #.....................
+  # continue dissolving
+  #.....................
+  elif evolTime > self.__startDissolveTime and self.__loadedFuelMass is not None:
 
     s = '__Dissolve(): continue dissolving...' 
     self.__log.info(s)
@@ -435,10 +443,17 @@ class Dissolver(object):
       s = '__Dissolve(): signal new duty cycle for ' + str(evolTime+timeStep)+' [min]'
       self.__log.info(s)
 
-      self.__ready2LoadFuel = True
+      self.__ready2LoadFuel   = True
+      self.__loadedFuelMass   = None
+      self.__loadedFuelVolume = None
 
+  #.............................
+  # do nothing in this time step
+  #.............................
   else: 
-      print('MADE IT HERE')
+
+      s = '__Dissolve(): idle at ' + str(evolTime)+' [min]'
+      self.__log.info(s)
 
   return
 
@@ -455,6 +470,8 @@ class Dissolver(object):
   sigma = 0.7
   mean = math.log(10) + sigma**2
 
+  variability = 1.0 - random.random() * 0.15
+
   t = evolTime - t0
   if t == 0: 
     logNormalPDF = 0.0
@@ -462,7 +479,7 @@ class Dissolver(object):
     logNormalPDF = 1.0/t/sigma/math.sqrt(2.0*math.pi) * \
                  math.exp( - (math.log(t) - mean)**2 / 2/ sigma**2 )
 
-  self.__historyXeMassVapor[evolTime+timeStep] = massXe * logNormalPDF
+  self.__historyXeMassVapor[evolTime+timeStep] = massXe * logNormalPDF * variability
 
 #---------------------------------------------------------------------------------
  def __ProvideXeVapor( self, portFile, evolTime ):
