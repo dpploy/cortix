@@ -161,6 +161,11 @@ class Scrubber(object):
     timeUnit = node.get('unit').strip()
     assert timeUnit == "minute"
 
+    timeCutOff = node.get('cut-off')
+    if timeCutOff is not None: 
+      timeCutOff = float(timeCutOff.strip())
+      if evolTime > timeCutOff: return
+
     # vfda to do: check for single var element
     node = rootNode.find('var')
     assert node.get('name').strip() == 'Xe Off-Gas Flow', 'invalid variable.'
