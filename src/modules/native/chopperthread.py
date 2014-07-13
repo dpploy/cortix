@@ -11,6 +11,7 @@ import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
+from src.modules.native.chopper import Chopper
 #*********************************************************************************
 
 #*********************************************************************************
@@ -35,11 +36,11 @@ class ChopperThread(Thread):
 # Create logger for this driver and its imported pymodule 
 
   log = logging.getLogger('chopper')
-  log.setLevel(logging.INFO)
+  log.setLevel(logging.DEBUG)
 # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
   fh = logging.FileHandler(fullPathTaskDir+'chopper.log')
-  fh.setLevel(logging.INFO)
+  fh.setLevel(logging.DEBUG)
 # create console handler with a higher log level
   ch = logging.StreamHandler()
   ch.setLevel(logging.WARN)
@@ -133,22 +134,51 @@ class ChopperThread(Thread):
 # Fourth command line argument is the module runtime-status.xml file
 # runtimeStatusFullPathFileName 
 
-
 #.................................................................................
 # Run Chopper
   log.info('entered Run Chopper section')
 
-
 #................................................................................
 # Setup input
 
-# vfda: nothing for now
+  found = False
+  for port in ports:
+    (portName,portType,portFile) = port
+    if portName == 'solids-input':
+      s = 'cp -f ' + inputDataFullPathFileNames[0] + ' ' + portFile
+      os.system(s)
+      log.debug(s)
+      found = True
+
+  assert found, 'Input setup failed.'
+
+  found = False
+  for port in ports:
+    (portName,portType,portFile) = port
+    if portName == 'gas-input':
+      s = 'cp -f ' + inputDataFullPathFileNames[1] + ' ' + portFile
+      os.system(s)
+      log.debug(s)
+      found = True
+
+  assert found, 'Input setup failed.'
+
+  found = False
+  for port in ports:
+    (portName,portType,portFile) = port
+    if portName == 'fines-input':
+      s = 'cp -f ' + inputDataFullPathFileNames[2] + ' ' + portFile
+      os.system(s)
+      log.debug(s)
+      found = True
+
+  assert found, 'Input setup failed.'
 
 #................................................................................
 # Create the host code          
 
-# nothing for now
-  log.info("host = Chopper( ports )")
+  host = Chopper( ports )
+  log.debug("host = Chopper( ports )")
 
 #.................................................................................
 # Evolve the chopper
@@ -156,20 +186,15 @@ class ChopperThread(Thread):
   self.__SetRuntimeStatus('running')
   log.info("SetRuntimeStatus('running')")
 
-  time.sleep(1) # fake running time for the chopper
+  facilityTime = 0.0
 
-  for port in ports:
+  while facilityTime <= evolveTime:
 
-   (portName,portType,portFile) = port
+   host.CallPorts( facilityTime )
 
-   if portName == 'Fuel_Solid':
-    s = 'cp -f ' + inputDataFullPathFileNames[0] + ' ' + portFile 
-    log.debug(s)
-    os.system(s)
-   if portName == 'Gas_Release':
-    s = 'cp -f ' + resultsDir + inputDataFullPathFileNames[1] + ' ' + portFile 
-    log.debug(s)
-    os.system(s)
+   host.Execute( facilityTime, timeStep )
+
+   facilityTime += timeStep
 
 #.................................................................................
 # Shutdown 

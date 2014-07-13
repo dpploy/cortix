@@ -139,26 +139,9 @@ class FuelAccumulationThread(Thread):
   log.debug('entered Run FuelAccumulation section')
 
 #................................................................................
-# Left here as an example; vfda
-# Setup input (this was used when debugging; need proper cortix-config.xml
+# Setup input (no input ports)
 
-# found = False
-# for port in ports:
-#  if port[0] is 'solids':
-#   print( 'cp -f ' + inputData[0] + ' ' + port[2] )
-#   os.system( 'cp -f ' + inputData[0] + ' ' + port[2] )
-#   found = True
-
-# assert found, 'Input setup failed.'
-
-# found = False
-# for port in ports:
-#  if port[0] is 'withdrawal-request':
-#   print( 'cp -f ' + inputData[1] + ' ' + port[2] )
-#   os.system( 'cp -f ' + inputData[1] + ' ' + port[2] )
-#   found = True
-
-# assert found, 'Input setup failed.'
+# vfda nothing here 
 
 #................................................................................
 # Create the host code          
@@ -177,7 +160,7 @@ class FuelAccumulationThread(Thread):
 
    host.CallPorts( facilityTime )
 
-   host.Execute( facilityTime, timeStep )
+   host.Execute( facilityTime, timeStep, evolveTime )
 
    facilityTime += timeStep
 

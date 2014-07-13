@@ -29,7 +29,7 @@ class PyPlot(object):
 
   self.__ports = ports
 
-  self.__timeSeriesData = dict(list()) # [(varName,varUnit,timeUnit,title,legend)] = (time,varValue)
+  self.__timeSeriesData = dict(list()) # [(varName,varUnit,timeUnit,title,legend)] = (time,varValue),(time,varValue),...]
 
   self.__log = logging.getLogger('pyplot')
   self.__log.info('initializing an instance of PyPlot')
@@ -39,7 +39,9 @@ class PyPlot(object):
 #---------------------------------------------------------------------------------
  def CallPorts(self, evolTime=0.0):
 
-  self.__UseData( usePortName='time-series', evolTime=evolTime  )
+  for port in self.__ports:
+   if port[1] == 'use':
+     self.__UseData( port, evolTime=evolTime  )
  
 #---------------------------------------------------------------------------------
  def Execute( self, evolTime=0.0, timeStep=1.0 ):
@@ -47,19 +49,20 @@ class PyPlot(object):
   s = 'Execute(): facility time [min] = ' + str(evolTime)
   self.__log.info(s)
 
-  if evolTime % 30.0 == 0.0: self.__PlotTimeSeries() # updata plot every 10 min
+  if evolTime % 30.0 == 0.0 and evolTime != 0.0 : 
+    self.__PlotTimeSeries() # updata plot every 30 min
 
 #---------------------------------------------------------------------------------
- def __UseData( self, usePortName=None, evolTime=0.0 ):
+ def __UseData( self, port, evolTime=0.0 ):
 
 # Access the port file
-  portFile = self.__GetPortFile( usePortName = usePortName )
+  portFile = self.__GetPortFile( usePort = port )
 
 # Get data from port files
-  if usePortName == 'time-series': self.__GetTimeSeries( portFile, evolTime )
+  if port[0] == 'time-series': self.__GetTimeSeries( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
- def __ProvideData( self, providePortName=None, evolTime=0.0 ):
+ def __ProvideData( self, port, evolTime=0.0 ):
 
 # Access the port file
   portFile = self.__GetPortFile( providePortName = providePortName )
@@ -68,16 +71,18 @@ class PyPlot(object):
 #  if providePortName == 'fuel-segments': self.__ProvideFuelSegments( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
- def __GetPortFile( self, usePortName=None, providePortName=None ):
+ def __GetPortFile( self, usePort=None, providePort=None ):
 
   portFile = None
 
-  if usePortName is not None:
+  #..........
+  # Use ports
+  #..........
+  if usePort is not None:
 
-    assert providePortName is None
+    assert providePort is None
 
-    for port in self.__ports:
-     if port[0] == usePortName and port[1] == 'use': portFile = port[2]
+    portFile = usePort[2]
 
     maxNTrials = 50
     nTrials    = 0
@@ -91,12 +96,14 @@ class PyPlot(object):
 
     assert os.path.isfile(portFile) is True, 'portFile %r not available; stop.' % portFile
 
-  if providePortName is not None:
+  #..............
+  # Provide ports
+  #..............
+  if providePort is not None:
 
-    assert usePortName is None
+    assert usePort is None
 
-    for port in self.__ports:
-     if port[0] == providePortName and port[1] == 'provide': portFile = port[2]
+    portFile = providePort[2]
 
   assert portFile is not None, 'portFile is invalid.'
 
@@ -131,10 +138,16 @@ class PyPlot(object):
     node = rootNode.find('time')
     timeUnit = node.get('unit').strip()
 
+    timeCutOff = node.get('cut-off')
+    if timeCutOff is not None: 
+      timeCutOff = float(timeCutOff.strip())
+      if evolTime > timeCutOff: return
+
     # vfda to do: fix this to allow for multiple variables!!!
     node = rootNode.find('var')
     varName = node.get('name').strip() 
     varUnit = node.get('unit').strip() 
+    varLegend = node.get('legend').strip() 
 
     nodes = rootNode.findall('timeStamp')
 
@@ -150,7 +163,7 @@ class PyPlot(object):
 
          found = True  
 
-         varSpec = (varName,varUnit,timeUnit)
+         varSpec = (varName,varUnit,timeUnit,varLegend)
 
          if timeStamp == 0.0: self.__timeSeriesData[varSpec] = list()
 
@@ -211,17 +224,32 @@ class PyPlot(object):
     varName  = varSpec[0]
     varUnit  = varSpec[1]; 
 
-    if varUnit == 'gram': 
-       varUnit = 'g'
+    if varUnit == 'gram': varUnit = 'g'
 
     timeUnit = varSpec[2]
+    varLegend = varSpec[3]
+
+    if timeUnit == 'minute': timeUnit = 'm'
 
     data = self.__timeSeriesData[varSpec]
     data = np.array(data)
-    x = data[:,0]/60.0
+
+    x = data[:,0]
+    if x.max() >= 120.0:
+      x /= 60.0
+      if timeUnit == 'm': timeUnit = 'h'
+
     y = data[:,1]
+    if y.max() >= 1000.0: 
+      y /= 1000.0
+      if varUnit == 'gram' or varUnit == 'g': 
+        varUnit = 'kg'
+    if y.max() <= .1: 
+      y *= 1000.0
+      if varUnit == 'gram' or varUnit == 'g': 
+        varUnit = 'mg'
   
-    ax.set_xlabel('Time [h]',fontsize=10)
+    ax.set_xlabel('Time ['+timeUnit+']',fontsize=10)
     ax.set_ylabel(varName+' ['+varUnit+']',fontsize=10)
 
     ymax  = y.max()
@@ -232,8 +260,8 @@ class PyPlot(object):
 
     ax.set_ylim(ymin,ymax)
 
-#  for l in axis.get_xticklabels(): l.set_fontsize('x-small')
-#  for l in axis.get_yticklabels(): l.set_fontsize('x-small')
+    for l in ax.get_xticklabels(): l.set_fontsize(10)
+    for l in ax.get_yticklabels(): l.set_fontsize(10)
 #  color  = parameters['plot-color']
 #  marker = parameters['plot-marker']+'-'
 #  axis.set_xlim(2e-3, 2)
@@ -247,7 +275,7 @@ class PyPlot(object):
 
   
     ax.plot( x, y, 's-', color='black', linewidth=0.5, markersize=2,  \
-             markeredgecolor='black' )
+             markeredgecolor='black', label=varLegend )
 #              markeredgecolor='black', label='dissolver request' )
 
 # if index == 0:
@@ -255,7 +283,7 @@ class PyPlot(object):
 #    axis.set_yscale("log")
 #    axis.plot( Q, haloI_fit, marker, color='red', linewidth=0.5, markersize=3, markeredgecolor=color, label=legend )
 
-#    ax.legend( loc='best', prop={'size':8} )
+    ax.legend( loc='best', prop={'size':8} )
 
 #  fig.show()
  

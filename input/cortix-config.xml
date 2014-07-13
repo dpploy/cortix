@@ -62,7 +62,7 @@
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
-   <evolveTime unit="hour">12.0</evolveTime>
+   <evolveTime unit="hour">22.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
@@ -95,8 +95,16 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="provide">Fuel_Solid</port>
-    <port type="provide">Gas_Release</port>
+    <port type="input">Fuel_Solid</port>
+    <port type="input">Gas_Release</port>
+    <port type="input">Particulate</port>
+    <port type="use">solids-input</port>
+    <port type="use">gas-input</port>
+    <port type="use">fines-input</port>
+    <port type="provide">solids</port>
+    <port type="provide">off-gas</port>
+    <port type="provide">fines</port>
+    <port type="provide">Xe-gas</port>
    </module>
 
    <module name="chopper-standalone" type="stand-alone">
@@ -166,6 +174,7 @@
     <port type="provide">product</port>
     <port type="provide">vapor</port>
     <port type="provide">heat</port>
+    <port type="provide">Xe-vapor</port>
    </module>
 
    <module name="dissolver-standalone" type="stand-alone">
@@ -286,11 +295,16 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModule="fuelaccumulation-native" fromPort="solids" toModule="chopper-native" toPort="Fuel_Solid"/> 
+    <connect fromModule="chopper-native" fromPort="solids-input" toModule="chopper-native" toPort="Fuel_Solid"/> 
+    <connect fromModule="chopper-native" fromPort="gas-input" toModule="chopper-native" toPort="Gas_Release"/> 
+    <connect fromModule="chopper-native" fromPort="fines-input" toModule="chopper-native" toPort="Particulate"/> 
+    <connect fromModule="fuelaccumulation-native" fromPort="solids" toModule="chopper-native" toPort="solids"/> 
     <connect fromModule="fuelaccumulation-native" fromPort="withdrawal-request" toModule="dissolver-native" toPort="solids-request"/> 
     <connect fromModule="dissolver-native" fromPort="solids" toModule="fuelaccumulation-native" toPort="fuel-segments"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="fuelaccumulation-native" toPort="mass-inventory"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="solids-request"/> 
+    <connect fromModule="pyplot-native" fromPort="time-series" toModule="chopper-native" toPort="Xe-gas"/> 
+    <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="Xe-vapor"/> 
    </network>
 
    <!-- connected modules -->
