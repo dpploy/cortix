@@ -59,6 +59,7 @@ class Dissolver(object):
   self.__UseData( usePortName='solids', evolTime=evolTime )     
 
   self.__ProvideData( providePortName='Xe-vapor', evolTime=evolTime )     
+  self.__ProvideData( providePortName='solids-load', evolTime=evolTime )     
 
 #---------------------------------------------------------------------------------
 # Evolve system from evolTime to evolTime+timeStep
@@ -94,6 +95,7 @@ class Dissolver(object):
 # Send data to port files
   if providePortName == 'solids-request': self.__ProvideSolidsRequest( portFile, evolTime )
   if providePortName == 'Xe-vapor': self.__ProvideXeVapor( portFile, evolTime )
+  if providePortName == 'solids-load': self.__ProvideSolidsLoad( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -171,6 +173,59 @@ class Dissolver(object):
     a.set('value',str(evolTime))
     if  self.__ready2LoadFuel == True:
       a.text = str(self.__solidsMassLoadMax)
+    else:
+      a.text = '0'
+
+    rootNode.append(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+
+  return 
+
+#---------------------------------------------------------------------------------
+ def __ProvideSolidsLoad( self, portFile, evolTime ):
+ 
+  gDec = self.__gramDecimals
+
+  # if the first time step, write the header of a time-series data file
+  if evolTime == 0.0:
+
+    fout = open( portFile, 'w')
+
+    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
+    s = '<time-series name="solids-load-dissolver">\n'; fout.write(s) 
+    s = ' <comment author="cortix.modules.native.dissolver" version="0.1"/>\n'; fout.write(s)
+    today = datetime.datetime.today()
+    s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
+    s = ' <time unit="minute"/>\n'; fout.write(s)
+    s = ' <var name="Fuel Loaded" unit="gram" legend="dissolver"/>\n'; fout.write(s)
+
+    s = '__ProvideSolidsLoad(): evolTime = '+str(evolTime)
+    self.__log.debug(s)
+    s = '__ProvideSolidsLoad(): ready to load = '+str(self.__ready2LoadFuel)
+    self.__log.debug(s)
+
+    if self.__GetFuelLoadMass() is not None:
+      (mass,unit) = self.__GetFuelLoadMass()
+    else:
+      mass = 0.0
+ 
+    s = ' <timeStamp value="'+str(evolTime)+'">'+str(round(mass,gDec))+'</timeStamp>\n';fout.write(s)
+
+    s = '</time-series>\n'; fout.write(s)
+    fout.close()
+
+  # if not the first time step then parse the existing history file and append
+  else:
+
+    tree = ElementTree.parse( portFile )
+    rootNode = tree.getroot()
+    a = ElementTree.Element('timeStamp')
+    a.set('value',str(evolTime))
+
+    if self.__GetFuelLoadMass() is not None:
+      (mass,unit) = self.__GetFuelLoadMass()
+      a.text = str(round(mass,gDec))
     else:
       a.text = '0'
 
@@ -328,7 +383,7 @@ class Dissolver(object):
   mass = 0.0
   massUnit = 'null'
 
-  if self.__fuelSegmentsLoad is None: return
+  if self.__fuelSegmentsLoad is None: return None
 
   segmentsGeoData = self.__fuelSegmentsLoad[0]
   for segmentData in segmentsGeoData:
@@ -345,7 +400,7 @@ class Dissolver(object):
   volume = 0.0
   volumeUnit = 'null'
 
-  if self.__fuelSegmentsLoad is None: return
+  if self.__fuelSegmentsLoad is None: return None
 
   segmentsGeoData = self.__fuelSegmentsLoad[0]
   for segmentData in segmentsGeoData:

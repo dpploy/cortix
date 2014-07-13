@@ -164,7 +164,13 @@ class Scrubber(object):
     timeCutOff = node.get('cut-off')
     if timeCutOff is not None: 
       timeCutOff = float(timeCutOff.strip())
-      if evolTime > timeCutOff: return
+      if evolTime > timeCutOff: 
+        if inflowGasName == 'XeGas-chopper':
+          self.__historyXeMassInflowGas[0][ evolTime ] = 0.0
+
+        if inflowGasName  == 'XeGas-condenser':
+          self.__historyXeMassInflowGas[1][ evolTime ] = 0.0
+        return
 
     # vfda to do: check for single var element
     node = rootNode.find('var')

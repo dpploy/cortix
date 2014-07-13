@@ -355,15 +355,15 @@ class Chopper(object):
   durationNode = rootNode.find('Duration')
 
   timeStep = float(durationNode.get('timeStep'))
-  s = '__GetSolids(): timeStep='+str(timeStep)
+  s = '__GetXeMassGas(): timeStep='+str(timeStep)
   self.__log.debug(s)
 
   streamNode = rootNode.find('Stream')
-  s = '__GetSolids(): streamNode='+streamNode.get('name')
+  s = '__GetXeMassGas(): streamNode='+streamNode.get('name')
   self.__log.debug(s)
  
   timeNodes = streamNode.findall('Time')
-  s = '__GetSolids(): # time nodes ='+str(len(timeNodes))
+  s = '__GetXeMassGas(): # time nodes ='+str(len(timeNodes))
   self.__log.debug(s)
 
 #.................................................................................
@@ -399,15 +399,15 @@ class Chopper(object):
   durationNode = rootNode.find('Duration')
 
   timeStep = float(durationNode.get('timeStep'))
-  s = '__GetSolids(): timeStep='+str(timeStep)
+  s = '__GetEndDutyTime(): timeStep='+str(timeStep)
   self.__log.debug(s)
 
   streamNode = rootNode.find('Stream')
-  s = '__GetSolids(): streamNode='+streamNode.get('name')
+  s = '__GetEndDutyTime(): streamNode='+streamNode.get('name')
   self.__log.debug(s)
  
   timeNodes = streamNode.findall('Time')
-  s = '__GetSolids(): # time nodes ='+str(len(timeNodes))
+  s = '__GetEndDutyTime(): # time nodes ='+str(len(timeNodes))
   self.__log.debug(s)
 
 #.................................................................................
