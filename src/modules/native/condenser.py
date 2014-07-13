@@ -197,12 +197,12 @@ class Condenser(object):
     fout = open( portFile, 'w')
 
     s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-series name="XeVapor">\n'; fout.write(s) 
+    s = '<time-series name="XeGas-condenser">\n'; fout.write(s) 
     s = ' <comment author="cortix.modules.native.condenser" version="0.1"/>\n'; fout.write(s)
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Xe Gas Flow" unit="gram" legend="condenser"/>\n'; fout.write(s)
+    s = ' <var name="Xe Off-Gas Flow" unit="gram" legend="condenser"/>\n'; fout.write(s)
     mass = 0.0
     s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
 

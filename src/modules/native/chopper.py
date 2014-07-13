@@ -313,7 +313,7 @@ class Chopper(object):
     fout = open( portFile, 'w')
 
     s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-series name="XeGas">\n'; fout.write(s) 
+    s = '<time-series name="XeGas-chopper">\n'; fout.write(s) 
     s = ' <comment author="cortix.modules.native.chopper" version="0.1"/>\n'; fout.write(s)
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)

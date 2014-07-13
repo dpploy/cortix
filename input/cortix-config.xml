@@ -228,6 +228,19 @@
     <port type="provide">cooling</port>
    </module>
 
+   <module name="scrubber-native" type="native">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <inputFileName>scrubber.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
+    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
+    <!-- The *input* type allows for module self-connection; see network section  -->
+    <port type="use">inflow-gas</port>
+    <port type="provide">off-gas</port>
+   </module>
+
    <module name="pyplot-native" type="native">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
@@ -302,11 +315,14 @@
     <connect fromModule="fuelaccumulation-native" fromPort="withdrawal-request" toModule="dissolver-native" toPort="solids-request"/> 
     <connect fromModule="dissolver-native" fromPort="solids" toModule="fuelaccumulation-native" toPort="fuel-segments"/> 
     <connect fromModule="condenser-native" fromPort="vapor" toModule="dissolver-native" toPort="Xe-vapor"/> 
+    <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="condenser-native" toPort="off-gas"/> 
+    <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="chopper-native" toPort="Xe-gas"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="fuelaccumulation-native" toPort="mass-inventory"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="solids-request"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="chopper-native" toPort="Xe-gas"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="Xe-vapor"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="condenser-native" toPort="off-gas"/> 
+    <connect fromModule="pyplot-native" fromPort="time-series" toModule="scrubber-native" toPort="off-gas"/> 
    </network>
 
    <!-- connected modules -->

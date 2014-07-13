@@ -40,8 +40,8 @@ class PyPlot(object):
  def CallPorts(self, evolTime=0.0):
 
   for port in self.__ports:
-   if port[1] == 'use':
-     self.__UseData( port, evolTime=evolTime  )
+    if port[1] == 'use':
+      self.__UseData( port, evolTime=evolTime  )
  
 #---------------------------------------------------------------------------------
  def Execute( self, evolTime=0.0, timeStep=1.0 ):

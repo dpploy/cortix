@@ -30,8 +30,12 @@ class Scrubber(object):
 
   self.__ports = ports
 
-  self.__historyXeMassVapor = dict()
-  self.__historyXeMassGas   = dict()
+  # hardwired for two inflows; fix this later
+  self.__historyXeMassInflowGas = list()
+  self.__historyXeMassInflowGas.append(dict())
+  self.__historyXeMassInflowGas.append(dict())
+
+  self.__historyXeMassOffGas = dict()
 
   self.__log = logging.getLogger('scrubber')
   self.__log.info('initializing an instance of Scrubber')
@@ -42,9 +46,12 @@ class Scrubber(object):
 #---------------------------------------------------------------------------------
  def CallPorts( self, evolTime=0.0 ):
 
-  self.__UseData( usePortName='vapor', evolTime=evolTime )     
+  for port in self.__ports:
+    (portName,portType,portFile) = port
+    if portName == 'inflow-gas' and portType == 'use': 
+      self.__UseData( port, evolTime=evolTime )     
 
-  self.__ProvideData( providePortName='off-gas', evolTime=evolTime )     
+  self.__ProvideData( port, evolTime=evolTime )     
 
 #---------------------------------------------------------------------------------
 # Evolve system from evolTime to evolTime+timeStep
@@ -53,43 +60,39 @@ class Scrubber(object):
   s = 'Execute(): facility time [min] = ' + str(evolTime)
   self.__log.info(s)
 
-  self.__Condense( evolTime, timeStep ) # starting at evolTime to evolTime + timeStep
+  self.__Scrub( evolTime, timeStep ) # starting at evolTime to evolTime + timeStep
  
 #---------------------------------------------------------------------------------
- def __UseData( self, usePortName=None, evolTime=0.0 ):
+ def __UseData( self, port, evolTime=0.0 ):
 
 # Access the port file
-  portFile = self.__GetPortFile( usePortName = usePortName )
+  portFile = self.__GetPortFile( usePort = port )
 
 # Get data from port files
-  if usePortName == 'vapor': self.__GetVapor( portFile, evolTime )
+  if port[0] == 'inflow-gas': self.__GetInflowGas( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
- def __ProvideData( self, providePortName=None, evolTime=0.0 ):
+ def __ProvideData( self, port=None, evolTime=0.0 ):
 
 # Access the port file
-  portFile = self.__GetPortFile( providePortName = providePortName )
+  portFile = self.__GetPortFile( providePort = port )
 
 # Send data to port files
-  if providePortName == 'off-gas': self.__ProvideXeGas( portFile, evolTime )
+  if port[0] == 'off-gas': self.__ProvideXeGas( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
- def __GetPortFile( self, usePortName=None, providePortName=None ):
+ def __GetPortFile( self, usePort=None, providePort=None ):
 
   portFile = None
 
   #..........
   # Use ports
   #..........
-  if usePortName is not None:
+  if usePort is not None:
 
-    assert providePortName is None
+    assert providePort is None
 
-    for port in self.__ports:
-      (portName,portType,thisPortFile) = port
-      if portName == usePortName and portType == 'use': portFile = thisPortFile
-
-    assert portFile is not None
+    portFile = usePort[2]
 
     maxNTrials = 50
     nTrials    = 0
@@ -105,53 +108,54 @@ class Scrubber(object):
   #..............
   # Provide ports
   #..............
-  if providePortName is not None:
+  if providePort is not None:
 
-    assert usePortName is None
+    assert usePort is None
 
-    for port in self.__ports:
-      (portName,portType,thisPortFile) = port
-      if portName == providePortName and portType == 'provide': portFile = thisPortFile
+    portFile = providePort[2]
 
-    assert portFile is not None, 'portFile is invalid.'
+  assert portFile is not None, 'portFile is invalid.'
 
   return portFile
 
 #---------------------------------------------------------------------------------
- def __Condense( self, evolTime, timeStep ):
+ def __Scrub( self, evolTime, timeStep ):
 
   gDec = self.__gramDecimals 
 
   sorbed = random.random() * 0.10
 
-  massXeVapor = self.__historyXeMassVapor[ evolTime ]  
+  massXeInflowGas  = self.__historyXeMassInflowGas[0][ evolTime ]  
+  massXeInflowGas += self.__historyXeMassInflowGas[1][ evolTime ]  
 
-  self.__historyXeMassGas[ evolTime + timeStep ] = massXeVapor * (1.0 - sorbed)
+  self.__historyXeMassOffGas[ evolTime + timeStep ] = massXeInflowGas * (1.0 - sorbed)
 
-  s = '__Condense(): condensed '+str(round(massXeVapor*sorbed,gDec))+' [g] at ' + str(evolTime)+' [min]'
+  s = '__Scrub(): scrubbed '+str(round(massXeInflowGas*sorbed,gDec))+' [g] at ' + str(evolTime)+' [min]'
   self.__log.info(s)
 
   return
 
 #---------------------------------------------------------------------------------
- def __GetVapor( self, portFile, evolTime ):
+ def __GetInflowGas( self, portFile, evolTime ):
 
   found = False
 
   while found is False:
 
-    s = '__GetVapor(): checking for vapor at '+str(evolTime)
+    s = '__GetInflowGas(): checking for inflow gas at '+str(evolTime)+' in '+portFile
     self.__log.debug(s)
 
     try:
       tree = ElementTree.parse( portFile )
     except ElementTree.ParseError as error:
-      s = '__GetVapor(): '+portFile+' unavailable. Error code: '+str(error.code)+' File position: '+str(error.position)+'. Retrying...'
+      s = '__GetInflowGas(): '+portFile+' unavailable. Error code: '+str(error.code)+' File position: '+str(error.position)+'. Retrying...'
       self.__log.debug(s)
       continue
 
     rootNode = tree.getroot()
     assert rootNode.tag == 'time-series', 'invalid format.' 
+
+    inflowGasName = rootNode.get('name')
 
     node = rootNode.find('time')
     timeUnit = node.get('unit').strip()
@@ -159,7 +163,7 @@ class Scrubber(object):
 
     # vfda to do: check for single var element
     node = rootNode.find('var')
-    assert node.get('name').strip() == 'Xe Vapor Flow', 'invalid variable.'
+    assert node.get('name').strip() == 'Xe Off-Gas Flow', 'invalid variable.'
     assert node.get('unit').strip() == 'gram', 'invalid mass unit'
 
     nodes = rootNode.findall('timeStamp')
@@ -175,9 +179,14 @@ class Scrubber(object):
 
          mass = 0.0
          mass = float(n.text.strip())
-         self.__historyXeMassVapor[ evolTime ] = mass
+          
+         if inflowGasName == 'XeGas-chopper':
+            self.__historyXeMassInflowGas[0][ evolTime ] = mass
 
-         s = '__GetVapor(): received vapor at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
+         if inflowGasName  == 'XeGas-condenser':
+            self.__historyXeMassInflowGas[1][ evolTime ] = mass
+
+         s = '__GetInflowGas(): received inflow gas '+inflowGasName+' at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
          self.__log.debug(s)
 
     # end for n in nodes:
@@ -197,12 +206,12 @@ class Scrubber(object):
     fout = open( portFile, 'w')
 
     s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-series name="XeVapor">\n'; fout.write(s) 
+    s = '<time-series name="XeGas-scrubber">\n'; fout.write(s) 
     s = ' <comment author="cortix.modules.native.scrubber" version="0.1"/>\n'; fout.write(s)
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Xe Gas Flow" unit="gram" legend="scrubber"/>\n'; fout.write(s)
+    s = ' <var name="Xe Off-Gas Flow" unit="gram" legend="scrubber"/>\n'; fout.write(s)
     mass = 0.0
     s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
 
@@ -217,8 +226,8 @@ class Scrubber(object):
     a = ElementTree.Element('timeStamp')
     a.set('value',str(evolTime))
     gDec = self.__gramDecimals
-    if len(self.__historyXeMassGas.keys()) > 0:
-      mass = round(self.__historyXeMassGas[evolTime],gDec)
+    if len(self.__historyXeMassOffGas.keys()) > 0:
+      mass = round(self.__historyXeMassOffGas[evolTime],gDec)
     else:
       mass = 0.0
     a.text = str(mass)
