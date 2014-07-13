@@ -216,7 +216,7 @@ class PyPlot(object):
   axes = np.array(axlst)
   axes = np.array(axlst)
 
-  text = 'Cortix::PyPlot Module'
+  text = 'Cortix.Modules.Native.PyPlot: Time-Sequence Data'
   fig.text(.5,.95,text,horizontalalignment='center',fontsize=16)
 
   for (varSpec,ax) in zip( self.__timeSeriesData , axes.flat ):

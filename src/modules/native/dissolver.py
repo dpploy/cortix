@@ -42,8 +42,8 @@ class Dissolver(object):
 
 #  self.__stateHistory = list(dict())
 
-  self.__historyXeMassVapor = dict()
-  self.__gasSpeciesFuelLoad = dict()
+  self.__historyXeMassVapor = dict()  # this is a persistent variable
+  self.__gasSpeciesFuelLoad = None    # this is also a control variable
 
   self.__log = logging.getLogger('dissolver')
   self.__log.info('initializing an instance of Dissolver')
@@ -426,7 +426,9 @@ class Dissolver(object):
     s = '__Dissolve(): begin dissolving...' 
     self.__log.info(s)
 
+    #................................................
     self.__UpdateStateVariables( evolTime, timeStep )
+    #................................................
 
   #.....................
   # continue dissolving
@@ -436,7 +438,9 @@ class Dissolver(object):
     s = '__Dissolve(): continue dissolving...' 
     self.__log.info(s)
 
+    #................................................
     self.__UpdateStateVariables( evolTime, timeStep )
+    #................................................
   
     if  evolTime + timeStep >= self.__startDissolveTime + self.__dutyPeriod: # time for new load
 
@@ -446,40 +450,50 @@ class Dissolver(object):
       self.__ready2LoadFuel   = True
       self.__loadedFuelMass   = None
       self.__loadedFuelVolume = None
+      self.__gasSpeciesFuelLoad = None
 
   #.............................
   # do nothing in this time step
   #.............................
   else: 
 
-      s = '__Dissolve(): idle at ' + str(evolTime)+' [min]'
-      self.__log.info(s)
+    s = '__Dissolve(): idle and ready ' + str(evolTime)+' [min]'
+    self.__log.info(s)
+
+    #................................................
+    self.__UpdateStateVariables( evolTime, timeStep )
+    #................................................
 
   return
 
 #---------------------------------------------------------------------------------
  def __UpdateStateVariables( self, evolTime, timeStep ):
   
-  (massXe, massXeUnit) = self.__gasSpeciesFuelLoad['Xe'] 
+  if self.__gasSpeciesFuelLoad is not None:
 
-# place holder for evolving Xe in dissolution; 
-# modeling as a log-normal distribution with positive skewness (right-skewness)
-#
-  t0 = self.__startDissolveTime 
-  tf = t0 + self.__dutyPeriod
-  sigma = 0.7
-  mean = math.log(10) + sigma**2
+    (massXe, massXeUnit) = self.__gasSpeciesFuelLoad['Xe'] 
+    # place holder for evolving Xe in dissolution; 
+    # modeling as a log-normal distribution with positive skewness (right-skewness)
+    #
+    t0 = self.__startDissolveTime 
+    tf = t0 + self.__dutyPeriod
+    sigma = 0.7
+    mean = math.log(10) + sigma**2
 
-  variability = 1.0 - random.random() * 0.15
+    variability = 1.0 - random.random() * 0.15
 
-  t = evolTime - t0
-  if t == 0: 
-    logNormalPDF = 0.0
+    t = evolTime - t0
+    if t == 0: 
+      logNormalPDF = 0.0
+    else:
+      logNormalPDF = 1.0/t/sigma/math.sqrt(2.0*math.pi) * \
+                   math.exp( - (math.log(t) - mean)**2 / 2/ sigma**2 )
+
+    self.__historyXeMassVapor[ evolTime+timeStep ] = massXe * logNormalPDF * variability
+
   else:
-    logNormalPDF = 1.0/t/sigma/math.sqrt(2.0*math.pi) * \
-                 math.exp( - (math.log(t) - mean)**2 / 2/ sigma**2 )
 
-  self.__historyXeMassVapor[evolTime+timeStep] = massXe * logNormalPDF * variability
+    self.__historyXeMassVapor[ evolTime+timeStep ] = 0.0
 
 #---------------------------------------------------------------------------------
  def __ProvideXeVapor( self, portFile, evolTime ):

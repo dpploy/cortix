@@ -301,6 +301,7 @@
     <connect fromModule="fuelaccumulation-native" fromPort="solids" toModule="chopper-native" toPort="solids"/> 
     <connect fromModule="fuelaccumulation-native" fromPort="withdrawal-request" toModule="dissolver-native" toPort="solids-request"/> 
     <connect fromModule="dissolver-native" fromPort="solids" toModule="fuelaccumulation-native" toPort="fuel-segments"/> 
+<!--    <connect fromModule="condenser-native" fromPort="vapor" toModule="dissolver-native" toPort="Xe-vapor"/> -->
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="fuelaccumulation-native" toPort="mass-inventory"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="solids-request"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="chopper-native" toPort="Xe-gas"/> 
