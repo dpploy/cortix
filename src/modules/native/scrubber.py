@@ -2,9 +2,9 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native Condenser module 
+Cortix native Scrubber module 
 
-Tue Jun 24 01:03:45 EDT 2014
+Sun Jul 13 15:31:30 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
@@ -14,7 +14,7 @@ import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
-class Condenser(object):
+class Scrubber(object):
 
 # Private member data
 # __slots__ = [
@@ -33,8 +33,8 @@ class Condenser(object):
   self.__historyXeMassVapor = dict()
   self.__historyXeMassGas   = dict()
 
-  self.__log = logging.getLogger('condenser')
-  self.__log.info('initializing an instance of Condenser')
+  self.__log = logging.getLogger('scrubber')
+  self.__log.info('initializing an instance of Scrubber')
 
   self.__gramDecimals = 3 # milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
@@ -198,11 +198,11 @@ class Condenser(object):
 
     s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
     s = '<time-series name="XeVapor">\n'; fout.write(s) 
-    s = ' <comment author="cortix.modules.native.condenser" version="0.1"/>\n'; fout.write(s)
+    s = ' <comment author="cortix.modules.native.scrubber" version="0.1"/>\n'; fout.write(s)
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Xe Gas Flow" unit="gram" legend="condenser"/>\n'; fout.write(s)
+    s = ' <var name="Xe Gas Flow" unit="gram" legend="scrubber"/>\n'; fout.write(s)
     mass = 0.0
     s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
 
@@ -230,6 +230,6 @@ class Condenser(object):
   return 
 
 #*********************************************************************************
-# Usage: -> python condenser.py
+# Usage: -> python scrubber.py
 if __name__ == "__main__":
- print('Unit testing for Condenser')
+ print('Unit testing for Scrubber')

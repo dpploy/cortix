@@ -62,7 +62,7 @@ class Dissolver(object):
 
 #---------------------------------------------------------------------------------
 # Evolve system from evolTime to evolTime+timeStep
- def Execute( self, evolTime=1.0, timeStep=1.0 ):
+ def Execute( self, evolTime=0.0, timeStep=1.0 ):
 
   s = 'Execute(): facility time [min] = ' + str(evolTime)
   self.__log.info(s)

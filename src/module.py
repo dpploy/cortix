@@ -13,6 +13,8 @@ from src.configtree import ConfigTree
 from src.modules.native.chopperthread import ChopperThread
 from src.modules.native.fuelaccumulationthread import FuelAccumulationThread
 from src.modules.native.dissolverthread import DissolverThread
+from src.modules.native.condenserthread import CondenserThread
+from src.modules.native.scrubberthread import ScrubberThread
 from src.modules.native.pyplotthread import PyPlotThread
 #*********************************************************************************
 
@@ -116,6 +118,12 @@ class Module(object):
        t.start()
     if name == 'dissolver-native':        
        t = DissolverThread( input, param, comm, status )
+       t.start()
+    if name == 'condenser-native':        
+       t = CondenserThread( input, param, comm, status )
+       t.start()
+    if name == 'scrubber-native':        
+       t = ScrubberThread( input, param, comm, status )
        t.start()
     if name == 'pyplot-native':        
        t = PyPlotThread( input, param, comm, status )

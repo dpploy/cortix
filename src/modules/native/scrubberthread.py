@@ -2,20 +2,20 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native Condenser module thread
+Cortix native Scrubber module thread
 
-Sun Jul 13 15:31:02 EDT 2014
+Sun Jul 13 15:30:50 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
-from src.modules.native.condenser import Condenser
+from src.modules.native.scrubber import Scrubber
 #*********************************************************************************
 
 #*********************************************************************************
-class CondenserThread(Thread):
+class ScrubberThread(Thread):
                      
  def __init__( self, inputFullPathFileName, 
                      cortexParamFullPathFileName,
@@ -27,18 +27,18 @@ class CondenserThread(Thread):
     self.__cortexCommFullPathFileName    = cortexCommFullPathFileName 
     self.__runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
 
-    super(CondenserThread, self).__init__()
+    super(ScrubberThread, self).__init__()
 
 #---------------------------------------------------------------------------------
  def run(self):
 
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
-  log = logging.getLogger('condenser')
+  log = logging.getLogger('scrubber')
   log.setLevel(logging.DEBUG)
 # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'condenser.log')
+  fh = logging.FileHandler(fullPathTaskDir+'scrubber.log')
   fh.setLevel(logging.DEBUG)
 # create console handler with a higher log level
   ch = logging.StreamHandler()
@@ -129,8 +129,8 @@ class CondenserThread(Thread):
 # runtimeStatusFullPathFileName = argv[4]
 
 #---------------------------------------------------------------------------------
-# Run Condenser
-  log.info('entered Run Condenser section')
+# Run Scrubber     
+  log.info('entered Run Scrubber section')
 
 #.................................................................................
 # Setup input
@@ -139,11 +139,11 @@ class CondenserThread(Thread):
 
 #.................................................................................
 # Create the host code             
-  host = Condenser( ports )
-  log.info("host = Condenser( ports )")
+  host = Scrubber( ports )
+  log.info("host = Scrubber( ports )")
 
 #.................................................................................
-# Evolve the condenser
+# Evolve the scrubber   
  
   self.__SetRuntimeStatus('running')  
   log.info("SetRuntimeStatus('running')")
@@ -172,7 +172,7 @@ class CondenserThread(Thread):
 
   fout = open( self.__runtimeStatusFullPathFileName,'w' )
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by CondenserThread.py -->\n'; fout.write(s)
+  s = '<!-- Written by Scrubber.py -->\n'; fout.write(s)
   today = datetime.datetime.today()
   s = '<!-- '+str(today)+' -->\n'; fout.write(s)
   s = '<runtime>\n'; fout.write(s)
@@ -181,7 +181,6 @@ class CondenserThread(Thread):
   fout.close()
 
 #*********************************************************************************
-# Usage: -> python codenserthread.py or ./condenserthread.py
+# Usage: -> python codenserthread.py or ./scrubberthread.py
 if __name__ == "__main__":
-   CondenserThread()
-
+   ScrubberThread()
