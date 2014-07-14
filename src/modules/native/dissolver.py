@@ -93,9 +93,12 @@ class Dissolver(object):
   portFile = self.__GetPortFile( providePortName = providePortName )
 
 # Send data to port files
-  if providePortName == 'solids-request': self.__ProvideSolidsRequest( portFile, evolTime )
-  if providePortName == 'Xe-vapor': self.__ProvideXeVapor( portFile, evolTime )
-  if providePortName == 'solids-load': self.__ProvideSolidsLoad( portFile, evolTime )
+  if providePortName == 'solids-request' and portFile is not None: 
+    self.__ProvideSolidsRequest( portFile, evolTime )
+  if providePortName == 'Xe-vapor' and portFile is not None: 
+    self.__ProvideXeVapor( portFile, evolTime )
+  if providePortName == 'solids-load' and portFile is not None: 
+    self.__ProvideSolidsLoad( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -129,8 +132,6 @@ class Dissolver(object):
     for port in self.__ports:
      if port[0] == providePortName and port[1] == 'provide': portFile = port[2]
  
-  assert portFile is not None, 'portFile %r is invalid.' % portFile
-
   return portFile
 
 #---------------------------------------------------------------------------------

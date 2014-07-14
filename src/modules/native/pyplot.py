@@ -74,9 +74,6 @@ class PyPlot(object):
 # Access the port file
   portFile = self.__GetPortFile( providePortName = providePortName )
 
-# Send data to port files
-#  if providePortName == 'fuel-segments': self.__ProvideFuelSegments( portFile, evolTime )
-
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePort=None, providePort=None ):
 
@@ -266,7 +263,7 @@ class PyPlot(object):
 
   assert nVariables <= 9, 'exceeded # of variables'
 
-  fig = plt.figure()
+  fig = plt.figure('time-series')
 
   gs = gridspec.GridSpec(3,3)
   gs.update(left=0.08,right=0.98,wspace=0.4,hspace=0.4)
@@ -354,7 +351,7 @@ class PyPlot(object):
   # end of for (varSpec,ax) in zip( self.__timeSeriesData , axes.flat ):
 
   fig.savefig('pyplot-timeseries.png',dpi=200,fomat='png')
-  plt.close('all')
+  plt.close('time-series')
 
 #---------------------------------------------------------------------------------
  def __PlotTimeTables( self ):
@@ -372,7 +369,7 @@ class PyPlot(object):
 
 #  assert nVariables <= 9, 'exceeded # of variables'
 
-  fig = plt.figure()
+  fig = plt.figure('time-tables')
 
   gs = gridspec.GridSpec(2,2)
   gs.update(left=0.1,right=0.98,wspace=0.4,hspace=0.4)
@@ -463,7 +460,7 @@ class PyPlot(object):
   # end of for (varSpec,ax) in zip( self.__timeSeriesData , axes.flat ):
 
   fig.savefig('pyplot-timetables.png',dpi=200,fomat='png')
-  plt.close('all')
+  plt.close('time-tables')
 
 #*********************************************************************************
 # Usage: -> python pyplot.py

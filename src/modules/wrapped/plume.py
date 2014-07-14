@@ -73,7 +73,8 @@ class Plume(object):
   portFile = self.__GetPortFile( providePortName = providePortName )
 
 # Send data to port files
-  if providePortName == 'time-puff': self.__ProvidePuff( portFile, evolTime )
+  if providePortName == 'time-puff' and portFile is not None: 
+     self.__ProvidePuff( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -115,8 +116,6 @@ class Plume(object):
       (portName,portType,thisPortFile) = port
       if portName == providePortName and portType == 'provide': portFile = thisPortFile
 
-    assert portFile is not None, 'portFile is invalid.'
-
   return portFile
 
 #---------------------------------------------------------------------------------
@@ -124,13 +123,15 @@ class Plume(object):
 
   inputFile = '/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/plume.input'
   
-  self.__WritePlumeInput( inputFile, evolTime )
+  self.__WritePlumeInputFile( inputFile, evolTime )
 
   outputFile = '/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/plume.output'
 
   hostExec = '/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/facility_pfpl/pfpl'
   
-  os.system( 'time '+ hostExec + ' ' + inputFile + ' ' + outputFile + ' &' )
+  # run via system level command (don't put it on the background)
+  os.system( 'time '+ hostExec + ' ' + inputFile + ' ' + outputFile )
+
 
   s = '__Puff(): done puffing at ' + str(evolTime)+' [min]'
   self.__log.info(s)
@@ -207,15 +208,15 @@ class Plume(object):
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     s = ' <timeStamp unit="minute" value="'+str(evolTime)+'">\n';fout.write(s)
 
-    s = '  <column name="Plume Distance" unit="km" legend="plume">0.0</column>\n'; fout.write(s)
+    s = '  <column name="Xe Plume Distance" unit="km" legend="plume">0.0</column>\n'; fout.write(s)
 
-    s = '  <column name="Plume 1/2 Width" unit="km" legend="plume">0.0</column>\n'; fout.write(s)
+    s = '  <column name="Xe Plume 1/2 Width" unit="km" legend="plume">0.0</column>\n'; fout.write(s)
 
-    s = '  <column name="Plume 1/2 Height" unit="km" legend="plume">0.0</column>\n'; fout.write(s)
+    s = '  <column name="Xe Plume 1/2 Height" unit="km" legend="plume">0.0</column>\n'; fout.write(s)
 
-    s = '  <column name="Center Line Conc." unit="pCi/m3" legend="center line">0.0</column>\n'; fout.write(s)
+    s = '  <column name="Xe Center Line Conc." unit="pCi/m3" legend="center line">0.0</column>\n'; fout.write(s)
 
-    s = '  <column name="2 Sigma Conc." unit="pCi/m3" legend="2 sigma">0.0</column>\n'; fout.write(s)
+    s = '  <column name="Xe 2 x Sigma Conc." unit="pCi/m3" legend="2 sigma">0.0</column>\n'; fout.write(s)
 
     s = ' </timeStamp>\n'; fout.write(s)
     s = '</time-tables>\n'; fout.write(s)
@@ -225,8 +226,6 @@ class Plume(object):
   else:
 
     outputFile = '/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/plume.output'
-
-    time.sleep(1)
 
     data = pandas.read_fwf(outputFile,skiprows=9,nrows=119,widths=[16,8,7,7,11,11,11,7],names=['A','Distance [km]','1/2 Width [km]','1/2 Height [km]','Center Conc. [pCi/m3]','2Sigma Center Conc. [pCi/m3]','G','H'])
 
@@ -238,7 +237,7 @@ class Plume(object):
     a.set('unit',"minute")
 
     b = ElementTree.SubElement(a, 'column')
-    b.set('name','Plume Distance')
+    b.set('name','Xe Plume Distance')
     b.set('unit','km')
     b.set('legend','plume')
     s = ''
@@ -248,7 +247,7 @@ class Plume(object):
     b.text = s
 
     c = ElementTree.SubElement(a, 'column')
-    c.set('name','Plume 1/2 Width')
+    c.set('name','Xe Plume 1/2 Width')
     c.set('unit','km')
     c.set('legend','plume')
     s = ''
@@ -258,7 +257,7 @@ class Plume(object):
     c.text = s
 
     d = ElementTree.SubElement(a, 'column')
-    d.set('name','Plume 1/2 Height')
+    d.set('name','Xe Plume 1/2 Height')
     d.set('unit','km')
     d.set('legend','plume')
     s = ''
@@ -268,7 +267,7 @@ class Plume(object):
     d.text = s
 
     e = ElementTree.SubElement(a, 'column')
-    e.set('name','Center Line Conc.')
+    e.set('name','Xe Center Line Conc.')
     e.set('unit','pCi/m3')
     e.set('legend','center line')
     s = ''
@@ -278,7 +277,7 @@ class Plume(object):
     e.text = s
 
     f = ElementTree.SubElement(a, 'column')
-    f.set('name','2 Sigma Conc.')
+    f.set('name','Xe 2 x Sigma Conc.')
     f.set('unit','pCi/m3')
     f.set('legend','2 sigma')
     s = ''
@@ -294,7 +293,7 @@ class Plume(object):
   return 
 
 #---------------------------------------------------------------------------------
- def __WritePlumeInput( self, inputFile, evolTime ):
+ def __WritePlumeInputFile( self, inputFile, evolTime ):
 
   fout = open( inputFile, 'w')
 

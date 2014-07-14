@@ -50,7 +50,7 @@ class Chopper(object):
 
   self.__ProvideData( providePortName='solids', evolTime=evolTime )
   self.__ProvideData( providePortName='Xe-gas', evolTime=evolTime )
-#  self.__ProvideData( providePortName='fines', evolTime=evolTime )
+  self.__ProvideData( providePortName='fines', evolTime=evolTime )
 
 #---------------------------------------------------------------------------------
  def Execute( self, evolTime=0.0, timeStep=1.0 ):
@@ -81,10 +81,11 @@ class Chopper(object):
   portFile = self.__GetPortFile( providePortName = providePortName )
 
 # Send data to port files
-  if providePortName == 'solids': self.__ProvideSolids( portFile, evolTime )
-  if providePortName == 'off-gas': self.__ProvideOffGas( portFile, evolTime )
-  if providePortName == 'fines': self.__ProvideFines( portFile, evolTime )
-  if providePortName == 'Xe-gas': self.__ProvideXeGas( portFile, evolTime )
+  if portFile is not None:
+    if providePortName == 'solids': self.__ProvideSolids( portFile, evolTime )
+    if providePortName == 'off-gas': self.__ProvideOffGas( portFile, evolTime )
+    if providePortName == 'fines': self.__ProvideFines( portFile, evolTime )
+    if providePortName == 'Xe-gas': self.__ProvideXeGas( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -125,8 +126,6 @@ class Chopper(object):
     for port in self.__ports:
       (portName,portType,thisPortFile) = port
       if portName == providePortName and portType == 'provide': portFile = thisPortFile
-
-    assert portFile is not None, 'portFile is invalid.'
 
   return portFile
 

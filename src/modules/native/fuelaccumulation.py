@@ -75,8 +75,10 @@ class FuelAccumulation(object):
   portFile = self.__GetPortFile( providePortName = providePortName )
 
 # Send data to port files
-  if providePortName == 'fuel-segments': self.__ProvideFuelSegmentsOnDemand( portFile, evolTime, evolveTime )
-  if providePortName == 'mass-inventory': self.__ProvideMassInventory( portFile, evolTime, evolveTime )
+  if providePortName == 'fuel-segments' and portFile is not None: 
+     self.__ProvideFuelSegmentsOnDemand( portFile, evolTime, evolveTime )
+  if providePortName == 'mass-inventory' and portFile is not None:
+     self.__ProvideMassInventory( portFile, evolTime, evolveTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -113,10 +115,6 @@ class FuelAccumulation(object):
 
     for port in self.__ports:
      if port[0] == providePortName and port[1] == 'provide': portFile = port[2]
-
-
-  assert portFile is not None, 'portFile is invalid.'
-
 
   return portFile
 
