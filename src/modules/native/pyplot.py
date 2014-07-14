@@ -29,7 +29,9 @@ class PyPlot(object):
 
   self.__ports = ports
 
-  self.__timeSeriesData = dict(list()) # [(varName,varUnit,timeUnit,title,legend)] = (time,varValue),(time,varValue),...]
+  self.__timeSeriesData = dict(list()) # [(varName,varUnit,timeUnit,title,legend)] = [(time,varValue),(time,varValue),...]
+
+  self.__timeTablesData = dict(list()) # [(time,timeUnit)] = [column,column,...]
 
   self.__log = logging.getLogger('pyplot')
   self.__log.info('initializing an instance of PyPlot')
@@ -52,6 +54,9 @@ class PyPlot(object):
   if evolTime % 30.0 == 0.0 and evolTime != 0.0 : 
     self.__PlotTimeSeries() # updata plot every 30 min
 
+  if evolTime % 30.0 == 0.0 and evolTime != 0.0 : 
+    self.__PlotTimeTables() # updata plot every 30 min
+
 #---------------------------------------------------------------------------------
  def __UseData( self, port, evolTime=0.0 ):
 
@@ -60,6 +65,8 @@ class PyPlot(object):
 
 # Get data from port files
   if port[0] == 'time-series': self.__GetTimeSeries( portFile, evolTime )
+
+  if port[0] == 'time-tables': self.__GetTimeTables( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
  def __ProvideData( self, port, evolTime=0.0 ):
@@ -187,6 +194,67 @@ class PyPlot(object):
   return
 
 #---------------------------------------------------------------------------------
+# This uses a use portFile which is guaranteed at this point
+ def __GetTimeTables( self, portFile, evolTime ):
+
+  s = '__GetTimeTables(): will check file: '+portFile
+  self.__log.debug(s)
+
+  found = False
+
+  while found is False:
+
+    s = '__GetTimeTables(): checking for value at '+str(evolTime)
+    self.__log.debug(s)
+
+#    tree = ElementTree.parse(portFile)
+
+    try:
+      tree = ElementTree.parse( portFile )
+    except ElementTree.ParseError as error:
+      s = '__GetTimeTables(): '+portFile+' unavailable. Error code: '+str(error.code)+' File position: '+str(error.position)+'. Retrying...'
+      self.__log.debug(s)
+      continue
+
+    rootNode = tree.getroot()
+    assert rootNode.tag == 'time-tables', 'invalid format.'
+  
+    timeNodes = rootNode.findall('timeStamp')
+
+    for timeNode in timeNodes:
+
+      timeStamp = float(timeNode.get('value').strip())
+
+      if timeStamp == evolTime:
+
+        found = True  
+
+        timeUnit = timeNode.get('unit').strip()
+
+        self.__timeTablesData[(timeStamp,timeUnit)] = list()
+
+        columns = timeNode.findall('column')
+
+        data = list()
+
+        for col in columns: data.append( col )
+
+        self.__timeTablesData[(timeStamp,timeUnit)] = data
+
+        s = '__GetTimeTables(): added '+str(len(data))+' columns of data'
+        self.__log.debug(s)
+
+      # end of if timeStamp == evolTime:
+
+    # end of for timeNode in timeNodes:
+
+    if found is False: time.sleep(1)
+
+  # while found is False:
+
+  return
+
+#---------------------------------------------------------------------------------
  def __PlotTimeSeries( self ):
 
 #  s = '__PlotVarTimeSeries(): __timeSeriesData keys = '+str(self.__timeSeriesData.keys())
@@ -213,7 +281,6 @@ class PyPlot(object):
   axlst.append(fig.add_subplot(gs[2, 0]))
   axlst.append(fig.add_subplot(gs[2, 1]))
   axlst.append(fig.add_subplot(gs[2, 2]))
-  axes = np.array(axlst)
   axes = np.array(axlst)
 
   text = 'Cortix.Modules.Native.PyPlot: Time-Sequence Data'
@@ -281,26 +348,122 @@ class PyPlot(object):
 # if index == 0:
 #    axis.set_xscale("log")
 #    axis.set_yscale("log")
-#    axis.plot( Q, haloI_fit, marker, color='red', linewidth=0.5, markersize=3, markeredgecolor=color, label=legend )
 
     ax.legend( loc='best', prop={'size':8} )
 
-#  fig.show()
- 
   # end of for (varSpec,ax) in zip( self.__timeSeriesData , axes.flat ):
 
-  fig.savefig('pyplot.png',dpi=200,fomat='png')
+  fig.savefig('pyplot-timeseries.png',dpi=200,fomat='png')
   plt.close('all')
 
-#  fig.savefig(outputfilename+'.png',dpi=200,fomat='png')
+#---------------------------------------------------------------------------------
+ def __PlotTimeTables( self ):
 
-#  x = np.linspace(0, evolTime)
-#  line, = plt.plot(x, np.sin(x), '--', linewidth=2)
+  s = '__PlotVarTimeTables(): plotting tables'
+  self.__log.debug(s)
 
-#  dashes = [10, 5, 100, 5] # 10 points on, 5 off, 100 on, 5 off
-#  line.set_dashes(dashes)
-#
-#  plt.show()
+#  s = '__PlotVarTimeTables(): __timeTablesData keys = '+str(self.__timeSeriesData.keys())
+#  self.__log.debug(s)
+
+#  s = '__PlotVarTimeTables(): __timeTablesData keys = '+str(self.__timeTablesData.items())
+#  self.__log.debug(s)
+
+  nTimeSteps = len(self.__timeTablesData.keys())
+
+#  assert nVariables <= 9, 'exceeded # of variables'
+
+  fig = plt.figure()
+
+  gs = gridspec.GridSpec(2,2)
+  gs.update(left=0.1,right=0.98,wspace=0.4,hspace=0.4)
+
+  axlst = list()
+  axlst.append(fig.add_subplot(gs[0, 0]))
+  axlst.append(fig.add_subplot(gs[0, 1]))
+  axlst.append(fig.add_subplot(gs[1, 0]))
+  axlst.append(fig.add_subplot(gs[1, 1]))
+  axes = np.array(axlst)
+
+  text = 'Cortix.Modules.Native.PyPlot: Time-Tables Data'
+  fig.text(.5,.95,text,horizontalalignment='center',fontsize=16)
+
+  for (key,val) in self.__timeTablesData.items():
+    (timeStamp,timeUnit) = key
+    columns              = val
+
+    if timeStamp == 0.0: continue
+
+    distance = columns[0]
+    xLabel = distance.get('name').strip()
+    xUnit  = distance.get('unit').strip()
+    x = distance.text.strip().split(',')
+    for i in range(len(x)): x[i] = float(x[i])
+    x = np.array(x)
+ 
+    for k in range(len(columns)-1):
+
+      ax = axes.flat[k]
+
+      y = columns[k+1]
+      yLabel = y.get('name').strip()
+      yUnit  = y.get('unit').strip()
+      yLegend= y.get('legend').strip()
+      y = y.text.strip().split(',')
+      for i in range(len(y)): 
+          y[i] = float(y[i])
+      y = np.array(y)
+ 
+      if k == 0 or k == 1: 
+        y *= 1000.0
+        yUnit = 'm'
+
+
+#    x = data[:,0]
+#    if x.max() >= 120.0:
+#      x /= 60.0
+#      if timeUnit == 'm': timeUnit = 'h'
+
+#    y = data[:,1]
+#    if y.max() >= 1000.0: 
+#      y /= 1000.0
+#      if varUnit == 'gram' or varUnit == 'g': 
+#        varUnit = 'kg'
+#    if y.max() <= .1: 
+#      y *= 1000.0
+#      if varUnit == 'gram' or varUnit == 'g': 
+#        varUnit = 'mg'
+  
+      ax.set_xlabel(xLabel+' ['+xUnit+']',fontsize=10)
+      ax.set_ylabel(yLabel+' ['+yUnit+']',fontsize=10)
+
+#    ymax  = y.max()
+#    dy    = ymax * .1
+#    ymax += dy
+#    ymin  = y.min()
+#    ymin -= dy
+
+#    ax.set_ylim(ymin,ymax)
+
+      for l in ax.get_xticklabels(): l.set_fontsize(10)
+      for l in ax.get_yticklabels(): l.set_fontsize(10)
+#  color  = parameters['plot-color']
+#  marker = parameters['plot-marker']+'-'
+#  axis.set_xlim(2e-3, 2)
+#  axis.set_aspect(1)
+#  axis.set_title("adjustable = box")
+
+      ax.plot( x, y, 's-', color='black', linewidth=0.5, markersize=2,  \
+             markeredgecolor='black', label=yLegend )
+
+      if k == 2 or k == 3: ax.set_yscale("log")
+
+
+#      ax.legend( loc='best', prop={'size':8} )
+
+  # end of for (varSpec,ax) in zip( self.__timeSeriesData , axes.flat ):
+
+  fig.savefig('pyplot-timetables.png',dpi=200,fomat='png')
+  plt.close('all')
 
 #*********************************************************************************
 # Usage: -> python pyplot.py

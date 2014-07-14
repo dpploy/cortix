@@ -15,6 +15,8 @@ from src.modules.native.fuelaccumulationthread import FuelAccumulationThread
 from src.modules.native.dissolverthread import DissolverThread
 from src.modules.native.condenserthread import CondenserThread
 from src.modules.native.scrubberthread import ScrubberThread
+from src.modules.native.hepafilterthread import HEPAFilterThread
+from src.modules.wrapped.plumethread import PlumeThread
 from src.modules.native.pyplotthread import PyPlotThread
 #*********************************************************************************
 
@@ -41,8 +43,8 @@ class Module(object):
 
   self.__executableName = 'null'
   self.__executablePath = 'null'
-  self.__inputFileName = 'null'
-  self.__inputFilePath = 'null'
+  self.__inputFileName  = 'null'
+  self.__inputFilePath  = 'null'
 
   self.__ports = list()
 
@@ -125,6 +127,12 @@ class Module(object):
     if name == 'scrubber-native':        
        t = ScrubberThread( input, param, comm, status )
        t.start()
+    if name == 'hepafilter-native':        
+       t = HEPAFilterThread( input, param, comm, status )
+       t.start()
+    if name == 'plume':        
+       t = PlumeThread( input, param, comm, status )
+       t.start()
     if name == 'pyplot-native':        
        t = PyPlotThread( input, param, comm, status )
        t.start()
@@ -132,7 +140,10 @@ class Module(object):
 #.................................................................................
 # Wrapped modules run on threads and external system call of their own with IO comm
   elif self.__type == 'wrapped':
-     assert True, 'module type not implemented.'
+    name = self.__name 
+    if name == 'plume':        
+       t = PlumeThread( input, param, comm, status )
+       t.start()
   else: 
      assert True, 'module type invalid.'
 
