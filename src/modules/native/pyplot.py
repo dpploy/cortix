@@ -72,7 +72,7 @@ class PyPlot(object):
  def __ProvideData( self, port, evolTime=0.0 ):
 
 # Access the port file
-  portFile = self.__GetPortFile( providePortName = providePortName )
+  portFile = self.__GetPortFile( providePort = port )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePort=None, providePort=None ):
@@ -254,9 +254,9 @@ class PyPlot(object):
 #---------------------------------------------------------------------------------
  def __PlotTimeSeries( self ):
 
-#  s = '__PlotVarTimeSeries(): __timeSeriesData keys = '+str(self.__timeSeriesData.keys())
+#  s = '__PlotTimeSeries(): __timeSeriesData keys = '+str(self.__timeSeriesData.keys())
 #  self.__log.debug(s)
-#  s = '__PlotVarTimeSeries(): __timeSeriesData keys = '+str(self.__timeSeriesData.items())
+#  s = '__PlotTimeSeries(): __timeSeriesData keys = '+str(self.__timeSeriesData.items())
 #  self.__log.debug(s)
 
   nVariables = len(self.__timeSeriesData.keys())
@@ -356,13 +356,13 @@ class PyPlot(object):
 #---------------------------------------------------------------------------------
  def __PlotTimeTables( self ):
 
-  s = '__PlotVarTimeTables(): plotting tables'
+  s = '__PlotTimeTables(): plotting tables'
   self.__log.debug(s)
 
-#  s = '__PlotVarTimeTables(): __timeTablesData keys = '+str(self.__timeSeriesData.keys())
+#  s = '__PlotTimeTables(): __timeTablesData keys = '+str(self.__timeSeriesData.keys())
 #  self.__log.debug(s)
 
-#  s = '__PlotVarTimeTables(): __timeTablesData keys = '+str(self.__timeTablesData.items())
+#  s = '__PlotTimeTables(): __timeTablesData keys = '+str(self.__timeTablesData.items())
 #  self.__log.debug(s)
 
   nTimeSteps = len(self.__timeTablesData.keys())
