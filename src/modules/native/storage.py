@@ -77,8 +77,8 @@ class Storage(object):
 # Send data to port files
   if providePortName == 'fuel-segments' and portFile is not None: 
      self.__ProvideFuelSegmentsOnDemand( portFile, evolTime, evolveTime )
-  if providePortName == 'mass-inventory' and portFile is not None:
-     self.__ProvideMassInventory( portFile, evolTime, evolveTime )
+  if providePortName == 'state' and portFile is not None:
+     self.__ProvideState( portFile, evolTime, evolveTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -589,7 +589,7 @@ class Storage(object):
   return
 
 #---------------------------------------------------------------------------------
- def __ProvideMassInventory( self, portFile, evolTime, evolveTime ):
+ def __ProvideState( self, portFile, evolTime, evolveTime ):
 
   # if the first time step, write the header of a time-series data file
   if evolTime == 0.0:
@@ -597,7 +597,7 @@ class Storage(object):
     fout = open( portFile, 'w')
 
     s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-series name="storageMassInventory">\n'; fout.write(s) 
+    s = '<time-series name="storage state">\n'; fout.write(s) 
     s = ' <comment author="cortix.modules.native.storage" version="0.1"/>\n'; fout.write(s)
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)

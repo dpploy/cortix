@@ -9,7 +9,7 @@ X133               ! name ('----' for interactive choice)
 0.1                ! Input fall vel (cm/s) if manual input
 293.0              ! For Chemical, gas temperature
 60.0               ! Release Durat(sec): >60s=>PLUME, <60s=>PUFF
-0.000000000000e+00        ! Release rate (Ci/s if rad, gm/s if chem)
+1.199361666667e-07        ! Release rate (Ci/s if rad, gm/s if chem)
 0                  ! Rain intensity (0=none,1=light,2=heavy)
 2014 2 28 10 0 0   ! Release start (yr,mo,dy,hr,min,sec)--UTC!
 270.0 3.0 30000.0 0.0 -9999.0 -9999.0 -9999.0   ! Winddir,spd(m/s),ceiling(feet),cloudfract 0...1,siga,sige,Mixht(m) each time

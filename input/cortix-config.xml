@@ -137,7 +137,7 @@
     <port type="use">withdrawal-request</port>
     <port type="provide">fuel-segments</port>
     <port type="provide">off-gas</port>
-    <port type="provide">mass-inventory</port>
+    <port type="provide">state</port>
    </module>
 
    <module name="storage-standalone" type="stand-alone">
@@ -349,7 +349,8 @@
     <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="chopper-native" toPort="Xe-gas"/> 
     <connect fromModule="hepafilter-native" fromPort="inflow-gas" toModule="scrubber-native" toPort="off-gas"/> 
     <connect fromModule="plume" fromPort="off-gas" toModule="hepafilter-native" toPort="off-gas"/> 
-    <connect fromModule="pyplot-native" fromPort="time-series" toModule="storage-native" toPort="mass-inventory"/> 
+    <connect fromModule="pyplot-native" fromPort="time-series" toModule="storage-native" toPort="state"/> 
+<!--    
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="solids-load"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="solids-request"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="chopper-native" toPort="Xe-gas"/> 
@@ -357,7 +358,8 @@
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="condenser-native" toPort="off-gas"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="scrubber-native" toPort="off-gas"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="hepafilter-native" toPort="off-gas"/> 
-<!--    <connect fromModule="pyplot-native" fromPort="time-tables" toModule="plume" toPort="time-puff"/> -->
+    <connect fromModule="pyplot-native" fromPort="time-tables" toModule="plume" toPort="time-puff"/> 
+-->
    </network>
 
    <!-- connected modules -->
