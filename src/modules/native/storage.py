@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native FuelAccumulation module
+Cortix native Storage module
 
 Tue Jun 24 01:03:45 EDT 2014
 """
@@ -13,7 +13,7 @@ import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
-class FuelAccumulation(object):
+class Storage(object):
 
 # Private member data
 # __slots__ = [
@@ -30,8 +30,8 @@ class FuelAccumulation(object):
 
   self.__withdrawMass = 0.0
 
-  self.__log = logging.getLogger('fuelaccumulation')
-  self.__log.info('initializing an instance of FuelAccumulation')
+  self.__log = logging.getLogger('storage')
+  self.__log.info('initializing an instance of Storage')
 
   self.__gramDecimals = 3 # milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
@@ -398,7 +398,7 @@ class FuelAccumulation(object):
 
     s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
     s = '<time-variable-packet name="fuelSegments">\n'; fout.write(s) 
-    s = ' <comment author="cortix.modules.native.fuelaccumulation" version="0.1"/>\n'; fout.write(s)
+    s = ' <comment author="cortix.modules.native.storage" version="0.1"/>\n'; fout.write(s)
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     s = ' <time unit="minute"/>\n'; fout.write(s)
@@ -597,8 +597,8 @@ class FuelAccumulation(object):
     fout = open( portFile, 'w')
 
     s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-series name="fuelAccumulationMassInventory">\n'; fout.write(s) 
-    s = ' <comment author="cortix.modules.native.fuelaccumulation" version="0.1"/>\n'; fout.write(s)
+    s = '<time-series name="storageMassInventory">\n'; fout.write(s) 
+    s = ' <comment author="cortix.modules.native.storage" version="0.1"/>\n'; fout.write(s)
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     s = ' <time unit="minute"/>\n'; fout.write(s)
@@ -662,6 +662,6 @@ class FuelAccumulation(object):
   self.__fuelSegments.insert(0,fuelSegment)
 
 #*********************************************************************************
-# Usage: -> python fuelaccumulation.py
+# Usage: -> python storage.py
 if __name__ == "__main__":
- print('Unit testing for FuelAccumulation')
+ print('Unit testing for Storage')

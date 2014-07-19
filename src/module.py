@@ -11,7 +11,7 @@ import os, sys, io, time
 import logging  
 from src.configtree import ConfigTree
 from src.modules.native.chopperthread import ChopperThread
-from src.modules.native.fuelaccumulationthread import FuelAccumulationThread
+from src.modules.native.storagethread import StorageThread
 from src.modules.native.dissolverthread import DissolverThread
 from src.modules.native.condenserthread import CondenserThread
 from src.modules.native.scrubberthread import ScrubberThread
@@ -115,8 +115,8 @@ class Module(object):
     if name == 'chopper-native':          
        t = ChopperThread( input, param, comm, status )
        t.start()
-    if name == 'fuelaccumulation-native': 
-       t = FuelAccumulationThread( input, param, comm, status )
+    if name == 'storage-native': 
+       t = StorageThread( input, param, comm, status )
        t.start()
     if name == 'dissolver-native':        
        t = DissolverThread( input, param, comm, status )

@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native FuelAccumulation module thread
+Cortix native Storage module thread
 
 Sun Jun 29 21:34:18 EDT 2014
 """
@@ -11,11 +11,11 @@ import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
-from src.modules.native.fuelaccumulation import FuelAccumulation
+from src.modules.native.storage import Storage
 #*********************************************************************************
 
 #*********************************************************************************
-class FuelAccumulationThread(Thread):
+class StorageThread(Thread):
 
  def __init__( self, inputFullPathFileName, 
                      cortexParamFullPathFileName,
@@ -27,7 +27,7 @@ class FuelAccumulationThread(Thread):
     self.__cortexCommFullPathFileName    = cortexCommFullPathFileName 
     self.__runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
 
-    super(FuelAccumulationThread, self).__init__()
+    super(StorageThread, self).__init__()
 
 #---------------------------------------------------------------------------------
  def run(self):
@@ -35,11 +35,11 @@ class FuelAccumulationThread(Thread):
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
 
-  log = logging.getLogger('fuelaccumulation')
+  log = logging.getLogger('storage')
   log.setLevel(logging.DEBUG)
   # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'fuelaccumulation.log')
+  fh = logging.FileHandler(fullPathTaskDir+'storage.log')
   fh.setLevel(logging.DEBUG)
   # create console handler with a higher log level
   ch = logging.StreamHandler()
@@ -135,8 +135,8 @@ class FuelAccumulationThread(Thread):
 # runtimeStatusFullPathFileName
 
 #---------------------------------------------------------------------------------
-# Run FuelAccumulation
-  log.debug('entered Run FuelAccumulation section')
+# Run Storage
+  log.debug('entered Run Storage section')
 
 #................................................................................
 # Setup input (no input ports)
@@ -145,8 +145,8 @@ class FuelAccumulationThread(Thread):
 
 #................................................................................
 # Create the host code          
-  host = FuelAccumulation( ports )
-  log.debug("host = FuelAccumulation( ports )")
+  host = Storage( ports )
+  log.debug("host = Storage( ports )")
 
 #................................................................................
 # Evolve the fuel accumulation
@@ -178,7 +178,7 @@ class FuelAccumulationThread(Thread):
 
   fout = open( self.__runtimeStatusFullPathFileName,'w' )
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by FuelAccumulationThread.py -->\n'; fout.write(s)
+  s = '<!-- Written by StorageThread.py -->\n'; fout.write(s)
   today = datetime.datetime.today()
   s = '<!-- '+str(today)+' -->\n'; fout.write(s)
   s = '<runtime>\n'; fout.write(s)
@@ -187,6 +187,6 @@ class FuelAccumulationThread(Thread):
   fout.close()
 
 #*********************************************************************************
-# Usage: -> python fuelaccumulationthread.py or ./fuelaccumulationthread.py
+# Usage: -> python storagethread.py or ./storagethread.py
 if __name__ == "__main__":
-   FuelAccumulationThread()
+   StorageThread()
