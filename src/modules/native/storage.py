@@ -45,7 +45,7 @@ class Storage(object):
 
   self.__ProvideData( providePortName='fuel-segments', evolTime=evolTime, evolveTime=evolveTime )
 
-  self.__ProvideData( providePortName='mass-inventory', evolTime=evolTime, evolveTime=evolveTime)
+  self.__ProvideData( providePortName='state', evolTime=evolTime, evolveTime=evolveTime)
 
 #---------------------------------------------------------------------------------
  def Execute( self, evolTime=0.0, timeStep=1.0, evolveTime=0.0 ):
@@ -594,21 +594,42 @@ class Storage(object):
   # if the first time step, write the header of a time-series data file
   if evolTime == 0.0:
 
-    fout = open( portFile, 'w')
+    assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
-    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-series name="storage state">\n'; fout.write(s) 
-    s = ' <comment author="cortix.modules.native.storage" version="0.1"/>\n'; fout.write(s)
+    tree = ElementTree.ElementTree()
+    rootNode = tree.getroot()
+
+    a = ElementTree.Element('time-series')
+    a.set('name','storage state')
+
+    b = ElementTree.SubElement(a,'comment')
     today = datetime.datetime.today()
-    s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
-    s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Fuel Inventory" unit="gram" legend="fuel accumulation"/>\n'; fout.write(s)
+    b.set('author','cortix.modules.native.storage')
+    b.set('version','0.1')
+
+    b = ElementTree.SubElement(a,'comment')
+    today = datetime.datetime.today()
+    b.set('today',str(today))
+
+    b = ElementTree.SubElement(a,'time')
+    b.set('unit','minute')
+
+    # first variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Fuel Inventory')
+    b.set('unit','gram')
+    b.set('legend','Storage')
+
+    # values for all variables
+    b = ElementTree.SubElement(a,'timeStamp')
+    b.set('value',str(evolTime))
     gDec = self.__gramDecimals
     mass = round(self.__GetMass(),gDec)
-    s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
+    b.text = str(mass)
 
-    s = '</time-series>\n'; fout.write(s)
-    fout.close()
+    tree = ElementTree.ElementTree(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
 
   # if not the first time step then parse the existing history file and append
   else:

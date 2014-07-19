@@ -349,8 +349,8 @@
     <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="chopper-native" toPort="Xe-gas"/> 
     <connect fromModule="hepafilter-native" fromPort="inflow-gas" toModule="scrubber-native" toPort="off-gas"/> 
     <connect fromModule="plume" fromPort="off-gas" toModule="hepafilter-native" toPort="off-gas"/> 
-    <connect fromModule="pyplot-native" fromPort="time-series" toModule="storage-native" toPort="state"/> 
 <!--    
+    <connect fromModule="pyplot-native" fromPort="time-series" toModule="storage-native" toPort="state"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="solids-load"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="solids-request"/> 
     <connect fromModule="pyplot-native" fromPort="time-series" toModule="chopper-native" toPort="Xe-gas"/> 
