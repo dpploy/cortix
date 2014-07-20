@@ -104,7 +104,6 @@
     <port type="provide">solids</port>
     <port type="provide">off-gas</port>
     <port type="provide">fines</port>
-    <port type="provide">Xe-gas</port>
    </module>
 
    <module name="chopper-standalone" type="stand-alone">
@@ -169,13 +168,12 @@
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="use">solids</port>
-    <port type="use">condenser-stream</port>
-    <port type="provide">solids-request</port>
-    <port type="provide">solids-load</port>
+    <port type="use">condensate</port>
+    <port type="provide">signal</port>
+    <port type="provide">state</port>
     <port type="provide">product</port>
     <port type="provide">vapor</port>
     <port type="provide">heat</port>
-    <port type="provide">Xe-vapor</port>
    </module>
 
    <module name="dissolver-standalone" type="stand-alone">
@@ -190,8 +188,8 @@
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="use">solids</port>
-    <port type="use">condenser-stream</port>
-    <port type="provide">solids-request</port>
+    <port type="use">condensate</port>
+    <port type="provide">signal</port>
     <port type="provide">product</port>
     <port type="provide">vapor</port>
     <port type="provide">heat</port>
@@ -279,7 +277,7 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use">time-series</port>
+    <port type="use">time-sequence</port>
     <port type="use">time-tables</port>
    </module>
 
@@ -294,7 +292,7 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use">time-series</port>
+    <port type="use">time-sequence</port>
    </module>
 
    <!-- Application: networks -->
@@ -308,7 +306,7 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModule="pyplot-native" fromPort="time-series" toModule="chopper-native" toPort="Gas_Release"/> 
+    <connect fromModule="pyplot-native" fromPort="time-sequence" toModule="chopper-native" toPort="Gas_Release"/> 
    </network>
 
    <network name="solo-fuel-accum">
@@ -328,7 +326,7 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="vapor"/> 
+    <connect fromModule="pyplot-native" fromPort="time-sequence" toModule="dissolver-native" toPort="vapor"/> 
    </network>
 
    <!-- connected modules -->
@@ -342,22 +340,22 @@
     <connect fromModule="chopper-native" fromPort="gas-input" toModule="chopper-native" toPort="Gas_Release"/> 
     <connect fromModule="chopper-native" fromPort="fines-input" toModule="chopper-native" toPort="Particulate"/> 
     <connect fromModule="storage-native" fromPort="solids" toModule="chopper-native" toPort="solids"/> 
-    <connect fromModule="storage-native" fromPort="withdrawal-request" toModule="dissolver-native" toPort="solids-request"/> 
+    <connect fromModule="storage-native" fromPort="withdrawal-request" toModule="dissolver-native" toPort="signal"/> 
     <connect fromModule="dissolver-native" fromPort="solids" toModule="storage-native" toPort="fuel-segments"/> 
-    <connect fromModule="condenser-native" fromPort="vapor" toModule="dissolver-native" toPort="Xe-vapor"/> 
+    <connect fromModule="condenser-native" fromPort="vapor" toModule="dissolver-native" toPort="vapor"/> 
     <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="condenser-native" toPort="off-gas"/> 
-    <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="chopper-native" toPort="Xe-gas"/> 
+    <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="chopper-native" toPort="off-gas"/> 
     <connect fromModule="hepafilter-native" fromPort="inflow-gas" toModule="scrubber-native" toPort="off-gas"/> 
     <connect fromModule="plume" fromPort="off-gas" toModule="hepafilter-native" toPort="off-gas"/> 
+    <connect fromModule="pyplot-native" fromPort="time-sequence" toModule="chopper-native" toPort="off-gas"/> 
+    <connect fromModule="pyplot-native" fromPort="time-sequence" toModule="storage-native" toPort="state"/> 
+    <connect fromModule="pyplot-native" fromPort="time-sequence" toModule="dissolver-native" toPort="signal"/> 
+    <connect fromModule="pyplot-native" fromPort="time-sequence" toModule="dissolver-native" toPort="vapor"/> 
+    <connect fromModule="pyplot-native" fromPort="time-sequence" toModule="dissolver-native" toPort="state"/> 
+    <connect fromModule="pyplot-native" fromPort="time-sequence" toModule="condenser-native" toPort="off-gas"/> 
+    <connect fromModule="pyplot-native" fromPort="time-sequence" toModule="scrubber-native" toPort="off-gas"/> 
+    <connect fromModule="pyplot-native" fromPort="time-sequence" toModule="hepafilter-native" toPort="off-gas"/> 
 <!--    
-    <connect fromModule="pyplot-native" fromPort="time-series" toModule="storage-native" toPort="state"/> 
-    <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="solids-load"/> 
-    <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="solids-request"/> 
-    <connect fromModule="pyplot-native" fromPort="time-series" toModule="chopper-native" toPort="Xe-gas"/> 
-    <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="Xe-vapor"/> 
-    <connect fromModule="pyplot-native" fromPort="time-series" toModule="condenser-native" toPort="off-gas"/> 
-    <connect fromModule="pyplot-native" fromPort="time-series" toModule="scrubber-native" toPort="off-gas"/> 
-    <connect fromModule="pyplot-native" fromPort="time-series" toModule="hepafilter-native" toPort="off-gas"/> 
     <connect fromModule="pyplot-native" fromPort="time-tables" toModule="plume" toPort="time-puff"/> 
 -->
    </network>
@@ -370,11 +368,11 @@
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <connect fromModule="storage-native" fromPort="solids" toModule="chopper-native" toPort="Fuel_Solid"/> 
-    <connect fromModule="storage-native" fromPort="withdrawal-request" toModule="dissolver-native" toPort="solids-request"/> 
+    <connect fromModule="storage-native" fromPort="withdrawal-request" toModule="dissolver-native" toPort="signal"/> 
     <connect fromModule="dissolver-native" fromPort="solids" toModule="storage-native" toPort="fuel-segments"/> 
     <connect fromModule="condenser-native" fromPort="vapor" toModule="dissolver-native" toPort="vapor"/> 
-    <connect fromModule="dissolver-native" fromPort="condenser-stream" toModule="condenser-native" toPort="condensate"/> 
-    <connect fromModule="pyplot-native" fromPort="time-series" toModule="dissolver-native" toPort="vapor"/> 
+    <connect fromModule="dissolver-native" fromPort="condensate" toModule="condenser-native" toPort="condensate"/> 
+    <connect fromModule="pyplot-native" fromPort="time-sequence" toModule="dissolver-native" toPort="vapor"/> 
    </network>
 
   </application>

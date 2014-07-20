@@ -156,7 +156,7 @@ class Plume(object):
       continue
 
     rootNode = tree.getroot()
-    assert rootNode.tag == 'time-series', 'invalid format.' 
+    assert rootNode.tag == 'time-sequence', 'invalid format.' 
 
     node = rootNode.find('time')
     timeUnit = node.get('unit').strip()
@@ -196,7 +196,7 @@ class Plume(object):
 #---------------------------------------------------------------------------------
  def __ProvidePuff( self, portFile, evolTime ):
 
-  # if the first time step, write the header of a time-series data file
+  # if the first time step, write the header of a time-sequence data file
   if evolTime == 0.0:
 
     fout = open( portFile, 'w')

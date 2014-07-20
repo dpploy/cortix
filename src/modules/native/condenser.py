@@ -71,7 +71,7 @@ class Condenser(object):
   portFile = self.__GetPortFile( providePortName = providePortName )
 
 # Send data to port files
-  if providePortName == 'off-gas': self.__ProvideXeGas( portFile, evolTime )
+  if providePortName == 'off-gas': self.__ProvideOffGas( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -151,7 +151,7 @@ class Condenser(object):
       continue
 
     rootNode = tree.getroot()
-    assert rootNode.tag == 'time-series', 'invalid format.' 
+    assert rootNode.tag == 'time-sequence', 'invalid format.' 
 
     node = rootNode.find('time')
     timeUnit = node.get('unit').strip()
@@ -189,24 +189,24 @@ class Condenser(object):
   return 
 
 #---------------------------------------------------------------------------------
- def __ProvideXeGas( self, portFile, evolTime ):
+ def __ProvideOffGas( self, portFile, evolTime ):
 
-  # if the first time step, write the header of a time-series data file
+  # if the first time step, write the header of a time-sequence data file
   if evolTime == 0.0:
 
     fout = open( portFile, 'w')
 
     s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-series name="XeGas-condenser">\n'; fout.write(s) 
+    s = '<time-sequence name="condenser-offgas">\n'; fout.write(s) 
     s = ' <comment author="cortix.modules.native.condenser" version="0.1"/>\n'; fout.write(s)
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Xe Off-Gas Flow" unit="gram" legend="condenser"/>\n'; fout.write(s)
+    s = ' <var name="Xe Off-Gas Flow" unit="gram" legend="Condenser-offgas"/>\n'; fout.write(s)
     mass = 0.0
     s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
 
-    s = '</time-series>\n'; fout.write(s)
+    s = '</time-sequence>\n'; fout.write(s)
     fout.close()
 
   # if not the first time step then parse the existing history file and append

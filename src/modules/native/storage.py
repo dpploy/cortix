@@ -58,6 +58,8 @@ class Storage(object):
   s = 'Execute(): # of segments  = '+str(len(self.__fuelSegments))
   self.__log.debug(s)
 
+  self.__Store( evolTime + timeStep )
+
 #---------------------------------------------------------------------------------
  def __UseData( self, usePortName=None, evolTime=0.0 ):
 
@@ -315,7 +317,7 @@ class Storage(object):
       continue
 
     rootNode = tree.getroot()
-    assert rootNode.tag == 'time-series', 'invalid format.' 
+    assert rootNode.tag == 'time-sequence', 'invalid format.' 
 
     node = rootNode.find('time')
     timeUnit = node.get('unit').strip()
@@ -591,7 +593,7 @@ class Storage(object):
 #---------------------------------------------------------------------------------
  def __ProvideState( self, portFile, evolTime, evolveTime ):
 
-  # if the first time step, write the header of a time-series data file
+  # if the first time step, write the header of a time-sequence data file
   if evolTime == 0.0:
 
     assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
@@ -599,8 +601,8 @@ class Storage(object):
     tree = ElementTree.ElementTree()
     rootNode = tree.getroot()
 
-    a = ElementTree.Element('time-series')
-    a.set('name','storage state')
+    a = ElementTree.Element('time-sequence')
+    a.set('name','storage-state')
 
     b = ElementTree.SubElement(a,'comment')
     today = datetime.datetime.today()
@@ -618,7 +620,7 @@ class Storage(object):
     b = ElementTree.SubElement(a,'var')
     b.set('name','Fuel Inventory')
     b.set('unit','gram')
-    b.set('legend','Storage')
+    b.set('legend','Storage-state')
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
@@ -681,6 +683,13 @@ class Storage(object):
  def __RestockFuelSegment( self, fuelSegment ):
 
   self.__fuelSegments.insert(0,fuelSegment)
+
+#---------------------------------------------------------------------------------
+ def __Store( self, facilityTime ):
+
+  # program here the Xe off gas
+
+  return
 
 #*********************************************************************************
 # Usage: -> python storage.py

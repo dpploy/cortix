@@ -59,7 +59,7 @@ class HEPAFilter(object):
   s = 'Execute(): facility time [min] = ' + str(evolTime)
   self.__log.info(s)
 
-  self.__Scrub( evolTime, timeStep ) # starting at evolTime to evolTime + timeStep
+  self.__Filter( evolTime, timeStep ) # starting at evolTime to evolTime + timeStep
  
 #---------------------------------------------------------------------------------
  def __UseData( self, port, evolTime=0.0 ):
@@ -77,7 +77,7 @@ class HEPAFilter(object):
   portFile = self.__GetPortFile( providePort = port )
 
 # Send data to port files
-  if port[0] == 'off-gas': self.__ProvideXeGas( portFile, evolTime )
+  if port[0] == 'off-gas': self.__ProvideOffGas( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePort=None, providePort=None ):
@@ -118,7 +118,7 @@ class HEPAFilter(object):
   return portFile
 
 #---------------------------------------------------------------------------------
- def __Scrub( self, evolTime, timeStep ):
+ def __Filter( self, evolTime, timeStep ):
 
   gDec = self.__gramDecimals 
 
@@ -128,7 +128,7 @@ class HEPAFilter(object):
 
   self.__historyXeMassOffGas[ evolTime + timeStep ] = massXeInflowGas * (1.0 - sorbed)
 
-  s = '__Scrub(): filtered '+str(round(massXeInflowGas*sorbed,gDec))+' [g] at ' + str(evolTime)+' [min]'
+  s = '__Filter(): filtered '+str(round(massXeInflowGas*sorbed,gDec))+' [g] at ' + str(evolTime)+' [min]'
   self.__log.info(s)
 
   return
@@ -151,7 +151,7 @@ class HEPAFilter(object):
       continue
 
     rootNode = tree.getroot()
-    assert rootNode.tag == 'time-series', 'invalid format.' 
+    assert rootNode.tag == 'time-sequence', 'invalid format.' 
 
     inflowGasName = rootNode.get('name')
 
@@ -163,7 +163,7 @@ class HEPAFilter(object):
     if timeCutOff is not None: 
       timeCutOff = float(timeCutOff.strip())
       if evolTime > timeCutOff: 
-        if inflowGasName == 'XeGas-scrubber':
+        if inflowGasName == 'scrubber-offgas':
           self.__historyXeMassInflowGas[0][ evolTime ] = 0.0
         return
 
@@ -186,7 +186,7 @@ class HEPAFilter(object):
          mass = 0.0
          mass = float(n.text.strip())
           
-         if inflowGasName == 'XeGas-scrubber':
+         if inflowGasName == 'scrubber-offgas':
             self.__historyXeMassInflowGas[0][ evolTime ] = mass
 
          s = '__GetInflowGas(): received inflow gas '+inflowGasName+' at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
@@ -201,24 +201,24 @@ class HEPAFilter(object):
   return 
 
 #---------------------------------------------------------------------------------
- def __ProvideXeGas( self, portFile, evolTime ):
+ def __ProvideOffGas( self, portFile, evolTime ):
 
-  # if the first time step, write the header of a time-series data file
+  # if the first time step, write the header of a time-sequence data file
   if evolTime == 0.0:
 
     fout = open( portFile, 'w')
 
     s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-series name="XeGas-hepafilter">\n'; fout.write(s) 
+    s = '<time-sequence name="hepafilter-offgas">\n'; fout.write(s) 
     s = ' <comment author="cortix.modules.native.hepafilter" version="0.1"/>\n'; fout.write(s)
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Xe Off-Gas Flow" unit="gram" legend="HEPA-filter"/>\n'; fout.write(s)
+    s = ' <var name="Xe Off-Gas Flow" unit="gram" legend="HEPA-filter-offgas"/>\n'; fout.write(s)
     mass = 0.0
     s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
 
-    s = '</time-series>\n'; fout.write(s)
+    s = '</time-sequence>\n'; fout.write(s)
     fout.close()
 
   # if not the first time step then parse the existing history file and append

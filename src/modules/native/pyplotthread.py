@@ -156,7 +156,7 @@ class PyPlotThread(Thread):
 
 #................................................................................
 # Create the host code          
-  host = PyPlot( ports )
+  host = PyPlot( ports, evolveTime )
   log.info("host = PyPlot( ports )")
 
 #................................................................................
@@ -171,9 +171,9 @@ class PyPlotThread(Thread):
 
    host.CallPorts( facilityTime )
 
-   host.Execute( facilityTime, timeStep )
-
    facilityTime += timeStep
+
+   host.Execute( facilityTime )
 
 #---------------------------------------------------------------------------------
 # Shutdown 

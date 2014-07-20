@@ -49,7 +49,7 @@ class Chopper(object):
   self.__UseData( usePortName='fines-input', evolTime=evolTime )
 
   self.__ProvideData( providePortName='solids', evolTime=evolTime )
-  self.__ProvideData( providePortName='Xe-gas', evolTime=evolTime )
+  self.__ProvideData( providePortName='off-gas', evolTime=evolTime )
   self.__ProvideData( providePortName='fines', evolTime=evolTime )
 
 #---------------------------------------------------------------------------------
@@ -85,7 +85,6 @@ class Chopper(object):
     if providePortName == 'solids': self.__ProvideSolids( portFile, evolTime )
     if providePortName == 'off-gas': self.__ProvideOffGas( portFile, evolTime )
     if providePortName == 'fines': self.__ProvideFines( portFile, evolTime )
-    if providePortName == 'Xe-gas': self.__ProvideXeGas( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -293,37 +292,33 @@ class Chopper(object):
 
 #---------------------------------------------------------------------------------
 # Provide the entire history data 
- def __ProvideOffGas( self, portFile, evolTime ):
-   return
-
-#---------------------------------------------------------------------------------
-# Provide the entire history data 
  def __ProvideFines( self, portFile, evolTime ):
    return
 
 #---------------------------------------------------------------------------------
- def __ProvideXeGas( self, portFile, evolTime ):
+ def __ProvideOffGas( self, portFile, evolTime ):
+
+  gDec = self.__gramDecimals
 
   if evolTime > self.__endDutyTimeGas: return
 
-  # if the first time step, write the header of a time-series data file
+  # if the first time step, write the header of a time-sequence data file
   if evolTime == 0.0:
 
     fout = open( portFile, 'w')
 
     s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-series name="XeGas-chopper">\n'; fout.write(s) 
+    s = '<time-sequence name="chopper-offgas">\n'; fout.write(s) 
     s = ' <comment author="cortix.modules.native.chopper" version="0.1"/>\n'; fout.write(s)
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     cutOff = self.__endDutyTimeGas
     s = ' <time unit="minute" cut-off="'+str(cutOff)+'"/>\n'; fout.write(s)
-    s = ' <var name="Xe Off-Gas Flow" unit="gram" legend="head-end"/>\n'; fout.write(s)
-    gDec = self.__gramDecimals
+    s = ' <var name="Xe Off-Gas Flow" unit="gram" legend="Chopper-offgas"/>\n'; fout.write(s)
     mass = round(self.__GetXeMassGas(evolTime),gDec)
     s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
 
-    s = '</time-series>\n'; fout.write(s)
+    s = '</time-sequence>\n'; fout.write(s)
     fout.close()
 
   # if not the first time step then parse the existing history file and append
@@ -333,7 +328,6 @@ class Chopper(object):
     rootNode = tree.getroot()
     a = ElementTree.Element('timeStamp')
     a.set('value',str(evolTime))
-    gDec = self.__gramDecimals
     mass = round(self.__GetXeMassGas(evolTime),gDec)
     a.text = str(mass)
 

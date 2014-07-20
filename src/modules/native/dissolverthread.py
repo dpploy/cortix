@@ -138,7 +138,7 @@ class DissolverThread(Thread):
 
 #.................................................................................
 # Create the host code             
-  host = Dissolver( ports )
+  host = Dissolver( ports, evolveTime )
   log.info("host = Dissolver( ports )")
 
 #.................................................................................

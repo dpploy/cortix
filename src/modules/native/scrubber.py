@@ -78,7 +78,7 @@ class Scrubber(object):
   portFile = self.__GetPortFile( providePort = port )
 
 # Send data to port files
-  if port[0] == 'off-gas': self.__ProvideXeGas( portFile, evolTime )
+  if port[0] == 'off-gas': self.__ProvideOffGas( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePort=None, providePort=None ):
@@ -153,7 +153,7 @@ class Scrubber(object):
       continue
 
     rootNode = tree.getroot()
-    assert rootNode.tag == 'time-series', 'invalid format.' 
+    assert rootNode.tag == 'time-sequence', 'invalid format.' 
 
     inflowGasName = rootNode.get('name')
 
@@ -165,10 +165,10 @@ class Scrubber(object):
     if timeCutOff is not None: 
       timeCutOff = float(timeCutOff.strip())
       if evolTime > timeCutOff: 
-        if inflowGasName == 'XeGas-chopper':
+        if inflowGasName == 'chopper-offgas':
           self.__historyXeMassInflowGas[0][ evolTime ] = 0.0
 
-        if inflowGasName  == 'XeGas-condenser':
+        if inflowGasName  == 'condenser-offgas':
           self.__historyXeMassInflowGas[1][ evolTime ] = 0.0
         return
 
@@ -191,10 +191,10 @@ class Scrubber(object):
          mass = 0.0
          mass = float(n.text.strip())
           
-         if inflowGasName == 'XeGas-chopper':
+         if inflowGasName == 'chopper-offgas':
             self.__historyXeMassInflowGas[0][ evolTime ] = mass
 
-         if inflowGasName  == 'XeGas-condenser':
+         if inflowGasName  == 'condenser-offgas':
             self.__historyXeMassInflowGas[1][ evolTime ] = mass
 
          s = '__GetInflowGas(): received inflow gas '+inflowGasName+' at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
@@ -209,24 +209,24 @@ class Scrubber(object):
   return 
 
 #---------------------------------------------------------------------------------
- def __ProvideXeGas( self, portFile, evolTime ):
+ def __ProvideOffGas( self, portFile, evolTime ):
 
-  # if the first time step, write the header of a time-series data file
+  # if the first time step, write the header of a time-sequence data file
   if evolTime == 0.0:
 
     fout = open( portFile, 'w')
 
     s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-series name="XeGas-scrubber">\n'; fout.write(s) 
+    s = '<time-sequence name="scrubber-offgas">\n'; fout.write(s) 
     s = ' <comment author="cortix.modules.native.scrubber" version="0.1"/>\n'; fout.write(s)
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Xe Off-Gas Flow" unit="gram" legend="scrubber"/>\n'; fout.write(s)
+    s = ' <var name="Xe Off-Gas Flow" unit="gram" legend="Scrubber-offgas"/>\n'; fout.write(s)
     mass = 0.0
     s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
 
-    s = '</time-series>\n'; fout.write(s)
+    s = '</time-sequence>\n'; fout.write(s)
     fout.close()
 
   # if not the first time step then parse the existing history file and append

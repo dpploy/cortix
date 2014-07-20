@@ -20,13 +20,15 @@ class Dissolver(object):
 # __slots__ = [
 
  def __init__( self,
-               ports
+               ports,
+               evolveTime=0.0
              ):
 
-# Sanity test
+  # Sanity test
   assert type(ports) is list, '-> ports type %r is invalid.' % type(ports)
+  assert type(evolveTime) is float, '-> time type %r is invalid.' % type(evolveTime)
 
-# Member data 
+  # Member data 
 
   self.__ports = ports
 
@@ -54,12 +56,12 @@ class Dissolver(object):
 #---------------------------------------------------------------------------------
  def CallPorts( self, evolTime=0.0 ):
 
-  self.__ProvideData( providePortName='solids-request', evolTime=evolTime )     
+  self.__ProvideData( providePortName='signal', evolTime=evolTime )     
 
   self.__UseData( usePortName='solids', evolTime=evolTime )     
 
-  self.__ProvideData( providePortName='Xe-vapor', evolTime=evolTime )     
-  self.__ProvideData( providePortName='solids-load', evolTime=evolTime )     
+  self.__ProvideData( providePortName='vapor', evolTime=evolTime )     
+  self.__ProvideData( providePortName='state', evolTime=evolTime )     
 
 #---------------------------------------------------------------------------------
 # Evolve system from evolTime to evolTime+timeStep
@@ -93,12 +95,12 @@ class Dissolver(object):
   portFile = self.__GetPortFile( providePortName = providePortName )
 
 # Send data to port files
-  if providePortName == 'solids-request' and portFile is not None: 
-    self.__ProvideSolidsRequest( portFile, evolTime )
-  if providePortName == 'Xe-vapor' and portFile is not None: 
-    self.__ProvideXeVapor( portFile, evolTime )
-  if providePortName == 'solids-load' and portFile is not None: 
-    self.__ProvideSolidsLoad( portFile, evolTime )
+  if providePortName == 'signal' and portFile is not None: 
+    self.__ProvideSignal( portFile, evolTime )
+  if providePortName == 'vapor' and portFile is not None: 
+    self.__ProvideVapor( portFile, evolTime )
+  if providePortName == 'state' and portFile is not None: 
+    self.__ProvideState( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -135,35 +137,50 @@ class Dissolver(object):
   return portFile
 
 #---------------------------------------------------------------------------------
- def __ProvideSolidsRequest( self, portFile, evolTime ):
+ def __ProvideSignal( self, portFile, evolTime ):
  
-  # if the first time step, write the header of a time-series data file
+  gDec = self.__gramDecimals
+
+  # if the first time step, write the header of a time-sequence data file
   if evolTime == 0.0:
 
-    fout = open( portFile, 'w')
+    assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
-    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-series name="dissolutionFuelRequest">\n'; fout.write(s) 
-    s = ' <comment author="cortix.modules.native.dissolver" version="0.1"/>\n'; fout.write(s)
+    tree = ElementTree.ElementTree()
+    rootNode = tree.getroot()
+
+    a = ElementTree.Element('time-sequence')
+    a.set('name','dissolver-signal')
+
+    b = ElementTree.SubElement(a,'comment')
     today = datetime.datetime.today()
-    s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
-    s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Fuel Request" unit="gram" legend="dissolver"/>\n'; fout.write(s)
+    b.set('author','cortix.modules.native.dissolver')
+    b.set('version','0.1')
 
-    s = '__ProvideSolidsRequest(): evolTime = '+str(evolTime)
-    self.__log.debug(s)
-    s = '__ProvideSolidsRequest(): ready to load = '+str(self.__ready2LoadFuel)
-    self.__log.debug(s)
+    b = ElementTree.SubElement(a,'comment')
+    today = datetime.datetime.today()
+    b.set('today',str(today))
 
-    if  self.__ready2LoadFuel is True:
- 
-      if self.__startDissolveTime >= 0.0:
-        assert evolTime >= self.__startDissolveTime + self.__dutyPeriod
+    b = ElementTree.SubElement(a,'time')
+    b.set('unit','minute')
 
-      s = ' <timeStamp value="'+str(evolTime)+'">'+str(self.__solidsMassLoadMax)+'</timeStamp>\n';fout.write(s)
+    # first variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Fuel Request')
+    b.set('unit','gram')
+    b.set('legend','Dissolver-signal')
 
-    s = '</time-series>\n'; fout.write(s)
-    fout.close()
+    # values for all variables
+    b = ElementTree.SubElement(a,'timeStamp')
+    b.set('value',str(evolTime))
+    if  self.__ready2LoadFuel == True:
+      b.text = str(round(self.__solidsMassLoadMax,gDec))
+    else:
+      b.text = '0'
+
+    tree = ElementTree.ElementTree(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
 
   # if not the first time step then parse the existing history file and append
   else:
@@ -173,7 +190,7 @@ class Dissolver(object):
     a = ElementTree.Element('timeStamp')
     a.set('value',str(evolTime))
     if  self.__ready2LoadFuel == True:
-      a.text = str(self.__solidsMassLoadMax)
+      a.text = str(round(self.__solidsMassLoadMax,gDec))
     else:
       a.text = '0'
 
@@ -184,37 +201,53 @@ class Dissolver(object):
   return 
 
 #---------------------------------------------------------------------------------
- def __ProvideSolidsLoad( self, portFile, evolTime ):
+ def __ProvideState( self, portFile, evolTime ):
  
   gDec = self.__gramDecimals
 
-  # if the first time step, write the header of a time-series data file
+  # if the first time step, write the header of a time-sequence data file
   if evolTime == 0.0:
 
-    fout = open( portFile, 'w')
+    assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
-    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-series name="solids-load-dissolver">\n'; fout.write(s) 
-    s = ' <comment author="cortix.modules.native.dissolver" version="0.1"/>\n'; fout.write(s)
+    tree = ElementTree.ElementTree()
+    rootNode = tree.getroot()
+
+    a = ElementTree.Element('time-sequence')
+    a.set('name','dissolver-state')
+
+    b = ElementTree.SubElement(a,'comment')
     today = datetime.datetime.today()
-    s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
-    s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Fuel Loaded" unit="gram" legend="dissolver"/>\n'; fout.write(s)
+    b.set('author','cortix.modules.native.dissolver')
+    b.set('version','0.1')
 
-    s = '__ProvideSolidsLoad(): evolTime = '+str(evolTime)
-    self.__log.debug(s)
-    s = '__ProvideSolidsLoad(): ready to load = '+str(self.__ready2LoadFuel)
-    self.__log.debug(s)
+    b = ElementTree.SubElement(a,'comment')
+    today = datetime.datetime.today()
+    b.set('today',str(today))
 
+    b = ElementTree.SubElement(a,'time')
+    b.set('unit','minute')
+
+    # first variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Fuel Loaded')
     if self.__GetFuelLoadMass() is not None:
       (mass,unit) = self.__GetFuelLoadMass()
     else:
       mass = 0.0
- 
-    s = ' <timeStamp value="'+str(evolTime)+'">'+str(round(mass,gDec))+'</timeStamp>\n';fout.write(s)
+      unit = 'gram'
+    b.set('unit',unit)
+    b.set('legend','Dissolver-state')
 
-    s = '</time-series>\n'; fout.write(s)
-    fout.close()
+    # values for all variables
+    b = ElementTree.SubElement(a,'timeStamp')
+    b.set('value',str(evolTime))
+    mass = round(mass,gDec)
+    b.text = str(mass)
+
+    tree = ElementTree.ElementTree(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
 
   # if not the first time step then parse the existing history file and append
   else:
@@ -552,25 +585,60 @@ class Dissolver(object):
     self.__historyXeMassVapor[ evolTime+timeStep ] = 0.0
 
 #---------------------------------------------------------------------------------
- def __ProvideXeVapor( self, portFile, evolTime ):
+ def __ProvideVapor( self, portFile, evolTime ):
 
-  # if the first time step, write the header of a time-series data file
+  # if the first time step, write the header of a time-sequence data file
   if evolTime == 0.0:
 
-    fout = open( portFile, 'w')
+    assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
-    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-series name="XeVapor">\n'; fout.write(s) 
-    s = ' <comment author="cortix.modules.native.dissolver" version="0.1"/>\n'; fout.write(s)
+    tree = ElementTree.ElementTree()
+    rootNode = tree.getroot()
+
+    a = ElementTree.Element('time-sequence')
+    a.set('name','dissolver-vapor')
+
+    b = ElementTree.SubElement(a,'comment')
     today = datetime.datetime.today()
-    s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
-    s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Xe Vapor Flow" unit="gram" legend="dissolver"/>\n'; fout.write(s)
-    mass = 0.0
-    s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
+    b.set('author','cortix.modules.native.dissolver')
+    b.set('version','0.1')
 
-    s = '</time-series>\n'; fout.write(s)
-    fout.close()
+    b = ElementTree.SubElement(a,'comment')
+    today = datetime.datetime.today()
+    b.set('today',str(today))
+
+    b = ElementTree.SubElement(a,'time')
+    b.set('unit','minute')
+
+    # first variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Xe Vapor Flow')
+    b.set('unit','gram')
+    b.set('legend','Dissolver-vapor')
+
+    # values for all variables
+    b = ElementTree.SubElement(a,'timeStamp')
+    b.set('value',str(evolTime))
+    b.text = str(0.0)
+
+    tree = ElementTree.ElementTree(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+
+#    fout = open( portFile, 'w')
+
+#    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
+#    s = '<time-sequence name="dissolver-vapor">\n'; fout.write(s) 
+#    s = ' <comment author="cortix.modules.native.dissolver" version="0.1"/>\n'; fout.write(s)
+#    today = datetime.datetime.today()
+#    s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
+#    s = ' <time unit="minute"/>\n'; fout.write(s)
+#    s = ' <var name="Xe Vapor Flow" unit="gram" legend="Dissolver-vapor"/>\n'; fout.write(s)
+#    mass = 0.0
+#    s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
+
+#    s = '</time-sequence>\n'; fout.write(s)
+#    fout.close()
 
   # if not the first time step then parse the existing history file and append
   else:
@@ -580,6 +648,8 @@ class Dissolver(object):
     a = ElementTree.Element('timeStamp')
     a.set('value',str(evolTime))
     gDec = self.__gramDecimals
+
+    # first variable
     if len(self.__historyXeMassVapor.keys()) > 0:
       mass = round(self.__historyXeMassVapor[evolTime],gDec)
     else:
