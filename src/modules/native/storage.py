@@ -370,6 +370,21 @@ class Storage(object):
   return mass
 
 #---------------------------------------------------------------------------------
+ def __GetPuMass(self, timeStamp=None):
+ 
+  mass = 0.0
+
+  if timeStamp is None:
+     for fuelSeg in self.__fuelSegments:
+      mass += fuelSeg[5]
+
+  else:
+     for fuelSeg in self.__fuelSegments:
+      if fuelSeg[0] <= timeStamp: mass += fuelSeg[5]
+
+  return mass
+
+#---------------------------------------------------------------------------------
 # Provide the entire history data 
  def __ProvideFuelSegmentsOnDemand( self, portFile, evolTime, evolveTime ):
 
@@ -618,16 +633,30 @@ class Storage(object):
 
     # first variable
     b = ElementTree.SubElement(a,'var')
-    b.set('name','Fuel Inventory')
+    b.set('name','Fuel Mass')
+    b.set('unit','gram')
+    b.set('legend','Storage-state')
+
+    # second variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Fuel Segments')
+    b.set('unit','')
+    b.set('legend','Storage-state')
+
+    # second variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Pu Mass')
     b.set('unit','gram')
     b.set('legend','Storage-state')
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
     b.set('value',str(evolTime))
+
+    # all variables values
     gDec = self.__gramDecimals
     mass = round(self.__GetMass(),gDec)
-    b.text = str(mass)
+    b.text = str(mass)+','+str(self.__GetNSegments())+','+str(self.__GetPuMass())
 
     tree = ElementTree.ElementTree(a)
 
@@ -640,9 +669,11 @@ class Storage(object):
     rootNode = tree.getroot()
     a = ElementTree.Element('timeStamp')
     a.set('value',str(evolTime))
+
+    # all variables values
     gDec = self.__gramDecimals
     mass = round(self.__GetMass(),gDec)
-    a.text = str(mass)
+    a.text = str(mass)+','+str(self.__GetNSegments())+','+str(self.__GetPuMass())
 
     rootNode.append(a)
 

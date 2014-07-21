@@ -64,16 +64,16 @@ class PyPlot(object):
   s = 'Execute(): facility time [min] = ' + str(facilityTime)
   self.__log.info(s)
 
-  if facilityTime % self.__plotInterval == 0.0 and facilityTime != 0.0: 
-    self.__PlotTimeTables() # updata plot every 30 min
-
   if facilityTime % self.__plotInterval == 0.0 and facilityTime < self.__evolveTime: 
     fromTime = max(0.0, facilityTime-self.__plotSlideWindow)
     toTime   = facilityTime
-    self.__PlotAllTimeSequences(fromTime, toTime) # updata plot every 30 min
 
-  if facilityTime >= self.__evolveTime:
-    self.__PlotAllTimeSequences(0.0, self.__evolveTime)  # plot all history
+    self.__PlotTimeSeqDashboard(fromTime, toTime) #  plot with slide window history
+    self.__PlotTimeTables(fromTime, toTime) # updata plot every 30 min
+
+  elif facilityTime >= self.__evolveTime: 
+    self.__PlotTimeSeqDashboard(0.0, self.__evolveTime)  # plot all history
+    self.__PlotTimeTables(0.0, self.__evolveTime) # plot all history
 
 #---------------------------------------------------------------------------------
  def __UseData( self, port, evolTime=0.0 ):
@@ -85,7 +85,8 @@ class PyPlot(object):
   if port[0] == 'time-sequence' and evolTime % self.__plotInterval == 0.0: 
     self.__GetTimeSequence( portFile, evolTime )
 
-  if port[0] == 'time-tables': self.__GetTimeTables( portFile, evolTime )
+  if port[0] == 'time-tables' and evolTime % self.__plotInterval == 0.0: 
+    self.__GetTimeTables( portFile, evolTime )
 
 #---------------------------------------------------------------------------------
 # Nothing planned to provide at this time; but could change
@@ -215,7 +216,7 @@ class PyPlot(object):
   return
 
 #---------------------------------------------------------------------------------
- def __PlotTimeTables( self ):
+ def __PlotTimeTables( self, initialTime=0.0, finalTime=0.0 ):
 
   nTimeSteps = len(self.__timeTablesData.keys())
   if nTimeSteps == 0: return
@@ -323,14 +324,14 @@ class PyPlot(object):
   plt.close('time-tables')
 
 #---------------------------------------------------------------------------------
- def __PlotAllTimeSequences( self, initialTime=0.0, finalTime=0.0 ):
+ def __PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
-  s = '__PlotAllTimeSequences(): from: '+str(initialTime)+' to '+str(finalTime)
+  s = '__PlotTimeSeqDashboard(): from: '+str(initialTime)+' to '+str(finalTime)
   self.__log.debug(s)
 
   nSequences = len(self.__timeSequences_tmp)
 
-  s = '__PlotAllTimeSequences(): # of sequences: '+str(nSequences)
+  s = '__PlotTimeSeqDashboard(): # of sequences: '+str(nSequences)
   self.__log.debug(s)
 
   if nSequences == 0: return
@@ -339,125 +340,137 @@ class PyPlot(object):
   for seq in self.__timeSequences_tmp:
     nVar += seq.GetNVariables()
 
-  s = '__PlotAllTimeSequences(): # of variables: '+str(nVar)
+  s = '__PlotTimeSeqDashboard(): # of variables: '+str(nVar)
   self.__log.debug(s)
 
-  assert nVar <= 9, 'exceeded # of variables'
-
-  fig = plt.figure('time-sequence')
-
-  gs = gridspec.GridSpec(3,3)
-  gs.update( left=0.08,right=0.98,wspace=0.4,hspace=0.4 )
-
-  axlst = list()
-  axlst.append( fig.add_subplot(gs[0, 0]) )
-  axlst.append( fig.add_subplot(gs[0, 1]) )
-  axlst.append( fig.add_subplot(gs[0, 2]) )
-  axlst.append( fig.add_subplot(gs[1, 0]) )
-  axlst.append( fig.add_subplot(gs[1, 1]) )
-  axlst.append( fig.add_subplot(gs[1, 2]) )
-  axlst.append( fig.add_subplot(gs[2, 0]) )
-  axlst.append( fig.add_subplot(gs[2, 1]) )
-  axlst.append( fig.add_subplot(gs[2, 2]) )
-  axes = np.array(axlst)
+  # collect all variables in a list for mapping on the dashboards
+  variablesData = list()
+  for seq in self.__timeSequences_tmp:
+    for (spec,values) in seq.GetVariables().items():
+      variablesData.append( (spec,values) )
+  assert len(variablesData) == nVar
 
   today = datetime.datetime.today()
-  text = str(today).split('.')[0]+': Cortix.Modules.Native.PyPlot: Time-Sequence Data'
-  fig.text(.5,.95,text,horizontalalignment='center',fontsize=14)
+  
+  # loop over variables and assign to the dashboards  
+  iDash = 0
+  for iVar in range(nVar):
 
-  axs = axes.flat
+    if iVar % 9 == 0: # if a multiple of 8 start a new dashboard
 
-  for iseq in range(nSequences):
+      if iVar != 0: # flush any current figure
+        figName = 'timeseq-dashboard-'+str(iDash)+'.png'
+        fig.savefig(figName,dpi=200,fomat='png')
+        plt.close(str(iDash))
+        s = '__PlotTimeSeqDashboard(): created plot: '+figName
+        self.__log.debug(s)
+        iDash += 1
+      # end of if iVar != 0: # flush any current figure
 
-    ax = axs[iseq]
-    timeSequence = self.__timeSequences_tmp[iseq]
+      fig = plt.figure(str(iDash))
 
-    for (spec,val) in timeSequence.GetVariables().items():
+      gs = gridspec.GridSpec(3,3)
+      gs.update( left=0.08,right=0.98,wspace=0.4,hspace=0.4 )
 
-      varName = spec[0]
-      varUnit = spec[1]
+      axlst = list()
 
-      if varUnit == 'gram': varUnit = 'g'
+      nPlotsNeeded = nVar - iVar 
+      count = 0
+      for i in range(3):
+        for j in range(3):
+          axlst.append( fig.add_subplot(gs[i, j]) )
+          count += 1
+          if count == nPlotsNeeded: break
+        if count == nPlotsNeeded: break
 
-      timeUnit  = spec[2]
-      varLegend = spec[3]
+      axes = np.array(axlst)
 
-      if timeUnit == 'minute': timeUnit = 'm'
+      text = str(today).split('.')[0]+': Cortix.Modules.Native.PyPlot: Time-Sequence Data'
+      fig.text(.5,.95,text,horizontalalignment='center',fontsize=14)
+
+      axs = axes.flat
  
-      data = np.array(val)
+      axId = 0
+
+    # end of if iVar % 9 == 0: # if a multiple of 9 start a new dashboard
+
+    (spec,val) = variablesData[iVar]
+
+    ax = axs[axId]
+    axId += 1
+ 
+    varName = spec[0]
+    varUnit = spec[1]
+
+    if varUnit == 'gram': varUnit = 'g'
+
+    timeUnit  = spec[2]
+    varLegend = spec[3]
+
+    if timeUnit == 'minute': timeUnit = 'm'
+ 
+    data = np.array(val)
 
 #      assert len(data.shape) == 2, 'not a 2-column shape: %r in var %r of %r; stop.' % (data.shape,varName,varLegend)
-      if len(data.shape) != 2: 
-        s = '__PlotAllTimeSequences(): bad data; variable: '+varName+' unit: '+varUnit+' legend: '+varLegend+' shape: '+str(data.shape)+' skipping...'
-        self.__log.warn(s)
-        continue #  simply skip bad data and log
+    if len(data.shape) != 2: 
+      s = '__PlotTimeSeqDashboard(): bad data; variable: '+varName+' unit: '+varUnit+' legend: '+varLegend+' shape: '+str(data.shape)+' skipping...'
+      self.__log.warn(s)
+      continue #  simply skip bad data and log
 
-      x = data[:,0]
-      if x.max() >= 120.0:
-        x /= 60.0
-        if timeUnit == 'm': timeUnit = 'h'
+    x = data[:,0]
+    if x.max() >= 120.0:
+      x /= 60.0
+      if timeUnit == 'm': timeUnit = 'h'
 
-      y = data[:,1]
-      if y.max() >= 1000.0: 
-        y /= 1000.0
-        if varUnit == 'gram' or varUnit == 'g': 
-          varUnit = 'kg'
-      if y.max() <= .1: 
-        y *= 1000.0
-        if varUnit == 'gram' or varUnit == 'g': 
-          varUnit = 'mg'
+    y = data[:,1]
+    if y.max() >= 1000.0: 
+      y /= 1000.0
+      if varUnit == 'gram' or varUnit == 'g': 
+        varUnit = 'kg'
+    if y.max() <= .1: 
+      y *= 1000.0
+      if varUnit == 'gram' or varUnit == 'g': 
+        varUnit = 'mg'
   
-      ax.set_xlabel('Time ['+timeUnit+']',fontsize=10)
-      ax.set_ylabel(varName+' ['+varUnit+']',fontsize=10)
+    ax.set_xlabel('Time ['+timeUnit+']',fontsize=10)
+    ax.set_ylabel(varName+' ['+varUnit+']',fontsize=10)
 
-      ymax  = y.max()
-      dy    = ymax * .1
-      ymax += dy
-      ymin  = y.min()
-      ymin -= dy
+    ymax  = y.max()
+    dy    = ymax * .1
+    ymax += dy
+    ymin  = y.min()
+    ymin -= dy
 
-      ax.set_ylim(ymin,ymax)
+    ax.set_ylim(ymin,ymax)
 
-      for l in ax.get_xticklabels(): l.set_fontsize(10)
-      for l in ax.get_yticklabels(): l.set_fontsize(10)
+    for l in ax.get_xticklabels(): l.set_fontsize(10)
+    for l in ax.get_yticklabels(): l.set_fontsize(10)
 
-      if timeUnit == 'h' and x.max()-x.min() <= 5.0:
-        majorLocator = MultipleLocator(1.0)
-        minorLocator = MultipleLocator(0.5)
+    if timeUnit == 'h' and x.max()-x.min() <= 5.0:
+      majorLocator = MultipleLocator(1.0)
+      minorLocator = MultipleLocator(0.5)
 
-        ax.xaxis.set_major_locator(majorLocator)
-        ax.xaxis.set_minor_locator(minorLocator)
+      ax.xaxis.set_major_locator(majorLocator)
+      ax.xaxis.set_minor_locator(minorLocator)
 
-#  color  = parameters['plot-color']
-#  marker = parameters['plot-marker']+'-'
-#  axis.set_xlim(2e-3, 2)
-#  axis.set_aspect(1)
-#  axis.set_title("adjustable = box")
-#  legend = parameters['plot-legend']
+    ax.plot( x, y, 's-', color='black', linewidth=0.5, markersize=2,  \
+             markeredgecolor='black', label=varLegend )
 
-  
-      ax.plot( x, y, 's-', color='black', linewidth=0.5, markersize=2,  \
-               markeredgecolor='black', label=varLegend )
-#              markeredgecolor='black', label='dissolver request' )
+    ax.legend( loc='best', prop={'size':8} )
 
-# if index == 0:
-#    axis.set_xscale("log")
-#    axis.set_yscale("log")
+    s = '__PlotTimeSeqDashboard(): plotted '+varName+' from '+varLegend
+    self.__log.debug(s)
 
-      ax.legend( loc='best', prop={'size':8} )
-
-      s = '__PlotAllTimeSequences(): plotted '+varName
-      self.__log.debug(s)
-    # end of for (spec,val) in timeSequence.GetVariables.items():
-
-  # end of for iseq in range(len(self.__timeSequence_tmp)):
-
-  fig.savefig('pyplot-timesequences.png',dpi=200,fomat='png')
-  plt.close('time-sequence')
+  # end of for iVar in range(nVar):
+  figName = 'timeseq-dashboard-'+str(iDash)+'.png'
+  fig.savefig(figName,dpi=200,fomat='png')
+  plt.close(str(iDash))
+  s = '__PlotTimeSeqDashboard(): created plot: '+figName
+  self.__log.debug(s)
 
   self.__timeSequences_tmp = list()
 
-  s = '__PlotAllTimeSequences(): done with plotting'
+  s = '__PlotTimeSeqDashboard(): done with plotting'
   self.__log.debug(s)
 
   return
