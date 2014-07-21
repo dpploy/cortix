@@ -121,11 +121,11 @@ class Plume(object):
 #---------------------------------------------------------------------------------
  def __Puff( self, evolTime, timeStep ):
 
-  inputFile = '/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/plume.input'
+  inputFile = '/tmp/plume.input'
   
   self.__WritePlumeInputFile( inputFile, evolTime )
 
-  outputFile = '/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/plume.output'
+  outputFile = '/tmp/plume.output'
 
   hostExec = '/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/facility_pfpl/pfpl'
   
@@ -225,7 +225,7 @@ class Plume(object):
   # if not the first time step then parse the existing history file and append
   else:
 
-    outputFile = '/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/plume.output'
+    outputFile = '/tmp/plume.output'
 
     data = pandas.read_fwf(outputFile,skiprows=9,nrows=119,widths=[16,8,7,7,11,11,11,7],names=['A','Distance [km]','1/2 Width [km]','1/2 Height [km]','Center Conc. [pCi/m3]','2Sigma Center Conc. [pCi/m3]','G','H'])
 
