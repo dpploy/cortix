@@ -19,38 +19,47 @@ class Storage(object):
 # __slots__ = [
 
  def __init__( self,
-               ports 
+               ports,
+               evolveTime=0.0
              ):
 
+  # Sanity test
   assert type(ports) is list, '-> ports type %r is invalid.' % type(ports)
+  assert type(evolveTime) is float, '-> time type %r is invalid.' % type(evolveTime)
 
+  # Logging
+  self.__log = logging.getLogger('storage')
+  self.__log.info('initializing an instance of Storage')
+
+  # Member data
   self.__ports = ports
+
+  self.__evolveTime = evolveTime
 
   self.__fuelSegments = list()
 
   self.__withdrawMass = 0.0
 
-  self.__log = logging.getLogger('storage')
-  self.__log.info('initializing an instance of Storage')
-
   self.__gramDecimals = 3 # milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
 
 #---------------------------------------------------------------------------------
- def CallPorts(self, evolTime=0.0, evolveTime=0.0):
+ def CallPorts(self, facilityTime=0.0):
 
-  self.__UseData( usePortName='solids', evolTime=evolTime  )
+  self.__UseData( usePortName='solids', atTime=facilityTime )
  
-  self.__UseData( usePortName='withdrawal-request', evolTime=evolTime  )
+  self.__UseData( usePortName='withdrawal-request', atTime=facilityTime  )
 
-  self.__ProvideData( providePortName='fuel-segments', evolTime=evolTime, evolveTime=evolveTime )
+  self.__ProvideData( providePortName='fuel-segments', atTime=facilityTime )
 
-  self.__ProvideData( providePortName='state', evolTime=evolTime, evolveTime=evolveTime)
+  self.__ProvideData( providePortName='state', atTime=facilityTime )
+
+  self.__ProvideData( providePortName='off-gas', atTime=facilityTime )
 
 #---------------------------------------------------------------------------------
- def Execute( self, evolTime=0.0, timeStep=1.0, evolveTime=0.0 ):
+ def Execute( self, facilityTime=0.0 ):
 
-  s = 'Execute(): facility time [min] = ' + str(evolTime)
+  s = 'Execute(): facility time [min] = ' + str(facilityTime)
   self.__log.info(s)
   gDec = self.__gramDecimals
   s = 'Execute(): total mass [g] = ' + str(round(self.__GetMass(),gDec))
@@ -58,29 +67,34 @@ class Storage(object):
   s = 'Execute(): # of segments  = '+str(len(self.__fuelSegments))
   self.__log.debug(s)
 
-  self.__Store( evolTime + timeStep )
+  self.__Store( facilityTime )
 
 #---------------------------------------------------------------------------------
- def __UseData( self, usePortName=None, evolTime=0.0 ):
+ def __UseData( self, usePortName=None, atTime=0.0 ):
 
 # Access the port file
-  portFile = self.__GetPortFile( usePortName = usePortName )
+  portFile = self.__GetPortFile( usePortName=usePortName )
 
 # Get data from port files
-  if usePortName == 'solids': self.__GetSolids( portFile, evolTime )
-  if usePortName == 'withdrawal-request': self.__GetWithdrawalRequest( portFile, evolTime )
+  if usePortName == 'solids': self.__GetSolids( portFile, atTime )
+
+  if usePortName == 'withdrawal-request': self.__GetWithdrawalRequest( portFile, atTime )
 
 #---------------------------------------------------------------------------------
- def __ProvideData( self, providePortName=None, evolTime=0.0, evolveTime=0.0 ):
+ def __ProvideData( self, providePortName=None, atTime=0.0 ):
 
 # Access the port file
-  portFile = self.__GetPortFile( providePortName = providePortName )
+  portFile = self.__GetPortFile( providePortName=providePortName )
 
 # Send data to port files
   if providePortName == 'fuel-segments' and portFile is not None: 
-     self.__ProvideFuelSegmentsOnDemand( portFile, evolTime, evolveTime )
+     self.__ProvideFuelSegmentsOnDemand( portFile, atTime )
+
   if providePortName == 'state' and portFile is not None:
-     self.__ProvideState( portFile, evolTime, evolveTime )
+     self.__ProvideState( portFile, atTime )
+
+  if providePortName == 'off-gas' and portFile is not None:
+     self.__ProvideOffGas( portFile, atTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -122,11 +136,11 @@ class Storage(object):
 
 #---------------------------------------------------------------------------------
 # This uses a use portFile which is guaranteed at this point
- def __GetSolids( self, portFile, evolTime ):
+ def __GetSolids( self, portFile, facilityTime ):
 
   # THIS IS A GLITCH ON THE INPUT DATA FROM THE HEAD-END. IT SHOULD HAVE DATA
   # FOR 24 HOURS. ONLY HAS 107 minutes
-  if evolTime > 107: return
+  if facilityTime > 107: return
 
   found = False
 
@@ -158,21 +172,6 @@ class Storage(object):
 #.................................................................................
     for timeNode in timeNodes:
 
-     totalMass = 0.0
-
-     U    = 0.0
-     Pu   = 0.0
-     Cs   = 0.0
-     Sr   = 0.0
-     I    = 0.0
-     Kr   = 0.0
-     Xe   = 0.0
-     a3H  = 0.0
-     Ru   = 0.0
-     O    = 0.0
-     N    = 0.0
-     FP   = 0.0
-
      timeIndex = int(timeNode.get('index'))
 
 #   s = '__GetSolids(): timeIndex='+str(timeIndex)
@@ -183,13 +182,13 @@ class Storage(object):
 #   s = '__GetSolids(): timeStamp='+str(timeStamp)
 #   self.__log.debug(s)
   
-     if timeStamp == evolTime: 
+     if timeStamp == facilityTime: 
 
        #...........
        found = True
        #...........
 
-#     s = '__GetSolids(): timeStamp='+str(timeStamp)+';'+' evolTime='+str(evolTime)
+#     s = '__GetSolids(): timeStamp='+str(timeStamp)+';'+' facilityTime='+str(facilityTime)
 #     self.__log.debug(s)
 
        n = timeNode.find('Segment_Length')
@@ -222,6 +221,20 @@ class Storage(object):
        n = timeNode.find('Segments_Output_This_Timestep')
        nSegments = float(n.get('segments_output'))
 
+       totalMass = 0.0
+  
+       U    = 0.0
+       Pu   = 0.0
+       Cs   = 0.0
+       Sr   = 0.0
+       I    = 0.0
+       Kr   = 0.0
+       Xe   = 0.0
+       a3H  = 0.0
+       Ru   = 0.0
+       O    = 0.0
+       N    = 0.0
+
        elements = timeNode.findall('Element')
        for element in elements:
          isotopes = element.findall('Isotope')
@@ -248,7 +261,10 @@ class Storage(object):
 #  print('OD          = ', oD)
 #  print('ID          = ', iD)
 
+       # end of for element in elements:
+
        FP = totalMass - (U + Pu + I + Kr + Xe + a3H)
+
 #     totalNSegments += nSegments
 
 #  print('mass U      = ', U)
@@ -259,21 +275,44 @@ class Storage(object):
 #  print('mass N      = ', N)
 #  print('mass FP     = ', FP)
 
+       gDec  = self.__gramDecimals 
+       mmDec = self.__mmDecimals 
+
+       totalMass     = round(totalMass,gDec)
+       segmentLength = round(segmentLength,mmDec)
+       iD            = round(iD,mmDec)
+       U             = round(U  ,gDec)
+       Pu            = round(Pu ,gDec)
+       I             = round(I  ,gDec)
+       Kr            = round(Kr ,gDec)
+       Xe            = round(Xe ,gDec)
+       a3H           = round(a3H,gDec)
+       FP            = round(FP ,gDec)
+
+       assert abs( totalMass - (U+Pu+I+Kr+Xe+a3H+FP) ) < 1.0e-2
+
+       segMass   = totalMass / int(nSegments)
+       segLength = segmentLength
+       segID     = iD
+       U         /=  int(nSegments)
+       Pu        /=  int(nSegments)
+       I         /=  int(nSegments)
+       Kr        /=  int(nSegments)
+       Xe        /=  int(nSegments)
+       a3H       /=  int(nSegments)
+       FP        /=  int(nSegments)
+
+       assert abs( segMass - (U+Pu+I+Kr+Xe+a3H+FP) ) < 1.0e-2
+
        for seg in range(1,int(nSegments)+1):
-         segMass   = totalMass / int(nSegments)
-         segLength = segmentLength
-         segID     = iD
-         U         = U  / int(nSegments)
-         Pu        = Pu / int(nSegments)
-         I         = I  / int(nSegments)
-         Kr        = Kr / int(nSegments)
-         Xe        = Xe / int(nSegments)
-         a3H       = a3H/ int(nSegments)
-         FP        = FP / int(nSegments)
-         segment   = ( timeStamp, segMass, segLength, segID, 
-                       U, Pu, I, Kr, Xe, a3H, FP )
+
+         segment = ( timeStamp, segMass, segLength, segID, 
+                     U, Pu, I, Kr, Xe, a3H, FP )
 
          self.__fuelSegments.append( segment )
+#         print( '# segments = ', len(self.__fuelSegments) )
+
+       # end of for seg in range(1,int(nSegments)+1):
   
 #  print('totalMass     [g]= ', totalMass)
 #  print('total # segments = ', totalNSegments)
@@ -292,6 +331,10 @@ class Storage(object):
 
        break
 
+     # end of if timeStamp == facilityTime: 
+
+    # end of for timeNode in timeNodes:
+
     if found is False: time.sleep(1) 
 
   # end of while found is False:
@@ -300,13 +343,13 @@ class Storage(object):
 
 #---------------------------------------------------------------------------------
 # This uses a use portFile which is guaranteed to exist at this point
- def __GetWithdrawalRequest( self, portFile, evolTime ):
+ def __GetWithdrawalRequest( self, portFile, facilityTime ):
 
   found = False
 
   while found is False:
 
-    s = '__GetWithdrawalRequest(): checking for withdrawal message at '+str(evolTime)
+    s = '__GetWithdrawalRequest(): checking for withdrawal message at '+str(facilityTime)
     self.__log.debug(s)
 
     try:
@@ -334,8 +377,8 @@ class Storage(object):
 
       timeStamp = float(n.get('value').strip())
  
-      # get data at timeStamp evolTime
-      if timeStamp == evolTime:
+      # get data at timeStamp facilityTime
+      if timeStamp == facilityTime:
 
          found = True
 
@@ -343,7 +386,7 @@ class Storage(object):
          mass = float(n.text.strip())
          self.__withdrawMass = mass
 
-         s = '__GetWithdrawalRequest(): received withdrawal message at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
+         s = '__GetWithdrawalRequest(): received withdrawal message at '+str(facilityTime)+' [min]; mass [g] = '+str(round(mass,3))
          self.__log.debug(s)
 
     # end for n in nodes:
@@ -370,6 +413,21 @@ class Storage(object):
   return mass
 
 #---------------------------------------------------------------------------------
+ def __GetUMass(self, timeStamp=None):
+ 
+  mass = 0.0
+
+  if timeStamp is None:
+     for fuelSeg in self.__fuelSegments:
+      mass += fuelSeg[4]
+
+  else:
+     for fuelSeg in self.__fuelSegments:
+      if fuelSeg[0] <= timeStamp: mass += fuelSeg[4]
+
+  return mass
+
+#---------------------------------------------------------------------------------
  def __GetPuMass(self, timeStamp=None):
  
   mass = 0.0
@@ -385,8 +443,39 @@ class Storage(object):
   return mass
 
 #---------------------------------------------------------------------------------
+ def __GetXeMass(self, timeStamp=None):
+ 
+  mass = 0.0
+
+  if timeStamp is None:
+     for fuelSeg in self.__fuelSegments:
+      mass += fuelSeg[8]
+
+  else:
+     for fuelSeg in self.__fuelSegments:
+      if fuelSeg[0] <= timeStamp: mass += fuelSeg[8]
+
+  return mass
+
+
+#---------------------------------------------------------------------------------
+ def __GetFPMass(self, timeStamp=None):
+ 
+  mass = 0.0
+
+  if timeStamp is None:
+     for fuelSeg in self.__fuelSegments:
+      mass += fuelSeg[10]
+
+  else:
+     for fuelSeg in self.__fuelSegments:
+      if fuelSeg[0] <= timeStamp: mass += fuelSeg[10]
+
+  return mass
+
+#---------------------------------------------------------------------------------
 # Provide the entire history data 
- def __ProvideFuelSegmentsOnDemand( self, portFile, evolTime, evolveTime ):
+ def __ProvideFuelSegmentsOnDemand( self, portFile, facilityTime ):
 
   gDec  = self.__gramDecimals
   mmDec = self.__mmDecimals
@@ -409,7 +498,7 @@ class Storage(object):
   #...........................................
   # if the first time step write a nice header
   #...........................................
-  if evolTime == 0.0:
+  if facilityTime == 0.0:
 
     fout = open( portFile, 'w')
 
@@ -433,31 +522,31 @@ class Storage(object):
     s = ' </pack2>\n'; fout.write(s)
 
     # time stamp
-    s = ' <timeStamp value="'+str(evolTime)+'">\n'; fout.write(s)
+    s = ' <timeStamp value="'+str(facilityTime)+'">\n'; fout.write(s)
 
-    if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
+    if withdrawMass == 0.0 or withdrawMass > self.__GetMass( facilityTime ): 
 
       s = ' </timeStamp>\n'; fout.write(s)
 
       s = '</time-variable-packet>\n'; fout.write(s)
       fout.close()
 
-      s = '__ProvideFuelSegmentsOnDemand(): providing no fuel at '+str(evolTime)+' [min]'
+      s = '__ProvideFuelSegmentsOnDemand(): providing no fuel at '+str(facilityTime)+' [min]'
       self.__log.debug(s)
 
       self.__withdrawMass = 0.0
 
       return
 
-    else: # of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
+    else: # of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( facilityTime ): 
 
       fuelSegmentsLoad = list()
       fuelMassLoad = 0.0
 
       # withdraw fuel elements
       while fuelMassLoad <= withdrawMass:
-           fuelSegmentCandidate = self.__WithdrawFuelSegment( evolTime )
-           if fuelSegmentCandidate is None: break # no segments left with time stamp <= evolTime
+           fuelSegmentCandidate = self.__WithdrawFuelSegment( facilityTime )
+           if fuelSegmentCandidate is None: break # no segments left with time stamp <= facilityTime
            mass          = fuelSegmentCandidate[1]
            fuelMassLoad += mass
            if fuelMassLoad <= withdrawMass:
@@ -471,7 +560,7 @@ class Storage(object):
       for fuelSeg in fuelSegmentsLoad:
 
         timeStamp = fuelSeg[0]
-        assert timeStamp <=  evolTime, 'sanity check failed.'
+        assert timeStamp <=  facilityTime, 'sanity check failed.'
         mass      = fuelSeg[1]
         length    = fuelSeg[2]
         segID     = fuelSeg[3]
@@ -504,7 +593,7 @@ class Storage(object):
         s = '</time-variable-packet>\n'; fout.write(s)
         fout.close()
 
-        s = '__ProvideFuelSegmentsOnDemand(): providing '+str(len(fuelSegmentsLoad))+' fuel segments at '+str(evolTime)+' [min].'
+        s = '__ProvideFuelSegmentsOnDemand(): providing '+str(len(fuelSegmentsLoad))+' fuel segments at '+str(facilityTime)+' [min].'
         self.__log.debug(s)
 
       # endo of for fuelSeg in fuelSegmentsLoad:
@@ -513,40 +602,40 @@ class Storage(object):
 
       return
 
-    # end of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
+    # end of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( facilityTime ): 
 
   #...........................................................................
   # if not the first time step then parse the existing history file and append
   #...........................................................................
-  else: # of if evolTime == 0.0:
+  else: # of if facilityTime == 0.0:
 
     tree = ElementTree.parse( portFile )
     rootNode = tree.getroot()
 
     newTimeStamp = ElementTree.Element('timeStamp')
-    newTimeStamp.set('value',str(evolTime))
+    newTimeStamp.set('value',str(facilityTime))
 
-    if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ): 
+    if withdrawMass == 0.0 or withdrawMass > self.__GetMass( facilityTime ): 
 
       rootNode.append(newTimeStamp)
       tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
 
       self.__withdrawMass = 0.0
 
-      s = '__ProvideFuelSegmentsOnDemand(): providing no fuel at '+str(evolTime)+' [min]'
+      s = '__ProvideFuelSegmentsOnDemand(): providing no fuel at '+str(facilityTime)+' [min]'
       self.__log.debug(s)
    
       return
 
-    else: # of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( evolTime ):
+    else: # of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( facilityTime ):
 
       fuelSegmentsLoad = list()
       fuelMassLoad = 0.0
 
       # withdraw fuel elements
       while fuelMassLoad <= withdrawMass:
-           fuelSegmentCandidate = self.__WithdrawFuelSegment( evolTime )
-           if fuelSegmentCandidate is None: break # no segments left with time stamp <= evolTime
+           fuelSegmentCandidate = self.__WithdrawFuelSegment( facilityTime )
+           if fuelSegmentCandidate is None: break # no segments left with time stamp <= facilityTime
            mass          = fuelSegmentCandidate[1]
            fuelMassLoad += mass
            if fuelMassLoad <= withdrawMass:
@@ -559,7 +648,7 @@ class Storage(object):
       for fuelSeg in fuelSegmentsLoad:
 
         timeStamp = fuelSeg[0]
-        assert timeStamp <= evolTime, 'sanity check failed.'
+        assert timeStamp <= facilityTime, 'sanity check failed.'
         mass      = round(fuelSeg[1],gDec)
         length    = round(fuelSeg[2],mmDec)
         segID     = round(fuelSeg[3],mmDec)
@@ -594,22 +683,22 @@ class Storage(object):
       rootNode.append(newTimeStamp)
       tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
 
-      s = '__ProvideFuelSegmentsOnDemand(): providing '+str(len(fuelSegmentsLoad))+' fuel segments at '+str(evolTime)+' [min].'
+      s = '__ProvideFuelSegmentsOnDemand(): providing '+str(len(fuelSegmentsLoad))+' fuel segments at '+str(facilityTime)+' [min].'
       self.__log.debug(s)
 
       self.__withdrawMass = 0.0
 
       return
 
-  # end of if evolTime == 0.0:
+  # end of if facilityTime == 0.0:
 
   return
 
 #---------------------------------------------------------------------------------
- def __ProvideState( self, portFile, evolTime, evolveTime ):
+ def __ProvideState( self, portFile, facilityTime ):
 
   # if the first time step, write the header of a time-sequence data file
-  if evolTime == 0.0:
+  if facilityTime == 0.0:
 
     assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
@@ -643,20 +732,36 @@ class Storage(object):
     b.set('unit','')
     b.set('legend','Storage-state')
 
-    # second variable
+    # third variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','U Mass')
+    b.set('unit','gram')
+    b.set('legend','Storage-state')
+
+    # fourth variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Pu Mass')
     b.set('unit','gram')
     b.set('legend','Storage-state')
 
+    # fifth variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','FP Mass')
+    b.set('unit','gram')
+    b.set('legend','Storage-state')
+
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
-    b.set('value',str(evolTime))
+    b.set('value',str(facilityTime))
 
     # all variables values
     gDec = self.__gramDecimals
     mass = round(self.__GetMass(),gDec)
-    b.text = str(mass)+','+str(self.__GetNSegments())+','+str(self.__GetPuMass())
+    b.text = str(mass)+','+\
+             str(self.__GetNSegments())+','+\
+             str(self.__GetUMass())+','+\
+             str(self.__GetPuMass())+','+\
+             str(self.__GetFPMass())
 
     tree = ElementTree.ElementTree(a)
 
@@ -668,12 +773,80 @@ class Storage(object):
     tree = ElementTree.parse( portFile )
     rootNode = tree.getroot()
     a = ElementTree.Element('timeStamp')
-    a.set('value',str(evolTime))
+    a.set('value',str(facilityTime))
 
     # all variables values
     gDec = self.__gramDecimals
     mass = round(self.__GetMass(),gDec)
-    a.text = str(mass)+','+str(self.__GetNSegments())+','+str(self.__GetPuMass())
+    a.text = str(mass)+','+\
+             str(self.__GetNSegments())+','+\
+             str(self.__GetUMass())+','+\
+             str(self.__GetPuMass())+','+\
+             str(self.__GetFPMass())
+
+    rootNode.append(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+
+  return 
+
+#---------------------------------------------------------------------------------
+ def __ProvideOffGas( self, portFile, facilityTime ):
+
+  # if the first time step, write the header of a time-sequence data file
+  if facilityTime == 0.0:
+
+    assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
+
+    tree = ElementTree.ElementTree()
+    rootNode = tree.getroot()
+
+    a = ElementTree.Element('time-sequence')
+    a.set('name','storage-state')
+
+    b = ElementTree.SubElement(a,'comment')
+    today = datetime.datetime.today()
+    b.set('author','cortix.modules.native.storage')
+    b.set('version','0.1')
+
+    b = ElementTree.SubElement(a,'comment')
+    today = datetime.datetime.today()
+    b.set('today',str(today))
+
+    b = ElementTree.SubElement(a,'time')
+    b.set('unit','minute')
+
+    # first variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Xe Off-Gas Flow')
+    b.set('unit','gram')
+    b.set('legend','Storage-offgas')
+
+    # values for all variables
+    b = ElementTree.SubElement(a,'timeStamp')
+    b.set('value',str(facilityTime))
+
+    # all variables values
+    gDec = self.__gramDecimals
+    mass = round(self.__GetXeMass(),gDec)
+    b.text = str(mass)
+
+    tree = ElementTree.ElementTree(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+
+  # if not the first time step then parse the existing history file and append
+  else:
+
+    tree = ElementTree.parse( portFile )
+    rootNode = tree.getroot()
+    a = ElementTree.Element('timeStamp')
+    a.set('value',str(facilityTime))
+
+    # all variables values
+    gDec = self.__gramDecimals
+    mass = round(self.__GetXeMass(),gDec)
+    a.text = str(mass)
 
     rootNode.append(a)
 
@@ -687,26 +860,26 @@ class Storage(object):
   nSegments = 0
 
   if timeStamp is None:
-      nSegments = len(self.__fuelSegments)
+    nSegments = len(self.__fuelSegments)
 
   else:
      for fuelSeg in self.__fuelSegments:
-      if fuelSeg[0] <= timeStamp: nSegments += 1
+       if fuelSeg[0] <= timeStamp: nSegments += 1
 
   return nSegments
 
 #---------------------------------------------------------------------------------
- def __WithdrawFuelSegment(self, evolTime ):
+ def __WithdrawFuelSegment(self, facilityTime ):
 
   fuelSegment = None
 
   for fuelSeg in self.__fuelSegments:
-     if fuelSeg[0] <= evolTime:
+    if fuelSeg[0] <= facilityTime:
       fuelSegment = fuelSeg
       self.__fuelSegments.remove(fuelSeg)
       break 
 
-#  print('WithdrawFuelSegment:: fuelSegment',fuelSegment, ' evolTime=',evolTime)
+#  print('WithdrawFuelSegment:: fuelSegment',fuelSegment, ' facilityTime=',facilityTime)
 
   return fuelSegment # if None, it is an empty drum
 
@@ -718,9 +891,55 @@ class Storage(object):
 #---------------------------------------------------------------------------------
  def __Store( self, facilityTime ):
 
-  # program here the Xe off gas
+  # Xe off-gas release place holder
+  gDec = self.__gramDecimals
+  for fuelSeg in self.__fuelSegments:
+    timeStamp = fuelSeg[0]
+    storageTime = facilityTime - timeStamp
+    massLossFactor = storageTime * 0.5/100.0
+    massLoss = fuelSeg[8] * massLossFactor
+    fuelSeg8 = round(fuelSeg[8] - massLoss,gDec)
+    fuelSeg1 = round(fuelSeg[1] - massLoss,gDec)
+    modifiedSegment = ( fuelSeg[0], fuelSeg1,   fuelSeg[2], fuelSeg[3], 
+                        fuelSeg[4], fuelSeg[5], fuelSeg[6], fuelSeg[7], fuelSeg8,
+                        fuelSeg[9], fuelSeg[10] )
+    self.__fuelSegments.remove(fuelSeg)
+    self.__fuelSegments.append(modifiedSegment)
+    
+  massCheck = self.__GetMassCheck()
+  assert massCheck is not None
+  assert massCheck is not False
 
   return
+
+#---------------------------------------------------------------------------------
+ def __GetMassCheck( self, timeStamp=None ):
+
+  check = True
+
+  gDec = self.__gramDecimals
+
+  if timeStamp is None:
+    for fuelSeg in self.__fuelSegments:
+      sumMass = 0.0
+      for mass in fuelSeg[4:11]:
+        sumMass += mass
+      if abs(round(sumMass,gDec) - round(fuelSeg[1],gDec)) > 1e-2: 
+        print(round(sumMass,gDec))
+        print(round(fuelSeg[1],gDec))
+        check = False
+#        return check
+  else:
+    for fuelSeg in self.__fuelSegments:
+      if fuelSeg[0] <= timeStamp:
+        sumMass = 0.0
+        for mass in fuelSeg[4:11]:
+          sumMass += mass
+        if abs(round(sumMass,gDec) - round(fuelSeg[1],gDec)) > 1e-2: 
+          check = False
+          return check
+
+  return check
 
 #*********************************************************************************
 # Usage: -> python storage.py

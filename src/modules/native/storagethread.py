@@ -145,7 +145,7 @@ class StorageThread(Thread):
 
 #................................................................................
 # Create the host code          
-  host = Storage( ports )
+  host = Storage( ports, evolveTime )
   log.debug("host = Storage( ports )")
 
 #................................................................................
@@ -160,9 +160,9 @@ class StorageThread(Thread):
 
    host.CallPorts( facilityTime )
 
-   host.Execute( facilityTime, timeStep, evolveTime )
-
    facilityTime += timeStep
+
+   host.Execute( facilityTime )
 
 #---------------------------------------------------------------------------------
 # Shutdown 

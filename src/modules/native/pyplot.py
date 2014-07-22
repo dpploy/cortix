@@ -37,16 +37,14 @@ class PyPlot(object):
   self.__log.info('initializing an instance of PyPlot')
 
   # Member data
-
   self.__ports = ports
 
   self.__evolveTime = evolveTime
 
   self.__timeTablesData = dict(list()) # [(time,timeUnit)] = [column,column,...]
 
-
-  self.__plotInterval    = 60.0   # minutes  (1 plot update every 30 min)
-  self.__plotSlideWindow = 3*60.0 # minutes  (1 plot update every 30 min)
+  self.__plotInterval    = 60.0   # minutes  (1 plot update every 60 min)
+  self.__plotSlideWindow = 3*60.0 # minutes  (1 plot update every 60 min)
   self.__gramDecimals    = 3      # milligram significant digits
 
   self.__timeSequences_tmp = list() # temporary storage
