@@ -8,6 +8,7 @@ Tue Jun 24 01:03:45 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
+import random
 import logging
 import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
@@ -39,6 +40,9 @@ class Storage(object):
   self.__fuelSegments = list()
 
   self.__withdrawMass = 0.0
+ 
+  self.__historyXeMassOffGas = dict()
+  self.__historyXeMassOffGas[0.0] = 0.0
 
   self.__gramDecimals = 3 # milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
@@ -52,9 +56,10 @@ class Storage(object):
 
   self.__ProvideData( providePortName='fuel-segments', atTime=facilityTime )
 
-  self.__ProvideData( providePortName='state', atTime=facilityTime )
-
   self.__ProvideData( providePortName='off-gas', atTime=facilityTime )
+
+  # make this always last
+  self.__ProvideData( providePortName='state', atTime=facilityTime )
 
 #---------------------------------------------------------------------------------
  def Execute( self, facilityTime=0.0 ):
@@ -90,11 +95,11 @@ class Storage(object):
   if providePortName == 'fuel-segments' and portFile is not None: 
      self.__ProvideFuelSegmentsOnDemand( portFile, atTime )
 
-  if providePortName == 'state' and portFile is not None:
-     self.__ProvideState( portFile, atTime )
-
   if providePortName == 'off-gas' and portFile is not None:
      self.__ProvideOffGas( portFile, atTime )
+
+  if providePortName == 'state' and portFile is not None:
+     self.__ProvideState( portFile, atTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -828,7 +833,7 @@ class Storage(object):
 
     # all variables values
     gDec = self.__gramDecimals
-    mass = round(self.__GetXeMass(),gDec)
+    mass = round(self.__historyXeMassOffGas[facilityTime],gDec)
     b.text = str(mass)
 
     tree = ElementTree.ElementTree(a)
@@ -845,7 +850,7 @@ class Storage(object):
 
     # all variables values
     gDec = self.__gramDecimals
-    mass = round(self.__GetXeMass(),gDec)
+    mass = round(self.__historyXeMassOffGas[facilityTime],gDec)
     a.text = str(mass)
 
     rootNode.append(a)
@@ -892,12 +897,16 @@ class Storage(object):
  def __Store( self, facilityTime ):
 
   # Xe off-gas release place holder
+
   gDec = self.__gramDecimals
+
   for fuelSeg in self.__fuelSegments:
     timeStamp = fuelSeg[0]
     storageTime = facilityTime - timeStamp
-    massLossFactor = storageTime * 0.5/100.0
+    factor = random.random() * 0.3
+    massLossFactor = storageTime * factor/100.0/60.0 # rate: 0 to 0.3 wt% per hour of "storage" time
     massLoss = fuelSeg[8] * massLossFactor
+    self.__historyXeMassOffGas[facilityTime] = massLoss
     fuelSeg8 = round(fuelSeg[8] - massLoss,gDec)
     fuelSeg1 = round(fuelSeg[1] - massLoss,gDec)
     modifiedSegment = ( fuelSeg[0], fuelSeg1,   fuelSeg[2], fuelSeg[3], 

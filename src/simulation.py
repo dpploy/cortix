@@ -189,6 +189,7 @@ class Simulation(object):
     fout.close()
     task.SetRuntimeCortixParamFile( taskFile )
 
+
     # using the taks and network create the runtime module directories and comm files
     for net in networks:
 
@@ -196,14 +197,20 @@ class Simulation(object):
 
       connect = net.GetConnectivity()
 
+      toModuleToPortVisited = dict()
+
       for con in connect:
 
        # Start with the ports that will function as a provide port or input port
        toModule = con['toModule']
        toPort   = con['toPort']
 
+       if toModule not in toModuleToPortVisited.keys(): 
+         toModuleToPortVisited[toModule] = list()
+
        module = self.__application.GetModule(toModule)
 
+       assert module is not None, 'module %r does not exist in application' % toModule
        assert module.HasPortName( toPort ), 'module %r does not have port %r.' % (module.GetName(), toPort )
        assert module.GetPortType(toPort) is not None, 'network name: %r, module name: %r, toPort: %r port type invalid %r' % (net.GetName(), module.GetName(), toPort, type(module.GetPortType(toPort)))
 
@@ -222,11 +229,14 @@ class Simulation(object):
             s = '<!-- Written by Simulation::__Setup() -->\n'; fout.write(s)
             s = '<cortixComm>\n'; fout.write(s)
 
-          fout = open( toModuleCommFile,'a' )
-          # this is the cortix info for modules providing data           
-          s = '<port name="'+toPort+'" type="provide" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
-          fout.write(s)
-          fout.close()
+          if toPort not in toModuleToPortVisited[toModule]:
+            fout = open( toModuleCommFile,'a' )
+            # this is the cortix info for modules providing data           
+            s = '<port name="'+toPort+'" type="provide" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
+            fout.write(s)
+            fout.close()
+            toModuleToPortVisited[toModule].append(toPort)
+
           r = '__Setup():: comm module: '+toModule+'; network: '+taskName+' '+s
           self.__log.debug(r)
 

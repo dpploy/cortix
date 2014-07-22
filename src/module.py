@@ -16,6 +16,7 @@ from src.modules.native.dissolverthread import DissolverThread
 from src.modules.native.condenserthread import CondenserThread
 from src.modules.native.scrubberthread import ScrubberThread
 from src.modules.native.hepafilterthread import HEPAFilterThread
+from src.modules.native.offgasthread import OffGasThread
 from src.modules.wrapped.plumethread import PlumeThread
 from src.modules.native.pyplotthread import PyPlotThread
 #*********************************************************************************
@@ -129,6 +130,9 @@ class Module(object):
        t.start()
     if name == 'hepafilter-native':        
        t = HEPAFilterThread( input, param, comm, status )
+       t.start()
+    if name == 'offgas-native':        
+       t = OffGasThread( input, param, comm, status )
        t.start()
     if name == 'plume':        
        t = PlumeThread( input, param, comm, status )
