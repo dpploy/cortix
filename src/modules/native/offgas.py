@@ -221,7 +221,7 @@ class OffGas(object):
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     s = ' <time unit="minute"/>\n'; fout.write(s)
     s = ' <var name="Xe Off-Gas" unit="gram/min" legend="Off-Gas-offgas"/>\n'; fout.write(s)
-    s = ' <var name="Xe Radioactivity" unit="Ci/m" legend="Off-Gas-offgas"/>\n'; fout.write(s)
+    s = ' <var name="Xe Radioactivity" unit="Ci/min" legend="Off-Gas-offgas"/>\n'; fout.write(s)
     mass = 0.0
     radioactivityXe = self.__radioactivityXe * mass 
     s = ' <timeStamp value="'+str(atTime)+'">'+\

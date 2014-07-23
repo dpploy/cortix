@@ -401,11 +401,12 @@ class PyPlot(object):
     varUnit = spec[1]
 
     if varUnit == 'gram': varUnit = 'g'
+    if varUnit == 'gram/min': varUnit = 'g/min'
 
     timeUnit  = spec[2]
     varLegend = spec[3]
 
-    if timeUnit == 'minute': timeUnit = 'm'
+    if timeUnit == 'minute': timeUnit = 'min'
  
     data = np.array(val)
 
@@ -418,7 +419,7 @@ class PyPlot(object):
     x = data[:,0]
     if x.max() >= 120.0:
       x /= 60.0
-      if timeUnit == 'm': timeUnit = 'h'
+      if timeUnit == 'min': timeUnit = 'h'
 
     y = data[:,1]
     if y.max() >= 1000.0: 
