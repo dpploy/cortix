@@ -97,7 +97,13 @@ class TimeSequence(object):
     name   = varNodes[ivar].get('name').strip()
     unit   = varNodes[ivar].get('unit').strip()
     legend = varNodes[ivar].get('legend').strip()
-    spec   = (name,unit,timeUnit,legend)
+    scale  = varNodes[ivar].get('scale')
+    if scale is None: 
+      spec   = (name,unit,timeUnit,legend,'linear')
+    else:
+      scale  = scale.strip()
+      assert scale == 'log' or scale == 'linear'
+      spec   = (name,unit,timeUnit,legend,scale)
     timeValues = list()
     for ts in timeStampNodes:
       time = float(ts.get('value').strip())
