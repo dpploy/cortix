@@ -425,10 +425,14 @@ class PyPlot(object):
       y /= 1000.0
       if varUnit == 'gram' or varUnit == 'g': 
         varUnit = 'kg'
+      if varUnit == 'gram/min' or varUnit == 'g/min': 
+        varUnit = 'kg/min'
     if y.max() <= .1: 
       y *= 1000.0
       if varUnit == 'gram' or varUnit == 'g': 
         varUnit = 'mg'
+      if varUnit == 'gram/min' or varUnit == 'g/min': 
+        varUnit = 'mg/min'
   
     ax.set_xlabel('Time ['+timeUnit+']',fontsize=10)
     ax.set_ylabel(varName+' ['+varUnit+']',fontsize=10)

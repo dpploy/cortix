@@ -43,6 +43,8 @@ class OffGas(object):
 
   self.__historyXeMassOffGas = dict()
 
+  self.__radioactivityXe = 1.5311e-4 # Ci/gram
+
   self.__gramDecimals = 3 # milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
 
@@ -173,8 +175,8 @@ class OffGas(object):
 
     # vfda to do: check for single var element
     node = rootNode.find('var')
-    assert node.get('name').strip() == 'Xe Off-Gas Flow', 'invalid variable.'
-    assert node.get('unit').strip() == 'gram', 'invalid mass unit'
+    assert node.get('name').strip() == 'Xe Off-Gas', 'invalid variable.'
+    assert node.get('unit').strip() == 'gram/min', 'invalid mass unit'
 
     nodes = rootNode.findall('timeStamp')
 
@@ -218,9 +220,14 @@ class OffGas(object):
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Xe Off-Gas Flow" unit="gram" legend="Off-Gas-offgas"/>\n'; fout.write(s)
+    s = ' <var name="Xe Off-Gas" unit="gram/min" legend="Off-Gas-offgas"/>\n'; fout.write(s)
+    s = ' <var name="Xe Radioactivity" unit="Ci/m" legend="Off-Gas-offgas"/>\n'; fout.write(s)
     mass = 0.0
-    s = ' <timeStamp value="'+str(atTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
+    radioactivityXe = self.__radioactivityXe * mass 
+    s = ' <timeStamp value="'+str(atTime)+'">'+\
+        str(mass)+','+\
+        str(radioactivityXe)+\
+        '</timeStamp>\n';fout.write(s)
 
     s = '</time-sequence>\n'; fout.write(s)
     fout.close()
@@ -237,7 +244,8 @@ class OffGas(object):
       mass = round(self.__historyXeMassOffGas[atTime],gDec)
     else:
       mass = 0.0
-    a.text = str(mass)
+    radioactivityXe = self.__radioactivityXe * mass 
+    a.text = str(mass)+','+str(radioactivityXe)
 
     rootNode.append(a)
 

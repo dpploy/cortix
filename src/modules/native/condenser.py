@@ -159,8 +159,8 @@ class Condenser(object):
 
     # vfda to do: check for single var element
     node = rootNode.find('var')
-    assert node.get('name').strip() == 'Xe Vapor Flow', 'invalid variable.'
-    assert node.get('unit').strip() == 'gram', 'invalid mass unit'
+    assert node.get('name').strip() == 'Xe Vapor', 'invalid variable.'
+    assert node.get('unit').strip() == 'gram/min', 'invalid mass unit'
 
     nodes = rootNode.findall('timeStamp')
 
@@ -202,7 +202,7 @@ class Condenser(object):
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Xe Off-Gas Flow" unit="gram" legend="Condenser-offgas"/>\n'; fout.write(s)
+    s = ' <var name="Xe Off-Gas" unit="gram/min" legend="Condenser-offgas"/>\n'; fout.write(s)
     mass = 0.0
     s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
 

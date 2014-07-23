@@ -823,8 +823,8 @@ class Storage(object):
 
     # first variable
     b = ElementTree.SubElement(a,'var')
-    b.set('name','Xe Off-Gas Flow')
-    b.set('unit','gram')
+    b.set('name','Xe Off-Gas')
+    b.set('unit','gram/min')
     b.set('legend','Storage-offgas')
 
     # values for all variables

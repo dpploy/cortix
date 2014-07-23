@@ -164,8 +164,8 @@ class Plume(object):
 
     # vfda to do: check for single var element
     node = rootNode.find('var')
-    assert node.get('name').strip() == 'Xe Off-Gas Flow', 'invalid variable.'
-    assert node.get('unit').strip() == 'gram', 'invalid mass unit'
+    assert node.get('name').strip() == 'Xe Off-Gas', 'invalid variable.'
+    assert node.get('unit').strip() == 'gram/min', 'invalid mass unit'
 
     nodes = rootNode.findall('timeStamp')
 
@@ -179,7 +179,8 @@ class Plume(object):
          found = True
 
          mass = 0.0
-         mass = float(n.text.strip())
+         # fix this for multiple fields in the future
+         mass = float(n.text.strip().split(',')[0])
          self.__historyXeMassOffGas[ evolTime ] = mass
 
          s = '__GetOffGas(): received off-gas at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))

@@ -314,7 +314,7 @@ class Chopper(object):
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     cutOff = self.__endDutyTimeGas
     s = ' <time unit="minute" cut-off="'+str(cutOff)+'"/>\n'; fout.write(s)
-    s = ' <var name="Xe Off-Gas Flow" unit="gram" legend="Chopper-offgas"/>\n'; fout.write(s)
+    s = ' <var name="Xe Off-Gas" unit="gram/min" legend="Chopper-offgas"/>\n'; fout.write(s)
     mass = round(self.__GetXeMassGas(evolTime),gDec)
     s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
 

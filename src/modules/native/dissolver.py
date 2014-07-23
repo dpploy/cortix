@@ -612,8 +612,8 @@ class Dissolver(object):
 
     # first variable
     b = ElementTree.SubElement(a,'var')
-    b.set('name','Xe Vapor Flow')
-    b.set('unit','gram')
+    b.set('name','Xe Vapor')
+    b.set('unit','gram/min')
     b.set('legend','Dissolver-vapor')
 
     # values for all variables
@@ -624,21 +624,6 @@ class Dissolver(object):
     tree = ElementTree.ElementTree(a)
 
     tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
-
-#    fout = open( portFile, 'w')
-
-#    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-#    s = '<time-sequence name="dissolver-vapor">\n'; fout.write(s) 
-#    s = ' <comment author="cortix.modules.native.dissolver" version="0.1"/>\n'; fout.write(s)
-#    today = datetime.datetime.today()
-#    s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
-#    s = ' <time unit="minute"/>\n'; fout.write(s)
-#    s = ' <var name="Xe Vapor Flow" unit="gram" legend="Dissolver-vapor"/>\n'; fout.write(s)
-#    mass = 0.0
-#    s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
-
-#    s = '</time-sequence>\n'; fout.write(s)
-#    fout.close()
 
   # if not the first time step then parse the existing history file and append
   else:
