@@ -52,6 +52,7 @@ class Dissolver(object):
 
   self.__gramDecimals = 3 # milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
+  self.__ccDecimals   = 3 # cubic centimeter significant digits
 
 #---------------------------------------------------------------------------------
  def CallPorts( self, evolTime=0.0 ):
@@ -203,7 +204,8 @@ class Dissolver(object):
 #---------------------------------------------------------------------------------
  def __ProvideState( self, portFile, evolTime ):
  
-  gDec = self.__gramDecimals
+  gDec  = self.__gramDecimals
+  ccDec = self.__ccDecimals   
 
   # if the first time step, write the header of a time-sequence data file
   if evolTime == 0.0:
@@ -239,11 +241,24 @@ class Dissolver(object):
     b.set('unit',unit)
     b.set('legend','Dissolver-state')
 
+    # second variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Fuel Loaded')
+    if self.__GetFuelLoadVolume() is not None:
+      (volume,unit) = self.__GetFuelLoadVolume()
+    else:
+      volume = 0.0
+      unit   = 'cc'
+    b.set('unit',unit)
+    b.set('legend','Dissolver-state')
+
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
     b.set('value',str(evolTime))
-    mass = round(mass,gDec)
-    b.text = str(mass)
+    mass   = round(mass,gDec)
+    volume = round(volume,ccDec)
+    b.text = str(mass)+','+\
+             str(volume)
 
     tree = ElementTree.ElementTree(a)
 
@@ -259,9 +274,11 @@ class Dissolver(object):
 
     if self.__GetFuelLoadMass() is not None:
       (mass,unit) = self.__GetFuelLoadMass()
-      a.text = str(round(mass,gDec))
+      (volume,unit) = self.__GetFuelLoadVolume()
+      a.text = str(round(mass,gDec))+','+\
+               str(round(volume,ccDec))
     else:
-      a.text = '0'
+      a.text = '0,0'
 
     rootNode.append(a)
 

@@ -305,21 +305,43 @@ class Chopper(object):
   # if the first time step, write the header of a time-sequence data file
   if evolTime == 0.0:
 
-    fout = open( portFile, 'w')
+    assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
-    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-sequence name="chopper-offgas">\n'; fout.write(s) 
-    s = ' <comment author="cortix.modules.native.chopper" version="0.1"/>\n'; fout.write(s)
+    tree = ElementTree.ElementTree()
+    rootNode = tree.getroot()
+
+    a = ElementTree.Element('time-sequence')
+    a.set('name','chopper-offgas')
+
+    b = ElementTree.SubElement(a,'comment')
     today = datetime.datetime.today()
-    s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
-    cutOff = self.__endDutyTimeGas
-    s = ' <time unit="minute" cut-off="'+str(cutOff)+'"/>\n'; fout.write(s)
-    s = ' <var name="Xe Off-Gas" unit="gram/min" legend="Chopper-offgas"/>\n'; fout.write(s)
-    mass = round(self.__GetXeMassGas(evolTime),gDec)
-    s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
+    b.set('author','cortix.modules.native.chopper')
+    b.set('version','0.1')
 
-    s = '</time-sequence>\n'; fout.write(s)
-    fout.close()
+    b = ElementTree.SubElement(a,'comment')
+    today = datetime.datetime.today()
+    b.set('today',str(today))
+
+    b = ElementTree.SubElement(a,'time')
+    b.set('unit','minute')
+    cutOff = self.__endDutyTimeGas
+    b.set('cut-off',str(cutOff))
+
+    # first variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Xe Off-Gas')
+    b.set('unit','gram/min')
+    b.set('legend','Chopper-offgas')
+
+    # values for all variables
+    b = ElementTree.SubElement(a,'timeStamp')
+    b.set('value',str(evolTime))
+    mass = round(self.__GetXeMassGas(evolTime),gDec)
+    b.text = str(mass)
+
+    tree = ElementTree.ElementTree(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
 
   # if not the first time step then parse the existing history file and append
   else:

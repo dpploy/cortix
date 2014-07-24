@@ -458,7 +458,7 @@ class PyPlot(object):
       ax.xaxis.set_major_locator(majorLocator)
       ax.xaxis.set_minor_locator(minorLocator)
 
-    if varScale == 'log': ax.set_yscale('log')
+    if varScale == 'log' and y.min() > 0.0: ax.set_yscale('log')
 
     ax.plot( x, y, 's-', color='black', linewidth=0.5, markersize=2,  \
              markeredgecolor='black', label=varLegend )
