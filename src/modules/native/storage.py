@@ -286,13 +286,6 @@ class Storage(object):
        totalMass     = round(totalMass,gDec)
        segmentLength = round(segmentLength,mmDec)
        iD            = round(iD,mmDec)
-       U             = round(U  ,gDec)
-       Pu            = round(Pu ,gDec)
-       I             = round(I  ,gDec)
-       Kr            = round(Kr ,gDec)
-       Xe            = round(Xe ,gDec)
-       a3H           = round(a3H,gDec)
-       FP            = round(FP ,gDec)
 
        assert abs( totalMass - (U+Pu+I+Kr+Xe+a3H+FP) ) < 1.0e-2
 
@@ -306,6 +299,14 @@ class Storage(object):
        Xe        /=  int(nSegments)
        a3H       /=  int(nSegments)
        FP        /=  int(nSegments)
+
+       U   = round(U  ,gDec)
+       Pu  = round(Pu ,gDec)
+       I   = round(I  ,gDec)
+       Kr  = round(Kr ,gDec)
+       Xe  = round(Xe ,gDec)
+       a3H = round(a3H,gDec)
+       FP  = round(FP ,gDec)
 
        assert abs( segMass - (U+Pu+I+Kr+Xe+a3H+FP) ) < 1.0e-2
 
@@ -480,7 +481,7 @@ class Storage(object):
 
 #---------------------------------------------------------------------------------
 # Provide the entire history data 
- def __ProvideFuelSegmentsOnDemand( self, portFile, facilityTime ):
+ def __ProvideFuelSegmentsOnDemand( self, portFile, atTime ):
 
   gDec  = self.__gramDecimals
   mmDec = self.__mmDecimals
@@ -500,58 +501,75 @@ class Storage(object):
 
   withdrawMass = self.__withdrawMass
 
-  #...........................................
-  # if the first time step write a nice header
-  #...........................................
-  if facilityTime == 0.0:
+  #........................................
+  # if the first time step write the header
+  #........................................
+  if atTime == 0.0:
 
-    fout = open( portFile, 'w')
+    assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
-    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-variable-packet name="fuelSegments">\n'; fout.write(s) 
-    s = ' <comment author="cortix.modules.native.storage" version="0.1"/>\n'; fout.write(s)
+    tree = ElementTree.ElementTree()
+    rootNode = tree.getroot()
+
+    a = ElementTree.Element('time-variable-packet')
+    a.set('name','storage-fuel-segments')
+
+    b = ElementTree.SubElement(a,'comment')
     today = datetime.datetime.today()
-    s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
-    s = ' <time unit="minute"/>\n'; fout.write(s)
+    b.set('author','cortix.modules.native.storage')
+    b.set('version','0.1')
+
+    b = ElementTree.SubElement(a,'comment')
+    today = datetime.datetime.today()
+    b.set('today',str(today))
+
+    b = ElementTree.SubElement(a,'time')
+    b.set('unit','minute')
 
     # first packet
-    s = ' <pack1 name="Geometry">\n'; fout.write(s)
+    b = ElementTree.SubElement(a,'pack1')
+    b.set('name','Geometry')
+
     for var in vars1:
-      s = '  <var name="'+var[0]+'" unit="'+var[1]+'"/>\n'; fout.write(s)
-    s = ' </pack1>\n'; fout.write(s)
+      c = ElementTree.SubElement(b,'var')
+      c.set('name',var[0])
+      c.set('unit',var[1])
 
     # second packet
-    s = ' <pack2 name="Composition">\n'; fout.write(s)
+    b = ElementTree.SubElement(a,'pack2')
+    b.set('name','Composition')
+
     for var in vars2:
-      s = '  <var name="'+var[0]+'" unit="'+var[1]+'"/>\n'; fout.write(s)
-    s = ' </pack2>\n'; fout.write(s)
+      c = ElementTree.SubElement(b,'var')
+      c.set('name',var[0])
+      c.set('unit',var[1])
 
-    # time stamp
-    s = ' <timeStamp value="'+str(facilityTime)+'">\n'; fout.write(s)
+    # values for all variables
+    b = ElementTree.SubElement(a,'timeStamp')
+    b.set('value',str(atTime))
 
-    if withdrawMass == 0.0 or withdrawMass > self.__GetMass( facilityTime ): 
+    if withdrawMass == 0.0 or withdrawMass > self.__GetMass( atTime ): 
+ 
+      tree = ElementTree.ElementTree(a)
+  
+      tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
 
-      s = ' </timeStamp>\n'; fout.write(s)
-
-      s = '</time-variable-packet>\n'; fout.write(s)
-      fout.close()
-
-      s = '__ProvideFuelSegmentsOnDemand(): providing no fuel at '+str(facilityTime)+' [min]'
+      s = '__ProvideFuelSegmentsOnDemand(): providing no fuel at '+str(atTime)+' [min]'
       self.__log.debug(s)
 
       self.__withdrawMass = 0.0
 
       return
 
-    else: # of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( facilityTime ): 
+    else: # of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( atTime ): 
 
       fuelSegmentsLoad = list()
       fuelMassLoad = 0.0
 
       # withdraw fuel elements
       while fuelMassLoad <= withdrawMass:
-           fuelSegmentCandidate = self.__WithdrawFuelSegment( facilityTime )
-           if fuelSegmentCandidate is None: break # no segments left with time stamp <= facilityTime
+           fuelSegmentCandidate = self.__WithdrawFuelSegment( atTime )
+           if fuelSegmentCandidate is None: break # no segments left with time stamp <= atTime
            mass          = fuelSegmentCandidate[1]
            fuelMassLoad += mass
            if fuelMassLoad <= withdrawMass:
@@ -565,7 +583,7 @@ class Storage(object):
       for fuelSeg in fuelSegmentsLoad:
 
         timeStamp = fuelSeg[0]
-        assert timeStamp <=  facilityTime, 'sanity check failed.'
+        assert timeStamp <=  atTime, 'sanity check failed.'
         mass      = fuelSeg[1]
         length    = fuelSeg[2]
         segID     = fuelSeg[3]
@@ -578,27 +596,28 @@ class Storage(object):
         FP        = fuelSeg[10]
 
         # first packet
-        s = '  <pack1>'
+        c = ElementTree.SubElement(b,'pack1')
         fuelSegVars1 = [timeStamp,mass,length,segID]
         assert len(fuelSegVars1) == len(vars1)
         for var in fuelSegVars1: 
           s += str(var)+','
-        s = s[:-1] + '</pack1>\n'; fout.write(s)
+        s = s[:-1] 
+        c.text = s
 
         # second packet
-        s = '  <pack2>'
+        c = ElementTree.SubElement(b,'pack2')
         fuelSegVars2 = [U,Pu,I,Kr,Xe,a3H,FP]
         assert len(fuelSegVars2) == len(vars2)
         for var in fuelSegVars2: 
           s += str(var)+','
-        s = s[:-1] + '</pack2>\n'; fout.write(s)
-  
-        s = ' </timeStamp>\n'; fout.write(s)
-  
-        s = '</time-variable-packet>\n'; fout.write(s)
-        fout.close()
+        s = s[:-1] 
+        c.text = s
 
-        s = '__ProvideFuelSegmentsOnDemand(): providing '+str(len(fuelSegmentsLoad))+' fuel segments at '+str(facilityTime)+' [min].'
+        tree = ElementTree.ElementTree(a)
+  
+        tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+  
+        s = '__ProvideFuelSegmentsOnDemand(): providing '+str(len(fuelSegmentsLoad))+' fuel segments at '+str(atTime)+' [min].'
         self.__log.debug(s)
 
       # endo of for fuelSeg in fuelSegmentsLoad:
@@ -607,40 +626,40 @@ class Storage(object):
 
       return
 
-    # end of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( facilityTime ): 
+    # end of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( atTime ): 
 
   #...........................................................................
   # if not the first time step then parse the existing history file and append
   #...........................................................................
-  else: # of if facilityTime == 0.0:
+  else: # of if atTime == 0.0:
 
     tree = ElementTree.parse( portFile )
     rootNode = tree.getroot()
 
     newTimeStamp = ElementTree.Element('timeStamp')
-    newTimeStamp.set('value',str(facilityTime))
+    newTimeStamp.set('value',str(atTime))
 
-    if withdrawMass == 0.0 or withdrawMass > self.__GetMass( facilityTime ): 
+    if withdrawMass == 0.0 or withdrawMass > self.__GetMass( atTime ): 
 
       rootNode.append(newTimeStamp)
       tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
 
       self.__withdrawMass = 0.0
 
-      s = '__ProvideFuelSegmentsOnDemand(): providing no fuel at '+str(facilityTime)+' [min]'
+      s = '__ProvideFuelSegmentsOnDemand(): providing no fuel at '+str(atTime)+' [min]'
       self.__log.debug(s)
    
       return
 
-    else: # of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( facilityTime ):
+    else: # of if withdrawMass == 0.0 or withdrawMass > self.__GetMass( atTime ):
 
       fuelSegmentsLoad = list()
       fuelMassLoad = 0.0
 
       # withdraw fuel elements
       while fuelMassLoad <= withdrawMass:
-           fuelSegmentCandidate = self.__WithdrawFuelSegment( facilityTime )
-           if fuelSegmentCandidate is None: break # no segments left with time stamp <= facilityTime
+           fuelSegmentCandidate = self.__WithdrawFuelSegment( atTime )
+           if fuelSegmentCandidate is None: break # no segments left with time stamp <= atTime
            mass          = fuelSegmentCandidate[1]
            fuelMassLoad += mass
            if fuelMassLoad <= withdrawMass:
@@ -653,7 +672,7 @@ class Storage(object):
       for fuelSeg in fuelSegmentsLoad:
 
         timeStamp = fuelSeg[0]
-        assert timeStamp <= facilityTime, 'sanity check failed.'
+        assert timeStamp <= atTime, 'sanity check failed.'
         mass      = round(fuelSeg[1],gDec)
         length    = round(fuelSeg[2],mmDec)
         segID     = round(fuelSeg[3],mmDec)
@@ -688,22 +707,22 @@ class Storage(object):
       rootNode.append(newTimeStamp)
       tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
 
-      s = '__ProvideFuelSegmentsOnDemand(): providing '+str(len(fuelSegmentsLoad))+' fuel segments at '+str(facilityTime)+' [min].'
+      s = '__ProvideFuelSegmentsOnDemand(): providing '+str(len(fuelSegmentsLoad))+' fuel segments at '+str(atTime)+' [min].'
       self.__log.debug(s)
 
       self.__withdrawMass = 0.0
 
       return
 
-  # end of if facilityTime == 0.0:
+  # end of if atTime == 0.0:
 
   return
 
 #---------------------------------------------------------------------------------
- def __ProvideState( self, portFile, facilityTime ):
+ def __ProvideState( self, portFile, atTime ):
 
   # if the first time step, write the header of a time-sequence data file
-  if facilityTime == 0.0:
+  if atTime == 0.0:
 
     assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
@@ -757,7 +776,7 @@ class Storage(object):
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
-    b.set('value',str(facilityTime))
+    b.set('value',str(atTime))
 
     # all variables values
     gDec = self.__gramDecimals
@@ -778,7 +797,7 @@ class Storage(object):
     tree = ElementTree.parse( portFile )
     rootNode = tree.getroot()
     a = ElementTree.Element('timeStamp')
-    a.set('value',str(facilityTime))
+    a.set('value',str(atTime))
 
     # all variables values
     gDec = self.__gramDecimals
@@ -796,10 +815,10 @@ class Storage(object):
   return 
 
 #---------------------------------------------------------------------------------
- def __ProvideOffGas( self, portFile, facilityTime ):
+ def __ProvideOffGas( self, portFile, atTime ):
 
   # if the first time step, write the header of a time-sequence data file
-  if facilityTime == 0.0:
+  if atTime == 0.0:
 
     assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
@@ -829,11 +848,11 @@ class Storage(object):
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
-    b.set('value',str(facilityTime))
+    b.set('value',str(atTime))
 
     # all variables values
     gDec = self.__gramDecimals
-    mass = round(self.__historyXeMassOffGas[facilityTime],gDec)
+    mass = round(self.__historyXeMassOffGas[atTime],gDec)
     b.text = str(mass)
 
     tree = ElementTree.ElementTree(a)
@@ -846,11 +865,11 @@ class Storage(object):
     tree = ElementTree.parse( portFile )
     rootNode = tree.getroot()
     a = ElementTree.Element('timeStamp')
-    a.set('value',str(facilityTime))
+    a.set('value',str(atTime))
 
     # all variables values
     gDec = self.__gramDecimals
-    mass = round(self.__historyXeMassOffGas[facilityTime],gDec)
+    mass = round(self.__historyXeMassOffGas[atTime],gDec)
     a.text = str(mass)
 
     rootNode.append(a)
@@ -874,17 +893,17 @@ class Storage(object):
   return nSegments
 
 #---------------------------------------------------------------------------------
- def __WithdrawFuelSegment(self, facilityTime ):
+ def __WithdrawFuelSegment(self, atTime ):
 
   fuelSegment = None
 
   for fuelSeg in self.__fuelSegments:
-    if fuelSeg[0] <= facilityTime:
+    if fuelSeg[0] <= atTime:
       fuelSegment = fuelSeg
       self.__fuelSegments.remove(fuelSeg)
       break 
 
-#  print('WithdrawFuelSegment:: fuelSegment',fuelSegment, ' facilityTime=',facilityTime)
+#  print('WithdrawFuelSegment:: fuelSegment',fuelSegment, ' atTime=',atTime)
 
   return fuelSegment # if None, it is an empty drum
 

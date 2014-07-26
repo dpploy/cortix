@@ -202,13 +202,13 @@ class Dissolver(object):
   return 
 
 #---------------------------------------------------------------------------------
- def __ProvideState( self, portFile, evolTime ):
+ def __ProvideState( self, portFile, atTime ):
  
   gDec  = self.__gramDecimals
   ccDec = self.__ccDecimals   
 
   # if the first time step, write the header of a time-sequence data file
-  if evolTime == 0.0:
+  if atTime == 0.0:
 
     assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
@@ -254,7 +254,7 @@ class Dissolver(object):
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
-    b.set('value',str(evolTime))
+    b.set('value',str(atTime))
     mass   = round(mass,gDec)
     volume = round(volume,ccDec)
     b.text = str(mass)+','+\
@@ -270,7 +270,7 @@ class Dissolver(object):
     tree = ElementTree.parse( portFile )
     rootNode = tree.getroot()
     a = ElementTree.Element('timeStamp')
-    a.set('value',str(evolTime))
+    a.set('value',str(atTime))
 
     if self.__GetFuelLoadMass() is not None:
       (mass,unit) = self.__GetFuelLoadMass()
@@ -602,10 +602,10 @@ class Dissolver(object):
     self.__historyXeMassVapor[ evolTime+timeStep ] = 0.0
 
 #---------------------------------------------------------------------------------
- def __ProvideVapor( self, portFile, evolTime ):
+ def __ProvideVapor( self, portFile, atTime ):
 
   # if the first time step, write the header of a time-sequence data file
-  if evolTime == 0.0:
+  if atTime == 0.0:
 
     assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
@@ -635,7 +635,7 @@ class Dissolver(object):
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
-    b.set('value',str(evolTime))
+    b.set('value',str(atTime))
     b.text = str(0.0)
 
     tree = ElementTree.ElementTree(a)
@@ -648,12 +648,12 @@ class Dissolver(object):
     tree = ElementTree.parse( portFile )
     rootNode = tree.getroot()
     a = ElementTree.Element('timeStamp')
-    a.set('value',str(evolTime))
+    a.set('value',str(atTime))
     gDec = self.__gramDecimals
 
     # first variable
     if len(self.__historyXeMassVapor.keys()) > 0:
-      mass = round(self.__historyXeMassVapor[evolTime],gDec)
+      mass = round(self.__historyXeMassVapor[atTime],gDec)
     else:
       mass = 0.0
     a.text = str(mass)
