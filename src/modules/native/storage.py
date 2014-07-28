@@ -29,7 +29,7 @@ class Storage(object):
   assert type(evolveTime) is float, '-> time type %r is invalid.' % type(evolveTime)
 
   # Logging
-  self.__log = logging.getLogger('storage')
+  self.__log = logging.getLogger('storing.storage')
   self.__log.info('initializing an instance of Storage')
 
   # Member data

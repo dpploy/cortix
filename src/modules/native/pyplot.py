@@ -33,7 +33,7 @@ class PyPlot(object):
   assert type(evolveTime) is float, '-> time type %r is invalid.' % type(evolveTime)
 
   # Logging
-  self.__log = logging.getLogger('pyplot')
+  self.__log = logging.getLogger('pyplotting.pyplot')
   self.__log.info('initializing an instance of PyPlot')
 
   # Member data

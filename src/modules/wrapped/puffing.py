@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native Plume module thread
+Cortix native Puffing module thread
 
 Sun Jul 13 23:33:35 EDT 2014
 """
@@ -11,11 +11,11 @@ import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
-from src.modules.wrapped.plume import Plume
+from src.modules.wrapped.puff import Puff
 #*********************************************************************************
 
 #*********************************************************************************
-class PlumeThread(Thread):
+class Puffing(Thread):
                      
  def __init__( self, inputFullPathFileName, 
                      cortexParamFullPathFileName,
@@ -27,18 +27,18 @@ class PlumeThread(Thread):
     self.__cortexCommFullPathFileName    = cortexCommFullPathFileName 
     self.__runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
 
-    super(PlumeThread, self).__init__()
+    super(Puffing, self).__init__()
 
 #---------------------------------------------------------------------------------
  def run(self):
 
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
-  log = logging.getLogger('plume')
+  log = logging.getLogger('puffing')
   log.setLevel(logging.DEBUG)
 # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'plume.log')
+  fh = logging.FileHandler(fullPathTaskDir+'puffing.log')
   fh.setLevel(logging.DEBUG)
 # create console handler with a higher log level
   ch = logging.StreamHandler()
@@ -129,8 +129,8 @@ class PlumeThread(Thread):
 # runtimeStatusFullPathFileName = argv[4]
 
 #---------------------------------------------------------------------------------
-# Run Plume        
-  log.info('entered Run Plume section')
+# Run Puff        
+  log.info('entered Run Puff section')
 
 #.................................................................................
 # Setup input
@@ -139,8 +139,8 @@ class PlumeThread(Thread):
 
 #.................................................................................
 # Create the host code             
-  host = Plume( ports )
-  log.info("host = Plume( ports )")
+  host = Puff( ports )
+  log.info("host = Puff( ports )")
 
 #.................................................................................
 # Evolve the plume        
@@ -172,7 +172,7 @@ class PlumeThread(Thread):
 
   fout = open( self.__runtimeStatusFullPathFileName,'w' )
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by Plume.py -->\n'; fout.write(s)
+  s = '<!-- Written by Puffing.py -->\n'; fout.write(s)
   today = datetime.datetime.today()
   s = '<!-- '+str(today)+' -->\n'; fout.write(s)
   s = '<runtime>\n'; fout.write(s)
@@ -181,7 +181,7 @@ class PlumeThread(Thread):
   fout.close()
 
 #*********************************************************************************
-# Usage: -> python codenserthread.py or ./plumethread.py
+# Usage: -> python puffing.py or ./puffing.py
 if __name__ == "__main__":
-   PlumeThread()
+   Puffing()
 

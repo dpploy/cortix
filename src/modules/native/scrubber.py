@@ -37,7 +37,7 @@ class Scrubber(object):
 
   self.__historyXeMassOffGas = dict()
 
-  self.__log = logging.getLogger('scrubber')
+  self.__log = logging.getLogger('scrubbing.scrubber')
   self.__log.info('initializing an instance of Scrubber')
 
   self.__gramDecimals = 3 # milligram significant digits

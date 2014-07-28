@@ -33,7 +33,7 @@ class Condenser(object):
   self.__historyXeMassVapor = dict()
   self.__historyXeMassGas   = dict()
 
-  self.__log = logging.getLogger('condenser')
+  self.__log = logging.getLogger('condensation.condenser')
   self.__log.info('initializing an instance of Condenser')
 
   self.__gramDecimals = 3 # milligram significant digits

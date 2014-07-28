@@ -15,7 +15,7 @@ from src.modules.native.pyplot import PyPlot
 #*********************************************************************************
 
 #*********************************************************************************
-class PyPlotThread(Thread):
+class PyPlotting(Thread):
 
  def __init__( self, inputFullPathFileName, 
                      cortexParamFullPathFileName,
@@ -27,7 +27,7 @@ class PyPlotThread(Thread):
     self.__cortexCommFullPathFileName    = cortexCommFullPathFileName 
     self.__runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
 
-    super(PyPlotThread, self).__init__()
+    super(PyPlotting, self).__init__()
 
 #---------------------------------------------------------------------------------
  def run(self):
@@ -35,11 +35,11 @@ class PyPlotThread(Thread):
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
 
-  log = logging.getLogger('pyplot')
+  log = logging.getLogger('pyplotting')
   log.setLevel(logging.DEBUG)
   # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'pyplot.log')
+  fh = logging.FileHandler(fullPathTaskDir+'pyplotting.log')
   fh.setLevel(logging.DEBUG)
   # create console handler with a higher log level
   ch = logging.StreamHandler()
@@ -189,7 +189,7 @@ class PyPlotThread(Thread):
 
   fout = open( self.__runtimeStatusFullPathFileName,'w' )
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by PyPlotThread.py -->\n'; fout.write(s)
+  s = '<!-- Written by PyPlotting.py -->\n'; fout.write(s)
   today = datetime.datetime.today()
   s = '<!-- '+str(today)+' -->\n'; fout.write(s)
   s = '<runtime>\n'; fout.write(s)
@@ -198,6 +198,6 @@ class PyPlotThread(Thread):
   fout.close()
 
 #*********************************************************************************
-# Usage: -> python pyplotthread.py or ./pyplotthread.py
+# Usage: -> python pyplottingthread.py or ./pyplottingthread.py
 if __name__ == "__main__":
-   PyPlotThread()
+   PyPlotting()

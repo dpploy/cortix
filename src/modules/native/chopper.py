@@ -35,7 +35,7 @@ class Chopper(object):
 
   self.__inputFuelSegments = list()  # consider this the input of all fuel rods
 
-  self.__log = logging.getLogger('chopper')
+  self.__log = logging.getLogger('shearing.chopper')
   self.__log.info('initializing an instance of Chopper')
 
   self.__gramDecimals = 3 # milligram significant digits

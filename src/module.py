@@ -10,15 +10,15 @@ Tue Dec 10 11:21:30 EDT 2013
 import os, sys, io, time
 import logging  
 from src.configtree import ConfigTree
-from src.modules.native.chopperthread import ChopperThread
-from src.modules.native.storagethread import StorageThread
-from src.modules.native.dissolverthread import DissolverThread
-from src.modules.native.condenserthread import CondenserThread
-from src.modules.native.scrubberthread import ScrubberThread
-from src.modules.native.hepafilterthread import HEPAFilterThread
-from src.modules.native.offgasthread import OffGasThread
-from src.modules.wrapped.plumethread import PlumeThread
-from src.modules.native.pyplotthread import PyPlotThread
+from src.modules.native.shearing import Shearing
+from src.modules.native.storing import Storing
+from src.modules.native.dissolution import Dissolution
+from src.modules.native.condensation import Condensation
+from src.modules.native.scrubbing import Scrubbing
+from src.modules.native.filtration import Filtration
+from src.modules.native.offgassing import OffGassing
+from src.modules.wrapped.puffing import Puffing
+from src.modules.native.pyplotting import PyPlotting
 #*********************************************************************************
 
 #*********************************************************************************
@@ -114,31 +114,28 @@ class Module(object):
   elif self.__type == 'native':
     name = self.__name 
     if name == 'chopper-native':          
-       t = ChopperThread( input, param, comm, status )
+       t = Shearing( input, param, comm, status )
        t.start()
     if name == 'storage-native': 
-       t = StorageThread( input, param, comm, status )
+       t = Storing( input, param, comm, status )
        t.start()
     if name == 'dissolver-native':        
-       t = DissolverThread( input, param, comm, status )
+       t = Dissolution( input, param, comm, status )
        t.start()
     if name == 'condenser-native':        
-       t = CondenserThread( input, param, comm, status )
+       t = Condensation( input, param, comm, status )
        t.start()
     if name == 'scrubber-native':        
-       t = ScrubberThread( input, param, comm, status )
+       t = Scrubbing( input, param, comm, status )
        t.start()
     if name == 'hepafilter-native':        
-       t = HEPAFilterThread( input, param, comm, status )
+       t = Filtration( input, param, comm, status )
        t.start()
     if name == 'offgas-native':        
-       t = OffGasThread( input, param, comm, status )
-       t.start()
-    if name == 'plume':        
-       t = PlumeThread( input, param, comm, status )
+       t = OffGassing( input, param, comm, status )
        t.start()
     if name == 'pyplot-native':        
-       t = PyPlotThread( input, param, comm, status )
+       t = PyPlotting( input, param, comm, status )
        t.start()
 
 #.................................................................................
@@ -146,7 +143,7 @@ class Module(object):
   elif self.__type == 'wrapped':
     name = self.__name 
     if name == 'plume':        
-       t = PlumeThread( input, param, comm, status )
+       t = Puffing( input, param, comm, status )
        t.start()
   else: 
      assert True, 'module type invalid.'

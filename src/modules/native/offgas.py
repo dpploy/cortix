@@ -169,7 +169,7 @@ class OffGas(object):
     if timeCutOff is not None: 
       timeCutOff = float(timeCutOff.strip())
       if atTime > timeCutOff: 
-        if inflowGasName == 'hepafilter-offgas':
+        if inflowGasName == 'filter-offgas':
           self.__historyXeMassInflowGas[0][ atTime ] = 0.0
         return
 
@@ -192,7 +192,7 @@ class OffGas(object):
          mass = 0.0
          mass = float(n.text.strip())
           
-         if inflowGasName == 'hepafilter-offgas':
+         if inflowGasName == 'filter-offgas':
             self.__historyXeMassInflowGas[0][ atTime ] = mass
 
          s = '__GetInflowGas(): received inflow gas '+inflowGasName+' at '+str(atTime)+' [min]; mass [g] = '+str(round(mass,3))

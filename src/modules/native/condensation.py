@@ -2,20 +2,20 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native OffGas module thread
+Cortix native Condensation module thread
 
-Tue Jul 22 14:32:18 EDT 2014
+Sun Jul 13 15:31:02 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
-from src.modules.native.offgas import OffGas
+from src.modules.native.condenser import Condenser
 #*********************************************************************************
 
 #*********************************************************************************
-class OffGasThread(Thread):
+class Condensation(Thread):
                      
  def __init__( self, inputFullPathFileName, 
                      cortexParamFullPathFileName,
@@ -27,18 +27,18 @@ class OffGasThread(Thread):
     self.__cortexCommFullPathFileName    = cortexCommFullPathFileName 
     self.__runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
 
-    super(OffGasThread, self).__init__()
+    super(Condensation, self).__init__()
 
 #---------------------------------------------------------------------------------
  def run(self):
 
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
-  log = logging.getLogger('offgas')
+  log = logging.getLogger('condensation')
   log.setLevel(logging.DEBUG)
 # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'offgas.log')
+  fh = logging.FileHandler(fullPathTaskDir+'condensation.log')
   fh.setLevel(logging.DEBUG)
 # create console handler with a higher log level
   ch = logging.StreamHandler()
@@ -129,8 +129,8 @@ class OffGasThread(Thread):
 # runtimeStatusFullPathFileName = argv[4]
 
 #---------------------------------------------------------------------------------
-# Run OffGasThread     
-  log.info('entered Run OffGas section')
+# Run Condenser
+  log.info('entered Run Condenser section')
 
 #.................................................................................
 # Setup input
@@ -139,11 +139,11 @@ class OffGasThread(Thread):
 
 #.................................................................................
 # Create the host code             
-  host = OffGas( ports, evolveTime )
-  log.info("host = OffGas( ports )")
+  host = Condenser( ports )
+  log.info("host = Condenser( ports )")
 
 #.................................................................................
-# Evolve the offgas   
+# Evolve the condenser
  
   self.__SetRuntimeStatus('running')  
   log.info("SetRuntimeStatus('running')")
@@ -157,7 +157,6 @@ class OffGasThread(Thread):
    host.Execute( facilityTime, timeStep )
 
    facilityTime += timeStep 
-
 #
 #---------------------------------------------------------------------------------
 # Shutdown 
@@ -173,7 +172,7 @@ class OffGasThread(Thread):
 
   fout = open( self.__runtimeStatusFullPathFileName,'w' )
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by OffGas.py -->\n'; fout.write(s)
+  s = '<!-- Written by Condensation.py -->\n'; fout.write(s)
   today = datetime.datetime.today()
   s = '<!-- '+str(today)+' -->\n'; fout.write(s)
   s = '<runtime>\n'; fout.write(s)
@@ -182,6 +181,7 @@ class OffGasThread(Thread):
   fout.close()
 
 #*********************************************************************************
-# Usage: -> python codenserthread.py or ./offgas.py
+# Usage: -> python condensation.py or ./condensation.py
 if __name__ == "__main__":
-   OffGasThread()
+   Condensation()
+

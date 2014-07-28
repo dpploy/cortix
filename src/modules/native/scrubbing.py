@@ -2,20 +2,20 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native HEPAFilter module thread
+Cortix native Scrubbing module thread
 
-Sun Jul 13 18:59:04 EDT 2014
+Sun Jul 13 15:30:50 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
-from src.modules.native.hepafilter import HEPAFilter
+from src.modules.native.scrubber import Scrubber
 #*********************************************************************************
 
 #*********************************************************************************
-class HEPAFilterThread(Thread):
+class Scrubbing(Thread):
                      
  def __init__( self, inputFullPathFileName, 
                      cortexParamFullPathFileName,
@@ -27,18 +27,18 @@ class HEPAFilterThread(Thread):
     self.__cortexCommFullPathFileName    = cortexCommFullPathFileName 
     self.__runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
 
-    super(HEPAFilterThread, self).__init__()
+    super(Scrubbing, self).__init__()
 
 #---------------------------------------------------------------------------------
  def run(self):
 
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
-  log = logging.getLogger('hepafilter')
+  log = logging.getLogger('scrubbing')
   log.setLevel(logging.DEBUG)
 # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'hepafilter.log')
+  fh = logging.FileHandler(fullPathTaskDir+'scrubbing.log')
   fh.setLevel(logging.DEBUG)
 # create console handler with a higher log level
   ch = logging.StreamHandler()
@@ -129,8 +129,8 @@ class HEPAFilterThread(Thread):
 # runtimeStatusFullPathFileName = argv[4]
 
 #---------------------------------------------------------------------------------
-# Run HEPAFilter     
-  log.info('entered Run HEPAFilter section')
+# Run Scrubber     
+  log.info('entered Run Scrubber section')
 
 #.................................................................................
 # Setup input
@@ -139,11 +139,11 @@ class HEPAFilterThread(Thread):
 
 #.................................................................................
 # Create the host code             
-  host = HEPAFilter( ports )
-  log.info("host = HEPAFilter( ports )")
+  host = Scrubber( ports )
+  log.info("host = Scrubber( ports )")
 
 #.................................................................................
-# Evolve the hepafilter   
+# Evolve the scrubber   
  
   self.__SetRuntimeStatus('running')  
   log.info("SetRuntimeStatus('running')")
@@ -172,7 +172,7 @@ class HEPAFilterThread(Thread):
 
   fout = open( self.__runtimeStatusFullPathFileName,'w' )
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by HEPAFilter.py -->\n'; fout.write(s)
+  s = '<!-- Written by Scrubbing.py -->\n'; fout.write(s)
   today = datetime.datetime.today()
   s = '<!-- '+str(today)+' -->\n'; fout.write(s)
   s = '<runtime>\n'; fout.write(s)
@@ -181,6 +181,6 @@ class HEPAFilterThread(Thread):
   fout.close()
 
 #*********************************************************************************
-# Usage: -> python codenserthread.py or ./hepafilter.py
+# Usage: -> python scrubbing.py or ./scrubbing.py
 if __name__ == "__main__":
-   HEPAFilterThread()
+   Scrubbing()

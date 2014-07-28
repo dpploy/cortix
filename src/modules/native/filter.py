@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native HEPAFilter module 
+Cortix native Filter module 
 
 Sun Jul 13 19:01:09 EDT 2014
 """
@@ -14,7 +14,7 @@ import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
-class HEPAFilter(object):
+class Filter(object):
 
 # Private member data
 # __slots__ = [
@@ -36,8 +36,8 @@ class HEPAFilter(object):
 
   self.__historyXeMassOffGas = dict()
 
-  self.__log = logging.getLogger('hepafilter')
-  self.__log.info('initializing an instance of HEPAFilter')
+  self.__log = logging.getLogger('filtration.filter')
+  self.__log.info('initializing an instance of Filter')
 
   self.__gramDecimals = 3 # milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
@@ -209,12 +209,12 @@ class HEPAFilter(object):
     fout = open( portFile, 'w')
 
     s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-sequence name="hepafilter-offgas">\n'; fout.write(s) 
-    s = ' <comment author="cortix.modules.native.hepafilter" version="0.1"/>\n'; fout.write(s)
+    s = '<time-sequence name="filter-offgas">\n'; fout.write(s) 
+    s = ' <comment author="cortix.modules.native.filter" version="0.1"/>\n'; fout.write(s)
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Xe Off-Gas" unit="gram/min" legend="HEPA-filter-offgas"/>\n'; fout.write(s)
+    s = ' <var name="Xe Off-Gas" unit="gram/min" legend="filter-offgas"/>\n'; fout.write(s)
     mass = 0.0
     s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
 
@@ -242,6 +242,6 @@ class HEPAFilter(object):
   return 
 
 #*********************************************************************************
-# Usage: -> python hepafilter.py
+# Usage: -> python filter.py
 if __name__ == "__main__":
- print('Unit testing for HEPAFilter')
+ print('Unit testing for Filter')

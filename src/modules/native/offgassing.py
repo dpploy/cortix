@@ -2,21 +2,21 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native Storage module thread
+Cortix native OffGassing module thread
 
-Sun Jun 29 21:34:18 EDT 2014
+Tue Jul 22 14:32:18 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
-from src.modules.native.storage import Storage
+from src.modules.native.offgas import OffGas
 #*********************************************************************************
 
 #*********************************************************************************
-class StorageThread(Thread):
-
+class OffGassing(Thread):
+                     
  def __init__( self, inputFullPathFileName, 
                      cortexParamFullPathFileName,
                      cortexCommFullPathFileName,
@@ -27,33 +27,32 @@ class StorageThread(Thread):
     self.__cortexCommFullPathFileName    = cortexCommFullPathFileName 
     self.__runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
 
-    super(StorageThread, self).__init__()
+    super(OffGassing, self).__init__()
 
 #---------------------------------------------------------------------------------
  def run(self):
 
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
-
-  log = logging.getLogger('storage')
+  log = logging.getLogger('offgassing')
   log.setLevel(logging.DEBUG)
-  # create file handler for logs
+# create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'storage.log')
+  fh = logging.FileHandler(fullPathTaskDir+'offgassing.log')
   fh.setLevel(logging.DEBUG)
-  # create console handler with a higher log level
+# create console handler with a higher log level
   ch = logging.StreamHandler()
   ch.setLevel(logging.INFO)
-  # create formatter and add it to the handlers
+# create formatter and add it to the handlers
   formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
   fh.setFormatter(formatter)
   ch.setFormatter(formatter)
-  # add the handlers to the logger
+# add the handlers to the logger
   log.addHandler(fh)
   log.addHandler(ch)
 
-  s = 'created logger: drv'
-  log.debug(s)
+  s = 'created logger: main'
+  log.info(s)
 
   s = 'input file: ' + self.__inputFullPathFileName
   log.debug(s)
@@ -71,14 +70,9 @@ class StorageThread(Thread):
 
   assert os.path.isfile(self.__inputFullPathFileName), 'file %r not available;stop.' % self.__inputFullPathFileName
 
-  fin = open(self.__inputFullPathFileName,'r')
-  inputData = list()
-  for line in fin:
-   inputData.append(line.strip())
-  fin.close()
 
 #.................................................................................
-# Second command line argument is the Cortix parameter file: cortix-param.xml
+# Second argument is the Cortix parameter file: cortix-param.xml
 # cortexParamFullPathFileName 
 
   assert os.path.isfile(self.__cortexParamFullPathFileName), 'file %r not available;stop.' % cortexParamFullPathFileName
@@ -99,7 +93,7 @@ class StorageThread(Thread):
   node = cortexParamXMLRootNode.find('timeStep')
 
   timeStepUnit = node.get('unit')
-  timeStep       = float(node.text.strip())
+  timeStep     = float(node.text.strip())
 
   if    timeStepUnit == 'min':  timeStep *= 1.0
   elif  timeStepUnit == 'hour': timeStep *= 60.0
@@ -107,7 +101,7 @@ class StorageThread(Thread):
   else: assert True, 'time unit invalid.'
 
 #.................................................................................
-# Third command line argument is the Cortix communication file: cortix-comm.xml
+# Third argument is the Cortix communication file: cortix-comm.xml
 # cortexCommFullPathFileName 
 
   assert os.path.isfile(self.__cortexCommFullPathFileName), 'file %r not available;stop.' % self.__cortexCommFullPathFileName
@@ -131,28 +125,28 @@ class StorageThread(Thread):
   log.debug(s)
 
 #.................................................................................
-# Fourth command line argument is the module runtime-status.xml file
-# runtimeStatusFullPathFileName
+# Fourth argument is the module runtime-status.xml file
+# runtimeStatusFullPathFileName = argv[4]
 
 #---------------------------------------------------------------------------------
-# Run Storage
-  log.debug('entered Run Storage section')
+# Run OffGasThread     
+  log.info('entered Run OffGas section')
 
-#................................................................................
-# Setup input (no input ports)
+#.................................................................................
+# Setup input
 
-# vfda nothing here 
+# vfda: nothing for now
 
-#................................................................................
-# Create the host code          
-  host = Storage( ports, evolveTime )
-  log.debug("host = Storage( ports )")
+#.................................................................................
+# Create the host code             
+  host = OffGas( ports, evolveTime )
+  log.info("host = OffGas( ports )")
 
-#................................................................................
-# Evolve the fuel accumulation
-
-  self.__SetRuntimeStatus('running')
-  log.debug("SetRuntimeStatus('running')")
+#.................................................................................
+# Evolve the offgas   
+ 
+  self.__SetRuntimeStatus('running')  
+  log.info("SetRuntimeStatus('running')")
 
   facilityTime = 0.0
 
@@ -160,25 +154,26 @@ class StorageThread(Thread):
 
    host.CallPorts( facilityTime )
 
-   facilityTime += timeStep
+   host.Execute( facilityTime, timeStep )
 
-   host.Execute( facilityTime )
+   facilityTime += timeStep 
 
+#
 #---------------------------------------------------------------------------------
 # Shutdown 
 
-  self.__SetRuntimeStatus('finished')
-  log.debug("SetRuntimeStatus('finished')")
-
+  self.__SetRuntimeStatus('finished')  
+  log.info("SetRuntimeStatus('finished')")
+ 
 #---------------------------------------------------------------------------------
- def __SetRuntimeStatus( self, status ):
+ def __SetRuntimeStatus(self, status):
 
   status = status.strip()
   assert status == 'running' or status == 'finished', 'status invalid.'
 
   fout = open( self.__runtimeStatusFullPathFileName,'w' )
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by StorageThread.py -->\n'; fout.write(s)
+  s = '<!-- Written by OffGassing.py -->\n'; fout.write(s)
   today = datetime.datetime.today()
   s = '<!-- '+str(today)+' -->\n'; fout.write(s)
   s = '<runtime>\n'; fout.write(s)
@@ -187,6 +182,6 @@ class StorageThread(Thread):
   fout.close()
 
 #*********************************************************************************
-# Usage: -> python storagethread.py or ./storagethread.py
+# Usage: -> python offgassing.py or ./offgassing.py
 if __name__ == "__main__":
-   StorageThread()
+   OffGassing()

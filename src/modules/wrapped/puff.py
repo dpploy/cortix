@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native Plume module 
+Cortix native Puff module 
 
 Sun Jul 13 23:33:23 EDT 2014
 """
@@ -15,7 +15,7 @@ import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
-class Plume(object):
+class Puff(object):
 
 # Private member data
 # __slots__ = [
@@ -35,8 +35,8 @@ class Plume(object):
 
   self.__radioactivity = 1.5311e-4 # Ci/gram
 
-  self.__log = logging.getLogger('plume')
-  self.__log.info('initializing an instance of Plume')
+  self.__log = logging.getLogger('puffing.puff')
+  self.__log.info('initializing an instance of Puff')
 
   self.__gramDecimals = 3 # milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
@@ -332,6 +332,6 @@ class Plume(object):
   self.__log.info(s)
 
 #*********************************************************************************
-# Usage: -> python plume.py
+# Usage: -> python puff.py
 if __name__ == "__main__":
- print('Unit testing for Plume')
+ print('Unit testing for Puff')

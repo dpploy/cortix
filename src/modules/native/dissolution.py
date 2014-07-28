@@ -2,20 +2,20 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native Scrubber module thread
+Cortix native Dissolution module thread
 
-Sun Jul 13 15:30:50 EDT 2014
+Tue Jun 24 01:03:45 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
-from src.modules.native.scrubber import Scrubber
+from src.modules.native.dissolver import Dissolver
 #*********************************************************************************
 
 #*********************************************************************************
-class ScrubberThread(Thread):
+class Dissolution(Thread):
                      
  def __init__( self, inputFullPathFileName, 
                      cortexParamFullPathFileName,
@@ -27,18 +27,18 @@ class ScrubberThread(Thread):
     self.__cortexCommFullPathFileName    = cortexCommFullPathFileName 
     self.__runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
 
-    super(ScrubberThread, self).__init__()
+    super(Dissolution, self).__init__()
 
 #---------------------------------------------------------------------------------
  def run(self):
 
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
-  log = logging.getLogger('scrubber')
+  log = logging.getLogger('dissolution')
   log.setLevel(logging.DEBUG)
 # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'scrubber.log')
+  fh = logging.FileHandler(fullPathTaskDir+'dissolution.log')
   fh.setLevel(logging.DEBUG)
 # create console handler with a higher log level
   ch = logging.StreamHandler()
@@ -69,7 +69,6 @@ class ScrubberThread(Thread):
 # inputFullPathFileName 
 
   assert os.path.isfile(self.__inputFullPathFileName), 'file %r not available;stop.' % self.__inputFullPathFileName
-
 
 #.................................................................................
 # Second argument is the Cortix parameter file: cortix-param.xml
@@ -129,8 +128,8 @@ class ScrubberThread(Thread):
 # runtimeStatusFullPathFileName = argv[4]
 
 #---------------------------------------------------------------------------------
-# Run Scrubber     
-  log.info('entered Run Scrubber section')
+# Run Dissolver
+  log.info('entered Run Dissolver section')
 
 #.................................................................................
 # Setup input
@@ -139,11 +138,11 @@ class ScrubberThread(Thread):
 
 #.................................................................................
 # Create the host code             
-  host = Scrubber( ports )
-  log.info("host = Scrubber( ports )")
+  host = Dissolver( ports, evolveTime )
+  log.info("host = Dissolver( ports )")
 
 #.................................................................................
-# Evolve the scrubber   
+# Evolve the dissolver
  
   self.__SetRuntimeStatus('running')  
   log.info("SetRuntimeStatus('running')")
@@ -172,7 +171,7 @@ class ScrubberThread(Thread):
 
   fout = open( self.__runtimeStatusFullPathFileName,'w' )
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by Scrubber.py -->\n'; fout.write(s)
+  s = '<!-- Written by Dissolution.py -->\n'; fout.write(s)
   today = datetime.datetime.today()
   s = '<!-- '+str(today)+' -->\n'; fout.write(s)
   s = '<runtime>\n'; fout.write(s)
@@ -181,6 +180,6 @@ class ScrubberThread(Thread):
   fout.close()
 
 #*********************************************************************************
-# Usage: -> python codenserthread.py or ./scrubberthread.py
+# Usage: -> python dissolution.py or ./dissolution.py
 if __name__ == "__main__":
-   ScrubberThread()
+   Dissolution()

@@ -11,6 +11,7 @@ import os, sys, io, time, datetime
 import math, random
 import logging
 import xml.etree.ElementTree as ElementTree
+from src.modules.native.core.nitron import Nitron
 #*********************************************************************************
 
 #*********************************************************************************
@@ -27,13 +28,23 @@ class Dissolver(object):
   # Sanity test
   assert type(ports) is list, '-> ports type %r is invalid.' % type(ports)
   assert type(evolveTime) is float, '-> time type %r is invalid.' % type(evolveTime)
+ 
+  # Logger
+  self.__log = logging.getLogger('dissolution.dissolver')
+  self.__log.info('initializing an instance of Dissolver')
 
-  # Member data 
-
-  self.__ports = ports
-
+  # Temporary configuration
   self.__solidsMassLoadMax = 670.0 # gram
   self.__dutyPeriod        = 120.0 # minute
+  self.__gramDecimals = 3 # milligram significant digits
+  self.__mmDecimals   = 3 # micrometer significant digits
+  self.__ccDecimals   = 3 # cubic centimeter significant digits
+
+  # Core dissolver module
+  self.__nitron = Nitron()
+
+  # Member data 
+  self.__ports = ports
 
   self.__ready2LoadFuel    = True   # this is a major control variable
   self.__startDissolveTime = -1.0   # this is a major control variable
@@ -47,34 +58,27 @@ class Dissolver(object):
   self.__historyXeMassVapor = dict()  # this is a persistent variable
   self.__gasSpeciesFuelLoad = None    # this is also a control variable
 
-  self.__log = logging.getLogger('dissolver')
-  self.__log.info('initializing an instance of Dissolver')
+#---------------------------------------------------------------------------------
+ def CallPorts( self, facilityTime=0.0 ):
 
-  self.__gramDecimals = 3 # milligram significant digits
-  self.__mmDecimals   = 3 # micrometer significant digits
-  self.__ccDecimals   = 3 # cubic centimeter significant digits
+  self.__ProvideData( providePortName='signal', atTime=facilityTime )     
+
+  self.__UseData( usePortName='solids', atTime=facilityTime )     
+
+  self.__ProvideData( providePortName='vapor', atTime=facilityTime )     
+  self.__ProvideData( providePortName='state', atTime=facilityTime )     
 
 #---------------------------------------------------------------------------------
- def CallPorts( self, evolTime=0.0 ):
+# Evolve system from facilityTime to facilityTime+timeStep
+ def Execute( self, facilityTime=0.0, timeStep=1.0 ):
 
-  self.__ProvideData( providePortName='signal', evolTime=evolTime )     
-
-  self.__UseData( usePortName='solids', evolTime=evolTime )     
-
-  self.__ProvideData( providePortName='vapor', evolTime=evolTime )     
-  self.__ProvideData( providePortName='state', evolTime=evolTime )     
-
-#---------------------------------------------------------------------------------
-# Evolve system from evolTime to evolTime+timeStep
- def Execute( self, evolTime=0.0, timeStep=1.0 ):
-
-  s = 'Execute(): facility time [min] = ' + str(evolTime)
+  s = 'Execute(): facility time [min] = ' + str(facilityTime)
   self.__log.info(s)
 
-  self.__Dissolve( evolTime, timeStep ) # starting at evolTime to evolTime + timeStep
+  self.__Dissolve( facilityTime, timeStep ) # starting at facilityTime advance timeStep
 
 #---------------------------------------------------------------------------------
- def __UseData( self, usePortName=None, evolTime=0.0 ):
+ def __UseData( self, usePortName=None, atTime=0.0 ):
 
 # Access the port file
   portFile = self.__GetPortFile( usePortName = usePortName )
@@ -83,25 +87,27 @@ class Dissolver(object):
   if usePortName == 'solids': 
 
      if self.__ready2LoadFuel is True:
-        self.__fuelSegmentsLoad = self.__GetSolids( portFile, evolTime )
+        self.__fuelSegmentsLoad = self.__GetSolids( portFile, atTime )
 
      if self.__fuelSegmentsLoad is not None: 
         self.__ready2LoadFuel    = False
-        self.__startDissolveTime = evolTime
+        self.__startDissolveTime = atTime
 
 #---------------------------------------------------------------------------------
- def __ProvideData( self, providePortName=None, evolTime=0.0 ):
+ def __ProvideData( self, providePortName=None, atTime=0.0 ):
 
 # Access the port file
   portFile = self.__GetPortFile( providePortName = providePortName )
 
 # Send data to port files
   if providePortName == 'signal' and portFile is not None: 
-    self.__ProvideSignal( portFile, evolTime )
+    self.__ProvideSignal( portFile, atTime )
+
   if providePortName == 'vapor' and portFile is not None: 
-    self.__ProvideVapor( portFile, evolTime )
+    self.__ProvideVapor( portFile, atTime )
+
   if providePortName == 'state' and portFile is not None: 
-    self.__ProvideState( portFile, evolTime )
+    self.__ProvideState( portFile, atTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -138,12 +144,13 @@ class Dissolver(object):
   return portFile
 
 #---------------------------------------------------------------------------------
- def __ProvideSignal( self, portFile, evolTime ):
+# Signal to request fuel load
+ def __ProvideSignal( self, portFile, facilityTime ):
  
   gDec = self.__gramDecimals
 
   # if the first time step, write the header of a time-sequence data file
-  if evolTime == 0.0:
+  if facilityTime == 0.0:
 
     assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
@@ -173,7 +180,7 @@ class Dissolver(object):
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
-    b.set('value',str(evolTime))
+    b.set('value',str(facilityTime))
     if  self.__ready2LoadFuel == True:
       b.text = str(round(self.__solidsMassLoadMax,gDec))
     else:
@@ -189,7 +196,7 @@ class Dissolver(object):
     tree = ElementTree.parse( portFile )
     rootNode = tree.getroot()
     a = ElementTree.Element('timeStamp')
-    a.set('value',str(evolTime))
+    a.set('value',str(facilityTime))
     if  self.__ready2LoadFuel == True:
       a.text = str(round(self.__solidsMassLoadMax,gDec))
     else:
@@ -202,93 +209,8 @@ class Dissolver(object):
   return 
 
 #---------------------------------------------------------------------------------
- def __ProvideState( self, portFile, atTime ):
- 
-  gDec  = self.__gramDecimals
-  ccDec = self.__ccDecimals   
-
-  # if the first time step, write the header of a time-sequence data file
-  if atTime == 0.0:
-
-    assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
-
-    tree = ElementTree.ElementTree()
-    rootNode = tree.getroot()
-
-    a = ElementTree.Element('time-sequence')
-    a.set('name','dissolver-state')
-
-    b = ElementTree.SubElement(a,'comment')
-    today = datetime.datetime.today()
-    b.set('author','cortix.modules.native.dissolver')
-    b.set('version','0.1')
-
-    b = ElementTree.SubElement(a,'comment')
-    today = datetime.datetime.today()
-    b.set('today',str(today))
-
-    b = ElementTree.SubElement(a,'time')
-    b.set('unit','minute')
-
-    # first variable
-    b = ElementTree.SubElement(a,'var')
-    b.set('name','Fuel Loaded')
-    if self.__GetFuelLoadMass() is not None:
-      (mass,unit) = self.__GetFuelLoadMass()
-    else:
-      mass = 0.0
-      unit = 'gram'
-    b.set('unit',unit)
-    b.set('legend','Dissolver-state')
-
-    # second variable
-    b = ElementTree.SubElement(a,'var')
-    b.set('name','Fuel Loaded')
-    if self.__GetFuelLoadVolume() is not None:
-      (volume,unit) = self.__GetFuelLoadVolume()
-    else:
-      volume = 0.0
-      unit   = 'cc'
-    b.set('unit',unit)
-    b.set('legend','Dissolver-state')
-
-    # values for all variables
-    b = ElementTree.SubElement(a,'timeStamp')
-    b.set('value',str(atTime))
-    mass   = round(mass,gDec)
-    volume = round(volume,ccDec)
-    b.text = str(mass)+','+\
-             str(volume)
-
-    tree = ElementTree.ElementTree(a)
-
-    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
-
-  # if not the first time step then parse the existing history file and append
-  else:
-
-    tree = ElementTree.parse( portFile )
-    rootNode = tree.getroot()
-    a = ElementTree.Element('timeStamp')
-    a.set('value',str(atTime))
-
-    if self.__GetFuelLoadMass() is not None:
-      (mass,unit) = self.__GetFuelLoadMass()
-      (volume,unit) = self.__GetFuelLoadVolume()
-      a.text = str(round(mass,gDec))+','+\
-               str(round(volume,ccDec))
-    else:
-      a.text = '0,0'
-
-    rootNode.append(a)
-
-    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
-
-  return 
-
-#---------------------------------------------------------------------------------
 # Reads the solids from an existing history file
- def __GetSolids( self, portFile, evolTime ):
+ def __GetSolids( self, portFile, facilityTime ):
 
   fuelSegmentsLoad = None
 
@@ -311,8 +233,8 @@ class Dissolver(object):
 
       timeStamp = float(n.get('value').strip())
 
-      # get data at timeStamp evolTime
-      if timeStamp == evolTime:
+      # get data at timeStamp facilityTime
+      if timeStamp == facilityTime:
 
         #...........
         found = True
@@ -328,7 +250,7 @@ class Dissolver(object):
           assert self.__ready2LoadFuel is True, 'sanity check failed.'
 
           if self.__startDissolveTime >= 0.0:
-             assert evolTime >= self.__startDissolveTime + self.__dutyPeriod, 'sanity check failed.'
+             assert facilityTime >= self.__startDissolveTime + self.__dutyPeriod, 'sanity check failed.'
 
           assert len(pack1) != 0 and len(pack2) != 0, 'sanity check failed.'
           assert len(pack1) == len(pack2), 'sanity check failed.'
@@ -409,13 +331,13 @@ class Dissolver(object):
 
         # end of if len(pack1) != 0 or len(pack2) != 0:
 
-      # end of if timeStamp == evolTime:
+      # end of if timeStamp == facilityTime:
 
     # end of for n in nodes:
 
     if found is False: 
       time.sleep(1)
-      s = '__GetSolids(): did not find time stamp '+str(evolTime)+' [min] in '+portFile
+      s = '__GetSolids(): did not find time stamp '+str(facilityTime)+' [min] in '+portFile
       self.__log.debug(s)
 
   # end of while found is False:
@@ -423,10 +345,257 @@ class Dissolver(object):
   if fuelSegmentsLoad is None: nSegments = 0
   else:                        nSegments = len(fuelSegmentsLoad[0])
 
-  s = '__GetSolids(): got fuel load at '+str(evolTime)+' [min], with '+str(nSegments)+' segments'
+  s = '__GetSolids(): got fuel load at '+str(facilityTime)+' [min], with '+str(nSegments)+' segments'
   self.__log.debug(s)
 
   return  fuelSegmentsLoad
+
+#---------------------------------------------------------------------------------
+ def __ProvideVapor( self, portFile, facilityTime ):
+
+  # if the first time step, write the header of a time-sequence data file
+  if facilityTime == 0.0:
+
+    assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
+
+    tree = ElementTree.ElementTree()
+    rootNode = tree.getroot()
+
+    a = ElementTree.Element('time-sequence')
+    a.set('name','dissolver-vapor')
+
+    b = ElementTree.SubElement(a,'comment')
+    today = datetime.datetime.today()
+    b.set('author','cortix.modules.native.dissolver')
+    b.set('version','0.1')
+
+    b = ElementTree.SubElement(a,'comment')
+    today = datetime.datetime.today()
+    b.set('today',str(today))
+
+    b = ElementTree.SubElement(a,'time')
+    b.set('unit','minute')
+
+    # first variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Xe Vapor')
+    b.set('unit','gram/min')
+    b.set('legend','Dissolver-vapor')
+
+    # values for all variables
+    b = ElementTree.SubElement(a,'timeStamp')
+    b.set('value',str(facilityTime))
+    b.text = str(0.0)
+
+    tree = ElementTree.ElementTree(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+
+  # if not the first time step then parse the existing history file and append
+  else:
+
+    tree = ElementTree.parse( portFile )
+    rootNode = tree.getroot()
+    a = ElementTree.Element('timeStamp')
+    a.set('value',str(facilityTime))
+    gDec = self.__gramDecimals
+
+    # first variable
+    if len(self.__historyXeMassVapor.keys()) > 0:
+      mass = round(self.__historyXeMassVapor[facilityTime],gDec)
+    else:
+      mass = 0.0
+    a.text = str(mass)
+
+    rootNode.append(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+
+  return 
+
+#---------------------------------------------------------------------------------
+ def __ProvideState( self, portFile, facilityTime ):
+ 
+  gDec  = self.__gramDecimals
+  ccDec = self.__ccDecimals   
+
+  # if the first time step, write the header of a time-sequence data file
+  if facilityTime == 0.0:
+
+    assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
+
+    tree = ElementTree.ElementTree()
+    rootNode = tree.getroot()
+
+    a = ElementTree.Element('time-sequence')
+    a.set('name','dissolver-state')
+
+    b = ElementTree.SubElement(a,'comment')
+    today = datetime.datetime.today()
+    b.set('author','cortix.modules.native.dissolver')
+    b.set('version','0.1')
+
+    b = ElementTree.SubElement(a,'comment')
+    today = datetime.datetime.today()
+    b.set('today',str(today))
+
+    b = ElementTree.SubElement(a,'time')
+    b.set('unit','minute')
+
+    # first variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Fuel Loaded')
+    if self.__GetFuelLoadMass() is not None:
+      (mass,unit) = self.__GetFuelLoadMass()
+    else:
+      mass = 0.0
+      unit = 'gram'
+    b.set('unit',unit)
+    b.set('legend','Dissolver-state')
+
+    # second variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Fuel Loaded')
+    if self.__GetFuelLoadVolume() is not None:
+      (volume,unit) = self.__GetFuelLoadVolume()
+    else:
+      volume = 0.0
+      unit   = 'cc'
+    b.set('unit',unit)
+    b.set('legend','Dissolver-state')
+
+    # values for all variables
+    b = ElementTree.SubElement(a,'timeStamp')
+    b.set('value',str(facilityTime))
+    mass   = round(mass,gDec)
+    volume = round(volume,ccDec)
+    b.text = str(mass)+','+\
+             str(volume)
+
+    tree = ElementTree.ElementTree(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+
+  # if not the first time step then parse the existing history file and append
+  else:
+
+    tree = ElementTree.parse( portFile )
+    rootNode = tree.getroot()
+    a = ElementTree.Element('timeStamp')
+    a.set('value',str(facilityTime))
+
+    if self.__GetFuelLoadMass() is not None:
+      (mass,unit) = self.__GetFuelLoadMass()
+      (volume,unit) = self.__GetFuelLoadVolume()
+      a.text = str(round(mass,gDec))+','+\
+               str(round(volume,ccDec))
+    else:
+      a.text = '0,0'
+
+    rootNode.append(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
+
+  return 
+
+#---------------------------------------------------------------------------------
+ def __Dissolve( self, facilityTime, timeStep ):
+
+  #..........
+  # new start
+  #..........
+  if facilityTime == self.__startDissolveTime: # this is the beginning of a duty cycle
+
+    s = '__Dissolve(): starting new duty cycle at ' + str(facilityTime) + ' [min]'
+    self.__log.info(s)
+    self.__loadedFuelMass = (mass,unit) = self.__GetFuelLoadMass()
+    s = '__Dissolve(): loaded mass ' + str(round(mass,3)) + ' [' + unit + ']'
+    self.__log.info(s)
+    self.__loadedFuelVolume = (volume,unit) = self.__GetFuelLoadVolume()
+    s = '__Dissolve(): loaded volume ' + str(round(volume,3)) + ' [' + unit + ']'
+    self.__log.info(s)
+    nSegments = len(self.__fuelSegmentsLoad[0])
+    s = '__Dissolve(): new fuel load # segments = ' + str(nSegments)
+    self.__log.info(s)
+
+    self.__gasSpeciesFuelLoad = self.__GetFuelLoadGasSpecies()
+
+    self.__fuelSegmentsLoad = None # clear the load
+
+    s = '__Dissolve(): begin dissolving...' 
+    self.__log.info(s)
+
+    #................................................
+    self.__UpdateStateVariables( facilityTime, timeStep )
+    #................................................
+
+  #.....................
+  # continue dissolving
+  #.....................
+  elif facilityTime > self.__startDissolveTime and self.__loadedFuelMass is not None:
+
+    s = '__Dissolve(): continue dissolving...' 
+    self.__log.info(s)
+
+    #................................................
+    self.__UpdateStateVariables( facilityTime, timeStep )
+    #................................................
+  
+    if  facilityTime + timeStep >= self.__startDissolveTime + self.__dutyPeriod: # time for new load
+
+      s = '__Dissolve(): signal new duty cycle for ' + str(facilityTime+timeStep)+' [min]'
+      self.__log.info(s)
+
+      self.__ready2LoadFuel   = True
+      self.__loadedFuelMass   = None
+      self.__loadedFuelVolume = None
+      self.__gasSpeciesFuelLoad = None
+
+  #.............................
+  # do nothing in this time step
+  #.............................
+  else: 
+
+    s = '__Dissolve(): idle and ready ' + str(facilityTime)+' [min]'
+    self.__log.info(s)
+
+    #................................................
+    self.__UpdateStateVariables( facilityTime, timeStep )
+    #................................................
+
+  return
+
+#---------------------------------------------------------------------------------
+ def __UpdateStateVariables( self, facilityTime, timeStep ):
+  
+  if self.__gasSpeciesFuelLoad is not None:
+
+    # place holder for evolving Xe in dissolution; 
+    # modeling as a log-normal distribution with positive skewness (right-skewness)
+
+    # here is the mass packet entering the system a facilityTime
+    (massXe, massXeUnit) = self.__gasSpeciesFuelLoad['Xe'] 
+
+    t0 = self.__startDissolveTime 
+    tf = t0 + self.__dutyPeriod
+    sigma = 0.7  # right-skewness
+    mean = math.log(10) + sigma**2
+
+    t = facilityTime - t0
+
+    if t == 0: 
+      logNormalPDF = 0.0
+    else:
+      logNormalPDF = 1.0/t/sigma/math.sqrt(2.0*math.pi) * \
+                     math.exp( - (math.log(t) - mean)**2 / 2/ sigma**2 )
+
+    variability = 1.0 - random.random() * 0.15
+
+    self.__historyXeMassVapor[ facilityTime+timeStep ] = massXe * logNormalPDF * variability
+
+  else:
+
+    self.__historyXeMassVapor[ facilityTime + timeStep ] = 0.0
 
 #---------------------------------------------------------------------------------
  def __GetFuelLoadMass( self ):
@@ -505,164 +674,6 @@ class Dissolver(object):
 
   return gasSpecies
 
-#---------------------------------------------------------------------------------
- def __Dissolve( self, evolTime, timeStep ):
-
-  #..........
-  # new start
-  #..........
-  if evolTime == self.__startDissolveTime: # this is the beginning of a duty cycle
-
-    s = '__Dissolve(): starting new duty cycle at ' + str(evolTime) + ' [min]'
-    self.__log.info(s)
-    self.__loadedFuelMass = (mass,unit) = self.__GetFuelLoadMass()
-    s = '__Dissolve(): loaded mass ' + str(round(mass,3)) + ' [' + unit + ']'
-    self.__log.info(s)
-    self.__loadedFuelVolume = (volume,unit) = self.__GetFuelLoadVolume()
-    s = '__Dissolve(): loaded volume ' + str(round(volume,3)) + ' [' + unit + ']'
-    self.__log.info(s)
-    nSegments = len(self.__fuelSegmentsLoad[0])
-    s = '__Dissolve(): new fuel load # segments = ' + str(nSegments)
-    self.__log.info(s)
-
-    self.__gasSpeciesFuelLoad = self.__GetFuelLoadGasSpecies()
-
-    self.__fuelSegmentsLoad = None # clear the load
-
-    s = '__Dissolve(): begin dissolving...' 
-    self.__log.info(s)
-
-    #................................................
-    self.__UpdateStateVariables( evolTime, timeStep )
-    #................................................
-
-  #.....................
-  # continue dissolving
-  #.....................
-  elif evolTime > self.__startDissolveTime and self.__loadedFuelMass is not None:
-
-    s = '__Dissolve(): continue dissolving...' 
-    self.__log.info(s)
-
-    #................................................
-    self.__UpdateStateVariables( evolTime, timeStep )
-    #................................................
-  
-    if  evolTime + timeStep >= self.__startDissolveTime + self.__dutyPeriod: # time for new load
-
-      s = '__Dissolve(): signal new duty cycle for ' + str(evolTime+timeStep)+' [min]'
-      self.__log.info(s)
-
-      self.__ready2LoadFuel   = True
-      self.__loadedFuelMass   = None
-      self.__loadedFuelVolume = None
-      self.__gasSpeciesFuelLoad = None
-
-  #.............................
-  # do nothing in this time step
-  #.............................
-  else: 
-
-    s = '__Dissolve(): idle and ready ' + str(evolTime)+' [min]'
-    self.__log.info(s)
-
-    #................................................
-    self.__UpdateStateVariables( evolTime, timeStep )
-    #................................................
-
-  return
-
-#---------------------------------------------------------------------------------
- def __UpdateStateVariables( self, evolTime, timeStep ):
-  
-  if self.__gasSpeciesFuelLoad is not None:
-
-    (massXe, massXeUnit) = self.__gasSpeciesFuelLoad['Xe'] 
-    # place holder for evolving Xe in dissolution; 
-    # modeling as a log-normal distribution with positive skewness (right-skewness)
-    #
-    t0 = self.__startDissolveTime 
-    tf = t0 + self.__dutyPeriod
-    sigma = 0.7
-    mean = math.log(10) + sigma**2
-
-    variability = 1.0 - random.random() * 0.15
-
-    t = evolTime - t0
-    if t == 0: 
-      logNormalPDF = 0.0
-    else:
-      logNormalPDF = 1.0/t/sigma/math.sqrt(2.0*math.pi) * \
-                   math.exp( - (math.log(t) - mean)**2 / 2/ sigma**2 )
-
-    self.__historyXeMassVapor[ evolTime+timeStep ] = massXe * logNormalPDF * variability
-
-  else:
-
-    self.__historyXeMassVapor[ evolTime+timeStep ] = 0.0
-
-#---------------------------------------------------------------------------------
- def __ProvideVapor( self, portFile, atTime ):
-
-  # if the first time step, write the header of a time-sequence data file
-  if atTime == 0.0:
-
-    assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
-
-    tree = ElementTree.ElementTree()
-    rootNode = tree.getroot()
-
-    a = ElementTree.Element('time-sequence')
-    a.set('name','dissolver-vapor')
-
-    b = ElementTree.SubElement(a,'comment')
-    today = datetime.datetime.today()
-    b.set('author','cortix.modules.native.dissolver')
-    b.set('version','0.1')
-
-    b = ElementTree.SubElement(a,'comment')
-    today = datetime.datetime.today()
-    b.set('today',str(today))
-
-    b = ElementTree.SubElement(a,'time')
-    b.set('unit','minute')
-
-    # first variable
-    b = ElementTree.SubElement(a,'var')
-    b.set('name','Xe Vapor')
-    b.set('unit','gram/min')
-    b.set('legend','Dissolver-vapor')
-
-    # values for all variables
-    b = ElementTree.SubElement(a,'timeStamp')
-    b.set('value',str(atTime))
-    b.text = str(0.0)
-
-    tree = ElementTree.ElementTree(a)
-
-    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
-
-  # if not the first time step then parse the existing history file and append
-  else:
-
-    tree = ElementTree.parse( portFile )
-    rootNode = tree.getroot()
-    a = ElementTree.Element('timeStamp')
-    a.set('value',str(atTime))
-    gDec = self.__gramDecimals
-
-    # first variable
-    if len(self.__historyXeMassVapor.keys()) > 0:
-      mass = round(self.__historyXeMassVapor[atTime],gDec)
-    else:
-      mass = 0.0
-    a.text = str(mass)
-
-    rootNode.append(a)
-
-    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
-
-  return 
 
 #*********************************************************************************
 # Usage: -> python dissolver.py
