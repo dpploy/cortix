@@ -10,6 +10,7 @@ Tue Jul 22 15:06:02 EDT 2014
 import os, sys, io, time, datetime
 import math, random
 import logging
+from scipy.constants import Avogadro as N_avogadro
 import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
@@ -43,7 +44,11 @@ class OffGas(object):
 
   self.__historyXeMassOffGas = dict()
 
-  self.__radioactivityXe = 1.5311e-4 # Ci/gram
+#  self.__radioactivityXe = 1.5311e-4 # Ci/gram
+
+  self.__atomicMassXe = 131.3
+  self.__curieConvFactor = 3.7e+10
+  self.__halfLifeXe = 4.53e+5
 
   self.__gramDecimals = 3 # milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
@@ -223,7 +228,10 @@ class OffGas(object):
     s = ' <var name="Xe Off-Gas" unit="gram/min" legend="Off-Gas-offgas"/>\n'; fout.write(s)
     s = ' <var name="Xe Radioactivity" unit="Ci/min" legend="Off-Gas-offgas" scale="log"/>\n'; fout.write(s)
     mass = 0.0
-    radioactivityXe = self.__radioactivityXe * mass 
+
+    radioactivityXe = mass/self.__atomicMassXe * N_avogadro / self.__curieConvFactor * math.log(2) / self.__halfLifeXe / 60.0
+
+#    radioactivityXe = self.__radioactivityXe * mass 
     s = ' <timeStamp value="'+str(atTime)+'">'+\
         str(mass)+','+\
         str(radioactivityXe)+\
@@ -244,7 +252,8 @@ class OffGas(object):
       mass = round(self.__historyXeMassOffGas[atTime],gDec)
     else:
       mass = 0.0
-    radioactivityXe = self.__radioactivityXe * mass 
+    radioactivityXe = mass/self.__atomicMassXe * N_avogadro / self.__curieConvFactor * math.log(2) / self.__halfLifeXe / 60.0
+#    radioactivityXe = self.__radioactivityXe * mass 
     a.text = str(mass)+','+str(radioactivityXe)
 
     rootNode.append(a)
