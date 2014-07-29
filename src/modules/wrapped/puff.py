@@ -11,6 +11,7 @@ import os, sys, io, time, datetime
 import math, random
 import pandas
 import logging
+from scipy.constants import Avogadro as N_avogadro
 import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
@@ -33,8 +34,10 @@ class Puff(object):
 
   self.__historyXeMassOffGas = dict()
 
-  self.__radioactivity = 1.5311e-4 # Ci/gram
-
+  self.__atomicMassXe = 131.3
+  self.__curieConvFactor = 3.7e+10
+  self.__halfLifeXe = 4.53e+5
+  
   self.__log = logging.getLogger('puffing.puff')
   self.__log.info('initializing an instance of Puff')
 
@@ -300,7 +303,7 @@ class Puff(object):
 
   mass = self.__historyXeMassOffGas[ evolTime ]
   
-  releaseRate = self.__radioactivity * mass / 60.0
+  releaseRate = mass/self.__atomicMassXe * N_avogadro / self.__curieConvFactor * math.log(2) / self.__halfLifeXe / 60.0
 
   s = '2                  ! Simulation duration (hrs)\n'; fout.write(s)
   s = '60                 ! Timestep for conc calcs (sec)\n'; fout.write(s)
