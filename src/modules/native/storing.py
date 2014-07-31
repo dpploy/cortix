@@ -158,11 +158,11 @@ class Storing(Thread):
 
   while facilityTime <= evolveTime:
 
-   host.CallPorts( facilityTime )
+    host.CallPorts( facilityTime )
 
-   facilityTime += timeStep
+    host.Execute( facilityTime, timeStep )
 
-   host.Execute( facilityTime )
+    facilityTime += timeStep
 
 #---------------------------------------------------------------------------------
 # Shutdown 

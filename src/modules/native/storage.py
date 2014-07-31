@@ -62,7 +62,7 @@ class Storage(object):
   self.__ProvideData( providePortName='state', atTime=facilityTime )
 
 #---------------------------------------------------------------------------------
- def Execute( self, facilityTime=0.0 ):
+ def Execute( self, facilityTime=0.0, timeStep=0.0 ):
 
   s = 'Execute(): facility time [min] = ' + str(facilityTime)
   self.__log.info(s)
@@ -72,7 +72,7 @@ class Storage(object):
   s = 'Execute(): # of segments  = '+str(len(self.__fuelSegments))
   self.__log.debug(s)
 
-  self.__Store( facilityTime )
+  self.__Store( facilityTime, timeStep )
 
 #---------------------------------------------------------------------------------
  def __UseData( self, usePortName=None, atTime=0.0 ):
@@ -142,10 +142,6 @@ class Storage(object):
 #---------------------------------------------------------------------------------
 # This uses a use portFile which is guaranteed at this point
  def __GetSolids( self, portFile, facilityTime ):
-
-  # THIS IS A GLITCH ON THE INPUT DATA FROM THE HEAD-END. IT SHOULD HAVE DATA
-  # FOR 24 HOURS. ONLY HAS 107 minutes
-  if facilityTime > 107: return
 
   found = False
 
@@ -852,7 +848,7 @@ class Storage(object):
 
     # all variables values
     gDec = self.__gramDecimals
-    mass = round(self.__historyXeMassOffGas[atTime],gDec)
+    mass = round( self.__historyXeMassOffGas[atTime], gDec )
     b.text = str(mass)
 
     tree = ElementTree.ElementTree(a)
@@ -869,7 +865,7 @@ class Storage(object):
 
     # all variables values
     gDec = self.__gramDecimals
-    mass = round(self.__historyXeMassOffGas[atTime],gDec)
+    mass = round( self.__historyXeMassOffGas[atTime], gDec )
     a.text = str(mass)
 
     rootNode.append(a)
@@ -913,19 +909,21 @@ class Storage(object):
   self.__fuelSegments.insert(0,fuelSegment)
 
 #---------------------------------------------------------------------------------
- def __Store( self, facilityTime ):
+ def __Store( self, facilityTime, timeStep ):
 
-  # Xe off-gas release place holder
+  # Xe off-gas release; model place holder
 
   gDec = self.__gramDecimals
 
+  self.__historyXeMassOffGas[facilityTime + timeStep] = 0.0
   for fuelSeg in self.__fuelSegments:
     timeStamp = fuelSeg[0]
     storageTime = facilityTime - timeStamp
+    assert storageTime >= 0.0
     factor = random.random() * 0.3
     massLossFactor = storageTime * factor/100.0/60.0 # rate: 0 to 0.3 wt% per hour of "storage" time
     massLoss = fuelSeg[8] * massLossFactor
-    self.__historyXeMassOffGas[facilityTime] = massLoss
+    self.__historyXeMassOffGas[facilityTime + timeStep] = massLoss
     fuelSeg8 = round(fuelSeg[8] - massLoss,gDec)
     fuelSeg1 = round(fuelSeg[1] - massLoss,gDec)
     modifiedSegment = ( fuelSeg[0], fuelSeg1,   fuelSeg[2], fuelSeg[3], 
@@ -933,7 +931,7 @@ class Storage(object):
                         fuelSeg[9], fuelSeg[10] )
     self.__fuelSegments.remove(fuelSeg)
     self.__fuelSegments.append(modifiedSegment)
-    
+  
   massCheck = self.__GetMassCheck()
   assert massCheck is not None
   assert massCheck is not False
