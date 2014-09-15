@@ -2,7 +2,8 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix: a program for integrating systems level modules
+Cortix: a program for system-level modules
+        coupling, execution, and analysis.
 
 Tue Dec 10 11:21:30 EDT 2013
 """
@@ -30,7 +31,7 @@ class Network(object):
 #  print('\t\tCortix::Simulation::Application::Network: name:',self.__name)
 
   self.__connectivity = list(dict()) # connectivity information of the network
-  self.__moduleNames = list()        # modules involved in the network
+  self.__moduleNames  = list()        # modules involved in the network
 
   self.__runtimeCortixCommFile = dict() # cortix communication file for modules
 
@@ -74,7 +75,7 @@ class Network(object):
     if tag == 'connect': 
 
      for (key,value) in attributes: 
-          assert key not in tmp.keys(), 'repeaded key in attribute of %r network' % self.__name
+          assert key not in tmp.keys(), 'repeated key in attribute of %r network' % self.__name
           tmp[key] = value
 
      self.__connectivity.append( tmp )

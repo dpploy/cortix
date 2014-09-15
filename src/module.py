@@ -2,7 +2,8 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix: a program for integrating systems level modules
+Cortix: a program for system-level modules
+        coupling, execution, and analysis.
 
 Tue Dec 10 11:21:30 EDT 2013
 """
@@ -17,8 +18,8 @@ from src.modules.native.condensation import Condensation
 from src.modules.native.scrubbing import Scrubbing
 from src.modules.native.filtration import Filtration
 from src.modules.native.offgassing import OffGassing
-from src.modules.wrapped.puffing import Puffing
 from src.modules.native.pyplotting import PyPlotting
+from src.modules.wrapped.puffing import Puffing
 #*********************************************************************************
 
 #*********************************************************************************

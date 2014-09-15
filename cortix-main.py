@@ -2,8 +2,8 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix: a program for system-level modules: integration, coupling, execution, 
-        and analysis.
+Cortix: a program for system-level modules
+        coupling, execution, and analysis.
 
 Tue Dec 10 11:21:30 EDT 2013
 """
@@ -13,13 +13,12 @@ import datetime
 from src.cortix import Cortix
 #*********************************************************************************
 
-
 def Main():
 
  pwd                = os.path.dirname(__file__)
  fullPathConfigFile = os.path.join(pwd, 'input/cortix-config.xml')
 
- # NB: if another instantiation of Cortix occur, the cortix wrk directory specified
+ # NB: if another instantiation of Cortix occurs, the cortix wrk directory specified
  #     in the cortix configuration file must be different, else the logging facility 
  #     will have log file collision.
  cortix1 = Cortix( 'cortix1', fullPathConfigFile )

@@ -2,7 +2,8 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix: a program for integrating system-level modules
+Cortix: a program for system-level modules
+        coupling, execution, and analysis.
 
 This class generates objects that hold an ElementTree node of an XML tree 
 structure. The level of the node depends on the argument passed when creating the 

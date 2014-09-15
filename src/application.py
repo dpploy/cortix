@@ -2,7 +2,8 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix: a program for integrating systems level modules
+Cortix: a program for system-level modules
+        coupling, execution, and analysis.
 
 An Application object is the composition of Module objects and Network objects.
 

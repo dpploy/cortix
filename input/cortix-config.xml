@@ -361,7 +361,9 @@
     <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="condenser-native" toPort="off-gas"/> 
     <connect fromModule="hepafilter-native" fromPort="inflow-gas" toModule="scrubber-native" toPort="off-gas"/> 
     <connect fromModule="offgas-native" fromPort="inflow-gas" toModule="hepafilter-native" toPort="off-gas"/> 
+<!--
     <connect fromModule="plume" fromPort="off-gas" toModule="offgas-native" toPort="off-gas"/> 
+-->
     <connect fromModule="pyplot-native" fromPort="time-sequence" toModule="chopper-native" toPort="off-gas"/> 
     <connect fromModule="pyplot-native" fromPort="time-sequence" toModule="storage-native" toPort="off-gas"/> 
     <connect fromModule="pyplot-native" fromPort="time-sequence" toModule="storage-native" toPort="state"/> 
