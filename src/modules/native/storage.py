@@ -46,6 +46,7 @@ class Storage(object):
 
   self.__gramDecimals = 3 # milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
+  self.__ccDecimals   = 3 # microcc significant digits
 
 #---------------------------------------------------------------------------------
  def CallPorts(self, facilityTime=0.0):
@@ -235,6 +236,7 @@ class Storage(object):
        Ru   = 0.0
        O    = 0.0
        N    = 0.0
+       C    = 0.0
 
        elements = timeNode.findall('Element')
        for element in elements:
@@ -255,6 +257,7 @@ class Storage(object):
                 if element.get('key') == 'Ru':  Ru += mass; 
                 if element.get('key') == 'O' :  O  += mass; 
                 if element.get('key') == 'N' :  N  += mass; 
+                if element.get('key') == 'C' :  C  += mass; 
 
 #  print('mass     [g]= ', mass)
 #  print('#segments   = ', nSegments)
@@ -754,17 +757,23 @@ class Storage(object):
 
     # third variable
     b = ElementTree.SubElement(a,'var')
+    b.set('name','Fuel Volume')
+    b.set('unit','cc')
+    b.set('legend','Storage-state')
+
+    # fourth variable
+    b = ElementTree.SubElement(a,'var')
     b.set('name','U Mass')
     b.set('unit','gram')
     b.set('legend','Storage-state')
 
-    # fourth variable
+    # fifth variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Pu Mass')
     b.set('unit','gram')
     b.set('legend','Storage-state')
 
-    # fifth variable
+    # sixth variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','FP Mass')
     b.set('unit','gram')
@@ -775,13 +784,19 @@ class Storage(object):
     b.set('value',str(atTime))
 
     # all variables values
-    gDec = self.__gramDecimals
-    mass = round(self.__GetMass(),gDec)
+    gDec   = self.__gramDecimals
+    ccDec  = self.__ccDecimals 
+    mass   = round(self.__GetMass(),gDec)
+    vol    = round(self.__GetFuelVolume(),ccDec)
+    uMass  = round(self.__GetUMass(),gDec)
+    puMass = round(self.__GetPuMass(),gDec)
+    fpMass = round(self.__GetFPMass(),gDec)
     b.text = str(mass)+','+\
              str(self.__GetNSegments())+','+\
-             str(self.__GetUMass())+','+\
-             str(self.__GetPuMass())+','+\
-             str(self.__GetFPMass())
+             str(vol)+','+\
+             str(uMass)+','+\
+             str(puMass)+','+\
+             str(fpMass)
 
     tree = ElementTree.ElementTree(a)
 
@@ -796,13 +811,19 @@ class Storage(object):
     a.set('value',str(atTime))
 
     # all variables values
-    gDec = self.__gramDecimals
-    mass = round(self.__GetMass(),gDec)
+    gDec   = self.__gramDecimals
+    ccDec  = self.__ccDecimals 
+    mass   = round(self.__GetMass(),gDec)
+    vol    = round(self.__GetFuelVolume(),ccDec)
+    uMass  = round(self.__GetUMass(),gDec)
+    puMass = round(self.__GetPuMass(),gDec)
+    fpMass = round(self.__GetFPMass(),gDec)
     a.text = str(mass)+','+\
              str(self.__GetNSegments())+','+\
-             str(self.__GetUMass())+','+\
-             str(self.__GetPuMass())+','+\
-             str(self.__GetFPMass())
+             str(vol)+','+\
+             str(uMass)+','+\
+             str(puMass)+','+\
+             str(fpMass)
 
     rootNode.append(a)
 
@@ -887,6 +908,26 @@ class Storage(object):
        if fuelSeg[0] <= timeStamp: nSegments += 1
 
   return nSegments
+
+#---------------------------------------------------------------------------------
+ def __GetFuelVolume(self, timeStamp=None):
+ 
+  volume = 0.0
+
+  if timeStamp is None:
+     for fuelSeg in self.__fuelSegments:
+      length = fuelSeg[2] 
+      iD     = fuelSeg[3]
+      volume += length/10.0 * math.pi * iD*iD / 4.0 / 100.0
+
+  else:
+     for fuelSeg in self.__fuelSegments:
+      if fuelSeg[0] <= timeStamp: 
+         length = fuelSeg[2] 
+         iD     = fuelSeg[3]
+         volume += length/10.0 * math.pi * iD*iD / 4.0 / 100.0
+
+  return volume  # cc unit
 
 #---------------------------------------------------------------------------------
  def __WithdrawFuelSegment(self, atTime ):

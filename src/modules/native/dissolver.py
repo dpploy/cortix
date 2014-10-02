@@ -244,7 +244,7 @@ class Dissolver(object):
         pack1 = n.findall('pack1')
         pack2 = n.findall('pack2')
 
-        # if there are data packs then read proceed with parsing
+        # if there are data packs then proceed with parsing
         if len(pack1) != 0 or len(pack2) != 0:
 
           assert self.__ready2LoadFuel is True, 'sanity check failed.'
@@ -329,11 +329,11 @@ class Dissolver(object):
 
           fuelSegmentsLoad = (segmentsGeometryData, segmentsCompositionData) 
 
-        # end of if len(pack1) != 0 or len(pack2) != 0:
+        # end of: if len(pack1) != 0 or len(pack2) != 0:
 
-      # end of if timeStamp == facilityTime:
+      # end of: if timeStamp == facilityTime:
 
-    # end of for n in nodes:
+    # end of: for n in nodes:
 
     if found is False: 
       time.sleep(1)
@@ -573,7 +573,7 @@ class Dissolver(object):
     # place holder for evolving Xe in dissolution; 
     # modeling as a log-normal distribution with positive skewness (right-skewness)
 
-    # here is the mass packet entering the system a facilityTime
+    # here is the mass packet entering the system at facilityTime
     (massXe, massXeUnit) = self.__gasSpeciesFuelLoad['Xe'] 
 
     t0 = self.__startDissolveTime 
@@ -654,7 +654,9 @@ class Dissolver(object):
   mass3H = 0.0
 
   segmentsCompData = self.__fuelSegmentsLoad[1]
+
   for segmentData in segmentsCompData:
+
     for (name,unit,value) in segmentData:
       if name=='I': 
          massI   += value

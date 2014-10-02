@@ -428,12 +428,16 @@ class PyPlot(object):
       y /= 1000.0
       if varUnit == 'gram' or varUnit == 'g': 
         varUnit = 'kg'
+      if varUnit == 'cc': 
+        varUnit = 'L'
       if varUnit == 'gram/min' or varUnit == 'g/min': 
         varUnit = 'kg/min'
     if y.max() <= .1: 
       y *= 1000.0
       if varUnit == 'gram' or varUnit == 'g': 
         varUnit = 'mg'
+      if varUnit == 'cc':
+        varUnit = 'm-cc'
       if varUnit == 'gram/min' or varUnit == 'g/min': 
         varUnit = 'mg/min'
   
