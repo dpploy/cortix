@@ -8,7 +8,7 @@ Tue Jun 24 01:03:45 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
-import random
+import math, random
 import logging
 import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
@@ -44,7 +44,10 @@ class Storage(object):
   self.__historyXeMassOffGas = dict()
   self.__historyXeMassOffGas[0.0] = 0.0
 
-  self.__gramDecimals = 3 # milligram significant digits
+  self.__historyKrMassOffGas = dict()
+  self.__historyKrMassOffGas[0.0] = 0.0
+
+  self.__gramDecimals = 4 # tenth of a milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
   self.__ccDecimals   = 3 # microcc significant digits
 
@@ -265,9 +268,9 @@ class Storage(object):
 #  print('OD          = ', oD)
 #  print('ID          = ', iD)
 
-       # end of for element in elements:
+       # end of: for element in elements:
 
-       FP = totalMass - (U + Pu + I + Kr + Xe + a3H)
+       FP = totalMass - (U + Pu + I + Kr + Xe + a3H + Ru + C)
 
 #     totalNSegments += nSegments
 
@@ -286,7 +289,7 @@ class Storage(object):
        segmentLength = round(segmentLength,mmDec)
        iD            = round(iD,mmDec)
 
-       assert abs( totalMass - (U+Pu+I+Kr+Xe+a3H+FP) ) < 1.0e-2
+       assert abs( totalMass - (U+Pu+I+Kr+Xe+a3H+Ru+C+FP) ) < 1.0e-2
 
        segMass   = totalMass / int(nSegments)
        segLength = segmentLength
@@ -297,6 +300,8 @@ class Storage(object):
        Kr        /=  int(nSegments)
        Xe        /=  int(nSegments)
        a3H       /=  int(nSegments)
+       Ru        /=  int(nSegments)
+       C         /=  int(nSegments)
        FP        /=  int(nSegments)
 
        U   = round(U  ,gDec)
@@ -305,19 +310,21 @@ class Storage(object):
        Kr  = round(Kr ,gDec)
        Xe  = round(Xe ,gDec)
        a3H = round(a3H,gDec)
+       Ru  = round(Ru ,gDec)
+       C   = round(C  ,gDec)
        FP  = round(FP ,gDec)
 
-       assert abs( segMass - (U+Pu+I+Kr+Xe+a3H+FP) ) < 1.0e-2
+       assert abs( segMass - (U+Pu+I+Kr+Xe+a3H+Ru+C+FP) ) < 1.0e-2
 
-       for seg in range(1,int(nSegments)+1):
+       for seg in range(int(nSegments)):
 
          segment = ( timeStamp, segMass, segLength, segID, 
-                     U, Pu, I, Kr, Xe, a3H, FP )
+                     U, Pu, I, Kr, Xe, a3H, Ru, C, FP )
 
          self.__fuelSegments.append( segment )
 #         print( '# segments = ', len(self.__fuelSegments) )
 
-       # end of for seg in range(1,int(nSegments)+1):
+       # end of: for seg in range(1,int(nSegments)+1):
   
 #  print('totalMass     [g]= ', totalMass)
 #  print('total # segments = ', totalNSegments)
@@ -334,15 +341,19 @@ class Storage(object):
 #  for s in self.__fuelSegments:
 #   print(s[0],s[1],s[2])
 
-       break
+       break # out of the timeNode loop
 
-     # end of if timeStamp == facilityTime: 
+     # end of: if timeStamp == facilityTime: 
 
-    # end of for timeNode in timeNodes:
+    # end of: for timeNode in timeNodes:
 
     if found is False: time.sleep(1) 
 
-  # end of while found is False:
+  # end of: while found is False:
+
+#  print('facility time ',facilityTime)
+#  print('fuel segments ',self.__fuelSegments)
+  assert self.__GetMassCheck() is True, 'mass imbalance at facility time %r; stop.' % facilityTime 
 
   return
 
@@ -496,6 +507,8 @@ class Storage(object):
            ('Kr','gram'),
            ('Xe','gram'),
            ('3H','gram'),
+           ('Ru','gram'),
+           ('C','gram'),
            ('FP','gram')]
 
   withdrawMass = self.__withdrawMass
@@ -592,7 +605,9 @@ class Storage(object):
         Kr        = fuelSeg[7]
         Xe        = fuelSeg[8]
         a3H       = fuelSeg[9]
-        FP        = fuelSeg[10]
+        Ru        = fuelSeg[10]
+        C         = fuelSeg[11]
+        FP        = fuelSeg[12]
 
         # first packet
         c = ElementTree.SubElement(b,'pack1')
@@ -681,7 +696,9 @@ class Storage(object):
         Kr        = round(fuelSeg[7],gDec)
         Xe        = round(fuelSeg[8],gDec)
         a3H       = round(fuelSeg[9],gDec)
-        FP        = round(fuelSeg[10],gDec)
+        Ru        = round(fuelSeg[10],gDec)
+        C         = round(fuelSeg[11],gDec)
+        FP        = round(fuelSeg[12],gDec)
  
         # first packet
         a = ElementTree.SubElement(newTimeStamp, 'pack1')
@@ -695,7 +712,7 @@ class Storage(object):
 
         # second packet
         b = ElementTree.SubElement(newTimeStamp, 'pack2')
-        fuelSegVars2 = [U,Pu,I,Kr,Xe,a3H,FP]
+        fuelSegVars2 = [U,Pu,I,Kr,Xe,a3H,Ru,C,FP]
         assert len(fuelSegVars2) == len(vars2)
         s = ''
         for var in fuelSegVars2: 
@@ -952,30 +969,56 @@ class Storage(object):
 #---------------------------------------------------------------------------------
  def __Store( self, facilityTime, timeStep ):
 
-  # Xe off-gas release; model place holder
+  # Kr, Xe off-gas release; model place holder
 
   gDec = self.__gramDecimals
 
   self.__historyXeMassOffGas[facilityTime + timeStep] = 0.0
+  self.__historyKrMassOffGas[facilityTime + timeStep] = 0.0
+
+  modifiedSegments = list()
+
   for fuelSeg in self.__fuelSegments:
     timeStamp = fuelSeg[0]
     storageTime = facilityTime - timeStamp
     assert storageTime >= 0.0
-    factor = random.random() * 0.3
-    massLossFactor = storageTime * factor/100.0/60.0 # rate: 0 to 0.3 wt% per hour of "storage" time
+
+    # Xe
+    factor = random.random() * 0.1
+    massLossFactor = storageTime * factor/100.0/60.0 # rate: 0 to 0.1 wt% per hour of "storage" time
     massLoss = fuelSeg[8] * massLossFactor
-    self.__historyXeMassOffGas[facilityTime + timeStep] = massLoss
+
+    self.__historyXeMassOffGas[ facilityTime + timeStep ] = massLoss
+
     fuelSeg8 = round(fuelSeg[8] - massLoss,gDec)
     fuelSeg1 = round(fuelSeg[1] - massLoss,gDec)
+
+    # Kr 
+    factor = random.random() * 0.1
+    massLossFactor = storageTime * factor/100.0/60.0 # rate: 0 to 0.1 wt% per hour of "storage" time
+    massLoss = fuelSeg[7] * massLossFactor
+
+    self.__historyKrMassOffGas[ facilityTime + timeStep ] = massLoss
+
+    fuelSeg7 = round(fuelSeg[7] - massLoss,gDec)
+    fuelSeg1 = round(fuelSeg1 - massLoss,gDec)
+
+
     modifiedSegment = ( fuelSeg[0], fuelSeg1,   fuelSeg[2], fuelSeg[3], 
-                        fuelSeg[4], fuelSeg[5], fuelSeg[6], fuelSeg[7], fuelSeg8,
-                        fuelSeg[9], fuelSeg[10] )
+                        fuelSeg[4], fuelSeg[5], fuelSeg[6], fuelSeg7, fuelSeg8,
+                        fuelSeg[9], fuelSeg[10], fuelSeg[11], fuelSeg[12] )
+
     self.__fuelSegments.remove(fuelSeg)
-    self.__fuelSegments.append(modifiedSegment)
+
+    modifiedSegments.append( modifiedSegment )
+
+#    self.__fuelSegments.append(modifiedSegment)
+
+  # end of: for fuelSeg in self.__fuelSegments:
+
+  self.__fuelSegments += modifiedSegments # vfda: may need a deep copy?
   
-  massCheck = self.__GetMassCheck()
-  assert massCheck is not None
-  assert massCheck is not False
+  assert self.__GetMassCheck() is True, 'mass imbalance; stop.'
 
   return
 
@@ -989,20 +1032,24 @@ class Storage(object):
   if timeStamp is None:
     for fuelSeg in self.__fuelSegments:
       sumMass = 0.0
-      for mass in fuelSeg[4:11]:
+      for mass in fuelSeg[4:12+1]:
         sumMass += mass
-      if abs(round(sumMass,gDec) - round(fuelSeg[1],gDec)) > 1e-2: 
-        print(round(sumMass,gDec))
-        print(round(fuelSeg[1],gDec))
+      if abs(round(sumMass,gDec) - round(fuelSeg[1],gDec)) >= 1e-2: 
+        print('sum of masses: ',round(sumMass,gDec))
+        print('fuelSeg[1]: ',round(fuelSeg[1],gDec))
+        print('fuelSegment: ',fuelSeg)
         check = False
-#        return check
+        return check
   else:
     for fuelSeg in self.__fuelSegments:
       if fuelSeg[0] <= timeStamp:
         sumMass = 0.0
-        for mass in fuelSeg[4:11]:
+        for mass in fuelSeg[4:12+1]:
           sumMass += mass
-        if abs(round(sumMass,gDec) - round(fuelSeg[1],gDec)) > 1e-2: 
+        if abs(round(sumMass,gDec) - round(fuelSeg[1],gDec)) >= 1e-2: 
+          print('sum of masses: ',round(sumMass,gDec))
+          print('fuelSeg[1]: ',round(fuelSeg[1],gDec))
+          print('fuelSegment: ',fuelSeg)
           check = False
           return check
 

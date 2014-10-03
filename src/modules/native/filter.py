@@ -39,7 +39,7 @@ class Filter(object):
   self.__log = logging.getLogger('filtration.filter')
   self.__log.info('initializing an instance of Filter')
 
-  self.__gramDecimals = 3 # milligram significant digits
+  self.__gramDecimals = 4 # tenth of a milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
 
 #---------------------------------------------------------------------------------

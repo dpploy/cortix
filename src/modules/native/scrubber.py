@@ -40,7 +40,7 @@ class Scrubber(object):
   self.__log = logging.getLogger('scrubbing.scrubber')
   self.__log.info('initializing an instance of Scrubber')
 
-  self.__gramDecimals = 3 # milligram significant digits
+  self.__gramDecimals = 4 # tenth of a milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
 
 #---------------------------------------------------------------------------------

@@ -50,7 +50,7 @@ class OffGas(object):
   self.__curieConvFactor = 3.7e+10
   self.__halfLifeXe = 4.53e+5
 
-  self.__gramDecimals = 3 # milligram significant digits
+  self.__gramDecimals = 4 # tenth of a milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
 
 #---------------------------------------------------------------------------------

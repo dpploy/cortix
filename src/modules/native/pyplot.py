@@ -45,7 +45,7 @@ class PyPlot(object):
 
   self.__plotInterval    = 60.0   # minutes  (1 plot update every 60 min)
   self.__plotSlideWindow = 3*60.0 # minutes  (1 plot update every 60 min)
-  self.__gramDecimals    = 3      # milligram significant digits
+  self.__gramDecimals    = 4      # tenth of a milligram significant digits
 
   self.__timeSequences_tmp = list() # temporary storage
 
@@ -449,6 +449,10 @@ class PyPlot(object):
     ymax += dy
     ymin  = y.min()
     ymin -= dy
+
+    if abs(ymin-ymax) <= 1.e-3:
+       ymin = -1.0
+       ymax =  1.0
 
     ax.set_ylim(ymin,ymax)
 

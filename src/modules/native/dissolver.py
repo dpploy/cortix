@@ -35,28 +35,48 @@ class Dissolver(object):
 
   # Temporary configuration
   self.__solidsMassLoadMax = 670.0 # gram
+  self.__dissolverVolume   = 10.0  # liter
   self.__dutyPeriod        = 120.0 # minute
-  self.__gramDecimals = 3 # milligram significant digits
+
+  self.__molarMassU  = 238.0
+  self.__molarMassPu = 239.0
+  self.__molarMassFP = 135.34-16*1.18
+
+  self.__rho_uo2       =  8.300  # g/cc
+  self.__rho_puo2      = 11.460
+  self.__rho_fpo1dot18 = 12.100
+
+  self.__gramDecimals = 4 # tenth of a milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
   self.__ccDecimals   = 3 # cubic centimeter significant digits
 
   # Core dissolver module
   self.__nitron = Nitron()
 
+  self.__HNO3molarity = 9  # Molar
+
   # Member data 
   self.__ports = ports
 
-  self.__ready2LoadFuel    = True   # this is a major control variable
-  self.__startDissolveTime = -1.0   # this is a major control variable
+  self.__ready2LoadFuel    = True   # major control variable
+  self.__startDissolveTime = -1.0   # major control variable
 
   self.__fuelSegmentsLoad = None
-  self.__loadedFuelMass   = None  # this is also a major control variable
-  self.__loadedFuelVolume = None  # this is also a major control variable
+  self.__loadedFuelMass   = None  # major control variable
+  self.__loadedFuelVolume = None  # major control variable
 
 #  self.__stateHistory = list(dict())
 
-  self.__historyXeMassVapor = dict()  # this is a persistent variable
-  self.__gasSpeciesFuelLoad = None    # this is also a control variable
+  self.__historyXeMassVapor   = dict()  # persistent variable
+  self.__historyKrMassVapor   = dict()  # persistent variable
+  self.__historyI2MassVapor   = dict()  # persistent variable
+  self.__historyRuO4MassVapor = dict()  # persistent variable
+  self.__historyCO2MassVapor  = dict()  # persistent variable
+
+  self.__historyI2MassLiquid  = dict()  # persistent variable
+  self.__historyI2MassLiquid[0.0] = 0.0
+
+  self.__loadedSpecies = None  # control variable
 
 #---------------------------------------------------------------------------------
  def CallPorts( self, facilityTime=0.0 ):
@@ -67,6 +87,8 @@ class Dissolver(object):
 
   self.__ProvideData( providePortName='vapor', atTime=facilityTime )     
   self.__ProvideData( providePortName='state', atTime=facilityTime )     
+
+  self.__UseData( usePortName='condensate', atTime=facilityTime )     
 
 #---------------------------------------------------------------------------------
 # Evolve system from facilityTime to facilityTime+timeStep
@@ -92,6 +114,8 @@ class Dissolver(object):
      if self.__fuelSegmentsLoad is not None: 
         self.__ready2LoadFuel    = False
         self.__startDissolveTime = atTime
+
+  if usePortName == 'condensate': self.__GetCondensate( portFile, atTime )
 
 #---------------------------------------------------------------------------------
  def __ProvideData( self, providePortName=None, atTime=0.0 ):
@@ -340,7 +364,7 @@ class Dissolver(object):
       s = '__GetSolids(): did not find time stamp '+str(facilityTime)+' [min] in '+portFile
       self.__log.debug(s)
 
-  # end of while found is False:
+  # end of: while found is False:
 
   if fuelSegmentsLoad is None: nSegments = 0
   else:                        nSegments = len(fuelSegmentsLoad[0])
@@ -382,10 +406,38 @@ class Dissolver(object):
     b.set('unit','gram/min')
     b.set('legend','Dissolver-vapor')
 
+    # second variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Kr Vapor')
+    b.set('unit','gram/min')
+    b.set('legend','Dissolver-vapor')
+
+    # third variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','I2 Vapor')
+    b.set('unit','gram/min')
+    b.set('legend','Dissolver-vapor')
+
+    # fourth variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','RuO4 Vapor')
+    b.set('unit','gram/min')
+    b.set('legend','Dissolver-vapor')
+
+    # fifth variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','CO2 Vapor')
+    b.set('unit','gram/min')
+    b.set('legend','Dissolver-vapor')
+
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
     b.set('value',str(facilityTime))
-    b.text = str(0.0)
+    b.text = str('0.0') + ',' + \
+             str('0.0') + ',' + \
+             str('0.0') + ',' + \
+             str('0.0') + ',' + \
+             str('0.0')
 
     tree = ElementTree.ElementTree(a)
 
@@ -398,14 +450,40 @@ class Dissolver(object):
     rootNode = tree.getroot()
     a = ElementTree.Element('timeStamp')
     a.set('value',str(facilityTime))
+
+    # all variables
     gDec = self.__gramDecimals
 
-    # first variable
     if len(self.__historyXeMassVapor.keys()) > 0:
-      mass = round(self.__historyXeMassVapor[facilityTime],gDec)
+      massXe = round(self.__historyXeMassVapor[facilityTime],gDec)
     else:
-      mass = 0.0
-    a.text = str(mass)
+      massXe = 0.0
+
+    if len(self.__historyKrMassVapor.keys()) > 0:
+      massKr = round(self.__historyKrMassVapor[facilityTime],gDec)
+    else:
+      massKr = 0.0
+
+    if len(self.__historyI2MassVapor.keys()) > 0:
+      massI2 = round(self.__historyI2MassVapor[facilityTime],gDec)
+    else:
+      massI2 = 0.0
+
+    if len(self.__historyRuO4MassVapor.keys()) > 0:
+      massRuO4 = round(self.__historyRuO4MassVapor[facilityTime],gDec)
+    else:
+      massRuO4 = 0.0
+
+    if len(self.__historyCO2MassVapor.keys()) > 0:
+      massCO2 = round(self.__historyCO2MassVapor[facilityTime],gDec)
+    else:
+      massCO2 = 0.0
+
+    a.text = str(massXe)   +','+ \
+             str(massKr)   +','+ \
+             str(massI2)   +','+ \
+             str(massRuO4) +','+ \
+             str(massCO2)
 
     rootNode.append(a)
 
@@ -446,10 +524,10 @@ class Dissolver(object):
     b = ElementTree.SubElement(a,'var')
     b.set('name','Fuel Loaded')
     if self.__GetFuelLoadMass() is not None:
-      (mass,unit) = self.__GetFuelLoadMass()
+      (massFuelLoad,unit) = self.__GetFuelLoadMass()
     else:
-      mass = 0.0
-      unit = 'gram'
+      massFuelLoad = 0.0
+    unit = 'gram'
     b.set('unit',unit)
     b.set('legend','Dissolver-state')
 
@@ -457,20 +535,33 @@ class Dissolver(object):
     b = ElementTree.SubElement(a,'var')
     b.set('name','Fuel Loaded')
     if self.__GetFuelLoadVolume() is not None:
-      (volume,unit) = self.__GetFuelLoadVolume()
+      (volumeFuelLoad,unit) = self.__GetFuelLoadVolume()
     else:
-      volume = 0.0
-      unit   = 'cc'
+      volumeFuelLoad = 0.0
+    unit = 'cc'
+    b.set('unit',unit)
+    b.set('legend','Dissolver-state')
+
+    # third variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','I2 Liquid')
+    if len(self.__historyI2MassLiquid.keys()) > 0:
+      massI2Liquid = self.__historyI2MassLiquid[ facilityTime ]
+    else:
+      massI2Liquid = 0.0
+    unit = 'gram'
     b.set('unit',unit)
     b.set('legend','Dissolver-state')
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
     b.set('value',str(facilityTime))
-    mass   = round(mass,gDec)
-    volume = round(volume,ccDec)
-    b.text = str(mass)+','+\
-             str(volume)
+    massFuelLoad   = round(massFuelLoad,gDec)
+    volumeFuelLoad = round(volumeFuelLoad,ccDec)
+    massI2Liquid   = round(massI2Liquid,gDec)
+    b.text = str(massFuelLoad)+','+\
+             str(volumeFuelLoad)+','+\
+             str(massI2Liquid)
 
     tree = ElementTree.ElementTree(a)
 
@@ -485,12 +576,20 @@ class Dissolver(object):
     a.set('value',str(facilityTime))
 
     if self.__GetFuelLoadMass() is not None:
-      (mass,unit) = self.__GetFuelLoadMass()
-      (volume,unit) = self.__GetFuelLoadVolume()
-      a.text = str(round(mass,gDec))+','+\
-               str(round(volume,ccDec))
+      (massFuelLoad,unit) = self.__GetFuelLoadMass()
+      (volumeFuelLoad,unit) = self.__GetFuelLoadVolume()
     else:
-      a.text = '0,0'
+      massFuelLoad = 0.0
+      volumeFuelLoad = 0.0
+
+    if len(self.__historyI2MassLiquid.keys()) > 0:
+      massI2Liquid = self.__historyI2MassLiquid[ facilityTime ]
+    else:
+      massI2Liquid = 0.0
+
+    a.text = str(round(massFuelLoad,gDec))+','+\
+             str(round(volumeFuelLoad,ccDec))+','+\
+             str(round(massI2Liquid,gDec))
 
     rootNode.append(a)
 
@@ -518,9 +617,12 @@ class Dissolver(object):
     s = '__Dissolve(): new fuel load # segments = ' + str(nSegments)
     self.__log.info(s)
 
-    self.__gasSpeciesFuelLoad = self.__GetFuelLoadGasSpecies()
+    self.__loadedSpecies = self.__GetFuelLoadSpecies()
 
     self.__fuelSegmentsLoad = None # clear the load
+
+    # set initial concentrations in the liquid phase to zero
+    self.__historyI2MassLiquid[ facilityTime ] = 0.0
 
     s = '__Dissolve(): begin dissolving...' 
     self.__log.info(s)
@@ -541,7 +643,7 @@ class Dissolver(object):
     self.__UpdateStateVariables( facilityTime, timeStep )
     #................................................
   
-    if  facilityTime + timeStep >= self.__startDissolveTime + self.__dutyPeriod: # time for new load
+    if  facilityTime + timeStep >= self.__startDissolveTime + self.__dutyPeriod: # prepare for a new load in the next time step
 
       s = '__Dissolve(): signal new duty cycle for ' + str(facilityTime+timeStep)+' [min]'
       self.__log.info(s)
@@ -549,7 +651,7 @@ class Dissolver(object):
       self.__ready2LoadFuel   = True
       self.__loadedFuelMass   = None
       self.__loadedFuelVolume = None
-      self.__gasSpeciesFuelLoad = None
+      self.__loadedSpecies = None
 
   #.............................
   # do nothing in this time step
@@ -558,6 +660,9 @@ class Dissolver(object):
 
     s = '__Dissolve(): idle and ready ' + str(facilityTime)+' [min]'
     self.__log.info(s)
+
+    # set initial concentrations in the liquid phase to zero
+    self.__historyI2MassLiquid[ facilityTime ] = 0.0
 
     #................................................
     self.__UpdateStateVariables( facilityTime, timeStep )
@@ -568,34 +673,66 @@ class Dissolver(object):
 #---------------------------------------------------------------------------------
  def __UpdateStateVariables( self, facilityTime, timeStep ):
   
-  if self.__gasSpeciesFuelLoad is not None:
+  if self.__loadedSpecies is not None:
 
-    # place holder for evolving Xe in dissolution; 
+    # place holder for evolving species in dissolution; 
     # modeling as a log-normal distribution with positive skewness (right-skewness)
 
     # here is the mass packet entering the system at facilityTime
-    (massXe, massXeUnit) = self.__gasSpeciesFuelLoad['Xe'] 
 
-    t0 = self.__startDissolveTime 
-    tf = t0 + self.__dutyPeriod
-    sigma = 0.7  # right-skewness
-    mean = math.log(10) + sigma**2
+    for key in self.__loadedSpecies:
 
-    t = facilityTime - t0
+      (mass, massUnit) = self.__loadedSpecies[ key ] 
 
-    if t == 0: 
-      logNormalPDF = 0.0
-    else:
-      logNormalPDF = 1.0/t/sigma/math.sqrt(2.0*math.pi) * \
-                     math.exp( - (math.log(t) - mean)**2 / 2/ sigma**2 )
+      t0 = self.__startDissolveTime 
+      tf = t0 + self.__dutyPeriod
+      sigma = 0.7  # right-skewness
+      mean = math.log(10) + sigma**2
 
-    variability = 1.0 - random.random() * 0.15
+      t = facilityTime - t0
 
-    self.__historyXeMassVapor[ facilityTime+timeStep ] = massXe * logNormalPDF * variability
+      if t == 0: 
+        logNormalPDF = 0.0
+      else:
+        logNormalPDF = 1.0/t/sigma/math.sqrt(2.0*math.pi) * \
+                       math.exp( - (math.log(t) - mean)**2 / 2/ sigma**2 )
+
+      if key == 'Xe':
+        variability = 1.0 - random.random() * 0.15
+        self.__historyXeMassVapor[ facilityTime + timeStep ] = mass * logNormalPDF * variability
+
+      if key == 'Kr':
+        variability = 1.0 - random.random() * 0.15
+        self.__historyKrMassVapor[ facilityTime + timeStep ] = mass * logNormalPDF * variability
+
+      if key == 'I2':
+        massSplit = 0.85
+        mass *= massSplit
+#        variability = 1.0 - random.random() * 0.10
+        variability = 1.0 
+        self.__historyI2MassVapor[ facilityTime + timeStep ] = mass * logNormalPDF * variability
+#        print(' self.__historyI2MassVapor = ', self.__historyI2MassVapor)
+#        print(' self.__historyI2MassLiquid = ', self.__historyI2MassLiquid)
+        self.__historyI2MassLiquid[ facilityTime + timeStep ] = \
+             self.__historyI2MassLiquid[ facilityTime ] + \
+             self.__historyI2MassVapor[ facilityTime + timeStep ] * (1.0-massSplit) * timeStep
+
+      if key == 'RuO4':
+        variability = 1.0 - random.random() * 0.15
+        self.__historyRuO4MassVapor[ facilityTime + timeStep ] = mass * logNormalPDF * variability
+
+      if key == 'CO2':
+        variability = 1.0 - random.random() * 0.15
+        self.__historyCO2MassVapor[ facilityTime + timeStep ] = mass * logNormalPDF * variability
 
   else:
 
     self.__historyXeMassVapor[ facilityTime + timeStep ] = 0.0
+    self.__historyKrMassVapor[ facilityTime + timeStep ] = 0.0
+    self.__historyI2MassVapor[ facilityTime + timeStep ] = 0.0
+    self.__historyI2MassLiquid[ facilityTime + timeStep ] = 0.0
+    self.__historyRuO4MassVapor[ facilityTime + timeStep ] = 0.0
+    self.__historyCO2MassVapor[ facilityTime + timeStep ] = 0.0
 
 #---------------------------------------------------------------------------------
  def __GetFuelLoadMass( self ):
@@ -623,6 +760,7 @@ class Dissolver(object):
   if self.__fuelSegmentsLoad is None: return None
 
   segmentsGeoData = self.__fuelSegmentsLoad[0]
+
   for segmentData in segmentsGeoData:
     for (name,unit,value) in segmentData:
       if name=='length': 
@@ -631,7 +769,7 @@ class Dissolver(object):
       if name=='innerDiameter': 
         iD = value
         iDUnit = unit
-    volume += length * math.pi * iD
+    volume += length * math.pi * iD * iD / 4.0
 
   if lengthUnit=='mm' and iDUnit=='mm': 
      volumeUnit = 'cc'
@@ -642,9 +780,11 @@ class Dissolver(object):
   return (volume,volumeUnit)
 
 #---------------------------------------------------------------------------------
- def __GetFuelLoadGasSpecies( self ):
+# "Derive" species from elemental composition from fuel load
+# vfda: will be changed
+ def __GetFuelLoadSpecies( self ):
 
-  gasSpecies = dict()
+  species = dict()
 
   if self.__fuelSegmentsLoad is None: return
  
@@ -652,6 +792,8 @@ class Dissolver(object):
   massKr = 0.0
   massXe = 0.0
   mass3H = 0.0
+  massRu = 0.0
+  massC  = 0.0
 
   segmentsCompData = self.__fuelSegmentsLoad[1]
 
@@ -659,23 +801,94 @@ class Dissolver(object):
 
     for (name,unit,value) in segmentData:
       if name=='I': 
-         massI   += value
+         massI    += value
          massIUnit = unit
+         species['I2'] = ( massI/2.0, massIUnit )
       if name=='Kr': 
-         massKr += value
+         massKr    += value
          massKrUnit = unit
+         species['Kr'] = ( massKr, massKrUnit )
       if name=='Xe': 
-         massXe += value
+         massXe    += value
          massXeUnit = unit
-      if name=='3H': 
-         mass3H += value
-         mass3HUnit = unit
+         species['Xe'] = ( massXe, massXeUnit )
+      if name=='Ru': 
+         massRu    += value
+         massRuUnit = unit
+         species['RuO4'] = ( massRu + massRu/101.07*4.0*16.0, massRuUnit )
+      if name=='C': 
+         massC    += value
+         massCUnit = unit
+         species['CO2'] = ( massC + massC/14.0*2.0*16.0, massCUnit )
 
-  gasSpecies = {'I':(massI,massIUnit), 'Kr':(massKr,massKrUnit),
-                'Xe':(massXe,massXeUnit), '3H':(mass3H,mass3HUnit)}
+  return species
 
-  return gasSpecies
+#---------------------------------------------------------------------------------
+ def __GetCondensate( self, portFile, facilityTime ):
 
+  found = False
+
+  while found is False:
+
+    s = '__GetCondensate(): checking for condensate at '+str(facilityTime)
+    self.__log.debug(s)
+
+    try:
+      tree = ElementTree.parse( portFile )
+    except ElementTree.ParseError as error:
+      s = '__GetCondensate(): '+portFile+' unavailable. Error code: '+str(error.code)+' File position: '+str(error.position)+'. Retrying...'
+      self.__log.debug(s)
+      continue
+
+    rootNode = tree.getroot()
+    assert rootNode.tag == 'time-sequence', 'invalid format.' 
+
+    timeNode = rootNode.find('time')
+    timeUnit = timeNode.get('unit').strip()
+    assert timeUnit == "minute"
+
+    varNodes = rootNode.findall('var')
+    varNames = list()
+    for v in varNodes:
+      name = v.get('name').strip()
+      assert v.get('name').strip() == 'I2 Condensate', 'invalid variable.'
+      assert v.get('unit').strip() == 'gram/min', 'invalid mass unit'
+      varNames.append(name)
+
+    timeStampNodes = rootNode.findall('timeStamp')
+
+    for tsn in timeStampNodes:
+
+      timeStamp = float(tsn.get('value').strip())
+ 
+      # get data at timeStamp facilityTime
+      if timeStamp == facilityTime:
+
+         found = True
+
+         varValues = tsn.text.strip().split(',')
+         assert len(varValues) == len(varNodes), 'inconsistent data; stop.'
+
+         for varName in varNames:
+           if varName == 'I2 Condensate':
+              ivar = varNames.index(varName)
+              mass = float(varValues[ivar])
+ #             if facilityTime in self.__historyI2MassLiquid.keys():
+              self.__historyI2MassLiquid[ facilityTime ] += mass
+ #             else:
+ #                self.__historyI2MassLiquid[ facilityTime ] = mass
+
+              s = '__GetCondensate(): received condensate at '+str(facilityTime)+' [min]; I2 mass [g] = '+str(round(mass,3))
+              self.__log.debug(s)
+           # end of: if varName == 'I2 Condensate':
+
+    # end for n in nodes:
+
+    if found is False: time.sleep(1) 
+
+  # end of while found is False:
+
+  return 
 
 #*********************************************************************************
 # Usage: -> python dissolver.py
