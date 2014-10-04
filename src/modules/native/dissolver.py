@@ -343,6 +343,7 @@ class Dissolver(object):
           # read the timeStamp data
           #............................
 
+          # geometry data: list of a list of triples
           # [ [(name,unit,val), (name,unit,val),...], [(name,unit,val),..], ... ]
           segmentsGeometryData = list()
           for pack in pack1:
@@ -354,6 +355,7 @@ class Dissolver(object):
               segGeomData.append( (name,unit,val) )
             segmentsGeometryData.append( segGeomData )
 
+          # composition data: list of a list of triples
           # [ [(name,unit,val), (name,unit,val),...], [(name,unit,val),..], ... ]
           segmentsCompositionData = list()
           for pack in pack2:
@@ -796,7 +798,7 @@ class Dissolver(object):
 
 #---------------------------------------------------------------------------------
 # "Derive" species from elemental composition from fuel load
-# vfda: will be changed
+# vfda: this will be changed
  def __GetFuelLoadSpecies( self ):
 
   species = dict()

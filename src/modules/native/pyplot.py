@@ -289,8 +289,8 @@ class PyPlot(object):
 #      if varUnit == 'gram' or varUnit == 'g': 
 #        varUnit = 'mg'
   
-      ax.set_xlabel(xLabel+' ['+xUnit+']',fontsize=10)
-      ax.set_ylabel(yLabel+' ['+yUnit+']',fontsize=10)
+      ax.set_xlabel(xLabel+' ['+xUnit+']',fontsize=9)
+      ax.set_ylabel(yLabel+' ['+yUnit+']',fontsize=9)
 
 #    ymax  = y.max()
 #    dy    = ymax * .1
@@ -440,9 +440,17 @@ class PyPlot(object):
         varUnit = 'm-cc'
       if varUnit == 'gram/min' or varUnit == 'g/min': 
         varUnit = 'mg/min'
+    if y.max() <= .001: 
+      y *= 1000000.0
+      if varUnit == 'gram' or varUnit == 'g': 
+        varUnit = 'ug'
+      if varUnit == 'cc':
+        varUnit = 'u-cc'
+      if varUnit == 'gram/min' or varUnit == 'g/min': 
+        varUnit = 'ug/min'
   
-    ax.set_xlabel('Time ['+timeUnit+']',fontsize=10)
-    ax.set_ylabel(varName+' ['+varUnit+']',fontsize=10)
+    ax.set_xlabel('Time ['+timeUnit+']',fontsize=9)
+    ax.set_ylabel(varName+' ['+varUnit+']',fontsize=9)
 
     ymax  = y.max()
     dy    = ymax * .1

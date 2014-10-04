@@ -40,10 +40,10 @@ class Condenser(object):
   self.__historyRuO4MassGas = dict()
   self.__historyKrMassGas   = dict()
 
-  self.__historyI2MassLiquid = dict()
-  self.__historyXeMassLiquid = dict()  # entrainment
+  self.__historyI2MassLiquid   = dict()
+  self.__historyXeMassLiquid   = dict()  # entrainment
   self.__historyRuO4MassLiquid = dict()  # entrainment
-  self.__historyKrMassLiquid = dict()  # entrainment
+  self.__historyKrMassLiquid   = dict()  # entrainment
 
   self.__log = logging.getLogger('condensation.condenser')
   self.__log.info('initializing an instance of Condenser')
