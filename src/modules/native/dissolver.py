@@ -12,6 +12,7 @@ import math, random
 import logging
 import xml.etree.ElementTree as ElementTree
 from src.modules.native.core.nitron import Nitron
+from scipy.integrate import odeint
 #*********************************************************************************
 
 #*********************************************************************************
@@ -38,9 +39,19 @@ class Dissolver(object):
   self.__dissolverVolume   = 10.0  # liter
   self.__dutyPeriod        = 120.0 # minute
 
-  self.__molarMassU  = 238.0
-  self.__molarMassPu = 239.0
-  self.__molarMassFP = 135.34-16*1.18
+  self.__molarMassU         = 238.0
+  self.__molarMassPu        = 239.0
+  self.__molarMassFP        = 135.34-16*1.18
+  self.__molarMassH2O       = 18.0    # g/mole
+  self.__molarMassHNO3      = 63.0    # g/mole
+  self.__molarMassNO        = 30.01   # g/mole
+  self.__molarMassNO2       = 46.0055 # g/mole
+  self.__molarMassUO2       = 270.05
+  self.__molarMassPuO2      = 271.17
+  self.__molarMassFPO1dot18 = 135.34
+  self.__molarMassUO2NO3_2  = self.__molarMassUO2 + 62.0*2.0 # g/mole
+  self.__molarMassPuNO3_4   = self.__molarMassPu  + 62.0*4.0 # g/mole
+  self.__molarMassFPNO3_2dot36 = 328.22
 
   self.__rho_uo2       =  8.300  # g/cc
   self.__rho_puo2      = 11.460
@@ -68,13 +79,18 @@ class Dissolver(object):
 #  self.__stateHistory = list(dict())
 
   self.__historyXeMassVapor   = dict()  # persistent variable
+  self.__historyXeMassVapor[0.0] = 0.0 
+
   self.__historyKrMassVapor   = dict()  # persistent variable
   self.__historyI2MassVapor   = dict()  # persistent variable
   self.__historyRuO4MassVapor = dict()  # persistent variable
   self.__historyCO2MassVapor  = dict()  # persistent variable
 
-  self.__historyI2MassLiquid  = dict()  # persistent variable
+  self.__historyI2MassLiquid = dict()  # persistent variable
   self.__historyI2MassLiquid[0.0] = 0.0
+
+  self.__historyHNO3Liquid = dict()  # persistent variable
+  self.__historyHNO3Liquid[0.0] = 0.0
 
   self.__loadedSpecies = None  # control variable
 
@@ -375,10 +391,10 @@ class Dissolver(object):
   return  fuelSegmentsLoad
 
 #---------------------------------------------------------------------------------
- def __ProvideVapor( self, portFile, facilityTime ):
+ def __ProvideVapor( self, portFile, atTime ):
 
   # if the first time step, write the header of a time-sequence data file
-  if facilityTime == 0.0:
+  if atTime == 0.0:
 
     assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
@@ -389,7 +405,6 @@ class Dissolver(object):
     a.set('name','dissolver-vapor')
 
     b = ElementTree.SubElement(a,'comment')
-    today = datetime.datetime.today()
     b.set('author','cortix.modules.native.dissolver')
     b.set('version','0.1')
 
@@ -432,7 +447,7 @@ class Dissolver(object):
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
-    b.set('value',str(facilityTime))
+    b.set('value',str(atTime))
     b.text = str('0.0') + ',' + \
              str('0.0') + ',' + \
              str('0.0') + ',' + \
@@ -449,33 +464,33 @@ class Dissolver(object):
     tree = ElementTree.parse( portFile )
     rootNode = tree.getroot()
     a = ElementTree.Element('timeStamp')
-    a.set('value',str(facilityTime))
+    a.set('value',str(atTime))
 
     # all variables
     gDec = self.__gramDecimals
 
     if len(self.__historyXeMassVapor.keys()) > 0:
-      massXe = round(self.__historyXeMassVapor[facilityTime],gDec)
+      massXe = round(self.__historyXeMassVapor[atTime],gDec)
     else:
       massXe = 0.0
 
     if len(self.__historyKrMassVapor.keys()) > 0:
-      massKr = round(self.__historyKrMassVapor[facilityTime],gDec)
+      massKr = round(self.__historyKrMassVapor[atTime],gDec)
     else:
       massKr = 0.0
 
     if len(self.__historyI2MassVapor.keys()) > 0:
-      massI2 = round(self.__historyI2MassVapor[facilityTime],gDec)
+      massI2 = round(self.__historyI2MassVapor[atTime],gDec)
     else:
       massI2 = 0.0
 
     if len(self.__historyRuO4MassVapor.keys()) > 0:
-      massRuO4 = round(self.__historyRuO4MassVapor[facilityTime],gDec)
+      massRuO4 = round(self.__historyRuO4MassVapor[atTime],gDec)
     else:
       massRuO4 = 0.0
 
     if len(self.__historyCO2MassVapor.keys()) > 0:
-      massCO2 = round(self.__historyCO2MassVapor[facilityTime],gDec)
+      massCO2 = round(self.__historyCO2MassVapor[atTime],gDec)
     else:
       massCO2 = 0.0
 
@@ -492,13 +507,13 @@ class Dissolver(object):
   return 
 
 #---------------------------------------------------------------------------------
- def __ProvideState( self, portFile, facilityTime ):
+ def __ProvideState( self, portFile, atTime ):
  
   gDec  = self.__gramDecimals
   ccDec = self.__ccDecimals   
 
   # if the first time step, write the header of a time-sequence data file
-  if facilityTime == 0.0:
+  if atTime == 0.0:
 
     assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
@@ -546,7 +561,7 @@ class Dissolver(object):
     b = ElementTree.SubElement(a,'var')
     b.set('name','I2 Liquid')
     if len(self.__historyI2MassLiquid.keys()) > 0:
-      massI2Liquid = self.__historyI2MassLiquid[ facilityTime ]
+      massI2Liquid = self.__historyI2MassLiquid[ atTime ]
     else:
       massI2Liquid = 0.0
     unit = 'gram'
@@ -555,7 +570,7 @@ class Dissolver(object):
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
-    b.set('value',str(facilityTime))
+    b.set('value',str(atTime))
     massFuelLoad   = round(massFuelLoad,gDec)
     volumeFuelLoad = round(volumeFuelLoad,ccDec)
     massI2Liquid   = round(massI2Liquid,gDec)
@@ -573,7 +588,7 @@ class Dissolver(object):
     tree = ElementTree.parse( portFile )
     rootNode = tree.getroot()
     a = ElementTree.Element('timeStamp')
-    a.set('value',str(facilityTime))
+    a.set('value',str(atTime))
 
     if self.__GetFuelLoadMass() is not None:
       (massFuelLoad,unit) = self.__GetFuelLoadMass()
@@ -583,7 +598,7 @@ class Dissolver(object):
       volumeFuelLoad = 0.0
 
     if len(self.__historyI2MassLiquid.keys()) > 0:
-      massI2Liquid = self.__historyI2MassLiquid[ facilityTime ]
+      massI2Liquid = self.__historyI2MassLiquid[ atTime ]
     else:
       massI2Liquid = 0.0
 
@@ -851,7 +866,7 @@ class Dissolver(object):
     varNames = list()
     for v in varNodes:
       name = v.get('name').strip()
-      assert v.get('name').strip() == 'I2 Condensate', 'invalid variable.'
+#      assert v.get('name').strip() == 'I2 Condensate', 'invalid variable.'
       assert v.get('unit').strip() == 'gram/min', 'invalid mass unit'
       varNames.append(name)
 
@@ -881,6 +896,17 @@ class Dissolver(object):
               s = '__GetCondensate(): received condensate at '+str(facilityTime)+' [min]; I2 mass [g] = '+str(round(mass,3))
               self.__log.debug(s)
            # end of: if varName == 'I2 Condensate':
+           if varName == 'Xe Condensate':
+              ivar = varNames.index(varName)
+              mass = float(varValues[ivar])
+ #             if facilityTime in self.__historyI2MassLiquid.keys():
+              self.__historyXeMassVapor[ facilityTime ] += mass
+ #             else:
+ #                self.__historyXeMassLiquid[ facilityTime ] = mass
+
+              s = '__GetCondensate(): received condensate at '+str(facilityTime)+' [min]; Xe mass [g] = '+str(round(mass,3))
+              self.__log.debug(s)
+           # end of: if varName == 'Xe Condensate':
 
     # end for n in nodes:
 

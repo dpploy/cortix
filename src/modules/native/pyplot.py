@@ -471,7 +471,7 @@ class PyPlot(object):
     ax.plot( x, y, 's-', color='black', linewidth=0.5, markersize=2,  \
              markeredgecolor='black', label=varLegend )
 
-    ax.legend( loc='best', prop={'size':8} )
+    ax.legend( loc='best', prop={'size':7} )
 
     s = '__PlotTimeSeqDashboard(): plotted '+varName+' from '+varLegend
     self.__log.debug(s)

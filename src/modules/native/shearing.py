@@ -175,10 +175,10 @@ class Shearing(Thread):
   assert found, 'Input setup failed.'
 
 #................................................................................
-# Create the host code          
+# Create the guest code          
 
-  host = Chopper( ports )
-  log.debug("host = Chopper( ports )")
+  guest = Chopper( ports )
+  log.debug("guest = Chopper( ports )")
 
 #.................................................................................
 # Evolve the chopper
@@ -190,9 +190,9 @@ class Shearing(Thread):
 
   while facilityTime <= evolveTime:
 
-   host.CallPorts( facilityTime )
+   guest.CallPorts( facilityTime )
 
-   host.Execute( facilityTime, timeStep )
+   guest.Execute( facilityTime, timeStep )
 
    facilityTime += timeStep
 

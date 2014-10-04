@@ -138,9 +138,9 @@ class Condensation(Thread):
 # vfda: nothing for now
 
 #.................................................................................
-# Create the host code             
-  host = Condenser( ports )
-  log.info("host = Condenser( ports )")
+# Create the guest code             
+  guest = Condenser( ports )
+  log.info("guest = Condenser( ports )")
 
 #.................................................................................
 # Evolve the condenser
@@ -152,9 +152,9 @@ class Condensation(Thread):
 
   while facilityTime <= evolveTime:
 
-   host.CallPorts( facilityTime )
+   guest.CallPorts( facilityTime )
 
-   host.Execute( facilityTime, timeStep )
+   guest.Execute( facilityTime, timeStep )
 
    facilityTime += timeStep 
 #

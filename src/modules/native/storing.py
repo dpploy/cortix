@@ -144,9 +144,9 @@ class Storing(Thread):
 # vfda nothing here 
 
 #................................................................................
-# Create the host code          
-  host = Storage( ports, evolveTime )
-  log.debug("host = Storage( ports )")
+# Create the guest code          
+  guest = Storage( ports, evolveTime )
+  log.debug("guest = Storage( ports )")
 
 #................................................................................
 # Evolve the fuel accumulation
@@ -158,9 +158,9 @@ class Storing(Thread):
 
   while facilityTime <= evolveTime:
 
-    host.CallPorts( facilityTime )
+    guest.CallPorts( facilityTime )
 
-    host.Execute( facilityTime, timeStep )
+    guest.Execute( facilityTime, timeStep )
 
     facilityTime += timeStep
 

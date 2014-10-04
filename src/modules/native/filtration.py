@@ -138,9 +138,9 @@ class Filtration(Thread):
 # vfda: nothing for now
 
 #.................................................................................
-# Create the host code             
-  host = Filter( ports )
-  log.info("host = Filter( ports )")
+# Create the guest code             
+  guest = Filter( ports )
+  log.info("guest = Filter( ports )")
 
 #.................................................................................
 # Evolve the filter   
@@ -152,9 +152,9 @@ class Filtration(Thread):
 
   while facilityTime <= evolveTime:
 
-   host.CallPorts( facilityTime )
+   guest.CallPorts( facilityTime )
 
-   host.Execute( facilityTime, timeStep )
+   guest.Execute( facilityTime, timeStep )
 
    facilityTime += timeStep 
 #

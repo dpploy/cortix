@@ -138,9 +138,9 @@ class OffGassing(Thread):
 # vfda: nothing for now
 
 #.................................................................................
-# Create the host code             
-  host = OffGas( ports, evolveTime )
-  log.info("host = OffGas( ports )")
+# Create the guest code             
+  guest = OffGas( ports, evolveTime )
+  log.info("guest = OffGas( ports )")
 
 #.................................................................................
 # Evolve the offgas   
@@ -152,9 +152,9 @@ class OffGassing(Thread):
 
   while facilityTime <= evolveTime:
 
-   host.CallPorts( facilityTime )
+   guest.CallPorts( facilityTime )
 
-   host.Execute( facilityTime, timeStep )
+   guest.Execute( facilityTime, timeStep )
 
    facilityTime += timeStep 
 

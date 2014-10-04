@@ -138,9 +138,9 @@ class Scrubbing(Thread):
 # vfda: nothing for now
 
 #.................................................................................
-# Create the host code             
-  host = Scrubber( ports )
-  log.info("host = Scrubber( ports )")
+# Create the guest code             
+  guest = Scrubber( ports )
+  log.info("guest = Scrubber( ports )")
 
 #.................................................................................
 # Evolve the scrubber   
@@ -152,9 +152,9 @@ class Scrubbing(Thread):
 
   while facilityTime <= evolveTime:
 
-   host.CallPorts( facilityTime )
+   guest.CallPorts( facilityTime )
 
-   host.Execute( facilityTime, timeStep )
+   guest.Execute( facilityTime, timeStep )
 
    facilityTime += timeStep 
 #

@@ -137,9 +137,9 @@ class Dissolution(Thread):
 # vfda: nothing for now
 
 #.................................................................................
-# Create the host code             
-  host = Dissolver( ports, evolveTime )
-  log.info("host = Dissolver( ports )")
+# Create the guest code             
+  guest = Dissolver( ports, evolveTime )
+  log.info("guest = Dissolver( ports )")
 
 #.................................................................................
 # Evolve the dissolver
@@ -151,9 +151,9 @@ class Dissolution(Thread):
 
   while facilityTime <= evolveTime:
 
-   host.CallPorts( facilityTime )
+   guest.CallPorts( facilityTime )
 
-   host.Execute( facilityTime, timeStep )
+   guest.Execute( facilityTime, timeStep )
 
    facilityTime += timeStep 
 #

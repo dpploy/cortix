@@ -32,9 +32,18 @@ class Condenser(object):
 
   self.__historyXeMassVapor = dict()
   self.__historyI2MassVapor = dict()
+  self.__historyRuO4MassVapor = dict()
+  self.__historyKrMassVapor = dict()
 
   self.__historyXeMassGas   = dict()
   self.__historyI2MassGas   = dict()
+  self.__historyRuO4MassGas = dict()
+  self.__historyKrMassGas   = dict()
+
+  self.__historyI2MassLiquid = dict()
+  self.__historyXeMassLiquid = dict()  # entrainment
+  self.__historyRuO4MassLiquid = dict()  # entrainment
+  self.__historyKrMassLiquid = dict()  # entrainment
 
   self.__log = logging.getLogger('condensation.condenser')
   self.__log.info('initializing an instance of Condenser')
@@ -43,41 +52,41 @@ class Condenser(object):
   self.__mmDecimals   = 3 # micrometer significant digits
 
 #---------------------------------------------------------------------------------
- def CallPorts( self, evolTime=0.0 ):
+ def CallPorts( self, facilityTime=0.0 ):
 
-  self.__UseData( usePortName='vapor', evolTime=evolTime )     
+  self.__UseData( usePortName='vapor', atTime=facilityTime )     
 
-  self.__ProvideData( providePortName='off-gas', evolTime=evolTime )     
-  self.__ProvideData( providePortName='condensate', evolTime=evolTime )     
+  self.__ProvideData( providePortName='off-gas', atTime=facilityTime )     
+  self.__ProvideData( providePortName='condensate', atTime=facilityTime )     
 
 #---------------------------------------------------------------------------------
-# Evolve system from evolTime to evolTime+timeStep
- def Execute( self, evolTime=0.0, timeStep=1.0 ):
+# Evolve system from facilityTime to facilityTime+timeStep
+ def Execute( self, facilityTime=0.0, timeStep=0.0 ):
 
-  s = 'Execute(): facility time [min] = ' + str(evolTime)
+  s = 'Execute(): facility time [min] = ' + str(facilityTime)
   self.__log.info(s)
 
-  self.__Condense( evolTime, timeStep ) # starting at evolTime to evolTime + timeStep
+  self.__Condense( facilityTime, timeStep ) # starting at facilityTime to facilityTime + timeStep
  
 #---------------------------------------------------------------------------------
- def __UseData( self, usePortName=None, evolTime=0.0 ):
+ def __UseData( self, usePortName=None, atTime=0.0 ):
 
 # Access the port file
   portFile = self.__GetPortFile( usePortName = usePortName )
 
 # Get data from port files
-  if usePortName == 'vapor': self.__GetVapor( portFile, evolTime )
+  if usePortName == 'vapor': self.__GetVapor( portFile, atTime )
 
 #---------------------------------------------------------------------------------
- def __ProvideData( self, providePortName=None, evolTime=0.0 ):
+ def __ProvideData( self, providePortName=None, atTime=0.0 ):
 
 # Access the port file
   portFile = self.__GetPortFile( providePortName = providePortName )
 
 # Send data to port files
-  if providePortName == 'off-gas': self.__ProvideOffGas( portFile, evolTime )
+  if providePortName == 'off-gas': self.__ProvideOffGas( portFile, atTime )
 
-  if providePortName == 'condensate': self.__ProvideCondensate( portFile, evolTime )
+  if providePortName == 'condensate': self.__ProvideCondensate( portFile, atTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -124,32 +133,48 @@ class Condenser(object):
   return portFile
 
 #---------------------------------------------------------------------------------
- def __Condense( self, evolTime, timeStep ):
+ def __Condense( self, facilityTime, timeStep ):
 
   gDec = self.__gramDecimals 
 
-  sorbed = random.random() * 0.10
-  massXeVapor = self.__historyXeMassVapor[ evolTime ]  
-  self.__historyXeMassGas[ evolTime + timeStep ] = massXeVapor * (1.0 - sorbed)
-  s = '__Condense(): condensed '+str(round(massXeVapor*sorbed,gDec))+' [g] at ' + str(evolTime)+' [min]'
+  entrained = random.random() * 0.08
+  massXeVapor = self.__historyXeMassVapor[ facilityTime ]  
+  self.__historyXeMassGas[ facilityTime + timeStep ] = massXeVapor * (1.0 - entrained)
+  self.__historyXeMassLiquid[ facilityTime + timeStep ] = massXeVapor * entrained
+  s = '__Condense(): Xe entrained '+str(round(massXeVapor*entrained,gDec))+' [g] at ' + str(facilityTime)+' [min]'
   self.__log.info(s)
 
-  sorbed = random.random() * 0.05
-  massI2Vapor = self.__historyI2MassVapor[ evolTime ]  
-  self.__historyI2MassGas[ evolTime + timeStep ] = massI2Vapor * (1.0 - sorbed)
-  s = '__Condense(): condensed '+str(round(massI2Vapor*sorbed,gDec))+' [g] at ' + str(evolTime)+' [min]'
+  entrained = random.random() * 0.06
+  massKrVapor = self.__historyKrMassVapor[ facilityTime ]  
+  self.__historyKrMassGas[ facilityTime + timeStep ] = massKrVapor * (1.0 - entrained)
+  self.__historyKrMassLiquid[ facilityTime + timeStep ] = massKrVapor * entrained
+  s = '__Condense(): Kr entrained '+str(round(massKrVapor*entrained,gDec))+' [g] at ' + str(facilityTime)+' [min]'
+  self.__log.info(s)
+
+  absorbed = random.random() * 0.05
+  massI2Vapor = self.__historyI2MassVapor[ facilityTime ]  
+  self.__historyI2MassGas[ facilityTime + timeStep ] = massI2Vapor * (1.0 - absorbed)
+  self.__historyI2MassLiquid[ facilityTime + timeStep ] = massI2Vapor * absorbed
+  s = '__Condense(): I2 absorbed '+str(round(massI2Vapor*absorbed,gDec))+' [g] at ' + str(facilityTime)+' [min]'
+  self.__log.info(s)
+
+  entrained = random.random() * 0.18
+  massRuO4Vapor = self.__historyRuO4MassVapor[ facilityTime ]  
+  self.__historyRuO4MassGas[ facilityTime + timeStep ] = massRuO4Vapor * (1.0 - entrained)
+  self.__historyRuO4MassLiquid[ facilityTime + timeStep ] = massRuO4Vapor * entrained
+  s = '__Condense(): RuO4 entrained '+str(round(massRuO4Vapor*entrained,gDec))+' [g] at ' + str(facilityTime)+' [min]'
   self.__log.info(s)
 
   return
 
 #---------------------------------------------------------------------------------
- def __GetVapor( self, portFile, evolTime ):
+ def __GetVapor( self, portFile, atTime ):
 
   found = False
 
   while found is False:
 
-    s = '__GetVapor(): checking for vapor at '+str(evolTime)
+    s = '__GetVapor(): checking for vapor at '+str(atTime)
     self.__log.debug(s)
 
     try:
@@ -180,8 +205,8 @@ class Condenser(object):
 
       timeStamp = float(tsn.get('value').strip())
  
-      # get data at timeStamp evolTime
-      if timeStamp == evolTime:
+      # get data at timeStamp atTime
+      if timeStamp == atTime:
 
          found = True
 
@@ -192,19 +217,35 @@ class Condenser(object):
            if varName == 'Xe Vapor':
               ivar = varNames.index(varName)
               mass = float(varValues[ivar])
-              self.__historyXeMassVapor[ evolTime ] = mass
+              self.__historyXeMassVapor[ atTime ] = mass
 
-              s = '__GetVapor(): received vapor at '+str(evolTime)+' [min]; Xe mass [g] = '+str(round(mass,3))
+              s = '__GetVapor(): received vapor at '+str(atTime)+' [min]; Xe mass [g] = '+str(round(mass,3))
               self.__log.debug(s)
            # end of: if varName == 'Xe Vapor':
            if varName == 'I2 Vapor':
               ivar = varNames.index(varName)
               mass = float(varValues[ivar])
-              self.__historyI2MassVapor[ evolTime ] = mass
+              self.__historyI2MassVapor[ atTime ] = mass
 
-              s = '__GetVapor(): received vapor at '+str(evolTime)+' [min]; I2 mass [g] = '+str(round(mass,3))
+              s = '__GetVapor(): received vapor at '+str(atTime)+' [min]; I2 mass [g] = '+str(round(mass,3))
               self.__log.debug(s)
            # end of: if varName == 'I2 Vapor':
+           if varName == 'RuO4 Vapor':
+              ivar = varNames.index(varName)
+              mass = float(varValues[ivar])
+              self.__historyRuO4MassVapor[ atTime ] = mass
+
+              s = '__GetVapor(): received vapor at '+str(atTime)+' [min]; RuO4 mass [g] = '+str(round(mass,3))
+              self.__log.debug(s)
+           # end of: if varName == 'RuO4 Vapor':
+           if varName == 'Kr Vapor':
+              ivar = varNames.index(varName)
+              mass = float(varValues[ivar])
+              self.__historyKrMassVapor[ atTime ] = mass
+
+              s = '__GetVapor(): received vapor at '+str(atTime)+' [min]; Kr mass [g] = '+str(round(mass,3))
+              self.__log.debug(s)
+           # end of: if varName == 'Kr Vapor':
 
     # end for n in nodes:
 
@@ -215,25 +256,65 @@ class Condenser(object):
   return 
 
 #---------------------------------------------------------------------------------
- def __ProvideOffGas( self, portFile, evolTime ):
+ def __ProvideOffGas( self, portFile, atTime ):
 
   # if the first time step, write the header of a time-sequence data file
-  if evolTime == 0.0:
+  if atTime == 0.0:
 
-    fout = open( portFile, 'w')
+    assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
-    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-sequence name="condenser-offgas">\n'; fout.write(s) 
-    s = ' <comment author="cortix.modules.native.condenser" version="0.1"/>\n'; fout.write(s)
+    tree = ElementTree.ElementTree()
+    rootNode = tree.getroot()
+
+    a = ElementTree.Element('time-sequence')
+    a.set('name','condenser-offgas')
+
+    b = ElementTree.SubElement(a,'comment')
+    b.set('author','cortix.modules.native.condenser')
+    b.set('version','0.1')
+
+    b = ElementTree.SubElement(a,'comment')
     today = datetime.datetime.today()
-    s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
-    s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Xe Off-Gas" unit="gram/min" legend="Condenser-offgas"/>\n'; fout.write(s)
-    mass = 0.0
-    s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
+    b.set('today',str(today))
 
-    s = '</time-sequence>\n'; fout.write(s)
-    fout.close()
+    b = ElementTree.SubElement(a,'time')
+    b.set('unit','minute')
+
+    # first variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Xe Off-Gas')
+    b.set('unit','gram/min')
+    b.set('legend','Condenser-offgas')
+
+    # second variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','I2 Off-Gas')
+    b.set('unit','gram/min')
+    b.set('legend','Condenser-offgas')
+
+    # third variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','RuO4 Off-Gas')
+    b.set('unit','gram/min')
+    b.set('legend','Condenser-offgas')
+
+    # fourth variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Kr Off-Gas')
+    b.set('unit','gram/min')
+    b.set('legend','Condenser-offgas')
+
+    # values for all variables
+    b = ElementTree.SubElement(a,'timeStamp')
+    b.set('value',str(atTime))
+    b.text = str('0.0') + ',' + \
+             str('0.0') + ',' + \
+             str('0.0') + ',' + \
+             str('0.0') 
+
+    tree = ElementTree.ElementTree(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
 
   # if not the first time step then parse the existing history file and append
   else:
@@ -241,13 +322,35 @@ class Condenser(object):
     tree = ElementTree.parse( portFile )
     rootNode = tree.getroot()
     a = ElementTree.Element('timeStamp')
-    a.set('value',str(evolTime))
+    a.set('value',str(atTime))
+
+    # all variables
     gDec = self.__gramDecimals
+
     if len(self.__historyXeMassGas.keys()) > 0:
-      mass = round(self.__historyXeMassGas[evolTime],gDec)
+      massXe = round(self.__historyXeMassGas[atTime],gDec)
     else:
-      mass = 0.0
-    a.text = str(mass)
+      massXe = 0.0
+
+    if len(self.__historyXeMassGas.keys()) > 0:
+      massI2 = round(self.__historyI2MassGas[atTime],gDec)
+    else:
+      massI2 = 0.0
+
+    if len(self.__historyXeMassGas.keys()) > 0:
+      massRuO4 = round(self.__historyRuO4MassGas[atTime],gDec)
+    else:
+      massRuO4 = 0.0
+
+    if len(self.__historyXeMassGas.keys()) > 0:
+      massKr = round(self.__historyKrMassGas[atTime],gDec)
+    else:
+      massKr = 0.0
+
+    a.text = str(massXe) +','+ \
+             str(massI2) +','+ \
+             str(massRuO4) +','+ \
+             str(massKr)  
 
     rootNode.append(a)
 
@@ -256,25 +359,65 @@ class Condenser(object):
   return 
 
 #---------------------------------------------------------------------------------
- def __ProvideCondensate( self, portFile, evolTime ):
+ def __ProvideCondensate( self, portFile, atTime ):
 
   # if the first time step, write the header of a time-sequence data file
-  if evolTime == 0.0:
+  if atTime == 0.0:
 
-    fout = open( portFile, 'w')
+    assert os.path.isfile(portFile) is False, 'portFile %r exists; stop.' % portFile
 
-    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<time-sequence name="condenser-condensate">\n'; fout.write(s) 
-    s = ' <comment author="cortix.modules.native.condenser" version="0.1"/>\n'; fout.write(s)
+    tree = ElementTree.ElementTree()
+    rootNode = tree.getroot()
+
+    a = ElementTree.Element('time-sequence')
+    a.set('name','condenser-condensate')
+
+    b = ElementTree.SubElement(a,'comment')
+    b.set('author','cortix.modules.native.condenser')
+    b.set('version','0.1')
+
+    b = ElementTree.SubElement(a,'comment')
     today = datetime.datetime.today()
-    s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
-    s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="I2 Condensate" unit="gram/min" legend="Condenser-condensate"/>\n'; fout.write(s)
-    mass = 0.0
-    s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
+    b.set('today',str(today))
 
-    s = '</time-sequence>\n'; fout.write(s)
-    fout.close()
+    b = ElementTree.SubElement(a,'time')
+    b.set('unit','minute')
+
+    # first variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Xe Condensate')
+    b.set('unit','gram/min')
+    b.set('legend','Condenser-condensate')
+
+    # second variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','I2 Condensate')
+    b.set('unit','gram/min')
+    b.set('legend','Condenser-condensate')
+
+    # third variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','RuO4 Condensate')
+    b.set('unit','gram/min')
+    b.set('legend','Condenser-condensate')
+
+    # fourth variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Kr Condensate')
+    b.set('unit','gram/min')
+    b.set('legend','Condenser-condensate')
+
+    # values for all variables
+    b = ElementTree.SubElement(a,'timeStamp')
+    b.set('value',str(atTime))
+    b.text = str('0.0') + ',' + \
+             str('0.0') + ',' + \
+             str('0.0') + ',' + \
+             str('0.0') 
+
+    tree = ElementTree.ElementTree(a)
+
+    tree.write( portFile, xml_declaration=True, encoding="unicode", method="xml" )
 
   # if not the first time step then parse the existing history file and append
   else:
@@ -282,13 +425,35 @@ class Condenser(object):
     tree = ElementTree.parse( portFile )
     rootNode = tree.getroot()
     a = ElementTree.Element('timeStamp')
-    a.set('value',str(evolTime))
+    a.set('value',str(atTime))
+
+    # all variables
     gDec = self.__gramDecimals
-    if len(self.__historyI2MassGas.keys()) > 0:
-      mass = round(self.__historyI2MassGas[evolTime],gDec)
+
+    if len(self.__historyXeMassLiquid.keys()) > 0:
+      massXe = round(self.__historyXeMassLiquid[atTime],gDec)
     else:
-      mass = 0.0
-    a.text = str(mass)
+      massXe = 0.0
+
+    if len(self.__historyI2MassLiquid.keys()) > 0:
+      massI2 = round(self.__historyI2MassLiquid[atTime],gDec)
+    else:
+      massI2 = 0.0
+
+    if len(self.__historyRuO4MassLiquid.keys()) > 0:
+      massRuO4 = round(self.__historyRuO4MassLiquid[atTime],gDec)
+    else:
+      massRuO4 = 0.0
+
+    if len(self.__historyKrMassLiquid.keys()) > 0:
+      massKr = round(self.__historyKrMassLiquid[atTime],gDec)
+    else:
+      massKr = 0.0
+
+    a.text = str(massXe) +','+ \
+             str(massI2) +','+ \
+             str(massRuO4) +','+ \
+             str(massKr)  
 
     rootNode.append(a)
 

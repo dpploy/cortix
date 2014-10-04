@@ -155,9 +155,9 @@ class PyPlotting(Thread):
 # assert found, 'Input setup failed.'
 
 #................................................................................
-# Create the host code          
-  host = PyPlot( ports, evolveTime )
-  log.info("host = PyPlot( ports )")
+# Create the guest code          
+  guest = PyPlot( ports, evolveTime )
+  log.info("guest = PyPlot( ports )")
 
 #................................................................................
 # Evolve the pyplot              
@@ -169,11 +169,11 @@ class PyPlotting(Thread):
 
   while facilityTime <= evolveTime:
 
-   host.CallPorts( facilityTime )
+   guest.CallPorts( facilityTime )
 
    facilityTime += timeStep
 
-   host.Execute( facilityTime )
+   guest.Execute( facilityTime )
 
 #---------------------------------------------------------------------------------
 # Shutdown 
