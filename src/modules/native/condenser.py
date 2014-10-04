@@ -48,9 +48,9 @@ class Condenser(object):
   self.__log = logging.getLogger('condensation.condenser')
   self.__log.info('initializing an instance of Condenser')
 
-  self.__gramDecimals = 4 # tenth of a milligram significant digits
+  self.__gramDecimals = 6 # microgram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
-  self.__pyplotScale  = 'log-linear'
+  self.__pyplotScale  = 'log-linear' # linear, linear-linear, log, log-log, linear-log, log-linear
 
 #---------------------------------------------------------------------------------
  def CallPorts( self, facilityTime=0.0 ):

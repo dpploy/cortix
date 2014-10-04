@@ -53,14 +53,16 @@ class Dissolver(object):
   self.__molarMassPuNO3_4   = self.__molarMassPu  + 62.0*4.0 # g/mole
   self.__molarMassFPNO3_2dot36 = 328.22
 
+  self.__roughnessF = 0.8
+
   self.__rho_uo2       =  8.300  # g/cc
   self.__rho_puo2      = 11.460
   self.__rho_fpo1dot18 = 12.100
 
-  self.__gramDecimals = 4 # tenth of a milligram significant digits
+  self.__gramDecimals = 6 # microgram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
   self.__ccDecimals   = 3 # cubic centimeter significant digits
-  self.__pyplotScale = 'log-linear'
+  self.__pyplotScale = 'log-linear' # linear, linear-linear, log, log-log, linear-log, log-linear
 
   # Core dissolver module
   self.__nitron = Nitron()
@@ -73,9 +75,9 @@ class Dissolver(object):
   self.__ready2LoadFuel    = True   # major control variable
   self.__startDissolveTime = -1.0   # major control variable
 
-  self.__fuelSegmentsLoad = None
-  self.__loadedFuelMass   = None  # major control variable
-  self.__loadedFuelVolume = None  # major control variable
+  self.__fuelSegments = None # major data: dissolving solids  (time-dependent)
+  self.__fuelMass     = None # major control variable (time-dependent)
+  self.__fuelVolume   = None # major control variable (time-dependent)
 
 #  self.__stateHistory = list(dict())
 
@@ -130,9 +132,9 @@ class Dissolver(object):
   if usePortName == 'solids': 
 
      if self.__ready2LoadFuel is True:
-        self.__fuelSegmentsLoad = self.__GetSolids( portFile, atTime )
+        self.__fuelSegments = self.__GetSolids( portFile, atTime )
 
-     if self.__fuelSegmentsLoad is not None: 
+     if self.__fuelSegments is not None: 
         self.__ready2LoadFuel    = False
         self.__startDissolveTime = atTime
 
@@ -258,7 +260,7 @@ class Dissolver(object):
 # Reads the solids (in the form of fuel segments) from an existing history file
  def __GetSolids( self, portFile, facilityTime ):
 
-  fuelSegmentsLoad = None
+  fuelSegments = None
 
   found = False
 
@@ -387,7 +389,7 @@ class Dissolver(object):
 
           assert len(segmentsGeometryData) == len(segmentsCompositionData)
 
-          fuelSegmentsLoad = (segmentsGeometryData, segmentsCompositionData) 
+          fuelSegments = (segmentsGeometryData, segmentsCompositionData) 
 
         # end of: if len(pack1) != 0 or len(pack2) != 0:
 
@@ -402,13 +404,13 @@ class Dissolver(object):
 
   # end of: while found is False:
 
-  if fuelSegmentsLoad is None: nSegments = 0
-  else:                        nSegments = len(fuelSegmentsLoad[0])
+  if fuelSegments is None: nSegments = 0
+  else:                        nSegments = len(fuelSegments[0])
 
   s = '__GetSolids(): got fuel load at '+str(facilityTime)+' [min], with '+str(nSegments)+' segments'
   self.__log.debug(s)
 
-  return  fuelSegmentsLoad
+  return  fuelSegments
 
 #---------------------------------------------------------------------------------
  def __ProvideVapor( self, portFile, atTime ):
@@ -577,8 +579,8 @@ class Dissolver(object):
     # first variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Fuel Loaded')
-    if self.__GetFuelLoadMass() is not None:
-      (massFuelLoad,unit) = self.__GetFuelLoadMass()
+    if self.__GetFuelMass() is not None:
+      (massFuelLoad,unit) = self.__GetFuelMass()
     else:
       massFuelLoad = 0.0
     unit = 'gram'
@@ -589,8 +591,8 @@ class Dissolver(object):
     # second variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Fuel Loaded')
-    if self.__GetFuelLoadVolume() is not None:
-      (volumeFuelLoad,unit) = self.__GetFuelLoadVolume()
+    if self.__GetFuelVolume() is not None:
+      (volumeFuelLoad,unit) = self.__GetFuelVolume()
     else:
       volumeFuelLoad = 0.0
     unit = 'cc'
@@ -647,9 +649,9 @@ class Dissolver(object):
     a.set('value',str(atTime))
 
     # all variables
-    if self.__GetFuelLoadMass() is not None:
-      (massFuelLoad,unit) = self.__GetFuelLoadMass()
-      (volumeFuelLoad,unit) = self.__GetFuelLoadVolume()
+    if self.__GetFuelMass() is not None:
+      (massFuelLoad,unit) = self.__GetFuelMass()
+      (volumeFuelLoad,unit) = self.__GetFuelVolume()
     else:
       massFuelLoad = 0.0
       volumeFuelLoad = 0.0
@@ -685,19 +687,19 @@ class Dissolver(object):
 
     s = '__Dissolve(): starting new duty cycle at ' + str(facilityTime) + ' [min]'
     self.__log.info(s)
-    self.__loadedFuelMass = (mass,unit) = self.__GetFuelLoadMass()
+    self.__fuelMass = (mass,unit) = self.__GetFuelMass()
     s = '__Dissolve(): loaded mass ' + str(round(mass,3)) + ' [' + unit + ']'
     self.__log.info(s)
-    self.__loadedFuelVolume = (volume,unit) = self.__GetFuelLoadVolume()
+    self.__fuelVolume = (volume,unit) = self.__GetFuelVolume()
     s = '__Dissolve(): loaded volume ' + str(round(volume,3)) + ' [' + unit + ']'
     self.__log.info(s)
-    nSegments = len(self.__fuelSegmentsLoad[0])
+    nSegments = len(self.__fuelSegments[0])
     s = '__Dissolve(): new fuel load # segments = ' + str(nSegments)
     self.__log.info(s)
 
     self.__loadedSpecies = self.__GetFuelLoadSpecies()
 
-    self.__fuelSegmentsLoad = None # clear the load
+    self.__fuelSegments = None # clear the load
 
     # set initial concentrations in the liquid phase to zero
     self.__historyI2MassLiquid[ facilityTime ] = 0.0
@@ -713,7 +715,7 @@ class Dissolver(object):
   #.....................
   # continue dissolving
   #.....................
-  elif facilityTime > self.__startDissolveTime and self.__loadedFuelMass is not None:
+  elif facilityTime > self.__startDissolveTime and self.__fuelMass is not None:
 
     s = '__Dissolve(): continue dissolving...' 
     self.__log.info(s)
@@ -727,10 +729,10 @@ class Dissolver(object):
       s = '__Dissolve(): signal new duty cycle for ' + str(facilityTime+timeStep)+' [min]'
       self.__log.info(s)
 
-      self.__ready2LoadFuel   = True
-      self.__loadedFuelMass   = None
-      self.__loadedFuelVolume = None
-      self.__loadedSpecies = None
+      self.__ready2LoadFuel = True
+      self.__fuelMass       = None
+      self.__fuelVolume     = None
+      self.__loadedSpecies  = None
 
   #.............................
   # do nothing in this time step
@@ -825,15 +827,19 @@ class Dissolver(object):
     self.__historyRuO4MassVapor[ facilityTime + timeStep ] = 0.0
     self.__historyCO2MassVapor[ facilityTime + timeStep ]  = 0.0
 
+#  if self.__fuelSegments is not None:
+#
+#    self.__LeachFuel( timeStep )
+
 #---------------------------------------------------------------------------------
- def __GetFuelLoadMass( self ):
+ def __GetFuelMass( self ):
 
   mass = 0.0
   massUnit = 'null'
 
-  if self.__fuelSegmentsLoad is None: return None
+  if self.__fuelSegments is None: return None
 
-  segmentsGeoData = self.__fuelSegmentsLoad[0]
+  segmentsGeoData = self.__fuelSegments[0]
   for segmentData in segmentsGeoData:
     for (name,unit,value) in segmentData:
       if name=='mass': 
@@ -843,14 +849,14 @@ class Dissolver(object):
   return (mass,massUnit)
 
 #---------------------------------------------------------------------------------
- def __GetFuelLoadVolume( self ):
+ def __GetFuelVolume( self ):
 
   volume = 0.0
   volumeUnit = 'null'
 
-  if self.__fuelSegmentsLoad is None: return None
+  if self.__fuelSegments is None: return None
 
-  segmentsGeoData = self.__fuelSegmentsLoad[0]
+  segmentsGeoData = self.__fuelSegments[0]
 
   for segmentData in segmentsGeoData:
     for (name,unit,value) in segmentData:
@@ -873,11 +879,12 @@ class Dissolver(object):
 #---------------------------------------------------------------------------------
 # "Derive" species from elemental composition from fuel load
 # vfda: this will be changed
+# Call this only one time!!!
  def __GetFuelLoadSpecies( self ):
 
   species = dict()
 
-  if self.__fuelSegmentsLoad is None: return
+  if self.__fuelSegments is None: return
  
   massI2   = 0.0
   massKr   = 0.0
@@ -886,7 +893,7 @@ class Dissolver(object):
   massRuO4 = 0.0
   massCO2  = 0.0
 
-  segmentsCompData = self.__fuelSegmentsLoad[1]
+  segmentsCompData = self.__fuelSegments[1]
 
   for segmentData in segmentsCompData:
 
@@ -999,6 +1006,83 @@ class Dissolver(object):
   # end of while found is False:
 
   return 
+
+#---------------------------------------------------------------------------------
+ def __LeachFuel( self, timeStep ):
+
+  if self.__fuelSegments is None: return 
+
+  molarityHNO3 = self.__HNO3molarity
+
+  uMolarMass  = self.__molarMassU
+  puMolarMass = self.__molarMassPu
+  fpMolarMass = self.__molarMassFP
+ 
+  uo2MolarMass       = self.__molarMassUO2
+  puo2MolarMass      = self.__molarMassPuO2
+  fpo1dot18MolarMass = self.__molarMassFPO1dot18
+
+  rhoUO2       = self.__rho_uo2
+  rhoPuO2      = self.__rho_puo2
+  rhoFPO1dot18 = self.__rho_fpo1dot18
+
+  segmentsGeoData  = self.__fuelSegments[0]
+  segmentsCompData = self.__fuelSegments[1]
+
+  for (segData,segCompData) in zip(segmentsGeoData,segmentsCompData):
+
+    for (name,unit,value) in segData:
+      if name=='mass': 
+        mass = value
+      if name=='massDensity': 
+        dens = value
+      if name=='innerDiameter': 
+        iD = value
+      if name=='length': 
+        length = value
+
+    segDissolArea = 2.0 * math.pi * iD * iD / 4.0
+
+    for (name,unit,value) in segComp:
+      if name=='U':
+         uMass = value
+      if name=='Pu':
+         puMass = value
+      if name=='FP':
+         fpMass = value
+
+    mUO2       = uMass  + uMass/uMolarMass*2.0*16.0
+    mPuO2      = puMass + puMass/puMolarMass*2.0*16.0
+    mFPO1dot18 = fpMass + fpMass/fpMolarMass*1.18*16.0
+
+    molesUO2       = mUO2/uo2MolarMass
+    molesPuO2      = mPuO2/puo2MolarMass
+    molesFPO1dot18 = mFPO1dot18/fpo1dot18MolarMass
+
+    molesTotal = molesUO2 + molesPuO2 + molesFPO1dot18
+  
+    xUO2 = molesUO2/molesTotal
+    xPuO2 = molesPuO2/molesTotal
+    xFPO1dot18 = molesFPO1dot18/molesTotal
+
+    mReactOrder = 2*(2-xUO2)
+
+    rhoPrime = 100.0 * dens / ( xUO2 * rhoUO2 + xPuO2 * rhoPuO2 + xFPO1dot18 * rhoFPO1dot18)
+
+    rateCte = ( 0.48 * math.exp(-0.091*rhoPrime) )**(xUO2) * \
+              ( 5.0 * math.exp(-0.27*rhoPrime) )**(1-xUO2)
+
+    dissolMassRate = - rateCte * molarityHNO3**mReactOrder * roughnessF * segArea
+
+    print('*********** segment ***********')
+    print('timeStep min = ', timeStep)
+    print('dissolMassRate g/s = ', dissolMassRate)
+    print('rateCte = ', rateCte)
+    print('molarityHNO3 M = ', molarityHNO3)
+    print('mReactOrder = ', mReactOrder)
+    print('rhoPrime g/cc = ', rhoPrime)
+    print('dens  g/cc= ', dens)
+      
 
 #*********************************************************************************
 # Usage: -> python dissolver.py

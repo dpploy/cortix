@@ -50,10 +50,10 @@ class Storage(object):
   self.__historyI2MassOffGas = dict()
   self.__historyI2MassOffGas[0.0] = 0.0
 
-  self.__gramDecimals = 4 # tenth of a milligram significant digits
+  self.__gramDecimals = 6 # microgram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
   self.__ccDecimals   = 3 # microcc significant digits
-  self.__pyplotScale = 'log-linear'
+  self.__pyplotScale = 'log-linear' # linear, linear-linear, log, log-log, linear-log, log-linear
 
 #---------------------------------------------------------------------------------
  def CallPorts(self, facilityTime=0.0):
@@ -757,6 +757,8 @@ class Storage(object):
 
 #---------------------------------------------------------------------------------
  def __ProvideState( self, portFile, atTime ):
+  
+  pyplotScale = 'linear'
 
   # if the first time step, write the header of a time-sequence data file
   if atTime == 0.0:
@@ -786,42 +788,42 @@ class Storage(object):
     b.set('name','Fuel Mass')
     b.set('unit','gram')
     b.set('legend','Storage-state')
-    b.set('scale',self.__pyplotScale)
+    b.set('scale',pyplotScale)
 
     # second variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Fuel Segments')
     b.set('unit','')
     b.set('legend','Storage-state')
-    b.set('scale',self.__pyplotScale)
+    b.set('scale',pyplotScale)
 
     # third variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Fuel Volume')
     b.set('unit','cc')
     b.set('legend','Storage-state')
-    b.set('scale',self.__pyplotScale)
+    b.set('scale',pyplotScale)
 
     # fourth variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','U Mass')
     b.set('unit','gram')
     b.set('legend','Storage-state')
-    b.set('scale',self.__pyplotScale)
+    b.set('scale',pyplotScale)
 
     # fifth variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Pu Mass')
     b.set('unit','gram')
     b.set('legend','Storage-state')
-    b.set('scale',self.__pyplotScale)
+    b.set('scale',pyplotScale)
 
     # sixth variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','FP Mass')
     b.set('unit','gram')
     b.set('legend','Storage-state')
-    b.set('scale',self.__pyplotScale)
+    b.set('scale',pyplotScale)
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')

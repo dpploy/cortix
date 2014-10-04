@@ -39,9 +39,9 @@ class Chopper(object):
   self.__log = logging.getLogger('shearing.chopper')
   self.__log.info('initializing an instance of Chopper')
 
-  self.__gramDecimals = 4 # tenth of a milligram significant digits
+  self.__gramDecimals = 6 # microgram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
-  self.__pyplotScale  = 'log'
+  self.__pyplotScale  = 'log-linear' # linear, linear-linear, log, log-log, linear-log, log-linear
 
 #---------------------------------------------------------------------------------
  def CallPorts(self, evolTime=0.0):
@@ -334,7 +334,7 @@ class Chopper(object):
     b.set('name','Xe Off-Gas')
     b.set('unit','gram/min')
     b.set('legend','Chopper-offgas')
-    b.set('legend',self.__pyplotScale)
+    b.set('scale',self.__pyplotScale)
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')

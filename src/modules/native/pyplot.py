@@ -348,7 +348,7 @@ class PyPlot(object):
       variablesData.append( (spec,values) )
   assert len(variablesData) == nVar
 
-  today = datetime.datetime.today()
+  today = datetime.datetime.today().strftime("%d%b%y %H:%M:%S")
   
   # loop over variables and assign to the dashboards  
   iDash = 0
@@ -383,7 +383,7 @@ class PyPlot(object):
 
       axes = np.array(axlst)
 
-      text = str(today).split('.')[0]+': Cortix.Modules.Native.PyPlot: Time-Sequence Data'
+      text = today+': Cortix.Modules.Native.PyPlot: Time-Sequence Data'
       fig.text(.5,.95,text,horizontalalignment='center',fontsize=14)
 
       axs = axes.flat
@@ -419,7 +419,7 @@ class PyPlot(object):
       continue #  simply skip bad data and log
 
     x = data[:,0]
-    if x.max() >= 120.0:
+    if varScale == 'linear' or varScale == 'linear-linear' or varScale == 'linear-log' and x.max() >= 120.0:
       x /= 60.0
       if timeUnit == 'min': timeUnit = 'h'
 
@@ -432,14 +432,6 @@ class PyPlot(object):
         varUnit = 'L'
       if varUnit == 'gram/min' or varUnit == 'g/min': 
         varUnit = 'kg/min'
-    if y.max() <= .1: 
-      y *= 1000.0
-      if varUnit == 'gram' or varUnit == 'g': 
-        varUnit = 'mg'
-      if varUnit == 'cc':
-        varUnit = 'm-cc'
-      if varUnit == 'gram/min' or varUnit == 'g/min': 
-        varUnit = 'mg/min'
     if y.max() <= .001: 
       y *= 1000000.0
       if varUnit == 'gram' or varUnit == 'g': 
@@ -448,6 +440,14 @@ class PyPlot(object):
         varUnit = 'u-cc'
       if varUnit == 'gram/min' or varUnit == 'g/min': 
         varUnit = 'ug/min'
+    if y.max() <= .1: 
+      y *= 1000.0
+      if varUnit == 'gram' or varUnit == 'g': 
+        varUnit = 'mg'
+      if varUnit == 'cc':
+        varUnit = 'm-cc'
+      if varUnit == 'gram/min' or varUnit == 'g/min': 
+        varUnit = 'mg/min'
   
     ax.set_xlabel('Time ['+timeUnit+']',fontsize=9)
     ax.set_ylabel(varName+' ['+varUnit+']',fontsize=9)
