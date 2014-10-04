@@ -50,6 +50,7 @@ class Condenser(object):
 
   self.__gramDecimals = 4 # tenth of a milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
+  self.__pyplotScale  = 'log-linear'
 
 #---------------------------------------------------------------------------------
  def CallPorts( self, facilityTime=0.0 ):
@@ -285,24 +286,28 @@ class Condenser(object):
     b.set('name','Xe Off-Gas')
     b.set('unit','gram/min')
     b.set('legend','Condenser-offgas')
+    b.set('scale',self.__pyplotScale)
 
     # second variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','I2 Off-Gas')
     b.set('unit','gram/min')
     b.set('legend','Condenser-offgas')
+    b.set('scale',self.__pyplotScale)
 
     # third variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','RuO4 Off-Gas')
     b.set('unit','gram/min')
     b.set('legend','Condenser-offgas')
+    b.set('scale',self.__pyplotScale)
 
     # fourth variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Kr Off-Gas')
     b.set('unit','gram/min')
     b.set('legend','Condenser-offgas')
+    b.set('scale',self.__pyplotScale)
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
@@ -388,24 +393,28 @@ class Condenser(object):
     b.set('name','Xe Condensate')
     b.set('unit','gram/min')
     b.set('legend','Condenser-condensate')
+    b.set('scale',self.__pyplotScale)
 
     # second variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','I2 Condensate')
     b.set('unit','gram/min')
     b.set('legend','Condenser-condensate')
+    b.set('scale',self.__pyplotScale)
 
     # third variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','RuO4 Condensate')
     b.set('unit','gram/min')
     b.set('legend','Condenser-condensate')
+    b.set('scale',self.__pyplotScale)
 
     # fourth variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Kr Condensate')
     b.set('unit','gram/min')
     b.set('legend','Condenser-condensate')
+    b.set('scale',self.__pyplotScale)
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')

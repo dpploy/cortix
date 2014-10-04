@@ -406,7 +406,7 @@ class PyPlot(object):
     timeUnit  = spec[2]
     varLegend = spec[3]
     varScale  = spec[4]
-    assert varScale == 'log' or varScale == 'linear'
+    assert varScale == 'log' or varScale == 'linear' or varScale == 'log-linear' or varScale == 'linear-log' or varScale == 'linear-linear' or varScale == 'log-log'
 
     if timeUnit == 'minute': timeUnit = 'min'
  
@@ -474,7 +474,27 @@ class PyPlot(object):
       ax.xaxis.set_major_locator(majorLocator)
       ax.xaxis.set_minor_locator(minorLocator)
 
-    if varScale == 'log' and y.min() > 0.0: ax.set_yscale('log')
+    if varScale == 'log' or varScale == 'log-log':
+      ax.set_xscale('log')
+      ax.set_yscale('log')
+      positiveX = x > 0.0
+      x = np.extract(positiveX, x)
+      y = np.extract(positiveX, y)
+      positiveY = y > 0.0
+      x = np.extract(positiveY, x)
+      y = np.extract(positiveY, y)
+
+    if varScale == 'log-linear':
+      ax.set_xscale('log')
+      positiveX = x > 0.0
+      x = np.extract(positiveX, x)
+      y = np.extract(positiveX, y)
+
+    if varScale == 'linear-log':
+      ax.set_yscale('log')
+      positiveY = y > 0.0
+      x = np.extract(positiveY, x)
+      y = np.extract(positiveY, y)
 
     ax.plot( x, y, 's-', color='black', linewidth=0.5, markersize=2,  \
              markeredgecolor='black', label=varLegend )

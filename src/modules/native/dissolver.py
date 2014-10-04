@@ -60,6 +60,7 @@ class Dissolver(object):
   self.__gramDecimals = 4 # tenth of a milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
   self.__ccDecimals   = 3 # cubic centimeter significant digits
+  self.__pyplotScale = 'log-linear'
 
   # Core dissolver module
   self.__nitron = Nitron()
@@ -83,11 +84,15 @@ class Dissolver(object):
 
   self.__historyKrMassVapor   = dict()  # persistent variable
   self.__historyI2MassVapor   = dict()  # persistent variable
+  self.__historyHTOMassVapor  = dict()  # persistent variable
   self.__historyRuO4MassVapor = dict()  # persistent variable
   self.__historyCO2MassVapor  = dict()  # persistent variable
 
   self.__historyI2MassLiquid = dict()  # persistent variable
   self.__historyI2MassLiquid[0.0] = 0.0
+
+  self.__historyHTOMassLiquid = dict()  # persistent variable
+  self.__historyHTOMassLiquid[0.0] = 0.0
 
   self.__historyHNO3Liquid = dict()  # persistent variable
   self.__historyHNO3Liquid[0.0] = 0.0
@@ -217,6 +222,7 @@ class Dissolver(object):
     b.set('name','Fuel Request')
     b.set('unit','gram')
     b.set('legend','Dissolver-signal')
+    b.set('scale','linear')
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
@@ -249,7 +255,7 @@ class Dissolver(object):
   return 
 
 #---------------------------------------------------------------------------------
-# Reads the solids from an existing history file
+# Reads the solids (in the form of fuel segments) from an existing history file
  def __GetSolids( self, portFile, facilityTime ):
 
   fuelSegmentsLoad = None
@@ -266,6 +272,8 @@ class Dissolver(object):
       continue
 
     rootNode = tree.getroot()
+
+    assert rootNode.tag == 'time-variable-packet', 'invalid cortix file format; stop.'
 
     nodes = rootNode.findall('timeStamp')
 
@@ -295,14 +303,15 @@ class Dissolver(object):
           assert len(pack1) != 0 and len(pack2) != 0, 'sanity check failed.'
           assert len(pack1) == len(pack2), 'sanity check failed.'
 
-          #............................
-          # read the header information
-          #............................
+          #............................................
+          # read the header information into Spec lists
+          #............................................
 
           timeElem = rootNode.find('time')
           timeStampUnit = timeElem.get('unit').strip()
           assert timeStampUnit == "minute"
 
+          # pack1
           pack1Spec = rootNode.findall('pack1')
           assert len(pack1Spec) == 1, 'sanity check failed.'
           pack1Spec = rootNode.find('pack1')
@@ -312,8 +321,9 @@ class Dissolver(object):
 
           # [(name,unit),(name,unit),...]
           segmentGeometrySpec = list()
-          for child in pack1Spec:
-            attributes = child.items()
+
+          for var in pack1Spec:
+            attributes = var.items()
             assert len(attributes) == 2
             for attribute in attributes:
               if   attribute[0] == 'name': name = attribute[1]
@@ -321,6 +331,7 @@ class Dissolver(object):
               else: assert True
             segmentGeometrySpec.append( (name, unit) )
 
+          # pack2
           pack2Spec = rootNode.findall('pack2')
           assert len(pack2Spec) == 1, 'sanity check failed.'
           pack2Spec = rootNode.find('pack2')
@@ -330,8 +341,9 @@ class Dissolver(object):
 
           # [(name,unit),(name,unit),...]
           segmentCompositionSpec = list()
-          for child in pack2Spec:
-            attributes = child.items()
+
+          for var in pack2Spec:
+            attributes = var.items()
             assert len(attributes) == 2
             for attribute in attributes:
               if   attribute[0] == 'name': name = attribute[1]
@@ -339,14 +351,17 @@ class Dissolver(object):
               else: assert True
             segmentCompositionSpec.append( (name,unit) )
 
-          #............................
-          # read the timeStamp data
-          #............................
+          #........................................
+          # read the timeStamp data into Data lists
+          #........................................
 
           # geometry data: list of a list of triples
+          # first level: one entry for each fuel segment
+          # second level: one entry (triple) for each geometry field
           # [ [(name,unit,val), (name,unit,val),...], [(name,unit,val),..], ... ]
           segmentsGeometryData = list()
-          for pack in pack1:
+
+          for pack in pack1: # each pack is a fuel segment
             packData = pack.text.strip().split(',')
             assert len(packData) == len(segmentGeometrySpec)
             for i in range(len(packData)): packData[i] = float(packData[i])
@@ -356,9 +371,12 @@ class Dissolver(object):
             segmentsGeometryData.append( segGeomData )
 
           # composition data: list of a list of triples
+          # first level: one entry for each fuel segment
+          # second level: one entry (triple) for each elemental specie field
           # [ [(name,unit,val), (name,unit,val),...], [(name,unit,val),..], ... ]
           segmentsCompositionData = list()
-          for pack in pack2:
+
+          for pack in pack2: # each pack is a segment
             packData = pack.text.strip().split(',')
             assert len(packData) == len(segmentCompositionSpec)
             for i in range(len(packData)): packData[i] = float(packData[i])
@@ -422,35 +440,48 @@ class Dissolver(object):
     b.set('name','Xe Vapor')
     b.set('unit','gram/min')
     b.set('legend','Dissolver-vapor')
+    b.set('scale',self.__pyplotScale)
 
     # second variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Kr Vapor')
     b.set('unit','gram/min')
     b.set('legend','Dissolver-vapor')
+    b.set('scale',self.__pyplotScale)
 
     # third variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','I2 Vapor')
     b.set('unit','gram/min')
     b.set('legend','Dissolver-vapor')
+    b.set('scale',self.__pyplotScale)
 
     # fourth variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','RuO4 Vapor')
     b.set('unit','gram/min')
     b.set('legend','Dissolver-vapor')
+    b.set('scale',self.__pyplotScale)
 
     # fifth variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','CO2 Vapor')
     b.set('unit','gram/min')
     b.set('legend','Dissolver-vapor')
+    b.set('scale',self.__pyplotScale)
+
+    # sixth variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','HTO Vapor')
+    b.set('unit','gram/min')
+    b.set('legend','Dissolver-vapor')
+    b.set('scale',self.__pyplotScale)
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
     b.set('value',str(atTime))
     b.text = str('0.0') + ',' + \
+             str('0.0') + ',' + \
              str('0.0') + ',' + \
              str('0.0') + ',' + \
              str('0.0') + ',' + \
@@ -496,11 +527,17 @@ class Dissolver(object):
     else:
       massCO2 = 0.0
 
+    if len(self.__historyHTOMassVapor.keys()) > 0:
+      massHTO = round(self.__historyHTOMassVapor[atTime],gDec)
+    else:
+      massHTO = 0.0
+
     a.text = str(massXe)   +','+ \
              str(massKr)   +','+ \
              str(massI2)   +','+ \
              str(massRuO4) +','+ \
-             str(massCO2)
+             str(massCO2)  +','+ \
+             str(massHTO)
 
     rootNode.append(a)
 
@@ -547,6 +584,7 @@ class Dissolver(object):
     unit = 'gram'
     b.set('unit',unit)
     b.set('legend','Dissolver-state')
+    b.set('scale',self.__pyplotScale)
 
     # second variable
     b = ElementTree.SubElement(a,'var')
@@ -558,6 +596,7 @@ class Dissolver(object):
     unit = 'cc'
     b.set('unit',unit)
     b.set('legend','Dissolver-state')
+    b.set('scale',self.__pyplotScale)
 
     # third variable
     b = ElementTree.SubElement(a,'var')
@@ -569,6 +608,19 @@ class Dissolver(object):
     unit = 'gram'
     b.set('unit',unit)
     b.set('legend','Dissolver-state')
+    b.set('scale',self.__pyplotScale)
+
+    # fourth variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','HTO Liquid')
+    if len(self.__historyHTOMassLiquid.keys()) > 0:
+      massHTOLiquid = self.__historyHTOMassLiquid[ atTime ]
+    else:
+      massHTOLiquid = 0.0
+    unit = 'gram'
+    b.set('unit',unit)
+    b.set('legend','Dissolver-state')
+    b.set('scale',self.__pyplotScale)
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
@@ -576,9 +628,11 @@ class Dissolver(object):
     massFuelLoad   = round(massFuelLoad,gDec)
     volumeFuelLoad = round(volumeFuelLoad,ccDec)
     massI2Liquid   = round(massI2Liquid,gDec)
+    massHTOLiquid   = round(massHTOLiquid,gDec)
     b.text = str(massFuelLoad)+','+\
              str(volumeFuelLoad)+','+\
-             str(massI2Liquid)
+             str(massI2Liquid)+','+\
+             str(massHTOLiquid)
 
     tree = ElementTree.ElementTree(a)
 
@@ -592,6 +646,7 @@ class Dissolver(object):
     a = ElementTree.Element('timeStamp')
     a.set('value',str(atTime))
 
+    # all variables
     if self.__GetFuelLoadMass() is not None:
       (massFuelLoad,unit) = self.__GetFuelLoadMass()
       (volumeFuelLoad,unit) = self.__GetFuelLoadVolume()
@@ -604,9 +659,15 @@ class Dissolver(object):
     else:
       massI2Liquid = 0.0
 
+    if len(self.__historyHTOMassLiquid.keys()) > 0:
+      massHTOLiquid = self.__historyHTOMassLiquid[ atTime ]
+    else:
+      massHTOLiquid = 0.0
+
     a.text = str(round(massFuelLoad,gDec))+','+\
              str(round(volumeFuelLoad,ccDec))+','+\
-             str(round(massI2Liquid,gDec))
+             str(round(massI2Liquid,gDec))+','+\
+             str(round(massHTOLiquid,gDec))
 
     rootNode.append(a)
 
@@ -640,6 +701,7 @@ class Dissolver(object):
 
     # set initial concentrations in the liquid phase to zero
     self.__historyI2MassLiquid[ facilityTime ] = 0.0
+    self.__historyHTOMassLiquid[ facilityTime ] = 0.0
 
     s = '__Dissolve(): begin dissolving...' 
     self.__log.info(s)
@@ -680,6 +742,7 @@ class Dissolver(object):
 
     # set initial concentrations in the liquid phase to zero
     self.__historyI2MassLiquid[ facilityTime ] = 0.0
+    self.__historyHTOMassLiquid[ facilityTime ] = 0.0
 
     #................................................
     self.__UpdateStateVariables( facilityTime, timeStep )
@@ -734,6 +797,15 @@ class Dissolver(object):
              self.__historyI2MassLiquid[ facilityTime ] + \
              self.__historyI2MassVapor[ facilityTime + timeStep ] * (1.0-massSplit) * timeStep
 
+      if key == 'HTO':
+        massSplit = 0.50
+        mass *= massSplit
+        variability = 1.0 
+        self.__historyHTOMassVapor[ facilityTime + timeStep ] = mass * logNormalPDF * variability
+        self.__historyHTOMassLiquid[ facilityTime + timeStep ] = \
+             self.__historyHTOMassLiquid[ facilityTime ] + \
+             self.__historyHTOMassVapor[ facilityTime + timeStep ] * (1.0-massSplit) * timeStep
+
       if key == 'RuO4':
         variability = 1.0 - random.random() * 0.15
         self.__historyRuO4MassVapor[ facilityTime + timeStep ] = mass * logNormalPDF * variability
@@ -744,12 +816,14 @@ class Dissolver(object):
 
   else:
 
-    self.__historyXeMassVapor[ facilityTime + timeStep ] = 0.0
-    self.__historyKrMassVapor[ facilityTime + timeStep ] = 0.0
-    self.__historyI2MassVapor[ facilityTime + timeStep ] = 0.0
-    self.__historyI2MassLiquid[ facilityTime + timeStep ] = 0.0
+    self.__historyXeMassVapor[ facilityTime + timeStep ]   = 0.0
+    self.__historyKrMassVapor[ facilityTime + timeStep ]   = 0.0
+    self.__historyI2MassVapor[ facilityTime + timeStep ]   = 0.0
+    self.__historyHTOMassVapor[ facilityTime + timeStep ]   = 0.0
+    self.__historyI2MassLiquid[ facilityTime + timeStep ]  = 0.0
+    self.__historyHTOMassLiquid[ facilityTime + timeStep ]  = 0.0
     self.__historyRuO4MassVapor[ facilityTime + timeStep ] = 0.0
-    self.__historyCO2MassVapor[ facilityTime + timeStep ] = 0.0
+    self.__historyCO2MassVapor[ facilityTime + timeStep ]  = 0.0
 
 #---------------------------------------------------------------------------------
  def __GetFuelLoadMass( self ):
@@ -805,12 +879,12 @@ class Dissolver(object):
 
   if self.__fuelSegmentsLoad is None: return
  
-  massI  = 0.0
-  massKr = 0.0
-  massXe = 0.0
-  mass3H = 0.0
-  massRu = 0.0
-  massC  = 0.0
+  massI2   = 0.0
+  massKr   = 0.0
+  massXe   = 0.0
+  massHTO  = 0.0
+  massRuO4 = 0.0
+  massCO2  = 0.0
 
   segmentsCompData = self.__fuelSegmentsLoad[1]
 
@@ -818,25 +892,33 @@ class Dissolver(object):
 
     for (name,unit,value) in segmentData:
       if name=='I': 
-         massI    += value
-         massIUnit = unit
-         species['I2'] = ( massI/2.0, massIUnit )
+         massI2    += value/2.0
+         massI2Unit = unit
       if name=='Kr': 
          massKr    += value
          massKrUnit = unit
-         species['Kr'] = ( massKr, massKrUnit )
       if name=='Xe': 
          massXe    += value
          massXeUnit = unit
-         species['Xe'] = ( massXe, massXeUnit )
       if name=='Ru': 
-         massRu    += value
-         massRuUnit = unit
-         species['RuO4'] = ( massRu + massRu/101.07*4.0*16.0, massRuUnit )
+         massRuO4   += value + value/101.07*4.0*16.0
+         massRuO4Unit = unit
       if name=='C': 
-         massC    += value
-         massCUnit = unit
-         species['CO2'] = ( massC + massC/14.0*2.0*16.0, massCUnit )
+         massCO2    += value + value/14.0*2.0*16.0
+         massCO2Unit = unit
+      if name=='3H': 
+         massHTO   += value + value/3.0*1.0*(16.0+1.0)
+         massHTOUnit = unit
+    # end of: for (name,unit,value) in segmentData:
+
+  # end of: for segmentData in segmentsCompData:
+
+  species['I2'] = ( massI2, massI2Unit )
+  species['Kr'] = ( massKr, massKrUnit )
+  species['Xe'] = ( massXe, massXeUnit )
+  species['RuO4'] = ( massRuO4, massRuO4Unit )
+  species['CO2'] = ( massCO2, massCO2Unit )
+  species['HTO'] = ( massHTO, massHTOUnit )
 
   return species
 

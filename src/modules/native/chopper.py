@@ -8,6 +8,7 @@ Sat Jul 12 16:12:56 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
+import random
 import logging
 import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
@@ -40,6 +41,7 @@ class Chopper(object):
 
   self.__gramDecimals = 4 # tenth of a milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
+  self.__pyplotScale  = 'log'
 
 #---------------------------------------------------------------------------------
  def CallPorts(self, evolTime=0.0):
@@ -332,6 +334,7 @@ class Chopper(object):
     b.set('name','Xe Off-Gas')
     b.set('unit','gram/min')
     b.set('legend','Chopper-offgas')
+    b.set('legend',self.__pyplotScale)
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
@@ -351,6 +354,8 @@ class Chopper(object):
     a = ElementTree.Element('timeStamp')
     a.set('value',str(evolTime))
     mass = round(self.__GetXeMassGas(evolTime),gDec)
+    factor = 1.0 + (2.0*random.random()-1.0) * 0.15/2.0
+    mass *= factor # add a total of 15% variability (+-7.5%)
     a.text = str(mass)
 
     rootNode.append(a)

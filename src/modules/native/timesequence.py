@@ -102,7 +102,7 @@ class TimeSequence(object):
       spec   = (name,unit,timeUnit,legend,'linear')
     else:
       scale  = scale.strip()
-      assert scale == 'log' or scale == 'linear'
+      assert scale == 'log' or scale == 'linear' or scale == 'log-log' or scale == 'linear-linear' or scale == 'log-linear' or scale == 'linear-log' 
       spec   = (name,unit,timeUnit,legend,scale)
     timeValues = list()
     for ts in timeStampNodes:

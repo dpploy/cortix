@@ -47,9 +47,13 @@ class Storage(object):
   self.__historyKrMassOffGas = dict()
   self.__historyKrMassOffGas[0.0] = 0.0
 
+  self.__historyI2MassOffGas = dict()
+  self.__historyI2MassOffGas[0.0] = 0.0
+
   self.__gramDecimals = 4 # tenth of a milligram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
   self.__ccDecimals   = 3 # microcc significant digits
+  self.__pyplotScale = 'log-linear'
 
 #---------------------------------------------------------------------------------
  def CallPorts(self, facilityTime=0.0):
@@ -384,7 +388,7 @@ class Storage(object):
       continue
 
     rootNode = tree.getroot()
-    assert rootNode.tag == 'time-sequence', 'invalid format.' 
+    assert rootNode.tag == 'time-sequence', 'invalid cortex file format; stop.' 
 
     node = rootNode.find('time')
     timeUnit = node.get('unit').strip()
@@ -504,10 +508,14 @@ class Storage(object):
   gDec  = self.__gramDecimals
   mmDec = self.__mmDecimals
 
-  vars1 = [('timeStamp','minute'),
+  # fuel segments at time=atTime have different time stamps when they were first cut
+  vars1 = [('cutTimeStamp','minute'),
            ('mass','gram'),
            ('length','mm'),
-           ('innerDiameter','mm')]
+           ('innerDiameter','mm'),
+           ('volume','cc'),
+           ('massDensity','g/cc'),
+          ]
 
   vars2 = [('U','gram'),
            ('Pu','gram'),
@@ -517,7 +525,8 @@ class Storage(object):
            ('3H','gram'),
            ('Ru','gram'),
            ('C','gram'),
-           ('FP','gram')]
+           ('FP','gram')
+          ]
 
   withdrawMass = self.__withdrawMass
 
@@ -589,7 +598,7 @@ class Storage(object):
       # withdraw fuel elements
       while fuelMassLoad <= withdrawMass:
            fuelSegmentCandidate = self.__WithdrawFuelSegment( atTime )
-           if fuelSegmentCandidate is None: break # no segments left with time stamp <= atTime
+           if fuelSegmentCandidate is None: break # no segments left with cut time stamp <= atTime
            mass          = fuelSegmentCandidate[1]
            fuelMassLoad += mass
            if fuelMassLoad <= withdrawMass:
@@ -602,11 +611,13 @@ class Storage(object):
       # Save in file data from withdrawal
       for fuelSeg in fuelSegmentsLoad:
 
-        timeStamp = fuelSeg[0]
-        assert timeStamp <=  atTime, 'sanity check failed.'
+        cutTimeStamp = fuelSeg[0]
+        assert cutTimeStamp <= atTime, 'sanity check failed.'
         mass      = fuelSeg[1]
         length    = fuelSeg[2]
         segID     = fuelSeg[3]
+        vol       = length/10.0 * math.pi * segID/10.0*segID/10.0 / 4.0
+        dens      = mass / vol
         U         = fuelSeg[4]
         Pu        = fuelSeg[5]
         I         = fuelSeg[6]
@@ -619,7 +630,7 @@ class Storage(object):
 
         # first packet
         c = ElementTree.SubElement(b,'pack1')
-        fuelSegVars1 = [timeStamp,mass,length,segID]
+        fuelSegVars1 = [cutTimeStamp,mass,length,segID,vol,dens]
         assert len(fuelSegVars1) == len(vars1)
         for var in fuelSegVars1: 
           s += str(var)+','
@@ -693,11 +704,13 @@ class Storage(object):
 
       for fuelSeg in fuelSegmentsLoad:
 
-        timeStamp = fuelSeg[0]
-        assert timeStamp <= atTime, 'sanity check failed.'
+        cutTimeStamp = fuelSeg[0]
+        assert cutTimeStamp <= atTime, 'sanity check failed.'
         mass      = round(fuelSeg[1],gDec)
         length    = round(fuelSeg[2],mmDec)
         segID     = round(fuelSeg[3],mmDec)
+        vol       = length/10.0 * math.pi * segID/10.0*segID/10.0 / 4.0
+        dens      = mass / vol
         U         = round(fuelSeg[4],gDec)
         Pu        = round(fuelSeg[5],gDec)
         I         = round(fuelSeg[6],gDec)
@@ -710,7 +723,7 @@ class Storage(object):
  
         # first packet
         a = ElementTree.SubElement(newTimeStamp, 'pack1')
-        fuelSegVars1 = [timeStamp,mass,length,segID]
+        fuelSegVars1 = [cutTimeStamp,mass,length,segID,vol,dens]
         assert len(fuelSegVars1) == len(vars1)
         s = ''
         for var in fuelSegVars1: 
@@ -773,36 +786,42 @@ class Storage(object):
     b.set('name','Fuel Mass')
     b.set('unit','gram')
     b.set('legend','Storage-state')
+    b.set('scale',self.__pyplotScale)
 
     # second variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Fuel Segments')
     b.set('unit','')
     b.set('legend','Storage-state')
+    b.set('scale',self.__pyplotScale)
 
     # third variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Fuel Volume')
     b.set('unit','cc')
     b.set('legend','Storage-state')
+    b.set('scale',self.__pyplotScale)
 
     # fourth variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','U Mass')
     b.set('unit','gram')
     b.set('legend','Storage-state')
+    b.set('scale',self.__pyplotScale)
 
     # fifth variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Pu Mass')
     b.set('unit','gram')
     b.set('legend','Storage-state')
+    b.set('scale',self.__pyplotScale)
 
     # sixth variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','FP Mass')
     b.set('unit','gram')
     b.set('legend','Storage-state')
+    b.set('scale',self.__pyplotScale)
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
@@ -868,7 +887,7 @@ class Storage(object):
     rootNode = tree.getroot()
 
     a = ElementTree.Element('time-sequence')
-    a.set('name','storage-state')
+    a.set('name','storage-offgas')
 
     b = ElementTree.SubElement(a,'comment')
     today = datetime.datetime.today()
@@ -887,15 +906,28 @@ class Storage(object):
     b.set('name','Xe Off-Gas')
     b.set('unit','gram/min')
     b.set('legend','Storage-offgas')
+    b.set('scale',self.__pyplotScale)
+
+    # second variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Kr Off-Gas')
+    b.set('unit','gram/min')
+    b.set('legend','Storage-offgas')
+    b.set('scale',self.__pyplotScale)
+
+    # third variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','I2 Off-Gas')
+    b.set('unit','gram/min')
+    b.set('legend','Storage-offgas')
+    b.set('scale',self.__pyplotScale)
 
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
     b.set('value',str(atTime))
-
-    # all variables values
-    gDec = self.__gramDecimals
-    mass = round( self.__historyXeMassOffGas[atTime], gDec )
-    b.text = str(mass)
+    b.text = str('0.0') + ',' + \
+             str('0.0') + ',' + \
+             str('0.0')
 
     tree = ElementTree.ElementTree(a)
 
@@ -911,8 +943,25 @@ class Storage(object):
 
     # all variables values
     gDec = self.__gramDecimals
-    mass = round( self.__historyXeMassOffGas[atTime], gDec )
-    a.text = str(mass)
+
+    if len(self.__historyXeMassOffGas.keys()) > 0:
+      massXe = round( self.__historyXeMassOffGas[ atTime ], gDec )
+    else:
+      massXe = 0.0
+
+    if len(self.__historyKrMassOffGas.keys()) > 0:
+      massKr = round( self.__historyKrMassOffGas[ atTime ], gDec )
+    else:
+      massKr = 0.0
+
+    if len(self.__historyI2MassOffGas.keys()) > 0:
+      massI2 = round( self.__historyI2MassOffGas[ atTime ], gDec )
+    else:
+      massI2 = 0.0
+
+    a.text = str(massXe) +','+ \
+             str(massKr) +','+ \
+             str(massI2)
 
     rootNode.append(a)
 
@@ -983,12 +1032,13 @@ class Storage(object):
 
   self.__historyXeMassOffGas[facilityTime + timeStep] = 0.0
   self.__historyKrMassOffGas[facilityTime + timeStep] = 0.0
+  self.__historyI2MassOffGas[facilityTime + timeStep] = 0.0
 
   modifiedSegments = list()
 
   for fuelSeg in self.__fuelSegments:
-    timeStamp = fuelSeg[0]
-    storageTime = facilityTime - timeStamp
+    cutTimeStamp = fuelSeg[0]
+    storageTime = facilityTime - cutTimeStamp
     assert storageTime >= 0.0
 
     # Xe
@@ -1011,9 +1061,19 @@ class Storage(object):
     fuelSeg7 = round(fuelSeg[7] - massLoss,gDec)
     fuelSeg1 = round(fuelSeg1 - massLoss,gDec)
 
+    # I2 
+    factor = random.random() * 0.1
+    massLossFactor = storageTime * factor/100.0/60.0 # rate: 0 to 0.1 wt% per hour of "storage" time
+    massLoss = fuelSeg[6] * massLossFactor
+
+    self.__historyI2MassOffGas[ facilityTime + timeStep ] = massLoss/2.0
+
+    fuelSeg6 = round(fuelSeg[6] - massLoss,gDec)
+    fuelSeg1 = round(fuelSeg1 - massLoss,gDec)
+
 
     modifiedSegment = ( fuelSeg[0], fuelSeg1,   fuelSeg[2], fuelSeg[3], 
-                        fuelSeg[4], fuelSeg[5], fuelSeg[6], fuelSeg7, fuelSeg8,
+                        fuelSeg[4], fuelSeg[5], fuelSeg6, fuelSeg7, fuelSeg8,
                         fuelSeg[9], fuelSeg[10], fuelSeg[11], fuelSeg[12] )
 
     self.__fuelSegments.remove(fuelSeg)
@@ -1031,13 +1091,13 @@ class Storage(object):
   return
 
 #---------------------------------------------------------------------------------
- def __GetMassCheck( self, timeStamp=None ):
+ def __GetMassCheck( self, cutTimeStamp=None ):
 
   check = True
 
   gDec = self.__gramDecimals
 
-  if timeStamp is None:
+  if cutTimeStamp is None:
     for fuelSeg in self.__fuelSegments:
       sumMass = 0.0
       for mass in fuelSeg[4:12+1]:
@@ -1050,7 +1110,7 @@ class Storage(object):
         return check
   else:
     for fuelSeg in self.__fuelSegments:
-      if fuelSeg[0] <= timeStamp:
+      if fuelSeg[0] <= cutTimeStamp:
         sumMass = 0.0
         for mass in fuelSeg[4:12+1]:
           sumMass += mass
