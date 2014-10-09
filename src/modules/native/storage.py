@@ -50,10 +50,10 @@ class Storage(object):
   self.__historyI2MassOffGas = dict()
   self.__historyI2MassOffGas[0.0] = 0.0
 
-  self.__gramDecimals = 6 # microgram significant digits
+  self.__gramDecimals = 7 # tenth microgram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
   self.__ccDecimals   = 3 # microcc significant digits
-  self.__pyplotScale = 'log-linear' # linear, linear-linear, log, log-log, linear-log, log-linear
+  self.__pyplotScale = 'linear' # linear, linear-linear, log, log-log, linear-log, log-linear
 
 #---------------------------------------------------------------------------------
  def CallPorts(self, facilityTime=0.0):
@@ -204,9 +204,11 @@ class Storage(object):
  
        if not ElementTree.iselement(n): continue # to the next timeNode
  
+       # NB: volume variability is the linear variability to the CUBE power
+
        segmentLength = float(n.get('length'))
-       factor = 1.0 + (2.0*random.random()-1.0) * 0.15/2.0
-       segmentLength *= factor # add a total of 15% variability (+-7.5%)
+       factor = 1.0 + (2.0*random.random()-1.0) * 0.025/2.0
+       segmentLength *= factor # add a total of 2.5% variability (+-1.25%)
        segmentLengthUnit = n.get('unit')
        if   segmentLengthUnit == 'm':  segmentLength *= 1000.0
        elif segmentLengthUnit == 'cm': segmentLength *= 10.0
@@ -215,8 +217,8 @@ class Storage(object):
         
        n = timeNode.find('Segment_Outside_Diameter')
        oD = float(n.get('outside_diameter'))
-       factor = 1.0 + (2.0*random.random()-1.0) * 0.15/2.0
-       oD *= factor # add a total of 15% variability (+-7.5%)
+       factor = 1.0 + (2.0*random.random()-1.0) * 0.025/2.0
+       oD *= factor # add a total of 2.5% variability (+-1.25%)
        oDUnit = n.get('unit')
        if   oDUnit == 'm':  oD *= 1000.0
        elif oDUnit == 'cm': oD *= 10.0
@@ -225,8 +227,8 @@ class Storage(object):
 
        n = timeNode.find('Segment_Inside_Diameter')
        iD = float(n.get('inside_diameter'))
-       factor = 1.0 + (2.0*random.random()-1.0) * 0.15/2.0
-       iD *= factor # add a total of 15% variability (+-7.5%)
+       factor = 1.0 + (2.0*random.random()-1.0) * 0.025/2.0
+       iD *= factor # add a total of 2.5% variability (+-1.25%)
        iDUnit = n.get('unit')
        if   iDUnit == 'm':  iD *= 1000.0
        elif iDUnit == 'cm': iD *= 10.0

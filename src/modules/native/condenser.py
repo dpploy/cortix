@@ -30,27 +30,36 @@ class Condenser(object):
 
   self.__ports = ports
 
-  self.__historyXeMassVapor = dict()
-  self.__historyI2MassVapor = dict()
+  self.__historyXeMassVapor   = dict()
+  self.__historyI2MassVapor   = dict()
   self.__historyRuO4MassVapor = dict()
-  self.__historyKrMassVapor = dict()
+  self.__historyKrMassVapor   = dict()
+  self.__historyNOMassVapor   = dict()
+  self.__historyNO2MassVapor  = dict()
 
   self.__historyXeMassGas   = dict()
   self.__historyI2MassGas   = dict()
   self.__historyRuO4MassGas = dict()
   self.__historyKrMassGas   = dict()
+  self.__historyNOMassGas   = dict()
+  self.__historyNO2MassGas  = dict()
 
   self.__historyI2MassLiquid   = dict()
   self.__historyXeMassLiquid   = dict()  # entrainment
   self.__historyRuO4MassLiquid = dict()  # entrainment
   self.__historyKrMassLiquid   = dict()  # entrainment
 
+  self.__historyHNO3MassLiquid = dict() # condensation
+  self.__molarMassHNO3      = 63.0    # g/mole
+  self.__molarMassNO        = 30.01   # g/mole
+  self.__molarMassNO2       = 46.0055 # g/mole
+
   self.__log = logging.getLogger('condensation.condenser')
   self.__log.info('initializing an instance of Condenser')
 
-  self.__gramDecimals = 6 # microgram significant digits
+  self.__gramDecimals = 7 # microgram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
-  self.__pyplotScale  = 'log-linear' # linear, linear-linear, log, log-log, linear-log, log-linear
+  self.__pyplotScale  = 'linear' # linear, linear-linear, log, log-log, linear-log, log-linear
 
 #---------------------------------------------------------------------------------
  def CallPorts( self, facilityTime=0.0 ):
@@ -85,9 +94,11 @@ class Condenser(object):
   portFile = self.__GetPortFile( providePortName = providePortName )
 
 # Send data to port files
-  if providePortName == 'off-gas': self.__ProvideOffGas( portFile, atTime )
+  if providePortName == 'off-gas' and portFile is not None:
+    self.__ProvideOffGas( portFile, atTime )
 
-  if providePortName == 'condensate': self.__ProvideCondensate( portFile, atTime )
+  if providePortName == 'condensate' and portFile is not None:
+    self.__ProvideCondensate( portFile, atTime )
 
 #---------------------------------------------------------------------------------
  def __GetPortFile( self, usePortName=None, providePortName=None ):
@@ -129,8 +140,6 @@ class Condenser(object):
       (portName,portType,thisPortFile) = port
       if portName == providePortName and portType == 'provide': portFile = thisPortFile
 
-    assert portFile is not None, 'portFile is invalid.'
-
   return portFile
 
 #---------------------------------------------------------------------------------
@@ -138,33 +147,47 @@ class Condenser(object):
 
   gDec = self.__gramDecimals 
 
-  entrained = random.random() * 0.08
+  entrained = 0.08
   massXeVapor = self.__historyXeMassVapor[ facilityTime ]  
   self.__historyXeMassGas[ facilityTime + timeStep ] = massXeVapor * (1.0 - entrained)
   self.__historyXeMassLiquid[ facilityTime + timeStep ] = massXeVapor * entrained
   s = '__Condense(): Xe entrained '+str(round(massXeVapor*entrained,gDec))+' [g] at ' + str(facilityTime)+' [min]'
   self.__log.info(s)
 
-  entrained = random.random() * 0.06
+  entrained = 0.06
   massKrVapor = self.__historyKrMassVapor[ facilityTime ]  
   self.__historyKrMassGas[ facilityTime + timeStep ] = massKrVapor * (1.0 - entrained)
   self.__historyKrMassLiquid[ facilityTime + timeStep ] = massKrVapor * entrained
   s = '__Condense(): Kr entrained '+str(round(massKrVapor*entrained,gDec))+' [g] at ' + str(facilityTime)+' [min]'
   self.__log.info(s)
 
-  absorbed = random.random() * 0.05
+  absorbed = 0.02
   massI2Vapor = self.__historyI2MassVapor[ facilityTime ]  
   self.__historyI2MassGas[ facilityTime + timeStep ] = massI2Vapor * (1.0 - absorbed)
   self.__historyI2MassLiquid[ facilityTime + timeStep ] = massI2Vapor * absorbed
   s = '__Condense(): I2 absorbed '+str(round(massI2Vapor*absorbed,gDec))+' [g] at ' + str(facilityTime)+' [min]'
   self.__log.info(s)
 
-  entrained = random.random() * 0.18
+  entrained = 0.02
   massRuO4Vapor = self.__historyRuO4MassVapor[ facilityTime ]  
   self.__historyRuO4MassGas[ facilityTime + timeStep ] = massRuO4Vapor * (1.0 - entrained)
   self.__historyRuO4MassLiquid[ facilityTime + timeStep ] = massRuO4Vapor * entrained
   s = '__Condense(): RuO4 entrained '+str(round(massRuO4Vapor*entrained,gDec))+' [g] at ' + str(facilityTime)+' [min]'
   self.__log.info(s)
+
+  condensed = 0.95
+  massNO2Vapor = self.__historyNO2MassVapor[ facilityTime ]  
+  self.__historyNO2MassGas[ facilityTime + timeStep ] = massNO2Vapor * (1.0 - condensed)
+  s = '__Condense(): NO2 condensed '+str(round(massNO2Vapor*condensed,gDec))+' [g] at ' + str(facilityTime)+' [min]'
+  self.__log.info(s)
+
+  massHNO3Liquid = massNO2Vapor * condensed / self.__molarMassNO2 / 3.0 * 2.0 * self.__molarMassHNO3
+
+  self.__historyHNO3MassLiquid[ facilityTime + timeStep ] = massHNO3Liquid
+
+  reducedNO = self.__historyNOMassVapor[ facilityTime ] - massHNO3Liquid
+
+#  self.__historyNO2MassGas[ facilityTime ] = 
 
   return
 
@@ -197,7 +220,7 @@ class Condenser(object):
     for v in varNodes:
       name = v.get('name').strip()
 #      assert v.get('name').strip() == 'Xe Vapor', 'invalid variable.'
-      assert v.get('unit').strip() == 'gram/min', 'invalid mass unit'
+#      assert v.get('unit').strip() == 'gram/min', 'invalid mass unit'
       varNames.append(name)
 
     timeStampNodes = rootNode.findall('timeStamp')
@@ -247,6 +270,22 @@ class Condenser(object):
               s = '__GetVapor(): received vapor at '+str(atTime)+' [min]; Kr mass [g] = '+str(round(mass,3))
               self.__log.debug(s)
            # end of: if varName == 'Kr Vapor':
+           if varName == 'NO Vapor':
+              ivar = varNames.index(varName)
+              mass = float(varValues[ivar])
+              self.__historyNOMassVapor[ atTime ] = mass
+
+              s = '__GetVapor(): received vapor at '+str(atTime)+' [min]; NO mass [g] = '+str(round(mass,3))
+              self.__log.debug(s)
+           # end of: if varName == 'NO Vapor':
+           if varName == 'NO2 Vapor':
+              ivar = varNames.index(varName)
+              mass = float(varValues[ivar])
+              self.__historyNO2MassVapor[ atTime ] = mass
+
+              s = '__GetVapor(): received vapor at '+str(atTime)+' [min]; NO2 mass [g] = '+str(round(mass,3))
+              self.__log.debug(s)
+           # end of: if varName == 'NO2 Vapor':
 
     # end for n in nodes:
 
@@ -284,28 +323,35 @@ class Condenser(object):
     # first variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Xe Off-Gas')
-    b.set('unit','gram/min')
+    b.set('unit','gram')
     b.set('legend','Condenser-offgas')
     b.set('scale',self.__pyplotScale)
 
     # second variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','I2 Off-Gas')
-    b.set('unit','gram/min')
+    b.set('unit','gram')
     b.set('legend','Condenser-offgas')
     b.set('scale',self.__pyplotScale)
 
     # third variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','RuO4 Off-Gas')
-    b.set('unit','gram/min')
+    b.set('unit','gram')
     b.set('legend','Condenser-offgas')
     b.set('scale',self.__pyplotScale)
 
     # fourth variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Kr Off-Gas')
-    b.set('unit','gram/min')
+    b.set('unit','gram')
+    b.set('legend','Condenser-offgas')
+    b.set('scale',self.__pyplotScale)
+
+    # fifth variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','NO2 Off-Gas')
+    b.set('unit','gram')
     b.set('legend','Condenser-offgas')
     b.set('scale',self.__pyplotScale)
 
@@ -313,6 +359,7 @@ class Condenser(object):
     b = ElementTree.SubElement(a,'timeStamp')
     b.set('value',str(atTime))
     b.text = str('0.0') + ',' + \
+             str('0.0') + ',' + \
              str('0.0') + ',' + \
              str('0.0') + ',' + \
              str('0.0') 
@@ -352,10 +399,16 @@ class Condenser(object):
     else:
       massKr = 0.0
 
+    if len(self.__historyNO2MassGas.keys()) > 0:
+      massNO2 = round(self.__historyNO2MassGas[atTime],gDec)
+    else:
+      massNO2 = 0.0
+
     a.text = str(massXe) +','+ \
              str(massI2) +','+ \
              str(massRuO4) +','+ \
-             str(massKr)  
+             str(massKr) +','+ \
+             str(massNO2)  
 
     rootNode.append(a)
 
@@ -391,28 +444,35 @@ class Condenser(object):
     # first variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Xe Condensate')
-    b.set('unit','gram/min')
+    b.set('unit','gram')
     b.set('legend','Condenser-condensate')
     b.set('scale',self.__pyplotScale)
 
     # second variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','I2 Condensate')
-    b.set('unit','gram/min')
+    b.set('unit','gram')
     b.set('legend','Condenser-condensate')
     b.set('scale',self.__pyplotScale)
 
     # third variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','RuO4 Condensate')
-    b.set('unit','gram/min')
+    b.set('unit','gram')
     b.set('legend','Condenser-condensate')
     b.set('scale',self.__pyplotScale)
 
     # fourth variable
     b = ElementTree.SubElement(a,'var')
     b.set('name','Kr Condensate')
-    b.set('unit','gram/min')
+    b.set('unit','gram')
+    b.set('legend','Condenser-condensate')
+    b.set('scale',self.__pyplotScale)
+
+    # fifth variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','HNO3 Condensate')
+    b.set('unit','gram')
     b.set('legend','Condenser-condensate')
     b.set('scale',self.__pyplotScale)
 
@@ -420,6 +480,7 @@ class Condenser(object):
     b = ElementTree.SubElement(a,'timeStamp')
     b.set('value',str(atTime))
     b.text = str('0.0') + ',' + \
+             str('0.0') + ',' + \
              str('0.0') + ',' + \
              str('0.0') + ',' + \
              str('0.0') 
@@ -459,10 +520,16 @@ class Condenser(object):
     else:
       massKr = 0.0
 
+    if len(self.__historyHNO3MassLiquid.keys()) > 0:
+      massHNO3 = round(self.__historyHNO3MassLiquid[atTime],gDec)
+    else:
+      massHNO3 = 0.0
+
     a.text = str(massXe) +','+ \
              str(massI2) +','+ \
              str(massRuO4) +','+ \
-             str(massKr)  
+             str(massKr) +','+ \
+             str(massHNO3)  
 
     rootNode.append(a)
 

@@ -133,7 +133,7 @@ class OffGas(object):
 
   gDec = self.__gramDecimals 
 
-  sorbed = random.random() * 0.10
+  sorbed = 0.10
 
   massXeInflowGas  = self.__historyXeMassInflowGas[0][ facilityTime ]  
 
@@ -181,7 +181,7 @@ class OffGas(object):
     # vfda to do: check for single var element
     node = rootNode.find('var')
     assert node.get('name').strip() == 'Xe Off-Gas', 'invalid variable.'
-    assert node.get('unit').strip() == 'gram/min', 'invalid mass unit'
+#    assert node.get('unit').strip() == 'gram/min', 'invalid mass unit'
 
     nodes = rootNode.findall('timeStamp')
 
@@ -225,8 +225,8 @@ class OffGas(object):
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Xe Off-Gas" unit="gram/min" legend="Off-Gas-offgas"/>\n'; fout.write(s)
-    s = ' <var name="Xe Radioactivity" unit="Ci/min" legend="Off-Gas-offgas" scale="log"/>\n'; fout.write(s)
+    s = ' <var name="Xe Off-Gas" unit="gram" legend="Off-Gas-offgas"/>\n'; fout.write(s)
+    s = ' <var name="Xe Radioactivity" unit="Ci" legend="Off-Gas-offgas" scale="linear-log"/>\n'; fout.write(s)
     mass = 0.0
 
     radioactivityXe = mass/self.__atomicMassXe * N_avogadro / self.__curieConvFactor * math.log(2) / self.__halfLifeXe / 60.0

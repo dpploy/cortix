@@ -123,9 +123,12 @@ class Scrubber(object):
 
   gDec = self.__gramDecimals 
 
-  sorbed = random.random() * 0.10
+  sorbed = 0.10
 
-  massXeInflowGas  = self.__historyXeMassInflowGas[0][ evolTime ]  
+  massXeInflowGas  = 0.0
+  for (key,value) in self.__historyXeMassInflowGas[0].items():
+    massXeInflowGas += value
+
   massXeInflowGas += self.__historyXeMassInflowGas[1][ evolTime ]  
 
   self.__historyXeMassOffGas[ evolTime + timeStep ] = massXeInflowGas * (1.0 - sorbed)
@@ -136,13 +139,13 @@ class Scrubber(object):
   return
 
 #---------------------------------------------------------------------------------
- def __GetInflowGas( self, portFile, evolTime ):
+ def __GetInflowGas( self, portFile, atTime ):
 
   found = False
 
   while found is False:
 
-    s = '__GetInflowGas(): checking for inflow gas at '+str(evolTime)+' in '+portFile
+    s = '__GetInflowGas(): checking for inflow gas at '+str(atTime)+' in '+portFile
     self.__log.debug(s)
 
     try:
@@ -157,50 +160,62 @@ class Scrubber(object):
 
     inflowGasName = rootNode.get('name')
 
-    node = rootNode.find('time')
-    timeUnit = node.get('unit').strip()
+    timeNode = rootNode.find('time')
+    timeUnit = timeNode.get('unit').strip()
     assert timeUnit == "minute"
 
-    timeCutOff = node.get('cut-off')
+    timeCutOff = timeNode.get('cut-off')
     if timeCutOff is not None: 
       timeCutOff = float(timeCutOff.strip())
-      if evolTime > timeCutOff: 
+      if atTime > timeCutOff: 
         if inflowGasName == 'chopper-offgas':
-          self.__historyXeMassInflowGas[0][ evolTime ] = 0.0
+          self.__historyXeMassInflowGas[0][ atTime ] = 0.0
 
         if inflowGasName  == 'condenser-offgas':
-          self.__historyXeMassInflowGas[1][ evolTime ] = 0.0
+          self.__historyXeMassInflowGas[1][ atTime ] = 0.0
         return
 
-    # vfda to do: check for single var element
-    node = rootNode.find('var')
-    assert node.get('name').strip() == 'Xe Off-Gas', 'invalid variable.'
-    assert node.get('unit').strip() == 'gram/min', 'invalid mass unit'
+    varNodes = rootNode.findall('var')
+    varNames = list()
+    for v in varNodes:
+      name = v.get('name').strip()
+#    assert node.get('name').strip() == 'Xe Off-Gas', 'invalid variable.'
+#    assert node.get('unit').strip() == 'gram/min', 'invalid mass unit'
+      varNames.append(name)
 
-    nodes = rootNode.findall('timeStamp')
+    timeStampNodes = rootNode.findall('timeStamp')
 
-    for n in nodes:
+    for tsn in timeStampNodes:
 
-      timeStamp = float(n.get('value').strip())
+      timeStamp = float(tsn.get('value').strip())
  
-      # get data at timeStamp evolTime
-      if timeStamp == evolTime:
+      # get data at timeStamp atTime
+      if timeStamp == atTime:
 
          found = True
 
-         mass = 0.0
-         mass = float(n.text.strip())
-          
-         if inflowGasName == 'chopper-offgas':
-            self.__historyXeMassInflowGas[0][ evolTime ] = mass
+         varValues = tsn.text.strip().split(',')
+         assert len(varValues) == len(varNodes), 'inconsistent data; stop.'
 
-         if inflowGasName  == 'condenser-offgas':
-            self.__historyXeMassInflowGas[1][ evolTime ] = mass
+         for varName in varNames:
+           if varName == 'Xe Off-Gas':
+              ivar = varNames.index(varName)
+              mass = float(varValues[ivar])
 
-         s = '__GetInflowGas(): received inflow gas '+inflowGasName+' at '+str(evolTime)+' [min]; mass [g] = '+str(round(mass,3))
-         self.__log.debug(s)
+              if inflowGasName == 'chopper-offgas':
+                 self.__historyXeMassInflowGas[0][ atTime ] =  mass
 
-    # end for n in nodes:
+              if inflowGasName  == 'condenser-offgas':
+                 self.__historyXeMassInflowGas[1][ atTime ] = mass
+
+              s = '__GetInflowGas(): received inflow gas '+inflowGasName+' at '+str(atTime)+' [min]; mass [g] = '+str(round(mass,3))
+              self.__log.debug(s)
+
+           # end of: if varName == 'Xe Vapor':
+
+         # end of: for varName in varNames:
+
+    # end for n in timeStampNodes:
 
     if found is False: time.sleep(1) 
 
@@ -222,7 +237,7 @@ class Scrubber(object):
     today = datetime.datetime.today()
     s = ' <comment today="'+str(today)+'"/>\n'; fout.write(s)
     s = ' <time unit="minute"/>\n'; fout.write(s)
-    s = ' <var name="Xe Off-Gas" unit="gram/min" legend="Scrubber-offgas"/>\n'; fout.write(s)
+    s = ' <var name="Xe Off-Gas" unit="gram" legend="Scrubber-offgas"/>\n'; fout.write(s)
     mass = 0.0
     s = ' <timeStamp value="'+str(evolTime)+'">'+str(mass)+'</timeStamp>\n';fout.write(s)
 

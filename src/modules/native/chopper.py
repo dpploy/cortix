@@ -39,7 +39,7 @@ class Chopper(object):
   self.__log = logging.getLogger('shearing.chopper')
   self.__log.info('initializing an instance of Chopper')
 
-  self.__gramDecimals = 6 # microgram significant digits
+  self.__gramDecimals = 7 # tenth microgram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
   self.__pyplotScale  = 'log-linear' # linear, linear-linear, log, log-log, linear-log, log-linear
 

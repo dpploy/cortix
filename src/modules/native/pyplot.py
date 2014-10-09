@@ -240,7 +240,7 @@ class PyPlot(object):
   axlst.append(fig.add_subplot(gs[1, 1]))
   axes = np.array(axlst)
 
-  text = 'Cortix.Modules.Native.PyPlot: Time-Tables Data'
+  text = 'Cortix.Modules.Native.PyPlot: Time-Tables Dashboard'
   fig.text(.5,.95,text,horizontalalignment='center',fontsize=16)
 
   for (key,val) in self.__timeTablesData.items():
@@ -383,7 +383,7 @@ class PyPlot(object):
 
       axes = np.array(axlst)
 
-      text = today+': Cortix.Modules.Native.PyPlot: Time-Sequence Data'
+      text = today+': Cortix.Modules.Native.PyPlot: Time-Sequence Dashboard'
       fig.text(.5,.95,text,horizontalalignment='center',fontsize=14)
 
       axs = axes.flat
@@ -424,7 +424,7 @@ class PyPlot(object):
       if timeUnit == 'min': timeUnit = 'h'
 
     y = data[:,1]
-    if y.max() >= 1000.0: 
+    if y.max() >= 1000.0 and varScale != 'liner-log' and varScale != 'log-log' and varScale != 'log': 
       y /= 1000.0
       if varUnit == 'gram' or varUnit == 'g': 
         varUnit = 'kg'
@@ -458,7 +458,7 @@ class PyPlot(object):
     ymin  = y.min()
     ymin -= dy
 
-    if abs(ymin-ymax) <= 1.e-3:
+    if abs(ymin-ymax) <= 1.e-4:
        ymin = -1.0
        ymax =  1.0
 
