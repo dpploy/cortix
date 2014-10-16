@@ -43,9 +43,8 @@ class PyPlot(object):
 
   self.__timeTablesData = dict(list()) # [(time,timeUnit)] = [column,column,...]
 
-  self.__plotInterval    = 60.0   # minutes  (1 plot update every 60 min)
-  self.__plotSlideWindow = 3*60.0 # minutes  (1 plot update every 60 min)
-  self.__gramDecimals    = 4      # tenth of a milligram significant digits
+  self.__plotInterval    = 120.0   # minutes  (1 plot update every 120 min)
+  self.__plotSlideWindow = 3*60.0  # minutes  (width of the sliding window)
 
   self.__timeSequences_tmp = list() # temporary storage
 
@@ -363,7 +362,7 @@ class PyPlot(object):
         s = '__PlotTimeSeqDashboard(): created plot: '+figName
         self.__log.debug(s)
         iDash += 1
-      # end of if iVar != 0: # flush any current figure
+      # end of: if iVar != 0: # flush any current figure
 
       fig = plt.figure(str(iDash))
 
@@ -390,7 +389,7 @@ class PyPlot(object):
  
       axId = 0
 
-    # end of if iVar % 9 == 0: # if a multiple of 9 start a new dashboard
+    # end of: if iVar % 9 == 0: # if a multiple of 9 start a new dashboard
 
     (spec,val) = variablesData[iVar]
 
@@ -406,7 +405,9 @@ class PyPlot(object):
     timeUnit  = spec[2]
     varLegend = spec[3]
     varScale  = spec[4]
-    assert varScale == 'log' or varScale == 'linear' or varScale == 'log-linear' or varScale == 'linear-log' or varScale == 'linear-linear' or varScale == 'log-log'
+    assert varScale == 'log' or varScale == 'linear' or varScale == 'log-linear' \
+           or varScale == 'linear-log' or varScale == 'linear-linear' or \
+           varScale == 'log-log'
 
     if timeUnit == 'minute': timeUnit = 'min'
  
@@ -419,35 +420,34 @@ class PyPlot(object):
       continue #  simply skip bad data and log
 
     x = data[:,0]
-    if varScale == 'linear' or varScale == 'linear-linear' or varScale == 'linear-log' and x.max() >= 120.0:
-      x /= 60.0
-      if timeUnit == 'min': timeUnit = 'h'
+    if varScale == 'linear' or varScale == 'linear-linear' or \
+       varScale == 'linear-log' and x.max() >= 120.0:
+       x /= 60.0
+       if timeUnit == 'min': timeUnit = 'h'
 
     y = data[:,1]
-    if y.max() >= 1000.0 and varScale != 'liner-log' and varScale != 'log-log' and varScale != 'log': 
+
+    if y.max() >= 1000.0 and varScale != 'linear-log' and \
+                  varScale != 'log-log' and varScale != 'log': 
       y /= 1000.0
-      if varUnit == 'gram' or varUnit == 'g': 
-        varUnit = 'kg'
-      if varUnit == 'cc': 
-        varUnit = 'L'
-      if varUnit == 'gram/min' or varUnit == 'g/min': 
-        varUnit = 'kg/min'
-    if y.max() <= .001: 
+      if varUnit == 'gram' or varUnit == 'g': varUnit = 'kg'
+      if varUnit == 'cc': varUnit = 'L'
+      if varUnit == 'Ci': varUnit = 'kCi'
+      if varUnit == 'gram/min' or varUnit == 'g/min': varUnit = 'kg/min'
+
+    if y.max() <= .001 and varScale != 'linear-log' and \
+                  varScale != 'log-log' and varScale != 'log': 
       y *= 1000000.0
-      if varUnit == 'gram' or varUnit == 'g': 
-        varUnit = 'ug'
-      if varUnit == 'cc':
-        varUnit = 'u-cc'
-      if varUnit == 'gram/min' or varUnit == 'g/min': 
-        varUnit = 'ug/min'
-    if y.max() <= .1: 
+      if varUnit == 'gram' or varUnit == 'g': varUnit = 'ug'
+      if varUnit == 'cc': varUnit = 'u-cc'
+      if varUnit == 'gram/min' or varUnit == 'g/min': varUnit = 'ug/min'
+
+    if y.max() <= .1 and varScale != 'linear-log' and \
+                  varScale != 'log-log' and varScale != 'log': 
       y *= 1000.0
-      if varUnit == 'gram' or varUnit == 'g': 
-        varUnit = 'mg'
-      if varUnit == 'cc':
-        varUnit = 'm-cc'
-      if varUnit == 'gram/min' or varUnit == 'g/min': 
-        varUnit = 'mg/min'
+      if varUnit == 'gram' or varUnit == 'g': varUnit = 'mg'
+      if varUnit == 'cc': varUnit = 'm-cc'
+      if varUnit == 'gram/min' or varUnit == 'g/min': varUnit = 'mg/min'
   
     ax.set_xlabel('Time ['+timeUnit+']',fontsize=9)
     ax.set_ylabel(varName+' ['+varUnit+']',fontsize=9)
@@ -459,10 +459,10 @@ class PyPlot(object):
     ymin -= dy
 
     if abs(ymin-ymax) <= 1.e-4:
-       ymin = -1.0
-       ymax =  1.0
+      ymin = -1.0
+      ymax =  1.0
 
-    ax.set_ylim(ymin,ymax)
+    ax.set_ylim( ymin, ymax )
 
     for l in ax.get_xticklabels(): l.set_fontsize(10)
     for l in ax.get_yticklabels(): l.set_fontsize(10)
@@ -483,6 +483,19 @@ class PyPlot(object):
       positiveY = y > 0.0
       x = np.extract(positiveY, x)
       y = np.extract(positiveY, y)
+      if y.size > 0:
+        if y.min() > 0.0 and y.max() > y.min(): 
+          ymax  = y.max()
+          dy    = ymax * .1
+          ymax += dy
+          ymin  = y.min()
+          ymin -= dy
+          if ymin < 0.0 or ymin > ymax/1000.0: ymin = ymax/1000.0
+          ax.set_ylim( ymin, ymax )
+        else:       
+          ax.set_ylim( 1.0 , 10.0 )
+      else: 
+        ax.set_ylim( 1.0, 10.0 )
 
     if varScale == 'log-linear':
       ax.set_xscale('log')
@@ -493,18 +506,38 @@ class PyPlot(object):
     if varScale == 'linear-log':
       ax.set_yscale('log')
       positiveY = y > 0.0
-      x = np.extract(positiveY, x)
-      y = np.extract(positiveY, y)
+      x = np.extract( positiveY, x )
+      y = np.extract( positiveY, y )
+#      assert x.size == y.size, 'size error; stop.'
+      if y.size > 0:
+        if y.min() > 0.0 and y.max() > y.min(): 
+          ymax  = y.max()
+          dy    = ymax * .1
+          ymax += dy
+          ymin  = y.min()
+          ymin -= dy
+          if ymin < 0.0 or ymin > ymax/1000.0: ymin = ymax/1000.0
+          ax.set_ylim( y.min(), ymax )
+        else:                                   
+          ax.set_ylim( 1.0, 10.0 )
+      else: 
+        ax.set_ylim( 1.0, 10.0 )
+
+    #...................
+    # make the plot here
 
     ax.plot( x, y, 's-', color='black', linewidth=0.5, markersize=2,  \
              markeredgecolor='black', label=varLegend )
+
+    #...................
 
     ax.legend( loc='best', prop={'size':7} )
 
     s = '__PlotTimeSeqDashboard(): plotted '+varName+' from '+varLegend
     self.__log.debug(s)
 
-  # end of for iVar in range(nVar):
+  # end of: for iVar in range(nVar):
+
   figName = 'timeseq-dashboard-'+str(iDash)+'.png'
   fig.savefig(figName,dpi=200,fomat='png')
   plt.close(str(iDash))

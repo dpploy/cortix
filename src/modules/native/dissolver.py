@@ -36,22 +36,22 @@ class Dissolver(object):
   self.__log.info('initializing an instance of Dissolver')
 
   # Temporary configuration
-  self.__solidsMassLoadMax = 670.0 # gram
-  self.__dissolverVolume   = 4.0  # liter
-  self.__dutyPeriod        = 120.0 # minute
+  self.__solidsMassLoadMax     = 670.0 # gram
+  self.__dissolverVolume       = 4.0  # liter
+  self.__dutyPeriod            = 120.0 # minute
 
-  self.__molarMassU         = 238.0
-  self.__molarMassPu        = 239.0
-  self.__molarMassFP        = 135.34-16*1.18
-  self.__molarMassH2O       = 18.0    # g/mole
-  self.__molarMassHNO3      = 63.0    # g/mole
-  self.__molarMassNO        = 30.01   # g/mole
-  self.__molarMassNO2       = 46.0055 # g/mole
-  self.__molarMassUO2       = 270.05
-  self.__molarMassPuO2      = 271.17
-  self.__molarMassFPO1dot18 = 135.34
-  self.__molarMassUO2NO3_2  = self.__molarMassUO2 + 62.0*2.0 # g/mole
-  self.__molarMassPuNO3_4   = self.__molarMassPu  + 62.0*4.0 # g/mole
+  self.__molarMassU            = 238.0
+  self.__molarMassPu           = 239.0
+  self.__molarMassFP           = 135.34-16*1.18
+  self.__molarMassH2O          = 18.0    # g/mole
+  self.__molarMassHNO3         = 63.0    # g/mole
+  self.__molarMassNO           = 30.01   # g/mole
+  self.__molarMassNO2          = 46.0055 # g/mole
+  self.__molarMassUO2          = 270.05
+  self.__molarMassPuO2         = 271.17
+  self.__molarMassFPO1dot18    = 135.34
+  self.__molarMassUO2NO3_2     = self.__molarMassUO2 + 62.0*2.0 # g/mole
+  self.__molarMassPuNO3_4      = self.__molarMassPu  + 62.0*4.0 # g/mole
   self.__molarMassFPNO3_2dot36 = 328.22
 
   self.__roughnessF = 4.0
@@ -1559,7 +1559,8 @@ class Dissolver(object):
 #      print('mass = ',mass)
       reducedVol = reducedMass/dens
       area = math.pi * iD * iD / 4.0
-      reducedLength = reducedVol*1000.0 / area
+      reducedLength = 0.0
+      if area > 0.0: reducedLength = reducedVol*1000.0 / area
       if reducedVol == 0.0: iD = 0.0; reducedLength = 0.0
 #      print('reducedLength = ',reducedLength)
 #      print('length = ',length)
