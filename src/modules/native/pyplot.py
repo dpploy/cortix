@@ -43,8 +43,8 @@ class PyPlot(object):
 
   self.__timeTablesData = dict(list()) # [(time,timeUnit)] = [column,column,...]
 
-  self.__plotInterval    = 120.0   # minutes  (1 plot update every 120 min)
-  self.__plotSlideWindow = 3*60.0  # minutes  (width of the sliding window)
+  self.__plotInterval    = 60.0   # minutes  (1 plot update every 120 min)
+  self.__plotSlideWindow = 5*60.0  # minutes  (width of the sliding window)
 
   self.__timeSequences_tmp = list() # temporary storage
 

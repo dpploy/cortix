@@ -827,6 +827,13 @@ class Storage(object):
     b.set('legend','Storage-state')
     b.set('scale',pyplotScale)
 
+    # seventh variable
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Xe Mass')
+    b.set('unit','gram')
+    b.set('legend','Storage-state')
+    b.set('scale',pyplotScale)
+
     # values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
     b.set('value',str(atTime))
@@ -839,12 +846,14 @@ class Storage(object):
     uMass  = round(self.__GetUMass(),gDec)
     puMass = round(self.__GetPuMass(),gDec)
     fpMass = round(self.__GetFPMass(),gDec)
+    xeMass = round(self.__GetXeMass(),gDec)
     b.text = str(mass)+','+\
              str(self.__GetNSegments())+','+\
              str(vol)+','+\
              str(uMass)+','+\
              str(puMass)+','+\
-             str(fpMass)
+             str(fpMass)+','+\
+             str(xeMass)
 
     tree = ElementTree.ElementTree(a)
 
@@ -866,12 +875,14 @@ class Storage(object):
     uMass  = round(self.__GetUMass(),gDec)
     puMass = round(self.__GetPuMass(),gDec)
     fpMass = round(self.__GetFPMass(),gDec)
+    xeMass = round(self.__GetXeMass(),gDec)
     a.text = str(mass)+','+\
              str(self.__GetNSegments())+','+\
              str(vol)+','+\
              str(uMass)+','+\
              str(puMass)+','+\
-             str(fpMass)
+             str(fpMass)+','+\
+             str(xeMass)
 
     rootNode.append(a)
 

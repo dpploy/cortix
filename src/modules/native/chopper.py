@@ -41,7 +41,8 @@ class Chopper(object):
 
   self.__gramDecimals = 7 # tenth microgram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
-  self.__pyplotScale  = 'log-linear' # linear, linear-linear, log, log-log, linear-log, log-linear
+#  self.__pyplotScale  = 'log-linear' # linear, linear-linear, log, log-log, linear-log, log-linear
+  self.__pyplotScale  = 'linear' # linear, linear-linear, log, log-log, linear-log, log-linear
 
 #---------------------------------------------------------------------------------
  def CallPorts(self, evolTime=0.0):

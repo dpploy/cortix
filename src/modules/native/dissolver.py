@@ -1743,8 +1743,8 @@ class Dissolver(object):
   # equations for fuel segments
   #...................................................
 
-  index        = varNames.index('hno3')
-  massHNO3     = x[index]
+  index         = varNames.index('hno3')
+  massHNO3      = x[index]
   molarMassHNO3 = hno3Params['molarMassHNO3']
   molarityHNO3  = massHNO3 / molarMassHNO3 / dissolverVolume
 
