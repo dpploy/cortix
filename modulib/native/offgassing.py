@@ -2,20 +2,20 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native Scrubbing module thread
+Cortix native OffGassing module thread
 
-Sun Jul 13 15:30:50 EDT 2014
+Tue Jul 22 14:32:18 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
-from src.modules.native.scrubber import Scrubber
+from modulib.native.offgas import OffGas
 #*********************************************************************************
 
 #*********************************************************************************
-class Scrubbing(Thread):
+class OffGassing(Thread):
                      
  def __init__( self, inputFullPathFileName, 
                      cortexParamFullPathFileName,
@@ -27,18 +27,18 @@ class Scrubbing(Thread):
     self.__cortexCommFullPathFileName    = cortexCommFullPathFileName 
     self.__runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
 
-    super(Scrubbing, self).__init__()
+    super(OffGassing, self).__init__()
 
 #---------------------------------------------------------------------------------
  def run(self):
 
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
-  log = logging.getLogger('scrubbing')
+  log = logging.getLogger('offgassing')
   log.setLevel(logging.DEBUG)
 # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'scrubbing.log')
+  fh = logging.FileHandler(fullPathTaskDir+'offgassing.log')
   fh.setLevel(logging.DEBUG)
 # create console handler with a higher log level
   ch = logging.StreamHandler()
@@ -129,8 +129,8 @@ class Scrubbing(Thread):
 # runtimeStatusFullPathFileName = argv[4]
 
 #---------------------------------------------------------------------------------
-# Run Scrubber     
-  log.info('entered Run Scrubber section')
+# Run OffGasThread     
+  log.info('entered Run OffGas section')
 
 #.................................................................................
 # Setup input
@@ -139,11 +139,11 @@ class Scrubbing(Thread):
 
 #.................................................................................
 # Create the guest code             
-  guest = Scrubber( ports )
-  log.info("guest = Scrubber( ports )")
+  guest = OffGas( ports, evolveTime )
+  log.info("guest = OffGas( ports )")
 
 #.................................................................................
-# Evolve the scrubber   
+# Evolve the offgas   
  
   self.__SetRuntimeStatus('running')  
   log.info("SetRuntimeStatus('running')")
@@ -157,6 +157,7 @@ class Scrubbing(Thread):
    guest.Execute( facilityTime, timeStep )
 
    facilityTime += timeStep 
+
 #
 #---------------------------------------------------------------------------------
 # Shutdown 
@@ -172,7 +173,7 @@ class Scrubbing(Thread):
 
   fout = open( self.__runtimeStatusFullPathFileName,'w' )
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by Scrubbing.py -->\n'; fout.write(s)
+  s = '<!-- Written by OffGassing.py -->\n'; fout.write(s)
   today = datetime.datetime.today()
   s = '<!-- '+str(today)+' -->\n'; fout.write(s)
   s = '<runtime>\n'; fout.write(s)
@@ -181,6 +182,6 @@ class Scrubbing(Thread):
   fout.close()
 
 #*********************************************************************************
-# Usage: -> python scrubbing.py or ./scrubbing.py
+# Usage: -> python offgassing.py or ./offgassing.py
 if __name__ == "__main__":
-   Scrubbing()
+   OffGassing()

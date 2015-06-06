@@ -2,21 +2,21 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native Shearing module thread 
+Cortix native Filtration module thread
 
-Tue Jun 24 12:36:17 EDT 2014
+Sun Jul 13 18:59:04 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
-from src.modules.native.chopper import Chopper
+from modulib.native.filter import Filter
 #*********************************************************************************
 
 #*********************************************************************************
-class Shearing(Thread):
-
+class Filtration(Thread):
+                     
  def __init__( self, inputFullPathFileName, 
                      cortexParamFullPathFileName,
                      cortexCommFullPathFileName,
@@ -26,24 +26,23 @@ class Shearing(Thread):
     self.__cortexParamFullPathFileName   = cortexParamFullPathFileName 
     self.__cortexCommFullPathFileName    = cortexCommFullPathFileName 
     self.__runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
-  
-    super(Shearing, self).__init__()
+
+    super(Filtration, self).__init__()
 
 #---------------------------------------------------------------------------------
  def run(self):
 
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
-
-  log = logging.getLogger('shearing')
+  log = logging.getLogger('filtration')
   log.setLevel(logging.DEBUG)
 # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'shearing.log')
+  fh = logging.FileHandler(fullPathTaskDir+'filtration.log')
   fh.setLevel(logging.DEBUG)
 # create console handler with a higher log level
   ch = logging.StreamHandler()
-  ch.setLevel(logging.WARN)
+  ch.setLevel(logging.INFO)
 # create formatter and add it to the handlers
   formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
   fh.setFormatter(formatter)
@@ -52,7 +51,7 @@ class Shearing(Thread):
   log.addHandler(fh)
   log.addHandler(ch)
 
-  s = 'created logger: drv'
+  s = 'created logger: main'
   log.info(s)
 
   s = 'input file: ' + self.__inputFullPathFileName
@@ -71,14 +70,9 @@ class Shearing(Thread):
 
   assert os.path.isfile(self.__inputFullPathFileName), 'file %r not available;stop.' % self.__inputFullPathFileName
 
-  fin = open(self.__inputFullPathFileName,'r')
-  inputDataFullPathFileNames = list()
-  for line in fin:
-   inputDataFullPathFileNames.append(line.strip())
-  fin.close()
 
 #.................................................................................
-# Second command line argument is the Cortix parameter file: cortix-param.xml
+# Second argument is the Cortix parameter file: cortix-param.xml
 # cortexParamFullPathFileName 
 
   assert os.path.isfile(self.__cortexParamFullPathFileName), 'file %r not available;stop.' % cortexParamFullPathFileName
@@ -99,7 +93,7 @@ class Shearing(Thread):
   node = cortexParamXMLRootNode.find('timeStep')
 
   timeStepUnit = node.get('unit')
-  timeStep       = float(node.text.strip())
+  timeStep     = float(node.text.strip())
 
   if    timeStepUnit == 'min':  timeStep *= 1.0
   elif  timeStepUnit == 'hour': timeStep *= 60.0
@@ -107,7 +101,7 @@ class Shearing(Thread):
   else: assert True, 'time unit invalid.'
 
 #.................................................................................
-# Third command line argument is the Cortix communication file: cortix-comm.xml
+# Third argument is the Cortix communication file: cortix-comm.xml
 # cortexCommFullPathFileName 
 
   assert os.path.isfile(self.__cortexCommFullPathFileName), 'file %r not available;stop.' % self.__cortexCommFullPathFileName
@@ -131,59 +125,27 @@ class Shearing(Thread):
   log.debug(s)
 
 #.................................................................................
-# Fourth command line argument is the module runtime-status.xml file
-# runtimeStatusFullPathFileName 
+# Fourth argument is the module runtime-status.xml file
+# runtimeStatusFullPathFileName = argv[4]
+
+#---------------------------------------------------------------------------------
+# Run Filter     
+  log.info('entered Run Filter section')
 
 #.................................................................................
-# Run Chopper
-  log.info('entered Run Chopper section')
-
-#................................................................................
 # Setup input
 
-  found = False
-  for port in ports:
-    (portName,portType,portFile) = port
-    if portName == 'solids-input':
-      s = 'cp -f ' + inputDataFullPathFileNames[0] + ' ' + portFile
-      os.system(s)
-      log.debug(s)
-      found = True
-
-  assert found, 'Input setup failed.'
-
-  found = False
-  for port in ports:
-    (portName,portType,portFile) = port
-    if portName == 'gas-input':
-      s = 'cp -f ' + inputDataFullPathFileNames[1] + ' ' + portFile
-      os.system(s)
-      log.debug(s)
-      found = True
-
-  assert found, 'Input setup failed.'
-
-  found = False
-  for port in ports:
-    (portName,portType,portFile) = port
-    if portName == 'fines-input':
-      s = 'cp -f ' + inputDataFullPathFileNames[2] + ' ' + portFile
-      os.system(s)
-      log.debug(s)
-      found = True
-
-  assert found, 'Input setup failed.'
-
-#................................................................................
-# Create the guest code          
-
-  guest = Chopper( ports )
-  log.debug("guest = Chopper( ports )")
+# vfda: nothing for now
 
 #.................................................................................
-# Evolve the chopper
+# Create the guest code             
+  guest = Filter( ports )
+  log.info("guest = Filter( ports )")
 
-  self.__SetRuntimeStatus('running')
+#.................................................................................
+# Evolve the filter   
+ 
+  self.__SetRuntimeStatus('running')  
   log.info("SetRuntimeStatus('running')")
 
   facilityTime = 0.0
@@ -194,30 +156,31 @@ class Shearing(Thread):
 
    guest.Execute( facilityTime, timeStep )
 
-   facilityTime += timeStep
-
-#.................................................................................
+   facilityTime += timeStep 
+#
+#---------------------------------------------------------------------------------
 # Shutdown 
 
-  self.__SetRuntimeStatus('finished')
+  self.__SetRuntimeStatus('finished')  
   log.info("SetRuntimeStatus('finished')")
-
+ 
 #---------------------------------------------------------------------------------
  def __SetRuntimeStatus(self, status):
 
   status = status.strip()
-  assert status == 'running' or status == 'finished', 'status %r invalid.' % status
+  assert status == 'running' or status == 'finished', 'status invalid.'
 
   fout = open( self.__runtimeStatusFullPathFileName,'w' )
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by Shearing.py -->\n'; fout.write(s)
+  s = '<!-- Written by Filtration.py -->\n'; fout.write(s)
   today = datetime.datetime.today()
+  s = '<!-- '+str(today)+' -->\n'; fout.write(s)
   s = '<runtime>\n'; fout.write(s)
   s = '<status>'+status+'</status>\n'; fout.write(s)
   s = '</runtime>\n'; fout.write(s)
   fout.close()
 
 #*********************************************************************************
-# Usage: -> python shearing.py or ./shearing.py
+# Usage: -> python filtration.py or ./filtration.py
 if __name__ == "__main__":
-  Shearing()
+   Filtration()

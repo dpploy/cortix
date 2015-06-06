@@ -2,20 +2,20 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native Filtration module thread
+Cortix native Dissolution module thread
 
-Sun Jul 13 18:59:04 EDT 2014
+Tue Jun 24 01:03:45 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
-from src.modules.native.filter import Filter
+import importlib
 #*********************************************************************************
 
 #*********************************************************************************
-class Filtration(Thread):
+class Dissolution(Thread):
                      
  def __init__( self, inputFullPathFileName, 
                      cortexParamFullPathFileName,
@@ -27,18 +27,21 @@ class Filtration(Thread):
     self.__cortexCommFullPathFileName    = cortexCommFullPathFileName 
     self.__runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
 
-    super(Filtration, self).__init__()
+    super(Dissolution, self).__init__()
+
+    self.__module = importlib.import_module('.dissolver',package='modulib.native')
+    print(self.__module)
 
 #---------------------------------------------------------------------------------
  def run(self):
 
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
-  log = logging.getLogger('filtration')
+  log = logging.getLogger('dissolution')
   log.setLevel(logging.DEBUG)
 # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'filtration.log')
+  fh = logging.FileHandler(fullPathTaskDir+'dissolution.log')
   fh.setLevel(logging.DEBUG)
 # create console handler with a higher log level
   ch = logging.StreamHandler()
@@ -69,7 +72,6 @@ class Filtration(Thread):
 # inputFullPathFileName 
 
   assert os.path.isfile(self.__inputFullPathFileName), 'file %r not available;stop.' % self.__inputFullPathFileName
-
 
 #.................................................................................
 # Second argument is the Cortix parameter file: cortix-param.xml
@@ -129,8 +131,8 @@ class Filtration(Thread):
 # runtimeStatusFullPathFileName = argv[4]
 
 #---------------------------------------------------------------------------------
-# Run Filter     
-  log.info('entered Run Filter section')
+# Run Dissolver
+  log.info('entered Run Dissolver section')
 
 #.................................................................................
 # Setup input
@@ -139,11 +141,11 @@ class Filtration(Thread):
 
 #.................................................................................
 # Create the guest code             
-  guest = Filter( ports )
-  log.info("guest = Filter( ports )")
+  guest = self.__module.Dissolver( ports, evolveTime )
+  log.info("guest = Dissolver( ports )")
 
 #.................................................................................
-# Evolve the filter   
+# Evolve the dissolver
  
   self.__SetRuntimeStatus('running')  
   log.info("SetRuntimeStatus('running')")
@@ -172,7 +174,7 @@ class Filtration(Thread):
 
   fout = open( self.__runtimeStatusFullPathFileName,'w' )
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by Filtration.py -->\n'; fout.write(s)
+  s = '<!-- Written by Dissolution.py -->\n'; fout.write(s)
   today = datetime.datetime.today()
   s = '<!-- '+str(today)+' -->\n'; fout.write(s)
   s = '<runtime>\n'; fout.write(s)
@@ -181,6 +183,6 @@ class Filtration(Thread):
   fout.close()
 
 #*********************************************************************************
-# Usage: -> python filtration.py or ./filtration.py
+# Usage: -> python dissolution.py or ./dissolution.py
 if __name__ == "__main__":
-   Filtration()
+   Dissolution()

@@ -11,7 +11,6 @@ import os, sys, io, time, datetime
 import math, random
 import logging
 import xml.etree.ElementTree as ElementTree
-from src.modules.native.core.nitron import Nitron
 import numpy as np
 from scipy.integrate import odeint
 #*********************************************************************************
@@ -64,9 +63,6 @@ class Dissolver(object):
   self.__mmDecimals   = 3 # micrometer significant digits
   self.__ccDecimals   = 3 # cubic centimeter significant digits
   self.__pyplotScale = 'linear' # linear, linear-linear, log, log-log, linear-log, log-linear
-
-  # Core dissolver module
-  self.__nitron = Nitron()
 
   self.__startingHNO3Molarity = 10 # Molar
 

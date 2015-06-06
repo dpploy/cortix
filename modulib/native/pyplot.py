@@ -14,7 +14,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MultipleLocator
-from   src.modules.native.timesequence import TimeSequence
+from   modulib.native.timesequence import TimeSequence
 #*********************************************************************************
 
 #*********************************************************************************

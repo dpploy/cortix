@@ -11,15 +11,15 @@ Tue Dec 10 11:21:30 EDT 2013
 import os, sys, io, time
 import logging  
 from src.configtree import ConfigTree
-from src.modules.native.shearing import Shearing
-from src.modules.native.storing import Storing
-from src.modules.native.dissolution import Dissolution
-from src.modules.native.condensation import Condensation
-from src.modules.native.scrubbing import Scrubbing
-from src.modules.native.filtration import Filtration
-from src.modules.native.offgassing import OffGassing
-from src.modules.native.pyplotting import PyPlotting
-from src.modules.wrapped.puffing import Puffing
+from modulib.native.shearing import Shearing
+from modulib.native.storing import Storing
+from modulib.native.dissolution import Dissolution
+from modulib.native.condensation import Condensation
+from modulib.native.scrubbing import Scrubbing
+from modulib.native.filtration import Filtration
+from modulib.native.offgassing import OffGassing
+from modulib.native.pyplotting import PyPlotting
+from modulib.wrapped.puffing import Puffing
 #*********************************************************************************
 
 #*********************************************************************************

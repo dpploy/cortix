@@ -2,21 +2,21 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native Condensation module thread
+Cortix native PyPlot module thread
 
-Sun Jul 13 15:31:02 EDT 2014
+Sun Jun 29 21:34:18 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
-from src.modules.native.condenser import Condenser
+from modulib.native.pyplot import PyPlot
 #*********************************************************************************
 
 #*********************************************************************************
-class Condensation(Thread):
-                     
+class PyPlotting(Thread):
+
  def __init__( self, inputFullPathFileName, 
                      cortexParamFullPathFileName,
                      cortexCommFullPathFileName,
@@ -27,31 +27,32 @@ class Condensation(Thread):
     self.__cortexCommFullPathFileName    = cortexCommFullPathFileName 
     self.__runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
 
-    super(Condensation, self).__init__()
+    super(PyPlotting, self).__init__()
 
 #---------------------------------------------------------------------------------
  def run(self):
 
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
-  log = logging.getLogger('condensation')
+
+  log = logging.getLogger('pyplotting')
   log.setLevel(logging.DEBUG)
-# create file handler for logs
+  # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'condensation.log')
+  fh = logging.FileHandler(fullPathTaskDir+'pyplotting.log')
   fh.setLevel(logging.DEBUG)
-# create console handler with a higher log level
+  # create console handler with a higher log level
   ch = logging.StreamHandler()
   ch.setLevel(logging.INFO)
-# create formatter and add it to the handlers
+  # create formatter and add it to the handlers
   formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
   fh.setFormatter(formatter)
   ch.setFormatter(formatter)
-# add the handlers to the logger
+  # add the handlers to the logger
   log.addHandler(fh)
   log.addHandler(ch)
 
-  s = 'created logger: main'
+  s = 'created logger: drv'
   log.info(s)
 
   s = 'input file: ' + self.__inputFullPathFileName
@@ -68,11 +69,10 @@ class Condensation(Thread):
 # This input file may be empty or used by this driver and/or the native module.
 # inputFullPathFileName 
 
-  assert os.path.isfile(self.__inputFullPathFileName), 'file %r not available;stop.' % self.__inputFullPathFileName
-
+#  assert os.path.isfile(self.__inputFullPathFileName), 'file %r not available;stop.' % self.__inputFullPathFileName
 
 #.................................................................................
-# Second argument is the Cortix parameter file: cortix-param.xml
+# Second command line argument is the Cortix parameter file: cortix-param.xml
 # cortexParamFullPathFileName 
 
   assert os.path.isfile(self.__cortexParamFullPathFileName), 'file %r not available;stop.' % cortexParamFullPathFileName
@@ -93,7 +93,7 @@ class Condensation(Thread):
   node = cortexParamXMLRootNode.find('timeStep')
 
   timeStepUnit = node.get('unit')
-  timeStep     = float(node.text.strip())
+  timeStep       = float(node.text.strip())
 
   if    timeStepUnit == 'min':  timeStep *= 1.0
   elif  timeStepUnit == 'hour': timeStep *= 60.0
@@ -101,7 +101,7 @@ class Condensation(Thread):
   else: assert True, 'time unit invalid.'
 
 #.................................................................................
-# Third argument is the Cortix communication file: cortix-comm.xml
+# Third command line argument is the Cortix communication file: cortix-comm.xml
 # cortexCommFullPathFileName 
 
   assert os.path.isfile(self.__cortexCommFullPathFileName), 'file %r not available;stop.' % self.__cortexCommFullPathFileName
@@ -125,27 +125,44 @@ class Condensation(Thread):
   log.debug(s)
 
 #.................................................................................
-# Fourth argument is the module runtime-status.xml file
-# runtimeStatusFullPathFileName = argv[4]
+# Fourth command line argument is the module runtime-status.xml file
+# runtimeStatusFullPathFileName
 
 #---------------------------------------------------------------------------------
-# Run Condenser
-  log.info('entered Run Condenser section')
+# Run PyPlot          
+  log.info('entered Run PyPlot section')
 
-#.................................................................................
-# Setup input
+#................................................................................
+# Left here as an example; vfda
+# Setup input (this was used when debugging; need proper cortix-config.xml
 
-# vfda: nothing for now
+# found = False
+# for port in ports:
+#  if port[0] is 'solids':
+#   print( 'cp -f ' + inputData[0] + ' ' + port[2] )
+#   os.system( 'cp -f ' + inputData[0] + ' ' + port[2] )
+#   found = True
 
-#.................................................................................
-# Create the guest code             
-  guest = Condenser( ports )
-  log.info("guest = Condenser( ports )")
+# assert found, 'Input setup failed.'
 
-#.................................................................................
-# Evolve the condenser
- 
-  self.__SetRuntimeStatus('running')  
+# found = False
+# for port in ports:
+#  if port[0] is 'withdrawal-request':
+#   print( 'cp -f ' + inputData[1] + ' ' + port[2] )
+#   os.system( 'cp -f ' + inputData[1] + ' ' + port[2] )
+#   found = True
+
+# assert found, 'Input setup failed.'
+
+#................................................................................
+# Create the guest code          
+  guest = PyPlot( ports, evolveTime )
+  log.info("guest = PyPlot( ports )")
+
+#................................................................................
+# Evolve the pyplot              
+
+  self.__SetRuntimeStatus('running')
   log.info("SetRuntimeStatus('running')")
 
   facilityTime = 0.0
@@ -154,25 +171,25 @@ class Condensation(Thread):
 
    guest.CallPorts( facilityTime )
 
-   guest.Execute( facilityTime, timeStep )
+   facilityTime += timeStep
 
-   facilityTime += timeStep 
-#
+   guest.Execute( facilityTime )
+
 #---------------------------------------------------------------------------------
 # Shutdown 
 
-  self.__SetRuntimeStatus('finished')  
+  self.__SetRuntimeStatus('finished')
   log.info("SetRuntimeStatus('finished')")
- 
+
 #---------------------------------------------------------------------------------
- def __SetRuntimeStatus(self, status):
+ def __SetRuntimeStatus( self, status ):
 
   status = status.strip()
   assert status == 'running' or status == 'finished', 'status invalid.'
 
   fout = open( self.__runtimeStatusFullPathFileName,'w' )
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by Condensation.py -->\n'; fout.write(s)
+  s = '<!-- Written by PyPlotting.py -->\n'; fout.write(s)
   today = datetime.datetime.today()
   s = '<!-- '+str(today)+' -->\n'; fout.write(s)
   s = '<runtime>\n'; fout.write(s)
@@ -181,7 +198,6 @@ class Condensation(Thread):
   fout.close()
 
 #*********************************************************************************
-# Usage: -> python condensation.py or ./condensation.py
+# Usage: -> python pyplottingthread.py or ./pyplottingthread.py
 if __name__ == "__main__":
-   Condensation()
-
+   PyPlotting()
