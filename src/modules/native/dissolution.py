@@ -11,7 +11,7 @@ import os, sys, io, time, datetime
 import logging
 from threading import Thread
 import xml.etree.ElementTree as ElementTree
-from src.modules.native.dissolver import Dissolver
+import importlib
 #*********************************************************************************
 
 #*********************************************************************************
@@ -28,6 +28,9 @@ class Dissolution(Thread):
     self.__runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
 
     super(Dissolution, self).__init__()
+
+    self.__module = importlib.import_module('.dissolver',package='src.modules.native')
+    print(self.__module)
 
 #---------------------------------------------------------------------------------
  def run(self):
@@ -138,7 +141,7 @@ class Dissolution(Thread):
 
 #.................................................................................
 # Create the guest code             
-  guest = Dissolver( ports, evolveTime )
+  guest = self.__module.Dissolver( ports, evolveTime )
   log.info("guest = Dissolver( ports )")
 
 #.................................................................................
