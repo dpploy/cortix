@@ -16,14 +16,12 @@ import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
-class Puff(object):
+class Driver():
 
 # Private member data
 # __slots__ = [
 
- def __init__( self,
-               ports
-             ):
+ def __init__( self, ports, evolveTime = 0.0 ):
 
 # Sanity test
   assert type(ports) is list, '-> ports type %r is invalid.' % type(ports)

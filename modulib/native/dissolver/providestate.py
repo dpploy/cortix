@@ -34,7 +34,7 @@ def ProvideState( self, portFile, atTime ):
 
     b = ElementTree.SubElement(a,'comment')
     today = datetime.datetime.today()
-    b.set('author','dissolver.nitrino')
+    b.set('author','dissolver')
     b.set('version','0.1')
 
     b = ElementTree.SubElement(a,'comment')

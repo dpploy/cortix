@@ -14,7 +14,6 @@ from src.configtree import ConfigTree
 from src.launcher   import Launcher
 
 from modulib.native.shearing import Shearing
-from modulib.wrapped.puffing import Puffing
 #*********************************************************************************
 
 #*********************************************************************************
@@ -101,6 +100,7 @@ class Module():
 
 #.................................................................................
 # Stand-alone modules run with external system call using file IO communication
+# Good luck, I will leave you alone now.
   if self.__type == 'stand-alone':
      os.system( 'time '+ hostExec + ' ' + 
                 input + ' ' + param + ' ' + comm + ' ' + status + ' &' )
@@ -109,32 +109,32 @@ class Module():
 # Native modules run on threads using file IO communication
   elif self.__type == 'native':
     modName = self.__name 
+    modType = self.__type
 
     if modName == 'chopper-native':          
        t = Shearing( input, param, comm, status )
        t.start()
 
-
     if modName == 'pyplot':        
-       t = Launcher( modName, input, param, comm, status )
+       t = Launcher( modType, modName, input, param, comm, status )
        t.start()
     if modName == 'storage': 
-       t = Launcher( modName, input, param, comm, status )
+       t = Launcher( modType, modName, input, param, comm, status )
        t.start()
     if modName == 'dissolver':        
-       t = Launcher( modName, input, param, comm, status )
+       t = Launcher( modType, modName, input, param, comm, status )
        t.start()
     if modName == 'condenser':        
-       t = Launcher( modName, input, param, comm, status )
+       t = Launcher( modType, modName, input, param, comm, status )
        t.start()
     if modName == 'scrubber':        
-       t = Launcher( modName, input, param, comm, status )
+       t = Launcher( modType, modName, input, param, comm, status )
        t.start()
     if modName == 'filter':        
-       t = Launcher( modName, input, param, comm, status )
+       t = Launcher( modType, modName, input, param, comm, status )
        t.start()
     if modName == 'offgas':        
-       t = Launcher( modName, input, param, comm, status )
+       t = Launcher( modType, modName, input, param, comm, status )
        t.start()
 
 #.................................................................................
@@ -142,7 +142,7 @@ class Module():
   elif self.__type == 'wrapped':
     name = self.__name 
     if name == 'plume':        
-       t = Puffing( input, param, comm, status )
+       t = Launcher( modType, modName, input, param, comm, status )
        t.start()
   else: 
      assert True, 'module type invalid.'

@@ -18,7 +18,7 @@ import importlib
 #*********************************************************************************
 class Launcher(Thread):
                      
- def __init__( self, moduleName,
+ def __init__( self, moduleType, moduleName,
                      inputFullPathFileName, 
                      cortexParamFullPathFileName,
                      cortexCommFullPathFileName,
@@ -32,7 +32,7 @@ class Launcher(Thread):
 
     super(Launcher, self).__init__()
 
-    modulePath = 'modulib.native.'+moduleName+'.driver'
+    modulePath = 'modulib.'+moduleType+'.'+moduleName+'.driver'
     self.__module = importlib.import_module(modulePath)
 
 #---------------------------------------------------------------------------------

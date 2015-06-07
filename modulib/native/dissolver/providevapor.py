@@ -27,7 +27,7 @@ def ProvideVapor( self, portFile, atTime ):
     a.set('name','dissolver-vapor')
 
     b = ElementTree.SubElement(a,'comment')
-    b.set('author','dissolver.nitrino')
+    b.set('author','dissolver')
     b.set('version','0.1')
 
     b = ElementTree.SubElement(a,'comment')
