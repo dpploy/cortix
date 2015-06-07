@@ -144,8 +144,8 @@ class Launcher(Thread):
 
 #.................................................................................
 # Create the guest code             
-  guest = self.__module.Driver( ports, evolveTime )
-  log.info("guest = Driver( ports )")
+  guest = self.__module.Driver( self.__inputFullPathFileName, ports, evolveTime )
+  log.info("guest = Driver( args )")
 
 #.................................................................................
 # Evolve the module 

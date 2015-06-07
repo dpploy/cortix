@@ -20,7 +20,7 @@ class Driver():
 # __slots__ = [
 
  def __init__( self,
-               ports, evolveTime = 0.0
+               inputFullPathFileName, ports, evolveTime = 0.0
              ):
 
 # Sanity test
@@ -36,7 +36,7 @@ class Driver():
 
   self.__historyXeMassOffGas = dict()
 
-  self.__log = logging.getLogger('filtration.filter')
+  self.__log = logging.getLogger('launcher-filter.filter')
   self.__log.info('initializing an instance of Filter')
 
   self.__gramDecimals = 4 # tenth of a milligram significant digits

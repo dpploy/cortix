@@ -18,7 +18,7 @@ from .dissolve    import Dissolve
 #*********************************************************************************
 class Driver():
 
- def __init__( self, ports=list(), evolveTime=0.0 ):
+ def __init__( self, inputFullPathFileName, ports=list(), evolveTime=0.0 ):
 
   # Sanity test
   assert type(ports) is list, '-> ports type %r is invalid.' % type(ports)

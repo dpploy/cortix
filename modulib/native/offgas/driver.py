@@ -21,6 +21,7 @@ class Driver():
 # __slots__ = [
 
  def __init__( self,
+               inputFullPathFileName, 
                ports,
                evolveTime
              ):
@@ -30,7 +31,7 @@ class Driver():
   assert type(evolveTime) is float, '-> time type %r is invalid.' % type(evolveTime)
 
   # Logging
-  self.__log = logging.getLogger('offgas')
+  self.__log = logging.getLogger('launcher-offgas.offgas')
   self.__log.info('initializing an instance of OffGas')
 
   # Member data 

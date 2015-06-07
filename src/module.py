@@ -12,8 +12,6 @@ import os, sys, io, time
 import logging  
 from src.configtree import ConfigTree
 from src.launcher   import Launcher
-
-from modulib.native.shearing import Shearing
 #*********************************************************************************
 
 #*********************************************************************************
@@ -106,15 +104,14 @@ class Module():
                 input + ' ' + param + ' ' + comm + ' ' + status + ' &' )
 
 #.................................................................................
-# Native modules run on threads using file IO communication
+# Native and wrapped modules run on threads using file IO communication
   elif self.__type == 'native':
     modName = self.__name 
     modType = self.__type
 
-    if modName == 'chopper-native':          
-       t = Shearing( input, param, comm, status )
+    if modName == 'chopper':          
+       t = Launcher( modType, modName, input, param, comm, status )
        t.start()
-
     if modName == 'pyplot':        
        t = Launcher( modType, modName, input, param, comm, status )
        t.start()

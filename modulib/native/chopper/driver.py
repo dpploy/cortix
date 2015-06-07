@@ -14,13 +14,15 @@ import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
-class Chopper():
+class Driver():
 
 # Private member data
 # __slots__ = [
 
  def __init__( self,
-               ports 
+               inputFullPathFileName,
+               ports,
+               evolveTime
              ):
 
   assert type(ports) is list, '-> ports type %r is invalid.' % type(ports)
@@ -36,13 +38,58 @@ class Chopper():
 
   self.__inputFuelSegments = list()  # consider this the input of all fuel rods
 
-  self.__log = logging.getLogger('shearing.chopper')
+  self.__log = logging.getLogger('launcher-chopper.chopper')
   self.__log.info('initializing an instance of Chopper')
 
   self.__gramDecimals = 7 # tenth microgram significant digits
   self.__mmDecimals   = 3 # micrometer significant digits
 #  self.__pyplotScale  = 'log-linear' # linear, linear-linear, log, log-log, linear-log, log-linear
   self.__pyplotScale  = 'linear' # linear, linear-linear, log, log-log, linear-log, log-linear
+
+# THIS IS A HACKING for mimicking a real chopper. The data is precomputed and
+# stored into input files, these files are used to provide data to other modules.
+# Will deal with this issue later.
+# However this prompts the need for a better design of initialization of modules
+# depending on input data files.
+
+  fin = open(inputFullPathFileName,'r')
+  inputDataFullPathFileNames = list()
+  for line in fin:
+   inputDataFullPathFileNames.append(line.strip())
+  fin.close()
+
+  found = False
+  for port in ports:
+    (portName,portType,portFile) = port
+    if portName == 'solids-input':
+      s = 'cp -f ' + inputDataFullPathFileNames[0] + ' ' + portFile
+      os.system(s)
+      self.__log.debug(s)
+      found = True
+
+  assert found, 'Input setup failed.'
+
+  found = False
+  for port in ports:
+    (portName,portType,portFile) = port
+    if portName == 'gas-input':
+      s = 'cp -f ' + inputDataFullPathFileNames[1] + ' ' + portFile
+      os.system(s)
+      self.__log.debug(s)
+      found = True
+
+  assert found, 'Input setup failed.'
+
+  found = False
+  for port in ports:
+    (portName,portType,portFile) = port
+    if portName == 'fines-input':
+      s = 'cp -f ' + inputDataFullPathFileNames[2] + ' ' + portFile
+      os.system(s)
+      self.__log.debug(s)
+      found = True
+
+  assert found, 'Input setup failed.'
 
 #---------------------------------------------------------------------------------
  def CallPorts(self, evolTime=0.0):

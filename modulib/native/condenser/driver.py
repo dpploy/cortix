@@ -19,7 +19,7 @@ class Driver():
 # Private member data
 # __slots__ = [
 
- def __init__( self, ports, evolveTime ):
+ def __init__( self, inputFullPathFileName, ports, evolveTime ):
 
 # Sanity test
   assert type(ports) is list, '-> ports type %r is invalid.' % type(ports)
@@ -52,7 +52,7 @@ class Driver():
   self.__molarMassNO        = 30.01   # g/mole
   self.__molarMassNO2       = 46.0055 # g/mole
 
-  self.__log = logging.getLogger('condensation.condenser')
+  self.__log = logging.getLogger('launcher-condenser.condenser')
   self.__log.info('initializing an instance of Condenser')
 
   self.__gramDecimals = 7 # microgram significant digits

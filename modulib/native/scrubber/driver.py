@@ -19,7 +19,7 @@ class Driver():
 # Private member data
 # __slots__ = [
 
- def __init__( self, ports, evolveTime ):
+ def __init__( self, inputFullPathFileName, ports, evolveTime ):
 
 # Sanity test
   assert type(ports) is list, '-> ports type %r is invalid.' % type(ports)
@@ -35,7 +35,7 @@ class Driver():
 
   self.__historyXeMassOffGas = dict()
 
-  self.__log = logging.getLogger('scrubbing.scrubber')
+  self.__log = logging.getLogger('launcher-scrubber.scrubber')
   self.__log.info('initializing an instance of Scrubber')
 
   self.__gramDecimals = 4 # tenth of a milligram significant digits
