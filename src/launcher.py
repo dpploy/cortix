@@ -40,7 +40,7 @@ class Launcher(Thread):
 
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
-  log = logging.getLogger('launcher')
+  log = logging.getLogger('launcher-'+self.__moduleName)
   log.setLevel(logging.DEBUG)
 # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
@@ -144,7 +144,7 @@ class Launcher(Thread):
 
 #.................................................................................
 # Create the guest code             
-  guest = self.__module.Driver( ports )
+  guest = self.__module.Driver( ports, evolveTime )
   log.info("guest = Driver( ports )")
 
 #.................................................................................

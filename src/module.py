@@ -14,7 +14,6 @@ from src.configtree import ConfigTree
 from src.launcher   import Launcher
 
 from modulib.native.shearing import Shearing
-from modulib.native.storing import Storing
 from modulib.native.condensation import Condensation
 from modulib.native.scrubbing import Scrubbing
 from modulib.native.filtration import Filtration
@@ -118,8 +117,8 @@ class Module():
     if modName == 'chopper-native':          
        t = Shearing( input, param, comm, status )
        t.start()
-    if modName == 'storage-native': 
-       t = Storing( input, param, comm, status )
+    if modName == 'storage': 
+       t = Launcher( modName, input, param, comm, status )
        t.start()
     if modName == 'dissolver':        
        t = Launcher( modName, input, param, comm, status )

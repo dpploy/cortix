@@ -122,7 +122,7 @@
     <port type="provide">Gas_Release</port>
    </module>
 
-   <module name="storage-native" type="native">
+   <module name="storage" type="native">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
@@ -329,8 +329,8 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModule="storage-native" fromPort="solids" toModule="storage-native" toPort="chopper-data-test"/> 
-    <connect fromModule="storage-native" fromPort="withdrawal-request" toModule="storage-native" toPort="dissolver-data-test"/> 
+    <connect fromModule="storage" fromPort="solids" toModule="storage" toPort="chopper-data-test"/> 
+    <connect fromModule="storage" fromPort="withdrawal-request" toModule="storage" toPort="dissolver-data-test"/> 
    </network>
 
    <!-- stand-alone module -->
@@ -353,13 +353,13 @@
     <connect fromModule="chopper-native" fromPort="solids-input" toModule="chopper-native" toPort="Fuel_Solid"/> 
     <connect fromModule="chopper-native" fromPort="gas-input" toModule="chopper-native" toPort="Gas_Release"/> 
     <connect fromModule="chopper-native" fromPort="fines-input" toModule="chopper-native" toPort="Particulate"/> 
-    <connect fromModule="storage-native" fromPort="solids" toModule="chopper-native" toPort="solids"/> 
-    <connect fromModule="storage-native" fromPort="withdrawal-request" toModule="dissolver" toPort="signal"/> 
-    <connect fromModule="dissolver" fromPort="solids" toModule="storage-native" toPort="fuel-segments"/> 
+    <connect fromModule="storage" fromPort="solids" toModule="chopper-native" toPort="solids"/> 
+    <connect fromModule="storage" fromPort="withdrawal-request" toModule="dissolver" toPort="signal"/> 
+    <connect fromModule="dissolver" fromPort="solids" toModule="storage" toPort="fuel-segments"/> 
     <connect fromModule="condenser-native" fromPort="vapor" toModule="dissolver" toPort="vapor"/> 
     <connect fromModule="dissolver" fromPort="condensate" toModule="condenser-native" toPort="condensate"/> 
     <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="chopper-native" toPort="off-gas"/> 
-    <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="storage-native" toPort="off-gas"/> 
+    <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="storage" toPort="off-gas"/> 
     <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="condenser-native" toPort="off-gas"/> 
     <connect fromModule="hepafilter-native" fromPort="inflow-gas" toModule="scrubber-native" toPort="off-gas"/> 
     <connect fromModule="offgas-native" fromPort="inflow-gas" toModule="hepafilter-native" toPort="off-gas"/> 
@@ -367,8 +367,8 @@
     <connect fromModule="plume" fromPort="off-gas" toModule="offgas-native" toPort="off-gas"/> 
 -->
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="chopper-native" toPort="off-gas"/> 
-    <connect fromModule="pyplot" fromPort="time-sequence" toModule="storage-native" toPort="off-gas"/> 
-    <connect fromModule="pyplot" fromPort="time-sequence" toModule="storage-native" toPort="state"/> 
+    <connect fromModule="pyplot" fromPort="time-sequence" toModule="storage" toPort="off-gas"/> 
+    <connect fromModule="pyplot" fromPort="time-sequence" toModule="storage" toPort="state"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="dissolver" toPort="signal"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="dissolver" toPort="vapor"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="dissolver" toPort="state"/> 
@@ -389,9 +389,9 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModule="storage-native" fromPort="solids" toModule="chopper-native" toPort="Fuel_Solid"/> 
-    <connect fromModule="storage-native" fromPort="withdrawal-request" toModule="dissolver" toPort="signal"/> 
-    <connect fromModule="dissolver" fromPort="solids" toModule="storage-native" toPort="fuel-segments"/> 
+    <connect fromModule="storage" fromPort="solids" toModule="chopper-native" toPort="Fuel_Solid"/> 
+    <connect fromModule="storage" fromPort="withdrawal-request" toModule="dissolver" toPort="signal"/> 
+    <connect fromModule="dissolver" fromPort="solids" toModule="storage" toPort="fuel-segments"/> 
     <connect fromModule="condenser-native" fromPort="vapor" toModule="dissolver" toPort="vapor"/> 
     <connect fromModule="dissolver" fromPort="condensate" toModule="condenser-native" toPort="condensate"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="dissolver" toPort="vapor"/> 
