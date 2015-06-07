@@ -254,7 +254,7 @@
     <port type="provide">off-gas</port>
    </module>
 
-   <module name="offgas-native" type="native">
+   <module name="offgas" type="native">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
@@ -362,9 +362,9 @@
     <connect fromModule="scrubber" fromPort="inflow-gas" toModule="storage" toPort="off-gas"/> 
     <connect fromModule="scrubber" fromPort="inflow-gas" toModule="condenser" toPort="off-gas"/> 
     <connect fromModule="filter" fromPort="inflow-gas" toModule="scrubber" toPort="off-gas"/> 
-    <connect fromModule="offgas-native" fromPort="inflow-gas" toModule="filter" toPort="off-gas"/> 
+    <connect fromModule="offgas" fromPort="inflow-gas" toModule="filter" toPort="off-gas"/> 
 <!--
-    <connect fromModule="plume" fromPort="off-gas" toModule="offgas-native" toPort="off-gas"/> 
+    <connect fromModule="plume" fromPort="off-gas" toModule="offgas" toPort="off-gas"/> 
 -->
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="chopper-native" toPort="off-gas"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="storage" toPort="off-gas"/> 
@@ -376,7 +376,7 @@
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="condenser" toPort="condensate"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="scrubber" toPort="off-gas"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="filter" toPort="off-gas"/> 
-    <connect fromModule="pyplot" fromPort="time-sequence" toModule="offgas-native" toPort="off-gas"/> 
+    <connect fromModule="pyplot" fromPort="time-sequence" toModule="offgas" toPort="off-gas"/> 
 <!--
     <connect fromModule="pyplot" fromPort="time-tables" toModule="plume" toPort="time-puff"/> 
 -->

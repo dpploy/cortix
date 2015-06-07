@@ -15,7 +15,7 @@ import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
-class OffGas(object):
+class Driver():
 
 # Private member data
 # __slots__ = [
