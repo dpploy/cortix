@@ -14,13 +14,13 @@ import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
-class Filter(object):
+class Driver():
 
 # Private member data
 # __slots__ = [
 
  def __init__( self,
-               ports
+               ports, evolveTime = 0.0
              ):
 
 # Sanity test

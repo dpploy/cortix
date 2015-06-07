@@ -241,12 +241,12 @@
     <port type="provide">off-gas</port>
    </module>
 
-   <module name="hepafilter-native" type="native">
+   <module name="filter" type="native">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
-    <inputFileName>hepafilter.input</inputFileName>
+    <inputFileName>filter.input</inputFileName>
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
@@ -361,8 +361,8 @@
     <connect fromModule="scrubber" fromPort="inflow-gas" toModule="chopper-native" toPort="off-gas"/> 
     <connect fromModule="scrubber" fromPort="inflow-gas" toModule="storage" toPort="off-gas"/> 
     <connect fromModule="scrubber" fromPort="inflow-gas" toModule="condenser" toPort="off-gas"/> 
-    <connect fromModule="hepafilter-native" fromPort="inflow-gas" toModule="scrubber" toPort="off-gas"/> 
-    <connect fromModule="offgas-native" fromPort="inflow-gas" toModule="hepafilter-native" toPort="off-gas"/> 
+    <connect fromModule="filter" fromPort="inflow-gas" toModule="scrubber" toPort="off-gas"/> 
+    <connect fromModule="offgas-native" fromPort="inflow-gas" toModule="filter" toPort="off-gas"/> 
 <!--
     <connect fromModule="plume" fromPort="off-gas" toModule="offgas-native" toPort="off-gas"/> 
 -->
@@ -375,7 +375,7 @@
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="condenser" toPort="off-gas"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="condenser" toPort="condensate"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="scrubber" toPort="off-gas"/> 
-    <connect fromModule="pyplot" fromPort="time-sequence" toModule="hepafilter-native" toPort="off-gas"/> 
+    <connect fromModule="pyplot" fromPort="time-sequence" toModule="filter" toPort="off-gas"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="offgas-native" toPort="off-gas"/> 
 <!--
     <connect fromModule="pyplot" fromPort="time-tables" toModule="plume" toPort="time-puff"/> 
