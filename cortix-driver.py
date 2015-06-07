@@ -5,6 +5,12 @@ Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 Cortix: a program for system-level modules
         coupling, execution, and analysis.
 
+Cortix is a library and it needs a driver to run it. This file is an example.
+Many Cortix objects can be potentially run simultaneously, a single object
+may be sufficient since many simulation/tasks can be ran via one object.
+
+As Cortix evolves additional complexity may be added to the driver.
+
 Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
