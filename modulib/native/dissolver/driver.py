@@ -18,13 +18,13 @@ from .dissolve    import Dissolve
 #*********************************************************************************
 class Driver():
 
- def __init__( self, ports=list() ):
+ def __init__( self, ports=list(), evolveTime=0.0 ):
 
   # Sanity test
   assert type(ports) is list, '-> ports type %r is invalid.' % type(ports)
  
   # Logger
-  self.log = logging.getLogger('laucher.dissolver')
+  self.log = logging.getLogger('launcher-dissolver.dissolver')
   self.log.info('initializing an instance of Dissolver')
 
   # Temporary configuration

@@ -33,7 +33,7 @@ class Driver():
   assert type(evolveTime) is float, '-> time type %r is invalid.' % type(evolveTime)
 
   # Logging
-  self.__log = logging.getLogger('driver.pyplot')
+  self.__log = logging.getLogger('launcher-pyplot.pyplot')
   self.__log.info('initializing an instance of PyPlot')
 
   # Member data
@@ -43,7 +43,7 @@ class Driver():
 
   self.__timeTablesData = dict(list()) # [(time,timeUnit)] = [column,column,...]
 
-  self.__plotInterval    = 60.0   # minutes  (1 plot update every 120 min)
+  self.__plotInterval    = 60.0   # minutes  (1 plot update every 60 min)
   self.__plotSlideWindow = 5*60.0  # minutes  (width of the sliding window)
 
   self.__timeSequences_tmp = list() # temporary storage
@@ -56,7 +56,7 @@ class Driver():
       self.__UseData( port, evolTime=facilityTime  )
  
 #---------------------------------------------------------------------------------
- def Execute( self, facilityTime=0.0 ):
+ def Execute( self, facilityTime=0.0 , timeStep=0.0):
 
   s = 'Execute(): facility time [min] = ' + str(facilityTime)
   self.__log.info(s)
