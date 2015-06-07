@@ -11,19 +11,19 @@ Tue Dec 10 11:21:30 EDT 2013
 import os, sys, io, time
 import logging  
 from src.configtree import ConfigTree
+from src.launcher   import Launcher
+
 from modulib.native.shearing import Shearing
 from modulib.native.storing import Storing
-from modulib.native.dissolution import Dissolution
 from modulib.native.condensation import Condensation
 from modulib.native.scrubbing import Scrubbing
 from modulib.native.filtration import Filtration
 from modulib.native.offgassing import OffGassing
-from modulib.native.pyplotting import PyPlotting
 from modulib.wrapped.puffing import Puffing
 #*********************************************************************************
 
 #*********************************************************************************
-class Module(object):
+class Module():
 
 # Private member data
 # __slots__ = [
@@ -113,30 +113,31 @@ class Module(object):
 #.................................................................................
 # Native modules run on threads using file IO communication
   elif self.__type == 'native':
-    name = self.__name 
-    if name == 'chopper-native':          
+    modName = self.__name 
+
+    if modName == 'chopper-native':          
        t = Shearing( input, param, comm, status )
        t.start()
-    if name == 'storage-native': 
+    if modName == 'storage-native': 
        t = Storing( input, param, comm, status )
        t.start()
-    if name == 'dissolver-native':        
-       t = Dissolution( input, param, comm, status )
+    if modName == 'dissolver':        
+       t = Launcher( modName, input, param, comm, status )
        t.start()
-    if name == 'condenser-native':        
+    if modName == 'condenser-native':        
        t = Condensation( input, param, comm, status )
        t.start()
-    if name == 'scrubber-native':        
+    if modName == 'scrubber-native':        
        t = Scrubbing( input, param, comm, status )
        t.start()
-    if name == 'hepafilter-native':        
+    if modName == 'hepafilter-native':        
        t = Filtration( input, param, comm, status )
        t.start()
-    if name == 'offgas-native':        
+    if modName == 'offgas-native':        
        t = OffGassing( input, param, comm, status )
        t.start()
-    if name == 'pyplot-native':        
-       t = PyPlotting( input, param, comm, status )
+    if modName == 'pyplot':        
+       t = Launcher( modName, input, param, comm, status )
        t.start()
 
 #.................................................................................
