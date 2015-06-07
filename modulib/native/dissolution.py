@@ -29,8 +29,14 @@ class Dissolution(Thread):
 
     super(Dissolution, self).__init__()
 
-    self.__module = importlib.import_module('.dissolver',package='modulib.native')
+#works    self.__module = importlib.import_module('.dissolver',package='modulib.native')
+#works    self.__module = importlib.import_module('modulib.native.dissolver')
+
+    print(sys.path)
+    self.__module = importlib.import_module('modulib.native.dissolver.main')
     print(self.__module)
+#    self.__module = importlib.import_module('main',package='modulib.native.caceta')
+
 
 #---------------------------------------------------------------------------------
  def run(self):
@@ -141,7 +147,7 @@ class Dissolution(Thread):
 
 #.................................................................................
 # Create the guest code             
-  guest = self.__module.Dissolver( ports, evolveTime )
+  guest = self.__module.Dissolver( ports )
   log.info("guest = Dissolver( ports )")
 
 #.................................................................................
