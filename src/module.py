@@ -104,43 +104,15 @@ class Module():
                 input + ' ' + param + ' ' + comm + ' ' + status + ' &' )
 
 #.................................................................................
-# Native and wrapped modules run on threads using file IO communication
-  elif self.__type == 'native':
+# Native modules run on threads using file IO communication
+# Wrapped modules run on threads and external system call of their own with IO comm
+  elif self.__type == 'native' or self.__type == 'wrapped':
     modName = self.__name 
     modType = self.__type
 
-    if modName == 'chopper':          
-       t = Launcher( modType, modName, input, param, comm, status )
-       t.start()
-    if modName == 'pyplot':        
-       t = Launcher( modType, modName, input, param, comm, status )
-       t.start()
-    if modName == 'storage': 
-       t = Launcher( modType, modName, input, param, comm, status )
-       t.start()
-    if modName == 'dissolver':        
-       t = Launcher( modType, modName, input, param, comm, status )
-       t.start()
-    if modName == 'condenser':        
-       t = Launcher( modType, modName, input, param, comm, status )
-       t.start()
-    if modName == 'scrubber':        
-       t = Launcher( modType, modName, input, param, comm, status )
-       t.start()
-    if modName == 'filter':        
-       t = Launcher( modType, modName, input, param, comm, status )
-       t.start()
-    if modName == 'offgas':        
-       t = Launcher( modType, modName, input, param, comm, status )
-       t.start()
+    t = Launcher( modType, modName, input, param, comm, status )
+    t.start()
 
-#.................................................................................
-# Wrapped modules run on threads and external system call of their own with IO comm
-  elif self.__type == 'wrapped':
-    name = self.__name 
-    if name == 'plume':        
-       t = Launcher( modType, modName, input, param, comm, status )
-       t.start()
   else: 
      assert True, 'module type invalid.'
 
