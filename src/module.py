@@ -14,7 +14,6 @@ from src.configtree import ConfigTree
 from src.launcher   import Launcher
 
 from modulib.native.shearing import Shearing
-from modulib.native.condensation import Condensation
 from modulib.native.scrubbing import Scrubbing
 from modulib.native.filtration import Filtration
 from modulib.native.offgassing import OffGassing
@@ -117,15 +116,6 @@ class Module():
     if modName == 'chopper-native':          
        t = Shearing( input, param, comm, status )
        t.start()
-    if modName == 'storage': 
-       t = Launcher( modName, input, param, comm, status )
-       t.start()
-    if modName == 'dissolver':        
-       t = Launcher( modName, input, param, comm, status )
-       t.start()
-    if modName == 'condenser-native':        
-       t = Condensation( input, param, comm, status )
-       t.start()
     if modName == 'scrubber-native':        
        t = Scrubbing( input, param, comm, status )
        t.start()
@@ -135,7 +125,18 @@ class Module():
     if modName == 'offgas-native':        
        t = OffGassing( input, param, comm, status )
        t.start()
+
+
     if modName == 'pyplot':        
+       t = Launcher( modName, input, param, comm, status )
+       t.start()
+    if modName == 'storage': 
+       t = Launcher( modName, input, param, comm, status )
+       t.start()
+    if modName == 'dissolver':        
+       t = Launcher( modName, input, param, comm, status )
+       t.start()
+    if modName == 'condenser':        
        t = Launcher( modName, input, param, comm, status )
        t.start()
 

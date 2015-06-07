@@ -196,7 +196,7 @@
     <port type="provide">heat</port>
    </module>
 
-   <module name="condenser-native" type="native">
+   <module name="condenser" type="native">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
@@ -356,11 +356,11 @@
     <connect fromModule="storage" fromPort="solids" toModule="chopper-native" toPort="solids"/> 
     <connect fromModule="storage" fromPort="withdrawal-request" toModule="dissolver" toPort="signal"/> 
     <connect fromModule="dissolver" fromPort="solids" toModule="storage" toPort="fuel-segments"/> 
-    <connect fromModule="condenser-native" fromPort="vapor" toModule="dissolver" toPort="vapor"/> 
-    <connect fromModule="dissolver" fromPort="condensate" toModule="condenser-native" toPort="condensate"/> 
+    <connect fromModule="condenser" fromPort="vapor" toModule="dissolver" toPort="vapor"/> 
+    <connect fromModule="dissolver" fromPort="condensate" toModule="condenser" toPort="condensate"/> 
     <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="chopper-native" toPort="off-gas"/> 
     <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="storage" toPort="off-gas"/> 
-    <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="condenser-native" toPort="off-gas"/> 
+    <connect fromModule="scrubber-native" fromPort="inflow-gas" toModule="condenser" toPort="off-gas"/> 
     <connect fromModule="hepafilter-native" fromPort="inflow-gas" toModule="scrubber-native" toPort="off-gas"/> 
     <connect fromModule="offgas-native" fromPort="inflow-gas" toModule="hepafilter-native" toPort="off-gas"/> 
 <!--
@@ -372,8 +372,8 @@
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="dissolver" toPort="signal"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="dissolver" toPort="vapor"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="dissolver" toPort="state"/> 
-    <connect fromModule="pyplot" fromPort="time-sequence" toModule="condenser-native" toPort="off-gas"/> 
-    <connect fromModule="pyplot" fromPort="time-sequence" toModule="condenser-native" toPort="condensate"/> 
+    <connect fromModule="pyplot" fromPort="time-sequence" toModule="condenser" toPort="off-gas"/> 
+    <connect fromModule="pyplot" fromPort="time-sequence" toModule="condenser" toPort="condensate"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="scrubber-native" toPort="off-gas"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="hepafilter-native" toPort="off-gas"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="offgas-native" toPort="off-gas"/> 
@@ -392,8 +392,8 @@
     <connect fromModule="storage" fromPort="solids" toModule="chopper-native" toPort="Fuel_Solid"/> 
     <connect fromModule="storage" fromPort="withdrawal-request" toModule="dissolver" toPort="signal"/> 
     <connect fromModule="dissolver" fromPort="solids" toModule="storage" toPort="fuel-segments"/> 
-    <connect fromModule="condenser-native" fromPort="vapor" toModule="dissolver" toPort="vapor"/> 
-    <connect fromModule="dissolver" fromPort="condensate" toModule="condenser-native" toPort="condensate"/> 
+    <connect fromModule="condenser" fromPort="vapor" toModule="dissolver" toPort="vapor"/> 
+    <connect fromModule="dissolver" fromPort="condensate" toModule="condenser" toPort="condensate"/> 
     <connect fromModule="pyplot" fromPort="time-sequence" toModule="dissolver" toPort="vapor"/> 
    </network>
 
