@@ -21,7 +21,7 @@ from xml.etree.ElementTree import Element
 #*********************************************************************************
 
 #*********************************************************************************
-class ConfigTree(object):
+class ConfigTree():
 
 # Private member data
 # __slots__ = [

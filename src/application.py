@@ -18,7 +18,7 @@ from src.network import Network
 #*********************************************************************************
 
 #*********************************************************************************
-class Application(object): # this is meant to be a singleton class
+class Application(): # this is meant to be a singleton class
 
 # Private member data
 # __slots__ = [
@@ -41,6 +41,17 @@ class Application(object): # this is meant to be a singleton class
 
   self.__workDir = appWorkDir
   assert os.path.isdir( appWorkDir ), 'work directory not available.'
+
+# Set the module library for each object
+
+  node = appConfigNode.GetSubNode('moduleLibrary')
+  self.__moduLibName = node.get('name').strip()
+
+  subnode = ConfigTree( node )
+  assert subnode.GetNodeTag() == 'moduleLibrary', ' fatal.'
+  for child in subnode.GetNodeChildren():
+   (tag, items, text) = child
+   if tag == 'parentDir': self.__moduLibFullParentDir = text.strip()
 
 # Create the logging facility for the singleton object
   node = appConfigNode.GetSubNode('logger')
@@ -166,7 +177,9 @@ class Application(object): # this is meant to be a singleton class
      modConfigNode = ConfigTree( modNode )
      assert modConfigNode.GetNodeName() == modNode.get('name'), 'check failed'
 
-     module = Module( self.__workDir, modConfigNode )
+     module = Module( self.__workDir, 
+                      self.__moduLibName, self.__moduLibFullParentDir, 
+                      modConfigNode )
 
      self.__modules.append( module )
 

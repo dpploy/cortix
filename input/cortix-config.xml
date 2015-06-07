@@ -77,8 +77,15 @@
   </task>
 
   <!-- Simulation: application -->
+  <!-- NB: each simulation has only one application -->
 
   <application name="demo1">
+
+   <moduleLibrary name='modulib'>
+    <parentDir>
+      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing
+    </parentDir>
+   </moduleLibrary>
 
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>

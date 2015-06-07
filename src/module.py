@@ -22,10 +22,16 @@ class Module():
 
  def __init__( self,
                parentWorkDir = None,
+               modLibName = None, modLibParentDir = None, 
                modConfigNode = ConfigTree()
              ):
 
   assert type(parentWorkDir) is str, '-> parentWorkDir is invalid.' 
+
+# Locate the module library
+
+  self.__modLibName      = modLibName
+  self.__modLibParentDir = modLibParentDir
 
 # Inherit a configuration tree
   assert type(modConfigNode) is ConfigTree, '-> modConfigNode is invalid.' 
@@ -107,10 +113,13 @@ class Module():
 # Native modules run on threads using file IO communication
 # Wrapped modules run on threads and external system call of their own with IO comm
   elif self.__type == 'native' or self.__type == 'wrapped':
+    modLibName      = self.__modLibName
+    modLibParentDir = self.__modLibParentDir
     modName = self.__name 
     modType = self.__type
 
-    t = Launcher( modType, modName, input, param, comm, status )
+    t = Launcher( modLibName, modLibParentDir, 
+                  modType, modName, input, param, comm, status )
     t.start()
 
   else: 
