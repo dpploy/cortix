@@ -32,9 +32,6 @@ class Launcher(Thread):
 
     super(Launcher, self).__init__()
 
-    print(sys.path)
-    sys.path.insert(1,modLibFullParentDir)
-    print(sys.path)
     modulePath = modLibName+'.'+moduleType+'.'+moduleName+'.driver'
     self.__module = importlib.import_module(modulePath)
 

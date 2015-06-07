@@ -42,7 +42,7 @@ class Application(): # this is meant to be a singleton class
   self.__workDir = appWorkDir
   assert os.path.isdir( appWorkDir ), 'work directory not available.'
 
-# Set the module library for each object
+# Set the module library for the application
 
   node = appConfigNode.GetSubNode('moduleLibrary')
   self.__moduLibName = node.get('name').strip()
@@ -52,6 +52,10 @@ class Application(): # this is meant to be a singleton class
   for child in subnode.GetNodeChildren():
    (tag, items, text) = child
    if tag == 'parentDir': self.__moduLibFullParentDir = text.strip()
+ 
+  if self.__moduLibFullParentDir[-1] == '/': self.__moduLibFullParentDir.strip('/') 
+
+  sys.path.insert(1,self.__moduLibFullParentDir)
 
 # Create the logging facility for the singleton object
   node = appConfigNode.GetSubNode('logger')
