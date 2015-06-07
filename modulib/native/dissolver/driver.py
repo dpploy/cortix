@@ -2,7 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix native Nitrino module 
+Cortix native Dissolver module 
 
 Tue Jun 24 01:03:45 EDT 2014
 """
@@ -16,17 +16,16 @@ from .dissolve    import Dissolve
 #*********************************************************************************
 
 #*********************************************************************************
-class Dissolver():
+class Driver():
 
  def __init__( self, ports=list() ):
 
-  print('Hello I am in the Dissolver')
   # Sanity test
   assert type(ports) is list, '-> ports type %r is invalid.' % type(ports)
  
   # Logger
-  self.log = logging.getLogger('dissolution.nitrino')
-  self.log.info('initializing an instance of Nitrino')
+  self.log = logging.getLogger('laucher.dissolver')
+  self.log.info('initializing an instance of Dissolver')
 
   # Temporary configuration
   self.solidsMassLoadMax     = 670.0 # gram

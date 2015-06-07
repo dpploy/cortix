@@ -14,7 +14,7 @@ import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
-class Chopper(object):
+class Chopper():
 
 # Private member data
 # __slots__ = [

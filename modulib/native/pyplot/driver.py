@@ -14,11 +14,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MultipleLocator
-from   modulib.native.timesequence import TimeSequence
+from   .timesequence import TimeSequence
 #*********************************************************************************
 
 #*********************************************************************************
-class PyPlot(object):
+class Driver():
 
 # Private member data
 # __slots__ = [
@@ -33,7 +33,7 @@ class PyPlot(object):
   assert type(evolveTime) is float, '-> time type %r is invalid.' % type(evolveTime)
 
   # Logging
-  self.__log = logging.getLogger('pyplotting.pyplot')
+  self.__log = logging.getLogger('driver.pyplot')
   self.__log.info('initializing an instance of PyPlot')
 
   # Member data

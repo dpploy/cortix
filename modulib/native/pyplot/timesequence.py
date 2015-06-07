@@ -17,7 +17,7 @@ import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
-class TimeSequence(object):
+class TimeSequence():
 
 # Private member data
 # __slots__ = [
