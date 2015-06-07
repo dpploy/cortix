@@ -14,7 +14,6 @@ from src.configtree import ConfigTree
 from src.launcher   import Launcher
 
 from modulib.native.shearing import Shearing
-from modulib.native.scrubbing import Scrubbing
 from modulib.native.filtration import Filtration
 from modulib.native.offgassing import OffGassing
 from modulib.wrapped.puffing import Puffing
@@ -116,9 +115,6 @@ class Module():
     if modName == 'chopper-native':          
        t = Shearing( input, param, comm, status )
        t.start()
-    if modName == 'scrubber-native':        
-       t = Scrubbing( input, param, comm, status )
-       t.start()
     if modName == 'hepafilter-native':        
        t = Filtration( input, param, comm, status )
        t.start()
@@ -137,6 +133,9 @@ class Module():
        t = Launcher( modName, input, param, comm, status )
        t.start()
     if modName == 'condenser':        
+       t = Launcher( modName, input, param, comm, status )
+       t.start()
+    if modName == 'scrubber':        
        t = Launcher( modName, input, param, comm, status )
        t.start()
 

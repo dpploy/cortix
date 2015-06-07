@@ -14,14 +14,12 @@ import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
-class Scrubber(object):
+class Driver():
 
 # Private member data
 # __slots__ = [
 
- def __init__( self,
-               ports
-             ):
+ def __init__( self, ports, evolveTime ):
 
 # Sanity test
   assert type(ports) is list, '-> ports type %r is invalid.' % type(ports)
