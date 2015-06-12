@@ -15,10 +15,7 @@ from xml.etree.cElementTree import ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
-class Task(object):
-
-# Private member data
-# __slots__ = [
+class Task():
 
  def __init__( self,
                parentWorkDir = None,

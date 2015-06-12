@@ -16,10 +16,7 @@ from src.simulation import Simulation
 #*********************************************************************************
 
 #*********************************************************************************
-class Cortix(object):
-
-# Private member data
-# __slots__ = [
+class Cortix():
 
  def __init__( self,
                name = None,

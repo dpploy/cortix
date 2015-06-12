@@ -18,9 +18,6 @@ from src.task import Task
 #*********************************************************************************
 class Simulation():
 
-# Private member data
-# __slots__ = [
-
  def __init__( self,
                parentWorkDir = None,
                simConfigNode = ConfigTree()
@@ -124,12 +121,7 @@ class Simulation():
 #------------
 # Tasks
 #------------
-  self.__tasks = list()
-
-  self.__SetupTasks()
-
-# Finish object initialization 
-  self.__Setup()
+  self.__tasks = list() # holds the task(s) created by the Execute method
 
   s = 'created simulation: '+self.__name
   self.__log.info(s)
@@ -137,12 +129,15 @@ class Simulation():
 #---------------------------------------------------------------------------------
 # Execute  
 
- def Execute(self, taskName=None):
+ def Execute( self, taskName=None ):
 
   s = 'start Execute('+taskName+')'
   self.__log.debug(s)
 
   if taskName is not None: 
+
+     self.__SetupTask( taskName )
+
      for task in self.__tasks:
        if task.GetName() == taskName: 
 
@@ -159,130 +154,150 @@ class Simulation():
 #---------------------------------------------------------------------------------
 # Setup simulation          
 
- def __Setup( self ):
+ def __SetupTask( self, taskName ):
 
-  s = 'start __Setup()'
+  s = 'start __SetupTask()'
   self.__log.debug(s)
+
+  task = None
+
+  for taskNode in self.__configNode.GetAllSubNodes('task'):
+
+   if taskNode.get('name') != taskName: continue
+
+   taskConfigNode = ConfigTree( taskNode )
+
+   task = Task( self.__workDir, taskConfigNode )
+
+   self.__tasks.append( task )
+
+   s = 'appended task: '+taskNode.get('name')
+   self.__log.debug(s)
+
+  if task is None:
+     s = 'no task to exectute; done here.'
+     self.__log.debug(s)
+     s = 'end __SetupTask()'
+     self.__log.debug(s)
+     return
 
   networks = self.__application.GetNetworks()
 
-# create subdirectories with task names
-  for task in self.__tasks:
-    taskName = task.GetName()
-    taskWorkDir = task.GetWorkDir()
-    assert os.path.isdir( taskWorkDir ), 'directory %r invalid.' % taskWorkDir
+# create subdirectory with task name
+  taskName = task.GetName()
+  taskWorkDir = task.GetWorkDir()
+  assert os.path.isdir( taskWorkDir ), 'directory %r invalid.' % taskWorkDir
 
-    # set the parameters for the task in the cortix param file 
-    taskFile = taskWorkDir + 'cortix-param.xml'
-    fout = open( taskFile,'w' )
-    s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-    s = '<!-- Written by Simulation::__Setup() -->\n'; fout.write(s)
-    s = '<cortixParam>\n'; fout.write(s)
-    evolveTime     = task.GetEvolveTime()
-    evolveTimeUnit = task.GetEvolveTimeUnit()
-    s = '<evolveTime unit="'+evolveTimeUnit+'"'+'>'+str(evolveTime)+'</evolveTime>\n'
-    fout.write(s)
-    timeStep       = task.GetTimeStep()
-    timeStepUnit   = task.GetTimeStepUnit()
-    s = '<timeStep unit="'+timeStepUnit+'"'+'>'+str(timeStep)+'</timeStep>\n'
-    fout.write(s)
-    s = '</cortixParam>'; fout.write(s)
-    fout.close()
-    task.SetRuntimeCortixParamFile( taskFile )
+  # set the parameters for the task in the cortix param file 
+  taskFile = taskWorkDir + 'cortix-param.xml'
+  fout = open( taskFile,'w' )
+  s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
+  s = '<!-- Written by Simulation::__Setup() -->\n'; fout.write(s)
+  s = '<cortixParam>\n'; fout.write(s)
+  evolveTime     = task.GetEvolveTime()
+  evolveTimeUnit = task.GetEvolveTimeUnit()
+  s = '<evolveTime unit="'+evolveTimeUnit+'"'+'>'+str(evolveTime)+'</evolveTime>\n'
+  fout.write(s)
+  timeStep       = task.GetTimeStep()
+  timeStepUnit   = task.GetTimeStepUnit()
+  s = '<timeStep unit="'+timeStepUnit+'"'+'>'+str(timeStep)+'</timeStep>\n'
+  fout.write(s)
+  s = '</cortixParam>'; fout.write(s)
+  fout.close()
+  task.SetRuntimeCortixParamFile( taskFile )
 
+  # using the taks and network create the runtime module directories and comm files
+  for net in networks:
 
-    # using the taks and network create the runtime module directories and comm files
-    for net in networks:
+   if net.GetName() == taskName: # Warning: net and task name must match
 
-     if net.GetName() == taskName: # Warning: net and task name must match
+    connect = net.GetConnectivity()
 
-      connect = net.GetConnectivity()
+    toModuleToPortVisited = dict()
 
-      toModuleToPortVisited = dict()
+    for con in connect:
 
-      for con in connect:
+     # Start with the ports that will function as a provide port or input port
+     toModule = con['toModule']
+     toPort   = con['toPort']
 
-       # Start with the ports that will function as a provide port or input port
-       toModule = con['toModule']
-       toPort   = con['toPort']
+     if toModule not in toModuleToPortVisited.keys(): 
+       toModuleToPortVisited[toModule] = list()
 
-       if toModule not in toModuleToPortVisited.keys(): 
-         toModuleToPortVisited[toModule] = list()
+     module = self.__application.GetModule(toModule)
 
-       module = self.__application.GetModule(toModule)
+     assert module is not None, 'module %r does not exist in application' % toModule
+     assert module.HasPortName( toPort ), 'module %r does not have port %r.' % (module.GetName(), toPort )
+     assert module.GetPortType(toPort) is not None, 'network name: %r, module name: %r, toPort: %r port type invalid %r' % (net.GetName(), module.GetName(), toPort, type(module.GetPortType(toPort)))
 
-       assert module is not None, 'module %r does not exist in application' % toModule
-       assert module.HasPortName( toPort ), 'module %r does not have port %r.' % (module.GetName(), toPort )
-       assert module.GetPortType(toPort) is not None, 'network name: %r, module name: %r, toPort: %r port type invalid %r' % (net.GetName(), module.GetName(), toPort, type(module.GetPortType(toPort)))
+     if module.GetPortType(toPort) != 'input':
 
-       if module.GetPortType(toPort) != 'input':
+        assert module.GetPortType(toPort) == 'provide', 'port type %r invalid. Module %r, port %r' % (module.GetPortType(toPort), module.GetName(), toPort)
 
-          assert module.GetPortType(toPort) == 'provide', 'port type %r invalid. Module %r, port %r' % (module.GetPortType(toPort), module.GetName(), toPort)
+        # "to" is who receives the "call", hence the provider
+        toModuleWorkDir  = taskWorkDir + toModule + '/'
+        toModuleCommFile = toModuleWorkDir + 'cortix-comm.xml'
+        if not os.path.isdir( toModuleWorkDir ):
+          os.system( 'mkdir -p ' + toModuleWorkDir )
+        if not os.path.isfile( toModuleCommFile ):
+          fout = open( toModuleCommFile,'w' )
+          s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
+          s = '<!-- Written by Simulation::__Setup() -->\n'; fout.write(s)
+          s = '<cortixComm>\n'; fout.write(s)
 
-          # "to" is who receives the "call", hence the provider
-          toModuleWorkDir  = taskWorkDir + toModule + '/'
-          toModuleCommFile = toModuleWorkDir + 'cortix-comm.xml'
-          if not os.path.isdir( toModuleWorkDir ):
-            os.system( 'mkdir -p ' + toModuleWorkDir )
-          if not os.path.isfile( toModuleCommFile ):
-            fout = open( toModuleCommFile,'w' )
-            s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-            s = '<!-- Written by Simulation::__Setup() -->\n'; fout.write(s)
-            s = '<cortixComm>\n'; fout.write(s)
+        if toPort not in toModuleToPortVisited[toModule]:
+          fout = open( toModuleCommFile,'a' )
+          # this is the cortix info for modules providing data           
+          s = '<port name="'+toPort+'" type="provide" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
+          fout.write(s)
+          fout.close()
+          toModuleToPortVisited[toModule].append(toPort)
 
-          if toPort not in toModuleToPortVisited[toModule]:
-            fout = open( toModuleCommFile,'a' )
-            # this is the cortix info for modules providing data           
-            s = '<port name="'+toPort+'" type="provide" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
-            fout.write(s)
-            fout.close()
-            toModuleToPortVisited[toModule].append(toPort)
+        r = '__Setup():: comm module: '+toModule+'; network: '+taskName+' '+s
+        self.__log.debug(r)
 
-          r = '__Setup():: comm module: '+toModule+'; network: '+taskName+' '+s
-          self.__log.debug(r)
+        # register the cortix-comm file for the network
+        net.SetRuntimeCortixCommFile( toModule, toModuleCommFile )
+     else:
+        toModuleWorkDir  = taskWorkDir + toModule + '/'
 
-          # register the cortix-comm file for the network
-          net.SetRuntimeCortixCommFile( toModule, toModuleCommFile )
-       else:
-          toModuleWorkDir  = taskWorkDir + toModule + '/'
+     # Now do the ports that will function as use ports
+     fromModule = con['fromModule']
+     fromPort   = con['fromPort']
 
-       # Now do the ports that will function as use ports
-       fromModule = con['fromModule']
-       fromPort   = con['fromPort']
+     module = self.__application.GetModule(fromModule)
 
-       module = self.__application.GetModule(fromModule)
-
-       assert module.HasPortName( fromPort ), 'module %r has no port %r' % (fromModule, fromPort)
-       assert module.GetPortType(fromPort) == 'use' , 'module %r: invalid type for port %r' % (fromModule, fromPort)
+     assert module.HasPortName( fromPort ), 'module %r has no port %r' % (fromModule, fromPort)
+     assert module.GetPortType(fromPort) == 'use' , 'module %r: invalid type for port %r' % (fromModule, fromPort)
 
 #       print(fromPort)
 #       print(fromPorts_visited)
 #       assert fromPort not in fromPorts_visited, 'error in cortix-config connect.'
 
-       # "from" is who makes the "call", hence the user        
-       fromModuleWorkDir  = taskWorkDir + fromModule + '/'
-       fromModuleCommFile = fromModuleWorkDir + 'cortix-comm.xml'
-       if not os.path.isdir( fromModuleWorkDir ):
-         os.system( 'mkdir -p '+ fromModuleWorkDir )
-       if not os.path.isfile(fromModuleCommFile):
-         fout = open( fromModuleCommFile,'w' )
-         s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-         s = '<!-- Written by Simulation::__Setup() -->\n'; fout.write(s)
-         s = '<cortixComm>\n'; fout.write(s)
+     # "from" is who makes the "call", hence the user        
+     fromModuleWorkDir  = taskWorkDir + fromModule + '/'
+     fromModuleCommFile = fromModuleWorkDir + 'cortix-comm.xml'
+     if not os.path.isdir( fromModuleWorkDir ):
+       os.system( 'mkdir -p '+ fromModuleWorkDir )
+     if not os.path.isfile(fromModuleCommFile):
+       fout = open( fromModuleCommFile,'w' )
+       s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
+       s = '<!-- Written by Simulation::__Setup() -->\n'; fout.write(s)
+       s = '<cortixComm>\n'; fout.write(s)
 
-       fout = open( fromModuleCommFile,'a' )
-       # this is the cortix info for modules using data           
-       assert module.GetPortType(fromPort) == 'use', 'fromPort must be use type.'
-       s = '<port name="'+fromPort+'" type="use" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
-       fout.write(s)
-       fout.close()
-       r = '__Setup():: comm module: '+fromModule+'; network: '+taskName+' '+s
-       self.__log.debug(r)
+     fout = open( fromModuleCommFile,'a' )
+     # this is the cortix info for modules using data           
+     assert module.GetPortType(fromPort) == 'use', 'fromPort must be use type.'
+     s = '<port name="'+fromPort+'" type="use" file="'+toModuleWorkDir+toPort+'.xml"/>\n'
+     fout.write(s)
+     fout.close()
+     r = '__Setup():: comm module: '+fromModule+'; network: '+taskName+' '+s
+     self.__log.debug(r)
 
 #       fromPorts_visited.append( fromPort )
 
-       # register the cortix-comm file for the network
-       net.SetRuntimeCortixCommFile( fromModule, fromModuleCommFile )
+     # register the cortix-comm file for the network
+     net.SetRuntimeCortixCommFile( fromModule, fromModuleCommFile )
 
 
 # finish forming the XML documents for port types
@@ -295,29 +310,6 @@ class Simulation():
     fout.close()
 
   s = 'end __Setup()'
-  self.__log.debug(s)
-
-  return
-
-#---------------------------------------------------------------------------------
-# Setup tasks               
-
- def __SetupTasks(self):
-
-  s = 'start __SetupTasks()'
-  self.__log.debug(s)
-
-  for taskNode in self.__configNode.GetAllSubNodes('task'):
-
-   taskConfigNode = ConfigTree( taskNode )
-   task = Task( self.__workDir, taskConfigNode )
-
-   self.__tasks.append( task )
-
-   s = 'appended task: '+taskNode.get('name')
-   self.__log.debug(s)
-
-  s = 'end __SetupTasks()'
   self.__log.debug(s)
 
   return

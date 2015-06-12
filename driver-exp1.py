@@ -7,7 +7,7 @@ Cortix: a program for system-level modules
 
 Cortix is a library and it is used by means of a driver. This file is a simple example
 of a driver. Many Cortix objects can be ran simultaneously; a single object
-may be sufficient though since many simulation/tasks can be ran via one object.
+may be sufficient since many simulation/tasks can be ran via one object.
 
 As Cortix evolves additional complexity may be added to the driver.
 
@@ -29,7 +29,7 @@ def Main():
  #     will have log file collision.
  cortix1 = Cortix( 'cortix1', fullPathConfigFile )
 
- sys.exit(0)
+# sys.exit(0)
 
 # cortix1.RunSimulations( taskName='solo-fuel-accum' )
 # cortix1.RunSimulations( taskName='solo-dissolve' )
