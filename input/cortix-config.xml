@@ -81,7 +81,7 @@
 
   <application name="demo1">
 
-   <moduleLibrary name='modulib'>
+   <moduleLibrary name='vfdalib'>
     <parentDir>
       /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
     </parentDir>

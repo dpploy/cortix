@@ -14,7 +14,7 @@ import os, sys, io
 import logging
 from src.configtree import ConfigTree
 from src.module import Module
-from src.network import Network
+from src.network.interface import Network
 #*********************************************************************************
 
 #*********************************************************************************
