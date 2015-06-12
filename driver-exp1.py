@@ -29,7 +29,7 @@ def Main():
  #     will have log file collision.
  cortix1 = Cortix( 'cortix1', fullPathConfigFile )
 
-# sys.exit(0)
+ sys.exit(0)
 
 # cortix1.RunSimulations( taskName='solo-fuel-accum' )
 # cortix1.RunSimulations( taskName='solo-dissolve' )

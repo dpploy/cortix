@@ -17,9 +17,6 @@ from src.launcher   import Launcher
 #*********************************************************************************
 class Module():
 
-# Private member data
-# __slots__ = [
-
  def __init__( self,
                parentWorkDir = None,
                modLibName = None, modLibParentDir = None, 

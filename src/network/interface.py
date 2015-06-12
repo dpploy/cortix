@@ -27,26 +27,24 @@ class Network():
   return
 
 #---------------------------------------------------------------------------------
-# "Approved" accessors 
-# Note to user: if you access private data through other means, you will get what 
-#               you deserve
+# Accessors for private data
+# Note to user: if you access through other means, you will get what you deserve
 
- def GetName(self):
-  return self.name
+ def GetName(self): return self.name
 
- def GetConnectivity(self):
-  return self.connectivity
+ def GetConnectivity(self): return self.connectivity
 
- def GetModuleNames(self):
-  return self.moduleNames
+ def GetModuleNames(self): return self.moduleNames
 
  def SetRuntimeCortixCommFile(self, moduleName, fullPathFileName):
-  self.runtimeCortixCommFile[ moduleName ] = fullPathFileName
+     self.runtimeCortixCommFile[ moduleName ] = fullPathFileName
 
  def GetRuntimeCortixCommFile(self, moduleName):
      if moduleName in self.runtimeCortixCommFile: 
         return self.runtimeCortixCommFile[ moduleName ]
      return None
+
+ def GetNXGraph(self): return self.nxGraph
 
 #*********************************************************************************
 # Printing utilities
