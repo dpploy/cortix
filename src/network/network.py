@@ -9,12 +9,12 @@ Tue Dec 10 11:21:30 EDT 2013
 #*********************************************************************************
 import os, sys, io
 import datetime
-from src.configtree import ConfigTree
-from .setup import setup
+from   src.configtree import ConfigTree
+from   .setup import setup
 #*********************************************************************************
 
 #*********************************************************************************
-def network(self, netConfigNode):  # constructor
+def network(self, netConfigNode):  # network class constructor
 
   assert type(netConfigNode) is ConfigTree, '-> netConfigNode is invalid.' 
 

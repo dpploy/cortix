@@ -102,28 +102,15 @@ class Module():
 
   status = runtimeModuleStatusFile
 
-#.................................................................................
-# Stand-alone modules run with external system call using file IO communication
-# Good luck, I will leave you alone now.
-  if self.__type == 'stand-alone':
-     os.system( 'time '+ hostExec + ' ' + 
-                input + ' ' + param + ' ' + comm + ' ' + status + ' &' )
+  modLibName      = self.__modLibName
+  modLibParentDir = self.__modLibParentDir
+  modName = self.__name 
+  modType = self.__type
 
-#.................................................................................
-# Native modules run on threads using file IO communication
-# Wrapped modules run on threads and external system call of their own with IO comm
-  elif self.__type == 'native' or self.__type == 'wrapped':
-    modLibName      = self.__modLibName
-    modLibParentDir = self.__modLibParentDir
-    modName = self.__name 
-    modType = self.__type
-
-    t = Launcher( modLibName, modLibParentDir, 
-                  modType, modName, input, param, comm, status )
-    t.start()
-
-  else: 
-     assert True, 'module type invalid.'
+  # run module on its own thread using file IO communication
+  t = Launcher( modLibName, modLibParentDir, 
+                modType, modName, input, param, comm, status )
+  t.start()
 
   return runtimeModuleStatusFile
 

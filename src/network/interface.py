@@ -15,6 +15,9 @@ from .network import network
 #*********************************************************************************
 
 #*********************************************************************************
+# Network interface
+# Note to developer: internal implementation via files in this directory.
+
 class Network():
 
  def __init__( self, netConfigNode = ConfigTree() ):
@@ -25,7 +28,8 @@ class Network():
 
 #---------------------------------------------------------------------------------
 # "Approved" accessors 
-# NB: if you access private data through other means, you will get what you deserve
+# Note to user: if you access private data through other means, you will get what 
+#               you deserve
 
  def GetName(self):
   return self.name

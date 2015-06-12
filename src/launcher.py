@@ -32,7 +32,7 @@ class Launcher(Thread):
 
     super(Launcher, self).__init__()
 
-    modulePath = modLibName+'.'+moduleType+'.'+moduleName+'.driver'
+    modulePath = modLibName+'.'+moduleName+'.cortix-driver'
     self.__module = importlib.import_module(modulePath)
 
 #---------------------------------------------------------------------------------
@@ -143,8 +143,8 @@ class Launcher(Thread):
 # vfda: nothing for now
 
 #.................................................................................
-# Create the guest code             
-  guest = self.__module.Driver( self.__inputFullPathFileName, ports, evolveTime )
+# Create the guest code driver
+  guest = self.__module.CortixDriver( self.__inputFullPathFileName, ports, evolveTime )
   log.info("guest = Driver( args )")
 
 #.................................................................................
