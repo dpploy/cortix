@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 def setup(self):
 
   self.connectivity = list(dict()) # connectivity information of the network
-  self.moduleNames  = list()        # modules involved in the network
+  self.slotNames  = list()        # modules involved in the network
 
   self.runtimeCortixCommFile = dict() # cortix communication file for modules
 
@@ -38,17 +38,22 @@ def setup(self):
     if tag == 'connect': 
 
      for (key,value) in attributes: 
-          assert key not in tmp.keys(), 'repeated key in attribute of %r network' % self.name
-          tmp[key] = value
+       assert key not in tmp.keys(), 'repeated key in attribute of %r network' % self.name
+      
+       value = value.strip()
+       if key == 'fromModuleSlot': value = value.replace(':','_')
+       if key == 'toModuleSlot'  : value = value.replace(':','_')
+
+       tmp[key] = value
 
      self.connectivity.append( tmp )
 
      for (key,val) in tmp.items():
-       if key == 'fromModule': self.runtimeCortixCommFile[ val ] = 'null'
-       if key == 'toModule'  : self.runtimeCortixCommFile[ val ] = 'null'
+       if key == 'fromModuleSlot': self.runtimeCortixCommFile[ val ] = 'null'
+       if key == 'toModuleSlot'  : self.runtimeCortixCommFile[ val ] = 'null'
 
-     vtx1 = tmp['fromModule']
-     vtx2 = tmp['toModule']
+     vtx1 = tmp['fromModuleSlot']
+     vtx2 = tmp['toModuleSlot']
 #     print(vtx1,vtx2)
      self.nxGraph.add_edge( vtx1, vtx2, 
                            fromPort=tmp['fromPort'],
@@ -56,18 +61,26 @@ def setup(self):
 
 #  print('\t\tCortix::Simulation::Application::Network: connectivity',self.connectivity)
 
-  self.moduleNames = [ name for name in self.runtimeCortixCommFile.keys() ]
+  self.slotNames = [ name for name in self.runtimeCortixCommFile.keys() ]
 
-#  print('\t\tCortix::Simulation::Application::Network: modules',self.moduleNames)
+#  print('\t\tCortix::Simulation::Application::Network: modules',self.slotNames)
 
 #  print(self.connectivity)
 
 #  print(self.nxGraph.name)
 #  print(self.nxGraph.nodes())
+#  print(self.nxGraph.nodes())
 #  print(self.nxGraph.edges())
 #  print(list(self.nxGraph.edges_iter(data=True)))
 
+#  H = nx.Graph(self.nxGraph)
 #  pos = nx.circular_layout(self.nxGraph,scale=3)
+#  pos=nx.spring_layout(H,iterations=30)
+#  nx.draw_networkx_nodes(self.nxGraph,pos,node_size=200,node_color='b',alpha=1.0)
+#  nx.draw_networkx_nodes(H,pos,node_size=200,node_color='b',alpha=1.0)
+#  nx.draw_networkx_labels(self.nxGraph,pos,fontsize=18)
+#  nx.draw_networkx_labels(H,pos,fontsize=18)
+#  nx.draw_networkx_edges(H,pos,alpha=0.4,node_size=0,width=1,edge_color='k')
 #  nx.draw(self.nxGraph,pos,with_labels=True)
 #  plt.savefig(self.name+'.png')
 

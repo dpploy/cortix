@@ -18,13 +18,14 @@ import importlib
 #*********************************************************************************
 class Launcher(Thread):
                      
- def __init__( self, modLibName, modLibFullParentDir, moduleType, moduleName,
+ def __init__( self, modLibName, modLibFullParentDir, moduleName, slotNumber,
                      inputFullPathFileName, 
                      cortexParamFullPathFileName,
                      cortexCommFullPathFileName,
                      runtimeStatusFullPathFileName ):
 
     self.__moduleName                    = moduleName
+    self.__slotNumber                    = slotNumber
     self.__inputFullPathFileName         = inputFullPathFileName 
     self.__cortexParamFullPathFileName   = cortexParamFullPathFileName 
     self.__cortexCommFullPathFileName    = cortexCommFullPathFileName 
@@ -40,7 +41,7 @@ class Launcher(Thread):
 
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
-  log = logging.getLogger('launcher-'+self.__moduleName)
+  log = logging.getLogger('launcher-'+self.__moduleName+'_'+str(self.__slotNumber))
   log.setLevel(logging.DEBUG)
 # create file handler for logs
   fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
@@ -135,7 +136,7 @@ class Launcher(Thread):
 
 #---------------------------------------------------------------------------------
 # Run ModuleName
-  log.info('entered Run '+self.__moduleName+' section')
+  log.info('entered Run '+self.__moduleName+'_'+str(self.__slotNumber)+' section')
 
 #.................................................................................
 # Setup input
@@ -144,8 +145,10 @@ class Launcher(Thread):
 
 #.................................................................................
 # Create the guest code driver
-  guest = self.__module.CortixDriver( self.__inputFullPathFileName, ports, evolveTime )
-  log.info("guest = Driver( args )")
+  guest = self.__module.CortixDriver( self.__slotNumber, 
+                                      self.__inputFullPathFileName, 
+                                      ports, evolveTime )
+  log.info("guest = CortixDriver( args )")
 
 #.................................................................................
 # Evolve the module 

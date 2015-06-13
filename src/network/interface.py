@@ -16,7 +16,7 @@ from .network import network
 
 #*********************************************************************************
 # Network interface
-# Note to developer: internal implementation via files in this directory.
+# Note to developer: internal implementation in separate files in this directory.
 
 class Network():
 
@@ -34,14 +34,14 @@ class Network():
 
  def GetConnectivity(self): return self.connectivity
 
- def GetModuleNames(self): return self.moduleNames
+ def GetSlotNames(self): return self.slotNames
 
- def SetRuntimeCortixCommFile(self, moduleName, fullPathFileName):
-     self.runtimeCortixCommFile[ moduleName ] = fullPathFileName
+ def SetRuntimeCortixCommFile(self, slotName, fullPathFileName):
+     self.runtimeCortixCommFile[ slotName ] = fullPathFileName
 
- def GetRuntimeCortixCommFile(self, moduleName):
-     if moduleName in self.runtimeCortixCommFile: 
-        return self.runtimeCortixCommFile[ moduleName ]
+ def GetRuntimeCortixCommFile(self, slotName):
+     if slotName in self.runtimeCortixCommFile: 
+        return self.runtimeCortixCommFile[ slotName ]
      return None
 
  def GetNXGraph(self): return self.nxGraph

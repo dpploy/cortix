@@ -80,7 +80,7 @@ class Module():
 #---------------------------------------------------------------------------------
 # Execute module            
 
- def Execute(self, runtimeCortixParamFile, runtimeCortixCommFile ):
+ def Execute(self, slotNumber, runtimeCortixParamFile, runtimeCortixCommFile ):
 
 #  print('module:',self.__name)
 #  print('module executable: ',self.__executableName)
@@ -89,10 +89,10 @@ class Module():
 #  print('param file       : ',runtimeCortixParamFile)
 #  print('comm  file       : ',runtimeCortixCommFile)
  
-  hostExec = self.__executablePath + self.__executableName
-  input    = self.__inputFilePath + self.__inputFileName
-  param    = runtimeCortixParamFile
-  comm     = runtimeCortixCommFile
+  guestExec = self.__executablePath + self.__executableName
+  input     = self.__inputFilePath + self.__inputFileName
+  param     = runtimeCortixParamFile
+  comm      = runtimeCortixCommFile
 
   fullPathCommDir = comm[:comm.rfind('/')]+'/'
   runtimeModuleStatusFile = fullPathCommDir + 'runtime-status.xml'
@@ -106,7 +106,7 @@ class Module():
 
   # run module on its own thread using file IO communication
   t = Launcher( modLibName, modLibParentDir, 
-                modType, modName, input, param, comm, status )
+                modName, slotNumber, input, param, comm, status )
   t.start()
 
   return runtimeModuleStatusFile

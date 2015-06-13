@@ -151,18 +151,20 @@ class Task():
 
   runtimeStatusFiles = dict()
   
-  for modName in network.GetModuleNames():
+  for slotName in network.GetSlotNames():
 
-    mod = application.GetModule( modName )
+    moduleName = slotName.split('_')[0]
+    slotNumber = slotName.split('_')[1]
+    mod = application.GetModule( moduleName )
 
     paramFile = self.__runtimeCortixParamFile
-    commFile  = network.GetRuntimeCortixCommFile( modName )
+    commFile  = network.GetRuntimeCortixCommFile( slotName )
 
-    # Run module in the background
-    statusFile = mod.Execute( paramFile, commFile )
+    # Run module in the slot
+    statusFile = mod.Execute( slotNumber, paramFile, commFile )
     assert statusFile is not None, 'module launching failed.'
 
-    runtimeStatusFiles[ mod.GetName() ] = statusFile
+    runtimeStatusFiles[ slotName ] = statusFile
 
 # monitor runtime status
 
@@ -172,9 +174,9 @@ class Task():
 
    time.sleep(20)
 
-   (status,modNames) = self.__GetRuntimeStatus( runtimeStatusFiles )
+   (status,slotNames) = self.__GetRuntimeStatus( runtimeStatusFiles )
 
-   s = 'runtime status: '+status+' modules: '+str(modNames)
+   s = 'runtime status: '+status+' module slots: '+str(slotNames)
    self.__log.info(s)
 
   return 
@@ -187,7 +189,7 @@ class Task():
   taskStatus = 'finished'
   runningModuleNames = list()
 
-  for (modName,statusFile) in runtimeStatusFiles.items():
+  for (slotName,statusFile) in runtimeStatusFiles.items():
 
      if not os.path.isfile(statusFile): time.sleep(1)
      assert os.path.isfile(statusFile), 'runtime status file %r not found.' % statusFile
@@ -199,9 +201,9 @@ class Task():
      status = node.text.strip()
      if status == 'running': 
        taskStatus = 'running'
-       runningModuleNames.append(modName)
+       runningModuleSlots.append(slotName)
   
-  return (taskStatus, runningModuleNames)
+  return (taskStatus, runningModuleSlots)
 
 #---------------------------------------------------------------------------------
 # Setup task                
