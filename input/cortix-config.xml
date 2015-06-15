@@ -114,15 +114,15 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="input">Fuel_Solid</port>
-    <port type="input">Gas_Release</port>
-    <port type="input">Particulate</port>
-    <port type="use">solids-input</port>
-    <port type="use">gas-input</port>
-    <port type="use">fines-input</port>
-    <port type="provide">solids</port>
-    <port type="provide">off-gas</port>
-    <port type="provide">fines</port>
+    <port type="input"   multiplicity="1">Fuel_Solid</port>
+    <port type="input"   multiplicity="1">Gas_Release</port>
+    <port type="input"   multiplicity="1">Particulate</port>
+    <port type="use"     multiplicity="1">solids-input</port>
+    <port type="use"     multiplicity="1">gas-input</port>
+    <port type="use"     multiplicity="1">fines-input</port>
+    <port type="provide" multiplicity="1">solids</port>
+    <port type="provide" multiplicity="1">off-gas</port>
+    <port type="provide" multiplicity="1">fines</port>
    </module>
 
    <module name="chopper-standalone" type="stand-alone">
@@ -136,8 +136,8 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="provide">Fuel_Solid</port>
-    <port type="provide">Gas_Release</port>
+    <port type="provide" multiplicity="1">Fuel_Solid</port>
+    <port type="provide" multiplicity="1">Gas_Release</port>
    </module>
 
    <module name="storage" type="native">
@@ -149,13 +149,13 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="input">chopper-data-test</port>
-    <port type="input">dissolver-data-test</port>
-    <port type="use">solids</port>
-    <port type="use">withdrawal-request</port>
-    <port type="provide">fuel-segments</port>
-    <port type="provide">off-gas</port>
-    <port type="provide">state</port>
+    <port type="input"   multiplicity="1">chopper-data-test</port>
+    <port type="input"   multiplicity="1">dissolver-data-test</port>
+    <port type="use"     multiplicity="1">solids</port>
+    <port type="use"     multiplicity="1">withdrawal-request</port>
+    <port type="provide" multiplicity="1">fuel-segments</port>
+    <port type="provide" multiplicity="1">off-gas</port>
+    <port type="provide" multiplicity="1">state</port>
    </module>
 
    <module name="storage-standalone" type="stand-alone">
@@ -169,12 +169,12 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="input">chopper-data-test</port>
-    <port type="input">dissolver-data-test</port>
-    <port type="use">solids</port>
-    <port type="use">withdrawal-request</port>
-    <port type="provide">fuel-segments</port>
-    <port type="provide">off-gas</port>
+    <port type="input"   multiplicity="1">chopper-data-test</port>
+    <port type="input"   multiplicity="1">dissolver-data-test</port>
+    <port type="use"     multiplicity="1">solids</port>
+    <port type="use"     multiplicity="1">withdrawal-request</port>
+    <port type="provide" multiplicity="1">fuel-segments</port>
+    <port type="provide" multiplicity="1">off-gas</port>
    </module>
 
    <module name="dissolver" type="native">
@@ -186,13 +186,13 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use">solids</port>
-    <port type="use">condensate</port>
-    <port type="provide">signal</port>
-    <port type="provide">state</port>
-    <port type="provide">product</port>
-    <port type="provide">vapor</port>
-    <port type="provide">heat</port>
+    <port type="use"     multiplicity="1">solids</port>
+    <port type="use"     multiplicity="1">condensate</port>
+    <port type="provide" multiplicity="1">signal</port>
+    <port type="provide" multiplicity="1">state</port>
+    <port type="provide" multiplicity="1">product</port>
+    <port type="provide" multiplicity="1">vapor</port>
+    <port type="provide" multiplicity="1">heat</port>
    </module>
 
    <module name="dissolver-standalone" type="stand-alone">
@@ -206,12 +206,12 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use">solids</port>
-    <port type="use">condensate</port>
-    <port type="provide">signal</port>
-    <port type="provide">product</port>
-    <port type="provide">vapor</port>
-    <port type="provide">heat</port>
+    <port type="use"     multiplicity="1">solids</port>
+    <port type="use"     multiplicity="1">condensate</port>
+    <port type="provide" multiplicity="1">signal</port>
+    <port type="provide" multiplicity="1">product</port>
+    <port type="provide" multiplicity="1">vapor</port>
+    <port type="provide" multiplicity="1">heat</port>
    </module>
 
    <module name="condenser" type="native">
@@ -223,10 +223,10 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use">vapor</port>
-    <port type="provide">off-gas</port>
-    <port type="provide">condensate</port>
-    <port type="provide">cooling</port>
+    <port type="use"     multiplicity="1">vapor</port>
+    <port type="provide" multiplicity="1">off-gas</port>
+    <port type="provide" multiplicity="1">condensate</port>
+    <port type="provide" multiplicity="1">cooling</port>
    </module>
 
    <module name="condenser-standalone" type="stand-alone">
@@ -240,10 +240,10 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use">vapor</port>
-    <port type="provide">off-gas</port>
-    <port type="provide">condensate</port>
-    <port type="provide">cooling</port>
+    <port type="use"     multiplicity="1">vapor</port>
+    <port type="provide" multiplicity="1">off-gas</port>
+    <port type="provide" multiplicity="1">condensate</port>
+    <port type="provide" multiplicity="1">cooling</port>
    </module>
 
    <module name="scrubber" type="native">
@@ -255,8 +255,8 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use">inflow-gas</port>
-    <port type="provide">off-gas</port>
+    <port type="use"     multiplicity="1">inflow-gas</port>
+    <port type="provide" multiplicity="1">off-gas</port>
    </module>
 
    <module name="filter" type="native">
@@ -268,8 +268,8 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use">inflow-gas</port>
-    <port type="provide">off-gas</port>
+    <port type="use"     multiplicity="1">inflow-gas</port>
+    <port type="provide" multiplicity="1">off-gas</port>
    </module>
 
    <module name="offgas" type="native">
@@ -281,8 +281,8 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use">inflow-gas</port>
-    <port type="provide">off-gas</port>
+    <port type="use"     multiplicity="1">inflow-gas</port>
+    <port type="provide" multiplicity="1">off-gas</port>
    </module>
 
    <module name="plume" type="wrapped">
@@ -296,8 +296,8 @@
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/facility_pfpl/</executablePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use">off-gas</port>
-    <port type="provide">time-puff</port>
+    <port type="use"     multiplicity="1">off-gas</port>
+    <port type="provide" multiplicity="1">time-puff</port>
    </module>
 
    <module name="pyplot" type="native">
@@ -309,8 +309,8 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use">time-sequence</port>
-    <port type="use">time-tables</port>
+    <port type="use" multiplicity="1">time-sequence</port>
+    <port type="use" multiplicity="1">time-tables</port>
    </module>
 
    <module name="pyplot-standalone" type="stand-alone">
@@ -324,7 +324,7 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use">time-sequence</port>
+    <port type="use" multiplicity="1">time-sequence</port>
    </module>
 
    <!-- Application: networks -->

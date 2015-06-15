@@ -43,7 +43,7 @@ class Module():
   self.__inputFileName  = 'null'
   self.__inputFilePath  = 'null'
 
-  self.__ports = list()
+  self.__ports = list()  # list of (portName, portType, portMultiplicity)
 
   self.__Setup()
 
@@ -55,7 +55,7 @@ class Module():
   return self.__name
 
  def GetPorts(self):
-  return self.__ports
+  return self.__ports  
 
  def GetPortType(self, portName):
      portType = None
@@ -134,14 +134,30 @@ class Module():
      self.__inputFilePath = text
 
     if tag == 'port': 
-       assert len(attributes) == 1, 'only 1 attribute allowed/required at this moment.'
-       key = attributes[0][0]
-       val = attributes[0][1].strip()
-       assert key == 'type', 'port attribute key must be "type".'
-       assert val == 'use' or val == 'provide' or val == 'input', 'port attribute value invalid.'
-       self.__ports.append( (text, attributes[0][1].strip()) ) # (portName, portType)
+       assert len(attributes) == 2, 'only 2 attribute allowed/required at this moment.'
 
-# 
+       tmp = dict() # store port name and two attributes
+
+       for attribute in attributes:
+
+         key = attribute[0]
+         val = attribute[1].strip()
+
+         if key == 'type':
+           assert val == 'use' or val == 'provide' or val == 'input', 'port attribute value invalid.'
+           tmp['portName']=text  # portName
+           tmp['portType']=val   # portType
+         elif key == 'multiplicity': 
+           tmp['portMultiplicity']=int(val)  # portMultiplicity
+         else:
+           assert True, 'invalid port attribute. fatal.'
+
+       assert len(tmp) == 3
+       store = (tmp['portName'],tmp['portType'],tmp['portMultiplicity'])
+       self.__ports.append( store ) # (portName, portType, portMultiplicity)
+       tmp = None
+       store = None
+    
 #  print('\t\tCortix::Simulation::Application::Module: executableName',self.__executableName)
 #  print('\t\tCortix::Simulation::Application::Module: executablePath',self.__executablePath)
 #  print('\t\tCortix::Simulation::Application::Module: inputFileName',self.__inputFileName)
