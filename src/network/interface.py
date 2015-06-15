@@ -11,7 +11,7 @@ Tue Dec 10 11:21:30 EDT 2013
 import os, sys, io
 import datetime
 from src.configtree import ConfigTree
-from .network import network
+from ._network import _network
 #*********************************************************************************
 
 #*********************************************************************************
@@ -22,7 +22,7 @@ class Network():
 
  def __init__( self, netConfigNode = ConfigTree() ):
 
-  network( self, netConfigNode ) # constructor
+  _network( self, netConfigNode ) # constructor
  
   return
 

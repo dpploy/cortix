@@ -58,7 +58,7 @@
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
-  <task name="shear-dissolve">
+  <task name="shear-dissolve-offgas">
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
@@ -68,7 +68,7 @@
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
-  <task name="demuth1">
+  <task name="shear-dissolve">
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
@@ -76,6 +76,16 @@
    <evolveTime unit="hour">24.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
   </task>
+
+  <task name="shear-double-dissolve-single-condense">
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
+   <evolveTime unit="hour">14.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
+  </task>
+
 
   <!-- Simulation: application -->
   <!-- NB: each simulation has only one application -->
@@ -353,7 +363,7 @@
 
    <!-- connected modules -->
    <!-- Network name must match a task name-->
-   <network name="shear-dissolve">
+   <network name="shear-dissolve-offgas">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
@@ -394,18 +404,61 @@
 
    <!-- connected modules -->
    <!-- Network name must match a task name-->
-   <network name="demuth1">
+   <network name="shear-dissolve">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="storage:0" fromPort="solids" toModuleSlot="chopper:0" toPort="Fuel_Solid"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate"/> 
+    <connect fromModuleSlot="storage:0" fromPort="solids" toModuleSlot="chopper:0" toPort="solids"/> 
     <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:0" toPort="signal"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
     <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolver:0" toPort="vapor"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="signal"/> 
     <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
+   </network>
+
+   <!-- connected modules -->
+   <!-- Network name must match a task name-->
+   <network name="shear-double-dissolve-single-condense">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate"/> 
+    <connect fromModuleSlot="storage:0" fromPort="solids" toModuleSlot="chopper:0" toPort="solids"/> 
+    <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:0" toPort="signal"/> 
+    <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:1" toPort="signal"/> 
+    <connect fromModuleSlot="dissolver:0" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
+    <connect fromModuleSlot="dissolver:1" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
+    <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolver:0" toPort="vapor"/> 
+    <connect fromModuleSlot="dissolver:0" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolver:1" toPort="vapor"/> 
+    <connect fromModuleSlot="dissolver:1" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="signal"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:1" toPort="signal"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:1" toPort="vapor"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:1" toPort="state"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
    </network>
 
   </application>

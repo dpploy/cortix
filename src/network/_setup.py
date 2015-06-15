@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 #---------------------------------------------------------------------------------
 # Private method: Setup network    
 
-def setup(self):
+def _setup(self):
 
   self.connectivity = list(dict()) # connectivity information of the network
   self.slotNames  = list()        # modules involved in the network
@@ -56,8 +56,8 @@ def setup(self):
      vtx2 = tmp['toModuleSlot']
 #     print(vtx1,vtx2)
      self.nxGraph.add_edge( vtx1, vtx2, 
-                           fromPort=tmp['fromPort'],
-                           toPort=tmp['toPort'])
+                            fromPort=tmp['fromPort'],
+                            toPort=tmp['toPort'])
 
 #  print('\t\tCortix::Simulation::Application::Network: connectivity',self.connectivity)
 
@@ -74,7 +74,7 @@ def setup(self):
 #  print(list(self.nxGraph.edges_iter(data=True)))
 
 #  H = nx.Graph(self.nxGraph)
-#  pos = nx.circular_layout(self.nxGraph,scale=3)
+#  pos = nx.circular_layout(self.nxGraph,scale=6)
 #  pos=nx.spring_layout(H,iterations=30)
 #  nx.draw_networkx_nodes(self.nxGraph,pos,node_size=200,node_color='b',alpha=1.0)
 #  nx.draw_networkx_nodes(H,pos,node_size=200,node_color='b',alpha=1.0)
@@ -82,6 +82,7 @@ def setup(self):
 #  nx.draw_networkx_labels(H,pos,fontsize=18)
 #  nx.draw_networkx_edges(H,pos,alpha=0.4,node_size=0,width=1,edge_color='k')
 #  nx.draw(self.nxGraph,pos,with_labels=True)
+#  nx.draw_networkx_labels(self.nxGraph,pos,fontsize=18)
 #  plt.savefig(self.name+'.png')
 
 #  sys.exit(0)

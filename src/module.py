@@ -80,7 +80,7 @@ class Module():
 #---------------------------------------------------------------------------------
 # Execute module            
 
- def Execute(self, slotNumber, runtimeCortixParamFile, runtimeCortixCommFile ):
+ def Execute(self, slotId, runtimeCortixParamFile, runtimeCortixCommFile ):
 
 #  print('module:',self.__name)
 #  print('module executable: ',self.__executableName)
@@ -106,7 +106,7 @@ class Module():
 
   # run module on its own thread using file IO communication
   t = Launcher( modLibName, modLibParentDir, 
-                modName, slotNumber, input, param, comm, status )
+                modName, slotId, input, param, comm, status )
   t.start()
 
   return runtimeModuleStatusFile

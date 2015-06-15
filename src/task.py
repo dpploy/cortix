@@ -154,14 +154,14 @@ class Task():
   for slotName in network.GetSlotNames():
 
     moduleName = slotName.split('_')[0]
-    slotNumber = slotName.split('_')[1]
+    slotId     = int(slotName.split('_')[1])
     mod = application.GetModule( moduleName )
 
     paramFile = self.__runtimeCortixParamFile
     commFile  = network.GetRuntimeCortixCommFile( slotName )
 
     # Run module in the slot
-    statusFile = mod.Execute( slotNumber, paramFile, commFile )
+    statusFile = mod.Execute( slotId, paramFile, commFile )
     assert statusFile is not None, 'module launching failed.'
 
     runtimeStatusFiles[ slotName ] = statusFile
@@ -187,7 +187,7 @@ class Task():
  def __GetRuntimeStatus(self, runtimeStatusFiles):
   
   taskStatus = 'finished'
-  runningModuleNames = list()
+  runningModuleSlots = list()
 
   for (slotName,statusFile) in runtimeStatusFiles.items():
 
