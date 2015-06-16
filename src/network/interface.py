@@ -11,6 +11,8 @@ Tue Dec 10 11:21:30 EDT 2013
 import os, sys, io
 import datetime
 from src.configtree import ConfigTree
+
+# constructor helper
 from ._network import _network
 #*********************************************************************************
 

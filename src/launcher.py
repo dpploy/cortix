@@ -148,6 +148,7 @@ class Launcher(Thread):
   guestDriver = self.__module.CortixDriver( self.__slotId, 
                                       self.__inputFullPathFileName, 
                                       ports, evolveTime )
+
   log.info("guestDriver = CortixDriver( args )")
 
 #.................................................................................
