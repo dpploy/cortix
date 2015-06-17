@@ -10,3 +10,7 @@ notes
 *.gz
 *.xml
 *.png
+*.dat
+*.inp
+*.msg
+*.out
