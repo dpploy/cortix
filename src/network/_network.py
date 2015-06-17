@@ -14,7 +14,9 @@ from   ._setup import _setup
 #*********************************************************************************
 
 #*********************************************************************************
-def _network(self, netConfigNode):  # network class constructor
+# network class constructor
+
+def _network(self, netConfigNode):  
 
   assert type(netConfigNode) is ConfigTree, '-> netConfigNode is invalid.' 
 

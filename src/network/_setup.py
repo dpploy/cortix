@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 def _setup(self):
 
   self.connectivity = list(dict()) # connectivity information of the network
-  self.slotNames  = list()        # modules involved in the network
+  self.slotNames  = list()         # modules involved in the network
 
   self.runtimeCortixCommFile = dict() # cortix communication file for modules
 

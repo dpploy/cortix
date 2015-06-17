@@ -225,15 +225,15 @@ class Simulation():
        toModuleToPortVisited[toModuleSlot] = list()
 
      toModuleName = toModuleSlot.split('_')[0]
-     module = self.__application.GetModule( toModuleName )
+     toModule = self.__application.GetModule( toModuleName )
 
-     assert module is not None, 'module %r does not exist in application' % toModuleName
-     assert module.HasPortName( toPort ), 'module %r does not have port %r.' % (module.GetName(), toPort )
-     assert module.GetPortType(toPort) is not None, 'network name: %r, module name: %r, toPort: %r port type invalid %r' % (net.GetName(), module.GetName(), toPort, type(module.GetPortType(toPort)))
+     assert toModule is not None, 'module %r does not exist in application' % toModuleName
+     assert toModule.HasPortName( toPort ), 'module %r does not have port %r.' % (toModule.GetName(), toPort )
+     assert toModule.GetPortType(toPort) is not None, 'network name: %r, module name: %r, toPort: %r port type invalid %r' % (net.GetName(), toModule.GetName(), toPort, type(toModule.GetPortType(toPort)))
 
-     if module.GetPortType(toPort) != 'input':
+     if toModule.GetPortType(toPort) != 'input':
 
-        assert module.GetPortType(toPort) == 'provide', 'port type %r invalid. Module %r, port %r' % (module.GetPortType(toPort), module.GetName(), toPort)
+        assert toModule.GetPortType(toPort) == 'provide', 'port type %r invalid. Module %r, port %r' % (toModule.GetPortType(toPort), toModule.GetName(), toPort)
 
         # "to" is who receives the "call", hence the provider
         toModuleSlotWorkDir  = taskWorkDir + toModuleSlot + '/'
@@ -267,10 +267,10 @@ class Simulation():
      fromPort       = con['fromPort']
 
      fromModuleName = fromModuleSlot.split('_')[0]
-     module = self.__application.GetModule(fromModuleName)
+     fromModule = self.__application.GetModule(fromModuleName)
 
-     assert module.HasPortName( fromPort ), 'module %r has no port %r' % (fromModuleName, fromPort)
-     assert module.GetPortType(fromPort) == 'use' , 'module %r: invalid type for port %r' % (fromModuleName, fromPort)
+     assert fromModule.HasPortName( fromPort ), 'module %r has no port %r' % (fromModuleName, fromPort)
+     assert fromModule.GetPortType(fromPort) == 'use' , 'module %r: invalid type for port %r' % (fromModuleName, fromPort)
 
 #       print(fromPort)
 #       print(fromPorts_visited)
@@ -289,8 +289,12 @@ class Simulation():
 
      fout = open( fromModuleSlotCommFile,'a' )
      # this is the cortix info for modules using data           
-     assert module.GetPortType(fromPort) == 'use', 'fromPort must be use type.'
-     s = '<port name="'+fromPort+'" type="use" file="'+toModuleSlotWorkDir+toPort+'.xml"/>\n'
+     assert fromModule.GetPortType(fromPort) == 'use', 'fromPort must be use type.'
+
+     if toModule.GetPortType(toPort) == "input":
+       s = '<port name="'+fromPort+'" type="use" file="'+toModuleSlotWorkDir+toPort+'"/>\n'
+     else:
+       s = '<port name="'+fromPort+'" type="use" file="'+toModuleSlotWorkDir+toPort+'.xml"/>\n'
      fout.write(s)
      fout.close()
      r = '__Setup():: comm module: '+fromModuleSlot+'; network: '+taskName+' '+s

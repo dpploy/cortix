@@ -105,6 +105,22 @@
 
    <!-- Application: modules set -->
 
+   <module name="fueldepot" type="native">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <inputFileName>fuelreceive.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
+    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
+    <!-- The *input* type allows for module self-connection; see network section  -->
+    <port type="input"   multiplicity="1">westinghouse-15x15-fuel.dat</port>
+    <port type="input"   multiplicity="1">westinghouse-15x15-radioactivity.dat</port>
+    <port type="input"   multiplicity="1">westinghouse-15x15-heat.dat</port>
+    <port type="use"     multiplicity="1">fuel-bundle</port>
+    <port type="provide" multiplicity="1">fuel-rods</port>
+   </module>
+
    <module name="chopper" type="native">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
@@ -114,9 +130,9 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="input"   multiplicity="1">Fuel_Solid</port>
-    <port type="input"   multiplicity="1">Gas_Release</port>
-    <port type="input"   multiplicity="1">Particulate</port>
+    <port type="input"   multiplicity="1">Fuel_Solid.xml</port>
+    <port type="input"   multiplicity="1">Gas_Release.xml</port>
+    <port type="input"   multiplicity="1">Particulate.xml</port>
     <port type="use"     multiplicity="1">solids-input</port>
     <port type="use"     multiplicity="1">gas-input</port>
     <port type="use"     multiplicity="1">fines-input</port>
@@ -136,8 +152,8 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="provide" multiplicity="1">Fuel_Solid</port>
-    <port type="provide" multiplicity="1">Gas_Release</port>
+    <port type="provide" multiplicity="1">Fuel_Solid.xml</port>
+    <port type="provide" multiplicity="1">Gas_Release.xml</port>
    </module>
 
    <module name="storage" type="native">
@@ -332,13 +348,29 @@
    <!-- NB: the connect tag is ordered: *from* is the receiver; *to* is the provider-->
 
    <!-- stand-alone module -->
+   <network name="solo-fueldepot">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="Fuel_Solid.xml"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release.xml"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate.xml"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
+   </network>
+
+   <!-- stand-alone module -->
    <network name="solo-shear">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="Gas_Release"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid.xml"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release.xml"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate.xml"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
    </network>
 
    <network name="solo-fuel-accum">
@@ -370,9 +402,9 @@
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid.xml"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release.xml"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate.xml"/> 
     <connect fromModuleSlot="storage:0" fromPort="solids" toModuleSlot="chopper:0" toPort="solids"/> 
     <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:0" toPort="signal"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
@@ -410,9 +442,9 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid.xml"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release.xml"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate.xml"/> 
     <connect fromModuleSlot="storage:0" fromPort="solids" toModuleSlot="chopper:0" toPort="solids"/> 
     <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:0" toPort="signal"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
@@ -436,9 +468,9 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid.xml"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release.xml"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate.xml"/> 
     <connect fromModuleSlot="storage:0" fromPort="solids" toModuleSlot="chopper:0" toPort="solids"/> 
     <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:0" toPort="signal"/> 
     <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:1" toPort="signal"/> 
