@@ -123,7 +123,14 @@ class Launcher(Thread):
       portName = node.get('name')
       portType = node.get('type')
       portFile = node.get('file')
-      ports.append( (portName, portType, portFile) )
+      portDirectory = node.get('directory')
+
+      if portFile is not None: 
+        ports.append( (portName, portType, portFile) ) 
+      elif portDirectory is not None: 
+        ports.append( (portName, portType, portDirectory) ) 
+      else: 
+         assert True, 'port mode incorrect. fatal.'
 
   tree = None
 
@@ -149,7 +156,7 @@ class Launcher(Thread):
                                       self.__inputFullPathFileName, 
                                       ports, evolveTime )
 
-  log.info("guestDriver = CortixDriver( args )")
+  log.info('guestDriver = CortixDriver( slotId='+str(self.__slotId)+',file='+self.__inputFullPathFileName+',ports='+str(ports)+',evolveTime='+str(evolveTime)+' )' )
 
 #.................................................................................
 # Evolve the module 

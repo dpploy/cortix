@@ -65,6 +65,14 @@ class Module():
 
      return portType        
 
+ def GetPortMode(self, portName):
+     portMode = None
+     for port in self.__ports:
+       if port[0] == portName:
+          portMode = port[2] 
+
+     return portMode        
+
  def GetPortNames(self):
      portNames = list()
      for port in self.__ports:
@@ -134,9 +142,9 @@ class Module():
      self.__inputFilePath = text
 
     if tag == 'port': 
-       assert len(attributes) == 2, 'only 2 attribute allowed/required at this moment.'
+       assert len(attributes) == 3, 'only 3 attribute allowed/required at this moment.'
 
-       tmp = dict() # store port name and two attributes
+       tmp = dict() # store port name and three attributes
 
        for attribute in attributes:
 
@@ -147,14 +155,18 @@ class Module():
            assert val == 'use' or val == 'provide' or val == 'input', 'port attribute value invalid.'
            tmp['portName']=text  # portName
            tmp['portType']=val   # portType
+         elif key == 'mode': 
+           v = val.split('.')[0]
+           assert v == 'file' or v == 'directory', 'port attribute value invalid.'
+           tmp['portMode'] = val
          elif key == 'multiplicity': 
            tmp['portMultiplicity']=int(val)  # portMultiplicity
          else:
            assert True, 'invalid port attribute. fatal.'
 
-       assert len(tmp) == 3
-       store = (tmp['portName'],tmp['portType'],tmp['portMultiplicity'])
-       self.__ports.append( store ) # (portName, portType, portMultiplicity)
+       assert len(tmp) == 4
+       store = (tmp['portName'],tmp['portType'],tmp['portMode'],tmp['portMultiplicity'])
+       self.__ports.append( store ) # (portName, portType, portMode, portMultiplicity)
        tmp = None
        store = None
     

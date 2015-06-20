@@ -31,9 +31,13 @@ def Main():
 
 # sys.exit(0)
 
- cortix1.RunSimulations( taskName='shear-dissolve-offgas' )
+# tested
+# cortix1.RunSimulations( taskName='shear-dissolve-offgas' )
 # cortix1.RunSimulations( taskName='solo-shear' )
+# cortix1.RunSimulations( taskName='solo-fueldepot' )
+ cortix1.RunSimulations( taskName='fueldepot-chopper' )
 
+# untested
 # cortix1.RunSimulations( taskName='solo-fuel-accum' )
 # cortix1.RunSimulations( taskName='solo-dissolve' )
 # cortix1.RunSimulations( taskName='shear-dissolve' )

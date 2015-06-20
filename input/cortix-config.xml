@@ -31,6 +31,15 @@
   <!--NB: each task combines parameters for one named application connectivity-->
   <!--NB: each task name must match a network name below-->
 
+  <task name="solo-fueldepot" >
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
+   <evolveTime unit="hour">12.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
+  </task>
+
   <task name="solo-shear" >
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -55,6 +64,16 @@
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
    <evolveTime unit="hour">8.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
+  </task>
+
+  <task name="fueldepot-chopper">
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
+   <evolveTime unit="hour">22.0</evolveTime> 
+<!-- <evolveTime unit="hour">5.0</evolveTime> -->
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
@@ -110,15 +129,13 @@
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
-    <inputFileName>fuelreceive.input</inputFileName>
+    <inputFileName>fueldepot.input</inputFileName>
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="input"   multiplicity="1">westinghouse-15x15-fuel.dat</port>
-    <port type="input"   multiplicity="1">westinghouse-15x15-radioactivity.dat</port>
-    <port type="input"   multiplicity="1">westinghouse-15x15-heat.dat</port>
-    <port type="use"     multiplicity="1">fuel-bundle</port>
-    <port type="provide" multiplicity="1">fuel-rods</port>
+    <port type="input"   mode="directory" multiplicity="1">westinghouse-15x15</port>
+    <port type="use"     mode="directory" multiplicity="1">fuel-input</port>
+    <port type="provide" mode="file.csv"  multiplicity="1">fuel-rods</port>
    </module>
 
    <module name="chopper" type="native">
@@ -130,15 +147,16 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="input"   multiplicity="1">Fuel_Solid.xml</port>
-    <port type="input"   multiplicity="1">Gas_Release.xml</port>
-    <port type="input"   multiplicity="1">Particulate.xml</port>
-    <port type="use"     multiplicity="1">solids-input</port>
-    <port type="use"     multiplicity="1">gas-input</port>
-    <port type="use"     multiplicity="1">fines-input</port>
-    <port type="provide" multiplicity="1">solids</port>
-    <port type="provide" multiplicity="1">off-gas</port>
-    <port type="provide" multiplicity="1">fines</port>
+    <port type="input"   mode="file.xml" multiplicity="1">Fuel_Solid</port>
+    <port type="input"   mode="file.xml" multiplicity="1">Gas_Release</port>
+    <port type="input"   mode="file.xml" multiplicity="1">Particulate</port>
+    <port type="use"     mode="file.xml" multiplicity="1">solids-input</port>
+    <port type="use"     mode="file.xml" multiplicity="1">gas-input</port>
+    <port type="use"     mode="file.xml" multiplicity="1">fines-input</port>
+    <port type="use"     mode="file.csv" multiplicity="1">fuel-rods</port>
+    <port type="provide" mode="file.xml" multiplicity="1">solids</port>
+    <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
+    <port type="provide" mode="file.xml" multiplicity="1">fines</port>
    </module>
 
    <module name="chopper-standalone" type="stand-alone">
@@ -152,8 +170,8 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="provide" multiplicity="1">Fuel_Solid.xml</port>
-    <port type="provide" multiplicity="1">Gas_Release.xml</port>
+    <port type="provide" mode="file.xml" multiplicity="1">Fuel_Solid</port>
+    <port type="provide" mode="file.xml" multiplicity="1">Gas_Release</port>
    </module>
 
    <module name="storage" type="native">
@@ -165,13 +183,13 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="input"   multiplicity="1">chopper-data-test</port>
-    <port type="input"   multiplicity="1">dissolver-data-test</port>
-    <port type="use"     multiplicity="1">solids</port>
-    <port type="use"     multiplicity="1">withdrawal-request</port>
-    <port type="provide" multiplicity="1">fuel-segments</port>
-    <port type="provide" multiplicity="1">off-gas</port>
-    <port type="provide" multiplicity="1">state</port>
+    <port type="input"   mode="file.xml" multiplicity="1">chopper-data-test</port>
+    <port type="input"   mode="file.xml" multiplicity="1">dissolver-data-test</port>
+    <port type="use"     mode="file.xml" multiplicity="1">solids</port>
+    <port type="use"     mode="file.xml" multiplicity="1">withdrawal-request</port>
+    <port type="provide" mode="file.xml" multiplicity="1">fuel-segments</port>
+    <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
+    <port type="provide" mode="file.xml" multiplicity="1">state</port>
    </module>
 
    <module name="storage-standalone" type="stand-alone">
@@ -185,12 +203,12 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="input"   multiplicity="1">chopper-data-test</port>
-    <port type="input"   multiplicity="1">dissolver-data-test</port>
-    <port type="use"     multiplicity="1">solids</port>
-    <port type="use"     multiplicity="1">withdrawal-request</port>
-    <port type="provide" multiplicity="1">fuel-segments</port>
-    <port type="provide" multiplicity="1">off-gas</port>
+    <port type="input"   mode="file.xml" multiplicity="1">chopper-data-test</port>
+    <port type="input"   mode="file.xml" multiplicity="1">dissolver-data-test</port>
+    <port type="use"     mode="file.xml" multiplicity="1">solids</port>
+    <port type="use"     mode="file.xml" multiplicity="1">withdrawal-request</port>
+    <port type="provide" mode="file.xml" multiplicity="1">fuel-segments</port>
+    <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
    </module>
 
    <module name="dissolver" type="native">
@@ -202,13 +220,13 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use"     multiplicity="1">solids</port>
-    <port type="use"     multiplicity="1">condensate</port>
-    <port type="provide" multiplicity="1">signal</port>
-    <port type="provide" multiplicity="1">state</port>
-    <port type="provide" multiplicity="1">product</port>
-    <port type="provide" multiplicity="1">vapor</port>
-    <port type="provide" multiplicity="1">heat</port>
+    <port type="use"     mode="file.xml" multiplicity="1">solids</port>
+    <port type="use"     mode="file.xml" multiplicity="1">condensate</port>
+    <port type="provide" mode="file.xml" multiplicity="1">signal</port>
+    <port type="provide" mode="file.xml" multiplicity="1">state</port>
+    <port type="provide" mode="file.xml" multiplicity="1">product</port>
+    <port type="provide" mode="file.xml" multiplicity="1">vapor</port>
+    <port type="provide" mode="file.xml" multiplicity="1">heat</port>
    </module>
 
    <module name="dissolver-standalone" type="stand-alone">
@@ -222,12 +240,12 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use"     multiplicity="1">solids</port>
-    <port type="use"     multiplicity="1">condensate</port>
-    <port type="provide" multiplicity="1">signal</port>
-    <port type="provide" multiplicity="1">product</port>
-    <port type="provide" multiplicity="1">vapor</port>
-    <port type="provide" multiplicity="1">heat</port>
+    <port type="use"     mode="file.xml" multiplicity="1">solids</port>
+    <port type="use"     mode="file.xml" multiplicity="1">condensate</port>
+    <port type="provide" mode="file.xml" multiplicity="1">signal</port>
+    <port type="provide" mode="file.xml" multiplicity="1">product</port>
+    <port type="provide" mode="file.xml" multiplicity="1">vapor</port>
+    <port type="provide" mode="file.xml" multiplicity="1">heat</port>
    </module>
 
    <module name="condenser" type="native">
@@ -239,10 +257,10 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use"     multiplicity="1">vapor</port>
-    <port type="provide" multiplicity="1">off-gas</port>
-    <port type="provide" multiplicity="1">condensate</port>
-    <port type="provide" multiplicity="1">cooling</port>
+    <port type="use"     mode="file.xml" multiplicity="1">vapor</port>
+    <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
+    <port type="provide" mode="file.xml" multiplicity="1">condensate</port>
+    <port type="provide" mode="file.xml" multiplicity="1">cooling</port>
    </module>
 
    <module name="condenser-standalone" type="stand-alone">
@@ -256,10 +274,10 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use"     multiplicity="1">vapor</port>
-    <port type="provide" multiplicity="1">off-gas</port>
-    <port type="provide" multiplicity="1">condensate</port>
-    <port type="provide" multiplicity="1">cooling</port>
+    <port type="use"     mode="file.xml" multiplicity="1">vapor</port>
+    <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
+    <port type="provide" mode="file.xml" multiplicity="1">condensate</port>
+    <port type="provide" mode="file.xml" multiplicity="1">cooling</port>
    </module>
 
    <module name="scrubber" type="native">
@@ -271,8 +289,8 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use"     multiplicity="1">inflow-gas</port>
-    <port type="provide" multiplicity="1">off-gas</port>
+    <port type="use"     mode="file.xml" multiplicity="1">inflow-gas</port>
+    <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
    </module>
 
    <module name="filter" type="native">
@@ -284,8 +302,8 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use"     multiplicity="1">inflow-gas</port>
-    <port type="provide" multiplicity="1">off-gas</port>
+    <port type="use"     mode="file.xml" multiplicity="1">inflow-gas</port>
+    <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
    </module>
 
    <module name="offgas" type="native">
@@ -297,8 +315,8 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use"     multiplicity="1">inflow-gas</port>
-    <port type="provide" multiplicity="1">off-gas</port>
+    <port type="use"     mode="file.xml" multiplicity="1">inflow-gas</port>
+    <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
    </module>
 
    <module name="plume" type="wrapped">
@@ -312,8 +330,8 @@
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/facility_pfpl/</executablePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use"     multiplicity="1">off-gas</port>
-    <port type="provide" multiplicity="1">time-puff</port>
+    <port type="use"     mode="file.xml" multiplicity="1">off-gas</port>
+    <port type="provide" mode="file.xml" multiplicity="1">time-puff</port>
    </module>
 
    <module name="pyplot" type="native">
@@ -325,8 +343,8 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use" multiplicity="1">time-sequence</port>
-    <port type="use" multiplicity="1">time-tables</port>
+    <port type="use" mode="file.xml" multiplicity="1">time-sequence</port>
+    <port type="use" mode="file.xml" multiplicity="1">time-tables</port>
    </module>
 
    <module name="pyplot-standalone" type="stand-alone">
@@ -340,12 +358,14 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use" multiplicity="1">time-sequence</port>
+    <port type="use" mode="file.xml" multiplicity="1">time-sequence</port>
    </module>
 
    <!-- Application: networks -->
    <!-- NB: each network has its own task definition above; with the same name -->
    <!-- NB: the connect tag is ordered: *from* is the receiver; *to* is the provider-->
+   <!-- NB: port labels are the "names" of the ports; "not" a file name necessarily-->
+   <!-- NB: module labels must be composed with a "slot" number, say "name:x"-->
 
    <!-- stand-alone module -->
    <network name="solo-fueldepot">
@@ -354,10 +374,7 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="Fuel_Solid.xml"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release.xml"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate.xml"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-15x15"/> 
    </network>
 
    <!-- stand-alone module -->
@@ -367,9 +384,9 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid.xml"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release.xml"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate.xml"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate"/> 
     <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
    </network>
 
@@ -393,6 +410,17 @@
     <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
    </network>
 
+   <!-- stand-alone module -->
+   <network name="fueldepot-chopper">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-15x15"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fuel-rods" toModuleSlot="fueldepot:0" toPort="fuel-rods"/> 
+   </network>
+
    <!-- connected modules -->
    <!-- Network name must match a task name-->
    <network name="shear-dissolve-offgas">
@@ -402,9 +430,9 @@
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid.xml"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release.xml"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate.xml"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate"/> 
     <connect fromModuleSlot="storage:0" fromPort="solids" toModuleSlot="chopper:0" toPort="solids"/> 
     <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:0" toPort="signal"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
@@ -442,9 +470,9 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid.xml"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release.xml"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate.xml"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate"/> 
     <connect fromModuleSlot="storage:0" fromPort="solids" toModuleSlot="chopper:0" toPort="solids"/> 
     <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:0" toPort="signal"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
@@ -468,9 +496,9 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid.xml"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release.xml"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate.xml"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate"/> 
     <connect fromModuleSlot="storage:0" fromPort="solids" toModuleSlot="chopper:0" toPort="solids"/> 
     <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:0" toPort="signal"/> 
     <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:1" toPort="signal"/> 

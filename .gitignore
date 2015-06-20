@@ -14,3 +14,5 @@ notes
 *.inp
 *.msg
 *.out
+*.html
+*.csv

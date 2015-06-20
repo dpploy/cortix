@@ -249,7 +249,14 @@ class Simulation():
         if toPort not in toModuleToPortVisited[toModuleSlot]:
           fout = open( toModuleSlotCommFile,'a' )
           # this is the cortix info for modules providing data           
-          s = '<port name="'+toPort+'" type="provide" file="'+toModuleSlotWorkDir+toPort+'.xml"/>\n'
+          toPortMode = toModule.GetPortMode(toPort)
+          if toPortMode.split('.')[0] == 'file':
+             ext = toPortMode.split('.')[1]
+             s = '<port name="'+toPort+'" type="provide" file="'+toModuleSlotWorkDir+toPort+'.'+ext+'"/>\n'
+          elif toPortMode == 'directory': 
+             s = '<port name="'+toPort+'" type="provide" directory="'+toModuleSlotWorkDir+toPort+'"/>\n'
+          else:
+             assert True, 'invalid port mode. fatal.'
           fout.write(s)
           fout.close()
           toModuleToPortVisited[toModuleSlot].append(toPort)
@@ -291,10 +298,15 @@ class Simulation():
      # this is the cortix info for modules using data           
      assert fromModule.GetPortType(fromPort) == 'use', 'fromPort must be use type.'
 
-     if toModule.GetPortType(toPort) == "input":
-       s = '<port name="'+fromPort+'" type="use" file="'+toModuleSlotWorkDir+toPort+'"/>\n'
+     toPortMode = toModule.GetPortMode(toPort)
+     if toPortMode.split('.')[0] == 'file':
+#        print( toPortMode )
+        ext = toPortMode.split('.')[1]
+        s = '<port name="'+fromPort+'" type="use" file="'+toModuleSlotWorkDir+toPort+'.'+ext+'"/>\n'
+     elif toPortMode == 'directory': 
+       s = '<port name="'+fromPort+'" type="use" directory="'+toModuleSlotWorkDir+toPort+'"/>\n'
      else:
-       s = '<port name="'+fromPort+'" type="use" file="'+toModuleSlotWorkDir+toPort+'.xml"/>\n'
+       assert True, 'invalid port mode. fatal.'
      fout.write(s)
      fout.close()
      r = '__Setup():: comm module: '+fromModuleSlot+'; network: '+taskName+' '+s
