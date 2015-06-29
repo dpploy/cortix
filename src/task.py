@@ -172,11 +172,11 @@ class Task():
 
   while status == 'running': 
 
-   time.sleep(20)
+   time.sleep(10)
 
    (status,slotNames) = self.__GetRuntimeStatus( runtimeStatusFiles )
 
-   s = 'runtime status: '+status+' module slots: '+str(slotNames)
+   s = 'runtime status: '+status+'; module slots running: '+str(slotNames)
    self.__log.info(s)
 
   return 

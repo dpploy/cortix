@@ -63,7 +63,7 @@
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
-   <evolveTime unit="hour">8.0</evolveTime>
+   <evolveTime unit="hour">1.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
@@ -72,7 +72,17 @@
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
-   <evolveTime unit="hour">22.0</evolveTime> 
+   <evolveTime unit="hour">12.0</evolveTime> 
+<!-- <evolveTime unit="hour">5.0</evolveTime> -->
+   <timeStep unit="minute">1.0</timeStep>
+  </task>
+
+  <task name="fueldepot-chopper-storage">
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
+   <evolveTime unit="hour">24.0</evolveTime> 
 <!-- <evolveTime unit="hour">5.0</evolveTime> -->
    <timeStep unit="minute">1.0</timeStep>
   </task>
@@ -133,9 +143,9 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="input"   mode="directory" multiplicity="1">westinghouse-15x15</port>
+    <port type="input"   mode="directory" multiplicity="1">westinghouse-14x14A</port>
     <port type="use"     mode="directory" multiplicity="1">fuel-input</port>
-    <port type="provide" mode="file.csv"  multiplicity="1">fuel-rods</port>
+    <port type="provide" mode="file.shlv"  multiplicity="1">fuel-bundle</port>
    </module>
 
    <module name="chopper" type="native">
@@ -147,16 +157,29 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="input"   mode="file.xml" multiplicity="1">Fuel_Solid</port>
-    <port type="input"   mode="file.xml" multiplicity="1">Gas_Release</port>
-    <port type="input"   mode="file.xml" multiplicity="1">Particulate</port>
-    <port type="use"     mode="file.xml" multiplicity="1">solids-input</port>
-    <port type="use"     mode="file.xml" multiplicity="1">gas-input</port>
-    <port type="use"     mode="file.xml" multiplicity="1">fines-input</port>
-    <port type="use"     mode="file.csv" multiplicity="1">fuel-rods</port>
-    <port type="provide" mode="file.xml" multiplicity="1">solids</port>
-    <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
-    <port type="provide" mode="file.xml" multiplicity="1">fines</port>
+    <port type="use"     mode="file.csv" multiplicity="1">fuel-bundle</port>
+    <port type="provide" mode="file.shlv" multiplicity="1">fuel-segments</port>
+    <port type="provide" mode="file.xml" multiplicity="1">state</port>
+   </module>
+
+   <module name="oldchopper" type="native">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <inputFileName>oldchopper.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
+    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
+    <!-- The *input* type allows for module self-connection; see network section  -->
+    <port type="input"     mode="file.xml" multiplicity="1">Fuel_Solid</port>
+    <port type="input"     mode="file.xml" multiplicity="1">Gas_Release</port>
+    <port type="input"     mode="file.xml" multiplicity="1">Particulate</port>
+    <port type="use"       mode="file.xml" multiplicity="1">solids-input</port>
+    <port type="use"       mode="file.xml" multiplicity="1">gas-input</port>
+    <port type="use"       mode="file.xml" multiplicity="1">fines-input</port>
+    <port type="provide"   mode="file.xml" multiplicity="1">solids</port>
+    <port type="provide"   mode="file.xml" multiplicity="1">off-gas</port>
+    <port type="provide"   mode="file.xml" multiplicity="1">fines</port>
    </module>
 
    <module name="chopper-standalone" type="stand-alone">
@@ -185,9 +208,9 @@
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="input"   mode="file.xml" multiplicity="1">chopper-data-test</port>
     <port type="input"   mode="file.xml" multiplicity="1">dissolver-data-test</port>
-    <port type="use"     mode="file.xml" multiplicity="1">solids</port>
+    <port type="use"     mode="file.xml" multiplicity="1">fuel-segments</port>
     <port type="use"     mode="file.xml" multiplicity="1">withdrawal-request</port>
-    <port type="provide" mode="file.xml" multiplicity="1">fuel-segments</port>
+    <port type="provide" mode="file.xml" multiplicity="1">fuel-segments-on-demand</port>
     <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
     <port type="provide" mode="file.xml" multiplicity="1">state</port>
    </module>
@@ -220,6 +243,8 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
+    <port type="input"   mode="file.xml" multiplicity="1">dissolver-test-input</port>
+    <port type="use"     mode="file.xml" multiplicity="1">solids-input</port>
     <port type="use"     mode="file.xml" multiplicity="1">solids</port>
     <port type="use"     mode="file.xml" multiplicity="1">condensate</port>
     <port type="provide" mode="file.xml" multiplicity="1">signal</port>
@@ -334,7 +359,7 @@
     <port type="provide" mode="file.xml" multiplicity="1">time-puff</port>
    </module>
 
-   <module name="pyplot" type="native">
+   <module name="support.pyplot" type="native">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
@@ -374,7 +399,7 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-15x15"/> 
+    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14A"/> 
    </network>
 
    <!-- stand-alone module -->
@@ -387,7 +412,7 @@
     <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid"/> 
     <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release"/> 
     <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
    </network>
 
    <network name="solo-fuel-accum">
@@ -407,7 +432,9 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
+    <connect fromModuleSlot="dissolver:0" fromPort="solids-input" toModuleSlot="dissolver:0" toPort="dissolver-test-input"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
    </network>
 
    <!-- stand-alone module -->
@@ -417,8 +444,22 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-15x15"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="fuel-rods" toModuleSlot="fueldepot:0" toPort="fuel-rods"/> 
+    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14A"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
+   </network>
+
+   <!-- stand-alone module -->
+   <network name="fueldepot-chopper-storage">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14A"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
+    <connect fromModuleSlot="storage:0" fromPort="fuel-segments" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
    </network>
 
    <!-- connected modules -->
@@ -430,15 +471,15 @@
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate"/> 
-    <connect fromModuleSlot="storage:0" fromPort="solids" toModuleSlot="chopper:0" toPort="solids"/> 
+    <connect fromModuleSlot="oldchopper:0" fromPort="solids-input" toModuleSlot="oldchopper:0" toPort="Fuel_Solid"/> 
+    <connect fromModuleSlot="oldchopper:0" fromPort="gas-input" toModuleSlot="oldchopper:0" toPort="Gas_Release"/> 
+    <connect fromModuleSlot="oldchopper:0" fromPort="fines-input" toModuleSlot="oldchopper:0" toPort="Particulate"/> 
+    <connect fromModuleSlot="storage:0" fromPort="solids" toModuleSlot="oldchopper:0" toPort="solids"/> 
     <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:0" toPort="signal"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
     <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolver:0" toPort="vapor"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
-    <connect fromModuleSlot="scrubber:0" fromPort="inflow-gas" toModuleSlot="chopper:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="scrubber:0" fromPort="inflow-gas" toModuleSlot="oldchopper:0" toPort="off-gas"/> 
     <connect fromModuleSlot="scrubber:0" fromPort="inflow-gas" toModuleSlot="storage:0" toPort="off-gas"/> 
     <connect fromModuleSlot="scrubber:0" fromPort="inflow-gas" toModuleSlot="condenser:0" toPort="off-gas"/> 
     <connect fromModuleSlot="filter:0" fromPort="inflow-gas" toModuleSlot="scrubber:0" toPort="off-gas"/> 
@@ -446,19 +487,19 @@
 <!--
     <connect fromModuleSlot="plume" fromPort="off-gas" toModuleSlot="offgas" toPort="off-gas"/> 
 -->
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="signal"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="scrubber:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="filter:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="offgas:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="oldchopper:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="signal"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="scrubber:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="filter:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="offgas:0" toPort="off-gas"/> 
 <!--
-    <connect fromModuleSlot="pyplot:0" fromPort="time-tables" toModuleSlot="plume:0" toPort="time-puff"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-tables" toModuleSlot="plume:0" toPort="time-puff"/> 
 -->
    </network>
 
@@ -478,14 +519,14 @@
     <connect fromModuleSlot="dissolver:0" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
     <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolver:0" toPort="vapor"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="signal"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="signal"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
    </network>
 
    <!-- connected modules -->
@@ -508,17 +549,17 @@
     <connect fromModuleSlot="dissolver:0" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
     <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolver:1" toPort="vapor"/> 
     <connect fromModuleSlot="dissolver:1" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="signal"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:1" toPort="signal"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:1" toPort="vapor"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:1" toPort="state"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="signal"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:1" toPort="signal"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:1" toPort="vapor"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:1" toPort="state"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
    </network>
 
   </application>
