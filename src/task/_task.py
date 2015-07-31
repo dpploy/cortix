@@ -7,36 +7,32 @@ Cortix: a program for system-level modules
 Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
-import os, sys, io
+import os, sys, io, time
 import logging
 from src.configtree import ConfigTree
-from src.application import Application
+from ._setup import _Setup
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
-# Simulation class constructor
-
-def _Simulation( self, parentWorkDir = None, simConfigNode = ConfigTree() ):
+def _Task( self, parentWorkDir = None, 
+                 taskConfigNode = ConfigTree() ):
 
   assert type(parentWorkDir) is str, '-> parentWorkDir invalid.' 
 
 # Inherit a configuration tree
-  assert type(simConfigNode) is ConfigTree, '-> simConfigNode invalid.' 
-  self.configNode = simConfigNode
+  assert type(taskConfigNode) is ConfigTree, '-> taskConfigNode not a ConfigTree.' 
+  self.configNode = taskConfigNode
 
 # Read the simulation name
-  self.name = simConfigNode.GetNodeName()
+  self.name = self.configNode.GetNodeName()
 
-# Create the cortix/simulation work directory
-  wrkDir = parentWorkDir 
-  wrkDir += 'sim_' + self.name + '/'
-  self.workDir = wrkDir
-
+# Set the work directory (previously created)
+  assert os.path.isdir( parentWorkDir ), 'work directory not available.'
+  self.workDir = parentWorkDir + 'task_' + self.name + '/'
   os.system( 'mkdir -p ' + self.workDir )
 
-# Create the logging facility for each object
-
-  node = simConfigNode.GetSubNode('logger')
+# Create the logging facility for the object
+  node = taskConfigNode.GetSubNode('logger')
   loggerName = self.name
   log = logging.getLogger(loggerName)
   log.setLevel(logging.NOTSET)
@@ -53,7 +49,7 @@ def _Simulation( self, parentWorkDir = None, simConfigNode = ConfigTree() ):
 
   self.log = log
 
-  fh = logging.FileHandler(self.workDir+'sim.log')
+  fh = logging.FileHandler(self.workDir+'task.log')
   fh.setLevel(logging.NOTSET)
 
   ch = logging.StreamHandler()
@@ -92,7 +88,6 @@ def _Simulation( self, parentWorkDir = None, simConfigNode = ConfigTree() ):
 
   s = 'created logger: '+self.name
   self.log.info(s)
-
   s = 'logger level: '+loggerLevel
   self.log.debug(s)
   s = 'logger file handler level: '+fhLevel
@@ -100,25 +95,18 @@ def _Simulation( self, parentWorkDir = None, simConfigNode = ConfigTree() ):
   s = 'logger console handler level: '+chLevel
   self.log.debug(s)
 
-#------------
-# Application
-#------------
-  for appNode in self.configNode.GetAllSubNodes('application'):
+  self.evolveTime     = 0.0
+  self.evolveTimeUnit = 'null'
 
-    appConfigNode = ConfigTree( appNode )
-    assert appConfigNode.GetNodeName() == appNode.get('name'), 'check failed'
+  self.timeStep     = 0.0
+  self.timeStepUnit = 'null'
 
-    self.application = Application( self.workDir, appConfigNode )
+  self.runtimeCortixParamFile = 'null'
 
-    s = 'created application: '+appNode.get('name')
-    self.log.debug(s)
+# Setup this object
+  _Setup( self )
 
-#------------
-# Tasks
-#------------
-  self.tasks = list() # holds the task(s) created by the Execute method
-
-  s = 'created simulation: '+self.name
+  s = 'created task: '+self.name
   self.log.info(s)
 
 
