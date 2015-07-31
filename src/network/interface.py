@@ -24,7 +24,7 @@ class Network():
 
  def __init__( self, netConfigNode = ConfigTree() ):
 
-  _network( self, netConfigNode ) # constructor
+  _network( self, netConfigNode ) # non-member constructor (external implementation)
  
   return
 

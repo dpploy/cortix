@@ -9,7 +9,8 @@ Cortix is a library and it is used by means of a driver. This file is a simple e
 of a driver. Many Cortix objects can be ran simultaneously; a single object
 may be sufficient since many simulation/tasks can be ran via one object.
 
-As Cortix evolves additional complexity may be added to the driver.
+As Cortix evolves additional complexity may be added to this driver and/or other
+driver examples can be created.
 
 Tue Dec 10 11:21:30 EDT 2013
 """
