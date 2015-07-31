@@ -13,7 +13,7 @@ from ._setup import _Setup
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
-# module class constructor
+# Module class constructor
 
 def _Module( self, parentWorkDir = None, 
                    modLibName = None, 

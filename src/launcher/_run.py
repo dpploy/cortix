@@ -10,41 +10,22 @@ Sat Jun  6 22:43:33 EDT 2015
 #*********************************************************************************
 import os, sys, io, time, datetime
 import logging
-from threading import Thread
 import xml.etree.ElementTree as ElementTree
-import importlib
+
+from ._setruntimestatus import _SetRuntimeStatus
 #*********************************************************************************
-
-#*********************************************************************************
-class Launcher(Thread):
-                     
- def __init__( self, modLibName, modLibFullParentDir, moduleName, slotId,
-                     inputFullPathFileName, 
-                     cortexParamFullPathFileName,
-                     cortexCommFullPathFileName,
-                     runtimeStatusFullPathFileName ):
-
-    self.__moduleName                    = moduleName
-    self.__slotId                        = slotId
-    self.__inputFullPathFileName         = inputFullPathFileName 
-    self.__cortexParamFullPathFileName   = cortexParamFullPathFileName 
-    self.__cortexCommFullPathFileName    = cortexCommFullPathFileName 
-    self.__runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
-
-    super(Launcher, self).__init__()
-
-    modulePath = modLibName+'.'+moduleName+'.cortix-driver'
-    self.__module = importlib.import_module(modulePath)
 
 #---------------------------------------------------------------------------------
- def run(self):
+# Internal threading run helper
+
+def _Run( self ):
 
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
-  log = logging.getLogger('launcher-'+self.__moduleName+'_'+str(self.__slotId))
+  log = logging.getLogger('launcher-'+self.moduleName+'_'+str(self.slotId))
   log.setLevel(logging.DEBUG)
 # create file handler for logs
-  fullPathTaskDir = self.__cortexCommFullPathFileName[:self.__cortexCommFullPathFileName.rfind('/')]+'/'
+  fullPathTaskDir = self.cortexCommFullPathFileName[:self.cortexCommFullPathFileName.rfind('/')]+'/'
   fh = logging.FileHandler(fullPathTaskDir+'launcher.log')
   fh.setLevel(logging.DEBUG)
 # create console handler with a higher log level
@@ -61,13 +42,13 @@ class Launcher(Thread):
   s = 'created logger: main'
   log.info(s)
 
-  s = 'input file: ' + self.__inputFullPathFileName
+  s = 'input file: ' + self.inputFullPathFileName
   log.debug(s)
 
-  s = 'param file: ' + self.__cortexParamFullPathFileName
+  s = 'param file: ' + self.cortexParamFullPathFileName
   log.debug(s)
 
-  s = 'comm file: ' + self.__cortexCommFullPathFileName
+  s = 'comm file: ' + self.cortexCommFullPathFileName
   log.debug(s)
 
 #.................................................................................
@@ -75,15 +56,15 @@ class Launcher(Thread):
 # This input file may be empty or used by this driver and/or the native module.
 # inputFullPathFileName 
 
-  assert os.path.isfile(self.__inputFullPathFileName), 'file %r not available;stop.' % self.__inputFullPathFileName
+  assert os.path.isfile(self.inputFullPathFileName), 'file %r not available;stop.' % self.inputFullPathFileName
 
 #.................................................................................
 # Second argument is the Cortix parameter file: cortix-param.xml
 # cortexParamFullPathFileName 
 
-  assert os.path.isfile(self.__cortexParamFullPathFileName), 'file %r not available;stop.' % cortexParamFullPathFileName
+  assert os.path.isfile(self.cortexParamFullPathFileName), 'file %r not available;stop.' % cortexParamFullPathFileName
 
-  tree = ElementTree.parse(self.__cortexParamFullPathFileName)
+  tree = ElementTree.parse(self.cortexParamFullPathFileName)
   cortexParamXMLRootNode = tree.getroot()
 
   node = cortexParamXMLRootNode.find('evolveTime')
@@ -110,9 +91,9 @@ class Launcher(Thread):
 # Third argument is the Cortix communication file: cortix-comm.xml
 # cortexCommFullPathFileName 
 
-  assert os.path.isfile(self.__cortexCommFullPathFileName), 'file %r not available;stop.' % self.__cortexCommFullPathFileName
+  assert os.path.isfile(self.cortexCommFullPathFileName), 'file %r not available;stop.' % self.cortexCommFullPathFileName
 
-  tree = ElementTree.parse(self.__cortexCommFullPathFileName)
+  tree = ElementTree.parse(self.cortexCommFullPathFileName)
   cortexCommXMLRootNode = tree.getroot()
 
 # Setup ports
@@ -143,7 +124,7 @@ class Launcher(Thread):
 
 #---------------------------------------------------------------------------------
 # Run ModuleName
-  log.info('entered Run '+self.__moduleName+'_'+str(self.__slotId)+' section')
+  log.info('entered Run '+self.moduleName+'_'+str(self.slotId)+' section')
 
 #.................................................................................
 # Setup input
@@ -152,51 +133,33 @@ class Launcher(Thread):
 
 #.................................................................................
 # Create the guest code driver
-  guestDriver = self.__module.CortixDriver( self.__slotId, 
-                                      self.__inputFullPathFileName, 
+  guestDriver = self.module.CortixDriver( self.slotId, 
+                                      self.inputFullPathFileName, 
                                       ports, evolveTime )
 
-  log.info('guestDriver = CortixDriver( slotId='+str(self.__slotId)+',file='+self.__inputFullPathFileName+',ports='+str(ports)+',evolveTime='+str(evolveTime)+' )' )
+  log.info('guestDriver = CortixDriver( slotId='+str(self.slotId)+',file='+self.inputFullPathFileName+',ports='+str(ports)+',evolveTime='+str(evolveTime)+' )' )
 
 #.................................................................................
 # Evolve the module 
  
-  self.__SetRuntimeStatus('running')  
+  _SetRuntimeStatus(self, 'running')  
   log.info("SetRuntimeStatus('running')")
 
   facilityTime = 0.0
 
   while facilityTime <= evolveTime:
 
-   guestDriver.CallPorts( facilityTime )
-
-   guestDriver.Execute( facilityTime, timeStep )
-
-   facilityTime += timeStep 
+    guestDriver.CallPorts( facilityTime )
+ 
+    guestDriver.Execute( facilityTime, timeStep )
+ 
+    facilityTime += timeStep 
 #
 #---------------------------------------------------------------------------------
 # Shutdown 
 
-  self.__SetRuntimeStatus('finished')  
+  _SetRuntimeStatus(self, 'finished')  
   log.info("SetRuntimeStatus('finished')")
  
-#---------------------------------------------------------------------------------
- def __SetRuntimeStatus(self, status):
-
-  status = status.strip()
-  assert status == 'running' or status == 'finished', 'status invalid.'
-
-  fout = open( self.__runtimeStatusFullPathFileName,'w' )
-  s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
-  s = '<!-- Written by Launcher.py -->\n'; fout.write(s)
-  today = datetime.datetime.today()
-  s = '<!-- '+str(today)+' -->\n'; fout.write(s)
-  s = '<runtime>\n'; fout.write(s)
-  s = '<status>'+status+'</status>\n'; fout.write(s)
-  s = '</runtime>\n'; fout.write(s)
-  fout.close()
 
 #*********************************************************************************
-# Usage: -> python launcher.py or ./launcher.py
-if __name__ == "__main__":
-   Launcher()
