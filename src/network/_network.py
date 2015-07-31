@@ -12,8 +12,8 @@ from   src.configtree import ConfigTree
 from   ._setup import _setup
 #*********************************************************************************
 
-#*********************************************************************************
-# network class constructor
+#---------------------------------------------------------------------------------
+# Network class constructor
 
 def _network(self, netConfigNode):  
 

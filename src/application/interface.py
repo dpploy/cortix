@@ -5,41 +5,50 @@ Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 Cortix: a program for system-level modules
         coupling, execution, and analysis.
 
+An Application object is the composition of Module objects and Network objects.
+
 Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
 import os, sys, io
 from src.configtree import ConfigTree
-from src.application.interface import Application
 
 # constructor helper
-from ._simulation import _Simulation
-
-from ._execute import _Execute
+from ._application import _Application
 #*********************************************************************************
 
 #*********************************************************************************
-class Simulation():
+class Application(): # this is meant to be a singleton class
 
  def __init__( self,
-               parentWorkDir = None,
-               simConfigNode = ConfigTree()
+               appWorkDir = None,
+               appConfigNode = ConfigTree()
              ):
 
-  _Simulation( self, parentWorkDir, simConfigNode )
+  _Application( self, appWorkDir, appConfigNode )
 
   return
 
 #---------------------------------------------------------------------------------
-# Execute  
+# Getters
 
- def Execute( self, taskName=None ):
+ def GetNetworks(self):
+  return self.networks
 
-  _Execute( self, taskName )
+ def GetNetwork(self, name):
+  for net in self.networks:
+     if net.GetName() == name: return net
+  return None
 
-  return
+ def GetModules(self):
+  return self.modules
+
+ def GetModule(self, name):
+  for mod in self.modules:
+     if mod.GetName() == name: return mod
+  return None
 
 #*********************************************************************************
-# Unit testing. Usage: -> python simulation.py
+# Unit testing. Usage: -> python application.py
 if __name__ == "__main__":
-  print('Unit testing for Simulation')
+  print('Unit testing for Application')

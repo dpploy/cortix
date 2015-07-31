@@ -14,6 +14,8 @@ from ._setup import _Setup
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
+# Task class constructor
+
 def _Task( self, parentWorkDir = None, 
                  taskConfigNode = ConfigTree() ):
 

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
@@ -13,54 +12,51 @@ Tue Dec 10 11:21:30 EDT 2013
 import os, sys, io
 import logging
 from src.configtree import ConfigTree
-#from src.module import Module
-from src.module.interface import Module
-from src.network.interface import Network
+
+from ._setupmodules import _SetupModules
+from ._setupnetworks import _SetupNetworks
 #*********************************************************************************
 
-#*********************************************************************************
-class Application(): # this is meant to be a singleton class
+#---------------------------------------------------------------------------------
+# Application class constructor
 
-# Private member data
-# __slots__ = [
-
- def __init__( self,
-               appWorkDir = None,
-               appConfigNode = ConfigTree()
-             ):
+def _Application( self,
+                   appWorkDir = None,
+                   appConfigNode = ConfigTree()
+                 ):
 
   assert type(appWorkDir) is str, '-> appWorkDir is invalid' 
 
 # Inherit a configuration tree
   assert type(appConfigNode) is ConfigTree, '-> appConfigNode invalid' 
-  self.__configNode = appConfigNode
+  self.configNode = appConfigNode
 
 # Read the application name
-  self.__name = self.__configNode.GetNodeName()
+  self.name = self.configNode.GetNodeName()
 
 # Set the work directory (previously created)
 
-  self.__workDir = appWorkDir
+  self.workDir = appWorkDir
   assert os.path.isdir( appWorkDir ), 'work directory not available.'
 
 # Set the module library for the application
 
   node = appConfigNode.GetSubNode('moduleLibrary')
-  self.__moduLibName = node.get('name').strip()
+  self.moduLibName = node.get('name').strip()
 
   subnode = ConfigTree( node )
   assert subnode.GetNodeTag() == 'moduleLibrary', ' fatal.'
   for child in subnode.GetNodeChildren():
    (tag, items, text) = child
-   if tag == 'parentDir': self.__moduLibFullParentDir = text.strip()
+   if tag == 'parentDir': self.moduLibFullParentDir = text.strip()
  
-  if self.__moduLibFullParentDir[-1] == '/': self.__moduLibFullParentDir.strip('/') 
+  if self.moduLibFullParentDir[-1] == '/': self.moduLibFullParentDir.strip('/') 
 
-  sys.path.insert(1,self.__moduLibFullParentDir)
+  sys.path.insert(1,self.moduLibFullParentDir)
 
 # Create the logging facility for the singleton object
   node = appConfigNode.GetSubNode('logger')
-  loggerName = self.__name
+  loggerName = self.name
   log = logging.getLogger(loggerName)
   log.setLevel(logging.NOTSET)
 
@@ -74,9 +70,9 @@ class Application(): # this is meant to be a singleton class
   else:
     assert True, 'logger level for %r: %r invalid' % (loggerName, loggerLevel)
 
-  self.__log = log
+  self.log = log
 
-  fh = logging.FileHandler(self.__workDir+'app.log')
+  fh = logging.FileHandler(self.workDir+'app.log')
   fh.setLevel(logging.NOTSET)
 
   ch = logging.StreamHandler()
@@ -113,115 +109,32 @@ class Application(): # this is meant to be a singleton class
   log.addHandler(fh)
   log.addHandler(ch)
 
-  s = 'created logger: '+self.__name
-  self.__log.info(s)
+  s = 'created logger: '+self.name
+  self.log.info(s)
 
   s = 'logger level: '+loggerLevel
-  self.__log.debug(s)
+  self.log.debug(s)
   s = 'logger file handler level: '+fhLevel
-  self.__log.debug(s)
+  self.log.debug(s)
   s = 'logger console handler level: '+chLevel
-  self.__log.debug(s)
+  self.log.debug(s)
 
 #--------
 # modules        
 #--------
-  self.__modules = list()
-  self.__SetupModules()
+  self.modules = list()
+  _SetupModules( self )
 
 #--------
 # networks
 #--------
-  self.__networks = list()
-  self.__SetupNetworks()
+  self.networks = list()
+  _SetupNetworks( self )
 
-  s = 'created application: '+self.__name
-  self.__log.info(s)
+  s = 'created application: '+self.name
+  self.log.info(s)
 
-#---------------------------------------------------------------------------------
-# Getters
-
- def GetNetworks(self):
-  return self.__networks
-
- def GetNetwork(self, name):
-  for net in self.__networks:
-     if net.GetName() == name: return net
-  return None
-
- def GetModules(self):
-  return self.__modules
-
- def GetModule(self, name):
-  for mod in self.__modules:
-     if mod.GetName() == name: return mod
-  return None
-
-#---------------------------------------------------------------------------------
-# Setup application         
-
- def Setup(self):
-
-#  for modName in self.__configNode.GetModuleNames():
-   
-#   module = Module( modName, self.__configNode )
-#   self.__modules.append( module )
-
-  return
-
-#---------------------------------------------------------------------------------
-# Setup modules             
-
- def __SetupModules(self):
-
-  s = 'start __SetupModules()'
-  self.__log.debug(s)
-
-  for modNode in self.__configNode.GetAllSubNodes('module'):
-
-     modConfigNode = ConfigTree( modNode )
-     assert modConfigNode.GetNodeName() == modNode.get('name'), 'check failed'
-
-     module = Module( self.__workDir, 
-                      self.__moduLibName, self.__moduLibFullParentDir, 
-                      modConfigNode )
-
-     self.__modules.append( module )
-
-     s = 'appended module ' + modNode.get('name')
-     self.__log.debug(s)
-
-  s = 'end __SetupModules()'
-  self.__log.debug(s)
-
-  return
-
-#---------------------------------------------------------------------------------
-# Setup network             
-
- def __SetupNetworks(self):
-
-  s = 'start __SetupNetworks()'
-  self.__log.debug(s)
-
-  for netNode in self.__configNode.GetAllSubNodes('network'):
-
-   netConfigNode = ConfigTree( netNode )
-   assert netConfigNode.GetNodeName() == netNode.get('name'), 'check failed'
-
-   network = Network( netConfigNode )
-
-   self.__networks.append( network )
-
-   s = 'appended network ' + netNode.get('name')
-   self.__log.debug(s)
-
-  s = 'end __SetupNetworks()'
-  self.__log.debug(s)
 
   return
 
 #*********************************************************************************
-# Unit testing. Usage: -> python application.py
-if __name__ == "__main__":
-  print('Unit testing for Application')
