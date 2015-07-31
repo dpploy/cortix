@@ -78,7 +78,7 @@ class Module():
 
  def Execute(self, slotId, runtimeCortixParamFile, runtimeCortixCommFile ):
 
-  runtimeModuleStatusFile = _execute( self, slotId, 
+  runtimeModuleStatusFile = _Execute( self, slotId, 
                                       runtimeCortixParamFile, runtimeCortixCommFile )
 
   return runtimeModuleStatusFile
