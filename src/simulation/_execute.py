@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
@@ -8,22 +9,32 @@ Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
 import os, sys, io
-from   src.utils.configtree import ConfigTree
-from   ._setup import _setup
+import logging
+from ._setuptask import _SetupTask
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
-# Network class constructor
+# Execute simulation
 
-def _network(self, netConfigNode):  
+def _Execute( self, taskName=None ):
 
-  assert type(netConfigNode) is ConfigTree, '-> netConfigNode is invalid.' 
+  s = 'start Execute('+taskName+')'
+  self.log.debug(s)
 
-  self.configNode = netConfigNode
+  if taskName is not None: 
 
-  self.name = self.configNode.GetNodeName()
+     _SetupTask( self, taskName )
 
-  _setup( self )
+     for task in self.tasks:
+       if task.GetName() == taskName: 
+
+         s = 'called task.Execute() on task ' + taskName
+         self.log.debug(s)
+
+         task.Execute( self.application )
+
+  s = 'end Execute('+taskName+')'
+  self.log.debug(s)
 
   return
 

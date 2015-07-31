@@ -11,8 +11,8 @@ Tue Dec 10 11:21:30 EDT 2013
 import os, sys, io
 import datetime
 import logging
-from src.configtree import ConfigTree
-from src.simulation import Simulation
+from src.utils.configtree import ConfigTree
+from src.simulation.interface import Simulation
 #*********************************************************************************
 
 #*********************************************************************************

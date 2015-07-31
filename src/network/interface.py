@@ -10,7 +10,7 @@ Tue Dec 10 11:21:30 EDT 2013
 #*********************************************************************************
 import os, sys, io
 import datetime
-from src.configtree import ConfigTree
+from src.utils.configtree import ConfigTree
 
 # constructor helper
 from ._network import _network
@@ -24,7 +24,7 @@ class Network():
 
  def __init__( self, netConfigNode = ConfigTree() ):
 
-  _network( self, netConfigNode ) # constructor
+  _network( self, netConfigNode ) # non-member constructor (external implementation)
  
   return
 
