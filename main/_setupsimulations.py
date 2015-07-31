@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
@@ -8,22 +9,27 @@ Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
 import os, sys, io
-from   src.utils.configtree import ConfigTree
-from   ._setup import _setup
+import datetime
+import logging
+from cortix.utils.configtree import ConfigTree
+from cortix.simulation.interface import Simulation
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
-# Network class constructor
+# Build Cortix simulations
 
-def _network(self, netConfigNode):  
+def _SetupSimulations(self):
 
-  assert type(netConfigNode) is ConfigTree, '-> netConfigNode is invalid.' 
+  for sim in self.configTree.GetAllSubNodes('simulation'):
+ 
+    s = '_SetupSimulations(): simulation name: '+sim.get('name')
+    self.log.debug(s)
 
-  self.configNode = netConfigNode
+    simConfigTree = ConfigTree(sim)
 
-  self.name = self.configNode.GetNodeName()
+    simulation = Simulation( self.workDir, simConfigTree ) 
 
-  _setup( self )
+    self.simulations.append( simulation )
 
   return
 

@@ -11,49 +11,51 @@ Tue Dec 10 11:21:30 EDT 2013
 import os, sys, io
 import datetime
 import logging
-from src.utils.configtree import ConfigTree
-from src.simulation.interface import Simulation
+from cortix.utils.configtree import ConfigTree
+from cortix.simulation.interface import Simulation
+
+from ._setupsimulations import _SetupSimulations
 #*********************************************************************************
 
-#*********************************************************************************
-class Cortix():
+#---------------------------------------------------------------------------------
+# Cortix class constructor
 
- def __init__( self,
-               name = None,
-               configFile = 'cortix-config.xml'
-             ):
+def _Cortix( self,
+             name = None,
+             configFile = 'cortix-config.xml'
+           ):
 
     assert name is not None, 'must give Cortix object a name'
 
     assert type(configFile) is str, '-> configFile not a str.' 
-    self.__configFile = configFile
+    self.configFile = configFile
 
 # Create a configuration tree
-    self.__configTree = ConfigTree( configFileName=self.__configFile )
+    self.configTree = ConfigTree( configFileName=self.configFile )
 
 # Read this object's name
-    node  = self.__configTree.GetSubNode('name')
-    self.__name = node.text.strip()
+    node  = self.configTree.GetSubNode('name')
+    self.name = node.text.strip()
  
     # check
-    assert self.__name == name, 'cortix object name conflicts with cortix-config.xml'
+    assert self.name == name, 'cortix object name conflicts with cortix-config.xml'
 
 # Read the work directory name
-    node  = self.__configTree.GetSubNode('workDir')
+    node  = self.configTree.GetSubNode('workDir')
     wrkDir = node.text.strip()
     if wrkDir[-1] != '/': wrkDir += '/'
 
-    self.__workDir = wrkDir + self.__name + '-wrk/'
+    self.workDir = wrkDir + self.name + '-wrk/'
 
 # Create the work directory 
-    if os.path.isdir(self.__workDir):
-      os.system( 'rm -rf ' + self.__workDir )
+    if os.path.isdir(self.workDir):
+      os.system( 'rm -rf ' + self.workDir )
 
-    os.system( 'mkdir -p ' + self.__workDir )
+    os.system( 'mkdir -p ' + self.workDir )
 
 # Create the logging facility for each object  
-    node = self.__configTree.GetSubNode('logger')
-    loggerName = self.__name
+    node = self.configTree.GetSubNode('logger')
+    loggerName = self.name
     log = logging.getLogger(loggerName)
     log.setLevel(logging.NOTSET)
 
@@ -67,9 +69,9 @@ class Cortix():
     else:
       assert True, 'logger level for %r: %r invalid' % (loggerName, loggerLevel)
 
-    self.__log = log
+    self.log = log
 
-    fh = logging.FileHandler(self.__workDir+'cortix.log')
+    fh = logging.FileHandler(self.workDir+'cortix.log')
     fh.setLevel(logging.NOTSET)
 
     ch = logging.StreamHandler()
@@ -106,56 +108,26 @@ class Cortix():
     log.addHandler(fh)
     log.addHandler(ch)
 
-    self.__log.info('created logger: '+self.__name)
+    self.log.info('created logger: '+self.name)
 
     s = 'logger level: '+loggerLevel
-    self.__log.debug(s)
+    self.log.debug(s)
     s = 'logger file handler level: '+fhLevel
-    self.__log.debug(s)
+    self.log.debug(s)
     s = 'logger console handler level: '+chLevel
-    self.__log.debug(s)
+    self.log.debug(s)
 
-    self.__log.info('created work directory: '+self.__workDir)
+    self.log.info('created work directory: '+self.workDir)
 
 # Setup simulations (one or more as specified in the config file)
 
-    self.__simulations = list()
+    self.simulations = list()
 
-    self.__SetupSimulations()
+    _SetupSimulations( self )
 
-    self.__log.info('created Cortix object '+self.__name)
+    self.log.info('created Cortix object '+self.name)
 
-#---------------------------------------------------------------------------------
-# Simulate                  
-
- def RunSimulations(self, taskName=None):
-
-  for sim in self.__simulations: sim.Execute( taskName )
+    return 
   
-  return
-
-#---------------------------------------------------------------------------------
-# Build Cortix simulations
-
- def __SetupSimulations(self):
-
-  for sim in self.__configTree.GetAllSubNodes('simulation'):
- 
-    s = '__SetupSimulations(): simulation name: '+sim.get('name')
-    self.__log.debug(s)
-
-    simConfigTree = ConfigTree(sim)
-
-    simulation = Simulation( self.__workDir, simConfigTree ) 
-
-    self.__simulations.append( simulation )
-
-  return
 
 #*********************************************************************************
-# Unit testing. Usage: -> python cortix.py
-if __name__ == "__main__":
-
-  print('Unit testing for Cortix')
-  cortix = Cortix("cortix-config.xml")
-

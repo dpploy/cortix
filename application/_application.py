@@ -4,39 +4,58 @@ Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 Cortix: a program for system-level modules
         coupling, execution, and analysis.
 
+An Application object is the composition of Module objects and Network objects.
+
 Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
 import os, sys, io
 import logging
-from src.utils.configtree import ConfigTree
-from src.application.interface import Application
+from cortix.utils.configtree import ConfigTree
+
+from ._setupmodules import _SetupModules
+from ._setupnetworks import _SetupNetworks
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
-# Simulation class constructor
+# Application class constructor
 
-def _Simulation( self, parentWorkDir = None, simConfigNode = ConfigTree() ):
+def _Application( self,
+                   appWorkDir = None,
+                   appConfigNode = ConfigTree()
+                 ):
 
-  assert type(parentWorkDir) is str, '-> parentWorkDir invalid.' 
+  assert type(appWorkDir) is str, '-> appWorkDir is invalid' 
 
 # Inherit a configuration tree
-  assert type(simConfigNode) is ConfigTree, '-> simConfigNode invalid.' 
-  self.configNode = simConfigNode
+  assert type(appConfigNode) is ConfigTree, '-> appConfigNode invalid' 
+  self.configNode = appConfigNode
 
-# Read the simulation name
-  self.name = simConfigNode.GetNodeName()
+# Read the application name
+  self.name = self.configNode.GetNodeName()
 
-# Create the cortix/simulation work directory
-  wrkDir = parentWorkDir 
-  wrkDir += 'sim_' + self.name + '/'
-  self.workDir = wrkDir
+# Set the work directory (previously created)
 
-  os.system( 'mkdir -p ' + self.workDir )
+  self.workDir = appWorkDir
+  assert os.path.isdir( appWorkDir ), 'work directory not available.'
 
-# Create the logging facility for each object
+# Set the module library for the application
 
-  node = simConfigNode.GetSubNode('logger')
+  node = appConfigNode.GetSubNode('moduleLibrary')
+  self.moduLibName = node.get('name').strip()
+
+  subnode = ConfigTree( node )
+  assert subnode.GetNodeTag() == 'moduleLibrary', ' fatal.'
+  for child in subnode.GetNodeChildren():
+   (tag, items, text) = child
+   if tag == 'parentDir': self.moduLibFullParentDir = text.strip()
+ 
+  if self.moduLibFullParentDir[-1] == '/': self.moduLibFullParentDir.strip('/') 
+
+  sys.path.insert(1,self.moduLibFullParentDir)
+
+# Create the logging facility for the singleton object
+  node = appConfigNode.GetSubNode('logger')
   loggerName = self.name
   log = logging.getLogger(loggerName)
   log.setLevel(logging.NOTSET)
@@ -53,7 +72,7 @@ def _Simulation( self, parentWorkDir = None, simConfigNode = ConfigTree() ):
 
   self.log = log
 
-  fh = logging.FileHandler(self.workDir+'sim.log')
+  fh = logging.FileHandler(self.workDir+'app.log')
   fh.setLevel(logging.NOTSET)
 
   ch = logging.StreamHandler()
@@ -100,25 +119,19 @@ def _Simulation( self, parentWorkDir = None, simConfigNode = ConfigTree() ):
   s = 'logger console handler level: '+chLevel
   self.log.debug(s)
 
-#------------
-# Application
-#------------
-  for appNode in self.configNode.GetAllSubNodes('application'):
+#--------
+# modules        
+#--------
+  self.modules = list()
+  _SetupModules( self )
 
-    appConfigNode = ConfigTree( appNode )
-    assert appConfigNode.GetNodeName() == appNode.get('name'), 'check failed'
+#--------
+# networks
+#--------
+  self.networks = list()
+  _SetupNetworks( self )
 
-    self.application = Application( self.workDir, appConfigNode )
-
-    s = 'created application: '+appNode.get('name')
-    self.log.debug(s)
-
-#------------
-# Tasks
-#------------
-  self.tasks = list() # holds the task(s) created by the Execute method
-
-  s = 'created simulation: '+self.name
+  s = 'created application: '+self.name
   self.log.info(s)
 
 

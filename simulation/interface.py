@@ -9,8 +9,8 @@ Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
 import os, sys, io
-from src.utils.configtree import ConfigTree
-from src.application.interface import Application
+from cortix.utils.configtree import ConfigTree
+from cortix.application.interface import Application
 
 # constructor helper
 from ._simulation import _Simulation

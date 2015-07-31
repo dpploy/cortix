@@ -8,7 +8,7 @@ Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
 import os, sys, io
-from src.utils.configtree import ConfigTree
+from cortix.utils.configtree import ConfigTree
 from ._setup import _Setup
 #*********************************************************************************
 
