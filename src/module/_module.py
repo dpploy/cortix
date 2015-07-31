@@ -9,13 +9,13 @@ Tue Dec 10 11:21:30 EDT 2013
 #*********************************************************************************
 import os, sys, io
 from src.configtree import ConfigTree
-from ._setup import _setup
+from ._setup import _Setup
 #*********************************************************************************
 
 #*********************************************************************************
 # module class constructor
 
-def _module( self, parentWorkDir = None, 
+def _Module( self, parentWorkDir = None, 
                    modLibName = None, 
                    modLibParentDir = None,
                    modConfigNode = ConfigTree() 
@@ -43,7 +43,7 @@ def _module( self, parentWorkDir = None,
 
   self.ports = list()  # list of (portName, portType, portMultiplicity)
 
-  _setup( self )  
+  _Setup( self )  
 
   return
 

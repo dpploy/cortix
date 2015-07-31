@@ -14,7 +14,7 @@ from src.configtree import ConfigTree
 #---------------------------------------------------------------------------------
 # Private method: setup module              
 
-def _setup( self ):
+def _Setup( self ):
 
 # Save config data
   for child in self.configNode.GetNodeChildren():

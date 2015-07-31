@@ -14,7 +14,7 @@ from src.launcher import Launcher
 #---------------------------------------------------------------------------------
 # Execute module            
 
-def _execute(self, slotId, runtimeCortixParamFile, runtimeCortixCommFile ):
+def _Execute(self, slotId, runtimeCortixParamFile, runtimeCortixCommFile ):
 
 #  print('module:',self.__name)
 #  print('module executable: ',self.__executableName)

@@ -11,7 +11,10 @@ Tue Dec 10 11:21:30 EDT 2013
 import os, sys, io
 from src.configtree import ConfigTree
 from src.application import Application
+
+# constructor helper
 from ._simulation import _Simulation
+
 from ._execute import _Execute
 #*********************************************************************************
 

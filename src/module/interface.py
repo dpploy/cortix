@@ -12,9 +12,9 @@ import os, sys, io, time
 from src.configtree import ConfigTree
 
 # constructor helper
-from ._module import _module
+from ._module import _Module
 
-from ._execute import _execute
+from ._execute import _Execute
 #*********************************************************************************
 
 #*********************************************************************************
@@ -29,7 +29,7 @@ class Module():
                modConfigNode = ConfigTree()
              ):
 
-  _module( self, parentWorkDir, 
+  _Module( self, parentWorkDir, 
                  modLibName, modLibParentDir, 
                  modConfigNode )
 
