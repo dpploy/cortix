@@ -8,8 +8,8 @@ Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
 import os, sys, io
-from src.utils.configtree import ConfigTree
-from src.task.interface import Task
+from cortix.utils.configtree import ConfigTree
+from cortix.task.interface import Task
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------

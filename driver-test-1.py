@@ -12,12 +12,14 @@ may be sufficient since many simulation/tasks can be ran via one object.
 As Cortix evolves additional complexity may be added to this driver and/or other
 driver examples can be created.
 
+Cortix is written in python language and it is imported as an namespace package
+as of python 3.3 or later.
+
 Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
-import os, sys, io
-import datetime
-from src.cortix import Cortix
+import sys, os
+from main.interface import Cortix
 #*********************************************************************************
 
 def Main():
@@ -49,4 +51,4 @@ def Main():
 #*********************************************************************************
 # Usage: -> python cortix-main.py or ./cortix-main.py
 if __name__ == "__main__":
-  Main()
+ Main()
