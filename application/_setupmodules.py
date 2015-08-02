@@ -28,11 +28,22 @@ def _SetupModules( self ):
      modConfigNode = ConfigTree( modNode )
      assert modConfigNode.GetNodeName() == modNode.get('name'), 'check failed'
 
-     module = Module( self.workDir, 
-                      self.moduLibName, self.moduLibFullParentDir, 
-                      modConfigNode )
+     newModule = Module( self.workDir, 
+                         self.moduLibName, self.moduLibFullParentDir, 
+                         modConfigNode )
 
-     self.modules.append( module )
+     # check for a duplicate module before appending a new one
+     for module in self.modules:
+       modName       = module.GetName()
+       modLibDirName = module.GetLibraryParentDir()
+       modLibName    = module.GetLibraryName()
+
+       if newModule.GetName() == modName:
+         if newModule.GetLibraryParentDir() == modLibDirName:
+           assert newModule.GetLibraryName != modLibName, 'duplicate module; abort.'
+
+     # add module to list
+     self.modules.append( newModule )
 
      s = 'appended module ' + modNode.get('name')
      self.log.debug(s)

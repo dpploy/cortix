@@ -18,7 +18,12 @@ from ._application import _Application
 #*********************************************************************************
 
 #*********************************************************************************
-class Application(): # this is meant to be a singleton class
+# This is meant to be a singleton class for each Cortix object; since Cortix
+# is used by a driver code, the driver can instantiate multiple Cortix objects which
+# will create multiple Application objects. Therefore within a Cortix object only
+# one instantiation of Application takes place.
+
+class Application(): 
 
  def __init__( self,
                appWorkDir = None,

@@ -19,7 +19,7 @@ def _Setup( self ):
 # Save config data
   for child in self.configNode.GetNodeChildren():
 
-    ( tag, attributes, text ) = child
+    ( elem, tag, attributes, text ) = child
     text = text.strip()
 
     if self.modType != 'native':
@@ -29,9 +29,24 @@ def _Setup( self ):
         self.executablePath = text
 
     if tag == 'inputFileName': self.inputFileName = text
+
     if tag == 'inputFilePath': 
      if text[-1] != '/': text += '/'
      self.inputFilePath = text
+
+    if tag == 'library':
+       assert len(attributes) == 1, 'only name of library allowed.'
+       key = attributes[0][0]; assert key == 'name', 'invalid attribute.'
+       val = attributes[0][1].strip()
+       self.modLibName = val
+
+       node = ConfigTree(elem)
+       subNode = node.GetSubNode('parentDir')
+       assert subNode is not None, 'missing parentDir.'
+       
+       self.modLibParentDir = subNode.text.strip()
+
+       if self.modLibParentDir[-1] == '/': self.modLibParentDir.strip('/') 
 
     if tag == 'port': 
        assert len(attributes) == 3, 'only 3 attribute allowed/required at this moment.'

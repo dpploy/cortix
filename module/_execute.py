@@ -23,7 +23,8 @@ def _Execute(self, slotId, runtimeCortixParamFile, runtimeCortixCommFile ):
 #  print('param file       : ',runtimeCortixParamFile)
 #  print('comm  file       : ',runtimeCortixCommFile)
  
-  guestExec = self.executablePath + self.executableName
+#  guestExec = self.executablePath + self.executableName
+
   input     = self.inputFilePath + self.inputFileName
   param     = runtimeCortixParamFile
   comm      = runtimeCortixCommFile
@@ -33,10 +34,10 @@ def _Execute(self, slotId, runtimeCortixParamFile, runtimeCortixCommFile ):
 
   status = runtimeModuleStatusFile
 
-  modLibName      = self.modLibName
   modLibParentDir = self.modLibParentDir
-  modName = self.modName 
-  modType = self.modType
+  modLibName      = self.modLibName
+  modName         = self.modName 
+  modType         = self.modType
 
   # run module on its own thread using file IO communication
   t = Launcher( modLibName, modLibParentDir, 

@@ -9,7 +9,7 @@
          If this rule is not followed, there will be collision with file in/outputs;
          including results files and logging files.-->
 
- <name>cortix1</name>
+ <name>cortix-dev1</name>
 
  <logger level="DEBUG">
   <fileHandler level="DEBUG"> </fileHandler>
@@ -20,7 +20,8 @@
 
 <!-- Simulation definition -->
 <!-- NB: each simulation has only one application -->
- <simulation name="headend-off-gas">
+
+ <simulation name="dev1">
 
   <logger level="DEBUG">
    <fileHandler level="DEBUG"> </fileHandler>
@@ -64,6 +65,15 @@
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
    <evolveTime unit="hour">1.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
+  </task>
+
+  <task name="solo-plume" >
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
+   <evolveTime unit="hour">12.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
@@ -115,11 +125,10 @@
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
-
   <!-- Simulation: application -->
   <!-- NB: each simulation has only one application -->
 
-  <application name="demo1">
+  <application name="dev1">
 
    <moduleLibrary name='vfdalib'>
     <parentDir>
@@ -351,11 +360,17 @@
     </logger>
     <inputFileName>plume.input</inputFileName>
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
+    <library name='srnl-lib'>
+     <parentDir>
+      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
+     </parentDir>
+    </library>
     <executableName>pfpl</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/facility_pfpl/</executablePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use"     mode="file.xml" multiplicity="1">off-gas</port>
+    <port type="input"   mode="file.xml" multiplicity="1">offgas-input</port>
+    <port type="use"     mode="file.xml" multiplicity="1">offgas</port>
     <port type="provide" mode="file.xml" multiplicity="1">time-puff</port>
    </module>
 
@@ -435,6 +450,16 @@
     <connect fromModuleSlot="dissolver:0" fromPort="solids-input" toModuleSlot="dissolver:0" toPort="dissolver-test-input"/> 
     <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
     <connect fromModuleSlot="support.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
+   </network>
+
+   <!-- stand-alone module -->
+   <network name="solo-plume">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <connect fromModuleSlot="plume:0" fromPort="offgas" toModuleSlot="plume:0" toPort="offgas-input"/> 
    </network>
 
    <!-- stand-alone module -->

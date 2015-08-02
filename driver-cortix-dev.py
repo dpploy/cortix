@@ -30,7 +30,7 @@ def Main():
  # NB: if another instantiation of Cortix occurs, the cortix wrk directory specified
  #     in the cortix configuration file must be different, else the logging facility 
  #     will have log file collision.
- cortix1 = Cortix( 'cortix1', fullPathConfigFile )
+ cortix1 = Cortix( 'cortix-dev1', fullPathConfigFile )
 
 # sys.exit(0)
 
@@ -38,8 +38,9 @@ def Main():
 # cortix1.RunSimulations( taskName='solo-fueldepot' )
 # cortix1.RunSimulations( taskName='solo-shear' )
 # cortix1.RunSimulations( taskName='solo-dissolve' )
- cortix1.RunSimulations( taskName='fueldepot-chopper' )
-# cortix1.RunSimulations( taskName='fueldepot-chopper-storage' )
+ cortix1.RunSimulations( taskName='solo-plume' )
+# cortix1.RunSimulations( taskName='fueldepot-chopper' )
+#not working cortix1.RunSimulations( taskName='fueldepot-chopper-storage' )
 
 # untested
 # cortix1.RunSimulations( taskName='shear-dissolve-offgas' )

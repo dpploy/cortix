@@ -16,15 +16,12 @@ Tue Dec 10 11:21:30 EDT 2013
 #*********************************************************************************
 import os, sys, io
 import datetime
-from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import ElementTree
 #*********************************************************************************
 
 #*********************************************************************************
 class ConfigTree():
-
-# Private member data
-# __slots__ = [
 
  def __init__( self,
                configTreeNode = None,
@@ -37,6 +34,7 @@ class ConfigTree():
 
     if configFileName is not None:
        assert type(configFileName) is str, '-> configFileName not a str.' 
+       assert configTreeNode is None, 'node and file not allowed together.'
 
        self.__ReadConfigTree( configFileName )
 
@@ -79,8 +77,9 @@ class ConfigTree():
 
   for child in self.__configTreeNode:
 
-   # NB: child.items() is a list of pairs: (key, val)
-   children.append( (child.tag, child.items(), child.text) )
+    # NB: child.items() is a list of attribute pairs: (key, val)
+    #     return child as a handle for drilling down the tree
+    children.append( (child, child.tag, child.items(), child.text) )
 
   return children
 #---------------------------------------------------------------------------------

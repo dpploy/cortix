@@ -9,7 +9,6 @@ Sat Jun  6 22:43:33 EDT 2015
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
-import logging
 import xml.etree.ElementTree as ElementTree
 
 from ._setruntimestatus import _SetRuntimeStatus
@@ -20,36 +19,6 @@ from ._setruntimestatus import _SetRuntimeStatus
 
 def _Run( self ):
 
-#.................................................................................
-# Create logger for this driver and its imported pymodule 
-  log = logging.getLogger('launcher-'+self.moduleName+'_'+str(self.slotId))
-  log.setLevel(logging.DEBUG)
-# create file handler for logs
-  fullPathTaskDir = self.cortexCommFullPathFileName[:self.cortexCommFullPathFileName.rfind('/')]+'/'
-  fh = logging.FileHandler(fullPathTaskDir+'launcher.log')
-  fh.setLevel(logging.DEBUG)
-# create console handler with a higher log level
-  ch = logging.StreamHandler()
-  ch.setLevel(logging.INFO)
-# create formatter and add it to the handlers
-  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-  fh.setFormatter(formatter)
-  ch.setFormatter(formatter)
-# add the handlers to the logger
-  log.addHandler(fh)
-  log.addHandler(ch)
-
-  s = 'created logger: main'
-  log.info(s)
-
-  s = 'input file: ' + self.inputFullPathFileName
-  log.debug(s)
-
-  s = 'param file: ' + self.cortexParamFullPathFileName
-  log.debug(s)
-
-  s = 'comm file: ' + self.cortexCommFullPathFileName
-  log.debug(s)
 
 #.................................................................................
 # First argument is the module input file name with full path.
@@ -116,7 +85,7 @@ def _Run( self ):
   tree = None
 
   s = 'ports: '+str(ports)
-  log.debug(s)
+  self.log.debug(s)
 
 #.................................................................................
 # Fourth argument is the module runtime-status.xml file
@@ -124,7 +93,7 @@ def _Run( self ):
 
 #---------------------------------------------------------------------------------
 # Run ModuleName
-  log.info('entered Run '+self.moduleName+'_'+str(self.slotId)+' section')
+  self.log.info('entered Run '+self.moduleName+'_'+str(self.slotId)+' section')
 
 #.................................................................................
 # Setup input
@@ -133,17 +102,17 @@ def _Run( self ):
 
 #.................................................................................
 # Create the guest code driver
-  guestDriver = self.module.CortixDriver( self.slotId, 
-                                      self.inputFullPathFileName, 
-                                      ports, evolveTime )
+  guestDriver = self.pyModule.CortixDriver( self.slotId, 
+                                            self.inputFullPathFileName, 
+                                            ports, evolveTime )
 
-  log.info('guestDriver = CortixDriver( slotId='+str(self.slotId)+',file='+self.inputFullPathFileName+',ports='+str(ports)+',evolveTime='+str(evolveTime)+' )' )
+  self.log.info('guestDriver = CortixDriver( slotId='+str(self.slotId)+',file='+self.inputFullPathFileName+',ports='+str(ports)+',evolveTime='+str(evolveTime)+' )' )
 
 #.................................................................................
 # Evolve the module 
  
   _SetRuntimeStatus(self, 'running')  
-  log.info("SetRuntimeStatus('running')")
+  self.log.info("SetRuntimeStatus('running')")
 
   facilityTime = 0.0
 
@@ -159,7 +128,7 @@ def _Run( self ):
 # Shutdown 
 
   _SetRuntimeStatus(self, 'finished')  
-  log.info("SetRuntimeStatus('finished')")
+  self.log.info("SetRuntimeStatus('finished')")
  
 
 #*********************************************************************************

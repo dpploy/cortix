@@ -19,7 +19,7 @@ def _Setup(self):
   self.log.debug(s)
 
   for child in self.configNode.GetNodeChildren():
-    (tag, items, text) = child
+    (elem, tag, items, text) = child
     if tag == 'evolveTime':
        for (key,value) in items:
         if key == 'unit' : self.evolveTimeUnit = value
