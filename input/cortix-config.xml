@@ -276,7 +276,7 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="input"   mode="file.xml" multiplicity="1">dissolver-test-input</port>
+    <port type="input"   mode="file.xml" multiplicity="1">dissolver-solo-input</port>
     <port type="use"     mode="file.xml" multiplicity="1">solids-input</port>
     <port type="use"     mode="file.xml" multiplicity="1">solids</port>
     <port type="use"     mode="file.xml" multiplicity="1">condensate</port>
@@ -400,9 +400,10 @@
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/facility_pfpl/</executablePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="input"   mode="file.xml" multiplicity="1">offgas-input</port>
+    <port type="input"   mode="file.xml" multiplicity="1">offgas-solo-input</port>
+    <port type="use"     mode="file.xml" multiplicity="1">offgas-input</port>
     <port type="use"     mode="file.xml" multiplicity="1">offgas</port>
-    <port type="provide" mode="file.xml" multiplicity="1">time-puff</port>
+    <port type="provide" mode="file.xml" multiplicity="1">puff</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -492,7 +493,7 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="dissolver:0" fromPort="solids-input" toModuleSlot="dissolver:0" toPort="dissolver-test-input"/> 
+    <connect fromModuleSlot="dissolver:0" fromPort="solids-input" toModuleSlot="dissolver:0" toPort="dissolver-solo-input"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
    </network>

@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
@@ -130,5 +129,4 @@ def _Cortix( self,
 
     return 
   
-
 #*********************************************************************************
