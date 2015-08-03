@@ -29,6 +29,7 @@ def _Application( self,
 
 # Inherit a configuration tree
   assert type(appConfigNode) is ConfigTree, '-> appConfigNode invalid' 
+  assert type(appConfigNode.GetNodeTag()) is str, 'empty xml tree.'
   self.configNode = appConfigNode
 
 # Read the application name
@@ -39,7 +40,7 @@ def _Application( self,
   self.workDir = appWorkDir
   assert os.path.isdir( appWorkDir ), 'work directory not available.'
 
-# Set the module library for the application
+# Set the module library for the whole application
 
   node = appConfigNode.GetSubNode('moduleLibrary')
   self.moduLibName = node.get('name').strip()
@@ -47,16 +48,17 @@ def _Application( self,
   subnode = ConfigTree( node )
   assert subnode.GetNodeTag() == 'moduleLibrary', ' fatal.'
   for child in subnode.GetNodeChildren():
-   (tag, items, text) = child
+   (elem, tag, attributes, text) = child
    if tag == 'parentDir': self.moduLibFullParentDir = text.strip()
  
   if self.moduLibFullParentDir[-1] == '/': self.moduLibFullParentDir.strip('/') 
 
+  # add library full path to python module search
   sys.path.insert(1,self.moduLibFullParentDir)
 
 # Create the logging facility for the singleton object
   node = appConfigNode.GetSubNode('logger')
-  loggerName = self.name
+  loggerName = self.name + '.app' # postfix to avoid clash of loggers
   log = logging.getLogger(loggerName)
   log.setLevel(logging.NOTSET)
 
@@ -69,8 +71,6 @@ def _Application( self,
   elif loggerLevel == 'FATAL':  log.setLevel(logging.FATAL)
   else:
     assert True, 'logger level for %r: %r invalid' % (loggerName, loggerLevel)
-
-  self.log = log
 
   fh = logging.FileHandler(self.workDir+'app.log')
   fh.setLevel(logging.NOTSET)
@@ -109,7 +109,9 @@ def _Application( self,
   log.addHandler(fh)
   log.addHandler(ch)
 
-  s = 'created logger: '+self.name
+  self.log = log
+
+  s = 'created Application logger: ' + self.name
   self.log.info(s)
 
   s = 'logger level: '+loggerLevel

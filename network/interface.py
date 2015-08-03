@@ -13,7 +13,7 @@ import datetime
 from cortix.utils.configtree import ConfigTree
 
 # constructor helper
-from ._network import _network
+from ._network import _Network
 #*********************************************************************************
 
 #*********************************************************************************
@@ -24,7 +24,7 @@ class Network():
 
  def __init__( self, netConfigNode = ConfigTree() ):
 
-  _network( self, netConfigNode ) # non-member constructor (external implementation)
+  _Network( self, netConfigNode ) # non-member constructor (external implementation)
  
   return
 

@@ -33,7 +33,8 @@ class Cortix():
 
  def RunSimulations(self, taskName=None):
 
-   for sim in self.simulations: sim.Execute( taskName )
+   for sim in self.simulations: 
+       sim.Execute( taskName )
   
    return
 

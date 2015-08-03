@@ -37,7 +37,7 @@ def _Simulation( self, parentWorkDir = None, simConfigNode = ConfigTree() ):
 # Create the logging facility for each object
 
   node = simConfigNode.GetSubNode('logger')
-  loggerName = self.name
+  loggerName = self.name + '.sim' # postfix to avoid loggers clash
   log = logging.getLogger(loggerName)
   log.setLevel(logging.NOTSET)
 
@@ -50,8 +50,6 @@ def _Simulation( self, parentWorkDir = None, simConfigNode = ConfigTree() ):
   elif loggerLevel == 'FATAL':  log.setLevel(logging.FATAL)
   else:
     assert True, 'logger level for %r: %r invalid' % (loggerName, loggerLevel)
-
-  self.log = log
 
   fh = logging.FileHandler(self.workDir+'sim.log')
   fh.setLevel(logging.NOTSET)
@@ -90,7 +88,9 @@ def _Simulation( self, parentWorkDir = None, simConfigNode = ConfigTree() ):
   log.addHandler(fh)
   log.addHandler(ch)
 
-  s = 'created logger: '+self.name
+  self.log = log
+
+  s = 'created Simulation logger: '+self.name
   self.log.info(s)
 
   s = 'logger level: '+loggerLevel
@@ -118,9 +118,9 @@ def _Simulation( self, parentWorkDir = None, simConfigNode = ConfigTree() ):
 #------------
   self.tasks = list() # holds the task(s) created by the Execute method
 
+
   s = 'created simulation: '+self.name
   self.log.info(s)
-
 
   return
 

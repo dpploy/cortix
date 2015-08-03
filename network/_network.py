@@ -9,13 +9,13 @@ Tue Dec 10 11:21:30 EDT 2013
 #*********************************************************************************
 import os, sys, io
 from   cortix.utils.configtree import ConfigTree
-from   ._setup import _setup
+from   ._setup import _Setup
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
 # Network class constructor
 
-def _network(self, netConfigNode):  
+def _Network(self, netConfigNode):  
 
   assert type(netConfigNode) is ConfigTree, '-> netConfigNode is invalid.' 
 
@@ -23,7 +23,7 @@ def _network(self, netConfigNode):
 
   self.name = self.configNode.GetNodeName()
 
-  _setup( self )
+  _Setup( self )
 
   return
 

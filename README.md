@@ -1,6 +1,14 @@
 **********************************************************************************
 Valmor F. de Almeida; dealmeidav@ornl.gov; vfda
 **********************************************************************************
+
+Cortix is a program (in the form of a library) for system-level modules coupling,
+execution, and analysis.
+
+The primary concepts in Cortix are the creation of an Application and a Simulation
+involving Tasks.
+
+**********************************************************************************
 Fri Jul 31 18:02:36 EDT 2015 vfda
 
 Cortix is a library and it is best used when copied to its own directory, say

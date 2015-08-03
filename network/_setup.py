@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 #---------------------------------------------------------------------------------
 # Private method: Setup network    
 
-def _setup(self):
+def _Setup(self):
 
   self.connectivity = list(dict()) # connectivity information of the network
   self.slotNames  = list()         # modules involved in the network
@@ -27,7 +27,7 @@ def _setup(self):
   
   for child in self.configNode.GetNodeChildren():
 
-    ( tag, attributes, text ) = child
+    ( elem, tag, attributes, text ) = child
 
     if tag == 'connect':
      assert text is None, 'non empty text, %r, in %r network: ' % (text,self.name)

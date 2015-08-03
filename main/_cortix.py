@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
@@ -69,7 +68,6 @@ def _Cortix( self,
     else:
       assert True, 'logger level for %r: %r invalid' % (loggerName, loggerLevel)
 
-    self.log = log
 
     fh = logging.FileHandler(self.workDir+'cortix.log')
     fh.setLevel(logging.NOTSET)
@@ -93,7 +91,7 @@ def _Cortix( self,
         # console handler
         chLevel = child.get('level').strip()
         if   chLevel == 'DEBUG': ch.setLevel(logging.DEBUG)
-        elif chLevel == 'INFO': ch.setLevel(logging.INFO)
+        elif chLevel == 'INFO': ch.setLevel(logging.INFO) 
         elif chLevel == 'WARN': ch.setLevel(logging.WARN)
         elif chLevel == 'ERROR': ch.setLevel(logging.ERROR)
         elif chLevel == 'CRITICAL': ch.setLevel(logging.CRITICAL)
@@ -108,7 +106,9 @@ def _Cortix( self,
     log.addHandler(fh)
     log.addHandler(ch)
 
-    self.log.info('created logger: '+self.name)
+    self.log = log
+
+    self.log.info('created Cortix logger: '+self.name)
 
     s = 'logger level: '+loggerLevel
     self.log.debug(s)
@@ -117,7 +117,7 @@ def _Cortix( self,
     s = 'logger console handler level: '+chLevel
     self.log.debug(s)
 
-    self.log.info('created work directory: '+self.workDir)
+    self.log.info('created Cortix work directory: '+self.workDir)
 
 # Setup simulations (one or more as specified in the config file)
 
@@ -129,5 +129,4 @@ def _Cortix( self,
 
     return 
   
-
 #*********************************************************************************

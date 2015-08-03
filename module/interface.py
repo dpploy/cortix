@@ -40,10 +40,16 @@ class Module():
 # python object referenced to). See NB below.
 
  def GetName(self):
-  return self.modName
+     return self.modName
+
+ def GetLibraryName(self):
+     return self.modLibName
+
+ def GetLibraryParentDir(self):
+     return self.modLibParentDir
 
  def GetPorts(self):
-  return self.ports  
+     return self.ports  
 
  def GetPortType(self, portName):
      portType = None
@@ -73,6 +79,7 @@ class Module():
        if port[0] == portName: return True
 
      return False
+
 #---------------------------------------------------------------------------------
 # Execute module            
 

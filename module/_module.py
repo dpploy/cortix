@@ -23,11 +23,6 @@ def _Module( self, parentWorkDir = None,
 
   assert type(parentWorkDir) is str, '-> parentWorkDir is invalid.' 
 
-# Locate the module library
-
-  self.modLibName      = modLibName
-  self.modLibParentDir = modLibParentDir
-
 # Inherit a configuration tree
   assert type(modConfigNode) is ConfigTree, '-> modConfigNode is invalid.' 
   self.configNode = modConfigNode
@@ -35,6 +30,10 @@ def _Module( self, parentWorkDir = None,
 # Read the module name and type
   self.modName = self.configNode.GetNodeName()
   self.modType = self.configNode.GetNodeType()
+
+# Specify module library with upstream information (override in _Setup() if needed)
+  self.modLibParentDir = modLibParentDir
+  self.modLibName      = modLibName
 
   self.executableName = 'null'
   self.executablePath = 'null'
