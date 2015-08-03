@@ -212,22 +212,6 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="chopper-standalone" type="stand-alone">
-    <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
-    </logger>
-    <executableName>chopper-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/chopper/</executablePath>
-    <inputFileName>chopper.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
-    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
-    <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="provide" mode="file.xml" multiplicity="1">Fuel_Solid</port>
-    <port type="provide" mode="file.xml" multiplicity="1">Gas_Release</port>
-   </module>
-
-   <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="storage" type="native">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
@@ -244,26 +228,6 @@
     <port type="provide" mode="file.xml" multiplicity="1">fuel-segments-on-demand</port>
     <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
     <port type="provide" mode="file.xml" multiplicity="1">state</port>
-   </module>
-
-   <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="storage-standalone" type="stand-alone">
-    <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
-    </logger>
-    <executableName>storage-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/storage/</executablePath>
-    <inputFileName>storage.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
-    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
-    <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="input"   mode="file.xml" multiplicity="1">chopper-data-test</port>
-    <port type="input"   mode="file.xml" multiplicity="1">dissolver-data-test</port>
-    <port type="use"     mode="file.xml" multiplicity="1">solids</port>
-    <port type="use"     mode="file.xml" multiplicity="1">withdrawal-request</port>
-    <port type="provide" mode="file.xml" multiplicity="1">fuel-segments</port>
-    <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -288,49 +252,11 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="dissolver-standalone" type="stand-alone">
-    <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
-    </logger>
-    <executableName>dissolver-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/dissolver/</executablePath>
-    <inputFileName>dissolver.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
-    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
-    <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use"     mode="file.xml" multiplicity="1">solids</port>
-    <port type="use"     mode="file.xml" multiplicity="1">condensate</port>
-    <port type="provide" mode="file.xml" multiplicity="1">signal</port>
-    <port type="provide" mode="file.xml" multiplicity="1">product</port>
-    <port type="provide" mode="file.xml" multiplicity="1">vapor</port>
-    <port type="provide" mode="file.xml" multiplicity="1">heat</port>
-   </module>
-
-   <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="condenser" type="native">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
-    <inputFileName>condenser.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
-    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
-    <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use"     mode="file.xml" multiplicity="1">vapor</port>
-    <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
-    <port type="provide" mode="file.xml" multiplicity="1">condensate</port>
-    <port type="provide" mode="file.xml" multiplicity="1">cooling</port>
-   </module>
-
-   <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="condenser-standalone" type="stand-alone">
-    <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
-    </logger>
-    <executableName>condenser-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/condenser/</executablePath>
     <inputFileName>condenser.input</inputFileName>
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
@@ -400,7 +326,7 @@
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/facility_pfpl/</executablePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="input"   mode="file.xml" multiplicity="1">offgas-solo-input</port>
+    <port type="input"   mode="file.xml" multiplicity="1">plume-solo-input</port>
     <port type="use"     mode="file.xml" multiplicity="1">offgas-input</port>
     <port type="use"     mode="file.xml" multiplicity="1">offgas</port>
     <port type="provide" mode="file.xml" multiplicity="1">puff</port>
@@ -425,20 +351,6 @@
     <port type="use" mode="file.xml" multiplicity="1">time-tables</port>
    </module>
 
-   <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="pyplot-standalone" type="stand-alone">
-    <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
-    </logger>
-    <executableName>pyplot-main.py</executableName>
-    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/modules/pyplot/</executablePath>
-    <inputFileName>pyplot.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
-    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
-    <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use" mode="file.xml" multiplicity="1">time-sequence</port>
-   </module>
 
    <!--                  Modules objects end here                                   -->
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -505,7 +417,7 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="plume:0" fromPort="offgas" toModuleSlot="plume:0" toPort="offgas-input"/> 
+    <connect fromModuleSlot="plume:0" fromPort="offgas-input" toModuleSlot="plume:0" toPort="plume-solo-input"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
