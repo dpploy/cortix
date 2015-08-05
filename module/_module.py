@@ -35,10 +35,10 @@ def _Module( self, parentWorkDir = None,
   self.modLibParentDir = modLibParentDir
   self.modLibName      = modLibName
 
-  self.executableName = 'null'
-  self.executablePath = 'null'
-  self.inputFileName  = 'null'
-  self.inputFilePath  = 'null'
+  self.executableName = 'null-exec'
+  self.executablePath = 'null-exec-path'
+  self.inputFileName  = 'null-input-file-name'
+  self.inputFilePath  = 'null-input-file-path'
 
   self.ports = list()  # list of (portName, portType, portMultiplicity)
 
