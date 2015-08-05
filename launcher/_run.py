@@ -18,21 +18,21 @@ from ._setruntimestatus import _SetRuntimeStatus
 
 def _Run( self ):
 
-
 #.................................................................................
-# First argument is the module input file name with full path.
-# This input file may be empty or used by this driver and/or the native module.
+# Verify the module input file name with full path.
+# This input file may be empty or used by this driver and/or the native/wrapped module.
 # inputFullPathFileName 
 
   assert os.path.isfile(self.inputFullPathFileName), 'file %r not available;stop.' % self.inputFullPathFileName
 
 #.................................................................................
-# Second argument is the Cortix parameter file: cortix-param.xml
+# Read the Cortix parameter file: cortix-param.xml
 # cortexParamFullPathFileName 
 
   assert os.path.isfile(self.cortexParamFullPathFileName), 'file %r not available;stop.' % cortexParamFullPathFileName
 
   tree = ElementTree.parse(self.cortexParamFullPathFileName)
+
   cortexParamXMLRootNode = tree.getroot()
 
   node = cortexParamXMLRootNode.find('evolveTime')
@@ -56,15 +56,16 @@ def _Run( self ):
   else: assert True, 'time unit invalid.'
 
 #.................................................................................
-# Third argument is the Cortix communication file: cortix-comm.xml
+# Read the Cortix communication file: cortix-comm.xml  and  setup ports
 # cortexCommFullPathFileName 
 
   assert os.path.isfile(self.cortexCommFullPathFileName), 'file %r not available;stop.' % self.cortexCommFullPathFileName
 
   tree = ElementTree.parse(self.cortexCommFullPathFileName)
+
   cortexCommXMLRootNode = tree.getroot()
 
-# Setup ports
+  # setup ports
   nodes = cortexCommXMLRootNode.findall('port')
   ports = list()
   if nodes is not None: 
@@ -86,23 +87,17 @@ def _Run( self ):
   s = 'ports: '+str(ports)
   self.log.debug(s)
 
-#.................................................................................
-# Fourth argument is the module runtime-status.xml file
-# runtimeStatusFullPathFileName = argv[4]
-
 #---------------------------------------------------------------------------------
 # Run ModuleName
+
   self.log.info('entered Run '+self.moduleName+'_'+str(self.slotId)+' section')
-
-#.................................................................................
-# Setup input
-
-# vfda: nothing for now
 
 #.................................................................................
 # Create the guest code driver
   guestDriver = self.pyModule.CortixDriver( self.slotId, 
                                             self.inputFullPathFileName, 
+                                            self.execFullPathFileName,
+                                            self.workDir,
                                             ports, evolveTime )
 
   self.log.info('guestDriver = CortixDriver( slotId='+str(self.slotId)+',file='+self.inputFullPathFileName+',ports='+str(ports)+',evolveTime='+str(evolveTime)+' )' )
@@ -128,6 +123,5 @@ def _Run( self ):
 
   _SetRuntimeStatus(self, 'finished')  
   self.log.info("SetRuntimeStatus('finished')")
- 
 
 #*********************************************************************************

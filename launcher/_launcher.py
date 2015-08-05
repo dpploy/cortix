@@ -18,8 +18,10 @@ import importlib
 #---------------------------------------------------------------------------------
 # Launcher class constructor
 
-def _Launcher( self, modLibName, modLibFullParentDir, moduleName, slotId,
+def _Launcher( self, modLibName, moduleName, slotId,
                      inputFullPathFileName, 
+                     execFullPathFileName,
+                     workDir,
                      cortexParamFullPathFileName,
                      cortexCommFullPathFileName,
                      runtimeStatusFullPathFileName ):
@@ -30,6 +32,9 @@ def _Launcher( self, modLibName, modLibFullParentDir, moduleName, slotId,
   self.cortexParamFullPathFileName   = cortexParamFullPathFileName 
   self.cortexCommFullPathFileName    = cortexCommFullPathFileName 
   self.runtimeStatusFullPathFileName = runtimeStatusFullPathFileName 
+
+  self.execFullPathFileName = execFullPathFileName
+  self.workDir              = workDir
 
 #.................................................................................
 # Create logger for this driver and its imported pymodule 
@@ -65,14 +70,13 @@ def _Launcher( self, modLibName, modLibFullParentDir, moduleName, slotId,
   s = 'comm file: ' + self.cortexCommFullPathFileName
   log.debug(s)
 
+  libModuleDriver = modLibName+'.'+moduleName+'.cortix-driver'
 
-  modulePath = modLibName+'.'+moduleName+'.cortix-driver'
-
-  s = 'module path: ' + modulePath
+  s = 'module driver: ' + libModuleDriver
   log.info(s) 
  
-  # import the corresponding python module
-  self.pyModule = importlib.import_module(modulePath)
+  # import the python module driver
+  self.pyModule = importlib.import_module(libModuleDriver)
 
   s = 'imported pyModule: ' + str(self.pyModule)
   log.info(s) 

@@ -28,11 +28,12 @@ def _Setup( self ):
         if text[-1] != '/': text += '/'
         self.executablePath = text
 
-    if tag == 'inputFileName': self.inputFileName = text
+    if tag == 'inputFileName': 
+       self.inputFileName = text
 
     if tag == 'inputFilePath': 
-     if text[-1] != '/': text += '/'
-     self.inputFilePath = text
+       if text[-1] != '/': text += '/'
+       self.inputFilePath = text
 
     if tag == 'library':
        assert len(attributes) == 1, 'only name of library allowed.'

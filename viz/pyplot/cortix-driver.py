@@ -20,6 +20,8 @@ class CortixDriver():
  def __init__( self,
                slotId,
                inputFullPathFileName,
+               execFullPathFileName,
+               workDir,
                ports=list(),
                evolveTime=0.0  # total evolution time
              ):

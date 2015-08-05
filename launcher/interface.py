@@ -20,14 +20,18 @@ from ._run import _Run
 #*********************************************************************************
 class Launcher(Thread):
                      
- def __init__( self, modLibName, modLibFullParentDir, moduleName, slotId,
+ def __init__( self, modLibName, moduleName, slotId,
                      inputFullPathFileName, 
+                     execFullPathFileName,
+                     workDir,
                      cortexParamFullPathFileName,
                      cortexCommFullPathFileName,
                      runtimeStatusFullPathFileName ):
 
-  _Launcher( self, modLibName, modLibFullParentDir, moduleName, slotId,
+  _Launcher( self, modLibName, moduleName, slotId,
                    inputFullPathFileName, 
+                   execFullPathFileName,
+                   workDir,
                    cortexParamFullPathFileName,
                    cortexCommFullPathFileName,
                    runtimeStatusFullPathFileName )
