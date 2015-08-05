@@ -29,19 +29,35 @@ def _Execute(self, slotId, runtimeCortixParamFile, runtimeCortixCommFile ):
   param     = runtimeCortixParamFile
   comm      = runtimeCortixCommFile
 
-  fullPathCommDir = comm[:comm.rfind('/')]+'/'
+  fullPathCommDir         = comm[:comm.rfind('/')]+'/'
   runtimeModuleStatusFile = fullPathCommDir + 'runtime-status.xml'
 
   status = runtimeModuleStatusFile
 
-  modLibParentDir = self.modLibParentDir
   modLibName      = self.modLibName
   modName         = self.modName 
   modType         = self.modType
 
+  # provide for all modules for additional work IO data
+  assert os.path.isdir( fullPathCommDir ), 'module directory not available.'
+
+  modWorkDir  = fullPathCommDir + 'wrk/'
+
+  os.system( 'mkdir -p ' + modWorkDir )
+
+  assert os.path.isdir( modWorkDir ), 'module work directory not available.'
+
+  # only for wrapped modules
+  modExecName = self.executablePath + self.executableName 
+
   # run module on its own thread using file IO communication
-  t = Launcher( modLibName, modLibParentDir, 
-                modName, slotId, input, param, comm, status )
+  t = Launcher( modLibName, modName, 
+                slotId, 
+                input, 
+                modExecName,
+                modWorkDir,
+                param, comm, status )
+
   t.start()
 
   return runtimeModuleStatusFile
