@@ -48,7 +48,7 @@ def _Execute(self, slotId, runtimeCortixParamFile, runtimeCortixCommFile ):
   assert os.path.isdir( modWorkDir ), 'module work directory not available.'
 
   # only for wrapped modules
-  modExecName = self.executableName + self.executablePath 
+  modExecName = self.executablePath + self.executableName 
 
   # run module on its own thread using file IO communication
   t = Launcher( modLibName, modName, 
