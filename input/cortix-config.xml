@@ -381,10 +381,10 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="chopper:0" fromPort="solids-input" toModuleSlot="chopper:0" toPort="Fuel_Solid"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="oldchopper:0" fromPort="solids-input" toModuleSlot="oldchopper:0" toPort="Fuel_Solid"/> 
+    <connect fromModuleSlot="oldchopper:0" fromPort="gas-input" toModuleSlot="oldchopper:0" toPort="Gas_Release"/> 
+    <connect fromModuleSlot="oldchopper:0" fromPort="fines-input" toModuleSlot="oldchopper:0" toPort="Particulate"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="oldchopper:0" toPort="off-gas"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -418,6 +418,7 @@
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <connect fromModuleSlot="plume:0" fromPort="offgas-input" toModuleSlot="plume:0" toPort="plume-solo-input"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-tables" toModuleSlot="plume:0" toPort="puff"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->

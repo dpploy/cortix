@@ -2,11 +2,11 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix: a program for integrating system-level modules
+Pyplot module.
 
 This class manages time-sequence data in XML or tabular formats.
 It is a helper for reading and manipulating stored file data in Cortix.
-The XML data is a ElementTree object. The tabular data is a Pandas object.
+The XML data is a ElementTree object. 
 
 Sat Jul 19 12:13:05 EDT 2014
 """
@@ -22,7 +22,7 @@ class TimeSequence():
 
  def __init__( self,
                fileName = None,   # full path file name
-               fileType = None,   # "xml" or "pandas"
+               fileType = None,   # "xml"
                initialTime = 0.0,
                finalTime   = 0.0,
                logger = None
@@ -52,7 +52,8 @@ class TimeSequence():
      
   self.__tree = None
 
-  if fileType == 'xml': self.__ReadXML()
+  if fileType == 'xml': 
+     self.__ReadXML()
 
   s = 'TimeSequence::__init__(): built object'
   self.__log.debug(s)
@@ -148,6 +149,7 @@ class TimeSequence():
     node = rootNode.find('time')
     timeUnit = node.get('unit').strip()
 
+    # (cut-off) legacy stuff
     timeCutOff = node.get('cut-off')
     if timeCutOff is not None: 
       timeCutOff = float(timeCutOff.strip())
