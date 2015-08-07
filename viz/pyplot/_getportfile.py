@@ -13,26 +13,24 @@ import os, sys, io, time, datetime
 #---------------------------------------------------------------------------------
 # This may return a None portfile
 
-def _GetPortFile( self, usePortName=None, providePortName=None ):
+def _GetPortFile( self, usePort=None, providePort=None ):
 
   portFile = None
 
   #..........
   # Use ports
   #..........
-  if usePortName is not None:
+  if usePort is not None:
 
-    assert providePortName is None
+    assert providePort is None
 
-    for port in self.ports:
-      (portName,portType,thisPortFile) = port
-      if portName == usePortName and portType == 'use': portFile = thisPortFile
+    portFile = usePort[2]
 
     if portFile is None: return None
 
     maxNTrials = 50
     nTrials    = 0
-    while not os.path.isfile(portFile) and nTrials < maxNTrials:
+    while os.path.isfile(portFile) is False and nTrials <= maxNTrials:
       nTrials += 1
       time.sleep(1)
 
@@ -45,13 +43,12 @@ def _GetPortFile( self, usePortName=None, providePortName=None ):
   #..............
   # Provide ports
   #..............
-  if providePortName is not None:
+  if providePort is not None:
 
-    assert usePortName is None
+    assert usePort is None
 
-    for port in self.ports:
-      (portName,portType,thisPortFile) = port
-      if portName == providePortName and portType == 'provide': portFile = thisPortFile
+    portFile = providePort[2] 
+
 
   return portFile
 

@@ -77,6 +77,15 @@
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
+  <task name="solo-condenser">
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
+   <evolveTime unit="hour">1.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
+  </task>
+
   <task name="solo-plume" >
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -248,7 +257,6 @@
     <port type="provide" mode="file.xml" multiplicity="1">state</port>
     <port type="provide" mode="file.xml" multiplicity="1">product</port>
     <port type="provide" mode="file.xml" multiplicity="1">vapor</port>
-    <port type="provide" mode="file.xml" multiplicity="1">heat</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -261,10 +269,11 @@
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
+    <port type="input"   mode="file.xml" multiplicity="1">condenser-solo-input</port>
+    <port type="use"     mode="file.xml" multiplicity="1">vapor-input</port>
     <port type="use"     mode="file.xml" multiplicity="1">vapor</port>
     <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
     <port type="provide" mode="file.xml" multiplicity="1">condensate</port>
-    <port type="provide" mode="file.xml" multiplicity="1">cooling</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -330,6 +339,29 @@
     <port type="use"     mode="file.xml" multiplicity="1">offgas-input</port>
     <port type="use"     mode="file.xml" multiplicity="1">offgas</port>
     <port type="provide" mode="file.xml" multiplicity="1">puff</port>
+   </module>
+
+   <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
+   <module name="cooltower" type="wrapped">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <inputFileName>cooltower.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
+    <library name='srnl-lib'>
+     <parentDir>
+      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
+     </parentDir>
+    </library>
+    <executableName>cttool.x</executableName>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/srnl-lib/cooltower/bin/</executablePath>
+    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
+    <!-- The *input* type allows for module self-connection; see network section  -->
+    <port type="input"   mode="file.xml" multiplicity="1">cooltower-solo-input</port>
+    <port type="use"     mode="file.xml" multiplicity="1">water-input</port>
+    <port type="use"     mode="file.xml" multiplicity="1">hot-water</port>
+    <port type="provide" mode="file.xml" multiplicity="1">cold-water</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -408,6 +440,18 @@
     <connect fromModuleSlot="dissolver:0" fromPort="solids-input" toModuleSlot="dissolver:0" toPort="dissolver-solo-input"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
+   </network>
+
+   <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
+   <network name="solo-condenser">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <connect fromModuleSlot="condenser:0" fromPort="vapor-input" toModuleSlot="condenser:0" toPort="condenser-solo-input"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->

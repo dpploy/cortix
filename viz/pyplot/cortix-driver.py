@@ -33,10 +33,12 @@ class CortixDriver():
   assert type(evolveTime) is float, '-> time type %r is invalid.' % type(evolveTime)
 
   # Logging
-  self.__log = logging.getLogger('launcher-viz.pyplot_'+str(slotId)+'cortixdriver.pyplot')
-  self.__log.info('initializing an object of CortixDriver()' )
+  self.__log = logging.getLogger('launcher-viz.pyplot_'+str(slotId)+'.cortixdriver.pyplot')
+  self.__log.debug('initializing an object of CortixDriver()' )
 
   self.__pyPlot = PyPlot( slotId, inputFullPathFileName, ports, evolveTime )
+
+  return
 
 #---------------------------------------------------------------------------------
 # Call all ports at facilityTime
@@ -44,9 +46,11 @@ class CortixDriver():
  def CallPorts( self, facilityTime=0.0 ):
 
   s = 'CallPorts(): facility time [min] = ' + str(facilityTime)
-  self.__log.info(s)
+  self.__log.debug(s)
  
   self.__pyPlot.CallPorts( facilityTime ) 
+
+  return
  
 #---------------------------------------------------------------------------------
 # Evolve system from facilityTime to facilityTime + timeStep
@@ -54,9 +58,11 @@ class CortixDriver():
  def Execute( self, facilityTime=0.0 , timeStep=0.0 ):
 
   s = 'Execute(): facility time [min] = ' + str(facilityTime)
-  self.__log.info(s)
+  self.__log.debug(s)
 
   self.__pyPlot.Execute( facilityTime, timeStep )
+
+  return
 
 #*********************************************************************************
 # Usage: -> python cortix-driver.py
