@@ -95,6 +95,15 @@
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
+  <task name="solo-cooltower" >
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
+   <evolveTime unit="hour">1.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
+  </task>
+
   <task name="fueldepot-chopper">
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -274,6 +283,7 @@
     <port type="use"     mode="file.xml" multiplicity="1">vapor</port>
     <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
     <port type="provide" mode="file.xml" multiplicity="1">condensate</port>
+    <port type="provide" mode="file.xml" multiplicity="1">hot-water</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -452,6 +462,18 @@
     <connect fromModuleSlot="condenser:0" fromPort="vapor-input" toModuleSlot="condenser:0" toPort="condenser-solo-input"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="hot-water"/> 
+   </network>
+
+   <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
+   <network name="solo-cooltower">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <connect fromModuleSlot="cooltower:0" fromPort="water-input" toModuleSlot="cooltower:0" toPort="cooltower-solo-input"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="cooltower:0" toPort="cold-water"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
