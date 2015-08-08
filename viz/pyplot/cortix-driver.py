@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Valmor F. de Almeida dealmeidav@ornl.gov; vfda
+Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
 Cortix driver for guest module.
 Module developer must implement its public methods.

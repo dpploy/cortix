@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Valmor F. de Almeida dealmeidav@ornl.gov; vfda
+Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
 PyPlot module.
 

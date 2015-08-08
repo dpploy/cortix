@@ -163,7 +163,7 @@
 
   <application name="dev1">
 
-   <moduleLibrary name='vfdalib'>
+   <moduleLibrary name='ornl-lib'>
     <parentDir>
       /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
     </parentDir>
