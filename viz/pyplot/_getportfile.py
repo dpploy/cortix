@@ -32,7 +32,7 @@ def _GetPortFile( self, usePort=None, providePort=None ):
     nTrials    = 0
     while os.path.isfile(portFile) is False and nTrials <= maxNTrials:
       nTrials += 1
-      time.sleep(1)
+      time.sleep(0.1)
 
     if nTrials >= 10:
       s = '_GetPortFile(): waited ' + str(nTrials) + ' trials for port: ' + portFile

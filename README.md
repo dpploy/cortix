@@ -9,13 +9,26 @@ The primary concepts in Cortix are the creation of an Application and a Simulati
 involving Tasks.
 
 **********************************************************************************
+Thu Aug 13 16:28:31 EDT 2015
+
+Dependencies:
+
+ Core:
+ python   >= 3.3
+ networkx >= 1.9.1
+
+ Viz:
+ matplotlib >= 1.4.2
+ numpy >= 1.9.0
+
+**********************************************************************************
 Fri Jul 31 18:02:36 EDT 2015 vfda
 
 Cortix is a library and it is best used when copied to its own directory, say
 
   /somepath/cortix/
 
-Then add /somepath/cortix to $PYTHONPATH
+Then add /somepath to $PYTHONPATH
 
 A driver is needed to run Cortix. 
 There is an example in the repository (driver-test-1.py).

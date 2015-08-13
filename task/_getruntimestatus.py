@@ -22,7 +22,7 @@ def _GetRuntimeStatus( self, runtimeStatusFiles ):
 
   for (slotName,statusFile) in runtimeStatusFiles.items():
 
-     if not os.path.isfile(statusFile): time.sleep(1)
+     if not os.path.isfile(statusFile): time.sleep(0.1)
      assert os.path.isfile(statusFile), 'runtime status file %r not found.' % statusFile
 
      tree = ElementTree()

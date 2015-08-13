@@ -138,7 +138,7 @@ class TimeSequence():
       mutex.release()
       s = 'TimeSequence(): '+self.__fileName+' unavailable. Error code: '+str(error.code)+'; File position: '+str(error.position)+'. Retrying...'
       self.__log.debug(s)
-      time.sleep(1)
+      time.sleep(0.1)
       continue
 
     mutex.release()
