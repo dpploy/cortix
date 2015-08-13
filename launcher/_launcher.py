@@ -58,7 +58,7 @@ def _Launcher( self, modLibName, moduleName, slotId,
 
   self.log = log
 
-  s = 'created logger: main'
+  s = 'created logger'
   log.info(s)
 
   s = 'input file: ' + self.inputFullPathFileName

@@ -37,7 +37,7 @@ def _Cortix( self,
     self.name = node.text.strip()
  
     # check
-    assert self.name == name, 'cortix object name conflicts with cortix-config.xml'
+    assert self.name == name, 'cortix object name %r conflicts with cortix-config.xml %r' % (self.name, name)
 
 # Read the work directory name
     node  = self.configTree.GetSubNode('workDir')

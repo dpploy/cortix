@@ -77,12 +77,30 @@
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
+  <task name="solo-condenser">
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
+   <evolveTime unit="hour">1.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
+  </task>
+
   <task name="solo-plume" >
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
    <evolveTime unit="hour">12.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
+  </task>
+
+  <task name="solo-cooltower" >
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
+   <evolveTime unit="hour">1.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
   </task>
 
@@ -145,7 +163,7 @@
 
   <application name="dev1">
 
-   <moduleLibrary name='vfdalib'>
+   <moduleLibrary name='ornl-lib'>
     <parentDir>
       /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
     </parentDir>
@@ -162,12 +180,12 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="fueldepot" type="native">
+    <inputFileName>fueldepot.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
-    <inputFileName>fueldepot.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="input"   mode="directory" multiplicity="1">westinghouse-14x14A</port>
@@ -177,27 +195,32 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="chopper" type="native">
+    <inputFileName>chopper.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
-    <inputFileName>chopper.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use"     mode="file.csv" multiplicity="1">fuel-bundle</port>
+    <port type="use"     mode="file.shlv" multiplicity="1">fuel-bundle</port>
     <port type="provide" mode="file.shlv" multiplicity="1">fuel-segments</port>
     <port type="provide" mode="file.xml" multiplicity="1">state</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="oldchopper" type="native">
+    <library name='vfda-lib'>
+     <parentDir>
+      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
+     </parentDir>
+    </library>
+    <inputFileName>oldchopper.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
-    <inputFileName>oldchopper.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="input"     mode="file.xml" multiplicity="1">Fuel_Solid</port>
@@ -213,12 +236,17 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="storage" type="native">
+    <library name='vfda-lib'>
+     <parentDir>
+      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
+     </parentDir>
+    </library>
+    <inputFileName>storage.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
-    <inputFileName>storage.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="input"   mode="file.xml" multiplicity="1">chopper-data-test</port>
@@ -232,12 +260,17 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="dissolver" type="native">
+    <library name='vfda-lib'>
+     <parentDir>
+      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
+     </parentDir>
+    </library>
+    <inputFileName>dissolver.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
-    <inputFileName>dissolver.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="input"   mode="file.xml" multiplicity="1">dissolver-solo-input</port>
@@ -248,33 +281,39 @@
     <port type="provide" mode="file.xml" multiplicity="1">state</port>
     <port type="provide" mode="file.xml" multiplicity="1">product</port>
     <port type="provide" mode="file.xml" multiplicity="1">vapor</port>
-    <port type="provide" mode="file.xml" multiplicity="1">heat</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="condenser" type="native">
+    <library name='vfda-lib'>
+     <parentDir>
+      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
+     </parentDir>
+    </library>
+    <inputFileName>condenser.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
-    <inputFileName>condenser.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
+    <port type="input"   mode="file.xml" multiplicity="1">condenser-solo-input</port>
+    <port type="use"     mode="file.xml" multiplicity="1">vapor-input</port>
     <port type="use"     mode="file.xml" multiplicity="1">vapor</port>
     <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
     <port type="provide" mode="file.xml" multiplicity="1">condensate</port>
-    <port type="provide" mode="file.xml" multiplicity="1">cooling</port>
+    <port type="provide" mode="file.xml" multiplicity="1">hot-water</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="scrubber" type="native">
+    <inputFileName>scrubber.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
-    <inputFileName>scrubber.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="use"     mode="file.xml" multiplicity="1">inflow-gas</port>
@@ -283,12 +322,12 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="filter" type="native">
+    <inputFileName>filter.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
-    <inputFileName>filter.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="use"     mode="file.xml" multiplicity="1">inflow-gas</port>
@@ -297,12 +336,12 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="offgas" type="native">
+    <inputFileName>offgas.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
-    <inputFileName>offgas.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="use"     mode="file.xml" multiplicity="1">inflow-gas</port>
@@ -311,19 +350,19 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="plume" type="wrapped">
-    <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
-    </logger>
-    <inputFileName>plume.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <library name='srnl-lib'>
      <parentDir>
       /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
      </parentDir>
     </library>
+    <inputFileName>plume.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <executableName>pfpl</executableName>
     <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/facility_pfpl/</executablePath>
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="input"   mode="file.xml" multiplicity="1">plume-solo-input</port>
@@ -333,11 +372,30 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="viz.pyplot" type="native">
+   <module name="cooltower" type="wrapped">
+    <library name='srnl-lib'>
+     <parentDir>
+      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
+     </parentDir>
+    </library>
+    <inputFileName>cooltower.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
+    <executableName>cttool.x</executableName>
+    <executablePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/srnl-lib/cooltower/bin/</executablePath>
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
+    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
+    <!-- The *input* type allows for module self-connection; see network section  -->
+    <port type="input"   mode="file.xml" multiplicity="1">cooltower-solo-input</port>
+    <port type="use"     mode="file.xml" multiplicity="1">water-input</port>
+    <port type="use"     mode="file.xml" multiplicity="1">hot-water</port>
+    <port type="provide" mode="file.xml" multiplicity="1">cold-water</port>
+   </module>
+
+   <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
+   <module name="viz.pyplot" type="native">
     <library name='cortix'>
      <parentDir>
       /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
@@ -345,6 +403,10 @@
     </library>
     <inputFileName>pyplot.input</inputFileName>
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="use" mode="file.xml" multiplicity="1">time-sequence</port>
@@ -408,6 +470,30 @@
     <connect fromModuleSlot="dissolver:0" fromPort="solids-input" toModuleSlot="dissolver:0" toPort="dissolver-solo-input"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
+   </network>
+
+   <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
+   <network name="solo-condenser">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <connect fromModuleSlot="condenser:0" fromPort="vapor-input" toModuleSlot="condenser:0" toPort="condenser-solo-input"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="hot-water"/> 
+   </network>
+
+   <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
+   <network name="solo-cooltower">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <connect fromModuleSlot="cooltower:0" fromPort="water-input" toModuleSlot="cooltower:0" toPort="cooltower-solo-input"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="cooltower:0" toPort="cold-water"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->

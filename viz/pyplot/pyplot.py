@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Valmor F. de Almeida dealmeidav@ornl.gov; vfda
+Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
 PyPlot module.
 
@@ -37,31 +37,43 @@ class PyPlot():
 
  def CallPorts( self, facilityTime=0.0 ):
 
-   self.__UseData( usePortName='time-sequence', atTime=facilityTime )
-   self.__UseData( usePortName='time-tables', atTime=facilityTime )
- 
+  if (facilityTime % self.plotInterval == 0.0 and facilityTime < self.evolveTime) or \
+      facilityTime >= self.evolveTime : 
+
+    # use ports in PyPlot have infinite multiplicity (implement multiplicity later)
+    assert len(self.timeSequences_tmp) == 0
+    for port in self.ports:
+      (portName,portType,thisPortFile) = port
+      if portType == 'use':
+         assert portName == 'time-sequence' or portName == 'time-tables'
+         self.__UseData( port, atTime=facilityTime  )
+
 #---------------------------------------------------------------------------------
  def Execute( self, facilityTime=0.0 , timeStep=0.0 ):
 
    s = 'Execute(): facility time [min] = ' + str(facilityTime)
-   self.log.info(s)
+   self.log.debug(s)
 
    _PlotData( self, facilityTime, timeStep )
 
 #---------------------------------------------------------------------------------
- def __UseData( self, usePortName=None, atTime=0.0 ):
+# This operates on a given use port;
+ def __UseData( self, port, atTime=0.0 ):
 
-  if atTime % self.plotInterval != 0.0: return
+  if (atTime % self.plotInterval == 0.0 and atTime < self.evolveTime) or \
+      atTime >= self.evolveTime :
 
 # Access the port file
-  portFile = _GetPortFile( self, usePortName = usePortName )
+    portFile = _GetPortFile( self, usePort = port )
+
+    usePortName = port[0]
 
 # Get data from port files
-  if usePortName == 'time-sequence' and portFile is not None:
-     _GetTimeSequence( self, portFile, atTime )
+    if usePortName == 'time-sequence' and portFile is not None:
+       _GetTimeSequence( self, portFile, atTime )
 
-  if usePortName == 'time-tables' and portFile is not None:
-     _GetTimeTables( self, portFile, atTime )
+    if usePortName == 'time-tables' and portFile is not None:
+       _GetTimeTables( self, portFile, atTime )
 
   return
 

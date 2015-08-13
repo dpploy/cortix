@@ -36,11 +36,13 @@ def Main():
 
 # tested
 # cortix1.RunSimulations( taskName='solo-fueldepot' )
- cortix1.RunSimulations( taskName='solo-shear' ) # oldchopper
+# cortix1.RunSimulations( taskName='solo-shear' ) # oldchopper
 # cortix1.RunSimulations( taskName='solo-dissolve' )
+# cortix1.RunSimulations( taskName='solo-condenser' )
 # cortix1.RunSimulations( taskName='solo-plume' )
+ cortix1.RunSimulations( taskName='solo-cooltower' )
 # cortix1.RunSimulations( taskName='fueldepot-chopper' )
-#not working cortix1.RunSimulations( taskName='fueldepot-chopper-storage' )
+# cortix1.RunSimulations( taskName='fueldepot-chopper-storage' )
 
 # untested
 # cortix1.RunSimulations( taskName='shear-dissolve-offgas' )

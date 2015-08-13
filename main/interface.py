@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Valmor F. de Almeida dealmeidav@ornl.gov; vfda
+Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
 Cortix: a program for system-level modules
         coupling, execution, and analysis.

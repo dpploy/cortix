@@ -106,11 +106,13 @@ def _Run( self ):
 # Evolve the module 
  
   _SetRuntimeStatus(self, 'running')  
-  self.log.info("SetRuntimeStatus('running')")
+  self.log.info("_SetRuntimeStatus(self, 'running'")
 
   facilityTime = 0.0
 
   while facilityTime <= evolveTime:
+ 
+    self.log.info('facility time [min] = '+str(facilityTime))
 
     guestDriver.CallPorts( facilityTime )
  
@@ -122,6 +124,6 @@ def _Run( self ):
 # Shutdown 
 
   _SetRuntimeStatus(self, 'finished')  
-  self.log.info("SetRuntimeStatus('finished')")
+  self.log.info("_SetRuntimeStatus(self, 'finished'")
 
 #*********************************************************************************

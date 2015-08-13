@@ -15,10 +15,11 @@ from ._plottimetables       import _PlotTimeTables
 #---------------------------------------------------------------------------------
 def _PlotData( self, facilityTime=0.0 , timeStep=0.0):
 
-  s = '_PlotData(): facility time [min] = ' + str(facilityTime)
-  self.log.info(s)
 
   if facilityTime % self.plotInterval == 0.0 and facilityTime < self.evolveTime: 
+
+    s = '_PlotData(): facility time [min] = ' + str(facilityTime)
+    self.log.debug(s)
 
     fromTime = max(0.0, facilityTime-self.plotSlideWindow)
     toTime   = facilityTime
@@ -28,6 +29,9 @@ def _PlotData( self, facilityTime=0.0 , timeStep=0.0):
     _PlotTimeTables(self, fromTime, toTime) # plot with slide window history
 
   elif facilityTime >= self.evolveTime: 
+
+    s = '_PlotData(): facility time [min] = ' + str(facilityTime)
+    self.log.debug(s)
 
     _PlotTimeSeqDashboard(self, 0.0, self.evolveTime)  # plot all history
 

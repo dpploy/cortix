@@ -35,6 +35,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
   s = '_PlotTimeSeqDashboard(): # of variables: '+str(nVar)
   self.log.debug(s)
 
+  # multiple sequences are stored coming from various sources
   # collect all variables in a list for mapping on the dashboards
   variablesData = list()
   for seq in self.timeSequences_tmp:

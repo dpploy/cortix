@@ -55,8 +55,8 @@ class TimeSequence():
   if fileType == 'xml': 
      self.__ReadXML()
 
-  s = 'TimeSequence::__init__(): built object'
-  self.__log.debug(s)
+#  s = 'TimeSequence::__init__(): built object'
+#  self.__log.debug(s)
 
 #---------------------------------------------------------------------------------
 # Accessors (note: all accessors of member data can potentially change the
@@ -138,7 +138,7 @@ class TimeSequence():
       mutex.release()
       s = 'TimeSequence(): '+self.__fileName+' unavailable. Error code: '+str(error.code)+'; File position: '+str(error.position)+'. Retrying...'
       self.__log.debug(s)
-      time.sleep(1)
+      time.sleep(0.1)
       continue
 
     mutex.release()

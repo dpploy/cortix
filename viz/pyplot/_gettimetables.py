@@ -36,7 +36,7 @@ def _GetTimeTables( self, portFile, atTime ):
       mutex.release()
       s = '_GetTimeTables(): '+portFile+' unavailable. Error code: '+str(error.code)+' File position: '+str(error.position)+'. Retrying...'
       self.log.debug(s)
-      time.sleep(1)
+      time.sleep(0.1)
       continue
 
     mutex.release()
@@ -73,7 +73,7 @@ def _GetTimeTables( self, portFile, atTime ):
 
     # end of for timeNode in timeNodes:
 
-    if found is False: time.sleep(1)
+    if found is False: time.sleep(0.1)
 
   # while found is False:
 
