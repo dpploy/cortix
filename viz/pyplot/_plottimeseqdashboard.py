@@ -54,13 +54,13 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       if iVar != 0: # flush any current figure
         figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash)+'.png'
         fig.savefig(figName,dpi=200,fomat='png')
-        plt.close(str(iDash))
+        plt.close(str(self.slotId)+'_'+str(iDash))
         s = '_PlotTimeSeqDashboard(): created plot: '+figName
         self.log.debug(s)
         iDash += 1
       # end of: if iVar != 0: # flush any current figure
 
-      fig = plt.figure(str(iDash))
+      fig = plt.figure(str(self.slotId)+'_'+str(iDash))
 
       gs = gridspec.GridSpec(3,3)
       gs.update( left=0.08,right=0.98,wspace=0.4,hspace=0.4 )
@@ -238,7 +238,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
   figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash)+'.png'
   fig.savefig(figName,dpi=200,fomat='png')
-  plt.close(str(iDash))
+  plt.close(str(self.slotId)+'_'+str(iDash))
   s = '_PlotTimeSeqDashboard(): created plot: '+figName
   self.log.debug(s)
 

@@ -42,114 +42,114 @@
   <!--NB: each task name must match a network name below-->
 
   <task name="solo-fueldepot" >
+   <evolveTime unit="hour">12.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
-   <evolveTime unit="hour">12.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
   </task>
 
   <task name="solo-shear" >
+   <evolveTime unit="hour">12.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
-   <evolveTime unit="hour">12.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
   </task>
 
   <task name="solo-fuel-accum" >
+   <evolveTime unit="hour">24.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
-   <evolveTime unit="hour">24.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
   </task>
 
   <task name="solo-dissolve">
+   <evolveTime unit="hour">1.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
-   <evolveTime unit="hour">1.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
   </task>
 
   <task name="solo-condenser">
+   <evolveTime unit="hour">1.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
-   <evolveTime unit="hour">1.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
   </task>
 
   <task name="solo-plume" >
+   <evolveTime unit="hour">12.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
-   <evolveTime unit="hour">12.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
   </task>
 
   <task name="solo-cooltower" >
+   <evolveTime unit="hour">1.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
-   <evolveTime unit="hour">1.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
   </task>
 
   <task name="fueldepot-chopper">
-   <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
-   </logger>
    <evolveTime unit="hour">12.0</evolveTime> 
 <!-- <evolveTime unit="hour">5.0</evolveTime> -->
    <timeStep unit="minute">1.0</timeStep>
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
   </task>
 
   <task name="fueldepot-chopper-storage">
+<!--   <evolveTime unit="hour">24.0</evolveTime> -->
+   <evolveTime unit="hour">4.0</evolveTime> -->
+   <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
-   <evolveTime unit="hour">24.0</evolveTime> 
-<!-- <evolveTime unit="hour">5.0</evolveTime> -->
-   <timeStep unit="minute">1.0</timeStep>
   </task>
 
   <task name="shear-dissolve-offgas">
-   <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
-   </logger>
    <evolveTime unit="hour">22.0</evolveTime> 
 <!-- <evolveTime unit="hour">5.0</evolveTime> -->
    <timeStep unit="minute">1.0</timeStep>
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
   </task>
 
   <task name="shear-dissolve">
+   <evolveTime unit="hour">24.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
-   <evolveTime unit="hour">24.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
   </task>
 
   <task name="shear-double-dissolve-single-condense">
+   <evolveTime unit="hour">14.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
     <consoleHandler level="INFO"> </consoleHandler>
    </logger>
-   <evolveTime unit="hour">14.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
   </task>
 
   <!--                   Tasks objects end here                                     -->
@@ -236,11 +236,6 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="storage" type="native">
-    <library name='vfda-lib'>
-     <parentDir>
-      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
-     </parentDir>
-    </library>
     <inputFileName>storage.input</inputFileName>
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
@@ -529,7 +524,8 @@
     <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14A"/> 
     <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
     <connect fromModuleSlot="storage:0" fromPort="fuel-segments" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
