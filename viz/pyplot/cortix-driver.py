@@ -36,7 +36,11 @@ class CortixDriver():
   self.__log = logging.getLogger('launcher-viz.pyplot_'+str(slotId)+'.cortixdriver.pyplot')
   self.__log.debug('initializing an object of CortixDriver()' )
 
-  self.__pyPlot = PyPlot( slotId, inputFullPathFileName, ports, evolveTime )
+  self.__pyPlot = PyPlot( slotId, 
+                          inputFullPathFileName, 
+                          workDir,
+                          ports, 
+                          evolveTime )
 
   return
 

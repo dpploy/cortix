@@ -124,6 +124,16 @@
    </logger>
   </task>
 
+  <task name="fueldepot-chopper-dissolver">
+<!--   <evolveTime unit="hour">24.0</evolveTime> -->
+   <evolveTime unit="hour">12.0</evolveTime> -->
+   <timeStep unit="minute">1.0</timeStep>
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
+  </task>
+
   <task name="shear-dissolve-offgas">
    <evolveTime unit="hour">22.0</evolveTime> 
 <!-- <evolveTime unit="hour">5.0</evolveTime> -->
@@ -204,6 +214,7 @@
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="use"     mode="file.shlv" multiplicity="1">fuel-bundle</port>
+    <port type="use"     mode="file.xml" multiplicity="1">start-signal</port>
     <port type="provide" mode="file.shlv" multiplicity="1">fuel-segments</port>
     <port type="provide" mode="file.xml" multiplicity="1">state</port>
    </module>
@@ -254,7 +265,7 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="dissolver" type="native">
+   <module name="dissolverA" type="native">
     <library name='vfda-lib'>
      <parentDir>
       /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
@@ -273,6 +284,26 @@
     <port type="use"     mode="file.xml" multiplicity="1">solids</port>
     <port type="use"     mode="file.xml" multiplicity="1">condensate</port>
     <port type="provide" mode="file.xml" multiplicity="1">signal</port>
+    <port type="provide" mode="file.xml" multiplicity="1">state</port>
+    <port type="provide" mode="file.xml" multiplicity="1">product</port>
+    <port type="provide" mode="file.xml" multiplicity="1">vapor</port>
+   </module>
+
+   <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
+   <module name="dissolver" type="native">
+    <inputFileName>dissolver.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
+    <!-- The *input* type allows for module self-connection; see network section  -->
+    <port type="input"   mode="file.xml" multiplicity="1">dissolver-solo-input</port>
+    <port type="use"     mode="file.xml" multiplicity="1">solids-input</port>
+    <port type="use"     mode="file.xml" multiplicity="1">solids</port>
+    <port type="use"     mode="file.xml" multiplicity="1">condensate</port>
+    <port type="provide" mode="file.xml" multiplicity="1">start-signal</port>
     <port type="provide" mode="file.xml" multiplicity="1">state</port>
     <port type="provide" mode="file.xml" multiplicity="1">product</port>
     <port type="provide" mode="file.xml" multiplicity="1">vapor</port>
@@ -462,9 +493,9 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="dissolver:0" fromPort="solids-input" toModuleSlot="dissolver:0" toPort="dissolver-solo-input"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
+    <connect fromModuleSlot="dissolverA:0" fromPort="solids-input" toModuleSlot="dissolverA:0" toPort="dissolver-solo-input"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="vapor"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -524,9 +555,24 @@
     <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14A"/> 
     <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
     <connect fromModuleSlot="storage:0" fromPort="fuel-segments" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
-<!--    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> -->
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
+   </network>
+
+   <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
+   <network name="fueldepot-chopper-dissolver">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14A"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="start-signal" toModuleSlot="dissolver:0" toPort="start-signal"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
+    <connect fromModuleSlot="dissolver:0" fromPort="solids" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
+    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -542,10 +588,10 @@
     <connect fromModuleSlot="oldchopper:0" fromPort="gas-input" toModuleSlot="oldchopper:0" toPort="Gas_Release"/> 
     <connect fromModuleSlot="oldchopper:0" fromPort="fines-input" toModuleSlot="oldchopper:0" toPort="Particulate"/> 
     <connect fromModuleSlot="storage:0" fromPort="solids" toModuleSlot="oldchopper:0" toPort="solids"/> 
-    <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:0" toPort="signal"/> 
-    <connect fromModuleSlot="dissolver:0" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
-    <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolver:0" toPort="vapor"/> 
-    <connect fromModuleSlot="dissolver:0" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolverA:0" toPort="signal"/> 
+    <connect fromModuleSlot="dissolverA:0" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
+    <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolverA:0" toPort="vapor"/> 
+    <connect fromModuleSlot="dissolverA:0" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
     <connect fromModuleSlot="scrubber:0" fromPort="inflow-gas" toModuleSlot="oldchopper:0" toPort="off-gas"/> 
     <connect fromModuleSlot="scrubber:0" fromPort="inflow-gas" toModuleSlot="storage:0" toPort="off-gas"/> 
     <connect fromModuleSlot="scrubber:0" fromPort="inflow-gas" toModuleSlot="condenser:0" toPort="off-gas"/> 
@@ -557,9 +603,9 @@
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="oldchopper:0" toPort="off-gas"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="signal"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="signal"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="vapor"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="scrubber:0" toPort="off-gas"/> 
@@ -582,16 +628,16 @@
     <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release"/> 
     <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate"/> 
     <connect fromModuleSlot="storage:0" fromPort="solids" toModuleSlot="chopper:0" toPort="solids"/> 
-    <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:0" toPort="signal"/> 
-    <connect fromModuleSlot="dissolver:0" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
-    <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolver:0" toPort="vapor"/> 
-    <connect fromModuleSlot="dissolver:0" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolverA:0" toPort="signal"/> 
+    <connect fromModuleSlot="dissolverA:0" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
+    <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolverA:0" toPort="vapor"/> 
+    <connect fromModuleSlot="dissolverA:0" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="signal"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="signal"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="vapor"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
    </network>
@@ -608,23 +654,23 @@
     <connect fromModuleSlot="chopper:0" fromPort="gas-input" toModuleSlot="chopper:0" toPort="Gas_Release"/> 
     <connect fromModuleSlot="chopper:0" fromPort="fines-input" toModuleSlot="chopper:0" toPort="Particulate"/> 
     <connect fromModuleSlot="storage:0" fromPort="solids" toModuleSlot="chopper:0" toPort="solids"/> 
-    <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:0" toPort="signal"/> 
-    <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolver:1" toPort="signal"/> 
-    <connect fromModuleSlot="dissolver:0" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
-    <connect fromModuleSlot="dissolver:1" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
-    <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolver:0" toPort="vapor"/> 
-    <connect fromModuleSlot="dissolver:0" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
-    <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolver:1" toPort="vapor"/> 
-    <connect fromModuleSlot="dissolver:1" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolverA:0" toPort="signal"/> 
+    <connect fromModuleSlot="storage:0" fromPort="withdrawal-request" toModuleSlot="dissolverA:1" toPort="signal"/> 
+    <connect fromModuleSlot="dissolverA:0" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
+    <connect fromModuleSlot="dissolverA:1" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
+    <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolverA:0" toPort="vapor"/> 
+    <connect fromModuleSlot="dissolverA:0" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolverA:1" toPort="vapor"/> 
+    <connect fromModuleSlot="dissolverA:1" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="signal"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="vapor"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:1" toPort="signal"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:1" toPort="vapor"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolver:1" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="signal"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="vapor"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:1" toPort="signal"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:1" toPort="vapor"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:1" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
    </network>
