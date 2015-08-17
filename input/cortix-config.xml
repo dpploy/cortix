@@ -116,7 +116,7 @@
 
   <task name="fueldepot-chopper-storage">
 <!--   <evolveTime unit="hour">24.0</evolveTime> -->
-   <evolveTime unit="hour">4.0</evolveTime> -->
+   <evolveTime unit="hour">12.0</evolveTime> -->
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
