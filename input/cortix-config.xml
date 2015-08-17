@@ -524,8 +524,9 @@
     <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14A"/> 
     <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
     <connect fromModuleSlot="storage:0" fromPort="fuel-segments" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
+<!--    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> -->
     <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
