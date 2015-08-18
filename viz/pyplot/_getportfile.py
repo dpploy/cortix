@@ -11,8 +11,9 @@ import os, sys, io, time, datetime
 
 #---------------------------------------------------------------------------------
 # This may return a None portfile
+# vfda REVISE ME!!
 
-def _GetPortFile( self, usePortName=None, providePortName=None ):
+def _GetPortFile( self, usePortName=None, usePortFile=None, providePortName=None ):
 
   portFile = None
 
@@ -25,7 +26,7 @@ def _GetPortFile( self, usePortName=None, providePortName=None ):
 
     for port in self.ports:
       (portName,portType,thisPortFile) = port
-      if portName == usePortName and portType == 'use': portFile = thisPortFile
+      if portName == usePortName and portType == 'use' and thisPortFile == usePortFile: portFile = thisPortFile
 
     if portFile is None: return None
 

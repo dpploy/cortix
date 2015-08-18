@@ -214,7 +214,7 @@
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="use"     mode="file.shlv" multiplicity="1">fuel-bundle</port>
-    <port type="use"     mode="file.xml" multiplicity="1">start-signal</port>
+    <port type="use"     mode="file.xml" multiplicity="1">status-signal</port>
     <port type="provide" mode="file.shlv" multiplicity="1">fuel-segments</port>
     <port type="provide" mode="file.xml" multiplicity="1">state</port>
    </module>
@@ -569,7 +569,7 @@
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14A"/> 
     <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="start-signal" toModuleSlot="dissolver:0" toPort="start-signal"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="status-signal" toModuleSlot="dissolver:0" toPort="status-signal"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="solids" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
     <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 

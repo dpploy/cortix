@@ -21,6 +21,7 @@ from ._plotdata import _PlotData
 #*********************************************************************************
 
 #*********************************************************************************
+# vfda: REVISE ME for multiple use port
 class PyPlot():
 
  def __init__( self,
@@ -48,7 +49,7 @@ class PyPlot():
       (portName,portType,thisPortFile) = port
       if portType == 'use':
          assert portName == 'time-sequence' or portName == 'time-tables'
-         self.__UseData( usePortName=portName, atTime=facilityTime  )
+         self.__UseData( usePortName=portName, usePortFile=thisPortFile, atTime=facilityTime  )
 
 #---------------------------------------------------------------------------------
  def Execute( self, facilityTime=0.0 , timeStep=0.0 ):
@@ -60,13 +61,13 @@ class PyPlot():
 
 #---------------------------------------------------------------------------------
 # This operates on a given use port;
- def __UseData( self, usePortName=None, atTime=0.0 ):
+ def __UseData( self, usePortName=None, usePortFile=None, atTime=0.0 ):
 
   if (atTime % self.plotInterval == 0.0 and atTime < self.evolveTime) or \
       atTime >= self.evolveTime :
 
 # Access the port file
-    portFile = _GetPortFile( self, usePortName = usePortName )
+    portFile = _GetPortFile( self, usePortName = usePortName, usePortFile=usePortFile )
 
 # Get data from port files
     if usePortName == 'time-sequence' and portFile is not None:
