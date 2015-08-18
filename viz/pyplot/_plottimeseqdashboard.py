@@ -54,13 +54,13 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       if iVar != 0: # flush any current figure
         figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash)+'.png'
         fig.savefig(figName,dpi=200,fomat='png')
-        plt.close(str(iDash))
+        plt.close(str(self.slotId)+'_'+str(iDash))
         s = '_PlotTimeSeqDashboard(): created plot: '+figName
         self.log.debug(s)
         iDash += 1
       # end of: if iVar != 0: # flush any current figure
 
-      fig = plt.figure(str(iDash))
+      fig = plt.figure(str(self.slotId)+'_'+str(iDash))
 
       gs = gridspec.GridSpec(3,3)
       gs.update( left=0.08,right=0.98,wspace=0.4,hspace=0.4 )
@@ -97,6 +97,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
     if varUnit == 'gram': varUnit = 'g'
     if varUnit == 'gram/min': varUnit = 'g/min'
+    if varUnit == 'gram/m3': varUnit = 'g/m3'
 
     timeUnit  = spec[2]
     varLegend = spec[3]
@@ -131,6 +132,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       if varUnit == 'Ci': varUnit = 'kCi'
       if varUnit == 'W': varUnit = 'kW'
       if varUnit == 'gram/min' or varUnit == 'g/min': varUnit = 'kg/min'
+      if varUnit == 'gram/m3' or varUnit == 'g/m3': varUnit = 'kg/m3'
       if varUnit == '': varUnit = 'x1e3'
 
     if y.max() <= .001 and varScale != 'linear-log' and \
@@ -139,6 +141,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       if varUnit == 'gram' or varUnit == 'g': varUnit = 'ug'
       if varUnit == 'cc': varUnit = 'u-cc'
       if varUnit == 'gram/min' or varUnit == 'g/min': varUnit = 'ug/min'
+      if varUnit == 'gram/m3' or varUnit == 'g/m3': varUnit = 'ug/m3'
 
     if y.max() <= .1 and varScale != 'linear-log' and \
                   varScale != 'log-log' and varScale != 'log': 
@@ -146,6 +149,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       if varUnit == 'gram' or varUnit == 'g': varUnit = 'mg'
       if varUnit == 'cc': varUnit = 'm-cc'
       if varUnit == 'gram/min' or varUnit == 'g/min': varUnit = 'mg/min'
+      if varUnit == 'gram/m3' or varUnit == 'g/m3': varUnit = 'mg/m3'
   
     ax.set_xlabel('Time ['+timeUnit+']',fontsize=9)
     ax.set_ylabel(varName+' ['+varUnit+']',fontsize=9)
@@ -238,7 +242,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
   figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash)+'.png'
   fig.savefig(figName,dpi=200,fomat='png')
-  plt.close(str(iDash))
+  plt.close(str(self.slotId)+'_'+str(iDash))
   s = '_PlotTimeSeqDashboard(): created plot: '+figName
   self.log.debug(s)
 

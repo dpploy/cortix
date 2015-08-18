@@ -22,6 +22,7 @@ from   .timesequence import TimeSequence
 def _PyPlot( self,
              slotId,
              inputFullPathFileName,
+             workDir,
              ports=list(),
              evolveTime=0.0  # total evolution time
            ):

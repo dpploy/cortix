@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
@@ -12,19 +11,22 @@ import os, sys, io, time, datetime
 
 #---------------------------------------------------------------------------------
 # This may return a None portfile
+# vfda REVISE ME!!
 
-def _GetPortFile( self, usePort=None, providePort=None ):
+def _GetPortFile( self, usePortName=None, usePortFile=None, providePortName=None ):
 
   portFile = None
 
   #..........
   # Use ports
   #..........
-  if usePort is not None:
+  if usePortName is not None:
 
-    assert providePort is None
+    assert providePortName is None
 
-    portFile = usePort[2]
+    for port in self.ports:
+      (portName,portType,thisPortFile) = port
+      if portName == usePortName and portType == 'use' and thisPortFile == usePortFile: portFile = thisPortFile
 
     if portFile is None: return None
 
@@ -43,12 +45,13 @@ def _GetPortFile( self, usePort=None, providePort=None ):
   #..............
   # Provide ports
   #..............
-  if providePort is not None:
+  if providePortName is not None:
 
-    assert usePort is None
+    assert usePortName is None
 
-    portFile = providePort[2] 
-
+    for port in self.ports:
+      (portName,portType,thisPortFile) = port
+      if portName == providePortName and portType == 'provide': portFile = thisPortFile
 
   return portFile
 
