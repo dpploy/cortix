@@ -105,7 +105,7 @@
   </task>
 
   <task name="fueldepot-chopper">
-   <evolveTime unit="hour">12.0</evolveTime> 
+   <evolveTime unit="hour">120.0</evolveTime> 
 <!-- <evolveTime unit="hour">5.0</evolveTime> -->
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
@@ -198,8 +198,9 @@
     </logger>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="input"   mode="directory" multiplicity="1">westinghouse-14x14A</port>
+    <port type="input"   mode="directory" multiplicity="1">westinghouse-14x14</port>
     <port type="use"     mode="directory" multiplicity="1">fuel-input</port>
+    <port type="use"     mode="file.xml" multiplicity="1">go-signal</port>
     <port type="provide" mode="file.shlv"  multiplicity="1">fuel-bundle</port>
    </module>
 
@@ -214,9 +215,10 @@
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="use"     mode="file.shlv" multiplicity="1">fuel-bundle</port>
-    <port type="use"     mode="file.xml" multiplicity="1">status-signal</port>
+    <port type="use"     mode="file.xml" multiplicity="1">go-signal</port>
     <port type="provide" mode="file.shlv" multiplicity="1">fuel-segments</port>
     <port type="provide" mode="file.xml" multiplicity="1">state</port>
+    <port type="provide" mode="file.xml" multiplicity="1">status-signal</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -259,6 +261,7 @@
     <port type="input"   mode="file.xml" multiplicity="1">dissolver-data-test</port>
     <port type="use"     mode="file.xml" multiplicity="1">fuel-segments</port>
     <port type="use"     mode="file.xml" multiplicity="1">withdrawal-request</port>
+    <port type="provide" mode="file.xml" multiplicity="1">status-signal</port>
     <port type="provide" mode="file.xml" multiplicity="1">fuel-segments-on-demand</port>
     <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
     <port type="provide" mode="file.xml" multiplicity="1">state</port>
@@ -459,7 +462,7 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14A"/> 
+    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -540,9 +543,11 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14A"/> 
+    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14"/> 
+    <connect fromModuleSlot="fueldepot:0" fromPort="go-signal" toModuleSlot="chopper:0" toPort="status-signal"/> 
     <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -552,12 +557,16 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14A"/> 
+    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14"/> 
+    <connect fromModuleSlot="fueldepot:0" fromPort="go-signal" toModuleSlot="chopper:0" toPort="status-signal"/> 
     <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="go-signal" toModuleSlot="storage:0" toPort="status-signal"/> 
     <connect fromModuleSlot="storage:0" fromPort="fuel-segments" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
     <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="storage:0" toPort="status-signal"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -567,7 +576,7 @@
      <consoleHandler level="INFO"> </consoleHandler>
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14A"/> 
+    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14"/> 
     <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
     <connect fromModuleSlot="chopper:0" fromPort="status-signal" toModuleSlot="dissolver:0" toPort="status-signal"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
