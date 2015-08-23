@@ -68,7 +68,7 @@
    </logger>
   </task>
 
-  <task name="solo-dissolve">
+  <task name="solo-dissolver">
    <evolveTime unit="hour">1.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
@@ -306,7 +306,7 @@
     <port type="use"     mode="file.xml" multiplicity="1">solids-input</port>
     <port type="use"     mode="file.xml" multiplicity="1">solids</port>
     <port type="use"     mode="file.xml" multiplicity="1">condensate</port>
-    <port type="provide" mode="file.xml" multiplicity="1">start-signal</port>
+    <port type="provide" mode="file.xml" multiplicity="1">status-signal</port>
     <port type="provide" mode="file.xml" multiplicity="1">state</port>
     <port type="provide" mode="file.xml" multiplicity="1">product</port>
     <port type="provide" mode="file.xml" multiplicity="1">vapor</port>
@@ -490,7 +490,7 @@
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
-   <network name="solo-dissolve">
+   <network name="solo-dissolver">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
@@ -577,11 +577,14 @@
     </logger>
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14"/> 
+    <connect fromModuleSlot="fueldepot:0" fromPort="go-signal" toModuleSlot="chopper:0" toPort="status-signal"/> 
     <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
-    <connect fromModuleSlot="chopper:0" fromPort="status-signal" toModuleSlot="dissolver:0" toPort="status-signal"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="go-signal" toModuleSlot="dissolver:0" toPort="status-signal"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="solids" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
     <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="status-signal"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->

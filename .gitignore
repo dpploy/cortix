@@ -19,3 +19,5 @@ notes
 mytags
 createtags
 *.plt
+driver-cortix-dev.py
+cortix-config.xml
