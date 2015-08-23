@@ -7,7 +7,7 @@ Tue Jun 24 01:03:45 EDT 2014
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
-import numpy as np
+import numpy as npy
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MultipleLocator
@@ -41,7 +41,8 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
   for seq in self.timeSequences_tmp:
     for (spec,values) in seq.GetVariables().items():
       variablesData.append( (spec,values) )
-  assert len(variablesData) == nVar
+
+  assert len(variablesData) == nVar, 'len(variablesData) = %r; nVar = %r'%(len(variablesData),nVar)
 
   today = datetime.datetime.today().strftime("%d%b%y %H:%M:%S")
   
@@ -76,7 +77,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
           if count == nPlotsNeeded: break
         if count == nPlotsNeeded: break
 
-      axes = np.array(axlst)
+      axes = npy.array(axlst)
 
       text = today+': cortix.viz.PyPlot_'+str(self.slotId)+': Time-Sequence Dashboard'
       fig.text(.5,.95,text,horizontalalignment='center',fontsize=14)
@@ -108,7 +109,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
     if timeUnit == 'minute': timeUnit = 'min'
  
-    data = np.array(val)
+    data = npy.array(val)
 
 #      assert len(data.shape) == 2, 'not a 2-column shape: %r in var %r of %r; stop.' % (data.shape,varName,varLegend)
     if len(data.shape) != 2: 
@@ -180,11 +181,11 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       ax.set_xscale('log')
       ax.set_yscale('log')
       positiveX = x > 0.0
-      x = np.extract(positiveX, x)
-      y = np.extract(positiveX, y)
+      x = npy.extract(positiveX, x)
+      y = npy.extract(positiveX, y)
       positiveY = y > 0.0
-      x = np.extract(positiveY, x)
-      y = np.extract(positiveY, y)
+      x = npy.extract(positiveY, x)
+      y = npy.extract(positiveY, y)
       if y.size > 0:
         if y.min() > 0.0 and y.max() > y.min(): 
           ymax  = y.max()
@@ -202,14 +203,14 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
     if varScale == 'log-linear':
       ax.set_xscale('log')
       positiveX = x > 0.0
-      x = np.extract(positiveX, x)
-      y = np.extract(positiveX, y)
+      x = npy.extract(positiveX, x)
+      y = npy.extract(positiveX, y)
 
     if varScale == 'linear-log':
       ax.set_yscale('log')
       positiveY = y > 0.0
-      x = np.extract( positiveY, x )
-      y = np.extract( positiveY, y )
+      x = npy.extract( positiveY, x )
+      y = npy.extract( positiveY, y )
 #      assert x.size == y.size, 'size error; stop.'
       if y.size > 0:
         if y.min() > 0.0 and y.max() > y.min(): 
