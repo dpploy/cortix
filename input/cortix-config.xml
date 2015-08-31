@@ -304,7 +304,7 @@
     <!-- The *input* type allows for module self-connection; see network section  -->
     <port type="input"   mode="file.xml" multiplicity="1">dissolver-solo-input</port>
     <port type="use"     mode="file.xml" multiplicity="1">solids-input</port>
-    <port type="use"     mode="file.xml" multiplicity="1">solids</port>
+    <port type="use"     mode="file.xml" multiplicity="1">fuel-segments</port>
     <port type="use"     mode="file.xml" multiplicity="1">condensate</port>
     <port type="provide" mode="file.xml" multiplicity="1">status-signal</port>
     <port type="provide" mode="file.xml" multiplicity="1">state</port>
@@ -580,11 +580,11 @@
     <connect fromModuleSlot="fueldepot:0" fromPort="go-signal" toModuleSlot="chopper:0" toPort="status-signal"/> 
     <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
     <connect fromModuleSlot="chopper:0" fromPort="go-signal" toModuleSlot="dissolver:0" toPort="status-signal"/> 
-    <connect fromModuleSlot="dissolver:0" fromPort="solids" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
+    <connect fromModuleSlot="dissolver:0" fromPort="fuel-segments" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
-    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
