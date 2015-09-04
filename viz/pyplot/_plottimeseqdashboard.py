@@ -137,6 +137,8 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       if varUnit == 'gram/min' or varUnit == 'g/min': varUnit = 'kg/min'
       if varUnit == 'gram/m3' or varUnit == 'g/m3': varUnit = 'kg/m3'
       if varUnit == 'gram/L' or varUnit == 'g/L': varUnit = 'kg/L'
+      if varUnit == 'W/L': varUnit = 'kW/L'
+      if varUnit == 'Ci/L': varUnit = 'kCi/L'
       if varUnit == '': varUnit = 'x1e3'
 
     if y.max() <= .001 and varScale != 'linear-log' and \
@@ -148,6 +150,8 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       if varUnit == 'gram/min' or varUnit == 'g/min': varUnit = 'ug/min'
       if varUnit == 'gram/m3' or varUnit == 'g/m3': varUnit = 'ug/m3'
       if varUnit == 'gram/L' or varUnit == 'g/L': varUnit = 'ug/L'
+      if varUnit == 'W/L': varUnit = 'uW/L'
+      if varUnit == 'Ci/L': varUnit = 'uCi/L'
 
     if y.max() <= .1 and varScale != 'linear-log' and \
                   varScale != 'log-log' and varScale != 'log': 
@@ -158,6 +162,8 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       if varUnit == 'gram/min' or varUnit == 'g/min': varUnit = 'mg/min'
       if varUnit == 'gram/m3' or varUnit == 'g/m3': varUnit = 'mg/m3'
       if varUnit == 'gram/L' or varUnit == 'g/L': varUnit = 'mg/L'
+      if varUnit == 'W/L': varUnit = 'mW/L'
+      if varUnit == 'Ci/L': varUnit = 'mCi/L'
   
     ax.set_xlabel('Time ['+timeUnit+']',fontsize=9)
     ax.set_ylabel(varName+' ['+varUnit+']',fontsize=9)
