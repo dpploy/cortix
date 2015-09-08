@@ -106,7 +106,7 @@ def _Run( self ):
 # Evolve the module 
  
   _SetRuntimeStatus(self, 'running')  
-  self.log.info("_SetRuntimeStatus(self, 'running'")
+  self.log.info("_SetRuntimeStatus(self, 'running')")
 
   facilityTime = 0.0
 
