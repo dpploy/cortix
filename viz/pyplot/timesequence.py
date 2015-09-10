@@ -111,8 +111,13 @@ class TimeSequence():
       if time >= self.__initialTime and time <= self.__finalTime:
         data = ts.text.strip().split(',')
         assert len(data) >= 1, 'empty data field in the %r variable; stop.' % name
-        if ivar == 0: assert len(data) == len(varNodes), '# variables %r != # values %r' % (len(data),len(varNodes))
-        timeValues.append( (time, float(data[ivar])) )
+# Accept missing data and fill in as zero; or neglect excess of data
+#        if ivar == 0: 
+#           assert len(data) == len(varNodes), '# variables %r != # values %r' % (len(data),len(varNodes))
+        if len(data) >= len(varNodes):
+           timeValues.append( (time, float(data[ivar])) )
+        else:
+           timeValues.append( (time, float(0.0)) )
     variables[spec] = timeValues
 
   return variables

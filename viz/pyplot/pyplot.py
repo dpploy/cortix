@@ -16,8 +16,8 @@ from ._pyplot import _PyPlot
 from ._getportfile import _GetPortFile
 
 from ._gettimesequence import _GetTimeSequence
-from ._gettimetables  import _GetTimeTables
-from ._plotdata import _PlotData
+from ._gettimetables   import _GetTimeTables
+from ._plotdata        import _PlotData
 #*********************************************************************************
 
 #*********************************************************************************
