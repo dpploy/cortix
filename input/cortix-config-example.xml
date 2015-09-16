@@ -136,8 +136,18 @@
 
   <task name="fueldepot-chopper-dissolver-tank">
 <!--   <evolveTime unit="hour">24.0</evolveTime> -->
-<!--   <evolveTime unit="hour">5.0</evolveTime> -->
-   <evolveTime unit="hour">18.0</evolveTime> 
+<!--   <evolveTime unit="hour">10.0</evolveTime> -->
+   <evolveTime unit="hour">20.0</evolveTime> 
+   <timeStep unit="minute">1.0</timeStep>
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
+  </task>
+
+  <task name="fueldepot-chopper-dissolver-tank-feedprep">
+<!--   <evolveTime unit="hour">28.0</evolveTime> -->
+   <evolveTime unit="hour">10.0</evolveTime> 
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -327,7 +337,7 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="tank" type="native">
-    <inputFileName>storage.input</inputFileName>
+    <inputFileName>tank.input</inputFileName>
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
@@ -335,12 +345,34 @@
     </logger>
     <!-- Ports have three types: 1) use, 2) provide, 3) input -->
     <!-- The *input* type allows for module self-connection; see network section  -->
-    <port type="use"     mode="file.xml" multiplicity="1">liquid</port>
-    <port type="use"     mode="file.xml" multiplicity="1">withdrawal-request</port>
-    <port type="provide" mode="file.xml" multiplicity="1">status-signal</port>
-    <port type="provide" mode="file.xml" multiplicity="1">liquid-on-demand</port>
-    <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
-    <port type="provide" mode="file.xml" multiplicity="1">state</port>
+    <port type="use"     mode="file.xml"  multiplicity="1">liquid</port>
+    <port type="use"     mode="file.xml"  multiplicity="1">withdrawal-request</port>
+    <port type="use"     mode="file.xml"  multiplicity="1">go-signal</port>
+    <port type="provide" mode="file.xml"  multiplicity="1">status-signal</port>
+    <port type="provide" mode="file.xml"  multiplicity="1">liquid-on-demand</port>
+    <port type="provide" mode="file.shlv" multiplicity="1">product</port>
+    <port type="provide" mode="file.xml"  multiplicity="1">off-gas</port>
+    <port type="provide" mode="file.xml"  multiplicity="1">state</port>
+   </module>
+
+   <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
+   <module name="feedprep" type="native">
+    <inputFileName>feedprep.input</inputFileName>
+    <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- Ports have three types: 1) use, 2) provide, 3) input -->
+    <!-- The *input* type allows for module self-connection; see network section  -->
+    <port type="use"     mode="file.xml"  multiplicity="1">liquid</port>
+    <port type="use"     mode="file.xml"  multiplicity="1">withdrawal-request</port>
+    <port type="use"     mode="file.xml"  multiplicity="1">go-signal</port>
+    <port type="provide" mode="file.xml"  multiplicity="1">status-signal</port>
+    <port type="provide" mode="file.xml"  multiplicity="1">liquid-on-demand</port>
+    <port type="provide" mode="file.shlv" multiplicity="1">product</port>
+    <port type="provide" mode="file.xml"  multiplicity="1">off-gas</port>
+    <port type="provide" mode="file.xml"  multiplicity="1">state</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -637,9 +669,36 @@
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
     <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="status-signal"/> 
     <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
-    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="product-plot"/> 
+<!--    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="product-plot"/>  -->
     <connect fromModuleSlot="viz.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="state"/> 
-    <connect fromModuleSlot="viz.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="viz.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="status-signal"/>  
+   </network>
+
+   <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
+   <network name="fueldepot-chopper-dissolver-tank-feedprep">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14"/> 
+    <connect fromModuleSlot="fueldepot:0" fromPort="go-signal" toModuleSlot="chopper:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="go-signal" toModuleSlot="dissolver:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="dissolver:0" fromPort="fuel-segments" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
+    <connect fromModuleSlot="dissolver:0" fromPort="go-signal" toModuleSlot="tank:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="tank:0" fromPort="liquid" toModuleSlot="dissolver:0" toPort="product"/> 
+    <connect fromModuleSlot="tank:0" fromPort="go-signal" toModuleSlot="feedprep:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="feedprep:0" fromPort="liquid" toModuleSlot="tank:0" toPort="product"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
+<!--    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="product-plot"/>  -->
+    <connect fromModuleSlot="viz.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="status-signal"/>  
+    <connect fromModuleSlot="viz.pyplot:3" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:3" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="status-signal"/>  
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
