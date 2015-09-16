@@ -60,7 +60,7 @@ def _Setup( self ):
          val = attribute[1].strip()
 
          if key == 'type':
-           assert val == 'use' or val == 'provide' or val == 'input', 'port attribute value invalid.'
+           assert val == 'use' or val == 'provide' or val == 'input' or val == 'output', 'port attribute value invalid.'
            tmp['portName']=text  # portName
            tmp['portType']=val   # portType
          elif key == 'mode': 
