@@ -9,6 +9,8 @@ notes
 *.tar
 *.gz
 *.xml
+*.ps
+*.shlv
 *.png
 *.dat
 *.inp

@@ -40,7 +40,6 @@ def _Launcher( self, modLibName, moduleName, slotId,
 # Create logger for this driver and its imported pymodule 
   log = logging.getLogger('launcher-'+self.moduleName+'_'+str(self.slotId))
   log.setLevel(logging.DEBUG)
-
 # create file handler for logs
   fullPathTaskDir = self.cortexCommFullPathFileName[:self.cortexCommFullPathFileName.rfind('/')]+'/'
   fh = logging.FileHandler(fullPathTaskDir+'launcher.log')

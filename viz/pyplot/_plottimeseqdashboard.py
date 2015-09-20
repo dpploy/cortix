@@ -98,7 +98,9 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
     if varUnit == 'gram': varUnit = 'g'
     if varUnit == 'gram/min': varUnit = 'g/min'
+    if varUnit == 'gram/s': varUnit = 'g/s'
     if varUnit == 'gram/m3': varUnit = 'g/m3'
+    if varUnit == 'gram/L': varUnit = 'g/L'
 
     timeUnit  = spec[2]
     varLegend = spec[3]
@@ -125,32 +127,60 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
     y = data[:,1]
 
-    if y.max() >= 1000.0 and varScale != 'linear-log' and \
+    if y.max() >= 1e3 and varScale != 'linear-log' and \
                   varScale != 'log-log' and varScale != 'log': 
-      y /= 1000.0
+      y /= 1e3
       if varUnit == 'gram' or varUnit == 'g': varUnit = 'kg'
+      if varUnit == 'L': varUnit = 'kL'
       if varUnit == 'cc': varUnit = 'L'
       if varUnit == 'Ci': varUnit = 'kCi'
       if varUnit == 'W': varUnit = 'kW'
       if varUnit == 'gram/min' or varUnit == 'g/min': varUnit = 'kg/min'
+      if varUnit == 'gram/s' or varUnit == 'g/s': varUnit = 'kg/s'
       if varUnit == 'gram/m3' or varUnit == 'g/m3': varUnit = 'kg/m3'
+      if varUnit == 'gram/L' or varUnit == 'g/L': varUnit = 'kg/L'
+      if varUnit == 'W/L': varUnit = 'kW/L'
+      if varUnit == 'Ci/L': varUnit = 'kCi/L'
       if varUnit == '': varUnit = 'x1e3'
 
-    if y.max() <= .001 and varScale != 'linear-log' and \
+    if y.max() < 1e-6 and varScale != 'linear-log' and \
                   varScale != 'log-log' and varScale != 'log': 
-      y *= 1000000.0
+      y *= 1e9
+      if varUnit == 'gram' or varUnit == 'g': varUnit = 'ng'
+      if varUnit == 'cc': varUnit = 'n-cc'
+      if varUnit == 'L': varUnit = 'nL'
+      if varUnit == 'gram/min' or varUnit == 'g/min': varUnit = 'ng/min'
+      if varUnit == 'gram/s' or varUnit == 'g/s': varUnit = 'ng/s'
+      if varUnit == 'gram/m3' or varUnit == 'g/m3': varUnit = 'ng/m3'
+      if varUnit == 'gram/L' or varUnit == 'g/L': varUnit = 'ng/L'
+      if varUnit == 'W/L': varUnit = 'nW/L'
+      if varUnit == 'Ci/L': varUnit = 'nCi/L'
+
+    if (y.max() >= 1e-6 and y.max() < 1e-3) and varScale != 'linear-log' and \
+                  varScale != 'log-log' and varScale != 'log': 
+      y *= 1e6
       if varUnit == 'gram' or varUnit == 'g': varUnit = 'ug'
       if varUnit == 'cc': varUnit = 'u-cc'
+      if varUnit == 'L': varUnit = 'uL'
       if varUnit == 'gram/min' or varUnit == 'g/min': varUnit = 'ug/min'
+      if varUnit == 'gram/s' or varUnit == 'g/s': varUnit = 'ug/s'
       if varUnit == 'gram/m3' or varUnit == 'g/m3': varUnit = 'ug/m3'
+      if varUnit == 'gram/L' or varUnit == 'g/L': varUnit = 'ug/L'
+      if varUnit == 'W/L': varUnit = 'uW/L'
+      if varUnit == 'Ci/L': varUnit = 'uCi/L'
 
-    if y.max() <= .1 and varScale != 'linear-log' and \
+    if (y.max() >= 1e-3 and y.max() < 1e-1) and varScale != 'linear-log' and \
                   varScale != 'log-log' and varScale != 'log': 
-      y *= 1000.0
+      y *= 1e3
       if varUnit == 'gram' or varUnit == 'g': varUnit = 'mg'
       if varUnit == 'cc': varUnit = 'm-cc'
+      if varUnit == 'L': varUnit = 'mL'
       if varUnit == 'gram/min' or varUnit == 'g/min': varUnit = 'mg/min'
+      if varUnit == 'gram/s' or varUnit == 'g/s': varUnit = 'mg/s'
       if varUnit == 'gram/m3' or varUnit == 'g/m3': varUnit = 'mg/m3'
+      if varUnit == 'gram/L' or varUnit == 'g/L': varUnit = 'mg/L'
+      if varUnit == 'W/L': varUnit = 'mW/L'
+      if varUnit == 'Ci/L': varUnit = 'mCi/L'
   
     ax.set_xlabel('Time ['+timeUnit+']',fontsize=9)
     ax.set_ylabel(varName+' ['+varUnit+']',fontsize=9)
