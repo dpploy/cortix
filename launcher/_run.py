@@ -112,12 +112,24 @@ def _Run( self ):
 
   while facilityTime <= evolveTime:
  
-    self.log.info('facility time [min] = '+str(facilityTime))
+    s = 'CORTIX::LAUNCHER->***->LAUNCHER->***->LAUNCHER->***->LAUNCHER'
+    self.log.debug(s)
+    s = '_Run('+str(round(facilityTime,3))+'[min]): '
+    self.log.debug(s)
+
+    startTime = time.time()
 
     guestDriver.CallPorts( facilityTime )
- 
     guestDriver.Execute( facilityTime, timeStep )
- 
+
+    endTime = time.time()
+
+    s = 'elapsed time (s): '+str(round(endTime-startTime,2))
+    self.log.debug(s)
+
+    s = '_Run('+str(round(facilityTime,3))+'[min]) '
+    self.log.info(s)
+
     facilityTime += timeStep 
 #
 #---------------------------------------------------------------------------------

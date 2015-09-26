@@ -54,7 +54,7 @@ class PyPlot():
 #---------------------------------------------------------------------------------
  def Execute( self, facilityTime=0.0 , timeStep=0.0 ):
 
-   s = 'Execute(): facility time [min] = ' + str(facilityTime)
+   s = 'Execute(): facility time [min] = ' + str(round(facilityTime,3))
    self.log.debug(s)
 
    _PlotData( self, facilityTime, timeStep )

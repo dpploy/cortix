@@ -44,10 +44,11 @@ def Main():
 # cortix1.RunSimulations( taskName='fueldepot-chopper' )
 # cortix1.RunSimulations( taskName='fueldepot-chopper-storage' )
 # cortix1.RunSimulations( taskName='fueldepot-chopper-dissolver' )
-# cortix1.RunSimulations( taskName='fueldepot-chopper-dissolver-tank' )
+ cortix1.RunSimulations( taskName='fueldepot-chopper-dissolver-tank' )
+# cortix1.RunSimulations( taskName='fueldepot-chopper-dissolver-tank-feedprep' )
 
 # testing
- cortix1.RunSimulations( taskName='fueldepot-chopper-dissolver-tank-feedprep' )
+# cortix1.RunSimulations( taskName='solo-solventxtract' )
 
 # untested
 # cortix1.RunSimulations( taskName='shear-dissolve-offgas' )
