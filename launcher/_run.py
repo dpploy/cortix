@@ -35,6 +35,16 @@ def _Run( self ):
 
   cortexParamXMLRootNode = tree.getroot()
 
+  node = cortexParamXMLRootNode.find('startTime')
+
+  startTimeUnit = node.get('unit')
+  startTime     = float(node.text.strip())
+
+  if    startTimeUnit == 'min':  startTime *= 1.0
+  elif  startTimeUnit == 'hour': startTime *= 60.0
+  elif  startTimeUnit == 'day':  startTime *= 24.0 * 60.0
+  else: assert True, 'time unit invalid.'
+
   node = cortexParamXMLRootNode.find('evolveTime')
 
   evolveTimeUnit = node.get('unit')
@@ -92,15 +102,17 @@ def _Run( self ):
 
   self.log.info('entered Run '+self.moduleName+'_'+str(self.slotId)+' section')
 
+  finalTime = startTime + evolveTime
+
 #.................................................................................
 # Create the guest code driver
   guestDriver = self.pyModule.CortixDriver( self.slotId, 
                                             self.inputFullPathFileName, 
                                             self.execFullPathFileName,
                                             self.workDir,
-                                            ports, evolveTime )
+                                            ports, startTime, finalTime )
 
-  self.log.info('guestDriver = CortixDriver( slotId='+str(self.slotId)+',file='+self.inputFullPathFileName+',ports='+str(ports)+',evolveTime='+str(evolveTime)+' )' )
+  self.log.info('guestDriver = CortixDriver( slotId='+str(self.slotId)+',file='+self.inputFullPathFileName+',ports='+str(ports)+',startTime='+str(startTime)+',finalTime='+str(finalTime)+' )' )
 
 #.................................................................................
 # Evolve the module 
@@ -108,9 +120,9 @@ def _Run( self ):
   _SetRuntimeStatus(self, 'running')  
   self.log.info("_SetRuntimeStatus(self, 'running')")
 
-  facilityTime = 0.0
+  facilityTime = startTime
 
-  while facilityTime <= evolveTime:
+  while facilityTime <= finalTime:
  
     s = 'CORTIX::LAUNCHER->***->LAUNCHER->***->LAUNCHER->***->LAUNCHER'
     self.log.debug(s)

@@ -24,14 +24,16 @@ def _PyPlot( self,
              inputFullPathFileName,
              workDir,
              ports=list(),
-             evolveTime=0.0  # total evolution time
+             startTime  = 0.0,
+             finalTime = 0.0  
            ):
 
   # Sanity test
   assert type(slotId) is int, '-> slotId type %r is invalid.' % type(slotId)
   assert type(ports) is list, '-> ports type %r is invalid.' % type(ports)
   assert ports is not None, 'fatal.'
-  assert type(evolveTime) is float, '-> time type %r is invalid.' % type(evolveTime)
+  assert type(startTime) is float, '-> time type %r is invalid.' % type(startTime)
+  assert type(finalTime) is float, '-> time type %r is invalid.' % type(finalTime)
 
   # Logger
   self.log = logging.getLogger('launcher-viz.pyplot_'+str(slotId)+'.cortixdriver.pyplot')
@@ -41,7 +43,8 @@ def _PyPlot( self,
   self.slotId = slotId
   self.ports  = ports
 
-  self.evolveTime = evolveTime
+  self.startTime  = startTime
+  self.finalTime = finalTime
 
   self.plotInterval    = 30.0   # minutes  (1 plot update every 60 min)
   self.plotSlideWindow = 5*30.0 # minutes  (width of the sliding window)
@@ -52,5 +55,31 @@ def _PyPlot( self,
 
   # tables in xml format
   self.timeTablesData = dict(list()) # [(time,timeUnit)] = [column,column,...]
+
+#.................................................................................
+# Input ports (if any)
+
+  fin = open(inputFullPathFileName,'r')
+  inputDataFullPathFileNames = list()
+  for line in fin:
+   inputDataFullPathFileNames.append(line.strip())
+  fin.close()
+
+  if len(inputDataFullPathFileNames) == 0: return
+
+  found = False
+  for (portName,portType,portFile) in ports: 
+    if portName == 'time-sequence-input': # this is the use port connected to the input port
+      s = 'cp -f ' + inputDataFullPathFileNames[0] + ' ' + portFile
+      os.system(s)
+      self.log.debug(s)
+      found = True
+
+  if found is True:
+     s = 'found time-sequence-input file.'
+  else:
+     s = 'did not find time-sequence-input file.'
+
+  self.log.warn(s)
 
 #*********************************************************************************

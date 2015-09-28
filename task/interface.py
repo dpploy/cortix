@@ -39,6 +39,12 @@ class Task():
  def GetWorkDir(self): 
   return self.workDir
 
+ def GetStartTime(self):
+  return self.startTime
+
+ def GetStartTimeUnit(self):
+  return self.startTimeUnit
+
  def GetEvolveTime(self):
   return self.evolveTime
 

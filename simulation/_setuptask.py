@@ -55,6 +55,10 @@ def _SetupTask( self, taskName ):
   s = '<?xml version="1.0" encoding="UTF-8"?>\n'; fout.write(s)
   s = '<!-- Written by Simulation::_Setup() -->\n'; fout.write(s)
   s = '<cortixParam>\n'; fout.write(s)
+  startTime     = task.GetStartTime()
+  startTimeUnit = task.GetStartTimeUnit()
+  s = '<startTime unit="'+startTimeUnit+'"'+'>'+str(startTime)+'</startTime>\n'
+  fout.write(s)
   evolveTime     = task.GetEvolveTime()
   evolveTimeUnit = task.GetEvolveTimeUnit()
   s = '<evolveTime unit="'+evolveTimeUnit+'"'+'>'+str(evolveTime)+'</evolveTime>\n'

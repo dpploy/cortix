@@ -18,10 +18,10 @@ def _GetTimeSequence( self, portFile, atTime ):
   s = '_GetTimeSequence(): will get data in portfile: '+portFile
   self.log.debug(s)
 
-  if atTime >= self.evolveTime: 
-    initialTime = 0.0
+  if atTime >= self.finalTime: 
+    initialTime = self.startTime
   else:
-    initialTime = max( 0.0, atTime-self.plotSlideWindow )
+    initialTime = max( self.startTime, atTime - self.plotSlideWindow )
 
   timeSequence = TimeSequence( portFile, 'xml', initialTime, atTime, self.log )
 

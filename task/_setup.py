@@ -19,17 +19,31 @@ def _Setup(self):
   self.log.debug(s)
 
   for child in self.configNode.GetNodeChildren():
+
     (elem, tag, items, text) = child
+
+    if tag == 'startTime':
+       for (key,value) in items:
+        if key == 'unit' : self.startTimeUnit = value
+       
+       self.startTime = float(text.strip())
+
     if tag == 'evolveTime':
        for (key,value) in items:
         if key == 'unit' : self.evolveTimeUnit = value
        
        self.evolveTime = float(text.strip())
+
     if tag == 'timeStep':
        for (key,value) in items:
         if key == 'unit' : self.timeStepUnit = value
        
        self.timeStep = float(text.strip())
+
+  s = 'startTime value = '+str(self.startTime)
+  self.log.debug(s)
+  s = 'startTime unit  = '+str(self.startTimeUnit)
+  self.log.debug(s)
 
   s = 'evolveTime value = '+str(self.evolveTime)
   self.log.debug(s)

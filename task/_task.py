@@ -97,6 +97,9 @@ def _Task( self, parentWorkDir = None,
   s = 'logger console handler level: '+chLevel
   self.log.debug(s)
 
+  self.startTime     = 0.0
+  self.startTimeUnit = 'null'
+
   self.evolveTime     = 0.0
   self.evolveTimeUnit = 'null'
 
@@ -105,8 +108,10 @@ def _Task( self, parentWorkDir = None,
 
   self.runtimeCortixParamFile = 'null'
 
+#---------------------------------------------------------------------------------
 # Setup this object
   _Setup( self )
+#---------------------------------------------------------------------------------
 
   s = 'created task: '+self.name
   self.log.info(s)

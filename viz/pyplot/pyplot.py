@@ -29,26 +29,28 @@ class PyPlot():
                inputFullPathFileName,
                workDir,
                ports = list(),
-               evolveTime = 0.0  # total evolution time
+               startTime = 0.0,
+               finalTime = 0.0  
              ):
 
   # Constructor
-  _PyPlot( self, slotId, inputFullPathFileName, workDir, ports, evolveTime )
+  _PyPlot( self, slotId, inputFullPathFileName, workDir, ports, startTime, finalTime )
 
 #---------------------------------------------------------------------------------
 # Transfer data at facilityTime
 
  def CallPorts( self, facilityTime=0.0 ):
 
-  if (facilityTime % self.plotInterval == 0.0 and facilityTime < self.evolveTime) or \
-      facilityTime >= self.evolveTime : 
+  if (facilityTime % self.plotInterval == 0.0 and \
+      facilityTime < self.finalTime) or facilityTime >= self.finalTime : 
 
     # use ports in PyPlot have infinite multiplicity (implement multiplicity later)
     assert len(self.timeSequences_tmp) == 0
     for port in self.ports:
       (portName,portType,thisPortFile) = port
       if portType == 'use':
-         assert portName == 'time-sequence' or portName == 'time-tables'
+         assert portName == 'time-sequence' or portName == 'time-tables' or \
+                portName == 'time-sequence-input'
          self.__UseData( usePortName=portName, usePortFile=thisPortFile, atTime=facilityTime  )
 
 #---------------------------------------------------------------------------------
@@ -63,14 +65,15 @@ class PyPlot():
 # This operates on a given use port;
  def __UseData( self, usePortName=None, usePortFile=None, atTime=0.0 ):
 
-  if (atTime % self.plotInterval == 0.0 and atTime < self.evolveTime) or \
-      atTime >= self.evolveTime :
+  if (atTime % self.plotInterval == 0.0 and atTime < self.finalTime) or \
+      atTime >= self.finalTime :
 
 # Access the port file
     portFile = _GetPortFile( self, usePortName = usePortName, usePortFile=usePortFile )
 
 # Get data from port files
-    if usePortName == 'time-sequence' and portFile is not None:
+    if usePortName == 'time-sequence' or usePortName == 'time-sequence-input' and \
+       portFile is not None:
        _GetTimeSequence( self, portFile, atTime )
 
     if usePortName == 'time-tables' and portFile is not None:

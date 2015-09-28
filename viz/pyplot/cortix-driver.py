@@ -23,14 +23,16 @@ class CortixDriver():
                execFullPathFileName,
                workDir,
                ports=list(),
-               evolveTime=0.0  # total evolution time
+               startTime = 0.0,
+               finalTime = 0.0  # evolution time
              ):
 
   # Sanity test
   assert type(slotId) is int, '-> slotId type %r is invalid.' % type(slotId)
   assert type(ports)  is list, '-> ports type %r is invalid.' % type(ports)
   assert len(ports) > 0
-  assert type(evolveTime) is float, '-> time type %r is invalid.' % type(evolveTime)
+  assert type(startTime) is float, '-> time type %r is invalid.' % type(startTime)
+  assert type(finalTime) is float, '-> time type %r is invalid.' % type(finalTime)
 
   # Logging
   self.__log = logging.getLogger('launcher-viz.pyplot_'+str(slotId)+'.cortixdriver.pyplot')
@@ -40,7 +42,8 @@ class CortixDriver():
                           inputFullPathFileName, 
                           workDir,
                           ports, 
-                          evolveTime )
+                          startTime, 
+                          finalTime )
 
   return
 
