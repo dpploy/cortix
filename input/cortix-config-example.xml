@@ -41,6 +41,16 @@
   <!--NB: each task combines parameters for one named application connectivity-->
   <!--NB: each task name must match a network name below-->
 
+  <task name="solo-pyplot" >
+   <startTime unit="hour">8.0</startTime>
+   <evolveTime unit="hour">2.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
+  </task>
+
   <task name="solo-fueldepot" >
    <evolveTime unit="hour">12.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
@@ -114,7 +124,7 @@
   </task>
 
   <task name="fueldepot-chopper">
-   <evolveTime unit="hour">120.0</evolveTime> 
+   <evolveTime unit="hour">130.0</evolveTime> <!-- all assemblies -->
 <!-- <evolveTime unit="hour">5.0</evolveTime> -->
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
@@ -145,7 +155,8 @@
 
   <task name="fueldepot-chopper-dissolver-tank">
 <!--   <evolveTime unit="hour">24.0</evolveTime> -->
-   <evolveTime unit="hour">17.0</evolveTime> <!-- one batch -->
+<!--   <evolveTime unit="hour">17.0</evolveTime>  one batch -->
+   <evolveTime unit="hour">50.0</evolveTime> 
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -546,8 +557,10 @@
     </logger>
     <!-- Ports have fourt types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allows for module self-connection; see network section  -->
-    <port type="use" mode="file.xml" multiplicity="1">time-sequence</port>
-    <port type="use" mode="file.xml" multiplicity="1">time-tables</port>
+    <port type="input" mode="file.xml" multiplicity="1">pyplot-solo-input</port>
+    <port type="use"   mode="file.xml" multiplicity="1">time-sequence-input</port>
+    <port type="use"   mode="file.xml" multiplicity="1">time-sequence</port>
+    <port type="use"   mode="file.xml" multiplicity="1">time-tables</port>
    </module>
 
 
@@ -562,6 +575,19 @@
    <!-- NB: the connect tag is ordered: *from* is the receiver; *to* is the provider-->
    <!-- NB: port labels are the "names" of the ports; "not" a file name necessarily-->
    <!-- NB: module labels must be composed with a "slot" number, say "name:x"-->
+
+   <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
+   <network name="solo-pyplot">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence-input" toModuleSlot="viz.pyplot:0" toPort="pyplot-solo-input"/> 
+   </network>
+
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="solo-fueldepot">
