@@ -124,8 +124,13 @@ def _Run( self ):
 
   while facilityTime <= finalTime:
  
-    s = 'CORTIX::LAUNCHER->***->LAUNCHER->***->LAUNCHER->***->LAUNCHER'
+    s = '****************************************************************************'
     self.log.debug(s)
+    s = 'CORTIX::LAUNCHER->***->LAUNCHER->***->LAUNCHER->***->LAUNCHER->***->LAUNCHER'
+    self.log.debug(s)
+    s = '****************************************************************************'
+    self.log.debug(s)
+
     s = '_Run('+str(round(facilityTime,3))+'[min]): '
     self.log.debug(s)
 
