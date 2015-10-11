@@ -42,8 +42,8 @@
   <!--NB: each task name must match a network name below-->
 
   <task name="solo-pyplot" >
-   <startTime unit="hour">8.0</startTime>
-   <evolveTime unit="hour">2.0</evolveTime>
+   <startTime unit="hour">0.0</startTime>
+   <evolveTime unit="hour">17.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -88,7 +88,16 @@
   </task>
 
   <task name="solo-condenser">
-   <evolveTime unit="hour">1.0</evolveTime>
+   <evolveTime unit="hour">42.0</evolveTime>
+   <timeStep unit="minute">1.0</timeStep>
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
+  </task>
+
+  <task name="solo-tank">
+   <evolveTime unit="hour">42.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -124,8 +133,8 @@
   </task>
 
   <task name="fueldepot-chopper">
-   <evolveTime unit="hour">130.0</evolveTime> <!-- all assemblies -->
-<!-- <evolveTime unit="hour">5.0</evolveTime> -->
+<!--   <evolveTime unit="hour">130.0</evolveTime> --> <!-- all assemblies -->
+   <evolveTime unit="hour">5.0</evolveTime> 
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -145,7 +154,7 @@
 
   <task name="fueldepot-chopper-dissolver">
 <!--   <evolveTime unit="hour">28.0</evolveTime> -->
-   <evolveTime unit="hour">14.0</evolveTime> 
+   <evolveTime unit="hour">42.0</evolveTime> 
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -156,7 +165,16 @@
   <task name="fueldepot-chopper-dissolver-tank">
 <!--   <evolveTime unit="hour">24.0</evolveTime> -->
 <!--   <evolveTime unit="hour">17.0</evolveTime>  one batch -->
-   <evolveTime unit="hour">50.0</evolveTime> 
+   <evolveTime unit="hour">42.0</evolveTime> 
+   <timeStep unit="minute">1.0</timeStep>
+   <logger level="DEBUG">
+    <fileHandler level="DEBUG"> </fileHandler>
+    <consoleHandler level="INFO"> </consoleHandler>
+   </logger>
+  </task>
+
+  <task name="tank-feedprep">
+   <evolveTime unit="hour">42.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -167,7 +185,7 @@
   <task name="fueldepot-chopper-dissolver-tank-feedprep">
 <!--   <evolveTime unit="hour">28.0</evolveTime> -->
 <!--   <evolveTime unit="hour">16.0</evolveTime> -->
-   <evolveTime unit="hour">14.0</evolveTime> 
+   <evolveTime unit="hour">42.0</evolveTime> 
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -362,9 +380,9 @@
     <port type="provide" mode="file.xml"  multiplicity="1">state</port>
     <port type="provide" mode="file.shlv" multiplicity="1">product</port>
     <port type="provide" mode="file.xml"  multiplicity="1">product-plot</port>
-    <port type="provide" mode="file.xml"  multiplicity="1">vapor</port>
+    <port type="provide" mode="file.shlv" multiplicity="1">vapor</port>
     <port type="provide" mode="file.dat"  multiplicity="1">vapor-table</port>
-    <port type="output"  mode="file.dat"  multiplicity="1">persistent-output</port>
+    <port type="output"  mode="file.any"  multiplicity="1">persistent-output</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -377,6 +395,7 @@
     </logger>
     <!-- Ports have fourt types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allows for module self-connection; see network section  -->
+    <port type="input"   mode="file.shlv" multiplicity="1">tank-solo-input</port>
     <port type="use"     mode="file.shlv" multiplicity="1">liquid</port>
     <port type="use"     mode="file.xml"  multiplicity="1">withdrawal-request</port>
     <port type="use"     mode="file.xml"  multiplicity="1">go-signal</port>
@@ -385,6 +404,7 @@
     <port type="provide" mode="file.shlv" multiplicity="1">product</port>
     <port type="provide" mode="file.xml"  multiplicity="1">off-gas</port>
     <port type="provide" mode="file.xml"  multiplicity="1">state</port>
+    <port type="output"  mode="file.any"  multiplicity="1">persistent-output</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -433,11 +453,6 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="condenser" type="native">
-    <library name='vfda-lib'>
-     <parentDir>
-      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
-     </parentDir>
-    </library>
     <inputFileName>condenser.input</inputFileName>
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
@@ -446,12 +461,12 @@
     </logger>
     <!-- Ports have fourt types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allows for module self-connection; see network section  -->
-    <port type="input"   mode="file.xml" multiplicity="1">condenser-solo-input</port>
-    <port type="use"     mode="file.xml" multiplicity="1">vapor-input</port>
-    <port type="use"     mode="file.xml" multiplicity="1">vapor</port>
-    <port type="provide" mode="file.xml" multiplicity="1">off-gas</port>
-    <port type="provide" mode="file.xml" multiplicity="1">condensate</port>
-    <port type="provide" mode="file.xml" multiplicity="1">hot-water</port>
+    <port type="input"   mode="file.shlv" multiplicity="1">condenser-solo-input</port>
+    <port type="use"     mode="file.shlv" multiplicity="1">vapor</port>
+    <port type="provide" mode="file.shlv" multiplicity="1">off-gas</port>
+    <port type="provide" mode="file.shlv" multiplicity="1">condensate</port>
+    <port type="provide" mode="file.xml"  multiplicity="1">hot-water</port>
+    <port type="provide" mode="file.xml"  multiplicity="1">state</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -652,10 +667,21 @@
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
-    <connect fromModuleSlot="condenser:0" fromPort="vapor-input" toModuleSlot="condenser:0" toPort="condenser-solo-input"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="hot-water"/> 
+    <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="condenser:0" toPort="condenser-solo-input"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="state"/> 
+   </network>
+
+   <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
+   <network name="solo-tank">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
+    <connect fromModuleSlot="tank:0" fromPort="liquid" toModuleSlot="tank:0" toPort="tank-solo-input"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="tank:0" toPort="state"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -751,11 +777,32 @@
     <connect fromModuleSlot="chopper:0" fromPort="go-signal" toModuleSlot="dissolver:0" toPort="status-signal"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="fuel-segments" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="persistent-output" toModuleSlot="dissolver:0" toPort="vapor-table"/> 
+    <connect fromModuleSlot="dissolver:0" fromPort="persistent-output" toModuleSlot="dissolver:0" toPort="vapor"/> 
+    <connect fromModuleSlot="dissolver:0" fromPort="persistent-output" toModuleSlot="dissolver:0" toPort="product"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
     <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="status-signal"/> 
     <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
 <!--    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="product-plot"/>  -->
+   </network>
+
+   <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
+   <network name="tank-feedprep">
+    <logger level="DEBUG">
+     <fileHandler level="DEBUG"> </fileHandler>
+     <consoleHandler level="INFO"> </consoleHandler>
+    </logger>
+    <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <!-- For self-connection of a module: fromPort is output type; toPort is t type-->
+    <connect fromModuleSlot="tank:0" fromPort="liquid" toModuleSlot="tank:0" toPort="tank-solo-input"/> 
+    <connect fromModuleSlot="tank:0" fromPort="go-signal" toModuleSlot="feedprep:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="feedprep:0" fromPort="liquid" toModuleSlot="tank:0" toPort="product"/> 
+    <connect fromModuleSlot="feedprep:0" fromPort="persistent-output" toModuleSlot="feedprep:0" toPort="product"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="tank:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="tank:0" toPort="status-signal"/>  
+    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="state"/> 
+    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="status-signal"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -772,6 +819,8 @@
     <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
     <connect fromModuleSlot="chopper:0" fromPort="go-signal" toModuleSlot="dissolver:0" toPort="status-signal"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="fuel-segments" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
+    <connect fromModuleSlot="dissolver:0" fromPort="persistent-output" toModuleSlot="dissolver:0" toPort="vapor-table"/> 
+    <connect fromModuleSlot="dissolver:0" fromPort="persistent-output" toModuleSlot="dissolver:0" toPort="vapor"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="go-signal" toModuleSlot="tank:0" toPort="status-signal"/> 
     <connect fromModuleSlot="tank:0" fromPort="liquid" toModuleSlot="dissolver:0" toPort="product"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
@@ -797,24 +846,21 @@
     <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
     <connect fromModuleSlot="chopper:0" fromPort="go-signal" toModuleSlot="dissolver:0" toPort="status-signal"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="fuel-segments" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
+    <connect fromModuleSlot="dissolver:0" fromPort="persistent-output" toModuleSlot="dissolver:0" toPort="vapor-table"/> 
+    <connect fromModuleSlot="dissolver:0" fromPort="persistent-output" toModuleSlot="dissolver:0" toPort="vapor"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="go-signal" toModuleSlot="tank:0" toPort="status-signal"/> 
     <connect fromModuleSlot="tank:0" fromPort="liquid" toModuleSlot="dissolver:0" toPort="product"/> 
     <connect fromModuleSlot="tank:0" fromPort="go-signal" toModuleSlot="feedprep:0" toPort="status-signal"/> 
     <connect fromModuleSlot="feedprep:0" fromPort="liquid" toModuleSlot="tank:0" toPort="product"/> 
     <connect fromModuleSlot="feedprep:0" fromPort="persistent-output" toModuleSlot="feedprep:0" toPort="product"/> 
-<!--
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
     <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="status-signal"/> 
     <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
--->
-<!--    <connect fromModuleSlot="viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="product-plot"/>  -->
-<!--
     <connect fromModuleSlot="viz.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="status-signal"/>  
--->
-<!--    <connect fromModuleSlot="viz.pyplot:3" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="state"/> -->
-    <connect fromModuleSlot="viz.pyplot:3" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="product-plot"/> 
+    <connect fromModuleSlot="viz.pyplot:3" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="state"/> 
+<!--    <connect fromModuleSlot="viz.pyplot:3" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="product-plot"/> -->
     <connect fromModuleSlot="viz.pyplot:3" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="status-signal"/>  
    </network>
 

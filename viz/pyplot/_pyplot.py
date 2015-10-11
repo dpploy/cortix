@@ -46,8 +46,8 @@ def _PyPlot( self,
   self.startTime  = startTime
   self.finalTime = finalTime
 
-  self.plotInterval    = 30.0   # minutes  (1 plot update every 60 min)
-  self.plotSlideWindow = 5*30.0 # minutes  (width of the sliding window)
+  self.plotInterval    = 60.0   # minutes  (1 plot update every 60 min)
+  self.plotSlideWindow = 5*60.0 # minutes  (width of the sliding window)
 
   # This holds all time sequences, potentially, one per use port. One time sequence
   # has all the data for one port connection.

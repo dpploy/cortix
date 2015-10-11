@@ -1,7 +1,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Pyplot module.
+PyPlot module.
 
 Tue Jun 24 01:03:45 EDT 2014
 """
@@ -18,6 +18,9 @@ from matplotlib.ticker import MultipleLocator
 # these time sequences will be cleared at the end.
 
 def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
+
+  nRows = 3
+  nCols = 3
 
   nSequences = len(self.timeSequences_tmp)
   if nSequences == 0: return
@@ -50,7 +53,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
   iDash = 0
   for iVar in range(nVar):
 
-    if iVar % 9 == 0: # if a multiple of 8 start a new dashboard
+    if iVar%(nRows*nCols) == 0: # if a multiple of nRows*nCols start a new dashboard
 
       if iVar != 0: # flush any current figure
         figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash)+'.png'
@@ -63,15 +66,15 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
       fig = plt.figure(str(self.slotId)+'_'+str(iDash))
 
-      gs = gridspec.GridSpec(3,3)
+      gs = gridspec.GridSpec(nRows,nCols)
       gs.update( left=0.08,right=0.98,wspace=0.4,hspace=0.4 )
 
       axlst = list()
 
       nPlotsNeeded = nVar - iVar 
       count = 0
-      for i in range(3):
-        for j in range(3):
+      for i in range(nRows):
+        for j in range(nCols):
           axlst.append( fig.add_subplot(gs[i, j]) )
           count += 1
           if count == nPlotsNeeded: break
@@ -86,7 +89,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
  
       axId = 0
 
-    # end of: if iVar % 9 == 0: # if a multiple of 9 start a new dashboard
+    # end of: if iVar % nRows*nCols == 0: # if a multiple of nRows*nCols start a new dashboard
 
     (spec,val) = variablesData[iVar]
 
@@ -255,6 +258,9 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
           ax.set_ylim( 1.0, 10.0 )
       else: 
         ax.set_ylim( 1.0, 10.0 )
+
+    # delete this 
+    ax.set_ylim( 1.2, 1.6 )
 
     #...................
     # make the plot here
