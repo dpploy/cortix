@@ -259,9 +259,6 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       else: 
         ax.set_ylim( 1.0, 10.0 )
 
-    # delete this 
-    ax.set_ylim( 1.2, 1.6 )
-
     #...................
     # make the plot here
 
