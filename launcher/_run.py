@@ -136,8 +136,15 @@ def _Run( self ):
 
     startTime = time.time()
 
+    #-----------------------------------------------------------------------------
+    # Data exchange at facilityTime (at startTime, this is here for provide state)
     guestDriver.CallPorts( facilityTime )
+    #-----------------------------------------------------------------------------
+
+    #-----------------------------------------------------------------------------
+    # Advance to facilityTime + timeStep
     guestDriver.Execute( facilityTime, timeStep )
+    #-----------------------------------------------------------------------------
 
     endTime = time.time()
 

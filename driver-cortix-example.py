@@ -37,9 +37,8 @@ def Main():
 # tested
  cortix1.RunSimulations( taskName='solo-pyplot' )
 # cortix1.RunSimulations( taskName='solo-fueldepot' )
-# cortix1.RunSimulations( taskName='solo-shear' ) # oldchopper
+# cortix1.RunSimulations( taskName='solo-shear' )     # oldchopper
 # cortix1.RunSimulations( taskName='solo-dissolver' ) # olddissolver
-# cortix1.RunSimulations( taskName='solo-condenser' )
 # cortix1.RunSimulations( taskName='solo-plume' )
 # cortix1.RunSimulations( taskName='solo-cooltower' )
 # cortix1.RunSimulations( taskName='fueldepot-chopper' )
@@ -47,6 +46,9 @@ def Main():
 # cortix1.RunSimulations( taskName='fueldepot-chopper-dissolver' )
 # cortix1.RunSimulations( taskName='fueldepot-chopper-dissolver-tank' )
 # cortix1.RunSimulations( taskName='fueldepot-chopper-dissolver-tank-feedprep' )
+# cortix1.RunSimulations( taskName='solo-condenser' )
+# cortix1.RunSimulations( taskName='solo-tank' )
+# cortix1.RunSimulations( taskName='tank-feedprep' )
 
 # testing
 # cortix1.RunSimulations( taskName='solo-solventxtract' )
