@@ -88,7 +88,7 @@
   </task>
 
   <task name="solo-condenser">
-   <evolveTime unit="hour">42.0</evolveTime>
+   <evolveTime unit="hour">20.0</evolveTime> <!-- 42h max -->
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -134,7 +134,7 @@
 
   <task name="fueldepot-chopper">
 <!--   <evolveTime unit="hour">130.0</evolveTime> --> <!-- all assemblies -->
-   <evolveTime unit="hour">5.0</evolveTime> 
+   <evolveTime unit="hour">14.0</evolveTime> 
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -284,10 +284,11 @@
     <!-- Ports have fourt types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allows for module self-connection; see network section  -->
     <port type="use"     mode="file.shlv" multiplicity="1">fuel-bundle</port>
-    <port type="use"     mode="file.xml" multiplicity="1">go-signal</port>
+    <port type="use"     mode="file.xml"  multiplicity="1">go-signal</port>
     <port type="provide" mode="file.shlv" multiplicity="1">fuel-segments</port>
-    <port type="provide" mode="file.xml" multiplicity="1">state</port>
-    <port type="provide" mode="file.xml" multiplicity="1">status-signal</port>
+    <port type="provide" mode="file.xml"  multiplicity="1">state</port>
+    <port type="provide" mode="file.xml"  multiplicity="1">status-signal</port>
+    <port type="output"  mode="file.any"  multiplicity="1">persistent-output</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -426,7 +427,7 @@
     <port type="provide" mode="file.xml"  multiplicity="1">product-plot</port>
     <port type="provide" mode="file.xml"  multiplicity="1">off-gas</port>
     <port type="provide" mode="file.xml"  multiplicity="1">state</port>
-    <port type="output"  mode="file.shlv" multiplicity="1">persistent-output</port>
+    <port type="output"  mode="file.any"  multiplicity="1">persistent-output</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -467,6 +468,7 @@
     <port type="provide" mode="file.shlv" multiplicity="1">condensate</port>
     <port type="provide" mode="file.xml"  multiplicity="1">hot-water</port>
     <port type="provide" mode="file.xml"  multiplicity="1">state</port>
+    <port type="output"  mode="file.any"  multiplicity="1">persistent-output</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -668,7 +670,8 @@
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
     <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="condenser:0" toPort="condenser-solo-input"/> 
-    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="state"/> 
+    <connect fromModuleSlot="condenser:0" fromPort="persistent-output" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="state"/>  
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -737,6 +740,7 @@
     <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14"/> 
     <connect fromModuleSlot="fueldepot:0" fromPort="go-signal" toModuleSlot="chopper:0" toPort="status-signal"/> 
     <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
+    <connect fromModuleSlot="chopper:0" fromPort="persistent-output" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
    </network>
