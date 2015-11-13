@@ -20,7 +20,7 @@ from matplotlib.ticker import MultipleLocator
 def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
   nRows = 3
-  nCols = 3
+  nCols = 1
 
   nSequences = len(self.timeSequences_tmp)
   if nSequences == 0: return
@@ -145,6 +145,8 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       if varUnit == 'W/L': varUnit = 'kW/L'
       if varUnit == 'Ci/L': varUnit = 'kCi/L'
       if varUnit == '': varUnit = 'x1e3'
+      if varUnit == 'L/min': varUnit = 'kL/min'
+      if varUnit == 'Pa': varUnit = 'kPa'
 
     if y.max() < 1e-6 and varScale != 'linear-log' and \
                   varScale != 'log-log' and varScale != 'log': 
@@ -158,6 +160,8 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       if varUnit == 'gram/L' or varUnit == 'g/L': varUnit = 'ng/L'
       if varUnit == 'W/L': varUnit = 'nW/L'
       if varUnit == 'Ci/L': varUnit = 'nCi/L'
+      if varUnit == 'L/min': varUnit = 'nL/min'
+      if varUnit == 'Pa': varUnit = 'nPa'
 
     if (y.max() >= 1e-6 and y.max() < 1e-3) and varScale != 'linear-log' and \
                   varScale != 'log-log' and varScale != 'log': 
@@ -171,6 +175,8 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       if varUnit == 'gram/L' or varUnit == 'g/L': varUnit = 'ug/L'
       if varUnit == 'W/L': varUnit = 'uW/L'
       if varUnit == 'Ci/L': varUnit = 'uCi/L'
+      if varUnit == 'L/min': varUnit = 'uL/min'
+      if varUnit == 'Pa': varUnit = 'uPa'
 
     if (y.max() >= 1e-3 and y.max() < 1e-1) and varScale != 'linear-log' and \
                   varScale != 'log-log' and varScale != 'log': 
@@ -184,6 +190,8 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       if varUnit == 'gram/L' or varUnit == 'g/L': varUnit = 'mg/L'
       if varUnit == 'W/L': varUnit = 'mW/L'
       if varUnit == 'Ci/L': varUnit = 'mCi/L'
+      if varUnit == 'L/min': varUnit = 'mL/min'
+      if varUnit == 'Pa': varUnit = 'mPa'
   
     ax.set_xlabel('Time ['+timeUnit+']',fontsize=9)
     ax.set_ylabel(varName+' ['+varUnit+']',fontsize=9)

@@ -71,7 +71,7 @@ def _Run( self ):
 
   assert os.path.isfile(self.cortexCommFullPathFileName), 'file %r not available;stop.' % self.cortexCommFullPathFileName
 
-  tree = ElementTree.parse(self.cortexCommFullPathFileName)
+  tree = ElementTree.parse( self.cortexCommFullPathFileName )
 
   cortexCommXMLRootNode = tree.getroot()
 
