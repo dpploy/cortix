@@ -205,7 +205,6 @@ def _SetupTask( self, taskName ):
     s = '</cortixComm>'; fout.write(s)
     fout.close()
 
-  sys.exit(0)
   s = 'end _Setup()'
   self.log.debug(s)
 
