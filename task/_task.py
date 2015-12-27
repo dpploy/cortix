@@ -98,15 +98,15 @@ def _Task( self, parentWorkDir = None,
   self.log.debug(s)
 
   self.startTime     = 0.0
-  self.startTimeUnit = 'null'
+  self.startTimeUnit = 'null-startTimeUnit'
 
   self.evolveTime     = 0.0
-  self.evolveTimeUnit = 'null'
+  self.evolveTimeUnit = 'null-evolveTimeUnit'
 
   self.timeStep     = 0.0
-  self.timeStepUnit = 'null'
+  self.timeStepUnit = 'null-timeStepUnit'
 
-  self.runtimeCortixParamFile = 'null'
+  self.runtimeCortixParamFile = 'null-runtimeCortixParamFile'
 
 #---------------------------------------------------------------------------------
 # Setup this object

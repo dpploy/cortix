@@ -34,8 +34,8 @@ def _Setup(self):
        
        self.evolveTime = float(text.strip())
 
-    assert self.evolveTimeUnit != 'null', 'invalid time unit = %r'%(self.evolveTimeUnit)
-    if self.startTimeUnit == 'null': self.startTimeUnit = self.evolveTimeUnit
+    assert self.evolveTimeUnit != 'null-evolveTimeUnit', 'invalid time unit = %r'%(self.evolveTimeUnit)
+    if self.startTimeUnit == 'null-startTimeUnit': self.startTimeUnit = self.evolveTimeUnit
 
     if tag == 'timeStep':
        for (key,value) in items:

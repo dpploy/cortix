@@ -200,7 +200,7 @@ def _SetupTask( self, taskName ):
    slotNames = net.GetSlotNames()
    for slotName in slotNames:
     commFile = net.GetRuntimeCortixCommFile(slotName)
-    if commFile == 'null': continue
+    if commFile == 'null-runtimeCortixCommFile': continue
     fout = open( commFile,'a' )
     s = '</cortixComm>'; fout.write(s)
     fout.close()
