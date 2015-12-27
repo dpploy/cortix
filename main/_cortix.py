@@ -66,7 +66,7 @@ def _Cortix( self,
     elif loggerLevel == 'CRITICAL': log.setLevel(logging.CRITICAL)
     elif loggerLevel == 'FATAL': log.setLevel(logging.CRITICAL)
     else:
-      assert True, 'logger level for %r: %r invalid' % (loggerName, loggerLevel)
+      assert False, 'logger level for %r: %r invalid' % (loggerName, loggerLevel)
 
 
     fh = logging.FileHandler(self.workDir+'cortix.log')
@@ -86,7 +86,7 @@ def _Cortix( self,
         elif fhLevel == 'CRITICAL': fh.setLevel(logging.CRITICAL)
         elif fhLevel == 'FATAL': fh.setLevel(logging.FATAL)
         else:
-          assert True, 'file handler log level for %r: %r invalid' % (loggerName, fhLevel)
+          assert False, 'file handler log level for %r: %r invalid' % (loggerName, fhLevel)
      if child.tag == 'consoleHandler':
         # console handler
         chLevel = child.get('level').strip()
@@ -97,7 +97,7 @@ def _Cortix( self,
         elif chLevel == 'CRITICAL': ch.setLevel(logging.CRITICAL)
         elif chLevel == 'FATAL': ch.setLevel(logging.FATAL)
         else:
-          assert True, 'console handler log level for %r: %r invalid' % (loggerName, chLevel)
+          assert False, 'console handler log level for %r: %r invalid' % (loggerName, chLevel)
     # formatter added to handlers
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)

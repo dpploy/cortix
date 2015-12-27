@@ -124,7 +124,7 @@ def _SetupTask( self, taskName ):
           elif toPortMode == 'directory': 
              s = '<port name="'+toPort+'" type="provide" directory="'+toModuleSlotWorkDir+toPort+'"/>\n'
           else:
-             assert True, 'invalid port mode. fatal.'
+             assert False, 'invalid port mode. fatal.'
           fout.write(s)
           fout.close()
           toModuleToPortVisited[toModuleSlot].append(toPort)
@@ -176,7 +176,7 @@ def _SetupTask( self, taskName ):
         elif toPortMode == 'directory': 
           s = '<port name="'+fromPort+'" type="use" directory="'+toModuleSlotWorkDir+toPort+'"/>\n'
         else:
-          assert True, 'invalid port mode. fatal.'
+          assert False, 'invalid port mode. fatal.'
         fout.write(s)
         fout.close()
 
