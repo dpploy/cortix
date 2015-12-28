@@ -108,7 +108,7 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
 
      density = 0.0
      density = self.propertyDensities[ colName ].sum()
-     return density
+     return float(density) # avoid numpy.float64 type
 
 #.................................................................................
 # get chemical element series
@@ -150,7 +150,7 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
        for nuclide in nuclides:
          density += self.propertyDensities.loc[nuclide,colName]
 
-     return density
+     return float(density) # avoid numpy.float64 type
    
 #.................................................................................
 # get specific nuclide (either the isotopes of the nuclide or the specific isotope) property
@@ -172,6 +172,6 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
       for isotope in isotopes:
         density += self.propertyDensities.loc[isotope,colName]
 
-    return density
+    return float(density) # avoid numpy.float64.type
 
 #*********************************************************************************
