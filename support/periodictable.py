@@ -37,6 +37,10 @@ and descriptive properties of the elements are stored as instance attributes.
 
 :Version: 2015.01.29
 
+Radiochemical data (isotopes) has been added to this table (2015-2016)
+Origin: http://www.radiochemistry.org/
+Valmor F. de Almeida: dealmeidavf@gmail.com; dealmeidav@ornl.gov
+
 Requirements
 ------------
 * `CPython 2.7 or 3.4 <http://www.python.org>`_
@@ -853,6 +857,7 @@ ELEMENTS = ElementsDict(
                   86: Isotope(85.9092624, 0.0986, 86),
                   87: Isotope(86.9088793, 0.07, 87),
                   88: Isotope(87.9056143, 0.8258, 88),
+                  89: Isotope(88.9074507, 0.0000, 89),
                   90: Isotope(89.9077379, 0.0000, 90)}),
     Element(
         39, 'Y', 'Yttrium',
@@ -865,7 +870,8 @@ ELEMENTS = ElementsDict(
         ionenergy=(6.2173, 12.24, 20.52, 61.8, 77.0,
                    93.0, 116.0, 129.0, 146.52, 191.0,
                    206.0, 374.0, ),
-        isotopes={89: Isotope(88.9058479, 1.0, 89),
+        isotopes={88: Isotope(87.9095011, 0.0, 88),
+                  89: Isotope(88.9058479, 1.0, 89),
                   90: Isotope(89.9071519, 0.0, 90),
                   91: Isotope(90.9073048, 0.0, 91)}),
     Element(
@@ -940,6 +946,7 @@ ELEMENTS = ElementsDict(
                   100: Isotope(99.9042197, 0.126, 100),
                   101: Isotope(100.9055822, 0.1706, 101),
                   102: Isotope(101.9043495, 0.3155, 102),
+                  103: Isotope(102.9063238, 0.0000, 103),
                   104: Isotope(103.90543, 0.1862, 104),
                   106: Isotope(105.9073294, 0.0000, 106)}),
     Element(
@@ -999,6 +1006,7 @@ ELEMENTS = ElementsDict(
                   112: Isotope(111.9027572, 0.2413, 112),
                   113: Isotope(112.9044009, 0.1222, 113),
                   114: Isotope(113.9033581, 0.2873, 114),
+                  115: Isotope(114.9054310, 0.0000, 115),
                   116: Isotope(115.904755, 0.0749, 116)}),
     Element(
         49, 'In', 'Indium',
@@ -1045,6 +1053,7 @@ ELEMENTS = ElementsDict(
                    108.0, ),
         isotopes={121: Isotope(120.903818, 0.5721, 121),
                   123: Isotope(122.9042157, 0.4279, 123),
+                  124: Isotope(123.9059357, 0.0000, 124),
                   125: Isotope(124.9052538, 0.0000, 125),
                   126: Isotope(125.907247, 0.0000, 126)}),
     Element(
@@ -1148,7 +1157,9 @@ ELEMENTS = ElementsDict(
         ionenergy=(5.5387, 10.85, 20.2, 36.72, ),
         isotopes={136: Isotope(135.90714, 0.00185, 136),
                   138: Isotope(137.905986, 0.00251, 138),
+                  139: Isotope(138.9066527, 0.00000, 139),
                   140: Isotope(139.905434, 0.8845, 140),
+                  141: Isotope(140.9082763, 0.0000, 141),
                   142: Isotope(141.90924, 0.11114, 142),
                   144: Isotope(143.9136473, 0.00000, 144)}),
     Element(
@@ -1189,7 +1200,8 @@ ELEMENTS = ElementsDict(
         ionenergy=(5.582, 10.9, ),
         isotopes={145: Isotope(144.912744, 1.0, 145),
                   146: Isotope(145.9146963, 0.0, 146),
-                  147: Isotope(146.9151385 , 0.0, 147)}),
+                  147: Isotope(146.9151385, 0.0, 147),
+                  148: Isotope(147.9174746, 0.0, 148)}),
     Element(
         62, 'Sm', 'Samarium',
         group=3, period=6, block='f', series=9,
@@ -1248,8 +1260,9 @@ ELEMENTS = ElementsDict(
         eleconfig='[Xe] 4f9 6s2',
         oxistates='4, 3*',
         ionenergy=(5.8638, 11.52, ),
-        isotopes={159: Isotope(158.925343, 1.0, 159),
-                  158: Isotope(157.9254131, 0.0, 158)}),
+        isotopes={158: Isotope(157.9254131, 0.0, 158),
+                  159: Isotope(158.925343, 1.0, 159),
+                  160: Isotope(159.9271676, 0.0, 160)}),
     Element(
         66, 'Dy', 'Dysprosium',
         group=3, period=6, block='f', series=9,
@@ -1302,6 +1315,7 @@ ELEMENTS = ElementsDict(
         oxistates='3*, 2',
         ionenergy=(6.1843, 12.05, 23.71, ),
         isotopes={169: Isotope(168.934211, 1.0, 169),
+                  170: Isotope(169.9358014, 0.0, 170),
                   171: Isotope(170.9364294, 0.0, 171)}),
     Element(
         70, 'Yb', 'Ytterbium',
@@ -1590,6 +1604,7 @@ ELEMENTS = ElementsDict(
         oxistates='6, 5*, 4, 3',
         ionenergy=(6.2657, ),
         isotopes={237: Isotope(237.0481673, 0.0, 237),
+                  238: Isotope(238.0509464, 0.0, 238),
                   239: Isotope(239.0529390, 0.0, 239)}),
     Element(
         94, 'Pu', 'Plutonium',
