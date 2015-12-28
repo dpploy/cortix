@@ -70,7 +70,7 @@ def _Setup( self ):
          elif key == 'multiplicity': 
            tmp['portMultiplicity']=int(val)  # portMultiplicity
          else:
-           assert True, 'invalid port attribute. fatal.'
+           assert False, 'invalid port attribute. fatal.'
 
        assert len(tmp) == 4
        store = (tmp['portName'],tmp['portType'],tmp['portMode'],tmp['portMultiplicity'])

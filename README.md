@@ -22,7 +22,7 @@ Dependencies:
  numpy >= 1.9.0
 
 **********************************************************************************
-Fri Jul 31 18:02:36 EDT 2015 vfda
+Sun Dec 13 20:18:19 EST 2015
 
 Cortix is a library and it is best used when copied to its own directory, say
 
@@ -44,6 +44,11 @@ Then to run Cortix, enter the directory of the driver and run the driver.
 Alternatively, Cortix can run from its own directory. Enter the /somepath/cortix/
 and run the driver.
 
+To capture the Cortix screen output of log messages and other messages, do
+
+  /driver-cortix.py >& screen.out
+
+under Linux (inspect the output file screen.out when the run is finished)
 
 **********************************************************************************
 Thu Jul 30 16:00:19 EDT 2015; vfda

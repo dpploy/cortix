@@ -47,7 +47,7 @@ def _Task( self, parentWorkDir = None,
   elif loggerLevel == 'CRITICAL':  log.setLevel(logging.CRITICAL)
   elif loggerLevel == 'FATAL':  log.setLevel(logging.FATAL)
   else:
-    assert True, 'logger level for %r: %r invalid' % (loggerName, loggerLevel)
+    assert False, 'logger level for %r: %r invalid' % (loggerName, loggerLevel)
 
   self.log = log
 
@@ -68,7 +68,7 @@ def _Task( self, parentWorkDir = None,
       elif fhLevel == 'CRITICAL': fh.setLevel(logging.CRITICAL)
       elif fhLevel == 'FATAL': fh.setLevel(logging.FATAL)
       else:
-        assert True, 'file handler log level for %r: %r invalid' % (loggerName, fhLevel)
+        assert False, 'file handler log level for %r: %r invalid' % (loggerName, fhLevel)
    if child.tag == 'consoleHandler':
       # console handler
       chLevel = child.get('level').strip()
@@ -79,7 +79,7 @@ def _Task( self, parentWorkDir = None,
       elif chLevel == 'CRITICAL': ch.setLevel(logging.CRITICAL)
       elif chLevel == 'FATAL': ch.setLevel(logging.FATAL)
       else:
-        assert True, 'console handler log level for %r: %r invalid' % (loggerName, chLevel)
+        assert False, 'console handler log level for %r: %r invalid' % (loggerName, chLevel)
   # formatter added to handlers
   formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
   fh.setFormatter(formatter)
@@ -98,19 +98,21 @@ def _Task( self, parentWorkDir = None,
   self.log.debug(s)
 
   self.startTime     = 0.0
-  self.startTimeUnit = 'null'
+  self.startTimeUnit = 'null-startTimeUnit'
 
   self.evolveTime     = 0.0
-  self.evolveTimeUnit = 'null'
+  self.evolveTimeUnit = 'null-evolveTimeUnit'
 
   self.timeStep     = 0.0
-  self.timeStepUnit = 'null'
+  self.timeStepUnit = 'null-timeStepUnit'
 
-  self.runtimeCortixParamFile = 'null'
+  self.runtimeCortixParamFile = 'null-runtimeCortixParamFile'
 
 #---------------------------------------------------------------------------------
 # Setup this object
+
   _Setup( self )
+
 #---------------------------------------------------------------------------------
 
   s = 'created task: '+self.name

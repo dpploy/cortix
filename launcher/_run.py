@@ -40,30 +40,30 @@ def _Run( self ):
   startTimeUnit = node.get('unit')
   startTime     = float(node.text.strip())
 
-  if    startTimeUnit == 'min':  startTime *= 1.0
+  if    startTimeUnit == 'minute':  startTime *= 1.0
   elif  startTimeUnit == 'hour': startTime *= 60.0
   elif  startTimeUnit == 'day':  startTime *= 24.0 * 60.0
-  else: assert True, 'time unit invalid.'
+  else: assert False, 'time unit invalid: %r'%(startTimeUnit)
 
   node = cortexParamXMLRootNode.find('evolveTime')
 
   evolveTimeUnit = node.get('unit')
   evolveTime     = float(node.text.strip())
 
-  if    evolveTimeUnit == 'min':  evolveTime *= 1.0
+  if    evolveTimeUnit == 'minute':  evolveTime *= 1.0
   elif  evolveTimeUnit == 'hour': evolveTime *= 60.0
   elif  evolveTimeUnit == 'day':  evolveTime *= 24.0 * 60.0
-  else: assert True, 'time unit invalid.'
+  else: assert False, 'time unit invalid: %r'%(evolveimeUnit)
 
   node = cortexParamXMLRootNode.find('timeStep')
 
   timeStepUnit = node.get('unit')
   timeStep     = float(node.text.strip())
 
-  if    timeStepUnit == 'min':  timeStep *= 1.0
+  if    timeStepUnit == 'minute':  timeStep *= 1.0
   elif  timeStepUnit == 'hour': timeStep *= 60.0
   elif  timeStepUnit == 'day':  timeStep *= 24.0 * 60.0
-  else: assert True, 'time unit invalid.'
+  else: assert False, 'time unit invalid: %r'%(timeStepUnit)
 
 #.................................................................................
 # Read the Cortix communication file: cortix-comm.xml  and  setup ports
@@ -90,7 +90,7 @@ def _Run( self ):
       elif portDirectory is not None: 
         ports.append( (portName, portType, portDirectory) ) 
       else: 
-         assert True, 'port mode incorrect. fatal.'
+         assert False, 'port mode incorrect. fatal.'
 
   tree = None
 

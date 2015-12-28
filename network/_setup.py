@@ -48,8 +48,8 @@ def _Setup(self):
      self.connectivity.append( tmp )
 
      for (key,val) in tmp.items():
-       if key == 'fromModuleSlot': self.runtimeCortixCommFile[ val ] = 'null'
-       if key == 'toModuleSlot'  : self.runtimeCortixCommFile[ val ] = 'null'
+       if key == 'fromModuleSlot': self.runtimeCortixCommFile[ val ] = 'null-runtimeCortixCommFile'
+       if key == 'toModuleSlot'  : self.runtimeCortixCommFile[ val ] = 'null-runtimeCortixCommFile'
 
      vtx1 = tmp['fromModuleSlot']
      vtx2 = tmp['toModuleSlot']

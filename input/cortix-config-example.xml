@@ -78,7 +78,7 @@
    </logger>
   </task>
 
-  <task name="solo-dissolver">
+  <task name="solo-dissolverA">
    <evolveTime unit="hour">1.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
@@ -134,7 +134,7 @@
 
   <task name="fueldepot-chopper">
 <!--   <evolveTime unit="hour">130.0</evolveTime> --> <!-- all assemblies -->
-   <evolveTime unit="hour">14.0</evolveTime> 
+   <evolveTime unit="hour">130.0</evolveTime> 
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -154,7 +154,8 @@
 
   <task name="fueldepot-chopper-dissolver">
 <!--   <evolveTime unit="hour">28.0</evolveTime> -->
-   <evolveTime unit="hour">42.0</evolveTime> 
+<!--   <evolveTime unit="hour">42.0</evolveTime>  -->
+   <evolveTime unit="hour">20.0</evolveTime>  
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -259,6 +260,11 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="fueldepot" type="native">
+    <library name='headend-lib'>
+     <parentDir>
+      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
+     </parentDir>
+    </library>
     <inputFileName>fueldepot.input</inputFileName>
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
@@ -275,6 +281,11 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="chopper" type="native">
+    <library name='headend-lib'>
+     <parentDir>
+      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
+     </parentDir>
+    </library>
     <inputFileName>chopper.input</inputFileName>
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
@@ -364,6 +375,11 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="dissolver" type="native">
+    <library name='headend-lib'>
+     <parentDir>
+      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
+     </parentDir>
+    </library>
     <inputFileName>dissolver.input</inputFileName>
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
@@ -454,6 +470,11 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="condenser" type="native">
+    <library name='ornl-lib'>
+     <parentDir>
+      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
+     </parentDir>
+    </library>
     <inputFileName>condenser.input</inputFileName>
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
@@ -647,7 +668,7 @@
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
-   <network name="solo-dissolver">
+   <network name="solo-dissolverA">
     <logger level="DEBUG">
      <fileHandler level="DEBUG"> </fileHandler>
      <consoleHandler level="INFO"> </consoleHandler>
@@ -740,7 +761,9 @@
     <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14"/> 
     <connect fromModuleSlot="fueldepot:0" fromPort="go-signal" toModuleSlot="chopper:0" toPort="status-signal"/> 
     <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
+<!--
     <connect fromModuleSlot="chopper:0" fromPort="persistent-output" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
+-->
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
     <connect fromModuleSlot="viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
    </network>
