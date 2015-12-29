@@ -68,7 +68,7 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
                       seriesNameMap['poor metals']
                     ]
            nuclides = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] not in collec ]
-           collec = ['O']
+           collec = ['C','O']
            nuclides = [ x for x in nuclides if x.split('-')[0].strip() not in collec ]
         #
         elif series == 'minor actinides':
@@ -160,7 +160,7 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
                      seriesNameMap['poor metals']
                     ]
           nuclides = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] not in collec ]
-          collec = ['O']
+          collec = ['C','O']
           nuclides = [ x for x in nuclides if x.split('-')[0].strip() not in collec ]
        #
        elif series == 'minor actinides':
