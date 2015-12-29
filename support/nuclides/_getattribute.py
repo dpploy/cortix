@@ -44,7 +44,7 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
         # CREATE A HELPER FUNCTION FOR THIS; NOTE THIS IS USED BELOW TOO!!!
         nuclidesNames = self.propertyDensities.index
 
-        seriesNameMap = {'alkali metals':'Alkali metals', 'alkali earth metals':'Alkaline earth metals', 'lanthanides':'Lanthanides', 'actinides':'Actinides', 'transition metals':'Transition metals','noble gases':'Noble gases','metalloids':'Metalloids','fission products':'fission products','nonmetals':'Nonmetals','oxide fission products':'oxide fission products','halogens':'Halogens', 'minor actinides':'minor actnides'}
+        seriesNameMap = {'alkali metals':'Alkali metals', 'alkali earth metals':'Alkaline earth metals', 'lanthanides':'Lanthanides', 'actinides':'Actinides', 'transition metals':'Transition metals','noble gases':'Noble gases','metalloids':'Metalloids','fission products':'fission products','nonmetals':'Nonmetals','oxide fission products':'oxide fission products','halogens':'Halogens', 'minor actinides':'minor actnides', 'volatile fission products':'volatile fission products','poor metals':'Poor metals'}
         #
         if series == 'fission products':
            nuclides = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] != seriesNameMap['actinides'] ]
@@ -52,10 +52,23 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
         elif series == 'oxide fission products':
            collec = [ seriesNameMap['actinides'],
                       seriesNameMap['halogens'],
-                      seriesNameMap['noble gases'],
+                      seriesNameMap['noble gases']
                     ]
            nuclides = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] not in collec ]
            collec = ['C','N','O','H']
+           nuclides = [ x for x in nuclides if x.split('-')[0].strip() not in collec ]
+        #
+        elif series == 'volatile fission products':
+           collec = [ seriesNameMap['actinides'],
+                      seriesNameMap['alkali metals'],
+                      seriesNameMap['alkali earth metals'],
+                      seriesNameMap['lanthanides'],
+                      seriesNameMap['metalloids'],
+                      seriesNameMap['transition metals'],
+                      seriesNameMap['poor metals']
+                    ]
+           nuclides = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] not in collec ]
+           collec = ['C','N','O']
            nuclides = [ x for x in nuclides if x.split('-')[0].strip() not in collec ]
         #
         elif series == 'minor actinides':
@@ -119,7 +132,7 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
 
      assert series in self.chemicalElementSeries, 'series: %r; fail.'%(series)
 
-     seriesNameMap = {'alkali metals':'Alkali metals', 'alkali earth metals':'Alkaline earth metals', 'lanthanides':'Lanthanides', 'actinides':'Actinides', 'transition metals':'Transition metals','noble gases':'Noble gases','metalloids':'Metalloids','fission products':'fission products','nonmetals':'Nonmetals','oxide fission products':'oxide fission products','halogens':'Halogens', 'minor actinides':'minor actnides'}
+     seriesNameMap = {'alkali metals':'Alkali metals', 'alkali earth metals':'Alkaline earth metals', 'lanthanides':'Lanthanides', 'actinides':'Actinides', 'transition metals':'Transition metals','noble gases':'Noble gases','metalloids':'Metalloids','fission products':'fission products','nonmetals':'Nonmetals','oxide fission products':'oxide fission products','halogens':'Halogens', 'minor actinides':'minor actnides', 'volatile fission products':'volatile fission products','poor metals':'Poor metals'}
 
      if series in self.chemicalElementSeries:
 
@@ -131,10 +144,23 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
        elif series == 'oxide fission products':
           collec = [ seriesNameMap['actinides'],
                      seriesNameMap['halogens'],
-                     seriesNameMap['noble gases'],
+                     seriesNameMap['noble gases']
                    ]
           nuclides = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] not in collec ]
           collec = ['C','N','O','H']
+          nuclides = [ x for x in nuclides if x.split('-')[0].strip() not in collec ]
+        #
+       elif series == 'volatile fission products':
+          collec = [ seriesNameMap['actinides'],
+                     seriesNameMap['alkali metals'],
+                     seriesNameMap['alkali earth metals'],
+                     seriesNameMap['lanthanides'],
+                     seriesNameMap['metalloids'],
+                     seriesNameMap['transition metals'],
+                     seriesNameMap['poor metals']
+                    ]
+          nuclides = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] not in collec ]
+          collec = ['C','N','O']
           nuclides = [ x for x in nuclides if x.split('-')[0].strip() not in collec ]
        #
        elif series == 'minor actinides':
