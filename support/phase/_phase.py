@@ -40,8 +40,9 @@ def _Phase( self, timeStamp, species=None, quantities=None, value=0.0 ):
 
   names = list()
 
-  for specie in self.species:
-      names.append(specie.name)
+  if species is not None:
+     for specie in self.species:
+         names.append(specie.name)
 
   if quantities is not None:
      for quant in self.quantities:

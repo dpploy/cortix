@@ -147,6 +147,24 @@ class Phase():
      self.phase.loc[timeStamp,actor] = float(value)
      return
 
+ def WriteHTML( self, fileName ):
+     assert type(fileName) == type(str())
+     tmp = self.phase
+     columnNames = tmp.columns
+     speciesNames = [ specie.name for specie in self.species ]
+     quantityNames = [ quantity.name for quantity in self.quantities ]
+     for col in columnNames:
+         if col in speciesNames: 
+            idx = speciesNames.index(col)
+            specie = self.species[idx]
+            tmp.rename( columns={col:specie.formula}, inplace=True )
+         elif col in quantityNames: 
+            idx = quantityNames.index(col)
+            quant = self.quantities[idx]
+            tmp.rename( columns={col:col+'['+quant.unit+']'}, inplace=True )
+         else: assert False,'oops fatal.'
+     tmp.to_html( fileName )
+
 #*******************************************************************************
 # Printing of data members
 # def __str__( self ):
