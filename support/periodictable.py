@@ -785,7 +785,7 @@ ELEMENTS = ElementsDict(
         isotopes={75: Isotope(74.9215964, 1.0, 75)}),
     Element(
         34, 'Se', 'Selenium',
-        group=16, period=4, block='p', series=1,
+        group=16, period=4, block='p', series=5,
         mass=78.96, eleneg=2.55, eleaffin=2.02067,
         covrad=1.16, atmrad=1.22, vdwrad=1.9,
         tboil=958.0, tmelt=494.0, density=4.82,
@@ -825,6 +825,7 @@ ELEMENTS = ElementsDict(
                    78.5, 110.0, 126.0, 230.39, ),
         isotopes={78: Isotope(77.920386, 0.0035, 78),
                   80: Isotope(79.916378, 0.0228, 80),
+                  81: Isotope(80.9165920, 0.0000, 81),
                   82: Isotope(81.9134846, 0.1158, 82),
                   83: Isotope(82.914136, 0.1149, 83),
                   84: Isotope(83.911507, 0.57, 84),

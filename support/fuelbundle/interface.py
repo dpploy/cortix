@@ -41,6 +41,8 @@ class FuelBundle():
 # These are passing arguments by value effectively. Because the python objects
 # passed into/out of the function are immutable.
 
+ #------
+ # Start: Pre-irradiation information
  def GetName(self):
      return self.__GetName()
  name = property(GetName,None,None,None)
@@ -64,11 +66,13 @@ class FuelBundle():
  def GetNFuelRods(self): 
      return self.__GetNFuelRods()
  nFuelRods = property(GetNFuelRods,None,None,None)
+ # End: Pre-irradiation information
+ #------
 
- def SetFuelPinLength(self,x): 
-     self.__SetFuelPinLength(x)
  def GetFuelPinLength(self): 
      return self.__GetFuelPinLength()
+ def SetFuelPinLength(self,x): 
+     self.__SetFuelPinLength(x)
  fuelPinLength = property(GetFuelPinLength,SetFuelPinLength,None,None)
 
  def GetFuelRodOD(self): 
@@ -87,17 +91,30 @@ class FuelBundle():
      return self.__GetFuelVolume()
  fuelVolume = property(GetFuelVolume,None,None,None)
 
+ def GetSolidPhase(self): 
+     return self._solidPhase
+ def SetSolidPhase(self,phase): 
+     self._solidPhase = phase
+ solidPhase = property(GetSolidPhase,SetSolidPhase,None,None)
+
+ def GetGasPhase(self): 
+     return self._gasPhase
+ def SetGasPhase(self,phase): 
+     self._gasPhase = phase
+ gasPhase = property(GetGasPhase,SetGasPhase,None,None)
+ 
+
 #*******************************************************************************
-# Internal helpers 
+# Internal class helpers 
 
  def __GetName(self):
-     return self.specs.loc['Name',1]
+     return self._specs.loc['Name',1]
 
  def __GetFuelEnrichment(self):
-     return float(self.specs.loc['Enrichment [U-235 wt%]',1])
+     return float(self._specs.loc['Enrichment [U-235 wt%]',1])
 
  def __GetFreshUMass(self):
-     return float(self.specs.loc['U mass per assy [kg]',1])*1000.0  # [g]
+     return float(self._specs.loc['U mass per assy [kg]',1])*1000.0  # [g]
 
  def __GetFreshU238Mass(self):
      totalUMass = self.__GetFreshUMass()
@@ -110,20 +127,20 @@ class FuelBundle():
      return totalUMass * fuelEnrichment/100.0
 
  def __GetNFuelRods(self):
-     return int(self.specs.loc['Fuel rods number',1])
+     return int(self._specs.loc['Fuel rods number',1])
 
  def __GetFuelPinLength(self):
-     return float(self.specs.loc['Fuel rods fuel length [in]',1]) * 2.54 # cm
+     return float(self._specs.loc['Fuel rods fuel length [in]',1]) * 2.54 # cm
 
  def __SetFuelPinLength(self,x):
-     self.specs.loc['Fuel rods fuel length [in]',1] = x / 2.54 # in
+     self._specs.loc['Fuel rods fuel length [in]',1] = x / 2.54 # in
      return
 
  def __GetFuelRodOD(self):
-     return float(self.specs.loc['Fuel rods O.D. [in]',1]) * 2.54 # cm
+     return float(self._specs.loc['Fuel rods O.D. [in]',1]) * 2.54 # cm
 
  def __GetFuelRodWallThickness(self):
-     return float(self.specs.loc['Fuel rods wall thickness [in]',1]) * 2.54 # cm
+     return float(self._specs.loc['Fuel rods wall thickness [in]',1]) * 2.54 # cm
 
  def __GetFuelPinRadius(self):
      fuelRodOD = self.__GetFuelRodOD()

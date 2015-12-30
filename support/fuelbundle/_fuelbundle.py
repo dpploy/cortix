@@ -20,7 +20,10 @@ def _FuelBundle( self,
 
      assert type(specs) == type(pandas.DataFrame()), 'oops not pandas table.'
 
-     self.specs = specs
+     self._specs = specs
+
+     self._solidPhase = None
+     self._gasPhase   = None
 
      return
 

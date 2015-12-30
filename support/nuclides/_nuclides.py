@@ -24,7 +24,7 @@ def _Nuclides( self, propertyDensities ):
   self.chemicalElementSeries = \
   ['alkali metals', 'alkali earth metals', 'lanthanides', 'actinides', 
    'transition metals','noble gases','metalloids','fission products','nonmetals',
-   'oxide fission products','halogens', 'minor actinides']
+   'oxide fission products','halogens', 'minor actinides', 'volatile fission products','poor metals']
 
   self.propertyDensities = propertyDensities; 
 
