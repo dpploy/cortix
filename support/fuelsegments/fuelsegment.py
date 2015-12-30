@@ -20,13 +20,13 @@ from ._getattribute import _GetAttribute
 class FuelSegment():
 
  def __init__( self, 
-               geometry          = pandas.Series(),
-               propertyDensities = pandas.DataFrame()
+               geometry = pandas.Series(),
+               species  = list()
              ):
 
   # constructor
   _FuelSegment( self, 
-                geometry, propertyDensities )
+                geometry, species )
 
 #*******************************************************************************
 

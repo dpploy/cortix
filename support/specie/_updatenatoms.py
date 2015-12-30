@@ -36,7 +36,7 @@ def _UpdateNAtoms( self ):
             multiple = float(tmp[0])
             symbol = tmp[1]
          else:
-            assert True
+            assert False
 
          nAtoms += multiple
 
@@ -47,7 +47,7 @@ def _UpdateNAtoms( self ):
            elif len(tmp) == 2:
               element = ELEMENTS[tmp[0]].isotopes[int(tmp[1].strip('m'))]
            else:
-              assert True
+              assert False
          except KeyError:
            summ += multiple * 0.0
          else:

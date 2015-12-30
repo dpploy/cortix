@@ -3,9 +3,32 @@
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
 This Specie class is to be used with other classes in plant-level process modules.
+NB: Species is always a plural but here, the class is named as singular to
+    reflect one specie. If many species are used in an external context, the plural
+    can be used.
 
 For unit testing do at the linux command prompt:
     python specie.py
+
+NB: the definition of chemical specie here is extended to ficticious compounds.
+    This is done as follows. Say MAO2 is a ficticious compound denoting a 
+    minor actinides dioxide. The list of atoms is given as follows:
+
+    ['0.49*Np-237', '0.42*Am-241', '0.08*Am-243', '0.01*Cm-244', '2.0*O-16']
+
+    note the MA forming nuclides add to 1 = 0.49 + 0.42 + 0.08 + 0.01. Hence
+    therefore the number of atoms in this compound is 3. 1 MA "atom" and 2 O.
+    The nuclide is indicated by the element symbol followed by a dash and the 
+    atomic mass number.
+
+    Other forms can be used for common true species
+
+    ['Np-237', '2.0*O-16'] or ['Np-237', 'O-16', 'O-16'] or [ '2*H', 'O' ] or
+    [ 'H', 'O', 'H' ]  etc...
+ 
+    This code will calculate the molar mass of any species with a given valid
+    atom list using a provided periodic table of chenical elements. The user 
+    can also reset the value of the molar mass with a setter method.
 
 Sat May  9 21:40:48 EDT 2015 created; vfda
 """
@@ -20,78 +43,12 @@ from ._updatenatoms import _UpdateNAtoms  # constructor
 #*******************************************************************************
 class Specie():
 
-# Class data
- atomicMass = {
-       'null': 0.0, 
-       'e'   : 0.548e-3,    # electron
-       'H'   : 1.00794, 
-       'D'   : 2.01410178, 
-       'C'   : 12.0107, 
-       'C-12': 12.0107, 
-       'C-13': 13, 
-       'O'   : 15.9994,
-       'N'   : 14.0067,
-       'Si'  : 28.0855,
-       'P'   : 30.973762, 
-       'S'   : 32.065,
-       'Cl'  : 35.453,
-       'Ga'  : 69.723,
-       'Se'  : 79.0,
-       'Br'  : 81.0,
-       'Kr'  : 83.0,
-       'Rb'  : 85.0,
-       'Sr'  : 87.62,
-       'Y'   : 89.0,
-       'Zr'  : 91.224,
-       'Nb'  : 95.0,
-       'Mo'  : 95.0,
-       'Tc'  : 99.0,
-       'Ru'  : 100.0,
-       'Rh'  : 103.0,
-       'Pd'  : 108.0,
-       'Ag'  : 109.0,
-       'Cd'  : 110.0,
-       'Sn'  : 116.0,
-       'Sb'  : 121.0,
-       'Te'  : 125.0,
-       'I'   : 127.0,
-       'Xe'  : 128.0,
-       'Cs'  : 132.9054,
-       'Ba'  : 134.0,
-       'La'  : 139.0,
-       'Ce'  : 140.0,
-       'Pr'  : 141.0,
-       'Nd'  : 142.0,
-       'Pm'  : 147.0,
-       'Sm'  : 147.0,
-       'Eu'  : 153.0,
-       'Gd'  : 154.0,
-       'Tb'  : 159.0,
-       'U'   : 238.0,
-       'Pu'  : 238.0,
-       'Pu-238'  : 238.0,
-       'Pu-239'  : 239.0,
-       'Pu-240'  : 240.0,
-       'Pu-241'  : 241.0,
-       'Pu-242'  : 242.0,
-       'Pu-244'  : 244.0,
-       'Np'  : 237.0,
-       'Am'  : 243.0,
-       'Cm'  : 244.0,
-       'FP'  : 115.365465356,  # Ficticious combined fission products
-       'MA'  : 118.999         # Ficticious combined minor actinides    
-               }     
-
- nuclideDecayData = { # 'nuclide' : (halfLife,timeUnit,decayEnergy_keV,decayMode)
-       'Pu-238' : (87.7, 'y', 5593.20, 'alpha')
-                    }
-#*******************************************************************************
  def __init__( self, 
                name    = 'null',
                formula = 'null',
                phase   = 'null',
                atoms   = list(),
-               molarCC = 0.0,      # M
+               molarCC = 0.0,      # M (mole/L)
                massCC  = 0.0,      # g/L
                flag    = None   ):
 
@@ -191,9 +148,13 @@ class Specie():
      _UpdateNAtoms(self)
  atoms = property(GetAtoms,SetAtoms,None,None)
 
- def GetNAtoms(self):
+ def GetNAtoms(self): # number of ficticious atoms in the species (see NB above)
      return self._nAtoms       
  nAtoms = property(GetNAtoms,None,None,None)
+
+ def GetNNuclides(self): # number of all nuclides involved in the species definition
+     return self._nNuclides    
+ nNuclides = property(GetNNuclides,None,None,None)
 
  def SetFlag(self,f):
      self._flag = f

@@ -37,46 +37,6 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
 # fuel volume
 
   if attributeName == 'fuelVolume':   return  __GetFuelSegmentVolume( self )
-
-#.................................................................................
-# isotopes python list
-
-  if attributeName == 'isotopes': 
-
-     if symbol is not None:
-        nuclidesNames = self.propertyDensities.index
-        isotopes = [x for x in nuclidesNames if x.split('-')[0].strip()==symbol]
-        return isotopes
-
-     if series is not None:
-        # CREATE A HELPER FUNCTION FOR THIS; NOTE THIS IS USED BELOW TOO!!!
-        nuclidesNames = self.propertyDensities.index
-
-        seriesNameMap = {'alkali metals':'Alkali metals', 'alkali earth metals':'Alkaline earth metals', 'lanthanides':'Lanthanides', 'actinides':'Actinides', 'transition metals':'Transition metals','noble gases':'Noble gases','metalloids':'Metalloids','fission products':'fission products','nonmetals':'Nonmetals','oxide fission products':'oxide fission products','halogens':'Halogens', 'minor actinides':'minor actnides'}
-    
-        if series == 'fission products':
-           isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] != seriesNameMap['actinides'] ]
-        elif series == 'oxide fission products':
-           collec = [ seriesNameMap['actinides'],
-                      seriesNameMap['halogens'],
-                      seriesNameMap['noble gases'],
-                    ]
-           isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] not in collec ]
-           collec = ['C','N','O','H']
-           isotopes = [ x for x in isotopes if x.split('-')[0].strip() not in collec ]
-        elif series == 'minor actinides':
-           isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] == seriesNameMap['actinides'] ]
-           collec = ['U','Pu']
-           isotopes = [ x for x in isotopes if x.split('-')[0].strip() not in collec ]
-        else:
-           isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ]== seriesNameMap[series] ]
-        return isotopes
-
-     if symbol is None and series is None:
-
-        nuclidesNames = self.propertyDensities.index
-        return list( nuclidesNames )
-
 #.................................................................................
 # segment volume
 
@@ -142,35 +102,8 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
  
      density = 0.0
 
-     assert series in self.chemicalElementSeries, 'series: %r; fail.'%(series)
-
-     seriesNameMap = {'alkali metals':'Alkali metals', 'alkali earth metals':'Alkaline earth metals', 'lanthanides':'Lanthanides', 'actinides':'Actinides', 'transition metals':'Transition metals','noble gases':'Noble gases','metalloids':'Metalloids','fission products':'fission products','nonmetals':'Nonmetals','oxide fission products':'oxide fission products','halogens':'Halogens', 'minor actinides':'minor actnides'}
-
-     if series in self.chemicalElementSeries:
-
-       nuclidesNames = self.propertyDensities.index
-    
-       if series == 'fission products':
-          isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] != seriesNameMap['actinides'] ]
-       elif series == 'oxide fission products':
-          collec = [ seriesNameMap['actinides'],
-                     seriesNameMap['halogens'],
-                     seriesNameMap['noble gases'],
-                   ]
-          isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] not in collec ]
-          collec = ['C','N','O','H']
-          isotopes = [ x for x in isotopes if x.split('-')[0].strip() not in collec ]
-       elif series == 'minor actinides':
-          isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] == seriesNameMap['actinides'] ]
-          collec = ['Np','Am','Cm']
-          isotopes = [ x for x in isotopes if x.split('-')[0].strip() in collec ]
-       else:
-          isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ]== seriesNameMap[series] ]
-
-#       print('fission products ',isotopes)
-
-       for isotope in isotopes:
-         density += self.propertyDensities.loc[isotope,colName]
+     for isotope in isotopes:
+       density += self.propertyDensities.loc[isotope,colName]
 
      if attributeDens is False:  
         volume = __GetFuelSegmentVolume( self )
