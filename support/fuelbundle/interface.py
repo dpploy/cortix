@@ -181,12 +181,12 @@ class FuelBundle():
 #*******************************************************************************
 # Printing of data members
  def __str__( self ):
-     s = 'name: %s; enrichment: %s; # rods: %s; fuel volume: %s; fuel mass: %s; gas mass %s\n'
-     return s % (self.name, self.fuelEnrichment, self.nFuelRods, self.fuelVolume, self.fuelMass, self.gasMass )
+     s = '%s\n %s\n %s\n'
+     return s % (self._specs, self._solidPhase, self._gasPhase)
 
  def __repr__( self ):
-     s = 'name: %s; enrichment: %s; # rods: %s; fuel volume: %s; fuel mass: %s; gas mass %s\n'
-     return s % (self.name, self.fuelEnrichment, self.nFuelRods, self.fuelVolume, self.fuelMass, self.gasMass)
+     s = '%s \n%s \n%s\n'
+     return s % (self._specs, self._solidPhase, self._gasPhase)
 #*******************************************************************************
 # Usage: -> python interface.py
 if __name__ == "__main__":
