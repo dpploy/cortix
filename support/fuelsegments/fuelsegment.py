@@ -36,6 +36,14 @@ class FuelSegment():
 # These are passing arguments by value effectively. Because the python objects
 # passed into/out of the function are immutable.
 
+ def GetGeometry(self):
+     return self._geometry
+ geometry = property(GetGeometry,None,None,None)
+
+ def GetSpecies(self):
+     return self._species
+ species = property(GetSpecies,None,None,None)
+
  def GetAttribute(self, name, symbol=None, series=None):
      return _GetAttribute( self, name, symbol, series )
 

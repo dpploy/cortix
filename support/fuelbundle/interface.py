@@ -91,6 +91,18 @@ class FuelBundle():
      return self.__GetFuelVolume()
  fuelVolume = property(GetFuelVolume,None,None,None)
 
+ def GetFuelMass(self): 
+     return self.__GetFuelMass()
+ fuelMass = property(GetFuelMass,None,None,None)
+
+ def GetFuelMassUnit(self): 
+     return self.__GetFuelMassUnit()
+ fuelMassUnit = property(GetFuelMassUnit,None,None,None)
+
+ def GetGasMass(self): 
+     return self.__GetGasMass()
+ gasMass = property(GetGasMass,None,None,None)
+
  def GetSolidPhase(self): 
      return self._solidPhase
  def SetSolidPhase(self,phase): 
@@ -158,15 +170,23 @@ class FuelBundle():
      nFuelRods = self.__GetNFuelRods()
      return fuelPinVolume * nFuelRods
 
+ def __GetFuelMass(self): # mass of the solid phase (gas phase in plenum not added)
+     return self._solidPhase.GetQuantity('mass').value
+ def __GetFuelMassUnit(self): # mass of the solid phase (gas phase in plenum not added)
+     return self._solidPhase.GetQuantity('mass').unit
+
+ def __GetGasMass(self): # gas plenum mass
+     return self._gasPhase.GetQuantity('mass').value
+
 #*******************************************************************************
 # Printing of data members
-# def __str__( self ):
-#     s = 'name: %5s; formalName: %5s; unit: %5s; '+' value: %6s\n'
-#     return s % (self.name, self.formalName, self.unit, self.value)
-#
-# def __repr__( self ):
-#     s = 'name: %5s; formalName: %5s; unit: %5s;'+' value: %6s\n'
-#     return s % (self.name, self.formalName, self.unit, self.value)
+ def __str__( self ):
+     s = 'name: %s; enrichment: %s; # rods: %s; fuel volume: %s; fuel mass: %s; gas mass %s\n'
+     return s % (self.name, self.fuelEnrichment, self.nFuelRods, self.fuelVolume, self.fuelMass, self.gasMass )
+
+ def __repr__( self ):
+     s = 'name: %s; enrichment: %s; # rods: %s; fuel volume: %s; fuel mass: %s; gas mass %s\n'
+     return s % (self.name, self.fuelEnrichment, self.nFuelRods, self.fuelVolume, self.fuelMass, self.gasMass)
 #*******************************************************************************
 # Usage: -> python interface.py
 if __name__ == "__main__":

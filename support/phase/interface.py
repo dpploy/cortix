@@ -149,7 +149,7 @@ class Phase():
 
  def WriteHTML( self, fileName ):
      assert type(fileName) == type(str())
-     tmp = self.phase
+     tmp = pandas.DataFrame(self.phase)
      columnNames = tmp.columns
      speciesNames = [ specie.name for specie in self.species ]
      quantityNames = [ quantity.name for quantity in self.quantities ]

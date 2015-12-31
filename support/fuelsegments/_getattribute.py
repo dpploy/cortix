@@ -16,12 +16,15 @@ from ..periodictable import SERIES
 # Get stored fuel segment property either overall or on a nuclide basis 
 
 #---------------------------------------------------------------------------------
-def _GetAttribute(self, attributeName, symbol=None, series=None ):
+def _GetAttribute(self, attributeName, nuclide=None, series=None ):
 
   assert attributeName in self.attributeNames, ' attribute name: %r; options: %r; fail.' % (attributeName,self.attributeNames)
 
-  if symbol is not None: assert series is None, 'fail.'
-  if series is not None: assert symbol is None, 'fail.'
+  if nuclide is not None: assert series is None, 'fail.'
+  if series is not None: assert nuclide is None, 'fail.'
+
+  if nuclide is not None: assert False,' not implemented.'
+  if series is not None: assert False,' not implemented.'
 
 #.................................................................................
 # # of segments
@@ -47,11 +50,29 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
     volume = claddingLength * math.pi * (claddingDiam/2.0)**2
     return volume
 
-#.................................................................................
-# mass or mass concentration
 
-  if attributeName == 'massCC' or attributeName == 'mass': 
-     colName = 'Mass CC [g/cc]'
+#.................................................................................
+# fuel segment overall quantities
+  if nuclide is None and series is None:
+
+# mass or mass concentration
+     if attributeName == 'massCC' or attributeName == 'massDens' or attributeName == 'mass': 
+        massCC = 0.0
+        for specie in self._species:
+            massCC += specie.massCC
+        if attributeName == 'massCC' or attributeName == 'massDens': return massCC
+        else:
+          volume = __GetFuelSegmentVolume( self )
+          return massCC * volume
+# radioactivity 
+     if attributeName == 'radioactivtyDens' or attributeName == 'radioactivity':
+        radioCC = 0.0
+        for specie in self._species:
+            radioCC += specie.molarRadioactivity * specie.molarCC
+        if attributeName == 'radioactivityCC': return radioCC
+        else:
+          volume = __GetFuelSegmentVolume( self )
+          return radioCC * volume
 
 #.................................................................................
 # radioactivity               
@@ -84,7 +105,7 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
 #.................................................................................
 # all nuclide content of the fuel added
 
-  if symbol is None and series is None:
+  if nuclide is None and series is None:
 
      density = 0.0
      density = self.propertyDensities[ colName ].sum()
@@ -115,19 +136,19 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
 #.................................................................................
 # get specific nuclide (either the isotopes of the nuclide or the specific isotope) property
 
-  if symbol is not None:
+  if nuclide is not None:
 
     density = 0.0
 
-  # isotope
-    if len(symbol.split('-')) == 2:
-      density = self.propertyDensities.loc[symbol,colName]
+  # nuclide 
+    if len(nuclide.split('-')) == 2:
+      density = self.propertyDensities.loc[nuclide,colName]
 
   # chemical element 
     else:
       nuclidesNames = self.propertyDensities.index
 #    print(self.propertyDensities)
-      isotopes = [x for x in nuclidesNames if x.split('-')[0].strip()==symbol]
+      isotopes = [x for x in nuclidesNames if x.split('-')[0].strip()==nuclide]
 #    print(isotopes)
       for isotope in isotopes:
         density += self.propertyDensities.loc[isotope,colName]

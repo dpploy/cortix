@@ -19,7 +19,7 @@ NB: the definition of chemical specie here is extended to ficticious compounds.
     note the MA forming nuclides add to 1 = 0.49 + 0.42 + 0.08 + 0.01. Hence
     therefore the number of atoms in this compound is 3. 1 MA "atom" and 2 O.
     The nuclide is indicated by the element symbol followed by a dash and the 
-    atomic mass number.
+    atomic mass number. Here the number of nuclide types is 5 (self._nNuclideTypes).
 
     Other forms can be used for common true species
 
@@ -72,22 +72,22 @@ class Specie():
 # These are passing arguments by value effectively. Because the python objects
 # passed into/out of the function are immutable.
 
- def SetName(self,n):
-     self._name = n
  def GetName(self):
      return self._name
+ def SetName(self,n):
+     self._name = n
  name = property(GetName,SetName,None,None)
 
- def SetFormula(self,f):
-     self._formula = f
  def GetFormula(self):
      return self._formula
+ def SetFormula(self,f):
+     self._formula = f
  formula = property(GetFormula,SetFormula,None,None)
 
- def SetPhase(self,p):
-     self._mass = p
  def GetPhase(self):
      return self._phase
+ def SetPhase(self,p):
+     self._mass = p
  phase = property(GetPhase,SetPhase,None,None)
 
  def GetMolarMass(self):
@@ -152,9 +152,9 @@ class Specie():
      return self._nAtoms       
  nAtoms = property(GetNAtoms,None,None,None)
 
- def GetNNuclides(self): # number of all nuclides involved in the species definition
-     return self._nNuclides    
- nNuclides = property(GetNNuclides,None,None,None)
+ def GetNNuclideTypes(self): # number of nuclide types involved in the species definition
+     return self._nNuclideTypes
+ nNuclideTypes = property(GetNNuclideTypes,None,None,None)
 
  def SetFlag(self,f):
      self._flag = f
@@ -162,47 +162,43 @@ class Specie():
      return self._flag
  flag = property(GetFlag,SetFlag,None,None)
 
+ def GetMolarCC(self):
+     return self._molarCC
  def SetMolarCC(self,v):
      self._molarCC = v
      self._massCC  = v * self._molarMass
- def GetMolarCC(self):
-     return self._molarCC
  molarCC = property(GetMolarCC,SetMolarCC,None,None)
 
- def SetMolarCCUnit(self,v):
-     self._molarCCUnit = v
  def GetMolarCCUnit(self):
      return self._molarCCUnit
+ def SetMolarCCUnit(self,v):
+     self._molarCCUnit = v
  molarCCUnit = property(GetMolarCCUnit,SetMolarCCUnit,None,None)
 
+ def GetMassCC(self):
+     return self._massCC
  def SetMassCC(self,v):
      self._massCC = v
      self._molarCC = v / self._molarMass
- def GetMassCC(self):
-     return self._massCC
  massCC = property(GetMassCC,SetMassCC,None,None)
 
- def SetMassCCUnit(self,v):
-     self._massCCUnit = v
  def GetMassCCUnit(self):
      return self._massCCUnit
+ def SetMassCCUnit(self,v):
+     self._massCCUnit = v
  massCCUnit = property(GetMassCCUnit,SetMassCCUnit,None,None)
 
 #*******************************************************************************
 # Internal helpers 
 
- def _GetAtomicMass(self):
-     return Specie.atomicMass
- def _GetNuclideDecayData(self):
-     return Specie.nuclideDecayData
 
 #*******************************************************************************
 # Printing of data members
  def __str__( self ):
-     s = ' %5s %5s %5s '+' molar mass: %6s '+' molar cc: %6s '+' mass cc: %6s '+' flag: %s '+'# atoms: %s'+' atoms: %s'+' molar radioactivity: %s'+' molar heat pwr: %s'+' molar gamma pwr: %s\n'
-     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms, self.molarRadioactivity, self.molarHeatPwr, self.molarGammaPwr)
+     s = ' %5s %5s %5s '+' molar mass: %6s '+' molar cc: %6s '+' mass cc: %6s '+' flag: %s '+' # atoms: %s'+' # nuclide types: %s'+' atoms: %s'+' molar radioactivity: %s'+' molar heat pwr: %s'+' molar gamma pwr: %s\n'
+     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.nNuclideTypes, self.atoms, self.molarRadioactivity, self.molarHeatPwr, self.molarGammaPwr)
 
  def __repr__( self ):
-     s = ' %5s %5s %5s '+' molar mass: %6s '+' molar cc: %6s '+' mass cc: %6s '+' flag: %s '+'# atoms: %s'+' atoms: %s'+' molar radioactivity: %s'+' molar heat pwr: %s'+' molar gamma pwr: %s\n'
-     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms, self.molarRadioactivity, self.molarHeatPwr, self.molarGammaPwr)
+     s = ' %5s %5s %5s '+' molar mass: %6s '+' molar cc: %6s '+' mass cc: %6s '+' flag: %s '+' # atoms: %s'+' # nuclide types: %s'+' atoms: %s'+' molar radioactivity: %s'+' molar heat pwr: %s'+' molar gamma pwr: %s\n'
+     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms, self.nNuclideTypes, self.molarRadioactivity, self.molarHeatPwr, self.molarGammaPwr)
 #*******************************************************************************
