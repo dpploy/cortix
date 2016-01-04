@@ -19,8 +19,8 @@ def _Specie( self,
              formula = 'null',
              phase   = 'null',
              atoms   = list(),
-             molarCC = 0.0,      # M 
-             massCC  = 0.0,      # g/L
+             molarCC = 0.0,      # default unit: M 
+             massCC  = 0.0,      # default unit: g/L
              flag    = None   ):
 
  assert type(name) == type(str()), 'oops not string.'

@@ -87,12 +87,12 @@ class Quantity():
 #*******************************************************************************
 # Printing of data members
  def __str__( self ):
-     s = 'name: %5s; formalName: %5s; unit: %5s; '+' value: %6s\n'
-     return s % (self.name, self.formalName, self.unit, self.value)
+     s = 'Quantity(): name=%s; formalName=%s; value=%s[%s].\n'
+     return s % (self.name, self.formalName, self.value, self.unit)
 
  def __repr__( self ):
-     s = 'name: %5s; formalName: %5s; unit: %5s;'+' value: %6s\n'
-     return s % (self.name, self.formalName, self.unit, self.value)
+     s = 'Quantity(): name=%s; formalName=%s; value=%s[%s].\n'
+     return s % (self.name, self.formalName, self.value, self.unit)
 #*******************************************************************************
 # Usage: -> python interface.py
 if __name__ == "__main__":

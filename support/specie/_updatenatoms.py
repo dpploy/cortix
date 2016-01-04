@@ -19,6 +19,8 @@ from ..periodictable import ELEMENTS
 
 def _UpdateNAtoms( self ):
 
+     assert False
+
      self._nAtoms = 0
      if len(self._atoms) > 0:
        nAtoms = 0

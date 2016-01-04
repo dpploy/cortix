@@ -26,7 +26,7 @@ def _FuelSegment( self, geometry, species ):
      assert type(species[0]) == type(Specie())
 
   self.attributeNames = \
-  ['nSegments','fuelVolume','mass','massDens','massCC','nuclides','isotopes','radioactivity','radioactivityDens','molarHeatPwr','molarGammaPwr']
+  ['nSegments','fuelVolume','mass','massDens','massCC','nuclides','isotopes','radioactivity','radioactivityDens','gamma','gammaDens','heat','heatDens','molarHeatPwr','molarGammaPwr']
 
   self._geometry = geometry
   self._species  = species

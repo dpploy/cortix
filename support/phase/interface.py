@@ -168,10 +168,10 @@ class Phase():
 #*******************************************************************************
 # Printing of data members
 # def __str__( self ):
-     s = '%s\n %s\n'
+     s = 'Phase(): %s;\n %s;\n'
      return s % (self.quantities, self.species)
 #
  def __repr__( self ):
-     s = '%s\n %s\n'
+     s = 'Phase(): %s;\n %s;\n'
      return s % (self.quantities, self.species)
 #*******************************************************************************

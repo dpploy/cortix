@@ -50,7 +50,6 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
     volume = claddingLength * math.pi * (claddingDiam/2.0)**2
     return volume
 
-
 #.................................................................................
 # fuel segment overall quantities
   if nuclide is None and series is None:
@@ -58,21 +57,43 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
 # mass or mass concentration
      if attributeName == 'massCC' or attributeName == 'massDens' or attributeName == 'mass': 
         massCC = 0.0
-        for specie in self._species:
-            massCC += specie.massCC
-        if attributeName == 'massCC' or attributeName == 'massDens': return massCC
+        for spc in self._species:
+            massCC += spc.massCC
+        if attributeName == 'massCC' or attributeName == 'massDens': 
+          return massCC
         else:
           volume = __GetFuelSegmentVolume( self )
           return massCC * volume
 # radioactivity 
      if attributeName == 'radioactivtyDens' or attributeName == 'radioactivity':
-        radioCC = 0.0
-        for specie in self._species:
-            radioCC += specie.molarRadioactivity * specie.molarCC
-        if attributeName == 'radioactivityCC': return radioCC
+        radDens = 0.0
+        for spc in self._species:
+            radDens += spc.molarRadioactivity * spc.molarCC
+        if attributeName == 'radioactivityDens': 
+          return radDens
         else:
           volume = __GetFuelSegmentVolume( self )
-          return radioCC * volume
+          return radDens * volume
+# gamma          
+     if attributeName == 'gammaDens' or attributeName == 'gamma':
+        gammaDens = 0.0
+        for spc in self._species:
+            gammaDens += spc.molarGammaPwr * spc.molarCC
+        if attributeName == 'gammaDens': 
+          return gammaDens
+        else:
+          volume = __GetFuelSegmentVolume( self )
+          return gammaDens * volume
+# heat           
+     if attributeName == 'heatDens' or attributeName == 'heat':
+        heatDens = 0.0
+        for spc in self._species:
+            heatDens += spc.molarHeatPwr * spc.molarCC
+        if attributeName == 'heatDens': 
+          return heatDens
+        else:
+          volume = __GetFuelSegmentVolume( self )
+          return heatDens * volume
 
 #.................................................................................
 # radioactivity               
@@ -108,7 +129,9 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
   if nuclide is None and series is None:
 
      density = 0.0
+
      density = self.propertyDensities[ colName ].sum()
+
      if attributeDens is False:  
         volume = __GetFuelSegmentVolume( self )
         prop = density * volume
