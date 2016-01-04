@@ -47,12 +47,18 @@ def _GetGroupAttribute(self, groupKey=None, attributeName=None, symbol=None, ser
 
 # Get average property in all fuel segments within a groupKey
   else:                
+
      if groupKey not in self.groups.keys(): return 0
+
      fuelSegments = self.groups[ groupKey ]
+
      if len(fuelSegments) is 0: return 0
+
      attribute = 0
+
      for fuelSegment in fuelSegments:
        attribute += fuelSegment.GetAttribute( attributeName, symbol, series )
+
      if attribute != 0 and \
         (attributeName[-4:] == 'Dens' or attributeName[-2:] == 'CC'):
         attribute /= len(fuelSegments)

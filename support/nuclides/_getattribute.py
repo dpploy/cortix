@@ -185,11 +185,11 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
 
     density = 0.0
 
-  # isotope
+  # single isotope
     if len(symbol.split('-')) == 2:
       density = self.propertyDensities.loc[symbol,colName]
 
-  # chemical element 
+  # many isotopes         
     else:
       nuclidesNames = self.propertyDensities.index
 #    print(self.propertyDensities)

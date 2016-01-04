@@ -11,28 +11,24 @@ Sat May  9 21:40:48 EDT 2015 created; vfda
 #*******************************************************************************
 import os, sys
 import pandas
+
+from ..specie.interface import Specie 
 #*******************************************************************************
 
 #*******************************************************************************
 # constructor
 
-def _FuelSegment( self, geometry, propertyDensities ):
+def _FuelSegment( self, geometry, species ):
 
   assert type(geometry) == type(pandas.Series()), 'fatal.'
-  assert type(propertyDensities) == type(pandas.DataFrame()), 'fatal.'
+  assert type(species)  == type(list()), 'fatal.'
+  if type(species) == type(list()) and len(species) > 0:
+     assert type(species[0]) == type(Specie())
 
   self.attributeNames = \
-   ['isotopes','nSegments','segmentId','fuelVolume',
-    'massCC','mass','radioactivityDens',
-    'radioactivity','thermalDens','thermal','heatDens','heat','gammaDens','gamma',
-    'segmentVolume']
+  ['nSegments','fuelVolume','mass','massDens','massCC','nuclides','isotopes','radioactivity','radioactivityDens','gamma','gammaDens','heat','heatDens','molarHeatPwr','molarGammaPwr']
 
-  self.chemicalElementSeries = \
-  ['alkali metals', 'alkali earth metals', 'lanthanides', 'actinides', 
-   'transition metals','noble gases','metalloids','fission products','nonmetals',
-   'oxide fission products','halogens', 'minor actinides']
-
-  self.geometry          = geometry;    
-  self.propertyDensities = propertyDensities; 
+  self._geometry = geometry
+  self._species  = species
 
 #*******************************************************************************

@@ -20,13 +20,13 @@ from ._getattribute import _GetAttribute
 class FuelSegment():
 
  def __init__( self, 
-               geometry          = pandas.Series(),
-               propertyDensities = pandas.DataFrame()
+               geometry = pandas.Series(),
+               species  = list()
              ):
 
   # constructor
   _FuelSegment( self, 
-                geometry, propertyDensities )
+                geometry, species )
 
 #*******************************************************************************
 
@@ -35,6 +35,14 @@ class FuelSegment():
 #-------------------------------------------------------------------------------
 # These are passing arguments by value effectively. Because the python objects
 # passed into/out of the function are immutable.
+
+ def GetGeometry(self):
+     return self._geometry
+ geometry = property(GetGeometry,None,None,None)
+
+ def GetSpecies(self):
+     return self._species
+ species = property(GetSpecies,None,None,None)
 
  def GetAttribute(self, name, symbol=None, series=None):
      return _GetAttribute( self, name, symbol, series )

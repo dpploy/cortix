@@ -91,6 +91,34 @@ class FuelBundle():
      return self.__GetFuelVolume()
  fuelVolume = property(GetFuelVolume,None,None,None)
 
+ def GetFuelMass(self): 
+     return self.__GetFuelMass()
+ fuelMass = property(GetFuelMass,None,None,None)
+
+ def GetFuelMassUnit(self): 
+     return self.__GetFuelMassUnit()
+ fuelMassUnit = property(GetFuelMassUnit,None,None,None)
+
+ def GetGasMass(self): 
+     return self.__GetGasMass()
+ gasMass = property(GetGasMass,None,None,None)
+
+ def GetRadioactivity(self): 
+     return self.__GetRadioactivity()
+ radioactivity = property(GetRadioactivity,None,None,None)
+
+ def GetGammaPwr(self): 
+     return self.__GetGammaPwr()
+ gammaPwr = property(GetGammaPwr,None,None,None)
+
+ def GetHeatPwr(self): 
+     return self.__GetHeatPwr()
+ heatPwr = property(GetHeatPwr,None,None,None)
+
+ def GetFuelRadioactivity(self): 
+     return self.__GetFuelRadioactivity()
+ fuelRadioactivity = property(GetFuelRadioactivity,None,None,None)
+
  def GetSolidPhase(self): 
      return self._solidPhase
  def SetSolidPhase(self,phase): 
@@ -158,15 +186,40 @@ class FuelBundle():
      nFuelRods = self.__GetNFuelRods()
      return fuelPinVolume * nFuelRods
 
+ def __GetFuelMass(self): # mass of the solid phase (gas phase in plenum not added)
+     return self._solidPhase.GetQuantity('mass').value
+ def __GetFuelMassUnit(self): # mass of the solid phase (gas phase in plenum not added)
+     return self._solidPhase.GetQuantity('mass').unit
+
+ def __GetFuelRadioactivity(self): # radioactivity of the solid phase
+     return self._solidPhase.GetQuantity('radioactivity').value
+ def __GetGasRadioactivity(self): # radioactivity of the gas phase
+     return self._gasPhase.GetQuantity('radioactivity').value
+
+ def __GetRadioactivity(self): # radioactivity of the fuel bundle
+     return self._solidPhase.GetQuantity('radioactivity').value + \
+            self._gasPhase.GetQuantity('radioactivity').value 
+
+ def __GetGammaPwr(self): # gamma pwr of the fuel bundle
+     return self._solidPhase.GetQuantity('gamma').value + \
+            self._gasPhase.GetQuantity('gamma').value 
+
+ def __GetHeatPwr(self): # heat pwr of the fuel bundle
+     return self._solidPhase.GetQuantity('heat').value + \
+            self._gasPhase.GetQuantity('heat').value 
+
+ def __GetGasMass(self): # gas plenum mass
+     return self._gasPhase.GetQuantity('mass').value
+
 #*******************************************************************************
 # Printing of data members
-# def __str__( self ):
-#     s = 'name: %5s; formalName: %5s; unit: %5s; '+' value: %6s\n'
-#     return s % (self.name, self.formalName, self.unit, self.value)
-#
-# def __repr__( self ):
-#     s = 'name: %5s; formalName: %5s; unit: %5s;'+' value: %6s\n'
-#     return s % (self.name, self.formalName, self.unit, self.value)
+ def __str__( self ):
+     s = 'FuelBundle(): %s\n %s\n %s\n'
+     return s % (self._specs, self._solidPhase, self._gasPhase)
+
+ def __repr__( self ):
+     s = 'FuelBundle(): %s\n %s\n %s\n'
+     return s % (self._specs, self._solidPhase, self._gasPhase)
 #*******************************************************************************
 # Usage: -> python interface.py
 if __name__ == "__main__":

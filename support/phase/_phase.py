@@ -52,7 +52,6 @@ def _Phase( self, timeStamp, species=None, quantities=None, value=0.0 ):
   self.phase = pandas.DataFrame( index=[timeStamp], columns = names )
   self.phase.fillna( float(value), inplace = True )
 
-
   return
 
 #*******************************************************************************

@@ -16,12 +16,15 @@ from ..periodictable import SERIES
 # Get stored fuel segment property either overall or on a nuclide basis 
 
 #---------------------------------------------------------------------------------
-def _GetAttribute(self, attributeName, symbol=None, series=None ):
+def _GetAttribute(self, attributeName, nuclide=None, series=None ):
 
   assert attributeName in self.attributeNames, ' attribute name: %r; options: %r; fail.' % (attributeName,self.attributeNames)
 
-  if symbol is not None: assert series is None, 'fail.'
-  if series is not None: assert symbol is None, 'fail.'
+  if nuclide is not None: assert series is None, 'fail.'
+  if series is not None: assert nuclide is None, 'fail.'
+
+  if nuclide is not None: assert False,' not implemented.'
+  if series is not None: assert False,' not implemented.'
 
 #.................................................................................
 # # of segments
@@ -37,46 +40,6 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
 # fuel volume
 
   if attributeName == 'fuelVolume':   return  __GetFuelSegmentVolume( self )
-
-#.................................................................................
-# isotopes python list
-
-  if attributeName == 'isotopes': 
-
-     if symbol is not None:
-        nuclidesNames = self.propertyDensities.index
-        isotopes = [x for x in nuclidesNames if x.split('-')[0].strip()==symbol]
-        return isotopes
-
-     if series is not None:
-        # CREATE A HELPER FUNCTION FOR THIS; NOTE THIS IS USED BELOW TOO!!!
-        nuclidesNames = self.propertyDensities.index
-
-        seriesNameMap = {'alkali metals':'Alkali metals', 'alkali earth metals':'Alkaline earth metals', 'lanthanides':'Lanthanides', 'actinides':'Actinides', 'transition metals':'Transition metals','noble gases':'Noble gases','metalloids':'Metalloids','fission products':'fission products','nonmetals':'Nonmetals','oxide fission products':'oxide fission products','halogens':'Halogens', 'minor actinides':'minor actnides'}
-    
-        if series == 'fission products':
-           isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] != seriesNameMap['actinides'] ]
-        elif series == 'oxide fission products':
-           collec = [ seriesNameMap['actinides'],
-                      seriesNameMap['halogens'],
-                      seriesNameMap['noble gases'],
-                    ]
-           isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] not in collec ]
-           collec = ['C','N','O','H']
-           isotopes = [ x for x in isotopes if x.split('-')[0].strip() not in collec ]
-        elif series == 'minor actinides':
-           isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] == seriesNameMap['actinides'] ]
-           collec = ['U','Pu']
-           isotopes = [ x for x in isotopes if x.split('-')[0].strip() not in collec ]
-        else:
-           isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ]== seriesNameMap[series] ]
-        return isotopes
-
-     if symbol is None and series is None:
-
-        nuclidesNames = self.propertyDensities.index
-        return list( nuclidesNames )
-
 #.................................................................................
 # segment volume
 
@@ -88,10 +51,49 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
     return volume
 
 #.................................................................................
-# mass or mass concentration
+# fuel segment overall quantities
+  if nuclide is None and series is None:
 
-  if attributeName == 'massCC' or attributeName == 'mass': 
-     colName = 'Mass CC [g/cc]'
+# mass or mass concentration
+     if attributeName == 'massCC' or attributeName == 'massDens' or attributeName == 'mass': 
+        massCC = 0.0
+        for spc in self._species:
+            massCC += spc.massCC
+        if attributeName == 'massCC' or attributeName == 'massDens': 
+          return massCC
+        else:
+          volume = __GetFuelSegmentVolume( self )
+          return massCC * volume
+# radioactivity 
+     if attributeName == 'radioactivtyDens' or attributeName == 'radioactivity':
+        radDens = 0.0
+        for spc in self._species:
+            radDens += spc.molarRadioactivity * spc.molarCC
+        if attributeName == 'radioactivityDens': 
+          return radDens
+        else:
+          volume = __GetFuelSegmentVolume( self )
+          return radDens * volume
+# gamma          
+     if attributeName == 'gammaDens' or attributeName == 'gamma':
+        gammaDens = 0.0
+        for spc in self._species:
+            gammaDens += spc.molarGammaPwr * spc.molarCC
+        if attributeName == 'gammaDens': 
+          return gammaDens
+        else:
+          volume = __GetFuelSegmentVolume( self )
+          return gammaDens * volume
+# heat           
+     if attributeName == 'heatDens' or attributeName == 'heat':
+        heatDens = 0.0
+        for spc in self._species:
+            heatDens += spc.molarHeatPwr * spc.molarCC
+        if attributeName == 'heatDens': 
+          return heatDens
+        else:
+          volume = __GetFuelSegmentVolume( self )
+          return heatDens * volume
 
 #.................................................................................
 # radioactivity               
@@ -124,10 +126,12 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
 #.................................................................................
 # all nuclide content of the fuel added
 
-  if symbol is None and series is None:
+  if nuclide is None and series is None:
 
      density = 0.0
+
      density = self.propertyDensities[ colName ].sum()
+
      if attributeDens is False:  
         volume = __GetFuelSegmentVolume( self )
         prop = density * volume
@@ -142,35 +146,8 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
  
      density = 0.0
 
-     assert series in self.chemicalElementSeries, 'series: %r; fail.'%(series)
-
-     seriesNameMap = {'alkali metals':'Alkali metals', 'alkali earth metals':'Alkaline earth metals', 'lanthanides':'Lanthanides', 'actinides':'Actinides', 'transition metals':'Transition metals','noble gases':'Noble gases','metalloids':'Metalloids','fission products':'fission products','nonmetals':'Nonmetals','oxide fission products':'oxide fission products','halogens':'Halogens', 'minor actinides':'minor actnides'}
-
-     if series in self.chemicalElementSeries:
-
-       nuclidesNames = self.propertyDensities.index
-    
-       if series == 'fission products':
-          isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] != seriesNameMap['actinides'] ]
-       elif series == 'oxide fission products':
-          collec = [ seriesNameMap['actinides'],
-                     seriesNameMap['halogens'],
-                     seriesNameMap['noble gases'],
-                   ]
-          isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] not in collec ]
-          collec = ['C','N','O','H']
-          isotopes = [ x for x in isotopes if x.split('-')[0].strip() not in collec ]
-       elif series == 'minor actinides':
-          isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] == seriesNameMap['actinides'] ]
-          collec = ['Np','Am','Cm']
-          isotopes = [ x for x in isotopes if x.split('-')[0].strip() in collec ]
-       else:
-          isotopes = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ]== seriesNameMap[series] ]
-
-#       print('fission products ',isotopes)
-
-       for isotope in isotopes:
-         density += self.propertyDensities.loc[isotope,colName]
+     for isotope in isotopes:
+       density += self.propertyDensities.loc[isotope,colName]
 
      if attributeDens is False:  
         volume = __GetFuelSegmentVolume( self )
@@ -182,19 +159,19 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
 #.................................................................................
 # get specific nuclide (either the isotopes of the nuclide or the specific isotope) property
 
-  if symbol is not None:
+  if nuclide is not None:
 
     density = 0.0
 
-  # isotope
-    if len(symbol.split('-')) == 2:
-      density = self.propertyDensities.loc[symbol,colName]
+  # nuclide 
+    if len(nuclide.split('-')) == 2:
+      density = self.propertyDensities.loc[nuclide,colName]
 
   # chemical element 
     else:
       nuclidesNames = self.propertyDensities.index
 #    print(self.propertyDensities)
-      isotopes = [x for x in nuclidesNames if x.split('-')[0].strip()==symbol]
+      isotopes = [x for x in nuclidesNames if x.split('-')[0].strip()==nuclide]
 #    print(isotopes)
       for isotope in isotopes:
         density += self.propertyDensities.loc[isotope,colName]
