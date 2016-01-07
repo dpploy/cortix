@@ -35,13 +35,13 @@ def _Phase( self, timeStamp, species=None, quantities=None, value=0.0 ):
   assert type(value) == type(float())
 
 # List of species and quantities objects; columns of data frame are named by objects
-  self.species    = species       # list
+  self._species   = species       # list
   self.quantities = quantities    # list
 
   names = list()
 
   if species is not None:
-     for specie in self.species:
+     for specie in self._species:
          names.append(specie.name)
 
   if quantities is not None:

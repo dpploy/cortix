@@ -47,19 +47,20 @@ class Phase():
      return list(self.phase.index)  # return all time stamps 
 
  def GetSpecie(self, name):
-     for specie in self.species:
+     for specie in self._species:
          if specie.name == name:
             return specie
      return None 
 
  def GetSpecies(self):
-     return self.species
+     return self._species
+ species = property(GetSpecies,None,None,None)
 
  def GetQuantities(self):
      return self.quantities
 
  def SetSpecieId(self, name, val):
-     for specie in self.species:
+     for specie in self._species:
          if specie.name == name:
             specie.flag = val
             return 
@@ -73,9 +74,9 @@ class Phase():
  def AddSpecie(self, newSpecie):
      assert type(newSpecie) == type(Specie())
      assert newSpecie.name not in list(self.phase.columns), 'quantity: %r exists. Current names: %r'%(newQuant,self.phase.columns)
-     speciesFormulae = [ specie.formula for specie in self.species ]
+     speciesFormulae = [ specie.formula for specie in self._species ]
      assert newSpecie.formula not in speciesFormulae
-     self.species.append( newSpecie )
+     self._species.append( newSpecie )
      newName = newSpecie.name
      col = pandas.DataFrame( index=list(self.phase.index), columns=[newName] )
      col.fillna(0.0)
@@ -151,12 +152,12 @@ class Phase():
      assert type(fileName) == type(str())
      tmp = pandas.DataFrame(self.phase)
      columnNames = tmp.columns
-     speciesNames = [ specie.name for specie in self.species ]
+     speciesNames = [ specie.name for specie in self._species ]
      quantityNames = [ quantity.name for quantity in self.quantities ]
      for col in columnNames:
          if col in speciesNames: 
             idx = speciesNames.index(col)
-            specie = self.species[idx]
+            specie = self._species[idx]
             tmp.rename( columns={col:specie.formula}, inplace=True )
          elif col in quantityNames: 
             idx = quantityNames.index(col)
@@ -169,9 +170,9 @@ class Phase():
 # Printing of data members
 # def __str__( self ):
      s = 'Phase(): %s;\n %s;\n'
-     return s % (self.quantities, self.species)
+     return s % (self.quantities, self._species)
 #
  def __repr__( self ):
      s = 'Phase(): %s;\n %s;\n'
-     return s % (self.quantities, self.species)
+     return s % (self.quantities, self._species)
 #*******************************************************************************
