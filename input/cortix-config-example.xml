@@ -52,7 +52,7 @@
   </task>
 
   <task name="solo-fueldepot" >
-   <evolveTime unit="hour">12.0</evolveTime>
+   <evolveTime unit="hour">2.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -88,7 +88,7 @@
   </task>
 
   <task name="solo-condenser">
-   <evolveTime unit="hour">20.0</evolveTime> <!-- 42h max -->
+   <evolveTime unit="hour">18.0</evolveTime> <!-- 18h max -->
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -133,8 +133,9 @@
   </task>
 
   <task name="fueldepot-chopper">
-<!--   <evolveTime unit="hour">130.0</evolveTime> --> <!-- all assemblies -->
-   <evolveTime unit="hour">130.0</evolveTime> 
+<!--   <evolveTime unit="hour">108.0</evolveTime> --> <!-- all assemblies -->
+<!--   <evolveTime unit="hour">36.0</evolveTime> --> <!-- 1 assembly -->
+   <evolveTime unit="hour">108.0</evolveTime> 
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -155,7 +156,7 @@
   <task name="fueldepot-chopper-dissolver">
 <!--   <evolveTime unit="hour">28.0</evolveTime> -->
 <!--   <evolveTime unit="hour">42.0</evolveTime>  -->
-   <evolveTime unit="hour">20.0</evolveTime>  
+   <evolveTime unit="hour">18.0</evolveTime>  
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -243,7 +244,7 @@
 
   <application name="dev1">
 
-   <moduleLibrary name='ornl-lib'>
+   <moduleLibrary name='head-lib'>
     <parentDir>
       /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
     </parentDir>
@@ -275,8 +276,9 @@
     <!-- The *input*, and *output* types allows for module self-connection; see network section  -->
     <port type="input"   mode="directory" multiplicity="1">westinghouse-14x14</port>
     <port type="use"     mode="directory" multiplicity="1">fuel-input</port>
-    <port type="use"     mode="file.xml" multiplicity="1">go-signal</port>
-    <port type="provide" mode="file.shlv"  multiplicity="1">fuel-bundle</port>
+    <port type="use"     mode="file.xml"  multiplicity="1">go-signal</port>
+    <port type="provide" mode="file.shlv" multiplicity="1">fuel-bundle</port>
+    <port type="output"  mode="file.any"  multiplicity="1">persistent-output</port>
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -374,10 +376,11 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
+<!--      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing  -->
    <module name="dissolver" type="native">
     <library name='headend-lib'>
      <parentDir>
-      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
+      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing  
      </parentDir>
     </library>
     <inputFileName>dissolver.input</inputFileName>
@@ -470,7 +473,7 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="condenser" type="native">
-    <library name='ornl-lib'>
+    <library name='headend-lib'>
      <parentDir>
       /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
      </parentDir>
@@ -637,6 +640,7 @@
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
     <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14"/> 
+    <connect fromModuleSlot="fueldepot:0" fromPort="persistent-output" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
