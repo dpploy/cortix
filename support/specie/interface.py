@@ -4,8 +4,8 @@ Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
 This Specie class is to be used with other classes in plant-level process modules.
 NB: Species is always a plural but here, the class is named as singular to
-    reflect one specie. If many species are used in an external context, the plural
-    can be used.
+    reflect one species. If many species are used in an external context, the plural
+    can be used without conflict.
 
 For unit testing do at the linux command prompt:
     python specie.py

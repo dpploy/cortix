@@ -4,6 +4,9 @@ Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
 Fuel segment support class
 
+A FuelSegment object describes the full composition and geometry of a fuel
+segment.
+
 Thu Jun 25 18:16:06 EDT 2015
 """
 #*********************************************************************************
