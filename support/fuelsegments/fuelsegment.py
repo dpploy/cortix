@@ -44,6 +44,12 @@ class FuelSegment():
      return self._species
  species = property(GetSpecies,None,None,None)
 
+ def GetSpecie(self, name):
+     for specie in self._species:
+       if specie.name == name: return specie
+     return None 
+ specie = property(GetSpecie,None,None,None)
+
  def GetAttribute(self, name, symbol=None, series=None):
      return _GetAttribute( self, name, symbol, series )
 

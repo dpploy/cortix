@@ -23,10 +23,14 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
 
   assert attributeName in self.attributeNames, ' attribute name: %r; options: %r; fail.' % (attributeName,self.attributeNames)
 
+  if nuclide is not None: assert len(nuclide.split('*')) == 1 # sanity check
+
   if nuclide is not None: assert series is None, 'fail.'
   if series is not None: assert nuclide is None, 'fail.'
 
   if series is not None: assert False,' not implemented.'
+
+  if attributeName == 'isotopes': assert nuclide is not None, 'need a nuclide symbol.'
 
 #.................................................................................
 # # of segments
@@ -51,6 +55,22 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
     claddingDiam   = self.geometry['OD [cm]']
     volume = claddingLength * math.pi * (claddingDiam/2.0)**2
     return volume
+
+#.................................................................................
+# fuel diameter      
+
+  if attributeName == 'fuelDiameter': 
+ 
+    fuelDiam   = self.geometry['fuel diameter [cm]']
+    return fuelDiam
+
+#.................................................................................
+# fuel length        
+
+  if attributeName == 'fuelLength': 
+ 
+    fuelLength = self.geometry['fuel length [cm]']
+    return fuelLength
 
 #.................................................................................
 # fuel segment overall quantities
@@ -101,6 +121,7 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
 # radioactivity               
 
   if attributeName == 'radioactivityDens' or attributeName == 'radioactivity': 
+     assert False
      colName = 'Radioactivity Dens. [Ci/cc]'
 
 #.................................................................................
@@ -108,85 +129,100 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
 
   if attributeName == 'thermalDens' or attributeName == 'thermal' or  \
      attributeName == 'heatDens'    or attributeName == 'heat': 
+     assert False
      colName = 'Thermal Dens. [W/cc]'
 
 #.................................................................................
 # gamma                       
 
   if attributeName == 'gammaDens' or attributeName == 'gamma': 
+     assert False
      colName = 'Gamma Dens. [W/cc]'
 
 #.................................................................................
 ##################################################################################
 #.................................................................................
 
-  if attributeName[-4:] == 'Dens' or attributeName[-2:] == 'CC': 
-     attributeDens = True
-  else:
-     attributeDens = False 
+#  if attributeName[-4:] == 'Dens' or attributeName[-2:] == 'CC': 
+#     attributeDens = True
+#  else:
+#     attributeDens = False 
 
 #.................................................................................
 # all nuclide content of the fuel added
 
-  if nuclide is None and series is None:
-
-     density = 0.0
-
-     density = self.propertyDensities[ colName ].sum()
-
-     if attributeDens is False:  
-        volume = __GetFuelSegmentVolume( self )
-        prop = density * volume
-        return prop
-     else:
-        return density
+#  if nuclide is None and series is None:
+#
+#     density = 0.0
+#
+#     density = self.propertyDensities[ colName ].sum()
+#
+#     if attributeDens is False:  
+#        volume = __GetFuelSegmentVolume( self )
+#        prop = density * volume
+#        return prop
+#     else:
+#        return density
 
 #.................................................................................
 # get chemical element series
 
-  if series is not None:
- 
-     density = 0.0
-
-     for isotope in isotopes:
-       density += self.propertyDensities.loc[isotope,colName]
-
-     if attributeDens is False:  
-        volume = __GetFuelSegmentVolume( self )
-        prop = density * volume
-        return prop
-     else:
-        return density
+#  if series is not None:
+# 
+#     density = 0.0
+#
+#     for isotope in isotopes:
+#       density += self.propertyDensities.loc[isotope,colName]
+#
+#     if attributeDens is False:  
+#        volume = __GetFuelSegmentVolume( self )
+#        prop = density * volume
+#        return prop
+#     else:
+#        return density
    
 #.................................................................................
 # get specific nuclide (either the isotopes of the nuclide or the specific isotope) property
 
   if nuclide is not None:
 
-    # case with a particular isotope
+    # a particular nuclide given (atomic number and atomic mass number)
     if len(nuclide.split('-')) == 2: 
 
-       nuclideMolarMass = ELEMENTS[nuclide.split('-')[0]].isotopes[int(nuclide.split('-')[1].strip('m'))].mass
+       nuclideMassNumber = int(nuclide.split('-')[1].strip('m'))
+       nuclideSymbol     = nuclide.split('-')[0]
+       nuclideMolarMass  = ELEMENTS[nuclideSymbol].isotopes[nuclideMassNumber].mass
 
        massCC = 0.0
 
        for spc in self._species:
 
-         nuclides = spc.atoms
+         formula = spc.atoms
 
          moleFraction = 0.0
-         for nucl in nuclides:
 
-           if len(nucl.split('*')) == 1: 
-             if nucl.split('*')[0].strip() == nuclide: 
+         for item in formula:
+
+           if len(item.split('*')) == 1: # no multiplier (implies 1.0)
+
+             formulaNuclideSymbol = item.split('-')[0].strip()
+             if formulaNuclideSymbol == nuclideSymbol: assert len(item.split('-')) == 2
+
+             if item.split('*')[0].strip() == nuclide: 
                 moleFraction = 1.0
              else:
                 moleFraction = 0.0
-           elif len(nucl.split('*')) == 2: 
-             if nucl.split('*')[1].strip() == nuclide: 
-                moleFraction = float(nucl.split('*')[0].strip()) 
+
+           elif len(item.split('*')) == 2: # with multiplier
+
+             formulaNuclideSymbol = item.split('*')[1].split('-')[0].strip()
+             if formulaNuclideSymbol == nuclideSymbol: assert len(item.split('*')[1].split('-')) == 2
+
+             if item.split('*')[1].strip() == nuclide: 
+                moleFraction = float(item.split('*')[0].strip()) 
              else:
                 moleFraction = 0.0
+
            else:
              assert False
 
@@ -194,35 +230,47 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
 
        return  massCC * __GetFuelSegmentVolume( self )
 
-  # chemical element (isotopes)
+  # chemical element given (only atomic number given)
     elif len(nuclide.split('-')) == 1: 
 
        massCC = 0.0
 
        for spc in self._species:
 
-         nuclides = spc.atoms
+         formula = spc.atoms
 
-         for nucl in nuclides:
+         for item in formula:
 
            moleFraction = 0.0
 
-           if len(nucl.split('*')) == 1: 
-             nuclideMolarMass = ELEMENTS[nucl.split('-')[0]].isotopes[int(nucl.split('-')[1].strip('m'))].mass
-             if nucl.split('-')[0].strip() == nuclide: 
+           if len(item.split('*')) == 1: # no multiplier (implies 1.0)
+
+             assert len(item.split('-')) == 2
+             formulaNuclideSymbol = item.split('-')[0].strip()
+             formulaNuclideMassNumber = int(item.split('-')[1].strip('m'))
+             formulaNuclideMolarMass = ELEMENTS[formulaNuclideSymbol].isotopes[formulaNuclideMassNumber].mass
+
+             if formulaNuclideSymbol == nuclide: 
                 moleFraction = 1.0
              else:
                 moleFraction = 0.0
-           elif len(nucl.split('*')) == 2: 
-             nuclideMolarMass = ELEMENTS[nucl.split('*')[1].split('-')[0]].isotopes[int(nucl.split('-')[1].strip('m'))].mass
-             if nucl.split('*')[1].split('-')[0].strip() == nuclide: 
-                moleFraction = float(nucl.split('*')[0].strip()) 
+
+           elif len(item.split('*')) == 2: # with multiplier
+
+             assert len(item.split('*')[1].split('-')) == 2
+             formulaNuclideSymbol = item.split('*')[1].split('-')[0].strip()
+             formulaNuclideMassNumber = int(item.split('*')[1].split('-')[1].strip('m'))
+             formulaNuclideMolarMass = ELEMENTS[formulaNuclideSymbol].isotopes[formulaNuclideMassNumber].mass
+
+             if formulaNuclideSymbol == nuclide: 
+                moleFraction = float(item.split('*')[0].strip()) 
              else:
                 moleFraction = 0.0
+
            else:
              assert False
 
-           massCC += spc.molarCC * moleFraction * nuclideMolarMass
+           massCC += spc.molarCC * moleFraction * formulaNuclideMolarMass
 
        return  massCC * __GetFuelSegmentVolume( self )
 

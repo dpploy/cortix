@@ -10,16 +10,26 @@ NB: Species is always a plural but here, the class is named as singular to
 For unit testing do at the linux command prompt:
     python specie.py
 
-NB: the definition of chemical specie here is extended to ficticious compounds.
-    This is done as follows. Say MAO2 is a ficticious compound denoting a 
-    minor actinides dioxide. The list of atoms is given as follows:
+NB: The Specie() class encapsulate either the molecular or empirical chemical
+    formula of a compound.
+    The definition of chemical specie here is extended to ficticious compounds.
+    This is done as follows. Say MAO2 is either a molecular or empirical chemical
+    formula of a ficticious compound denoting a minor actinides dioxide. The list 
+    of atoms is given as follows:
 
     ['0.49*Np-237', '0.42*Am-241', '0.08*Am-243', '0.01*Cm-244', '2.0*O-16']
 
     note the MA forming nuclides add to 1 = 0.49 + 0.42 + 0.08 + 0.01. Hence
     therefore the number of atoms in this compound is 3. 1 MA "atom" and 2 O.
+    Note that the total number of "atoms" is obtained by summing all multipliers:
+    0.49 + 0.42 + 0.08 + 0.01 + 2.0.
     The nuclide is indicated by the element symbol followed by a dash and the 
     atomic mass number. Here the number of nuclide types is 5 (self._nNuclideTypes).
+
+    The numbers preceeding the nuclide symbol before the * will referred to as
+    multipliers. The sum of the multipliers will add to the number of "atoms" in
+    the formula. WARNING: a multiplier could be in the format 0.00e-00. In this 
+    case a hiphen may appear twice, e.g.: 1.549e-09*U-233
 
     Other forms can be used for common true species
 
@@ -27,7 +37,7 @@ NB: the definition of chemical specie here is extended to ficticious compounds.
     [ 'H', 'O', 'H' ]  etc...
  
     This code will calculate the molar mass of any species with a given valid
-    atom list using a provided periodic table of chenical elements. The user 
+    atom list using a provided periodic table of chemical elements. The user 
     can also reset the value of the molar mass with a setter method.
 
 Sat May  9 21:40:48 EDT 2015 created; vfda
@@ -36,8 +46,8 @@ Sat May  9 21:40:48 EDT 2015 created; vfda
 #*******************************************************************************
 import os, sys
 
-from ._specie import _Specie  # constructor
-from ._updatenatoms import _UpdateNAtoms  # constructor
+from ._specie import _Specie              # constructor
+from ._updatemolarmass import _UpdateMolarMass  
 #*******************************************************************************
 
 #*******************************************************************************
@@ -108,6 +118,16 @@ class Specie():
      self._molarRadioactivity = v
  molarRadioactivity = property(GetMolarRadioactivity,SetMolarRadioactivity,None,None)
 
+ def GetMolarRadioactivityFractions(self):
+     return self._molarRadioactivityFractions
+ def SetMolarRadioactivityFractions(self,fracs):
+     assert type(fracs) == type(list()), 'oops not list.'
+     assert len(fracs) == len(self._atoms), 'oops not right length,'
+     if len(fracs) != 0:
+        assert type(fracs[-1]) == type(float()), 'oops not float.'
+     self._molarRadioactivityFractions = fracs
+ molarRadioactivityFractions = property(GetMolarRadioactivityFractions,SetMolarRadioactivityFractions,None,None)
+
  def GetMolarRadioactivityUnit(self):
      return self._molarRadioactivityUnit
  def SetMolarRadioactivityUnit(self,v):
@@ -145,7 +165,7 @@ class Specie():
      if len(atoms) != 0:
         assert type(atoms[-1]) == type(str()), 'oops not string.'
      self._atoms = atoms
-     _UpdateNAtoms(self)
+     _UpdateMolarMass(self)
  atoms = property(GetAtoms,SetAtoms,None,None)
 
  def GetNAtoms(self): # number of ficticious atoms in the species (see NB above)
@@ -195,10 +215,10 @@ class Specie():
 #*******************************************************************************
 # Printing of data members
  def __str__( self ):
-     s = 'Specie(): name=%s; formula=%s; phase=%s;'+' molar mass=%s[%s];'+' molar cc=%s[%s];'+' mass cc=%s[%s];'+' flag=%s;'+' # atoms=%s;'+' # nuclide types=%s;'+' atoms=%s;'+' molar radioactivity=%s[%s];'+' molar heat pwr=%s[%s];'+' molar gamma pwr=%s[%s].\n'
-     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.nAtoms, self.nNuclideTypes, self.atoms, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarHeatPwr, self.molarHeatPwrUnit, self.molarGammaPwr, self.molarGammaPwrUnit)
+     s = 'Specie(): name=%s; formula=%s; phase=%s;'+' molar mass=%s[%s];'+' molar cc=%s[%s];'+' mass cc=%s[%s];'+' flag=%s;'+' # atoms=%s;'+' # nuclide types=%s;'+' atoms=%s;'+' molar radioactivity=%s[%s];'+' molar heat pwr=%s[%s];'+' molar gamma pwr=%s[%s];'+' molar radioactivity fractions=%s.\n'
+     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.nAtoms, self.nNuclideTypes, self.atoms, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarHeatPwr, self.molarHeatPwrUnit, self.molarGammaPwr, self.molarGammaPwrUnit, self.molarRadioactivityFractions)
 
  def __repr__( self ):
-     s = 'Specie(): name=%s; formula=%s; phase=%s;'+' molar mass=%s[%s];'+' molar cc=%s[%s];'+' mass cc=%s[%s];'+' flag=%s;'+' # atoms=%s;'+' # nuclide types=%s;'+' atoms=%s;'+' molar radioactivity=%s[%s];'+' molar heat pwr=%s[%s];'+' molar gamma pwr=%s[%s].\n'
-     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.nAtoms, self.nNuclideTypes, self.atoms, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarHeatPwr, self.molarHeatPwrUnit, self.molarGammaPwr, self.molarGammaPwrUnit)
+     s = 'Specie(): name=%s; formula=%s; phase=%s;'+' molar mass=%s[%s];'+' molar cc=%s[%s];'+' mass cc=%s[%s];'+' flag=%s;'+' # atoms=%s;'+' # nuclide types=%s;'+' atoms=%s;'+' molar radioactivity=%s[%s];'+' molar heat pwr=%s[%s];'+' molar gamma pwr=%s[%s];'+' molar radioactivity fractions=%s.\n'
+     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.nAtoms, self.nNuclideTypes, self.atoms, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarHeatPwr, self.molarHeatPwrUnit, self.molarGammaPwr, self.molarGammaPwrUnit, self.molarRadioactivityFractions)
 #*******************************************************************************
