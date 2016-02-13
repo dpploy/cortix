@@ -74,8 +74,8 @@ class Phase():
  def AddSpecie(self, newSpecie):
      assert type(newSpecie) == type(Specie())
      assert newSpecie.name not in list(self.phase.columns), 'quantity: %r exists. Current names: %r'%(newQuant,self.phase.columns)
-     speciesFormulae = [ specie.formula for specie in self._species ]
-     assert newSpecie.formula not in speciesFormulae
+     speciesFormulae = [ specie.formulaName for specie in self._species ]
+     assert newSpecie.formulaName not in speciesFormulae
      self._species.append( newSpecie )
      newName = newSpecie.name
      col = pandas.DataFrame( index=list(self.phase.index), columns=[newName] )
@@ -158,7 +158,7 @@ class Phase():
          if col in speciesNames: 
             idx = speciesNames.index(col)
             specie = self._species[idx]
-            tmp.rename( columns={col:specie.formula}, inplace=True )
+            tmp.rename( columns={col:specie.formulaName}, inplace=True )
          elif col in quantityNames: 
             idx = quantityNames.index(col)
             quant = self.quantities[idx]

@@ -16,19 +16,19 @@ from ..periodictable import ELEMENTS
 # constructor
 
 def _Specie( self, 
-             name    = 'null',
-             formula = 'null',
-             phase   = 'null',
-             atoms   = list(),
-             molarCC = 0.0,      # default unit: M 
-             massCC  = 0.0,      # default unit: g/L
-             flag    = None   ):
+             name        = 'null',
+             formulaName = 'null',
+             phase       = 'null',
+             atoms       = list(),
+             molarCC     = 0.0,      # default unit: M 
+             massCC      = 0.0,      # default unit: g/L
+             flag        = None   ):
 
  assert type(name) == type(str()), 'oops not string.'
  self._name = name;    
 
- assert type(formula) == type(str()), 'oops not string.'
- self._formula = formula; 
+ assert type(formulaName) == type(str()), 'oops not string.'
+ self._formulaName = formulaName; 
 
  assert type(phase) == type(str()), 'oops not string.'
  self._phase = phase;   

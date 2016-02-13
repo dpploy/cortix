@@ -54,18 +54,18 @@ from ._updatemolarmass import _UpdateMolarMass
 class Specie():
 
  def __init__( self, 
-               name    = 'null',
-               formula = 'null',
-               phase   = 'null',
-               atoms   = list(),
-               molarCC = 0.0,      # default unit: M (mole/L)
-               massCC  = 0.0,      # default unit: g/L
-               flag    = None   ):
+               name        = 'null',
+               formulaName = 'null',
+               phase       = 'null',
+               atoms       = list(),
+               molarCC     = 0.0,      # default unit: M (mole/L)
+               massCC      = 0.0,      # default unit: g/L
+               flag        = None   ):
 
      # constructor
      _Specie( self, 
               name,
-              formula,
+              formulaName,
               phase,
               atoms,
               molarCC,
@@ -88,11 +88,11 @@ class Specie():
      self._name = n
  name = property(GetName,SetName,None,None)
 
- def GetFormula(self):
-     return self._formula
- def SetFormula(self,f):
-     self._formula = f
- formula = property(GetFormula,SetFormula,None,None)
+ def GetFormulaName(self):
+     return self._formulaName
+ def SetFormulaName(self,f):
+     self._formulaName = f
+ formulaName = property(GetFormulaName,SetFormulaName,None,None)
 
  def GetPhase(self):
      return self._phase
@@ -158,6 +158,7 @@ class Specie():
      self._molarGammaPwrUnit = v
  molarGammaPwrUnit = property(GetMolarGammaPwrUnit,SetMolarGammaPwrUnit,None,None)
  
+ # Deprecated 
  def GetAtoms(self):
      return self._atoms       
  def SetAtoms(self, atoms):
@@ -167,6 +168,17 @@ class Specie():
      self._atoms = atoms
      _UpdateMolarMass(self)
  atoms = property(GetAtoms,SetAtoms,None,None)
+
+ # New interface 
+ def GetFormula(self):
+     return self._atoms       
+ def SetFormula(self, atoms):
+     assert type(atoms) == type(list()), 'oops not list.'
+     if len(atoms) != 0:
+        assert type(atoms[-1]) == type(str()), 'oops not string.'
+     self._atoms = atoms
+     _UpdateMolarMass(self)
+ formula = property(GetFormula,SetFormula,None,None)
 
  def GetNAtoms(self): # number of ficticious atoms in the species (see NB above)
      return self._nAtoms       
@@ -215,10 +227,10 @@ class Specie():
 #*******************************************************************************
 # Printing of data members
  def __str__( self ):
-     s = 'Specie(): name=%s; formula=%s; phase=%s;'+' molar mass=%s[%s];'+' molar cc=%s[%s];'+' mass cc=%s[%s];'+' flag=%s;'+' # atoms=%s;'+' # nuclide types=%s;'+' atoms=%s;'+' molar radioactivity=%s[%s];'+' molar heat pwr=%s[%s];'+' molar gamma pwr=%s[%s];'+' molar radioactivity fractions=%s.\n'
-     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.nAtoms, self.nNuclideTypes, self.atoms, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarHeatPwr, self.molarHeatPwrUnit, self.molarGammaPwr, self.molarGammaPwrUnit, self.molarRadioactivityFractions)
+     s = 'Specie(): name=%s; formulaName=%s; phase=%s;'+' molar mass=%s[%s];'+' molar cc=%s[%s];'+' mass cc=%s[%s];'+' flag=%s;'+' # formula=%s;'+' # nuclide types=%s;'+' atoms=%s;'+' molar radioactivity=%s[%s];'+' molar heat pwr=%s[%s];'+' molar gamma pwr=%s[%s];'+' molar radioactivity fractions=%s.\n'
+     return s % (self.name, self.formulaName, self.phase, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.nAtoms, self.nNuclideTypes, self.atoms, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarHeatPwr, self.molarHeatPwrUnit, self.molarGammaPwr, self.molarGammaPwrUnit, self.molarRadioactivityFractions)
 
  def __repr__( self ):
-     s = 'Specie(): name=%s; formula=%s; phase=%s;'+' molar mass=%s[%s];'+' molar cc=%s[%s];'+' mass cc=%s[%s];'+' flag=%s;'+' # atoms=%s;'+' # nuclide types=%s;'+' atoms=%s;'+' molar radioactivity=%s[%s];'+' molar heat pwr=%s[%s];'+' molar gamma pwr=%s[%s];'+' molar radioactivity fractions=%s.\n'
-     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.nAtoms, self.nNuclideTypes, self.atoms, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarHeatPwr, self.molarHeatPwrUnit, self.molarGammaPwr, self.molarGammaPwrUnit, self.molarRadioactivityFractions)
+     s = 'Specie(): name=%s; formulaName=%s; phase=%s;'+' molar mass=%s[%s];'+' molar cc=%s[%s];'+' mass cc=%s[%s];'+' flag=%s;'+' # formula=%s;'+' # nuclide types=%s;'+' atoms=%s;'+' molar radioactivity=%s[%s];'+' molar heat pwr=%s[%s];'+' molar gamma pwr=%s[%s];'+' molar radioactivity fractions=%s.\n'
+     return s % (self.name, self.formulaName, self.phase, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.nAtoms, self.nNuclideTypes, self.atoms, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarHeatPwr, self.molarHeatPwrUnit, self.molarGammaPwr, self.molarGammaPwrUnit, self.molarRadioactivityFractions)
 #*******************************************************************************
