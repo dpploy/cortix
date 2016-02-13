@@ -44,16 +44,22 @@ class FuelSegment():
      return self._species
  species = property(GetSpecies,None,None,None)
 
+ def GetSpecie(self, name):
+     for specie in self._species:
+       if specie.name == name: return specie
+     return None 
+ specie = property(GetSpecie,None,None,None)
+
  def GetAttribute(self, name, symbol=None, series=None):
      return _GetAttribute( self, name, symbol, series )
 
 #*******************************************************************************
 # Printing of data members
-# def __str__( self ):
-#     s = ' %5s %5s %5s '+' molar mass: %6s '+' molar cc: %6s '+' mass cc: %6s '+' flag: %s '+'# atoms: %s'+' atoms: %s\n'
-#     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)
-#
-# def __repr__( self ):
-#     s = ' %5s %5s %5s '+' molar mass: %6s '+' molar cc: %6s '+' mass cc: %6s '+' flag: %s '+'# atoms: %s'+' atoms: %s\n'
-#     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)
+ def __str__( self ):
+     s = 'FuelSegment(): %s\n %s\n'
+     return s % (self._geometry, self._species)
+
+ def __repr__( self ):
+     s = 'FuelSegment(): %s\n %s\n'
+     return s % (self._geometry, self._species)
 #*******************************************************************************
