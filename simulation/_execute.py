@@ -23,7 +23,9 @@ def _Execute( self, taskName=None ):
 
   if taskName is not None: 
 
+     #---------------------------
      _SetupTask( self, taskName )
+     #---------------------------
 
      for task in self.tasks:
        if task.GetName() == taskName: 
@@ -31,7 +33,9 @@ def _Execute( self, taskName=None ):
          s = 'called task.Execute() on task ' + taskName
          self.log.debug(s)
 
+         #-------------------------------
          task.Execute( self.application )
+         #-------------------------------
 
   s = 'end Execute('+taskName+')'
   self.log.debug(s)

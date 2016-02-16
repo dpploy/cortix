@@ -30,6 +30,13 @@ class Simulation():
 
   return
 
+ def __del__( self ):
+
+  s = 'destroyed simulation: '+self.name
+  self.log.info(s)
+
+  return
+
 #---------------------------------------------------------------------------------
 # Execute  
 

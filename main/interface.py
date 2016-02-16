@@ -27,6 +27,13 @@ class Cortix():
 
     return
 
+ def __del__( self ):
+
+    s = 'destroyed Cortix object: '+self.name
+    self.log.info(s)
+
+    return
+
 #---------------------------------------------------------------------------------
 # Simulate                  
 

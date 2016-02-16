@@ -34,6 +34,13 @@ class Application():
 
   return
 
+ def __del__( self ):
+
+  s = 'destroyed application: '+self.name
+  self.log.info(s)
+
+  return
+
 #---------------------------------------------------------------------------------
 # Getters
 

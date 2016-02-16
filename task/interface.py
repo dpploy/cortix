@@ -29,6 +29,13 @@ class Task():
 
   return
 
+ def __del__( self ):
+
+  s = 'destroyed task: '+self.name
+  self.log.info(s)
+
+  return
+
 #---------------------------------------------------------------------------------
 # Accessors (note: all accessors of member data can potentially change the
 # python object referenced to). See NB below.
