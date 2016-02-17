@@ -56,7 +56,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
     if iVar%(nRows*nCols) == 0: # if a multiple of nRows*nCols start a new dashboard
 
       if iVar != 0: # flush any current figure
-        figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash)+'.png'
+        figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash).zfill(2)+'.png'
         fig.savefig(figName,dpi=200,fomat='png')
         plt.close(str(self.slotId)+'_'+str(iDash))
         s = '_PlotTimeSeqDashboard(): created plot: '+figName
@@ -293,7 +293,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
   # end of: for iVar in range(nVar):
 
-  figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash)+'.png'
+  figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash).zfill(2)+'.png'
   fig.savefig(figName,dpi=200,fomat='png')
   plt.close(str(self.slotId)+'_'+str(iDash))
   s = '_PlotTimeSeqDashboard(): created plot: '+figName
