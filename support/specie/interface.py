@@ -227,10 +227,10 @@ class Specie():
 #*******************************************************************************
 # Printing of data members
  def __str__( self ):
-     s = 'Specie(): name=%s; formulaName=%s; phase=%s;'+' formula=%s;'+' # atoms=%s;'+' # nuclide types=%s;'+' molar mass=%s[%s];'+' molar cc=%s[%s];'+' mass cc=%s[%s];'+' flag=%s;'+' molar radioactivity=%s[%s];'+' molar heat pwr=%s[%s];'+' molar gamma pwr=%s[%s];'+' molar radioactivity fractions=%s.\n'
+     s = '\n Specie(): name=%s;'+' formulaName=%s;'+' phase=%s;'+'\n formula=%s;'+'\n # atoms=%s;'+' # nuclide types=%s;'+' molar mass=%s[%s];'+' molar cc=%s[%s];'+' mass cc=%s[%s];'+'\n flag=%s;'+'\n molar radioactivity=%s[%s];'+'\n molar heat pwr=%s[%s];'+'\n molar gamma pwr=%s[%s];'+'\n molar radioactivity fractions=%s.\n'
      return s % (self.name, self.formulaName, self.phase, self.atoms, self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarHeatPwr, self.molarHeatPwrUnit, self.molarGammaPwr, self.molarGammaPwrUnit, self.molarRadioactivityFractions)
 
  def __repr__( self ):
-     s = 'Specie(): name=%s; formulaName=%s; phase=%s;'+' formula=%s;'+' # atoms=%s;'+' # nuclide types=%s;'+' molar mass=%s[%s];'+' molar cc=%s[%s];'+' mass cc=%s[%s];'+' flag=%s;'+' molar radioactivity=%s[%s];'+' molar heat pwr=%s[%s];'+' molar gamma pwr=%s[%s];'+' molar radioactivity fractions=%s.\n'
+     s = '\n Specie(): name=%s;'+' formulaName=%s;'+' phase=%s;'+'\n formula=%s;'+'\n # atoms=%s;'+' # nuclide types=%s;'+' molar mass=%s[%s];'+' molar cc=%s[%s];'+' mass cc=%s[%s];'+'\n flag=%s;'+'\n molar radioactivity=%s[%s];'+'\n molar heat pwr=%s[%s];'+'\n molar gamma pwr=%s[%s];'+'\n molar radioactivity fractions=%s.\n'
      return s % (self.name, self.formulaName, self.phase, self.atoms, self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarHeatPwr, self.molarHeatPwrUnit, self.molarGammaPwr, self.molarGammaPwrUnit, self.molarRadioactivityFractions)
 #*******************************************************************************
