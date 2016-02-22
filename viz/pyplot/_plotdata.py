@@ -24,6 +24,11 @@ def _PlotData( self, facilityTime=0.0 , timeStep=0.0):
     fromTime = max(0.0, facilityTime-self.plotSlideWindow)
     toTime   = facilityTime
 
+    s = '_PlotData(): fromTime [min] = ' + str(fromTime)
+    self.log.debug(s)
+    s = '_PlotData(): toTime [min] = ' + str(toTime)
+    self.log.debug(s)
+
     _PlotTimeSeqDashboard(self, fromTime, toTime) #  plot with slide window history
 
     _PlotTimeTables(self, fromTime, toTime) # plot with slide window history

@@ -35,7 +35,7 @@ class CortixDriver():
   assert type(finalTime) is float, '-> time type %r is invalid.' % type(finalTime)
 
   # Logging
-  self.__log = logging.getLogger('launcher-viz.pyplot_'+str(slotId)+'.cortixdriver.pyplot')
+  self.__log = logging.getLogger('launcher-viz.pyplot_'+str(slotId)+'.cortixdriver')
   self.__log.debug('initializing an object of CortixDriver()' )
 
   self.__pyPlot = PyPlot( slotId, 
