@@ -19,8 +19,8 @@ from matplotlib.ticker import MultipleLocator
 
 def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
-  nRows = 3
-  nCols = 1
+  nRows = 2
+  nCols = 2
 
   nSequences = len(self.timeSequences_tmp)
   if nSequences == 0: return
@@ -64,7 +64,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
         iDash += 1
       # end of: if iVar != 0: # flush any current figure
 
-      fig = plt.figure(str(self.slotId)+'_'+str(iDash))
+      fig = plt.figure(num=str(self.slotId)+'_'+str(iDash))
 
       gs = gridspec.GridSpec(nRows,nCols)
       gs.update( left=0.08,right=0.98,wspace=0.4,hspace=0.4 )
