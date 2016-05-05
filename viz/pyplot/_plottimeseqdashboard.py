@@ -48,6 +48,8 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
   assert len(variablesData) == nVar, 'len(variablesData) = %r; nVar = %r'%(len(variablesData),nVar)
 
   today = datetime.datetime.today().strftime("%d%b%y %H:%M:%S")
+
+  figNum = 0 # fig counter
   
   # loop over variables and assign to the dashboards  
   iDash = 0
@@ -58,13 +60,14 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       if iVar != 0: # flush any current figure
         figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash).zfill(2)+'.png'
         fig.savefig(figName,dpi=200,fomat='png')
-        plt.close(str(self.slotId)+'_'+str(iDash))
+        plt.close(figNum)
         s = '_PlotTimeSeqDashboard(): created plot: '+figName
         self.log.debug(s)
         iDash += 1
       # end of: if iVar != 0: # flush any current figure
 
-      fig = plt.figure(num=str(self.slotId)+'_'+str(iDash))
+      figNum = str(self.slotId)+'.'+str(iDash)
+      fig = plt.figure(num=figNum)
 
       gs = gridspec.GridSpec(nRows,nCols)
       gs.update( left=0.08,right=0.98,wspace=0.4,hspace=0.4 )
@@ -295,7 +298,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
   figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash).zfill(2)+'.png'
   fig.savefig(figName,dpi=200,fomat='png')
-  plt.close(str(self.slotId)+'_'+str(iDash))
+  plt.close(figNum)
   s = '_PlotTimeSeqDashboard(): created plot: '+figName
   self.log.debug(s)
 

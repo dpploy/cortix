@@ -24,3 +24,5 @@ createtags
 driver-cortix-dev.py
 input/cortix-config.xml
 support/actor
+video*
+record*
