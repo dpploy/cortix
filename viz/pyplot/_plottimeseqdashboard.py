@@ -20,7 +20,7 @@ from matplotlib.ticker import MultipleLocator
 def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
   nRows = 2
-  nCols = 2
+  nCols = 4
 
   nSequences = len(self.timeSequences_tmp)
   if nSequences == 0: return
@@ -49,7 +49,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
   today = datetime.datetime.today().strftime("%d%b%y %H:%M:%S")
 
-  figNum = 0 # fig counter
+  figNum = None 
   
   # loop over variables and assign to the dashboards  
   iDash = 0
@@ -60,7 +60,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
       if iVar != 0: # flush any current figure
         figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash).zfill(2)+'.png'
         fig.savefig(figName,dpi=200,fomat='png')
-        plt.close(figNum)
+        plt.close( figNum )
         s = '_PlotTimeSeqDashboard(): created plot: '+figName
         self.log.debug(s)
         iDash += 1
@@ -222,7 +222,10 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
     ax.set_ylim( ymin, ymax )
 
-    for l in ax.get_xticklabels(): l.set_fontsize(10)
+    if nCols >= 4:
+       for l in ax.get_xticklabels(): l.set_fontsize(8)
+    else:
+       for l in ax.get_xticklabels(): l.set_fontsize(10)
     for l in ax.get_yticklabels(): l.set_fontsize(10)
 
     if timeUnit == 'h' and x.max()-x.min() <= 5.0:
@@ -298,7 +301,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
   figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash).zfill(2)+'.png'
   fig.savefig(figName,dpi=200,fomat='png')
-  plt.close(figNum)
+  plt.close( figNum )
   s = '_PlotTimeSeqDashboard(): created plot: '+figName
   self.log.debug(s)
 
