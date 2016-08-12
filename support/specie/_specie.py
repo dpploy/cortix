@@ -9,7 +9,8 @@ Sat May  9 21:40:48 EDT 2015 created; vfda
 import os, sys
 
 from ._updatemolarmass import _UpdateMolarMass
-from ..periodictable import ELEMENTS
+from ._formulacleanup  import _FormulaCleanup
+from ..periodictable   import ELEMENTS
 #*******************************************************************************
 
 #*******************************************************************************
@@ -35,6 +36,8 @@ def _Specie( self,
 
  assert type(atoms) == type(list()), 'oops not list.'
  self._atoms = atoms;   
+
+ if len(self._atoms) > 0: _FormulaCleanup( self )
 
  self._flag = flag  # flag can be any type
 

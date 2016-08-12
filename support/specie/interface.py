@@ -3,30 +3,30 @@
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
 This Specie class is to be used with other classes in plant-level process modules.
-NB: Species is always a plural but here, the class is named as singular to
-    reflect one species. If many species are used in an external context, the plural
-    can be used without conflict.
+NB: Species is always used either in singular or plural cases, the class here is 
+    named here to reflect one species. If many species are used in an external 
+    context, the species object name can be used without conflict.
 
 For unit testing do at the linux command prompt:
     python specie.py
 
-NB: The Specie() class encapsulate either the molecular or empirical chemical
+NB: The Specie() class encapsulates either the molecular or empirical chemical
     formula of a compound.
-    The definition of chemical specie here is extended to ficticious compounds.
+    The definition of a chemical species here is extended to ficticious compounds.
     This is done as follows. Say MAO2 is either a molecular or empirical chemical
     formula of a ficticious compound denoting a minor actinides dioxide. The list 
     of atoms is given as follows:
 
     ['0.49*Np-237', '0.42*Am-241', '0.08*Am-243', '0.01*Cm-244', '2.0*O-16']
 
-    note the MA forming nuclides add to 1 = 0.49 + 0.42 + 0.08 + 0.01. Hence
-    therefore the number of atoms in this compound is 3. 1 MA "atom" and 2 O.
+    note the MA forming nuclides add to 1 = 0.49 + 0.42 + 0.08 + 0.01. Therefore
+    the number of atoms in this compound is 3. 1 MA "atom" and 2 O.
     Note that the total number of "atoms" is obtained by summing all multipliers:
     0.49 + 0.42 + 0.08 + 0.01 + 2.0.
     The nuclide is indicated by the element symbol followed by a dash and the 
     atomic mass number. Here the number of nuclide types is 5 (self._nNuclideTypes).
 
-    The numbers preceeding the nuclide symbol before the * will referred to as
+    The numbers preceeding the nuclide symbol before the * will be referred to as
     multipliers. The sum of the multipliers will add to the number of "atoms" in
     the formula. WARNING: a multiplier could be in the format 0.00e-00. In this 
     case a hiphen may appear twice, e.g.: 1.549e-09*U-233
@@ -48,6 +48,7 @@ import os, sys
 
 from ._specie import _Specie              # constructor
 from ._updatemolarmass import _UpdateMolarMass  
+from ._formulacleanup   import _FormulaCleanup
 #*******************************************************************************
 
 #*******************************************************************************
@@ -166,6 +167,7 @@ class Specie():
      if len(atoms) != 0:
         assert type(atoms[-1]) == type(str()), 'oops not string.'
      self._atoms = atoms
+     _FormulaCleanup(self)
      _UpdateMolarMass(self)
  atoms = property(GetAtoms,SetAtoms,None,None)
 
@@ -177,6 +179,7 @@ class Specie():
      if len(atoms) != 0:
         assert type(atoms[-1]) == type(str()), 'oops not string.'
      self._atoms = atoms
+     _FormulaCleanup(self)
      _UpdateMolarMass(self)
  formula = property(GetFormula,SetFormula,None,None)
 
@@ -227,10 +230,10 @@ class Specie():
 #*******************************************************************************
 # Printing of data members
  def __str__( self ):
-     s = '\n Specie(): name=%s;'+' formulaName=%s;'+' phase=%s;'+'\n formula=%s;'+'\n # atoms=%s;'+' # nuclide types=%s;'+' molar mass=%s[%s];'+' molar cc=%s[%s];'+' mass cc=%s[%s];'+'\n flag=%s;'+'\n molar radioactivity=%s[%s];'+'\n molar heat pwr=%s[%s];'+'\n molar gamma pwr=%s[%s];'+'\n molar radioactivity fractions=%s.\n'
-     return s % (self.name, self.formulaName, self.phase, self.atoms, self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarHeatPwr, self.molarHeatPwrUnit, self.molarGammaPwr, self.molarGammaPwrUnit, self.molarRadioactivityFractions)
+     s = '\n Specie(): name=%s;'+' formulaName=%s;'+' phase=%s;'+'\n formula=%s;'+'\n # atoms=%s;'+' # nuclide types=%s;'+' molar mass=%9.3e[%s];'+' molar cc=%9.3e[%s];'+' mass cc=%9.3e[%s];'+'\n flag=%s;'+'\n molar radioactivity=%9.3e[%s];'+'\n radioactivity  dens.=%9.3e[%s];'+'\n molar heat pwr=%9.3e[%s];'+'\n heat pwr dens.=%9.3e[%s];'+'\n molar gamma pwr=%9.3e[%s];'+'\n gamma pwr dens.=%9.3e[%s];'+'\n molar radioactivity fractions=%s.\n'
+     return s % (self.name, self.formulaName, self.phase, self.atoms, self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarRadioactivity*self.molarCC,'[Ci/cc]',self.molarHeatPwr, self.molarHeatPwrUnit, self.molarHeatPwr*self.molarCC,'[W/cc]',self.molarGammaPwr, self.molarGammaPwrUnit,self.molarGammaPwr*self.molarCC,'[W/cc]',['%9.3e' % i for i in self.molarRadioactivityFractions])
 
  def __repr__( self ):
-     s = '\n Specie(): name=%s;'+' formulaName=%s;'+' phase=%s;'+'\n formula=%s;'+'\n # atoms=%s;'+' # nuclide types=%s;'+' molar mass=%s[%s];'+' molar cc=%s[%s];'+' mass cc=%s[%s];'+'\n flag=%s;'+'\n molar radioactivity=%s[%s];'+'\n molar heat pwr=%s[%s];'+'\n molar gamma pwr=%s[%s];'+'\n molar radioactivity fractions=%s.\n'
-     return s % (self.name, self.formulaName, self.phase, self.atoms, self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarHeatPwr, self.molarHeatPwrUnit, self.molarGammaPwr, self.molarGammaPwrUnit, self.molarRadioactivityFractions)
+     s = '\n Specie(): name=%s;'+' formulaName=%s;'+' phase=%s;'+'\n formula=%s;'+'\n # atoms=%s;'+' # nuclide types=%s;'+' molar mass=%9.3e[%s];'+' molar cc=%9.3e[%s];'+' mass cc=%9.3e[%s];'+'\n flag=%s;'+'\n molar radioactivity=%9.3e[%s];'+'\n radioactivity dens.=%9.3e[%s];'+'\n molar heat pwr=%9.3e[%s];'+'\n heat pwr dens.=%9.3e[%s]'+'\n molar gamma pwr=%9.3e[%s];'+'\n gamma pwr dens.=%9.3e[%s]'+'\n molar radioactivity fractions=%s.\n'
+     return s % (self.name, self.formulaName, self.phase, self.atoms, self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarRadioactivity*self.molarCC,'[Ci/cc]',self.molarHeatPwr, self.molarHeatPwrUnit, self.molarHeatPwr*self.molarCC,'[W/cc]',self.molarGammaPwr, self.molarGammaPwrUnit, self.molarGammaPwr*self.molarCC,'[W/cc]',['%9.3e' % i for i in self.molarRadioactivityFractions])
 #*******************************************************************************

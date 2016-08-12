@@ -20,7 +20,7 @@ from matplotlib.ticker import MultipleLocator
 def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
   nRows = 2
-  nCols = 4
+  nCols = 2
 
   nSequences = len(self.timeSequences_tmp)
   if nSequences == 0: return
