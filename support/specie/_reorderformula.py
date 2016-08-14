@@ -12,7 +12,10 @@ import os, sys
 #*******************************************************************************
 
 #*******************************************************************************
-def _FormulaCleanup( self ):
+def _ReorderFormula( self ):
+
+ atoms1 = self._atoms[:] # shallow copy
+ atoms2 = list()
 
  if len(self._atoms) > 0:
 
@@ -37,12 +40,12 @@ def _FormulaCleanup( self ):
 
      multiplier = '{0:9.3e}'.format( multiplier )
 
-     self._atoms[ self._atoms.index( entry ) ] = multiplier+'*'+tmp[1]
+     atoms1[ self._atoms.index( entry ) ] = multiplier+'*'+tmp[1]
 
    # order in decreasing order of multiplier magnitude
    multipliers_lst = list()
 
-   for entry in self._atoms:
+   for entry in atoms1:
 
      tmp = entry.split('*')
 
@@ -57,12 +60,12 @@ def _FormulaCleanup( self ):
 
      multipliers_lst.append( float( multiplier ) )
 
-   sortedAtoms_lst = [ a for (i,a) in sorted( zip(multipliers_lst,self._atoms), 
+   sortedAtoms_lst = [ a for (i,a) in sorted( zip(multipliers_lst,atoms1), 
                                               key=lambda pair: pair[0],
                                               reverse=True ) ]
 
-   self._atoms = sortedAtoms_lst
+   atoms2 = sortedAtoms_lst
 
- return
+ return atoms2
 
 #*******************************************************************************
