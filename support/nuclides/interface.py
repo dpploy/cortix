@@ -2,9 +2,10 @@
 """
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
-Nuclides container
+Nuclides container.
 The purpose of the this container is to store and query a table of nuclides.
-Typically the table is filled in with data from an ORIGEN calculation.
+Typically the table is filled in with data from an ORIGEN calculation or 
+some other fission/transmutation code.
 
 VFdALib support classes 
 
