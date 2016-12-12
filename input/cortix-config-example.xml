@@ -43,7 +43,7 @@
 
   <task name="solo-pyplot" >
    <startTime unit="hour">0.0</startTime>
-   <evolveTime unit="hour">17.0</evolveTime>
+   <evolveTime unit="hour">18.0</evolveTime>
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
     <fileHandler level="DEBUG"> </fileHandler>
@@ -156,6 +156,7 @@
   <task name="fueldepot-chopper-dissolver">
 <!--   <evolveTime unit="hour">28.0</evolveTime> -->
 <!--   <evolveTime unit="hour">42.0</evolveTime>  -->
+<!--   <evolveTime unit="hour">18.0</evolveTime>  -->
    <evolveTime unit="hour">18.0</evolveTime>  
    <timeStep unit="minute">1.0</timeStep>
    <logger level="DEBUG">
@@ -244,7 +245,7 @@
 
   <application name="dev1">
 
-   <moduleLibrary name='head-lib'>
+   <moduleLibrary name='headend-lib'>
     <parentDir>
       /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
     </parentDir>
@@ -275,9 +276,11 @@
     <!-- Ports have fourt types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allows for module self-connection; see network section  -->
     <port type="input"   mode="directory" multiplicity="1">westinghouse-14x14</port>
+    <port type="input"   mode="directory" multiplicity="1">mark-31a</port>
     <port type="use"     mode="directory" multiplicity="1">fuel-input</port>
     <port type="use"     mode="file.xml"  multiplicity="1">go-signal</port>
     <port type="provide" mode="file.shlv" multiplicity="1">fuel-bundle</port>
+    <port type="provide" mode="file.shlv" multiplicity="1">fuel-bucket</port>
     <port type="output"  mode="file.any"  multiplicity="1">persistent-output</port>
    </module>
 
@@ -407,6 +410,11 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="tank" type="native">
+    <library name='ornl-lib'>
+     <parentDir>
+      /home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing 
+     </parentDir>
+    </library>
     <inputFileName>tank.input</inputFileName>
     <inputFilePath>/home/dealmeida/mac-fvu/gentoo-home/work/codes/reprocessing/cortix/input/</inputFilePath>
     <logger level="DEBUG">
@@ -639,8 +647,12 @@
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
+<!--
     <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="westinghouse-14x14"/> 
     <connect fromModuleSlot="fueldepot:0" fromPort="persistent-output" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
+-->
+    <connect fromModuleSlot="fueldepot:0" fromPort="fuel-input" toModuleSlot="fueldepot:0" toPort="mark-31a"/> 
+    <connect fromModuleSlot="fueldepot:0" fromPort="persistent-output" toModuleSlot="fueldepot:0" toPort="fuel-bucket"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
