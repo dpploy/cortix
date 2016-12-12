@@ -2,13 +2,13 @@
 """
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
-This FuelBundle class is a container for usage with other plant-level process modules.
-It is meant to represent a fuel bundle of an oxide fuel LWR reactor.
+This FuelAssembly class is a container for usage with other plant-level process modules.
+It is meant to represent a fuel assembly of a metal fuel LWR reactor.
 
 For unit testing do at the linux command prompt:
     python interface.py
 
-Sun Dec 27 15:06:55 EST 2015
+Mon Dec 12 00:32:35 EST 2016
 """
 
 #*******************************************************************************
@@ -16,11 +16,11 @@ import os, sys
 import math
 import pandas
 
-from ._fuelbundle import _FuelBundle  # constructor
+from ._fuelassembly import _FuelAssembly  # constructor
 #*******************************************************************************
 
 #*******************************************************************************
-class FuelBundle():
+class FuelAssembly():
 
 #*******************************************************************************
  def __init__( self, 
@@ -28,7 +28,7 @@ class FuelBundle():
              ):
 
      # constructor
-     _FuelBundle( self, 
+     _FuelAssembly( self, 
                   specs
                 )
 
@@ -64,9 +64,9 @@ class FuelBundle():
      return self.__GetFreshU235UMass()
  freshU235Mass = property(GetFreshU235Mass,None,None,None)
 
- def GetNFuelRods(self): 
-     return self.__GetNFuelRods()
- nFuelRods = property(GetNFuelRods,None,None,None)
+ def GetNFuelSlugs(self): 
+     return self.__GetNFuelSlugs()
+ nFuelSlugs = property(GetNFuelSlugs,None,None,None)
  # End: Pre-irradiation information
  #------
 
@@ -99,10 +99,6 @@ class FuelBundle():
  def GetFuelMassUnit(self): 
      return self.__GetFuelMassUnit()
  fuelMassUnit = property(GetFuelMassUnit,None,None,None)
-
- def GetGasMass(self): 
-     return self.__GetGasMass()
- gasMass = property(GetGasMass,None,None,None)
 
  def GetRadioactivity(self): 
      return self.__GetRadioactivity()
@@ -155,21 +151,21 @@ class FuelBundle():
      fuelEnrichment = self.__GetFuelEnrichment()
      return totalUMass * fuelEnrichment/100.0
 
- def __GetNFuelRods(self):
-     return int(self._specs.loc['Fuel rods number',1])
+ def __GetNFuelSlugs(self):
+     return int(self._specs.loc['Fuel slugs number',1])
 
  def __GetFuelPinLength(self):
-     return float(self._specs.loc['Fuel rods fuel length [in]',1]) * 2.54 # cm
+     return float(self._specs.loc['Fuel slugs fuel length [in]',1]) * 2.54 # cm
 
  def __SetFuelPinLength(self,x):
-     self._specs.loc['Fuel rods fuel length [in]',1] = x / 2.54 # in
+     self._specs.loc['Fuel slugs fuel length [in]',1] = x / 2.54 # in
      return
 
  def __GetFuelRodOD(self):
-     return float(self._specs.loc['Fuel rods O.D. [in]',1]) * 2.54 # cm
+     return float(self._specs.loc['Fuel slugs O.D. [in]',1]) * 2.54 # cm
 
  def __GetFuelRodWallThickness(self):
-     return float(self._specs.loc['Fuel rods wall thickness [in]',1]) * 2.54 # cm
+     return float(self._specs.loc['Fuel slugs wall thickness [in]',1]) * 2.54 # cm
 
  def __GetFuelPinRadius(self):
      fuelRodOD = self.__GetFuelRodOD()
@@ -184,8 +180,8 @@ class FuelBundle():
 
  def __GetFuelVolume(self):
      fuelPinVolume = self.__GetFuelPinVolume()
-     nFuelRods = self.__GetNFuelRods()
-     return fuelPinVolume * nFuelRods
+     nFuelSlugs = self.__GetNFuelSlugs()
+     return fuelPinVolume * nFuelSlugs
 
  def __GetFuelMass(self): # mass of the solid phase (gas phase in plenum not added)
      return self._solidPhase.GetQuantity('mass').value
@@ -197,31 +193,28 @@ class FuelBundle():
  def __GetGasRadioactivity(self): # radioactivity of the gas phase
      return self._gasPhase.GetQuantity('radioactivity').value
 
- def __GetRadioactivity(self): # radioactivity of the fuel bundle
+ def __GetRadioactivity(self): # radioactivity of the fuel assembly
      return self._solidPhase.GetQuantity('radioactivity').value + \
             self._gasPhase.GetQuantity('radioactivity').value 
 
- def __GetGammaPwr(self): # gamma pwr of the fuel bundle
+ def __GetGammaPwr(self): # gamma pwr of the fuel assembly
      return self._solidPhase.GetQuantity('gamma').value + \
             self._gasPhase.GetQuantity('gamma').value 
 
- def __GetHeatPwr(self): # heat pwr of the fuel bundle
+ def __GetHeatPwr(self): # heat pwr of the fuel assembly
      return self._solidPhase.GetQuantity('heat').value + \
             self._gasPhase.GetQuantity('heat').value 
-
- def __GetGasMass(self): # gas plenum mass
-     return self._gasPhase.GetQuantity('mass').value
 
 #*******************************************************************************
 # Printing of data members
  def __str__( self ):
-     s = 'FuelBundle(): %s\n %s\n %s\n'
+     s = 'FuelAssembly(): %s\n %s\n %s\n'
      return s % (self._specs, self._solidPhase, self._gasPhase)
 
  def __repr__( self ):
-     s = 'FuelBundle(): %s\n %s\n %s\n'
+     s = 'FuelAssembly(): %s\n %s\n %s\n'
      return s % (self._specs, self._solidPhase, self._gasPhase)
 #*******************************************************************************
 # Usage: -> python interface.py
 if __name__ == "__main__":
-   print('Unit testing for FuelBundle')
+   print('Unit testing for FuelAssembly')
