@@ -2,8 +2,8 @@
 """
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
-This FuelAssembly class is a container for usage with other plant-level process modules.
-It is meant to represent a fuel assembly of a metal fuel LWR reactor.
+This FuelBucket class is a container for usage with other plant-level process modules.
+It is meant to represent a fuel bucket of a metal fuel LWR reactor.
 
 For unit testing do at the linux command prompt:
     python interface.py
@@ -16,11 +16,11 @@ import os, sys
 import math
 import pandas
 
-from ._fuelassembly import _FuelAssembly  # constructor
+from ._fuelbucket import _FuelBucket  # constructor
 #*******************************************************************************
 
 #*******************************************************************************
-class FuelAssembly():
+class FuelBucket():
 
 #*******************************************************************************
  def __init__( self, 
@@ -28,7 +28,7 @@ class FuelAssembly():
              ):
 
      # constructor
-     _FuelAssembly( self, 
+     _FuelBucket( self, 
                   specs
                 )
 
@@ -70,23 +70,23 @@ class FuelAssembly():
  # End: Pre-irradiation information
  #------
 
- def GetFuelPinLength(self): 
-     return self.__GetFuelPinLength()
- def SetFuelPinLength(self,x): 
-     self.__SetFuelPinLength(x)
- fuelPinLength = property(GetFuelPinLength,SetFuelPinLength,None,None)
+ def GetFuelSlugLength(self): 
+     return self.__GetFuelSlugLength()
+ def SetFuelSlugLength(self,x): 
+     self.__SetFuelSlugLength(x)
+ fuelSlugLength = property(GetFuelSlugLength,SetFuelSlugLength,None,None)
 
  def GetFuelRodOD(self): 
      return self.__GetFuelRodOD()
  fuelRodOD = property(GetFuelRodOD,None,None,None)
 
- def GetFuelPinRadius(self): 
-     return self.__GetFuelPinRadius()
- fuelPinRadius = property(GetFuelPinRadius,None,None,None)
+ def GetFuelSlugRadius(self): 
+     return self.__GetFuelSlugRadius()
+ fuelSlugRadius = property(GetFuelSlugRadius,None,None,None)
 
- def GetFuelPinVolume(self): 
-     return self.__GetFuelPinVolume()
- fuelPinVolume = property(GetFuelPinVolume,None,None,None)
+ def GetFuelSlugVolume(self): 
+     return self.__GetFuelSlugVolume()
+ fuelSlugVolume = property(GetFuelSlugVolume,None,None,None)
 
  def GetFuelVolume(self): 
      return self.__GetFuelVolume()
@@ -154,10 +154,10 @@ class FuelAssembly():
  def __GetNFuelSlugs(self):
      return int(self._specs.loc['Fuel slugs number',1])
 
- def __GetFuelPinLength(self):
+ def __GetFuelSlugLength(self):
      return float(self._specs.loc['Fuel slugs fuel length [in]',1]) * 2.54 # cm
 
- def __SetFuelPinLength(self,x):
+ def __SetFuelSlugLength(self,x):
      self._specs.loc['Fuel slugs fuel length [in]',1] = x / 2.54 # in
      return
 
@@ -167,21 +167,21 @@ class FuelAssembly():
  def __GetFuelRodWallThickness(self):
      return float(self._specs.loc['Fuel slugs wall thickness [in]',1]) * 2.54 # cm
 
- def __GetFuelPinRadius(self):
+ def __GetFuelSlugRadius(self):
      fuelRodOD = self.__GetFuelRodOD()
      fuelRodWallThickness = self.__GetFuelRodWallThickness()
-     fuelPinRadius = ( fuelRodOD - 2.0 * fuelRodWallThickness ) / 2.0
-     return fuelPinRadius
+     fuelSlugRadius = ( fuelRodOD - 2.0 * fuelRodWallThickness ) / 2.0
+     return fuelSlugRadius
 
- def __GetFuelPinVolume(self):
-     fuelPinLength = self.__GetFuelPinLength()
-     fuelPinRadius = self.__GetFuelPinRadius()
-     return fuelPinLength * math.pi * fuelPinRadius ** 2
+ def __GetFuelSlugVolume(self):
+     fuelSlugLength = self.__GetFuelSlugLength()
+     fuelSlugRadius = self.__GetFuelSlugRadius()
+     return fuelSlugLength * math.pi * fuelSlugRadius ** 2
 
  def __GetFuelVolume(self):
-     fuelPinVolume = self.__GetFuelPinVolume()
+     fuelSlugVolume = self.__GetFuelSlugVolume()
      nFuelSlugs = self.__GetNFuelSlugs()
-     return fuelPinVolume * nFuelSlugs
+     return fuelSlugVolume * nFuelSlugs
 
  def __GetFuelMass(self): # mass of the solid phase (gas phase in plenum not added)
      return self._solidPhase.GetQuantity('mass').value
@@ -193,28 +193,28 @@ class FuelAssembly():
  def __GetGasRadioactivity(self): # radioactivity of the gas phase
      return self._gasPhase.GetQuantity('radioactivity').value
 
- def __GetRadioactivity(self): # radioactivity of the fuel assembly
+ def __GetRadioactivity(self): # radioactivity of the fuel bucket
      return self._solidPhase.GetQuantity('radioactivity').value + \
             self._gasPhase.GetQuantity('radioactivity').value 
 
- def __GetGammaPwr(self): # gamma pwr of the fuel assembly
+ def __GetGammaPwr(self): # gamma pwr of the fuel bucket
      return self._solidPhase.GetQuantity('gamma').value + \
             self._gasPhase.GetQuantity('gamma').value 
 
- def __GetHeatPwr(self): # heat pwr of the fuel assembly
+ def __GetHeatPwr(self): # heat pwr of the fuel bucket
      return self._solidPhase.GetQuantity('heat').value + \
             self._gasPhase.GetQuantity('heat').value 
 
 #*******************************************************************************
 # Printing of data members
  def __str__( self ):
-     s = 'FuelAssembly(): %s\n %s\n %s\n'
+     s = 'FuelBucket(): %s\n %s\n %s\n'
      return s % (self._specs, self._solidPhase, self._gasPhase)
 
  def __repr__( self ):
-     s = 'FuelAssembly(): %s\n %s\n %s\n'
+     s = 'FuelBucket(): %s\n %s\n %s\n'
      return s % (self._specs, self._solidPhase, self._gasPhase)
 #*******************************************************************************
 # Usage: -> python interface.py
 if __name__ == "__main__":
-   print('Unit testing for FuelAssembly')
+   print('Unit testing for FuelBucket')
