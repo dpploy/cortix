@@ -48,6 +48,10 @@ class FuelBucket():
      return self.__GetName()
  name = property(GetName,None,None,None)
 
+ def GetSlugType(self):
+     return self.__GetSlugType()
+ slugType = property(GetSlugType,None,None,None)
+
  def GetFuelEnrichment(self):
      return self.__GetFuelEnrichment()
  fuelEnrichment = property(GetFuelEnrichment,None,None,None)
@@ -64,29 +68,25 @@ class FuelBucket():
      return self.__GetFreshU235UMass()
  freshU235Mass = property(GetFreshU235Mass,None,None,None)
 
- def GetNFuelSlugs(self): 
-     return self.__GetNFuelSlugs()
- nFuelSlugs = property(GetNFuelSlugs,None,None,None)
+ def GetNSlugs(self): 
+     return self.__GetNSlugs()
+ nSlugs = property(GetNSlugs,None,None,None)
  # End: Pre-irradiation information
  #------
 
- def GetFuelSlugLength(self): 
-     return self.__GetFuelSlugLength()
- def SetFuelSlugLength(self,x): 
-     self.__SetFuelSlugLength(x)
- fuelSlugLength = property(GetFuelSlugLength,SetFuelSlugLength,None,None)
+ def GetSlugLength(self): 
+     return self.__GetSlugLength()
+ def SetSlugLength(self,x): 
+     self.__SetSlugLength(x)
+ slugLength = property(GetSlugLength,SetSlugLength,None,None)
 
  def GetFuelRodOD(self): 
      return self.__GetFuelRodOD()
  fuelRodOD = property(GetFuelRodOD,None,None,None)
 
- def GetFuelSlugRadius(self): 
-     return self.__GetFuelSlugRadius()
- fuelSlugRadius = property(GetFuelSlugRadius,None,None,None)
-
- def GetFuelSlugVolume(self): 
-     return self.__GetFuelSlugVolume()
- fuelSlugVolume = property(GetFuelSlugVolume,None,None,None)
+ def GetSlugFuelVolume(self): 
+     return self.__GetSlugFuelVolume()
+ slugFuelVolume = property(GetSlugFuelVolume,None,None,None)
 
  def GetFuelVolume(self): 
      return self.__GetFuelVolume()
@@ -122,98 +122,97 @@ class FuelBucket():
      self._solidPhase = phase
  solidPhase = property(GetSolidPhase,SetSolidPhase,None,None)
 
- def GetGasPhase(self): 
-     return self._gasPhase
- def SetGasPhase(self,phase): 
-     self._gasPhase = phase
- gasPhase = property(GetGasPhase,SetGasPhase,None,None)
- 
-
 #*******************************************************************************
 # Internal class helpers 
 
  def __GetName(self):
      return self._specs.loc['Name',1]
 
+ def __GetSlugType(self):
+     return self._specs.loc['Slug type',1]
+
  def __GetFuelEnrichment(self):
      return float(self._specs.loc['Enrichment [U-235 wt%]',1])
 
  def __GetFreshUMass(self):
-     return float(self._specs.loc['U mass per assy [kg]',1])*1000.0  # [g]
+     return float(self._specs.loc['U mass per bucket [kg]',1])*1000.0  # [g]
 
  def __GetFreshU238Mass(self):
-     totalUMass = self.__GetFreshUMass()
+     totalUMass     = self.__GetFreshUMass()
      fuelEnrichment = self.__GetFuelEnrichment()
      return totalUMass * (1.0-fuelEnrichment/100.0)
 
  def __GetFreshU235Mass(self):
-     totalUMass = self.__GetFreshUMass()
+     totalUMass     = self.__GetFreshUMass()
      fuelEnrichment = self.__GetFuelEnrichment()
      return totalUMass * fuelEnrichment/100.0
 
- def __GetNFuelSlugs(self):
-     return int(self._specs.loc['Fuel slugs number',1])
+ def __GetNSlugs(self):
+     return int(self._specs.loc['Number of slugs',1])
 
- def __GetFuelSlugLength(self):
-     return float(self._specs.loc['Fuel slugs fuel length [in]',1]) * 2.54 # cm
+ def __GetSlugLength(self):
+     return float(self._specs.loc['Slug length [in]',1]) * 2.54 # cm
 
- def __SetFuelSlugLength(self,x):
-     self._specs.loc['Fuel slugs fuel length [in]',1] = x / 2.54 # in
+ def __SetSlugLength(self,x):
+     self._specs.loc['Slug length [in]',1] = x / 2.54 # in
      return
 
- def __GetFuelRodOD(self):
-     return float(self._specs.loc['Fuel slugs O.D. [in]',1]) * 2.54 # cm
+ def __GetOuterSlugOD(self):
+     return float(self._specs.loc['Outer slug O.D. [in]',1]) * 2.54 # cm
+ def __GetOuterSlugID(self):
+     return float(self._specs.loc['Outer slug I.D. [in]',1]) * 2.54 # cm
 
- def __GetFuelRodWallThickness(self):
-     return float(self._specs.loc['Fuel slugs wall thickness [in]',1]) * 2.54 # cm
+ def __GetInnerSlugOD(self):
+     return float(self._specs.loc['Inner slug O.D. [in]',1]) * 2.54 # cm
+ def __GetInnerSlugID(self):
+     return float(self._specs.loc['Inner slug I.D. [in]',1]) * 2.54 # cm
 
- def __GetFuelSlugRadius(self):
-     fuelRodOD = self.__GetFuelRodOD()
-     fuelRodWallThickness = self.__GetFuelRodWallThickness()
-     fuelSlugRadius = ( fuelRodOD - 2.0 * fuelRodWallThickness ) / 2.0
-     return fuelSlugRadius
+ def __GetCladdingThickness(self):
+     return float(self._specs.loc['Cladding thickness [mm]',1]) # mm
 
- def __GetFuelSlugVolume(self):
-     fuelSlugLength = self.__GetFuelSlugLength()
-     fuelSlugRadius = self.__GetFuelSlugRadius()
-     return fuelSlugLength * math.pi * fuelSlugRadius ** 2
+ def __GetSlugFuelVolume(self):
+     slugLength = self.__GetSlugLength()
+     cladThickness = self.__GetCladdingThickness()/10.0
+     fuelLength = slugLength - 2.0*cladThickness
+     fuelOuterSlugOuterRadius = self.__GetOuterSlugOD()/2.0 - cladThickness
+     fuelOuterSlugInnerRadius = self.__GetOuterSlugID()/2.0 + cladThickness
+     outerVolume = fuelLength * math.pi * (fuelOuterSlugOuterRadius**2 - fuelOuterSlugInnerRadius**2)
+     fuelInnerSlugOuterRadius = self.__GetInnerSlugOD()/2.0 - cladThickness
+     fuelInnerSlugInnerRadius = self.__GetInnerSlugID()/2.0 + cladThickness
+     innerVolume = fuelLength * math.pi * (fuelInnerSlugOuterRadius**2 - fuelInnerSlugInnerRadius**2)
+     return outerVolume + innerVolume
 
  def __GetFuelVolume(self):
-     fuelSlugVolume = self.__GetFuelSlugVolume()
-     nFuelSlugs = self.__GetNFuelSlugs()
-     return fuelSlugVolume * nFuelSlugs
+     slugFuelVolume = self.__GetSlugFuelVolume()
+     nFuelSlugs = self.__GetNSlugs()
+     return slugFuelVolume * nFuelSlugs
 
- def __GetFuelMass(self): # mass of the solid phase (gas phase in plenum not added)
+ def __GetFuelMass(self): # mass of the solid phase 
      return self._solidPhase.GetQuantity('mass').value
- def __GetFuelMassUnit(self): # mass of the solid phase (gas phase in plenum not added)
+ def __GetFuelMassUnit(self): # mass of the solid phase 
      return self._solidPhase.GetQuantity('mass').unit
 
  def __GetFuelRadioactivity(self): # radioactivity of the solid phase
      return self._solidPhase.GetQuantity('radioactivity').value
- def __GetGasRadioactivity(self): # radioactivity of the gas phase
-     return self._gasPhase.GetQuantity('radioactivity').value
 
  def __GetRadioactivity(self): # radioactivity of the fuel bucket
-     return self._solidPhase.GetQuantity('radioactivity').value + \
-            self._gasPhase.GetQuantity('radioactivity').value 
+     return self._solidPhase.GetQuantity('radioactivity').value 
 
  def __GetGammaPwr(self): # gamma pwr of the fuel bucket
-     return self._solidPhase.GetQuantity('gamma').value + \
-            self._gasPhase.GetQuantity('gamma').value 
+     return self._solidPhase.GetQuantity('gamma').value 
 
  def __GetHeatPwr(self): # heat pwr of the fuel bucket
-     return self._solidPhase.GetQuantity('heat').value + \
-            self._gasPhase.GetQuantity('heat').value 
+     return self._solidPhase.GetQuantity('heat').value 
 
 #*******************************************************************************
 # Printing of data members
  def __str__( self ):
      s = 'FuelBucket(): %s\n %s\n %s\n'
-     return s % (self._specs, self._solidPhase, self._gasPhase)
+     return s % (self._specs, self._solidPhase)
 
  def __repr__( self ):
      s = 'FuelBucket(): %s\n %s\n %s\n'
-     return s % (self._specs, self._solidPhase, self._gasPhase)
+     return s % (self._specs, self._solidPhase)
 #*******************************************************************************
 # Usage: -> python interface.py
 if __name__ == "__main__":

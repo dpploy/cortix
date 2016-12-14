@@ -165,8 +165,8 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
        #
        elif series == 'minor actinides':
           nuclides = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ] == seriesNameMap['actinides'] ]
-          collec = ['Np','Am','Cm']
-          nuclides = [ x for x in nuclides if x.split('-')[0].strip() in collec ]
+          collec = ['U','Pu']
+          nuclides = [ x for x in nuclides if x.split('-')[0].strip() not in collec ]
        #
        else:
           nuclides = [ x for x in nuclidesNames if SERIES[ ELEMENTS[x.split('-')[0].strip()].series ]== seriesNameMap[series] ]

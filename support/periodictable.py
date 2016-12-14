@@ -1607,7 +1607,7 @@ ELEMENTS = ElementsDict(
         ionenergy=(6.1941, ),
         isotopes={233: Isotope(233.0396352, 0.000, 233, 159.2, 'ky'), # kilo year
                   234: Isotope(234.0409521, 0.0055, 234, 245.5, 'ky'),
-                  235: Isotope(235.0439299, 0.72, 235, 704, 'My'), # Mega year
+                  235: Isotope(235.0439299, 0.0072, 235, 704, 'My'), # Mega year
                   236: Isotope(236.0455680, 0.00, 236, 23.42, 'My'), # Mega year
                   237: Isotope(237.0487302, 0.00, 237, 6.75, 'd'), # day
                   238: Isotope(238.0507826, 0.992745, 238, 4.468, 'Gy')}), # Giga year

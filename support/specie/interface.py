@@ -3,8 +3,8 @@
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
 This Specie class is to be used with other classes in plant-level process modules.
-NB: Species is always used either in singular or plural cases, the class here is 
-    named here to reflect one species. If many species are used in an external 
+NB: Species is always used either in singular or plural cases, the class 
+    named here reflects one species. If many species are used in an external 
     context, the species object name can be used without conflict.
 
 For unit testing do at the linux command prompt:
@@ -14,7 +14,7 @@ NB: The Specie() class encapsulates either the molecular or empirical chemical
     formula of a compound.
     The definition of a chemical species here is extended to ficticious compounds.
     This is done as follows. Say MAO2 is either a molecular or empirical chemical
-    formula of a ficticious compound denoting a minor actinides dioxide. The list 
+    formula of a ficticious compound denoting minor actinides dioxide. The list 
     of atoms is given as follows:
 
     ['0.49*Np-237', '0.42*Am-241', '0.08*Am-243', '0.01*Cm-244', '2.0*O-16']

@@ -14,7 +14,7 @@ import pandas
 #*******************************************************************************
 # constructor
 
-def _FuelAssembly( self, 
+def _FuelBucket( self, 
                  specs = pandas.DataFrame()
                ):
 

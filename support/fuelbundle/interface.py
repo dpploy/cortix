@@ -4,6 +4,13 @@ Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
 This FuelBundle class is a container for usage with other plant-level process modules.
 It is meant to represent a fuel bundle of an oxide fuel LWR reactor.
+There are three main data structures:
+  1) fuel bundle specs
+  2) solid phase
+  3) gas phase
+The container user will have to provide all the data and from then on, this class
+will help acess the data.
+The printing methods reveal the contained data.
 
 For unit testing do at the linux command prompt:
     python interface.py
