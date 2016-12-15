@@ -131,11 +131,22 @@ class FuelBucket():
  def __GetSlugType(self):
      return self._specs.loc['Slug type',1]
 
+ def __GetNSlugs(self):
+     return int(self._specs.loc['Number of slugs',1])
+
  def __GetFuelEnrichment(self):
      return float(self._specs.loc['Enrichment [U-235 wt%]',1])
 
+ def __GetOuterSlugFreshUMass(self):
+     return float(self._specs.loc['U mass outer slug [kg]',1])*1000.0  # [g]
+ def __GetInnerSlugFreshUMass(self):
+     return float(self._specs.loc['U mass inner slug [kg]',1])*1000.0  # [g]
+
  def __GetFreshUMass(self):
-     return float(self._specs.loc['U mass per bucket [kg]',1])*1000.0  # [g]
+     nSlugs = self.__GetNSlugs()
+     uMassOuterSlug = self.__GetOuterSlugFreshUMass()
+     uMassInnerSlug = self.__GetInnerSlugFreshUMass()
+     return nSlugs*(uMassOuterSlug + uMassInnerSlug)
 
  def __GetFreshU238Mass(self):
      totalUMass     = self.__GetFreshUMass()
@@ -146,9 +157,6 @@ class FuelBucket():
      totalUMass     = self.__GetFreshUMass()
      fuelEnrichment = self.__GetFuelEnrichment()
      return totalUMass * fuelEnrichment/100.0
-
- def __GetNSlugs(self):
-     return int(self._specs.loc['Number of slugs',1])
 
  def __GetSlugLength(self):
      return float(self._specs.loc['Slug length [in]',1]) * 2.54 # cm
@@ -167,18 +175,21 @@ class FuelBucket():
  def __GetInnerSlugID(self):
      return float(self._specs.loc['Inner slug I.D. [in]',1]) * 2.54 # cm
 
- def __GetCladdingThickness(self):
-     return float(self._specs.loc['Cladding thickness [mm]',1]) # mm
+ def __GetCladdingWallThickness(self):
+     return float(self._specs.loc['Cladding wall thickness [mm]',1]) # mm
+ def __GetCladdingEndThickness(self):
+     return float(self._specs.loc['Cladding end thickness [mm]',1]) # mm
 
  def __GetSlugFuelVolume(self):
      slugLength = self.__GetSlugLength()
-     cladThickness = self.__GetCladdingThickness()/10.0
-     fuelLength = slugLength - 2.0*cladThickness
-     fuelOuterSlugOuterRadius = self.__GetOuterSlugOD()/2.0 - cladThickness
-     fuelOuterSlugInnerRadius = self.__GetOuterSlugID()/2.0 + cladThickness
+     cladWallThickness = self.__GetCladdingWallThickness()/10.0
+     cladEndThickness = self.__GetCladdingEndThickness()/10.0
+     fuelLength = slugLength - 2.0*cladEndThickness
+     fuelOuterSlugOuterRadius = self.__GetOuterSlugOD()/2.0 - cladWallThickness
+     fuelOuterSlugInnerRadius = self.__GetOuterSlugID()/2.0 + cladWallThickness
      outerVolume = fuelLength * math.pi * (fuelOuterSlugOuterRadius**2 - fuelOuterSlugInnerRadius**2)
-     fuelInnerSlugOuterRadius = self.__GetInnerSlugOD()/2.0 - cladThickness
-     fuelInnerSlugInnerRadius = self.__GetInnerSlugID()/2.0 + cladThickness
+     fuelInnerSlugOuterRadius = self.__GetInnerSlugOD()/2.0 - cladWallThickness
+     fuelInnerSlugInnerRadius = self.__GetInnerSlugID()/2.0 + cladWallThickness
      innerVolume = fuelLength * math.pi * (fuelInnerSlugOuterRadius**2 - fuelInnerSlugInnerRadius**2)
      return outerVolume + innerVolume
 
@@ -207,11 +218,11 @@ class FuelBucket():
 #*******************************************************************************
 # Printing of data members
  def __str__( self ):
-     s = 'FuelBucket(): %s\n %s\n %s\n'
+     s = 'FuelBucket(): %s\n %s\n'
      return s % (self._specs, self._solidPhase)
 
  def __repr__( self ):
-     s = 'FuelBucket(): %s\n %s\n %s\n'
+     s = 'FuelBucket(): %s\n %s\n'
      return s % (self._specs, self._solidPhase)
 #*******************************************************************************
 # Usage: -> python interface.py
