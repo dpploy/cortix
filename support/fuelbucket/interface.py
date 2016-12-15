@@ -52,6 +52,10 @@ class FuelBucket():
      return self.__GetSlugType()
  slugType = property(GetSlugType,None,None,None)
 
+ def GetNSlugs(self): 
+     return self.__GetNSlugs()
+ nSlugs = property(GetNSlugs,None,None,None)
+
  def GetFuelEnrichment(self):
      return self.__GetFuelEnrichment()
  fuelEnrichment = property(GetFuelEnrichment,None,None,None)
@@ -68,9 +72,10 @@ class FuelBucket():
      return self.__GetFreshU235UMass()
  freshU235Mass = property(GetFreshU235Mass,None,None,None)
 
- def GetNSlugs(self): 
-     return self.__GetNSlugs()
- nSlugs = property(GetNSlugs,None,None,None)
+ def GetCladdingMass(self): 
+     return self.__GetCladdingMass() 
+ claddingMass = property(GetCladdingMass,None,None,None)
+
  # End: Pre-irradiation information
  #------
 
@@ -91,6 +96,14 @@ class FuelBucket():
  def GetFuelVolume(self): 
      return self.__GetFuelVolume()
  fuelVolume = property(GetFuelVolume,None,None,None)
+
+ def GetSlugCladdingVolume(self): 
+     return self.__GetSlugCladdingVolume()
+ slugCladdingVolume = property(GetSlugCladdingVolume,None,None,None)
+
+ def GetCladdingVolume(self): 
+     return self.__GetCladdingVolume()
+ claddingVolume = property(GetCladdingVolume,None,None,None)
 
  def GetFuelMass(self): 
      return self.__GetFuelMass()
@@ -116,11 +129,17 @@ class FuelBucket():
      return self.__GetFuelRadioactivity()
  fuelRadioactivity = property(GetFuelRadioactivity,None,None,None)
 
- def GetSolidPhase(self): 
-     return self._solidPhase
- def SetSolidPhase(self,phase): 
-     self._solidPhase = phase
- solidPhase = property(GetSolidPhase,SetSolidPhase,None,None)
+ def GetFuelPhase(self): 
+     return self._fuelPhase
+ def SetFuelPhase(self,phase): 
+     self._fuelPhase = phase
+ fuelPhase = property(GetFuelPhase,SetFuelPhase,None,None)
+
+ def GetCladdingPhase(self): 
+     return self._claddingPhase
+ def SetCladdingPhase(self,phase): 
+     self._claddingPhase = phase
+ claddingPhase = property(GetCladdingPhase,SetCladdingPhase,None,None)
 
 #*******************************************************************************
 # Internal class helpers 
@@ -142,6 +161,11 @@ class FuelBucket():
  def __GetInnerSlugFreshUMass(self):
      return float(self._specs.loc['U mass inner slug [kg]',1])*1000.0  # [g]
 
+ def __GetOuterSlugCladdingMass(self):
+     return float(self._specs.loc['Cladding mass outer slug [kg]',1])*1000.0  # [g]
+ def __GetInnerSlugCladdingMass(self):
+     return float(self._specs.loc['Cladding mass inner slug [kg]',1])*1000.0  # [g]
+
  def __GetFreshUMass(self):
      nSlugs = self.__GetNSlugs()
      uMassOuterSlug = self.__GetOuterSlugFreshUMass()
@@ -157,6 +181,12 @@ class FuelBucket():
      totalUMass     = self.__GetFreshUMass()
      fuelEnrichment = self.__GetFuelEnrichment()
      return totalUMass * fuelEnrichment/100.0
+
+ def __GetCladdingMass(self):
+     nSlugs = self.__GetNSlugs()
+     cladMassOuterSlug = self.__GetOuterSlugCladdingMass()
+     cladMassInnerSlug = self.__GetInnerSlugCladdingMass()
+     return nSlugs*(cladMassOuterSlug + cladMassInnerSlug)
 
  def __GetSlugLength(self):
      return float(self._specs.loc['Slug length [in]',1]) * 2.54 # cm
@@ -193,37 +223,55 @@ class FuelBucket():
      innerVolume = fuelLength * math.pi * (fuelInnerSlugOuterRadius**2 - fuelInnerSlugInnerRadius**2)
      return outerVolume + innerVolume
 
+ def __GetSlugVolume(self):
+     slugLength = self.__GetSlugLength()
+     outerSlugOuterRadius = self.__GetOuterSlugOD()/2.0 
+     outerSlugInnerRadius = self.__GetOuterSlugID()/2.0 
+     outerVolume = slugLength * math.pi * (outerSlugOuterRadius**2 - outerSlugInnerRadius**2)
+     innerSlugOuterRadius = self.__GetInnerSlugOD()/2.0 
+     innerSlugInnerRadius = self.__GetInnerSlugID()/2.0 
+     innerVolume = slugLength * math.pi * (innerSlugOuterRadius**2 - innerSlugInnerRadius**2)
+     return outerVolume + innerVolume
+
+ def __GetSlugCladdingVolume(self):
+     return self.__GetSlugVolume() - self.__GetSlugFuelVolume()
+
  def __GetFuelVolume(self):
      slugFuelVolume = self.__GetSlugFuelVolume()
      nFuelSlugs = self.__GetNSlugs()
      return slugFuelVolume * nFuelSlugs
 
+ def __GetCladdingVolume(self):
+     slugCladdingVolume = self.__GetSlugCladdingVolume()
+     nFuelSlugs = self.__GetNSlugs()
+     return slugCladdingVolume * nFuelSlugs
+
  def __GetFuelMass(self): # mass of the solid phase 
-     return self._solidPhase.GetQuantity('mass').value
+     return self._fuelPhase.GetQuantity('mass').value
  def __GetFuelMassUnit(self): # mass of the solid phase 
-     return self._solidPhase.GetQuantity('mass').unit
+     return self._fuelPhase.GetQuantity('mass').unit
 
  def __GetFuelRadioactivity(self): # radioactivity of the solid phase
-     return self._solidPhase.GetQuantity('radioactivity').value
+     return self._fuelPhase.GetQuantity('radioactivity').value
 
  def __GetRadioactivity(self): # radioactivity of the fuel bucket
-     return self._solidPhase.GetQuantity('radioactivity').value 
+     return self._fuelPhase.GetQuantity('radioactivity').value 
 
  def __GetGammaPwr(self): # gamma pwr of the fuel bucket
-     return self._solidPhase.GetQuantity('gamma').value 
+     return self._fuelPhase.GetQuantity('gamma').value 
 
  def __GetHeatPwr(self): # heat pwr of the fuel bucket
-     return self._solidPhase.GetQuantity('heat').value 
+     return self._fuelPhase.GetQuantity('heat').value 
 
 #*******************************************************************************
 # Printing of data members
  def __str__( self ):
-     s = 'FuelBucket(): %s\n %s\n'
-     return s % (self._specs, self._solidPhase)
+     s = 'FuelBucket(): %s\n %s\n %s\n'
+     return s % (self._specs, self._fuelPhase, self._claddingPhase)
 
  def __repr__( self ):
-     s = 'FuelBucket(): %s\n %s\n'
-     return s % (self._specs, self._solidPhase)
+     s = 'FuelBucket(): %s\n %s\n %s\n'
+     return s % (self._specs, self._fuelPhase, self._claddingPhase)
 #*******************************************************************************
 # Usage: -> python interface.py
 if __name__ == "__main__":

@@ -22,7 +22,10 @@ def _FuelBucket( self,
 
      self._specs = specs
 
-     self._solidPhase = None
+     self._solidPhase    = None
+
+     self._fuelPhase     = None
+     self._claddingPhase = None
 
      return
 
