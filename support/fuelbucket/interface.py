@@ -266,12 +266,18 @@ class FuelBucket():
 #*******************************************************************************
 # Printing of data members
  def __str__( self ):
-     s = 'FuelBucket(): %s\n %s\n %s\n'
-     return s % (self._specs, self._fuelPhase, self._claddingPhase)
+     s = 'FuelBucket():\n*******\n specs:\n*******\n %s\n'
+     t = '***********\n fuelPhase:\n**********\n %s\n'
+     u = '***************\n claddingPhase:\n***************\n %s\n'
+     stu = s+t+u
+     return stu % (self._specs, self._fuelPhase, self._claddingPhase)
 
  def __repr__( self ):
-     s = 'FuelBucket(): %s\n %s\n %s\n'
-     return s % (self._specs, self._fuelPhase, self._claddingPhase)
+     s = 'FuelBucket():\n*******\n specs:\n*******\n %s\n'
+     t = '***********\n fuelPhase:\n**********\n %s\n'
+     u = '***************\n claddingPhase:\n***************\n %s\n'
+     stu = s+t+u
+     return stu % (self._specs, self._fuelPhase, self._claddingPhase)
 #*******************************************************************************
 # Usage: -> python interface.py
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 """
 Valmor de Almeida dealmeidav@ornl.gov; vfda
 
-This Secie class is to be used with other classes in plant-level process modules.
+This Specie class is to be used with other classes in plant-level process modules.
 
 Tue Aug  9 00:35:53 EDT 2016
 """
@@ -17,7 +17,9 @@ def _ReorderFormula( self ):
  atoms1 = self._atoms[:] # shallow copy
  atoms2 = list()
 
- if len(self._atoms) > 0:
+ if len(self._atoms) <= 1: return atoms1
+
+ if len(self._atoms) > 1:
 
    # save the multiplier value as a string type of scientific notation
    for entry in self._atoms:
