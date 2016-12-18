@@ -267,21 +267,21 @@ class FuelBucket():
      return slugCladdingVolume * nFuelSlugs
 
  def __GetFuelMass(self): # mass of the solid phase 
-     return self._fuelPhase.GetQuantity('mass').value
+     return self._fuelPhase.GetValue('mass')
  def __GetFuelMassUnit(self): # mass of the solid phase 
      return self._fuelPhase.GetQuantity('mass').unit
 
  def __GetFuelRadioactivity(self): # radioactivity of the solid phase
-     return self._fuelPhase.GetQuantity('radioactivity').value
+     return self._fuelPhase.GetValue('radioactivity')
 
- def __GetRadioactivity(self): # radioactivity of the fuel bucket
-     return self._fuelPhase.GetQuantity('radioactivity').value 
+ def __GetRadioactivity(self): # radioactivity of the fuel bucket (fix this)
+     return self._fuelPhase.GetValue('radioactivity')
 
  def __GetGammaPwr(self): # gamma pwr of the fuel bucket
-     return self._fuelPhase.GetQuantity('gamma').value 
+     return self._fuelPhase.GetValue('gamma')
 
  def __GetHeatPwr(self): # heat pwr of the fuel bucket
-     return self._fuelPhase.GetQuantity('heat').value 
+     return self._fuelPhase.GetValue('heat')
 
 #*******************************************************************************
 # Printing of data members

@@ -21,9 +21,9 @@ from ._getattribute import _GetAttribute
 class FuelSlug():
 
  def __init__( self, 
-               specs = pandas.Series(),
-               fuelPhase = Phase(0.0),
-               claddingPhase = Phase(0.0)
+               specs         = pandas.Series(),
+               fuelPhase     = Phase(),
+               claddingPhase = Phase()
              ):
 
   # constructor

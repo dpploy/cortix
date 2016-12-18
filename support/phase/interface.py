@@ -32,7 +32,7 @@ from ..quantity.interface import Quantity
 class Phase():
 
  def __init__( self, 
-               timeStamp = 0.0,
+               timeStamp  = None,
                species    = None,   
                quantities = None,   
                value      = float(0.0)
@@ -151,10 +151,13 @@ class Phase():
      assert actor in self._phase.columns
      return self._phase.loc[timeStamp,actor]
 
- def SetValue(self, timeStamp, actor, value):
-# vfda: change this later
-# def SetValue(self, actor, value=None, timeStamp=None):
-     assert timeStamp in self._phase.index, 'missing timeStamp = %r'%(timeStamp)
+#old def SetValue(self, timeStamp, actor, value):
+#new
+ def SetValue(self, actor, value, timeStamp=None):
+     if timeStamp is None:
+        timeStamp = self._phase.index[-1]
+     else:
+        assert timeStamp in self._phase.index, 'missing timeStamp = %r'%(timeStamp)
      assert actor in self._phase.columns
      self._phase.loc[timeStamp,actor] = float(value)
      return

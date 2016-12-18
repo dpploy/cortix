@@ -68,34 +68,31 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
 
 # mass or mass concentration
      if attributeName == 'fuelMassCC' or attributeName == 'fuelMassDens' or attributeName == 'fuelMass': 
-        massCC = 0.0
-        for spc in self._fuelPhase.species:
-            massCC += spc.massCC
-        if attributeName == 'fuelMassCC' or attributeName == 'fuelMassDens': 
-          return massCC
+        mass = self._fuelPhase.GetValue('mass')
+        if attributeName == 'fuelMass':
+          return mass
         else:
           volume = __GetFuelVolume( self )
-          return massCC * volume
+          assert volume == self._fuelPhase.GetValue('volume')
+          return mass / volume
 # mass or mass concentration
      if attributeName == 'claddingMassCC' or attributeName == 'claddingMassDens' or attributeName == 'claddingMass': 
-        massCC = 0.0
-        for spc in self._claddingPhase.species:
-            massCC += spc.massCC
-        if attributeName == 'claddingMassCC' or attributeName == 'claddingMassDens': 
-          return massCC
+        mass = self._claddingPhase.GetValue('mass')
+        if attributeName == 'claddingMass':
+          return mass
         else:
           volume = __GetCladdingVolume( self )
-          return massCC * volume
+          assert volume == self._claddingPhase.GetValue('volume')
+          return mass / volume
 # radioactivity 
      if attributeName == 'radioactivtyDens' or attributeName == 'radioactivity':
-        radDens = 0.0
-        for spc in self._fuelPhase.species:
-            radDens += spc.molarRadioactivity * spc.molarCC
-        if attributeName == 'radioactivityDens': 
-          return radDens
+        radioactivity = self._fuelPhase.GetValue('radioactivity')
+        if attributeName == 'radioactivity': 
+          return radioactivity
         else:
           volume = __GetFuelVolume( self )
-          return radDens * volume
+          assert volume == self._fuelPhase.GetValue('volume')
+          return radioactivity / volume
 # gamma          
      if attributeName == 'gammaDens' or attributeName == 'gamma':
         gammaDens = 0.0
