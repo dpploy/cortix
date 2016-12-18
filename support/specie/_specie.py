@@ -54,7 +54,7 @@ def _Specie( self,
  self._molarCCUnit = 'mole/L'
  self._massCCUnit  = 'g/L'
 
-
+ 
  _UpdateMolarMass( self )
 
 

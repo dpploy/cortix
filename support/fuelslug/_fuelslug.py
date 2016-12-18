@@ -12,23 +12,23 @@ Sat May  9 21:40:48 EDT 2015 created; vfda
 import os, sys
 import pandas
 
-from ..specie.interface import Specie 
+from ..phase.interface  import Phase
 #*******************************************************************************
 
 #*******************************************************************************
 # constructor
 
-def _FuelSlug( self, geometry, species ):
+def _FuelSlug( self, specs, fuelPhase, claddingPhase ):
 
-  assert type(geometry) == type(pandas.Series()), 'fatal.'
-  assert type(species)  == type(list()), 'fatal.'
-  if type(species) == type(list()) and len(species) > 0:
-     assert type(species[0]) == type(Specie())
+  assert type(specs)      == type(pandas.Series()), 'fatal.'
+  assert type(fuelPhase)     == type(Phase()), 'fatal.'
+  assert type(claddingPhase) == type(Phase()), 'fatal.'
 
   self.attributeNames = \
-  ['nSlugs','fuelVolume','fuelDiameter','fuelLength','mass','massDens','massCC','nuclides','isotopes','radioactivity','radioactivityDens','gamma','gammaDens','heat','heatDens','molarHeatPwr','molarGammaPwr']
+  ['nSlugs','slugType','slugVolume','fuelVolume','claddingVolume','fuelLength','slugLength','fuelMass','fuelMassDens','fuelMassCC','claddingMass','claddingMassDens','claddingMassCC','nuclides','isotopes','radioactivity','radioactivityDens','gamma','gammaDens','heat','heatDens','molarHeatPwr','molarGammaPwr']
 
-  self._geometry = geometry
-  self._species  = species
+  self._specs         = specs
+  self._fuelPhase     = fuelPhase
+  self._claddingPhase = claddingPhase
 
 #*******************************************************************************

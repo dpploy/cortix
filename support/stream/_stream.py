@@ -12,7 +12,7 @@ Sat Aug 15 17:24:18 EDT 2015
 import os, sys
 import pandas
 
-from ..specie.interface import Specie
+from ..specie.interface   import Specie
 from ..quantity.interface import Quantity
 #*******************************************************************************
 

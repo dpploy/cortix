@@ -35,23 +35,26 @@ def _Phase( self, timeStamp, species=None, quantities=None, value=0.0 ):
   assert type(value) == type(float())
 
 # List of species and quantities objects; columns of data frame are named by objects
-  self._species   = species       # list
-  self.quantities = quantities    # list
+  self._species    = species       # list
+  self._quantities = quantities    # list
 
   names = list()
 
   if species is not None:
      for specie in self._species:
          names.append(specie.name)
+         specie.massCC = value     # massCC in specie is overriden here
 
   if quantities is not None:
-     for quant in self.quantities:
+     for quant in self._quantities:
          names.append(quant.name)
+         quant.value = value       # value in quant is overriden here
 
 # Table data phase 
-  self.phase = pandas.DataFrame( index=[timeStamp], columns = names )
-  self.phase.fillna( float(value), inplace = True )
-
+  self._phase = pandas.DataFrame( index=[timeStamp], columns = names )
+  self._phase.fillna( float(value), inplace = True )
+  
+ 
   return
 
 #*******************************************************************************
