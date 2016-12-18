@@ -29,8 +29,8 @@ def _FuelSlug( self, specs, fuelPhase, claddingPhase ):
   ['nSlugs','slugType','slugVolume','fuelVolume','claddingVolume','fuelLength','slugLength','fuelMass','fuelMassDens','fuelMassCC','claddingMass','claddingMassDens','claddingMassCC','nuclides','isotopes','radioactivity','radioactivityDens','gamma','gammaDens','heat','heatDens','molarHeatPwr','molarGammaPwr']
 
   # own internal copy
-  self._specs         = deepcopy(specs)
-  self._fuelPhase     = deepcopy(fuelPhase)
-  self._claddingPhase = deepcopy(claddingPhase)
+  self._specs         = deepcopy( specs )
+  self._fuelPhase     = deepcopy( fuelPhase )
+  self._claddingPhase = deepcopy( claddingPhase )
 
 #*******************************************************************************

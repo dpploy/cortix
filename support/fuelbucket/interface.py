@@ -15,6 +15,7 @@ Mon Dec 12 00:32:35 EST 2016
 import os, sys
 import math
 import pandas
+from copy import deepcopy
 
 from ._fuelbucket import _FuelBucket  # constructor
 #*******************************************************************************
@@ -152,13 +153,13 @@ class FuelBucket():
  def GetFuelPhase(self): 
      return self._fuelPhase
  def SetFuelPhase(self,phase): 
-     self._fuelPhase = phase
+     self._fuelPhase = deepcopy( phase )
  fuelPhase = property(GetFuelPhase,SetFuelPhase,None,None)
 
  def GetCladdingPhase(self): 
      return self._claddingPhase
  def SetCladdingPhase(self,phase): 
-     self._claddingPhase = phase
+     self._claddingPhase = deepcopy( phase )
  claddingPhase = property(GetCladdingPhase,SetCladdingPhase,None,None)
 
 #*******************************************************************************
