@@ -35,7 +35,7 @@ class Phase():
                timeStamp  = None,
                species    = None,   
                quantities = None,   
-               value      = float(0.0)
+               value      = float(0.0) # note: remove this later and let 0.0 be default
              ):
 
    # constructor
