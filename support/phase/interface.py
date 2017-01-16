@@ -4,9 +4,11 @@ Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
 Phase history container. 
 
+----------
 ATTENTION:
+----------
 The species (list of Specie) and quantities (list of Quantity) data members 
-have arbitrary values either at an arbitrary point in the history or at no point in 
+have ARBITRARY values either at an arbitrary point in the history or at no point in 
 the history. 
 
 To obtain history values, associated to the phase, at a particular point in time, 
@@ -183,10 +185,10 @@ class Phase():
 #*******************************************************************************
 # Printing of data members
 # def __str__( self ):
-     s = '\n\t **Phase()**: \n\t *quantities*: %s\n\t *species*: %s\n\t *history end*: %s'
-     return s % (self._quantities, self._species, self._phase.loc[self._phase.index[-1]:])
+     s = '\n\t **Phase()**: \n\t *quantities*: %s\n\t *species*: %s\n\t *history end*:\n%s'
+     return s % (self._quantities, self._species, self._phase.loc[self._phase.index[-1],:])
 #
  def __repr__( self ):
-     s = '\n\t **Phase()**: \n\t *quantities*: %s\n\t *species*: %s\n\t *history end*: %s'
-     return s % (self._quantities, self._species, self._phase.loc[self._phase.index[-1]:])
+     s = '\n\t **Phase()**: \n\t *quantities*: %s\n\t *species*: %s\n\t *history end*:\n%s'
+     return s % (self._quantities, self._species, self._phase.loc[self._phase.index[-1],:])
 #*******************************************************************************
