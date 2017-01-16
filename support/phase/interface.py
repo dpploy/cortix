@@ -185,10 +185,10 @@ class Phase():
 #*******************************************************************************
 # Printing of data members
 # def __str__( self ):
-     s = '\n\t **Phase()**: \n\t *quantities*: %s\n\t *species*: %s\n\t *history end*:\n%s'
-     return s % (self._quantities, self._species, self._phase.loc[self._phase.index[-1],:])
+     s = '\n\t **Phase()**: \n\t *quantities*: %s\n\t *species*: %s\n\t *history end* @%s\n%s'
+     return s % (self._quantities, self._species, self._phase.index[-1], self._phase.loc[self._phase.index[-1],:])
 #
  def __repr__( self ):
-     s = '\n\t **Phase()**: \n\t *quantities*: %s\n\t *species*: %s\n\t *history end*:\n%s'
-     return s % (self._quantities, self._species, self._phase.loc[self._phase.index[-1],:])
+     s = '\n\t **Phase()**: \n\t *quantities*: %s\n\t *species*: %s\n\t *history end* @%s\n%s'
+     return s % (self._quantities, self._species, self._phase.index[-1], self._phase.loc[self._phase.index[-1],:])
 #*******************************************************************************

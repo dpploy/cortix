@@ -4,6 +4,12 @@ Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
 Fuel slug 
 
+---------
+ATTENTION:
+---------
+This container requires two Phase() containers which are by definition histories. 
+The history is not checked. Therefore any inconsistency will be propagated forward.
+
 VFdALib support classes 
 
 Thu Dec 15 16:18:39 EST 2016
@@ -13,8 +19,8 @@ Thu Dec 15 16:18:39 EST 2016
 import os, sys
 import pandas
 from ..phase.interface import Phase
-from ._fuelslug     import _FuelSlug      # constructor
-from ._getattribute import _GetAttribute  
+from ._fuelslug        import _FuelSlug      # constructor
+from ._getattribute    import _GetAttribute  
 #*******************************************************************************
 
 #*******************************************************************************
