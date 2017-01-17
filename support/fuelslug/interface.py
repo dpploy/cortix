@@ -9,6 +9,8 @@ ATTENTION:
 ---------
 This container requires two Phase() containers which are by definition histories. 
 The history is not checked. Therefore any inconsistency will be propagated forward.
+A fuel slug has two solid phases: cladding and fuel. The user will decide how to
+best use the underlying history data in the Phase() container of each phase.
 
 VFdALib support classes 
 

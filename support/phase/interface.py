@@ -57,6 +57,7 @@ class Phase():
 
  def GetTimeStamps(self): 
      return list(self._phase.index)  # return all time stamps 
+ timeStamps = property(GetTimeStamps,None,None,None)
 
  def GetSpecie(self, name):
      for specie in self._species:
@@ -92,11 +93,9 @@ class Phase():
      self._species.append( newSpecie )
      newName = newSpecie.name
      col = pandas.DataFrame( index=list(self._phase.index), columns=[newName] )
-     col.fillna(0.0)
      tmp = self._phase
      df = tmp.join( col, how='outer' )
-     df = df.fillna(0.0)
-     self._phase = df
+     self._phase = df.fillna(0.0)
 
  def AddQuantity(self, newQuant):
      assert type(newQuant) == type(Quantity())
@@ -106,11 +105,9 @@ class Phase():
      self._quantities.append( newQuant )
      newName = newQuant.name
      col = pandas.DataFrame( index=list(self._phase.index), columns=[newName] )
-     col.fillna(0.0)
      tmp = self._phase
      df = tmp.join( col, how='outer' )
-     df = df.fillna(0.0)
-     self._phase = df
+     self._phase = df.fillna(0.0)
 
  def AddRow(self, timeStamp, rowValues):
 
@@ -141,8 +138,29 @@ class Phase():
      self._phase.loc[timeStamp,:] *= float(value)
      return
 
+ # set species and quantities of history to a given value (default to zero value)
+ # all time stamps are preserved
  def ClearHistory(self, value=0.0):
      self._phase.loc[:,:] = float(value)
+     return
+
+ # set species and quantities of history to a given value (default to zero value)
+ # only one time stamp is preserved (default to last time stamp)
+ def ResetHistory(self, timeStamp=None, value=None):
+     if timeStamp is None:
+        values = self.GetRow()
+        timeStamp = self._phase.index[-1]
+     else:
+        values = self.GetRow(timeStamp)
+
+     columns = list( self._phase.columns )
+
+     self._phase = pandas.DataFrame( index=[timeStamp], columns = columns )
+     self._phase.fillna( 0.0, inplace=True )
+
+     if value is not None:
+        self._phase.loc[timeStamp,:] = float(value)
+
      return
 
  def GetValue(self, actor, timeStamp=None):
@@ -185,10 +203,10 @@ class Phase():
 #*******************************************************************************
 # Printing of data members
 # def __str__( self ):
-     s = '\n\t **Phase()**: \n\t *quantities*: %s\n\t *species*: %s\n\t *history end* @%s\n%s'
-     return s % (self._quantities, self._species, self._phase.index[-1], self._phase.loc[self._phase.index[-1],:])
+     s = '\n\t **Phase()**: \n\t *quantities*: %s\n\t *species*: %s\n\t *history* #timeStamps=%s\n\t *history end* @%s\n%s'
+     return s % (self._quantities, self._species, len(self._phase.index), self._phase.index[-1], self._phase.loc[self._phase.index[-1],:])
 #
  def __repr__( self ):
-     s = '\n\t **Phase()**: \n\t *quantities*: %s\n\t *species*: %s\n\t *history end* @%s\n%s'
-     return s % (self._quantities, self._species, self._phase.index[-1], self._phase.loc[self._phase.index[-1],:])
+     s = '\n\t **Phase()**: \n\t *quantities*: %s\n\t *species*: %s\n\t *history* #timeStamps=%s\n\t *history end* @%s\n%s'
+     return s % (self._quantities, self._species, len(self._phase.index), self._phase.index[-1], self._phase.loc[self._phase.index[-1],:])
 #*******************************************************************************

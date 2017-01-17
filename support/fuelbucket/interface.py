@@ -3,7 +3,14 @@
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
 This FuelBucket class is a container for usage with other plant-level process modules.
-It is meant to represent a fuel bucket of a metal fuel LWR reactor.
+It is meant to represent a fuel bucket of a metal fuel reactor.
+
+---------
+ATTENTION:
+---------
+
+This container uses Phase() for phases (cladding and fuel). Therefore user is 
+responsible to make the "history" of the phases consistent. See Phase() info.
 
 For unit testing do at the linux command prompt:
     python interface.py
