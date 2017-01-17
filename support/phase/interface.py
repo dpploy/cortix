@@ -154,11 +154,16 @@ class Phase():
         values = self.GetRow(timeStamp)
 
      columns = list( self._phase.columns )
+     assert len(columns) == len(values),'FATAL: oops internal error.'
 
      self._phase = pandas.DataFrame( index=[timeStamp], columns = columns )
      self._phase.fillna( 0.0, inplace=True )
-
-     if value is not None:
+  
+     if value is None:
+        for v in values:
+          idx = values.index(v)
+          self._phase.loc[timeStamp,columns[idx]] = v
+     else:
         self._phase.loc[timeStamp,:] = float(value)
 
      return
