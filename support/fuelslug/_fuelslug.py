@@ -26,7 +26,7 @@ def _FuelSlug( self, specs, fuelPhase, claddingPhase ):
   assert type(claddingPhase) == type(Phase()), 'fatal.'
 
   self.attributeNames = \
-  ['nSlugs','slugType','slugVolume','fuelVolume','claddingVolume','fuelLength','slugLength','fuelMass','fuelMassDens','fuelMassCC','claddingMass','claddingMassDens','claddingMassCC','nuclides','isotopes','radioactivity','radioactivityDens','gamma','gammaDens','heat','heatDens','molarHeatPwr','molarGammaPwr']
+  ['nSlugs','slugType','slugVolume','slugArea','fuelVolume','claddingVolume','claddingArea','fuelLength','slugLength','fuelMass','fuelMassDens','fuelMassCC','claddingMass','claddingMassDens','claddingMassCC','nuclides','isotopes','radioactivity','radioactivityDens','gamma','gammaDens','heat','heatDens','molarHeatPwr','molarGammaPwr']
 
   # own internal copy
   self._specs         = deepcopy( specs )

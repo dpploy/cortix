@@ -123,7 +123,7 @@ class Specie():
      return self._molarRadioactivityFractions
  def SetMolarRadioactivityFractions(self,fracs):
      assert type(fracs) == type(list()), 'oops not list.'
-     assert len(fracs) == len(self._atoms), 'oops not right length,'
+     if len(fracs) > 0: assert len(fracs) == len(self._atoms), 'oops not right length,'
      if len(fracs) != 0:
         assert type(fracs[-1]) == type(float()), 'oops not float.'
      self._molarRadioactivityFractions = fracs

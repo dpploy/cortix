@@ -58,6 +58,13 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
   if attributeName == 'claddingVolume':   return  __GetCladdingVolume( self )
 
 #.................................................................................
+# cladding area   
+
+  if attributeName == 'claddingArea':   return  __GetCladdingArea( self )
+  if attributeName == 'slugArea':       return  __GetCladdingArea( self )
+
+
+#.................................................................................
 # fuel length        
 
   if attributeName == 'fuelLength':  return __GetFuelLength( self )
@@ -73,7 +80,7 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
           return mass
         else:
           volume = __GetFuelVolume( self )
-          assert volume == self._fuelPhase.GetValue('volume')
+          assert abs(volume - self._fuelPhase.GetValue('volume'))/volume*100.0 < 0.1
           return mass / volume
 # mass or mass concentration
      if attributeName == 'claddingMassCC' or attributeName == 'claddingMassDens' or attributeName == 'claddingMass': 
@@ -82,7 +89,7 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
           return mass
         else:
           volume = __GetCladdingVolume( self )
-          assert volume == self._claddingPhase.GetValue('volume')
+          assert abs(volume - self._claddingPhase.GetValue('volume'))/volume*100.0 < 0.1
           return mass / volume
 # radioactivity 
      if attributeName == 'radioactivtyDens' or attributeName == 'radioactivity':
@@ -91,7 +98,7 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
           return radioactivity
         else:
           volume = __GetFuelVolume( self )
-          assert volume == self._fuelPhase.GetValue('volume')
+          assert abs(volume - self._fuelPhase.GetValue('volume'))/volume*100.0 < 0.1
           return radioactivity / volume
 # gamma          
      if attributeName == 'gammaDens' or attributeName == 'gamma':
@@ -333,5 +340,32 @@ def __GetCladdingVolume(self):
    fuelVolume = __GetFuelVolume(self)
 
    return slugVolume - fuelVolume
+
+#---------------------------------------------------------------------------------
+def __GetCladdingArea(self):
+
+  slugLength = self._specs['Slug length [cm]'] 
+
+  outerSlugArea = 0.0
+
+  # side walls
+  outerSlugOuterRadius = self._specs['Outer slug OD [cm]']/2.0 
+  outerSlugArea += 2.0*math.pi * outerSlugOuterRadius * slugLength
+  outerSlugInnerRadius = self._specs['Outer slug ID [cm]']/2.0 
+  outerSlugArea += 2.0*math.pi * outerSlugInnerRadius * slugLength
+  # add bottom and top areas
+  outerSlugArea += 2.0 * math.pi * (outerSlugOuterRadius**2 - outerSlugInnerRadius**2)
+
+  innerSlugArea = 0.0
+
+  # side walls
+  innerSlugOuterRadius = self._specs['Inner slug OD [cm]']/2.0 
+  innerSlugArea += 2.0*math.pi * innerSlugOuterRadius * slugLength
+  innerSlugInnerRadius = self._specs['Inner slug ID [cm]']/2.0 
+  innerSlugArea += 2.0*math.pi * innerSlugInnerRadius * slugLength
+  # add bottom and top areas
+  innerSlugArea += 2.0 * math.pi * (innerSlugOuterRadius**2 - innerSlugInnerRadius**2)
+
+  return outerSlugArea + innerSlugArea
 
 #*********************************************************************************
