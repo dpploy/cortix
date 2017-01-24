@@ -23,6 +23,8 @@ import pandas
 from ..phase.interface import Phase
 from ._fuelslug        import _FuelSlug      # constructor
 from ._getattribute    import _GetAttribute  
+
+from ._reducecladdingvolume import _ReduceCladdingVolume 
 #*******************************************************************************
 
 #*******************************************************************************
@@ -60,6 +62,9 @@ class FuelSlug():
 
  def GetAttribute(self, name, phase=None, symbol=None, series=None):
      return _GetAttribute( self, name, symbol, series )
+
+ def ReduceCladdingVolume(self, dissolvedVolume ):
+     _ReduceCladdingVolume( self, dissolvedVolume )
 
 #*******************************************************************************
 # Printing of data members

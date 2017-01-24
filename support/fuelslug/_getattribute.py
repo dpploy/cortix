@@ -7,7 +7,7 @@ Fuel slug support class
 A FuelSlug object describes the full composition and geometry of a fuel
 slug.
 
-Thu Jun 25 18:16:06 EDT 2015
+Sun Jan 22 13:14:58 EST 2017
 """
 #*********************************************************************************
 import os, sys, io, time, datetime
@@ -58,11 +58,20 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
   if attributeName == 'claddingVolume':   return  __GetCladdingVolume( self )
 
 #.................................................................................
+# equivalent cladding volume
+
+  if attributeName == 'equivalentCladdingVolume':   return  __GetEquivalentCladdingVolume( self )
+
+#.................................................................................
 # cladding area   
 
   if attributeName == 'claddingArea':   return  __GetCladdingArea( self )
   if attributeName == 'slugArea':       return  __GetCladdingArea( self )
 
+#.................................................................................
+# equivalent cladding area   
+
+  if attributeName == 'equivalentCladdingArea':   return  __GetEquivalentCladdingArea( self )
 
 #.................................................................................
 # fuel length        
@@ -88,7 +97,8 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
         if attributeName == 'claddingMass':
           return mass
         else:
-          volume = __GetCladdingVolume( self )
+#          volume = __GetCladdingVolume( self )
+          volume = __GetEquivalentCladdingVolume(self)
           assert abs(volume - self._claddingPhase.GetValue('volume'))/volume*100.0 < 0.1
           return mass / volume
 # radioactivity 
@@ -350,22 +360,41 @@ def __GetCladdingArea(self):
 
   # side walls
   outerSlugOuterRadius = self._specs['Outer slug OD [cm]']/2.0 
-  outerSlugArea += 2.0*math.pi * outerSlugOuterRadius * slugLength
+  outerSlugArea       += 2.0*math.pi * outerSlugOuterRadius * slugLength
   outerSlugInnerRadius = self._specs['Outer slug ID [cm]']/2.0 
-  outerSlugArea += 2.0*math.pi * outerSlugInnerRadius * slugLength
+  outerSlugArea       += 2.0*math.pi * outerSlugInnerRadius * slugLength
   # add bottom and top areas
-  outerSlugArea += 2.0 * math.pi * (outerSlugOuterRadius**2 - outerSlugInnerRadius**2)
+  outerSlugArea       += 2.0 * math.pi * (outerSlugOuterRadius**2 - outerSlugInnerRadius**2)
 
   innerSlugArea = 0.0
 
   # side walls
   innerSlugOuterRadius = self._specs['Inner slug OD [cm]']/2.0 
-  innerSlugArea += 2.0*math.pi * innerSlugOuterRadius * slugLength
+  innerSlugArea       += 2.0*math.pi * innerSlugOuterRadius * slugLength
   innerSlugInnerRadius = self._specs['Inner slug ID [cm]']/2.0 
-  innerSlugArea += 2.0*math.pi * innerSlugInnerRadius * slugLength
+  innerSlugArea       += 2.0*math.pi * innerSlugInnerRadius * slugLength
   # add bottom and top areas
-  innerSlugArea += 2.0 * math.pi * (innerSlugOuterRadius**2 - innerSlugInnerRadius**2)
+  innerSlugArea       += 2.0 * math.pi * (innerSlugOuterRadius**2 - innerSlugInnerRadius**2)
 
   return outerSlugArea + innerSlugArea
+
+#---------------------------------------------------------------------------------
+def __GetEquivalentCladdingArea(self):
+
+  ro = self._claddingHollowSphereRo 
+
+  area = 4.0*math.pi * ro
+
+  return area
+
+#---------------------------------------------------------------------------------
+def __GetEquivalentCladdingVolume(self):
+
+  ro = self._claddingHollowSphereRo 
+  ri = self._claddingHollowSphereRi 
+
+  volume = 4.0/3.0*math.pi * (ro**3 - ri**3)
+
+  return volume
 
 #*********************************************************************************
