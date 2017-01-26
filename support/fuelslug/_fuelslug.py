@@ -29,7 +29,7 @@ def _FuelSlug( self, specs, fuelPhase, claddingPhase ):
   assert type(claddingPhase) == type(Phase()), 'fatal.'
 
   self.attributeNames = \
-  ['nSlugs','slugType','slugVolume','slugArea','fuelVolume','claddingVolume','claddingArea','equivalentCladdingVolume','equivalentCladdingArea','fuelLength','slugLength','fuelMass','fuelMassDens','fuelMassCC','claddingMass','claddingMassDens','claddingMassCC','nuclides','isotopes','radioactivity','radioactivityDens','gamma','gammaDens','heat','heatDens','molarHeatPwr','molarGammaPwr']
+  ['nSlugs','slugType','slugVolume','slugArea','fuelVolume','claddingVolume','fuelArea','claddingArea','equivalentCladdingVolume','equivalentCladdingArea','equivalentFuelVolume','equivalentFuelArea','fuelLength','slugLength','fuelMass','fuelMassDens','fuelMassCC','claddingMass','claddingMassDens','claddingMassCC','nuclides','isotopes','radioactivity','radioactivityDens','gamma','gammaDens','heat','heatDens','molarHeatPwr','molarGammaPwr']
 
   # own internal copy
   self._specs         = deepcopy( specs )
@@ -47,5 +47,15 @@ def _FuelSlug( self, specs, fuelPhase, claddingPhase ):
 
   self._claddingHollowSphereRo = ro
   self._claddingHollowSphereRi = ri
+
+  area   = _GetAttribute( self, 'fuelArea' )
+  volume = _GetAttribute( self, 'fuelVolume' )
+
+  ro = math.sqrt( area/4/pi )
+  ri = ( ro**3 - volume*3/4/pi )**(1/3)
+
+  self._fuelHollowSphereRo = ro
+  self._fuelHollowSphereRi = ri
+
 
 #*******************************************************************************

@@ -45,17 +45,22 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
 #.................................................................................
 # slug volume
 
-  if attributeName == 'slugVolume':   return  __GetSlugVolume( self )
+  if attributeName == 'slugVolume': return  __GetSlugVolume( self )
 
 #.................................................................................
 # fuel volume
 
-  if attributeName == 'fuelVolume':   return  __GetFuelVolume( self )
+  if attributeName == 'fuelVolume': return  __GetFuelVolume( self )
+
+#.................................................................................
+# equivalent fuel volume
+
+  if attributeName == 'equivalentFuelVolume': return  __GetEquivalentFuelVolume( self )
 
 #.................................................................................
 # cladding volume
 
-  if attributeName == 'claddingVolume':   return  __GetCladdingVolume( self )
+  if attributeName == 'claddingVolume': return  __GetCladdingVolume( self )
 
 #.................................................................................
 # equivalent cladding volume
@@ -63,10 +68,20 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
   if attributeName == 'equivalentCladdingVolume':   return  __GetEquivalentCladdingVolume( self )
 
 #.................................................................................
+# fuel area   
+
+  if attributeName == 'fuelArea': return  __GetFuelArea( self )
+
+#.................................................................................
+# equivalent fuel area   
+
+  if attributeName == 'equivalentFuelArea':   return  __GetEquivalentFuelArea( self )
+
+#.................................................................................
 # cladding area   
 
-  if attributeName == 'claddingArea':   return  __GetCladdingArea( self )
-  if attributeName == 'slugArea':       return  __GetCladdingArea( self )
+  if attributeName == 'claddingArea': return  __GetCladdingArea( self )
+  if attributeName == 'slugArea':     return  __GetCladdingArea( self )
 
 #.................................................................................
 # equivalent cladding area   
@@ -88,7 +103,8 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
         if attributeName == 'fuelMass':
           return mass
         else:
-          volume = __GetFuelVolume( self )
+#          volume = __GetFuelVolume( self )
+          volume = __GetEquivalentFuelVolume( self )
           assert abs(volume - self._fuelPhase.GetValue('volume'))/volume*100.0 < 0.1
           return mass / volume
 # mass or mass concentration
@@ -352,6 +368,36 @@ def __GetCladdingVolume(self):
    return slugVolume - fuelVolume
 
 #---------------------------------------------------------------------------------
+def __GetFuelArea(self):
+
+  pi = math.pi 
+
+  cladWallThickness = self._specs['Cladding wall thickness [cm]']
+  slugLength = self._specs['Slug length [cm]'] 
+
+  outerSlugFuelArea = 0.0
+
+  # side walls
+  outerSlugOuterRadius = self._specs['Outer slug OD [cm]']/2.0 
+  outerSlugFuelArea   += 2.0*pi * (outerSlugOuterRadius-cladWallThickness) * slugLength
+  outerSlugInnerRadius = self._specs['Outer slug ID [cm]']/2.0 
+  outerSlugFuelArea   += 2.0*pi * (outerSlugInnerRadius+cladWallThickness) * slugLength
+  # add bottom and top areas
+  outerSlugFuelArea       += 2.0*pi * ( (outerSlugOuterRadius-cladWallThickness)**2 - (outerSlugInnerRadius+cladWallThickness)**2 )
+
+  innerSlugFuelArea = 0.0
+
+  # side walls
+  innerSlugOuterRadius = self._specs['Inner slug OD [cm]']/2.0 
+  innerSlugFuelArea       += 2.0*pi * (innerSlugOuterRadius-cladWallThickness) * slugLength
+  innerSlugInnerRadius = self._specs['Inner slug ID [cm]']/2.0 
+  innerSlugFuelArea       += 2.0*pi * (innerSlugInnerRadius+cladWallThickness) * slugLength
+  # add bottom and top areas
+  innerSlugFuelArea       += 2.0*pi *  ( (innerSlugOuterRadius-cladWallThickness)**2 - (innerSlugInnerRadius+cladWallThickness)**2 ) 
+
+  return outerSlugFuelArea + innerSlugFuelArea
+
+#---------------------------------------------------------------------------------
 def __GetCladdingArea(self):
 
   slugLength = self._specs['Slug length [cm]'] 
@@ -396,5 +442,24 @@ def __GetEquivalentCladdingVolume(self):
   volume = 4.0/3.0*math.pi * (ro**3 - ri**3)
 
   return volume
+
+#---------------------------------------------------------------------------------
+def __GetEquivalentFuelVolume(self):
+
+  ro = self._fuelHollowSphereRo 
+  ri = self._fuelHollowSphereRi 
+
+  volume = 4.0/3.0*math.pi * (ro**3 - ri**3)
+
+  return volume
+
+#---------------------------------------------------------------------------------
+def __GetEquivalentFuelArea(self):
+
+  ro = self._fuelHollowSphereRo 
+
+  area = 4.0*math.pi * ro
+
+  return area
 
 #*********************************************************************************

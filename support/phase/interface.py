@@ -183,6 +183,7 @@ class Phase():
         timeStamp = self._phase.index[-1]
      else:
         assert timeStamp in self._phase.index, 'missing timeStamp = %r'%(timeStamp)
+     assert type(actor) == type(str())
      assert actor in self._phase.columns
      self._phase.loc[timeStamp,actor] = float(value)
      return

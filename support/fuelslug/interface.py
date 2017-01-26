@@ -25,6 +25,7 @@ from ._fuelslug        import _FuelSlug      # constructor
 from ._getattribute    import _GetAttribute  
 
 from ._reducecladdingvolume import _ReduceCladdingVolume 
+from ._reducefuelvolume import _ReduceFuelVolume 
 #*******************************************************************************
 
 #*******************************************************************************
@@ -65,6 +66,9 @@ class FuelSlug():
 
  def ReduceCladdingVolume(self, dissolvedVolume ):
      _ReduceCladdingVolume( self, dissolvedVolume )
+
+ def ReduceFuelVolume(self, dissolvedVolume ):
+     _ReduceFuelVolume( self, dissolvedVolume )
 
 #*******************************************************************************
 # Printing of data members
