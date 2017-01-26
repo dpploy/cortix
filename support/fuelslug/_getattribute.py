@@ -115,7 +115,10 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
         else:
 #          volume = __GetCladdingVolume( self )
           volume = __GetEquivalentCladdingVolume(self)
-          assert abs(volume - self._claddingPhase.GetValue('volume'))/volume*100.0 < 0.1
+          if volume == 0.0:
+            assert abs(volume - self._claddingPhase.GetValue('volume')) < 1e-8
+          else:
+            assert abs(volume - self._claddingPhase.GetValue('volume'))/volume*100.0 < 0.1
           return mass / volume
 # radioactivity 
      if attributeName == 'radioactivtyDens' or attributeName == 'radioactivity':
@@ -124,7 +127,10 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
           return radioactivity
         else:
           volume = __GetFuelVolume( self )
-          assert abs(volume - self._fuelPhase.GetValue('volume'))/volume*100.0 < 0.1
+          if volume == 0.0:
+            assert abs(volume - self._fuelPhase.GetValue('volume')) < 1e-8
+          else:
+            assert abs(volume - self._fuelPhase.GetValue('volume'))/volume*100.0 < 0.1
           return radioactivity / volume
 # gamma          
      if attributeName == 'gammaDens' or attributeName == 'gamma':
