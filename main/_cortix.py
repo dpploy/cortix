@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-This File contains the main main Cortix class definition.
+This File contains the main Cortix class definition.
 
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
