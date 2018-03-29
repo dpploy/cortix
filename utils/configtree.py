@@ -18,7 +18,7 @@ from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import ElementTree
 #*********************************************************************************
 
-#========================BEGIN ConfigTree CLASS DEFINITION================================
+#========================BEGIN CONFIG_TREE CLASS DEFINITION================================
 class ConfigTree:
 
     """
@@ -46,28 +46,28 @@ class ConfigTree:
         """Returns the Element tree's root node"""
         return self.config_tree_node
 
-    def GetNodeTag(self):
+    def get_node_tag(self):
         """
         Returns the tag associated with the root node
         of the element tree.
         """
         return self.config_tree_node.tag
 
-    def GetNodeName(self):
+    def get_node_name(self):
         """
         Returns the name associated with the root
         node of the element tree
         """
         return self.config_tree_node.get('name')
 
-    def GetNodeType(self):
+    def get_node_type(self):
         """
         Returns the type associated with the root
         node of the element tree.
         """
         return self.config_tree_node.get('type')
 
-    def GetSubNode(self, tag):
+    def get_sub_node(self, tag):
         """
         Returns a subnode of the element tree
         specified by the parameter tag.
@@ -75,7 +75,7 @@ class ConfigTree:
         assert isinstance(tag, str), 'tag invalid'
         return self.config_tree_node.find(tag)
 
-    def GetAllSubNodes(self, tag):
+    def get_all_sub_nodes(self, tag):
         """
         Returns a list of all nodes in the element
         tree that contain a given tag.
@@ -83,7 +83,7 @@ class ConfigTree:
         assert isinstance(tag, str), 'tag invalid'
         return self.config_tree_node.findall(tag)
 
-    def GetNodeChildren(self):
+    def get_node_children(self):
         """
         Returns a list of all the nodes in the
         element tree.
@@ -93,9 +93,10 @@ class ConfigTree:
             children.append((child, child.tag, child.items(), child.text))
         return children
 
-#========================END ConfigTree CLASS DEFINITION===========================
+#========================END CONFIG_TREE CLASS DEFINITION===========================
 
 # Unit testing. Usage: -> python configtree.py
 if __name__ == "__main__":
     print('Unit testing for ConfigTree')
+    # TODO: FIX THE UNIT TEST, IT FAILS DUE TO THE LACK OF INPUT FILE
     ConfigTree(config_file_name="cortix-config.xml")
