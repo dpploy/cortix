@@ -26,7 +26,7 @@ def _Task( self, parentWorkDir = None,
   self.configNode = taskConfigNode
 
 # Read the simulation name
-  self.name = self.configNode.GetNodeName()
+  self.name = self.configNode.get_node_name()
 
 # Set the work directory (previously created)
   assert os.path.isdir( parentWorkDir ), 'work directory not available.'
@@ -34,7 +34,7 @@ def _Task( self, parentWorkDir = None,
   os.system( 'mkdir -p ' + self.workDir )
 
 # Create the logging facility for the object
-  node = taskConfigNode.GetSubNode('logger')
+  node = taskConfigNode.get_sub_node('logger')
   loggerName = self.name
   log = logging.getLogger(loggerName)
   log.setLevel(logging.NOTSET)

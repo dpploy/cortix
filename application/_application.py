@@ -29,11 +29,11 @@ def _Application( self,
 
 # Inherit a configuration tree
   assert type(appConfigNode) is ConfigTree, '-> appConfigNode invalid' 
-  assert type(appConfigNode.GetNodeTag()) is str, 'empty xml tree.'
+  assert type(appConfigNode.get_node_tag()) is str, 'empty xml tree.'
   self.configNode = appConfigNode
 
 # Read the application name
-  self.name = self.configNode.GetNodeName()
+  self.name = self.configNode.get_node_name()
 
 # Set the work directory (previously created)
 
@@ -42,12 +42,12 @@ def _Application( self,
 
 # Set the module library for the whole application
 
-  node = appConfigNode.GetSubNode('moduleLibrary')
+  node = appConfigNode.get_sub_node('moduleLibrary')
   self.moduLibName = node.get('name').strip()
 
   subnode = ConfigTree( node )
-  assert subnode.GetNodeTag() == 'moduleLibrary', ' fatal.'
-  for child in subnode.GetNodeChildren():
+  assert subnode.get_node_tag() == 'moduleLibrary', ' fatal.'
+  for child in subnode.get_node_children():
    (elem, tag, attributes, text) = child
    if tag == 'parentDir': self.moduLibFullParentDir = text.strip()
  
@@ -57,7 +57,7 @@ def _Application( self,
   sys.path.insert(1,self.moduLibFullParentDir)
 
 # Create the logging facility for the singleton object
-  node = appConfigNode.GetSubNode('logger')
+  node = appConfigNode.get_sub_node('logger')
   loggerName = self.name + '.app' # postfix to avoid clash of loggers
   log = logging.getLogger(loggerName)
   log.setLevel(logging.NOTSET)

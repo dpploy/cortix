@@ -23,10 +23,10 @@ def _SetupModules( self ):
   s = 'start _SetupModules()'
   self.log.debug(s)
 
-  for modNode in self.configNode.GetAllSubNodes('module'):
+  for modNode in self.configNode.get_all_sub_nodes('module'):
 
      modConfigNode = ConfigTree( modNode )
-     assert modConfigNode.GetNodeName() == modNode.get('name'), 'check failed'
+     assert modConfigNode.get_node_name() == modNode.get('name'), 'check failed'
 
      newModule = Module( self.workDir, 
                          self.moduLibName, self.moduLibFullParentDir, 

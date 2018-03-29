@@ -22,7 +22,7 @@ def _SetupTask( self, taskName ):
 
   task = None
 
-  for taskNode in self.configNode.GetAllSubNodes('task'):
+  for taskNode in self.configNode.get_all_sub_nodes('task'):
 
    if taskNode.get('name') != taskName: continue
 

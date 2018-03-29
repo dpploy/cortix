@@ -17,7 +17,7 @@ from cortix.utils.configtree import ConfigTree
 def _Setup( self ):
 
 # Save config data
-  for child in self.configNode.GetNodeChildren():
+  for child in self.configNode.get_node_children():
 
     ( elem, tag, attributes, text ) = child
     text = text.strip()
@@ -42,7 +42,7 @@ def _Setup( self ):
        self.modLibName = val
 
        node = ConfigTree(elem)
-       subNode = node.GetSubNode('parentDir')
+       subNode = node.get_sub_node('parentDir')
        assert subNode is not None, 'missing parentDir.'
        
        self.modLibParentDir = subNode.text.strip()

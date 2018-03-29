@@ -21,7 +21,7 @@ def _Network(self, netConfigNode):
 
   self.configNode = netConfigNode
 
-  self.name = self.configNode.GetNodeName()
+  self.name = self.configNode.get_node_name()
 
   _Setup( self )
 

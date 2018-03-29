@@ -25,7 +25,7 @@ def _Simulation( self, parentWorkDir = None, simConfigNode = ConfigTree() ):
   self.configNode = simConfigNode
 
 # Read the simulation name
-  self.name = simConfigNode.GetNodeName()
+  self.name = simConfigNode.get_node_name()
 
 # Create the cortix/simulation work directory
   wrkDir = parentWorkDir 
@@ -36,7 +36,7 @@ def _Simulation( self, parentWorkDir = None, simConfigNode = ConfigTree() ):
 
 # Create the logging facility for each object
 
-  node = simConfigNode.GetSubNode('logger')
+  node = simConfigNode.get_sub_node('logger')
   loggerName = self.name + '.sim' # postfix to avoid loggers clash
   log = logging.getLogger(loggerName)
   log.setLevel(logging.NOTSET)
@@ -103,10 +103,10 @@ def _Simulation( self, parentWorkDir = None, simConfigNode = ConfigTree() ):
 #------------
 # Application
 #------------
-  for appNode in self.configNode.GetAllSubNodes('application'):
+  for appNode in self.configNode.get_all_sub_nodes('application'):
 
     appConfigNode = ConfigTree( appNode )
-    assert appConfigNode.GetNodeName() == appNode.get('name'), 'check failed'
+    assert appConfigNode.get_node_name() == appNode.get('name'), 'check failed'
 
     self.application = Application( self.workDir, appConfigNode )
 

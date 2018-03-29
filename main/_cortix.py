@@ -38,7 +38,7 @@ class Cortix:
         self.config_tree = ConfigTree(config_file_name=self.config_file)
 
         # Read this object's name
-        node = self.config_tree.GetSubNode("name")
+        node = self.config_tree.get_sub_node("name")
         self.name = node.text.strip()
 
         # check
@@ -46,7 +46,7 @@ class Cortix:
         "Cortix object name %r conflicts with cortix-config.xml %r" % (self.name, name)
 
         # Read the work directory name
-        node = self.config_tree.GetSubNode("workDir")
+        node = self.config_tree.get_sub_node("workDir")
         work_dir = node.text.strip()
         if work_dir[-1] != '/':
             work_dir += '/'
@@ -60,7 +60,7 @@ class Cortix:
         os.system('mkdir -p ' + self.work_dir)
 
         # Create the logging facility for each object
-        node = self.config_tree.GetSubNode("logger")
+        node = self.config_tree.get_sub_node("logger")
         logger_name = self.name
         self.log = logging.getLogger(logger_name)
         self.log.setLevel(logging.NOTSET)
@@ -118,7 +118,7 @@ class Cortix:
         whose purpose is to set up the simulations defined by the
         Cortix configuration.
         """
-        for sim in self.config_tree.GetAllSubNodes('simulation'):
+        for sim in self.config_tree.get_all_sub_nodes('simulation'):
             self.log.debug("SetupSimulations(): simulation name: %s", sim.get('name'))
             sim_config_tree = ConfigTree(sim)
             simulation = Simulation(self.work_dir, sim_config_tree)

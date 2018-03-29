@@ -25,7 +25,7 @@ def _Setup(self):
 
   self.nxGraph = nx.MultiDiGraph(name=self.name) # graph of the network
   
-  for child in self.configNode.GetNodeChildren():
+  for child in self.configNode.get_node_children():
 
     ( elem, tag, attributes, text ) = child
 

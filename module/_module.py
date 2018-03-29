@@ -28,8 +28,8 @@ def _Module( self, parentWorkDir = None,
   self.configNode = modConfigNode
 
 # Read the module name and type
-  self.modName = self.configNode.GetNodeName()
-  self.modType = self.configNode.GetNodeType()
+  self.modName = self.configNode.get_node_name()
+  self.modType = self.configNode.get_node_type()
 
 # Specify module library with upstream information (override in _Setup() if needed)
   self.modLibParentDir = modLibParentDir

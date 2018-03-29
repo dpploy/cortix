@@ -24,10 +24,10 @@ def _SetupNetworks(self):
   s = 'start _SetupNetworks()'
   self.log.debug(s)
 
-  for netNode in self.configNode.GetAllSubNodes('network'):
+  for netNode in self.configNode.get_all_sub_nodes('network'):
 
    netConfigNode = ConfigTree( netNode )
-   assert netConfigNode.GetNodeName() == netNode.get('name'), 'check failed'
+   assert netConfigNode.get_node_name() == netNode.get('name'), 'check failed'
 
    network = Network( netConfigNode )
 

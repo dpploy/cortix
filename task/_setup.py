@@ -18,7 +18,7 @@ def _Setup(self):
   s = 'start _Setup()'
   self.log.debug(s)
 
-  for child in self.configNode.GetNodeChildren():
+  for child in self.configNode.get_node_children():
 
     (elem, tag, items, text) = child
 
