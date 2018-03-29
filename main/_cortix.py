@@ -12,121 +12,129 @@ import datetime
 import logging
 from cortix.utils.configtree import ConfigTree
 from cortix.simulation.interface import Simulation
-
 from ._setupsimulations import _SetupSimulations
 #*********************************************************************************
 
-#---------------------------------------------------------------------------------
-# Cortix class constructor
+class Cortix:
+    def __init__(self, name=None, config_file="cortix-config.xml"):
 
-def _Cortix( self,
-             name = None,
-             configFile = 'cortix-config.xml'
-           ):
+        assert name is not None, "must give Cortix object a name"
 
-    assert name is not None, 'must give Cortix object a name'
+        assert isinstance(config_file, str), "-> configFile not a str."
+        self.config_file = config_file
 
-    assert type(configFile) is str, '-> configFile not a str.' 
-    self.configFile = configFile
+        # Create a configuration tree
+        self.config_tree = ConfigTree(configFileName=self.config_file)
 
-# Create a configuration tree
-    self.configTree = ConfigTree( configFileName=self.configFile )
+        # Read this object's name
+        node = self.config_tree.GetSubNode("name")
+        self.name = node.text.strip()
 
-# Read this object's name
-    node  = self.configTree.GetSubNode('name')
-    self.name = node.text.strip()
- 
-    # check
-    assert self.name == name, 'cortix object name %r conflicts with cortix-config.xml %r' % (self.name, name)
+        # check
+        assert self.name == name,\
+        "Cortix object name %r conflicts with cortix-config.xml %r" % (self.name, name)
 
-# Read the work directory name
-    node  = self.configTree.GetSubNode('workDir')
-    wrkDir = node.text.strip()
-    if wrkDir[-1] != '/': wrkDir += '/'
+        # Read the work directory name
+        node = self.config_tree.GetSubNode("workDir")
+        work_dir = node.text.strip()
+        if work_dir[-1] != '/':
+            work_dir += '/'
 
-    self.workDir = wrkDir + self.name + '-wrk/'
+        self.work_dir = work_dir + self.name + "-wrk/"
 
-# Create the work directory 
-    if os.path.isdir(self.workDir):
-      os.system( 'rm -rf ' + self.workDir )
+        # Create the work directory
+        if os.path.isdir(self.work_dir):
+            os.system('rm -rf ' + self.work_dir)
 
-    os.system( 'mkdir -p ' + self.workDir )
+        os.system('mkdir -p ' + self.work_dir)
 
-# Create the logging facility for each object  
-    node = self.configTree.GetSubNode('logger')
-    loggerName = self.name
-    log = logging.getLogger(loggerName)
-    log.setLevel(logging.NOTSET)
+        # Create the logging facility for each object
+        node = self.config_tree.GetSubNode("logger")
+        logger_name = self.name
+        log = logging.getLogger(logger_name)
+        log.setLevel(logging.NOTSET)
 
-    loggerLevel = node.get('level').strip()
-    if   loggerLevel == 'DEBUG': log.setLevel(logging.DEBUG)
-    elif loggerLevel == 'INFO':  log.setLevel(logging.INFO)
-    elif loggerLevel == 'WARN': log.setLevel(logging.WARN)
-    elif loggerLevel == 'ERROR': log.setLevel(logging.ERROR)
-    elif loggerLevel == 'CRITICAL': log.setLevel(logging.CRITICAL)
-    elif loggerLevel == 'FATAL': log.setLevel(logging.CRITICAL)
-    else:
-      assert False, 'logger level for %r: %r invalid' % (loggerName, loggerLevel)
+        logger_level = node.get("level").strip()
+        self.set_logger_level(log, logger_name, logger_level)
 
+        file_handler = logging.FileHandler(self.work_dir + "cortix.log")
+        file_handler.setLevel(logging.NOTSET)
+        file_handler_level = None
 
-    fh = logging.FileHandler(self.workDir+'cortix.log')
-    fh.setLevel(logging.NOTSET)
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.NOTSET)
+        console_handler_level = None
 
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.NOTSET)
+        for child in node:
+            if child.tag == "fileHandler":
+                file_handler_level = child.get("level").strip()
+                self.set_logger_level(file_handler, logger_name, file_handler_level)
+            if child.tag == "consoleHandler":
+                console_handler_level = child.get("level").strip()
+                self.set_logger_level(console_handler, logger_name, console_handler_level)
 
-    for child in node:
-     if child.tag == 'fileHandler':
-        # file handler
-        fhLevel = child.get('level').strip()
-        if   fhLevel == 'DEBUG': fh.setLevel(logging.DEBUG)
-        elif fhLevel == 'INFO': fh.setLevel(logging.INFO)
-        elif fhLevel == 'WARN': fh.setLevel(logging.WARN)
-        elif fhLevel == 'ERROR': fh.setLevel(logging.ERROR)
-        elif fhLevel == 'CRITICAL': fh.setLevel(logging.CRITICAL)
-        elif fhLevel == 'FATAL': fh.setLevel(logging.FATAL)
+        # Formatter added to handlers
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        file_handler.setFormatter(formatter)
+        console_handler.setFormatter(formatter)
+
+        # add handlers to logger
+        log.addHandler(file_handler)
+        log.addHandler(console_handler)
+
+        self.log = log
+        self.log.info("Created Cortix logger: %s", self.name)
+        self.log.debug("Logger level: %s", logger_level)
+        self.log.debug("Logger file handler level: %s", file_handler_level)
+        self.log.debug("Logger console handler level: %s", console_handler_level)
+        self.log.info("Created Cortix work directory: %s", self.work_dir)
+
+        # Setup simulations (one or more as specified in the config file)
+        self.simulations = list()
+        _SetupSimulations(self)
+
+        self.log.info("Created Cortix object %s", self.name)
+
+    def set_logger_level(self, handler, handler_name, handler_level):
+        """
+        This is a helper function for the constructor that
+        takes in a file/console handler and sets its level
+        accordingly.
+        """
+
+        if handler_level == 'DEBUG':
+            handler.setLevel(logging.DEBUG)
+        elif handler_level == 'INFO':
+            handler.setLevel(logging.INFO)
+        elif handler_level == 'WARN':
+            handler.setLevel(logging.WARN)
+        elif handler_level == 'ERROR':
+            handler.setLevel(logging.ERROR)
+        elif handler_level == 'CRITICAL':
+            handler.setLevel(logging.CRITICAL)
+        elif handler_level == 'FATAL':
+            handler.setLevel(logging.FATAL)
         else:
-          assert False, 'file handler log level for %r: %r invalid' % (loggerName, fhLevel)
-     if child.tag == 'consoleHandler':
-        # console handler
-        chLevel = child.get('level').strip()
-        if   chLevel == 'DEBUG': ch.setLevel(logging.DEBUG)
-        elif chLevel == 'INFO': ch.setLevel(logging.INFO) 
-        elif chLevel == 'WARN': ch.setLevel(logging.WARN)
-        elif chLevel == 'ERROR': ch.setLevel(logging.ERROR)
-        elif chLevel == 'CRITICAL': ch.setLevel(logging.CRITICAL)
-        elif chLevel == 'FATAL': ch.setLevel(logging.FATAL)
-        else:
-          assert False, 'console handler log level for %r: %r invalid' % (loggerName, chLevel)
-    # formatter added to handlers
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    fh.setFormatter(formatter)
-    ch.setFormatter(formatter)
-    # add handlers to logger
-    log.addHandler(fh)
-    log.addHandler(ch)
+            assert False, "File handler log level for %r: %r invalid"\
+            % (handler_name, handler_level)
 
-    self.log = log
+        return handler
 
-    self.log.info('created Cortix logger: '+self.name)
+    
+    def run_simulations(self, task_name=None):
+        """
+        This method runs every simulation
+        defined by the Cortix object.
+        """
+        for sim in self.simulations:
+            sim.Execute(task_name)
 
-    s = 'logger level: '+loggerLevel
-    self.log.debug(s)
-    s = 'logger file handler level: '+fhLevel
-    self.log.debug(s)
-    s = 'logger console handler level: '+chLevel
-    self.log.debug(s)
+    def __del__(self):
+        self.log.info("Destroyed Cortix object: %s", self.name)
 
-    self.log.info('created Cortix work directory: '+self.workDir)
-
-# Setup simulations (one or more as specified in the config file)
-
-    self.simulations = list()
-
-    _SetupSimulations( self )
-
-    self.log.info('created Cortix object '+self.name)
-
-    return 
-  
 #*********************************************************************************
+
+# Unit testing. Usage: -> python cortix.py
+if __name__ == "__main__":
+    print('Unit testing for Cortix')
+    Cortix("cortix-config.xml")

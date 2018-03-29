@@ -18,8 +18,8 @@ as of python 3.3 or later.
 Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
-from main.interface import Cortix
 import os
+from main._cortix import Cortix
 #*********************************************************************************
 
 def Main():
