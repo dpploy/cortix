@@ -18,8 +18,8 @@ as of python 3.3 or later.
 Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
-import sys, os
 from main.interface import Cortix
+import os
 #*********************************************************************************
 
 def Main():
@@ -35,7 +35,7 @@ def Main():
 # sys.exit(0)
 
 # tested
-# cortix1.RunSimulations( taskName='solo-pyplot' )
+ cortix1.run_simulations( task_name='solo-pyplot' )
 # cortix1.RunSimulations( taskName='solo-fueldepot' )
 # cortix1.RunSimulations( taskName='solo-shear' )     # oldchopper
 # cortix1.RunSimulations( taskName='solo-dissolverA' ) # olddissolver
@@ -43,7 +43,7 @@ def Main():
 # cortix1.RunSimulations( taskName='solo-cooltower' )
 # cortix1.RunSimulations( taskName='fueldepot-chopper' )
 # cortix1.RunSimulations( taskName='fueldepot-chopper-storage' )
- cortix1.RunSimulations( taskName='fueldepot-chopper-dissolver' )
+# cortix1.RunSimulations( taskName='fueldepot-chopper-dissolver' )
 # cortix1.RunSimulations( taskName='fueldepot-chopper-dissolver-tank' )
 # cortix1.RunSimulations( taskName='fueldepot-chopper-dissolver-tank-feedprep' )
 # cortix1.RunSimulations( taskName='solo-condenser' )
