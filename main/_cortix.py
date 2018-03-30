@@ -15,7 +15,7 @@ Tue Dec 10 11:21:30 EDT 2013
 import os
 import logging
 from cortix.utils.configtree import ConfigTree
-from cortix.simulation.interface import Simulation
+from cortix.simulation._simulation import Simulation
 #*********************************************************************************
 
 
@@ -110,7 +110,7 @@ class Cortix:
         defined by the Cortix object.
         """
         for sim in self.simulations:
-            sim.Execute(task_name)
+            sim.execute(task_name)
 
     def setup_simulations(self):
         """
