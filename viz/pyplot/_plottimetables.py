@@ -10,6 +10,8 @@ import os, sys, io, time, datetime
 import logging
 import xml.etree.ElementTree as ElementTree
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MultipleLocator

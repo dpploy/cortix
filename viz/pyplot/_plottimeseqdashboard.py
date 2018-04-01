@@ -8,6 +8,8 @@ Tue Jun 24 01:03:45 EDT 2014
 #*********************************************************************************
 import os, sys, io, time, datetime
 import numpy as npy
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MultipleLocator
@@ -59,7 +61,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
       if iVar != 0: # flush any current figure
         figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash).zfill(2)+'.png'
-        fig.savefig(figName,dpi=200,fomat='png')
+        fig.savefig(figName,dpi=200,fomat='pdf')
         plt.close( figNum )
         s = '_PlotTimeSeqDashboard(): created plot: '+figName
         self.log.debug(s)
