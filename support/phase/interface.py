@@ -2,7 +2,8 @@
 """
 Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Phase history container. 
+Phase *history* container. When you think of a phase value, think of that value at
+a specific point in time.
 
 ----------
 ATTENTION:
@@ -13,7 +14,7 @@ the history.
 
 To obtain history values, associated to the phase, at a particular point in time, 
 use the GetValue() method to access the history data frame (pandas) via columns and 
-rows. The corresponding values in species and quantities are overriden and not to
+rows. The corresponding values in species and quantities are overriden and NOT to
 be used through the phase interface.
 
 VFdALib support classes 
