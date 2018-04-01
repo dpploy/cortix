@@ -46,7 +46,7 @@ def _Phase( self, timeStamp=None, species=None, quantities=None, value=0.0 ):
   if species is not None:
      for specie in self._species:
          names.append(specie.name)
-         specie.massCC = value     # massCC in specie is overriden here on local copy
+         specie.massCC = value   # massCC in specie is overriden here on local copy
 
   if quantities is not None:
      for quant in self._quantities:
