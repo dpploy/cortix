@@ -16,7 +16,6 @@ from cortix.task.interface import Task
 #*********************************************************************************
 
 
-
 #=============================BEGIN SETUP_TASK=====================================
 def setup_task(self, task_name):
     """
@@ -42,7 +41,7 @@ def setup_task(self, task_name):
         self.log.debug('end setup_task')
         return
 
-    networks = self.application.GetNetworks()
+    networks = self.application.get_networks()
 
     # create subdirectory with task name
     task_name = task.GetName()
@@ -82,7 +81,7 @@ def setup_task(self, task_name):
                     to_module_to_port_visited[to_module_slot] = list()
 
                 to_module_name = to_module_slot.split('_')[0]
-                to_module = self.application.GetModule(to_module_name)
+                to_module = self.application.get_module(to_module_name)
 
                 assert to_module is not None, \
                   'module %r does not exist in application' % to_module_name
@@ -142,7 +141,7 @@ def setup_task(self, task_name):
                 from_module_slot = con['fromModuleSlot']
                 from_port = con['fromPort']
                 from_module_name = from_module_slot.split('_')[0]
-                from_module = self.application.GetModule(from_module_name)
+                from_module = self.application.get_module(from_module_name)
 
                 assert from_module.HasPortName(from_port), 'module %r has no port %r'\
                   % (from_module_name, from_port)

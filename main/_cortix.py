@@ -16,6 +16,7 @@ import os
 import logging
 from cortix.utils.configtree import ConfigTree
 from cortix.simulation._simulation import Simulation
+from cortix.main.set_logger_level import set_logger_level
 #*********************************************************************************
 
 
@@ -64,9 +65,8 @@ class Cortix:
         logger_name = self.name
         self.log = logging.getLogger(logger_name)
         self.log.setLevel(logging.NOTSET)
-
         logger_level = node.get("level").strip()
-        set_logger_level(self.log, logger_name, logger_level)
+        self.log = set_logger_level(self.log, logger_name, logger_level)
 
         file_handler = logging.FileHandler(self.work_dir + "cortix.log")
         file_handler.setLevel(logging.NOTSET)
@@ -79,10 +79,10 @@ class Cortix:
         for child in node:
             if child.tag == "fileHandler":
                 file_handler_level = child.get("level").strip()
-                set_logger_level(file_handler, logger_name, file_handler_level)
+                file_handler = set_logger_level(file_handler, logger_name, file_handler_level)
             if child.tag == "consoleHandler":
                 console_handler_level = child.get("level").strip()
-                set_logger_level(console_handler, logger_name, console_handler_level)
+                console_handler = set_logger_level(console_handler, logger_name, console_handler_level)
 
         # Formatter added to handlers
         formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -128,31 +128,6 @@ class Cortix:
         self.log.info("Destroyed Cortix object: %s", self.name)
 
 #========================END CORTIX CLASS DEFINITION==================================
-
-def set_logger_level(handler, handler_name, handler_level):
-    """
-    This is a helper function for the Cortix constructor that
-    takes in a file/console handler and sets its logger level
-    accordingly.
-    """
-
-    if handler_level == 'DEBUG':
-        handler.setLevel(logging.DEBUG)
-    elif handler_level == 'INFO':
-        handler.setLevel(logging.INFO)
-    elif handler_level == 'WARN':
-        handler.setLevel(logging.WARN)
-    elif handler_level == 'ERROR':
-        handler.setLevel(logging.ERROR)
-    elif handler_level == 'CRITICAL':
-        handler.setLevel(logging.CRITICAL)
-    elif handler_level == 'FATAL':
-        handler.setLevel(logging.FATAL)
-    else:
-        assert False, "File handler log level for %r: %r invalid"\
-            % (handler_name, handler_level)
-
-    return handler
 
 # Unit testing. Usage: -> python cortix.py
 if __name__ == "__main__":

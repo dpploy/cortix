@@ -18,7 +18,7 @@ from ._getruntimestatus import _GetRuntimeStatus
 
 def _Execute(self, application ):
 
-  network = application.GetNetwork( self.name )
+  network = application.get_network(self.name)
 
   runtimeStatusFiles = dict()
   
@@ -26,7 +26,7 @@ def _Execute(self, application ):
 
     moduleName = slotName.split('_')[0]
     slotId     = int(slotName.split('_')[1])
-    mod = application.GetModule( moduleName )
+    mod = application.get_module( moduleName )
 
     paramFile = self.runtimeCortixParamFile
     commFile  = network.GetRuntimeCortixCommFile( slotName )
