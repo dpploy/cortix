@@ -32,7 +32,7 @@ class Network():
 # Accessors for "private" data
 # Note to user: if you access through other means, you will get what you deserve
 
- def GetName(self): return self.name
+ def get_name(self): return self.name
 
  def GetConnectivity(self): return self.connectivity
 

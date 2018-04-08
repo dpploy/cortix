@@ -59,9 +59,9 @@ class Quantity():
 
  def SetName(self,n):
      self._name = n
- def GetName(self):
+ def get_name(self):
      return self._name
- name = property(GetName,SetName,None,None)
+ name = property(get_name,SetName,None,None)
 
  def SetValue(self,v):
      self._value = v

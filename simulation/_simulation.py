@@ -103,7 +103,7 @@ class Simulation:
         if task_name is not None:
             setup_task(self, task_name)
             for task in self.tasks:
-                if task.GetName() == task_name:
+                if task.get_name() == task_name:
                     task.Execute(self.application)
                     self.log.debug("called task.Execute() on task %s", task_name)
 

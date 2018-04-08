@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 """
 This file defines the helper function setup_task which
 is used in the Simulation constructor by the execute function
@@ -44,7 +46,7 @@ def setup_task(self, task_name):
     networks = self.application.get_networks()
 
     # create subdirectory with task name
-    task_name = task.GetName()
+    task_name = task.get_name()
     task_work_dir = task.GetWorkDir()
     assert os.path.isdir(task_work_dir), "directory %r invalid." % task_work_dir
 
@@ -69,7 +71,7 @@ def setup_task(self, task_name):
 
     # using the tasks and network create the runtime module directories and comm files
     for net in networks:
-        if net.GetName() == task_name: # Warning: net and task name must match
+        if net.get_name() == task_name: # Warning: net and task name must match
             connect = net.GetConnectivity()
             to_module_to_port_visited = dict()
             for con in connect:
@@ -86,19 +88,19 @@ def setup_task(self, task_name):
                 assert to_module is not None, \
                   'module %r does not exist in application' % to_module_name
 
-                assert to_module.HasPortName(to_port), \
-                  'module %r has no port %r.' % (to_module.GetName(), to_port)
+                assert to_module.has_port_name(to_port), \
+                  'module %r has no port %r.' % (to_module.get_name(), to_port)
 
-                assert to_module.GetPortType(to_port) is not None,\
+                assert to_module.get_port_type(to_port) is not None,\
                   'network name: %r, module name: %r, to_port: %r port type invalid %r' %(\
-                  net.GetName(), to_module.GetName(), to_port, type(to_module.GetPortType(to_port)))
+                  net.get_name(), to_module.get_name(), to_port, type(to_module.get_port_type(to_port)))
 
                 to_module_slot_work_dir = task_work_dir + to_module_slot + '/'
 
-                if to_module.GetPortType(to_port) != 'input':
-                    assert to_module.GetPortType(to_port) == 'provide', \
+                if to_module.get_port_type(to_port) != 'input':
+                    assert to_module.get_port_type(to_port) == 'provide', \
                       'port type %r invalid. Module %r, port %r' \
-                      % (to_module.GetPortType(to_port), to_module.GetName(), to_port)
+                      % (to_module.get_port_type(to_port), to_module.get_name(), to_port)
 
                 # "to" is who receives the "call", hence the provider
                 to_module_slot_comm_file = to_module_slot_work_dir + 'cortix-comm.xml'
@@ -115,7 +117,7 @@ def setup_task(self, task_name):
                 if to_port not in to_module_to_port_visited[to_module_slot]:
                     fout = open(to_module_slot_comm_file, 'a')
                     # this is the cortix info for modules providing data
-                    to_port_mode = to_module.GetPortMode(to_port)
+                    to_port_mode = to_module.get_port_mode(to_port)
                     if to_port_mode.split('.')[0] == 'file':
                         ext = to_port_mode.split('.')[1]
                         log_str = '<port name="'+to_port+'" type="provide" file="'\
@@ -143,20 +145,20 @@ def setup_task(self, task_name):
                 from_module_name = from_module_slot.split('_')[0]
                 from_module = self.application.get_module(from_module_name)
 
-                assert from_module.HasPortName(from_port), 'module %r has no port %r'\
+                assert from_module.has_port_name(from_port), 'module %r has no port %r'\
                   % (from_module_name, from_port)
 
-                assert from_module.GetPortType(from_port) is not None, \
+                assert from_module.get_port_type(from_port) is not None, \
                   'network name: %r, module name: %r, from_port: %r port type invalid %r'\
-                  % (net.GetName(), from_module.GetName(), from_port, \
-                     type(from_module.GetPortType(from_port)))
+                  % (net.get_name(), from_module.get_name(), from_port, \
+                     type(from_module.get_port_type(from_port)))
 
                 from_module_slot_work_dir = task_work_dir + from_module_slot + '/'
 
-                if from_module.GetPortType(from_port) != 'output':
-                    assert from_module.GetPortType(from_port) == 'use', \
+                if from_module.get_port_type(from_port) != 'output':
+                    assert from_module.get_port_type(from_port) == 'use', \
                       'port type %r invalid. Module %r, port %r'\
-                      % (from_module.GetPortType(from_port), from_module.GetName(), from_port)
+                      % (from_module.get_port_type(from_port), from_module.get_name(), from_port)
 
                     # "from" is who makes the "call", hence the user
                     from_module_slot_comm_file = from_module_slot_work_dir + 'cortix-comm.xml'
@@ -173,9 +175,9 @@ def setup_task(self, task_name):
                 fout = open(from_module_slot_comm_file, 'a')
 
                 # this is the cortix info for modules using data
-                assert from_module.GetPortType(from_port) == 'use', 'from_port must be use type.'
+                assert from_module.get_port_type(from_port) == 'use', 'from_port must be use type.'
 
-            to_port_mode = to_module.GetPortMode(to_port)
+            to_port_mode = to_module.get_port_mode(to_port)
             if to_port_mode.split('.')[0] == 'file':
                 ext = to_port_mode.split('.')[1]
                 log_str = '<port name="' + from_port + '" type="use" file="' + \
@@ -196,7 +198,7 @@ def setup_task(self, task_name):
             # register the cortix-comm file for the network
             net.SetRuntimeCortixCommFile(from_module_slot, from_module_slot_comm_file)
 
-            # finish forming the XML documents for port types
+    # finish forming the XML documents for port types
     for net in networks:
         slot_names = net.GetSlotNames()
         for slot_name in slot_names:

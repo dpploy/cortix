@@ -18,7 +18,7 @@ import sys
 import logging
 from cortix.utils.configtree import ConfigTree
 from cortix.main.set_logger_level import set_logger_level
-from cortix.module.interface import Module
+from cortix.module._module import Module
 from cortix.network.interface import Network
 #*********************************************************************************
 
@@ -128,13 +128,13 @@ class Application:
 
             # check for a duplicate module before appending a new one
             for module in self.modules:
-                mod_name = module.GetName()
-                mod_lib_dir_name = module.GetLibraryParentDir()
-                mod_lib_name = module.GetLibraryName()
+                mod_name = module.get_name()
+                mod_lib_dir_name = module.get_library_parent_dir()
+                mod_lib_name = module.get_library_name()
 
-                if new_module.GetName() == mod_name:
-                    if new_module.GetLibraryParentDir() == mod_lib_dir_name:
-                        assert new_module.GetLibraryName != mod_lib_name, "duplicate module; ABORT."
+                if new_module.get_name() == mod_name:
+                    if new_module.get_library_parent_dir() == mod_lib_dir_name:
+                        assert new_module.get_library_name != mod_lib_name, "duplicate module; ABORT."
 
             # add module to list
             self.modules.append(new_module)
@@ -174,7 +174,7 @@ class Application:
         None if the name doesn't exist.
         """
         for net in self.networks:
-            if net.GetName() == name:
+            if net.get_name() == name:
                 return net
         return None
 
@@ -190,7 +190,7 @@ class Application:
         None if the name doesn't exist.
         """
         for mod in self.modules:
-            if mod.GetName() == name:
+            if mod.get_name() == name:
                 return mod
         return None
 

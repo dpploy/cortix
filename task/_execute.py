@@ -32,7 +32,7 @@ def _Execute(self, application ):
     commFile  = network.GetRuntimeCortixCommFile( slotName )
 
     # Run module in the slot
-    statusFile = mod.Execute( slotId, paramFile, commFile )
+    statusFile = mod.execute( slotId, paramFile, commFile )
     assert statusFile is not None, 'module launching failed.'
 
     runtimeStatusFiles[ slotName ] = statusFile
