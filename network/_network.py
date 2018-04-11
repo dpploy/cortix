@@ -1,7 +1,7 @@
 """
 This file contains the Network class definition
-for the Cortix project. A network is a
-defines the connectivity between Cortix modules
+for the Cortix project. A network defines the 
+connectivity between Cortix modules.
 
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
