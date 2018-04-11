@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """
 This file contains the Launcher functionality
 of the Cortix Class.
@@ -20,8 +21,8 @@ import importlib
 import xml.etree.ElementTree as ElementTree
 #*********************************************************************************
 
-#---------------------------------------------------------------------------------
-# Launcher class constructor
+
+#========================BEGIN LAUNCHER CLASS DEFINITION=========================
 
 class Launcher(Thread):
     """
@@ -91,15 +92,12 @@ class Launcher(Thread):
         Runs the simulation from start to end, and montiors
         its progress at each time step.
         """
-        #.................................................................................
+
         # Verify the module input file name with full path.
         # This input file may be empty or used by this driver and/or the native/wrapped module.
-        # input_full_path_filename
-
         assert os.path.isfile(self.input_full_path_file_name), \
             'file %r not available;stop.' % self.input_full_path_file_name
 
-        #.................................................................................
         # Read the Cortix parameter file: cortix-param.xml
         # cortix_param_full_path_filename
 
@@ -202,15 +200,11 @@ class Launcher(Thread):
             self.log.debug('run(%s', str(round(facility_time, 3)) + '[min]): ')
             start_time = time.time()
 
-            #-----------------------------------------------------------------------------
             # Data exchange at facility_time (at start_time, this is here for provide state)
             guest_driver.CallPorts(facility_time)
-            #-----------------------------------------------------------------------------
 
-            #-----------------------------------------------------------------------------
             # Advance to facility_time + time_step
             guest_driver.Execute(facility_time, time_step)
-            #-----------------------------------------------------------------------------
 
             end_time = time.time()
             self.log.debug('elapsed time (s): %s', str(round(end_time - start_time, 2)))
@@ -238,3 +232,5 @@ class Launcher(Thread):
         fout.write('<status>' + status + '</status>\n')
         fout.write('</runtime>\n')
         fout.close()
+
+#===============================END LAUNCHER CLASS DEFINITION==============================

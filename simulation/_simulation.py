@@ -104,7 +104,7 @@ class Simulation:
             setup_task(self, task_name)
             for task in self.tasks:
                 if task.get_name() == task_name:
-                    task.Execute(self.application)
+                    task.execute(self.application)
                     self.log.debug("called task.Execute() on task %s", task_name)
 
         self.log.debug("end Execute(%s)", task_name)

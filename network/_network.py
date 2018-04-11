@@ -16,6 +16,7 @@ import networkx as nx
 from cortix.utils.configtree import ConfigTree
 #*********************************************************************************
 
+#========================BEGIN NETWORK CLASS DEFINITION=========================
 class Network:
     """
     Cortix network class definition. Defines the manner in which Modules interact.
@@ -116,7 +117,8 @@ class Network:
         """
         return 'Network data members: name=%5s' % (self.name)
 
-#*********************************************************************************
+#========================END NETWORK CLASS DEFINITION=========================
+
 # Unit testing. Usage: -> python network.py
 if __name__ == "__main__":
     print('Unit testing for network')

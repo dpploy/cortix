@@ -14,7 +14,7 @@ Tue Dec 10 11:21:30 EDT 2013
 #*********************************************************************************
 import os
 from cortix.utils.configtree import ConfigTree
-from cortix.task.interface import Task
+from cortix.task._task import Task
 #*********************************************************************************
 
 
@@ -47,7 +47,7 @@ def setup_task(self, task_name):
 
     # create subdirectory with task name
     task_name = task.get_name()
-    task_work_dir = task.GetWorkDir()
+    task_work_dir = task.get_work_dir()
     assert os.path.isdir(task_work_dir), "directory %r invalid." % task_work_dir
 
     # set the parameters for the task in the cortix param file
@@ -56,18 +56,18 @@ def setup_task(self, task_name):
     fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
     fout.write('<!-- Written by Simulation::_Setup() -->\n')
     fout.write('<cortixParam>\n')
-    start_time = task.GetStartTime()
-    start_time_unit = task.GetStartTimeUnit()
+    start_time = task.get_start_time()
+    start_time_unit = task.get_start_time_unit()
     fout.write('<startTime unit="'+start_time_unit+'"'+'>'+str(start_time)+'</startTime>\n')
-    evolve_time = task.GetEvolveTime()
-    evolve_time_unit = task.GetEvolveTimeUnit()
+    evolve_time = task.get_evolve_time()
+    evolve_time_unit = task.get_evolve_time_unit()
     fout.write('<evolveTime unit="'+evolve_time_unit+'"'+'>'+str(evolve_time)+'</evolveTime>\n')
-    time_step = task.GetTimeStep()
-    time_step_unit = task.GetTimeStepUnit()
+    time_step = task.get_time_step()
+    time_step_unit = task.get_time_step_unit()
     fout.write('<timeStep unit="'+time_step_unit+'"'+'>'+str(time_step)+'</timeStep>\n')
     fout.write('</cortixParam>')
     fout.close()
-    task.SetRuntimeCortixParamFile(task_file)
+    task.set_runtime_cortix_param_file(task_file)
 
     # using the tasks and network create the runtime module directories and comm files
     for net in networks:

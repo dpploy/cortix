@@ -17,6 +17,7 @@ from cortix.utils.configtree import ConfigTree
 from cortix.launcher._launcher import Launcher
 #*********************************************************************************
 
+#=================================BEGIN MODULE CLASS DEFINITION==========================
 class Module:
     """
     This is the main class definition of the Cortix Module
@@ -215,4 +216,4 @@ class Module:
         worker_thread.start()
         return runtime_module_status_file
 
-#*********************************************************************************
+#=================================END MODULE CLASS DEFINITION==========================
