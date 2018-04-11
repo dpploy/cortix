@@ -19,7 +19,7 @@ import logging
 from cortix.utils.configtree import ConfigTree
 from cortix.main.set_logger_level import set_logger_level
 from cortix.module._module import Module
-from cortix.network.interface import Network
+from cortix.network._network import Network
 #*********************************************************************************
 
 #========================BEGIN APPLICATION CLASS DEFINITION=========================

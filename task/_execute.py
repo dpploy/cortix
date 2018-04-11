@@ -22,14 +22,14 @@ def _Execute(self, application ):
 
   runtimeStatusFiles = dict()
   
-  for slotName in network.GetSlotNames():
+  for slotName in network.get_slot_names():
 
     moduleName = slotName.split('_')[0]
     slotId     = int(slotName.split('_')[1])
     mod = application.get_module( moduleName )
 
     paramFile = self.runtimeCortixParamFile
-    commFile  = network.GetRuntimeCortixCommFile( slotName )
+    commFile  = network.get_runtime_cortix_comm_file( slotName )
 
     # Run module in the slot
     statusFile = mod.execute( slotId, paramFile, commFile )

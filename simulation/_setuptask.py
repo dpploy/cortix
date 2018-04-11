@@ -72,7 +72,7 @@ def setup_task(self, task_name):
     # using the tasks and network create the runtime module directories and comm files
     for net in networks:
         if net.get_name() == task_name: # Warning: net and task name must match
-            connect = net.GetConnectivity()
+            connect = net.get_connectivity()
             to_module_to_port_visited = dict()
             for con in connect:
                 # Start with the ports that will function as a provide port or input port
@@ -137,7 +137,7 @@ def setup_task(self, task_name):
                 self.log.debug(debug_str)
 
                 # register the cortix-comm file for the network
-                net.SetRuntimeCortixCommFile(to_module_slot, to_module_slot_comm_file)
+                net.set_runtime_cortix_comm_file(to_module_slot, to_module_slot_comm_file)
 
                 # Now do the ports that will function as use ports
                 from_module_slot = con['fromModuleSlot']
@@ -196,13 +196,13 @@ def setup_task(self, task_name):
             self.log.debug(debug_str)
 
             # register the cortix-comm file for the network
-            net.SetRuntimeCortixCommFile(from_module_slot, from_module_slot_comm_file)
+            net.set_runtime_cortix_comm_file(from_module_slot, from_module_slot_comm_file)
 
     # finish forming the XML documents for port types
     for net in networks:
-        slot_names = net.GetSlotNames()
+        slot_names = net.get_slot_names()
         for slot_name in slot_names:
-            comm_file = net.GetRuntimeCortixCommFile(slot_name)
+            comm_file = net.get_runtime_cortix_comm_file(slot_name)
             if comm_file == 'null-runtimeCortixCommFile':
                 continue
             fout = open(comm_file, 'a')
