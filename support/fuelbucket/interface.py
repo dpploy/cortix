@@ -52,9 +52,9 @@ class FuelBucket():
 
  #------
  # Start: Pre-irradiation information
- def GetName(self):
-     return self.__GetName()
- name = property(GetName,None,None,None)
+ def get_name(self):
+     return self.__get_name()
+ name = property(get_name,None,None,None)
 
  def GetSlugType(self):
      return self.__GetSlugType()
@@ -172,7 +172,7 @@ class FuelBucket():
 #*******************************************************************************
 # Internal class helpers 
 
- def __GetName(self):
+ def __get_name(self):
      return self._specs.loc['Name',1]
 
  def __GetSlugType(self):

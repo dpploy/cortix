@@ -1,4 +1,9 @@
+# -*- coding: utf-8 -*-
+
 """
+This file contains the class definition for the Simulation feature
+in the Cortix project.
+
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
 Cortix: a program for system-level modules
@@ -6,122 +11,105 @@ Cortix: a program for system-level modules
 
 Tue Dec 10 11:21:30 EDT 2013
 """
+
 #*********************************************************************************
-import os, sys, io
+import os
 import logging
 from cortix.utils.configtree import ConfigTree
-from cortix.application.interface import Application
+from cortix.application._application import Application
+from cortix.simulation._setuptask import setup_task
+from cortix.main.set_logger_level import set_logger_level
 #*********************************************************************************
 
-#---------------------------------------------------------------------------------
-# Simulation class constructor
+#========================BEGIN SIMULATION CLASS DEFINITION=======================
 
-def _Simulation( self, parentWorkDir = None, simConfigNode = ConfigTree() ):
+class Simulation:
 
-  assert type(parentWorkDir) is str, '-> parentWorkDir invalid.' 
+    """
+    This is the main class definition for the simulation implementation in
+    the Cortix project. This class provides an interface to the instantiation
+    and execution of a simulation as defined in the Cortix config.
+    """
 
-# Inherit a configuration tree
-  assert type(simConfigNode) is ConfigTree, '-> simConfigNode invalid.' 
-  self.configNode = simConfigNode
+    def __init__(self, parent_work_dir=None, sim_config_node=ConfigTree()):
+        assert isinstance(parent_work_dir, str), "-> parentWorkDir invalid."
 
-# Read the simulation name
-  self.name = simConfigNode.GetNodeName()
+        # Inherit a configuration tree
+        assert isinstance(sim_config_node, ConfigTree), "-> simConfigNode invalid."
+        self.config_node = sim_config_node
 
-# Create the cortix/simulation work directory
-  wrkDir = parentWorkDir 
-  wrkDir += 'sim_' + self.name + '/'
-  self.workDir = wrkDir
+        # Read the simulation name
+        self.name = sim_config_node.get_node_name()
 
-  os.system( 'mkdir -p ' + self.workDir )
+        # Create the cortix/simulation work directory
+        self.work_dir = parent_work_dir + "sim_" + self.name + '/'
 
-# Create the logging facility for each object
+        os.system("mkdir -p " + self.work_dir)
 
-  node = simConfigNode.GetSubNode('logger')
-  loggerName = self.name + '.sim' # postfix to avoid loggers clash
-  log = logging.getLogger(loggerName)
-  log.setLevel(logging.NOTSET)
+        # Create the logging facility for each object
+        node = sim_config_node.get_sub_node("logger")
+        logger_name = self.name + ".sim"
+        self.log = logging.getLogger(logger_name)
+        self.log.setLevel(logging.NOTSET)
 
-  loggerLevel = node.get('level').strip()
-  if   loggerLevel == 'DEBUG': log.setLevel(logging.DEBUG)
-  elif loggerLevel == 'INFO':  log.setLevel(logging.INFO)
-  elif loggerLevel == 'WARN':  log.setLevel(logging.WARN)
-  elif loggerLevel == 'ERROR':  log.setLevel(logging.ERROR)
-  elif loggerLevel == 'CRITICAL':  log.setLevel(logging.CRITICAL)
-  elif loggerLevel == 'FATAL':  log.setLevel(logging.FATAL)
-  else:
-    assert False, 'logger level for %r: %r invalid' % (loggerName, loggerLevel)
+        logger_level = node.get('level').strip()
+        self.log = set_logger_level(self.log, logger_name, logger_level)
 
-  fh = logging.FileHandler(self.workDir+'sim.log')
-  fh.setLevel(logging.NOTSET)
+        file_handler = logging.FileHandler(self.work_dir + 'sim.log')
+        file_handler.setLevel(logging.NOTSET)
 
-  ch = logging.StreamHandler()
-  ch.setLevel(logging.NOTSET)
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.NOTSET)
 
-  for child in node:
-   if child.tag == 'fileHandler':
-      # file handler
-      fhLevel = child.get('level').strip()
-      if   fhLevel == 'DEBUG': fh.setLevel(logging.DEBUG)
-      elif fhLevel == 'INFO': fh.setLevel(logging.INFO)
-      elif fhLevel == 'WARN': fh.setLevel(logging.WARN)
-      elif fhLevel == 'ERROR': fh.setLevel(logging.ERROR)
-      elif fhLevel == 'CRITICAL': fh.setLevel(logging.CRITICAL)
-      elif fhLevel == 'FATAL': fh.setLevel(logging.FATAL)
-      else:
-        assert False, 'file handler log level for %r: %r invalid' % (loggerName, fhLevel)
-   if child.tag == 'consoleHandler':
-      # console handler
-      chLevel = child.get('level').strip()
-      if   chLevel == 'DEBUG': ch.setLevel(logging.DEBUG)
-      elif chLevel == 'INFO': ch.setLevel(logging.INFO)
-      elif chLevel == 'WARN': ch.setLevel(logging.WARN)
-      elif chLevel == 'ERROR': ch.setLevel(logging.ERROR)
-      elif chLevel == 'CRITICAL': ch.setLevel(logging.CRITICAL)
-      elif chLevel == 'FATAL': ch.setLevel(logging.FATAL)
-      else:
-        assert False, 'console handler log level for %r: %r invalid' % (loggerName, chLevel)
-  # formatter added to handlers
-  formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-  fh.setFormatter(formatter)
-  ch.setFormatter(formatter)
-  # add handlers to logger
-  log.addHandler(fh)
-  log.addHandler(ch)
+        for child in node:
+            if child.tag == "fileHandler":
+                file_handler_level = child.get("level").strip()
+                file_handler = set_logger_level(file_handler, logger_name, file_handler_level)
 
-  self.log = log
+            if child.tag == 'consoleHandler':
+                console_handler_level = child.get('level').strip()
+                console_handler = set_logger_level(console_handler, logger_name, console_handler_level)
 
-  s = 'created Simulation logger: '+self.name
-  self.log.info(s)
+        # formatter added to handlers
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        file_handler.setFormatter(formatter)
+        console_handler.setFormatter(formatter)
 
-  s = 'logger level: '+loggerLevel
-  self.log.debug(s)
-  s = 'logger file handler level: '+fhLevel
-  self.log.debug(s)
-  s = 'logger console handler level: '+chLevel
-  self.log.debug(s)
+        # add handlers to logger
+        self.log.addHandler(file_handler)
+        self.log.addHandler(console_handler)
 
-#------------
-# Application
-#------------
-  for appNode in self.configNode.GetAllSubNodes('application'):
+        self.log.info("created Simulation logger: %s", self.name)
+        self.log.debug("'logger level: %s", logger_level)
+        self.log.debug("logger file handler level: %s", file_handler_level)
+        self.log.debug("logger console handler level: %s", console_handler_level)
 
-    appConfigNode = ConfigTree( appNode )
-    assert appConfigNode.GetNodeName() == appNode.get('name'), 'check failed'
+        for app_node in self.config_node.get_all_sub_nodes("application"):
+            app_config_node = ConfigTree(app_node)
+            assert app_config_node.get_node_name() == app_node.get("name"), "check failed"
+            self.application = Application(self.work_dir, app_config_node)
+            self.log.debug("created application: %s", app_node.get('name'))
 
-    self.application = Application( self.workDir, appConfigNode )
+        # Stores the task(s) created by the Execute method
+        self.tasks = list()
+        self.log.info("created simulation: %s", self.name)
 
-    s = 'created application: '+appNode.get('name')
-    self.log.debug(s)
+    def execute(self, task_name=None):
+        """
+        This method allows for the execution of a simulation.
+        """
+        self.log.debug("start Execute(%s)", task_name)
 
-#------------
-# Tasks
-#------------
-  self.tasks = list() # holds the task(s) created by the Execute method
+        if task_name is not None:
+            setup_task(self, task_name)
+            for task in self.tasks:
+                if task.get_name() == task_name:
+                    task.execute(self.application)
+                    self.log.debug("called task.Execute() on task %s", task_name)
 
+        self.log.debug("end Execute(%s)", task_name)
 
-  s = 'created simulation: '+self.name
-  self.log.info(s)
+    def __del__(self):
+        self.log.info("destroyed simulation: %s", self.name)
 
-  return
-
-#*********************************************************************************
+#================================END SIMULATION CLASS DEFINITION================================

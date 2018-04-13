@@ -27,7 +27,7 @@ def _GetTimeSequence( self, portFile, atTime ):
 
   self.timeSequences_tmp.append( timeSequence )
 
-  s = '_GetTimeSequence(): loaded ' + timeSequence.GetName()
+  s = '_GetTimeSequence(): loaded ' + timeSequence.get_name()
   self.log.debug(s)
 
 
