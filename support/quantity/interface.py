@@ -19,7 +19,9 @@ from ._quantity import _Quantity  # constructor
 #*******************************************************************************
 class Quantity():
 
-#*******************************************************************************
+#todo: this probably should not have a "value" for the same reason as Specie.
+#      this needs some thinking.
+
  def __init__( self, 
                name       = 'null-quantity',
                formalName = 'null-quantity',

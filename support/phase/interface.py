@@ -2,18 +2,19 @@
 """
 Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Phase history container. 
+Phase *history* container. When you think of a phase value, think of that value at
+a specific point in time.
 
 ----------
 ATTENTION:
 ----------
-The species (list of Specie) and quantities (list of Quantity) data members 
-have ARBITRARY values either at an arbitrary point in the history or at no point in 
-the history. 
+The species (list of Specie) AND quantities (list of Quantity) data members 
+have ARBITRARY density values either at an arbitrary point in the history or at 
+no point in the history. This needs to be removed in the future.
 
 To obtain history values, associated to the phase, at a particular point in time, 
 use the GetValue() method to access the history data frame (pandas) via columns and 
-rows. The corresponding values in species and quantities are overriden and not to
+rows. The corresponding values in species and quantities are OVERRIDEN and NOT to
 be used through the phase interface.
 
 VFdALib support classes 
@@ -39,6 +40,7 @@ class Phase():
                quantities = None,   
                value      = float(0.0) # note: remove this later and let 0.0 be default
              ):
+# Value needs to be removed; makes no sense
 
    # constructor
    _Phase( self, timeStamp, species, quantities, value )

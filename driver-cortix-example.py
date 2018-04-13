@@ -35,7 +35,11 @@ def Main():
 # sys.exit(0)
 
 # tested
+<<<<<<< HEAD
  cortix1.run_simulations( task_name='solo-pyplot' )
+=======
+ cortix1.RunSimulations( taskName='solo-pyplot' )
+>>>>>>> 9e11f24602b08b83f3896048adeccf98e1d0c9f1
 # cortix1.RunSimulations( taskName='solo-fueldepot' )
 # cortix1.RunSimulations( taskName='solo-shear' )     # oldchopper
 # cortix1.RunSimulations( taskName='solo-dissolverA' ) # olddissolver

@@ -22,6 +22,7 @@ Sun Dec 27 15:06:55 EST 2015
 import os, sys
 import math
 import pandas
+from copy import deepcopy
 
 from ._fuelbundle import _FuelBundle  # constructor
 #*******************************************************************************
@@ -130,13 +131,13 @@ class FuelBundle():
  def GetSolidPhase(self): 
      return self._solidPhase
  def SetSolidPhase(self,phase): 
-     self._solidPhase = phase
+     self._solidPhase = deepcopy( phase )
  solidPhase = property(GetSolidPhase,SetSolidPhase,None,None)
 
  def GetGasPhase(self): 
      return self._gasPhase
  def SetGasPhase(self,phase): 
-     self._gasPhase = phase
+     self._gasPhase = deepcopy( phase )
  gasPhase = property(GetGasPhase,SetGasPhase,None,None)
  
 
@@ -195,29 +196,29 @@ class FuelBundle():
      return fuelPinVolume * nFuelRods
 
  def __GetFuelMass(self): # mass of the solid phase (gas phase in plenum not added)
-     return self._solidPhase.GetQuantity('mass').value
+     return self._solidPhase.GetValue('mass')
  def __GetFuelMassUnit(self): # mass of the solid phase (gas phase in plenum not added)
      return self._solidPhase.GetQuantity('mass').unit
 
  def __GetFuelRadioactivity(self): # radioactivity of the solid phase
-     return self._solidPhase.GetQuantity('radioactivity').value
+     return self._solidPhase.GetValue('radioactivity')
  def __GetGasRadioactivity(self): # radioactivity of the gas phase
-     return self._gasPhase.GetQuantity('radioactivity').value
+     return self._gasPhase.GetValue('radioactivity')
 
  def __GetRadioactivity(self): # radioactivity of the fuel bundle
-     return self._solidPhase.GetQuantity('radioactivity').value + \
-            self._gasPhase.GetQuantity('radioactivity').value 
+     return self._solidPhase.GetValue('radioactivity') + \
+            self._gasPhase.GetValue('radioactivity')
 
  def __GetGammaPwr(self): # gamma pwr of the fuel bundle
-     return self._solidPhase.GetQuantity('gamma').value + \
-            self._gasPhase.GetQuantity('gamma').value 
+     return self._solidPhase.GetValue('gamma') + \
+            self._gasPhase.GetValue('gamma') 
 
  def __GetHeatPwr(self): # heat pwr of the fuel bundle
-     return self._solidPhase.GetQuantity('heat').value + \
-            self._gasPhase.GetQuantity('heat').value 
+     return self._solidPhase.GetValue('heat') + \
+            self._gasPhase.GetValue('heat') 
 
  def __GetGasMass(self): # gas plenum mass
-     return self._gasPhase.GetQuantity('mass').value
+     return self._gasPhase.GetValue('mass')
 
 #*******************************************************************************
 # Printing of data members

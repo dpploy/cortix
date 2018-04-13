@@ -54,6 +54,10 @@ from ._reorderformula  import _ReorderFormula
 #*******************************************************************************
 class Specie():
 
+#todo: phase should not be here; concentrations should not be here
+#      only molar quantities should be here
+#      see the Phase container
+
  def __init__( self, 
                name        = 'null',
                formulaName = 'null',
@@ -159,7 +163,7 @@ class Specie():
      self._molarGammaPwrUnit = v
  molarGammaPwrUnit = property(GetMolarGammaPwrUnit,SetMolarGammaPwrUnit,None,None)
  
- # Deprecated 
+ # Deprecated; see new interface below as GetFormula
  def GetAtoms(self):
      return self._atoms       
  def SetAtoms(self, atoms):

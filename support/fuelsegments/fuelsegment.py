@@ -19,6 +19,9 @@ from ._getattribute import _GetAttribute
 #*******************************************************************************
 class FuelSegment():
 
+#Todo: Species should not be here. Need to replace by Phase instead.
+#      Chopper will be affected
+
  def __init__( self, 
                geometry = pandas.Series(),
                species  = list()
