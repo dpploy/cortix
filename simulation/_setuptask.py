@@ -163,37 +163,37 @@ def setup_task(self, task_name):
                     # "from" is who makes the "call", hence the user
                     from_module_slot_comm_file = from_module_slot_work_dir + 'cortix-comm.xml'
 
-                if not os.path.isdir(from_module_slot_work_dir):
-                    os.system('mkdir -p '+ from_module_slot_work_dir)
+                    if not os.path.isdir(from_module_slot_work_dir):
+                        os.system('mkdir -p '+ from_module_slot_work_dir)
 
-                if not os.path.isfile(from_module_slot_comm_file):
-                    fout = open(from_module_slot_comm_file, 'w')
-                    fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-                    fout.write('<!-- Written by Simulation::_Setup() -->\n')
-                    fout.write('<cortixComm>\n')
+                    if not os.path.isfile(from_module_slot_comm_file):
+                        fout = open(from_module_slot_comm_file, 'w')
+                        fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+                        fout.write('<!-- Written by Simulation::_Setup() -->\n')
+                        fout.write('<cortixComm>\n')
 
-                fout = open(from_module_slot_comm_file, 'a')
+                    fout = open(from_module_slot_comm_file, 'a')
 
-                # this is the cortix info for modules using data
-                assert from_module.get_port_type(from_port) == 'use', 'from_port must be use type.'
+                    # this is the cortix info for modules using data
+                    assert from_module.get_port_type(from_port) == 'use', 'from_port must be use type.'
 
-            to_port_mode = to_module.get_port_mode(to_port)
-            if to_port_mode.split('.')[0] == 'file':
-                ext = to_port_mode.split('.')[1]
-                log_str = '<port name="' + from_port + '" type="use" file="' + \
-                          to_module_slot_work_dir + to_port +'.' + ext + '"/>\n'
-            elif to_port_mode == 'directory':
-                log_str = '<port name="' + from_port + '" type="use" directory="' + \
-                          to_module_slot_work_dir + to_port + '"/>\n'
-            else:
-                assert False, 'invalid port mode. fatal.'
+                    to_port_mode = to_module.get_port_mode(to_port)
+                    if to_port_mode.split('.')[0] == 'file':
+                        ext = to_port_mode.split('.')[1]
+                        log_str = '<port name="' + from_port + '" type="use" file="' + \
+                                  to_module_slot_work_dir + to_port +'.' + ext + '"/>\n'
+                    elif to_port_mode == 'directory':
+                        log_str = '<port name="' + from_port + '" type="use" directory="' + \
+                                  to_module_slot_work_dir + to_port + '"/>\n'
+                    else:
+                        assert False, 'invalid port mode. fatal.'
 
-            fout.write(log_str)
-            fout.close()
+                    fout.write(log_str)
+                    fout.close()
 
-            debug_str = "_Setup():: comm module: " + from_module_slot + '; network: '\
-                        + task_name + ' ' + log_str
-            self.log.debug(debug_str)
+                    debug_str = "_Setup():: comm module: " + from_module_slot + '; network: '\
+                                + task_name + ' ' + log_str
+                    self.log.debug(debug_str)
 
             # register the cortix-comm file for the network
             net.set_runtime_cortix_comm_file(from_module_slot, from_module_slot_comm_file)
