@@ -13,7 +13,7 @@ import time
 import logging
 from xml.etree.cElementTree import ElementTree
 from cortix.utils.configtree import ConfigTree
-from cortix.main.set_logger_level import set_logger_level
+from cortix.utils.set_logger_level import set_logger_level
 #*********************************************************************************
 
 #========================BEGIN TASK CLASS DEFINITION==========================================

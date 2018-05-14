@@ -14,7 +14,7 @@ Tue Dec 10 11:21:30 EDT 2013
 #*********************************************************************************
 import os
 from cortix.utils.configtree import ConfigTree
-from cortix.task._task import Task
+from cortix.task import Task
 #*********************************************************************************
 
 

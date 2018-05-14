@@ -15,8 +15,8 @@ Tue Dec 10 11:21:30 EDT 2013
 import os
 import logging
 from cortix.utils.configtree import ConfigTree
-from cortix.simulation._simulation import Simulation
-from cortix.main.set_logger_level import set_logger_level
+from cortix.simulation import Simulation
+from cortix.utils.set_logger_level import set_logger_level
 #*********************************************************************************
 
 

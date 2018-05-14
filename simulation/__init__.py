@@ -12,16 +12,16 @@ Cortix: a program for system-level modules
 Tue Dec 10 11:21:30 EDT 2013
 """
 
-#*********************************************************************************
+# ********************************************************************************* #
 import os
 import logging
 from cortix.utils.configtree import ConfigTree
-from cortix.application._application import Application
+from cortix.application import Application
 from cortix.simulation._setuptask import setup_task
-from cortix.main.set_logger_level import set_logger_level
-#*********************************************************************************
+from cortix.utils.set_logger_level import set_logger_level
+# ********************************************************************************* #
 
-#========================BEGIN SIMULATION CLASS DEFINITION=======================
+# ========================BEGIN SIMULATION CLASS DEFINITION======================= #
 
 class Simulation:
 
