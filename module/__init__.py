@@ -13,6 +13,8 @@ Tue Dec 10 11:21:30 EDT 2013
 
 #*********************************************************************************
 import os
+from mpi4py import MPI
+from mpi4py.futures import MPIPoolExecutor
 from cortix.utils.configtree import ConfigTree
 from cortix.launcher import Launcher
 #*********************************************************************************
@@ -181,7 +183,7 @@ class Module:
 
     def execute(self, slot_id, runtime_cortix_param_file, runtime_cortix_comm_file):
         """
-        Spawns a worker thread to execute the module.
+        Spawns a worker process to execute the module.
         """
         module_input = self.input_file_path + self.input_file_name
         param = runtime_cortix_param_file
@@ -213,7 +215,13 @@ class Module:
                                  mod_exec_name,
                                  mod_work_dir,
                                  param, comm, status)
-        worker_thread.start()
+
+        # Launch an MPI process
+        print("Spawning a process...")
+        executor = MPIPoolExecutor(max_workers=1)
+        future = executor.submit(worker_thread.start())
+        print("Finished spawning process...")
+        
         return runtime_module_status_file
 
 #=================================END MODULE CLASS DEFINITION==========================

@@ -16,6 +16,8 @@ import os
 import logging
 import time
 import datetime
+from mpi4py import MPI
+from mpi4py.futures import MPIPoolExecutor
 from threading import Thread
 import importlib
 import xml.etree.ElementTree as ElementTree
@@ -85,7 +87,7 @@ class Launcher(Thread):
 
         # Spawn a thread for the launcher
         super(Launcher, self).__init__()
-
+        
     def run(self):
         """
         Function used to timestep through the modules.
