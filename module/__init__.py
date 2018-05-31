@@ -209,7 +209,7 @@ class Module:
         mod_exec_name = self.executable_path + self.executable_name
 
         # run module on its own thread using file IO communication
-        worker_thread = Launcher(mod_lib_name, mod_name,
+        launch = Launcher(mod_lib_name, mod_name,
                                  slot_id,
                                  module_input,
                                  mod_exec_name,
@@ -219,7 +219,7 @@ class Module:
         # Launch an MPI process
         print("Spawning a process...")
         executor = MPIPoolExecutor(max_workers=1)
-        future = executor.submit(worker_thread.start())
+        future = executor.submit(launch.run())
         print("Finished spawning process...")
         
         return runtime_module_status_file

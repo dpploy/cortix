@@ -26,7 +26,7 @@ import xml.etree.ElementTree as ElementTree
 
 #========================BEGIN LAUNCHER CLASS DEFINITION=========================
 
-class Launcher(Thread):
+class Launcher():
     """
     The Launcher class handles the main funcitonality of
     stepping through the simulation, and monitoring
@@ -85,9 +85,6 @@ class Launcher(Thread):
         self.py_module = importlib.import_module(lib_module_driver)
         log.info('imported pyModule: %s', str(self.py_module))
 
-        # Spawn a thread for the launcher
-        super(Launcher, self).__init__()
-        
     def run(self):
         """
         Function used to timestep through the modules.
