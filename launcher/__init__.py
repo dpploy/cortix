@@ -220,16 +220,20 @@ class Launcher():
         constructor to output status of the
         current run.
         """
+        comm = MPI.COMM_WORLD
+        rank = comm.Get_rank()
+        size = comm.Get_size()
+        amode = MPI.MODE_WRONLY|MPI.MODE_CREATE
         status = status.strip()
         assert status == 'running' or status == 'finished', 'status invalid.'
-        fout = open(self.runtime_status_full_path, 'w')
-        fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-        fout.write('<!-- Written by _launcher.py -->\n')
+        fout = MPI.File.Open(comm, self.runtime_status_full_path, amode)
+        fout.Write(b'<?xml version="1.0" encoding="UTF-8"?>\n')
+        fout.Write(b'<!-- Written by _launcher.py -->\n')
         today = datetime.datetime.today()
-        fout.write('<!-- ' + str(today) + ' -->\n')
-        fout.write('<runtime>\n')
-        fout.write('<status>' + status + '</status>\n')
-        fout.write('</runtime>\n')
-        fout.close()
+        fout.Write("".join('<!-- ' + str(today) + ' -->\n').encode())
+        fout.Write(b'<runtime>\n')
+        fout.Write("".join('<status>' + status + '</status>\n').encode())
+        fout.Write(b'</runtime>\n')
+        fout.Close()
 
 #===============================END LAUNCHER CLASS DEFINITION==============================
