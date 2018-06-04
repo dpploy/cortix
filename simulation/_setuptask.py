@@ -13,6 +13,7 @@ Tue Dec 10 11:21:30 EDT 2013
 
 #*********************************************************************************
 import os
+from mpi4py import MPI
 from cortix.utils.configtree import ConfigTree
 from cortix.task import Task
 #*********************************************************************************
@@ -28,6 +29,13 @@ def setup_task(self, task_name):
     self.log.debug("start _SetupTask()")
     task = None
 
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+
+    cmode = MPI.MODE_WRONLY|MPI.MODE_CREATE
+    amode = MPI.MODE_WRONLY|MPI.MODE_APPEND
+    
     for task_node in self.config_node.get_all_sub_nodes('task'):
         if task_node.get('name') != task_name:
             continue
@@ -52,21 +60,22 @@ def setup_task(self, task_name):
 
     # set the parameters for the task in the cortix param file
     task_file = task_work_dir + 'cortix-param.xml'
-    fout = open(task_file, 'w')
-    fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-    fout.write('<!-- Written by Simulation::_Setup() -->\n')
-    fout.write('<cortixParam>\n')
+
+    fout = MPI.File.Open(comm, task_file, cmode)
+    fout.Write(b'<?xml version="1.0" encoding="UTF-8"?>\n')
+    fout.Write(b'<!-- Written by Simulation::_Setup() -->\n')
+    fout.Write(b'<cortixParam>\n')
     start_time = task.get_start_time()
     start_time_unit = task.get_start_time_unit()
-    fout.write('<startTime unit="'+start_time_unit+'"'+'>'+str(start_time)+'</startTime>\n')
+    fout.Write("".join('<startTime unit="'+start_time_unit+'"'+'>'+str(start_time)+'</startTime>\n').encode())
     evolve_time = task.get_evolve_time()
     evolve_time_unit = task.get_evolve_time_unit()
-    fout.write('<evolveTime unit="'+evolve_time_unit+'"'+'>'+str(evolve_time)+'</evolveTime>\n')
+    fout.Write("".join('<evolveTime unit="'+evolve_time_unit+'"'+'>'+str(evolve_time)+'</evolveTime>\n').encode())
     time_step = task.get_time_step()
     time_step_unit = task.get_time_step_unit()
-    fout.write('<timeStep unit="'+time_step_unit+'"'+'>'+str(time_step)+'</timeStep>\n')
-    fout.write('</cortixParam>')
-    fout.close()
+    fout.Write("".join('<timeStep unit="'+time_step_unit+'"'+'>'+str(time_step)+'</timeStep>\n').encode())
+    fout.Write(b'</cortixParam>')
+    fout.Close()
     task.set_runtime_cortix_param_file(task_file)
 
     # using the tasks and network create the runtime module directories and comm files
@@ -109,13 +118,13 @@ def setup_task(self, task_name):
                     os.system("mkdir -p " + to_module_slot_work_dir)
 
                 if not os.path.isfile(to_module_slot_comm_file):
-                    fout = open(to_module_slot_comm_file, 'w')
-                    fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-                    fout.write('<!-- Written by Simulation::_Setup() -->\n')
-                    fout.write('<cortixComm>\n')
+                    fout = MPI.File.Open(comm, to_module_slot_comm_file, cmode)
+                    fout.Write(b'<?xml version="1.0" encoding="UTF-8"?>\n')
+                    fout.Write(b'<!-- Written by Simulation::_Setup() -->\n')
+                    fout.Write(b'<cortixComm>\n')
 
                 if to_port not in to_module_to_port_visited[to_module_slot]:
-                    fout = open(to_module_slot_comm_file, 'a')
+                    fout = MPI.File.Open(comm, to_module_slot_comm_file, amode)
                     # this is the cortix info for modules providing data
                     to_port_mode = to_module.get_port_mode(to_port)
                     if to_port_mode.split('.')[0] == 'file':
@@ -128,8 +137,8 @@ def setup_task(self, task_name):
                     else:
                         assert False, 'invalid port mode. fatal.'
 
-                    fout.write(log_str)
-                    fout.close()
+                    fout.Write(log_str.encode())
+                    fout.Close()
                     to_module_to_port_visited[to_module_slot].append(to_port)
 
                 debug_str = '_Setup():: comm module: ' + to_module_slot + '; network: '\
@@ -167,12 +176,13 @@ def setup_task(self, task_name):
                         os.system('mkdir -p '+ from_module_slot_work_dir)
 
                     if not os.path.isfile(from_module_slot_comm_file):
-                        fout = open(from_module_slot_comm_file, 'w')
-                        fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-                        fout.write('<!-- Written by Simulation::_Setup() -->\n')
-                        fout.write('<cortixComm>\n')
+                        fout = MPI.File.Open(comm, from_module_slot_comm_file, cmode)
+                        fout.Write(b'<?xml version="1.0" encoding="UTF-8"?>\n')
+                        fout.Write(b'<!-- Written by Simulation::_Setup() -->\n')
+                        fout.Write(b'<cortixComm>\n')
+                        fout.Close()
 
-                    fout = open(from_module_slot_comm_file, 'a')
+                    fout = MPI.File.Open(comm, from_module_slot_comm_file, amode)
 
                     # this is the cortix info for modules using data
                     assert from_module.get_port_type(from_port) == 'use', 'from_port must be use type.'
@@ -188,8 +198,8 @@ def setup_task(self, task_name):
                     else:
                         assert False, 'invalid port mode. fatal.'
 
-                    fout.write(log_str)
-                    fout.close()
+                    fout.Write(log_str.encode())
+                    fout.Close()
 
                     debug_str = "_Setup():: comm module: " + from_module_slot + '; network: '\
                                 + task_name + ' ' + log_str
@@ -205,9 +215,9 @@ def setup_task(self, task_name):
             comm_file = net.get_runtime_cortix_comm_file(slot_name)
             if comm_file == 'null-runtimeCortixCommFile':
                 continue
-            fout = open(comm_file, 'a')
-            fout.write('</cortixComm>')
-            fout.close()
+            fout = MPI.File.Open(comm, comm_file, amode)
+            fout.Write(b'</cortixComm>')
+            fout.Close()
 
     self.log.debug('end _Setup()')
 
