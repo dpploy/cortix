@@ -18,7 +18,6 @@ import time
 import datetime
 from mpi4py import MPI
 from mpi4py.futures import MPIPoolExecutor
-from threading import Thread
 import importlib
 import xml.etree.ElementTree as ElementTree
 #*********************************************************************************

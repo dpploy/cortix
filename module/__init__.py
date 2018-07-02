@@ -216,12 +216,8 @@ class Module:
                                  mod_work_dir,
                                  param, comm, status)
 
-        # Launch an MPI process
-        print("Spawning a process...")
+        # Launch an MPI process 
         executor = MPIPoolExecutor(max_workers=1)
         future = executor.submit(launch.run())
-        print("Finished spawning process...")
-        
         return runtime_module_status_file
-
 #=================================END MODULE CLASS DEFINITION==========================
