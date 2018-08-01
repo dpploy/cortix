@@ -1,28 +1,33 @@
-**********************************************************************************
-Valmor F. de Almeida; dealmeidav@ornl.gov; vfda
-**********************************************************************************
+<h1> Cortix </h1>
+<p align="center"><img src="graph.png"></p>
 
-Cortix is a program (in the form of a library) for system-level modules coupling,
-execution, and analysis.
+<h2> What is Cortix? </h2>
+<ul>
+ <li>Cortix is a Python library for system-level module coupling, execution, and analysis.</li>
+ <li>Cortix takes as input a collection of computational modules and provides an environment
+  for the coupling of those modules into a single simulation.</li> 
+ <li>Cortix handles...
+   <ul>
+    <li>Communication between the modules</li>
+    <li>Numerical integration</li>
+    <li>Data visualization</li>
+   </ul>
+  </li>
+</ul> 
 
 The primary concepts in Cortix are the creation of an Application and a Simulation
 involving Tasks.
 
-**********************************************************************************
-Thu Aug 13 16:28:31 EDT 2015
+<h2> Dependencies </h2>
+<ul>
+ <li> Python >= 3.3 </li>
+ <li> mpi4py >= 3.0.0 </li>
+ <li> networkx >= 1.9.1 </li>
+ <li> matplotlib >= 1.4.3 </li>
+ <li> numpy >= 1.9.0 </li>
+</ul>
 
-Dependencies:
-
- Core:
- python   >= 3.3
- networkx >= 1.9.1
-
- Viz:
- matplotlib >= 1.4.3
- numpy >= 1.9.0
-
-**********************************************************************************
-Sun Dec 13 20:18:19 EST 2015
+<h2>Usage</h2>
 
 Cortix is a library and it is best used when copied to its own directory, say
 
@@ -50,17 +55,8 @@ To capture the Cortix screen output of log messages and other messages, do
 
 under Linux (inspect the output file screen.out when the run is finished)
 
-**********************************************************************************
-Thu Jul 30 16:00:19 EDT 2015; vfda
-
-This repository was created as follows:
-
- cd cortix
- git remote add origin git@code.ornl.gov:fvu/cortix.git
- git push -u origin master
-
-The git remote repository is at the ORNL external gitlab:
-
-git remote add origin git@code.ornl.gov:fvu/cortix.git
-
-
+<h2>Maintainers</h2>
+<ul>
+ <li> Valmor F. de Almeida: Valmor_deAlmeida@uml.edu </li>
+ <li> Taha M. Azzaoui: tazzaoui@cs.uml.edu </li>
+</ul>

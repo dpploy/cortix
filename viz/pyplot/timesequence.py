@@ -62,7 +62,7 @@ class TimeSequence():
 # Accessors (note: all accessors of member data can potentially change the
 # python object referenced to). See NB below.
 
- def GetName(self):
+ def get_name(self):
   root = self.__tree.getroot()
   return root.get('name').strip()
 
