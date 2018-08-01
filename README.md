@@ -1,5 +1,5 @@
 <h1> Cortix </h1>
-<p align="center"><img src="cortix-cover.png"></p>
+<p align="center"><img src="graph.png"></p>
 
 <h2> What is Cortix? </h2>
 <ul>
