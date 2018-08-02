@@ -29,20 +29,33 @@ involving Tasks.
 
 <h2>Usage</h2>
 
-Cortix is a library and it is best used when copied to its own directory, say
+Cortix is a library and it is best used when copied to its own directory, say inside
+a project directory of your choice, e.g.
 
-  /somepath/cortix/
+  /somepath/myproject/cortix/
 
-Then add /somepath to $PYTHONPATH
+or anywhere else in your system, e.g.
 
-A driver is needed to run Cortix. 
-There is an example in the repository (driver-test-1.py).
+  /somepath/cortix
+
+Then add either /somepath/myproject to $PYTHONPATH or /somepath to $PYTHONPATH .
+
+Cortix has an examples directory (examples/) which contains examples for input
+files and a driver file. At the moment these input files are past files used in the 
+development of Cortix.
+
+A driver file is needed to run Cortix. 
+There is an example in the repository examples directory (driver-cortix.py).
 This driver can be copied to say:
 
-   /somesimulationpath/driver-test.py
+   /somepath/driver-test.py
+
+or 
+
+   /somepath/myproject/driver-test.py
 
 An input configuration (xml) file is also needed. An example is provided in 
-the repository (cortix-config.xml).
+the repository examples/input directory (cortix-config.xml).
 
 Then to run Cortix, enter the directory of the driver and run the driver.
 
