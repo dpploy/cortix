@@ -20,11 +20,11 @@ involving Tasks.
 
 <h2> Dependencies </h2>
 <ul>
- <li> Python >= 3.3 </li>
- <li> mpi4py >= 3.0.0 </li>
- <li> networkx >= 1.9.1 </li>
- <li> matplotlib >= 1.4.3 </li>
- <li> numpy >= 1.9.0 </li>
+ <li> Python >= 3.6.5 </li>
+ <li> mpi4py >= 3.0.0 (use openmpi >= 3.1.1) </li>
+ <li> networkx >= 1.11 </li>
+ <li> matplotlib >= 2.2.2 </li>
+ <li> numpy >= 1.10.4 </li>
 </ul>
 
 <h2>Usage</h2>
