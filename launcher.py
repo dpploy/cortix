@@ -87,7 +87,7 @@ class Launcher():
     def run(self):
         """
         Function used to timestep through the modules.
-        Runs the simulation from start to end, and montiors
+        Runs the simulation from start to end, and moinitors
         its progress at each time step.
         """
 
