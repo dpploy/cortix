@@ -15,10 +15,10 @@ Tue Dec 10 11:21:30 EDT 2013
 import os
 import logging
 from mpi4py import MPI
-from cortix.task import Task
-from cortix.simulation import Simulation
-from cortix.utils.configtree import ConfigTree
-from cortix.utils.set_logger_level import set_logger_level
+from cortix.src.task import Task
+from cortix.src.simulation import Simulation
+from cortix.src.utils.configtree import ConfigTree
+from cortix.src.utils.set_logger_level import set_logger_level
 #*********************************************************************************
 
 

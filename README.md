@@ -73,3 +73,8 @@ under Linux (inspect the output file screen.out when the run is finished)
  <li> Valmor F. de Almeida: Valmor_deAlmeida@uml.edu </li>
  <li> Taha M. Azzaoui: tazzaoui@cs.uml.edu </li>
 </ul>
+
+<h2>Documentation</h2>
+<ul>
+ <li> Gilberto E. Alas: gilbert_alas@student.uml.edu </li>
+</ul>

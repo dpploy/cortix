@@ -15,8 +15,8 @@ Tue Dec 10 11:21:30 EDT 2013
 import os
 from mpi4py import MPI
 from mpi4py.futures import MPIPoolExecutor
-from cortix.utils.configtree import ConfigTree
-from cortix.launcher import Launcher
+from cortix.src.utils.configtree import ConfigTree
+from cortix.src.launcher import Launcher
 #*********************************************************************************
 
 #=================================BEGIN MODULE CLASS DEFINITION==========================

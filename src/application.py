@@ -16,10 +16,10 @@ Tue Dec 10 11:21:30 EDT 2013
 import os
 import sys
 import logging
-from cortix.utils.configtree import ConfigTree
-from cortix.utils.set_logger_level import set_logger_level
-from cortix.module import Module
-from cortix.network import Network
+from cortix.src.utils.configtree import ConfigTree
+from cortix.src.utils.set_logger_level import set_logger_level
+from cortix.src.module import Module
+from cortix.src.network import Network
 #*********************************************************************************
 
 #========================BEGIN APPLICATION CLASS DEFINITION=========================
