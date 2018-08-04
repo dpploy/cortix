@@ -1,1 +1,1 @@
-from .main import Cortix
+from .src.main import Cortix

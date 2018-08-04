@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
-Cortix: a program for system-level modules coupling, execution, and analysis.
-Cortix is a library and it is used by means of a driver file. 
-This file is a simple example of a driver. 
-Many Cortix objects can be ran simultaneously; a single object
+Cortix: a program for system-level modules
+        coupling, execution, and analysis.
+Cortix is a library and it is used by means of a driver. This file is a simple example
+of a driver. Many Cortix objects can be ran simultaneously; a single object
 may be sufficient since many simulation/tasks can be ran via one object.
-As Cortix evolves, additional complexity may be added to this driver and/or other
+As Cortix evolves additional complexity may be added to this driver and/or other
 driver examples can be created.
 Cortix is written in python language and it is imported as an namespace package
 as of python 3.3 or later.
@@ -15,10 +15,10 @@ Tue Dec 10 11:21:30 EDT 2013
 #*********************************************************************************
 import os
 from mpi4py import MPI
-from cortix import Cortix
+from cortix import Cortix 
 #*********************************************************************************
 
-def Main():
+def main():
  pwd                   = os.path.dirname(__file__)
  full_path_config_file = os.path.join(pwd, 'input/cortix-config.xml')
 
@@ -64,4 +64,4 @@ def Main():
 #*********************************************************************************
 # Usage: -> python cortix-main.py or ./cortix-main.py
 if __name__ == "__main__":
- Main()
+ main()

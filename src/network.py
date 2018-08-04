@@ -13,7 +13,7 @@ Tue Dec 10 11:21:30 EDT 2013
 
 #*********************************************************************************
 import networkx as nx
-from cortix.utils.configtree import ConfigTree
+from cortix.src.utils.configtree import ConfigTree
 #*********************************************************************************
 
 #========================BEGIN NETWORK CLASS DEFINITION=========================
