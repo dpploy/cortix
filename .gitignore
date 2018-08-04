@@ -19,10 +19,9 @@ notes
 *.html
 *.csv
 mytags
+docs
 createtags
 *.plt
-driver-cortix-dev.py
-input/cortix-config.xml
 support/actor
 video*
 record*
