@@ -113,7 +113,7 @@ class Simulation:
 #---------------------- end def __del__():----------------------------------------
 
 #*********************************************************************************
-# Private helper functions
+# Private helper functions (internal use: __)
 
     def __setup_task(self, task_name):
         """
