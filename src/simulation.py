@@ -7,7 +7,6 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 Tue Dec 10 11:21:30 EDT 2013
 """
-
 #*********************************************************************************
 import os
 import logging
@@ -108,6 +107,7 @@ class Simulation:
 #---------------------- end def execute():----------------------------------------
 
     def __del__(self):
+
         self.log.info("destroyed simulation: %s", self.name)
 #---------------------- end def __del__():----------------------------------------
 
@@ -119,12 +119,13 @@ class Simulation:
         This is a helper function used by the execute() method.
         It sets up the set of tasks defined in the Cortix config for a simulation.
         """
+
         self.log.debug("start _setup_task()")
         task = None
 
         comm = MPI.COMM_WORLD
-#vfda: needed?        rank = comm.Get_rank()
-#vfda: needed?        size = comm.Get_size()
+        # rank = comm.Get_rank()
+        # size = comm.Get_size()
 
         cmode = MPI.MODE_WRONLY|MPI.MODE_CREATE
         amode = MPI.MODE_WRONLY|MPI.MODE_APPEND

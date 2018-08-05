@@ -16,18 +16,19 @@ from cortix.src.utils.configtree import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
 #*********************************************************************************
 
-#========================BEGIN TASK CLASS DEFINITION==========================================
-
 class Task:
     """
     This class defines the implementation of a Task in the Cortix Project.
     A Task is piece of work done by a simulation.
     """
+
     def __init__(self, parent_work_dir=None, task_config_node=ConfigTree()):
+
         assert isinstance(parent_work_dir, str), '-> parent_work_dir invalid.'
 
         # Inherit a configuration tree
-        assert isinstance(task_config_node, ConfigTree), '-> task_config_node not a ConfigTree.'
+        assert isinstance(task_config_node, ConfigTree), \
+        '-> task_config_node not a ConfigTree.'
         self.config_node = task_config_node
 
         # Read the simulation name
@@ -57,7 +58,8 @@ class Task:
             if child.tag == 'fileHandler':
                 # file handler
                 file_handle_level = child.get('level').strip()
-                file_handle = set_logger_level(file_handle, logger_name, file_handle_level)
+                file_handle = set_logger_level(file_handle, logger_name, \
+                                               file_handle_level)
             if child.tag == 'consoleHandler':
                 # console handler
                 console_handle_level = child.get('level').strip()
@@ -108,7 +110,7 @@ class Task:
         if self.start_time_unit == 'null-startTimeUnit':
             self.start_time_unit = self.evolve_time_unit
         assert self.evolve_time_unit != 'null-evolveTimeUnit', \
-                                        'invalid time unit = %r' %(self.evolve_time_unit)
+        'invalid time unit = %r' %(self.evolve_time_unit)
 
         self.log.debug('startTime value = %s', str(self.start_time))
         self.log.debug('startTime unit  = %s', str(self.start_time_unit))
@@ -116,6 +118,7 @@ class Task:
         self.log.debug('evolveTime unit  = %s', str(self.evolve_time_unit))
         self.log.debug('end _Setup()')
         self.log.info('created task: %s', self.name)
+#---------------------- end def __init__():---------------------------------------
 
     def execute(self, application):
         """
@@ -138,98 +141,132 @@ class Task:
         status = 'running'
         while status == 'running':
             time.sleep(10)  # hard coded; fix me.
-            (status, slot_names) = get_runtime_status(runtime_status_files)
-            self.log.info('runtime status: %s; module slots running: %s', status, str(slot_names))
+            (status, slot_names) = self.__get_runtime_status(runtime_status_files)
+            self.log.info('runtime status: %s; module slots running: %s', status, \
+                          str(slot_names))
+#---------------------- end def execute():---------------------------------------
 
     def get_name(self):
         """
         Returns the name of the task.
         """
+
         return self.name
+#---------------------- end def get_name():---------------------------------------
 
     def get_work_dir(self):
         """
         Returns the working directory
         of the task specification.
         """
+
         return self.work_dir
+#---------------------- end def get_work_dir():-----------------------------------
 
     def get_start_time(self):
         """
         Returns the task's initial time
         """
+
         return self.start_time
+#---------------------- end def get_start_time():---------------------------------
 
     def get_start_time_unit(self):
         """
         Returns the unit of the task's initial time
         """
+
         return self.start_time_unit
+#---------------------- end def get_start_time_unit():----------------------------
 
     def get_evolve_time(self):
         """
         Returns the tasks's final time
         """
+
         return self.evolve_time
+#---------------------- end def get_evolve_time():--------------------------------
 
     def get_evolve_time_unit(self):
         """
         Returns the unit of the task's final time.
         """
+
         return self.evolve_time_unit
+#---------------------- end def get_evolve_time_unit():---------------------------
 
     def get_time_step(self):
         """
         Returns the magnitude of an incremental step
         in the task's time.
         """
+
         return self.time_step
+#---------------------- end def get_time_step():----------------------------------
 
     def get_time_step_unit(self):
         """
         Returns the unit of the tasks's time step
         """
+
         return self.time_step_unit
+#---------------------- end def get_time_step_unit():-----------------------------
 
     def set_runtime_cortix_param_file(self, full_path):
         """
         Sets the task config file to the specified file.
         """
+
         self.runtime_cortix_param_file = full_path
+#---------------------- end def set_runtime_cortix_param_file():------------------
 
     def get_runtime_cortix_param_file(self):
         """
         Returns the taks's config file.
         """
+
         return self.runtime_cortix_param_file
+#---------------------- end def get_runtime_cortix_param_file():------------------
 
     def __del__(self):
         self.log.info('destroyed task: %s', self.name)
+#---------------------- end def __del__():----------------------------------------
 
-#========================END TASK CLASS DEFINITION=============================================
+#*********************************************************************************
+# Private helper functions (internal use: __)
 
-def get_runtime_status(runtime_status_files):
-    """
-    Helper funcion for montioring the status of the task.
-    """
-    task_status = 'finished'
-    running_module_slots = list()
-    for (slot_name, status_file) in runtime_status_files.items():
-        if not os.path.isfile(status_file):
-            time.sleep(0.1)
-        assert os.path.isfile(status_file), 'runtime status file %r not found.' % status_file
-        tree = ElementTree()
-        tree.parse(status_file)
-        status_file_xml_root_node = tree.getroot()
-        node = status_file_xml_root_node.find('status')
-        status = node.text.strip()
-        if status == 'running':
-            task_status = 'running'
-            running_module_slots.append(slot_name)
-    return (task_status, running_module_slots)
+    def __get_runtime_status(self, runtime_status_files):
+        """
+        Helper funcion for montioring the status of the task.
+        """
+
+        task_status = 'finished'
+        running_module_slots = list()
+
+        for (slot_name, status_file) in runtime_status_files.items():
+            if not os.path.isfile(status_file):
+                time.sleep(0.1)
+
+            assert os.path.isfile(status_file), 'runtime status file %r not found.' \
+            % status_file
+
+            tree = ElementTree()
+            tree.parse(status_file)
+            status_file_xml_root_node = tree.getroot()
+            node = status_file_xml_root_node.find('status')
+
+            status = node.text.strip()
+
+            if status == 'running':
+                task_status = 'running'
+                running_module_slots.append(slot_name)
+
+        return (task_status, running_module_slots)
+#---------------------- end def __get_runtime_status():---------------------------
 
 
-# Unit testing. Usage: -> python application.py
+#====================== end class Task: ==========================================
+
+# Unit testing. Usage: -> python task.py
 if __name__ == "__main__":
     print('Unit testing for Task')
-

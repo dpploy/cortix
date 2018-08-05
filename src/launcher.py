@@ -213,6 +213,11 @@ class Launcher():
         self.log.info("__set_runtime_status(self, 'finished'")
 #---------------------- end def run():--------------------------------------------
 
+    def __del__(self):
+
+        self.log.info('destroyed launcher-%s', self.module_name+'_'+str(self.slot_id))
+#---------------------- end def __del__():---------------------------
+
 #*********************************************************************************
 # Private helper functions (internal use: __)
 
@@ -222,9 +227,10 @@ class Launcher():
         constructor to output status of the
         current run.
         """
+
         comm = MPI.COMM_WORLD
-#vfda: needed?        rank = comm.Get_rank()
-#vfda: needed?        size = comm.Get_size()
+        # rank = comm.Get_rank()
+        # size = comm.Get_size()
         amode = MPI.MODE_WRONLY|MPI.MODE_CREATE
 
         status = status.strip()
