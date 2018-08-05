@@ -1,14 +1,10 @@
 # -*- coding: utf-8 -*-
-
 """
+Application class for Cortix.
 
-This file contains the main Application class definition.
+Cortix: a program for system-level modules coupling, execution, and analysis.
 
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
-
-Cortix: a program for system-level modules
-        coupling, execution, and analysis.
-
 Tue Dec 10 11:21:30 EDT 2013
 """
 
@@ -22,16 +18,13 @@ from cortix.src.module import Module
 from cortix.src.network import Network
 #*********************************************************************************
 
-#========================BEGIN APPLICATION CLASS DEFINITION=========================
-
 class Application:
-
     """
-    An Application object is the composition of
-    Module objects and Network objects.
+    An Application object is the composition of Module objects and Network objects.
     """
 
     def __init__(self, app_work_dir=None, app_config_node=ConfigTree()):
+
         assert isinstance(app_work_dir, str), "-> app_work_dir is invalid"
 
         # Inherit a configuration tree
@@ -81,7 +74,8 @@ class Application:
             if child.tag == 'fileHandler':
                 # file handler
                 file_handler_level = child.get('level').strip()
-                file_handler = set_logger_level(file_handler, logger_name, file_handler_level)
+                file_handler = set_logger_level(file_handler, logger_name, \
+                                                file_handler_level)
             if child.tag == 'consoleHandler':
                 # console handler
                 console_handler_level = child.get('level').strip()
@@ -102,48 +96,59 @@ class Application:
         self.log.debug("logger console handler level: %s", console_handler_level)
 
         self.modules = list()
-        self.setup_modules()
+        self.__setup_modules()
 
         self.networks = list()
-        self.setup_networks()
+        self.__setup_networks()
 
         self.log.info("Created application: %s", self.name)
+#---------------------- end def __init__():---------------------------------------
 
-
-    def setup_modules(self):
-
+    def get_networks(self):
         """
-        A helper function used by the Application constructor
-        to setup the modules portion of the Application.
+        Returns a list of the
+        application's networks.
         """
+        return self.networks
+#---------------------- end def get_networks():-----------------------------------
 
-        self.log.debug("Start _SetupModules()")
-        for mode_node in self.config_node.get_all_sub_nodes('module'):
+    def get_network(self, name):
+        """
+        Returns a network with a given name.
+        None if the name doesn't exist.
+        """
+        for net in self.networks:
+            if net.get_name() == name:
+                return net
+        return None
+#---------------------- end def get_network():------------------------------------
 
-            mod_config_node = ConfigTree(mode_node)
-            assert mod_config_node.get_node_name() == mode_node.get('name'), 'check failed'
+    def get_modules(self):
+        """
+        Returns a list of the application's modules
+        """
+        return self.modules
+#---------------------- end def get_modules():------------------------------------
 
-            new_module = Module(self.work_dir, self.module_lib_name,
-                                self.module_lib_full_parent_dir, mod_config_node)
+    def get_module(self, name):
+        """
+        Returns a module with a given name.
+        None if the name doesn't exist.
+        """
+        for mod in self.modules:
+            if mod.get_name() == name:
+                return mod
+        return None
+#---------------------- end def get_module():-------------------------------------
 
-            # check for a duplicate module before appending a new one
-            for module in self.modules:
-                mod_name = module.get_name()
-                mod_lib_dir_name = module.get_library_parent_dir()
-                mod_lib_name = module.get_library_name()
+    def __del__(self):
+        self.log.info("destroyed application: %s", self.name)
+#---------------------- end def __del__():----------------------------------------
 
-                if new_module.get_name() == mod_name:
-                    if new_module.get_library_parent_dir() == mod_lib_dir_name:
-                        assert new_module.get_library_name != mod_lib_name, "duplicate module; ABORT."
+#*********************************************************************************
+# Private helper functions (internal use: __)
 
-            # add module to list
-            self.modules.append(new_module)
-            self.log.debug("appended module %s", mode_node.get('name'))
-
-        self.log.debug("end _SetupModules()")
-
-    def setup_networks(self):
-
+    def __setup_networks(self):
         """
         A helper function used by the Application constructor
         to setup the networks portion of the Application.
@@ -159,46 +164,43 @@ class Application:
             self.log.debug("appended network %s", net_node.get("name"))
 
         self.log.debug("end _SetupNetworks()")
+#---------------------- end def __setup_networks():-------------------------------
 
+    def __setup_modules(self):
+        """
+        A helper function used by the Application constructor
+        to setup the modules portion of the Application.
+        """
 
-    def get_networks(self):
-        """
-        Returns a list of the
-        application's networks.
-        """
-        return self.networks
+        self.log.debug("Start _SetupModules()")
+        for mode_node in self.config_node.get_all_sub_nodes('module'):
 
-    def get_network(self, name):
-        """
-        Returns a network with a given name.
-        None if the name doesn't exist.
-        """
-        for net in self.networks:
-            if net.get_name() == name:
-                return net
-        return None
+            mod_config_node = ConfigTree(mode_node)
+            assert mod_config_node.get_node_name() == mode_node.get('name'), \
+            'check failed'
 
-    def get_modules(self):
-        """
-        Returns a list of the application's modules
-        """
-        return self.modules
+            new_module = Module(self.work_dir, self.module_lib_name,
+                                self.module_lib_full_parent_dir, mod_config_node)
 
-    def get_module(self, name):
-        """
-        Returns a module with a given name.
-        None if the name doesn't exist.
-        """
-        for mod in self.modules:
-            if mod.get_name() == name:
-                return mod
-        return None
+            # check for a duplicate module before appending a new one
+            for module in self.modules:
+                mod_name = module.get_name()
+                mod_lib_dir_name = module.get_library_parent_dir()
+                mod_lib_name = module.get_library_name()
 
-    def __del__(self):
-        self.log.info("destroyed application: %s", self.name)
+                if new_module.get_name() == mod_name:
+                    if new_module.get_library_parent_dir() == mod_lib_dir_name:
+                        assert new_module.get_library_name != mod_lib_name, \
+                        "duplicate module; ABORT."
 
+            # add module to list
+            self.modules.append(new_module)
+            self.log.debug("appended module %s", mode_node.get('name'))
 
-#========================END APPLICATION CLASS DEFINITION===============================
+        self.log.debug("end _SetupModules()")
+#---------------------- end def __setup_modules():--------------------------------
+
+#====================== end class Application: ===================================
 
 #*********************************************************************************
 # Unit testing. Usage: -> python application.py

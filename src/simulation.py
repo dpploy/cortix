@@ -19,7 +19,6 @@ from cortix.src.utils.set_logger_level import set_logger_level
 #*********************************************************************************
 
 class Simulation:
-
     """
     Cortix Simulation element as defined in the Cortix config.
     """
