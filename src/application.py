@@ -108,6 +108,7 @@ class Application:
         Returns a list of the
         application's networks.
         """
+
         return self.networks
 #---------------------- end def get_networks():-----------------------------------
 
@@ -116,6 +117,7 @@ class Application:
         Returns a network with a given name.
         None if the name doesn't exist.
         """
+
         for net in self.networks:
             if net.get_name() == name:
                 return net
@@ -126,6 +128,7 @@ class Application:
         """
         Returns a list of the application's modules
         """
+
         return self.modules
 #---------------------- end def get_modules():------------------------------------
 
@@ -141,6 +144,7 @@ class Application:
 #---------------------- end def get_module():-------------------------------------
 
     def __del__(self):
+
         self.log.info("destroyed application: %s", self.name)
 #---------------------- end def __del__():----------------------------------------
 

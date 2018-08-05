@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
-
 """
-This File contains the main Cortix class definition.
+The Cortix class definition.
+
+
+Cortix: a program for system-level modules coupling, execution, and analysis.
 
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
-
-Cortix: a program for system-level modules
-        coupling, execution, and analysis.
-
 Tue Dec 10 11:21:30 EDT 2013
 """
-
 #*********************************************************************************
 import os
 import logging
@@ -21,11 +18,7 @@ from cortix.src.utils.configtree import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
 #*********************************************************************************
 
-
-#========================BEGIN CORTIX CLASS DEFINITION================================
-
 class Cortix():
-
     """
     The main Cortix class definition. This class encapsulates the
     concepts of a task, application, and module, providing the
@@ -33,6 +26,7 @@ class Cortix():
     """
 
     def __init__(self, name=None, config_file="cortix-config.xml"):
+
         assert name is not None, "must give Cortix object a name"
         assert isinstance(config_file, str), "-> configFile not a str."
         self.config_file = config_file
@@ -46,7 +40,8 @@ class Cortix():
 
         # check
         assert self.name == name,\
-        "Cortix object name %r conflicts with cortix-config.xml %r" % (self.name, name)
+        "Cortix object name %r conflicts with cortix-config.xml %r" \
+        % (self.name, name)
 
         # Read the work directory name
         node = self.config_tree.get_sub_node("workDir")
@@ -81,10 +76,12 @@ class Cortix():
         for child in node:
             if child.tag == "fileHandler":
                 file_handler_level = child.get("level").strip()
-                file_handler = set_logger_level(file_handler, logger_name, file_handler_level)
+                file_handler = set_logger_level(file_handler, logger_name, \
+                                                file_handler_level)
             if child.tag == "consoleHandler":
                 console_handler_level = child.get("level").strip()
-                console_handler = set_logger_level(console_handler, logger_name, console_handler_level)
+                console_handler = set_logger_level(console_handler, logger_name, \
+                                                   console_handler_level)
 
         # Formatter added to handlers
         formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -102,35 +99,44 @@ class Cortix():
 
         # Setup simulations (one or more as specified in the config file)
         self.simulations = list()
-        self.setup_simulations()
+        self.__setup_simulations()
 
         self.log.info("Created Cortix object %s", self.name)
+#---------------------- end def __init__():---------------------------------------
 
     def run_simulations(self, task_name=None):
         """
         This method runs every simulation
         defined by the Cortix object.
         """
+
         for sim in self.simulations:
             sim.execute(task_name)
+#---------------------- end def run_simulations():--------------------------------
 
-    def setup_simulations(self):
+#*********************************************************************************
+# Private helper functions (internal use: __)
+
+    def __setup_simulations(self):
         """
         This method is a helper function for the Cortix constructor
         whose purpose is to set up the simulations defined by the
         Cortix configuration.
         """
+
         for sim in self.config_tree.get_all_sub_nodes('simulation'):
             self.log.debug("SetupSimulations(): simulation name: %s", sim.get('name'))
             sim_config_tree = ConfigTree(sim)
             simulation = Simulation(self.work_dir, sim_config_tree)
             self.simulations.append(simulation)
+#---------------------- end def __setup_simulations():----------------------------
 
     def __del__(self):
+
         self.log.info("Destroyed Cortix object: %s", self.name)
+#---------------------- end def __del__():----------------------------------------
 
-#========================END CORTIX CLASS DEFINITION==================================
-
+#====================== end class Cortix: ========================================
 # Unit testing. Usage: -> python cortix.py
 if __name__ == "__main__":
     # TODO: THIS FAILS SINCE THERE DOES NOT EXIST A cortix-config.xml
