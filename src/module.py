@@ -1,16 +1,12 @@
 # -*- coding: utf-8 -*-
-
 """
-This file contains the Cortix Module class defintion.
+Cortix Module class defintion.
+
+Cortix: a program for system-level modules coupling, execution, and analysis.
 
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
-
-Cortix: a program for system-level modules
-        coupling, execution, and analysis.
-
 Tue Dec 10 11:21:30 EDT 2013
 """
-
 #*********************************************************************************
 import os
 from mpi4py import MPI
@@ -19,12 +15,12 @@ from cortix.src.utils.configtree import ConfigTree
 from cortix.src.launcher import Launcher
 #*********************************************************************************
 
-#=================================BEGIN MODULE CLASS DEFINITION==========================
 class Module:
     """
     This is the main class definition of the Cortix Module
     functionality.
     """
+
     def __init__(self, parent_work_dir=None, mod_lib_name=None, \
                  mod_lib_parent_dir=None, mod_config_node=ConfigTree()):
 
@@ -38,7 +34,8 @@ class Module:
         self.mod_name = self.config_node.get_node_name()
         self.mod_type = self.config_node.get_node_type()
 
-        # Specify module library with upstream information (override in _Setup() if needed)
+        # Specify module library with upstream information (override in _Setup() 
+        # if needed)
         self.mod_lib_parent_dir = mod_lib_parent_dir
         self.mod_lib_name = mod_lib_name
 
@@ -114,77 +111,96 @@ class Module:
                 assert len(tmp) == 4
                 store = (tmp['portName'], tmp['portType'], tmp['portMode'], \
                          tmp['portMultiplicity'])
-                self.ports.append(store) # (portName, portType, portMode, portMultiplicity)
+                self.ports.append(store) # (portName, portType, portMode, 
+                                         #  portMultiplicity)
                 tmp = None
                 store = None
+#---------------------- end def __init__():---------------------------------------
 
     def get_name(self):
         """
         Returns the module name
         """
+
         return self.mod_name
+#---------------------- end def get_name():---------------------------------------
 
     def get_library_name(self):
         """
         Returns the module's library name.
         """
+
         return self.mod_lib_name
+#---------------------- end def get_library_name():-------------------------------
 
     def get_library_parent_dir(self):
         """
         Returns the library's parent directory.
         """
+
         return self.mod_lib_parent_dir
+#---------------------- end def get_library_parent_dir():-------------------------
 
     def get_ports(self):
         """
         Returns a list of the module's ports.
         """
+
         return self.ports
+#---------------------- end def get_ports():--------------------------------------
 
     def get_port_type(self, port_name):
         """
         Retuns the port type specified by port_name
         """
+
         port_type = None
         for port in self.ports:
             if port[0] == port_name:
                 port_type = port[1]
         return port_type
+#---------------------- end def get_port_type():----------------------------------
 
     def get_port_mode(self, port_name):
         """
         Returns the port mode specified by port_name
         """
+
         port_mode = None
         for port in self.ports:
             if port[0] == port_name:
                 port_mode = port[2]
         return port_mode
+#---------------------- end def get_port_mode():----------------------------------
 
     def get_port_names(self):
         """
         Returns a list containing the name of all of the module's ports
         """
+
         port_names = list()
         for port in self.ports:
             port_names.append(port[0])
         return port_names
+#---------------------- end def get_port_names():---------------------------------
 
     def has_port_name(self, port_name):
         """
         Returns true iff a port with the name
         port_name is available in the module.
         """
+
         for port in self.ports:
             if port[0] == port_name:
                 return True
         return False
+#---------------------- end def has_port_name():----------------------------------
 
     def execute(self, slot_id, runtime_cortix_param_file, runtime_cortix_comm_file):
         """
         Spawns a worker process to execute the module.
         """
+
         module_input = self.input_file_path + self.input_file_name
         param = runtime_cortix_param_file
         comm = runtime_cortix_comm_file
@@ -210,14 +226,16 @@ class Module:
 
         # run module on its own thread using file IO communication
         launch = Launcher(mod_lib_name, mod_name,
-                                 slot_id,
-                                 module_input,
-                                 mod_exec_name,
-                                 mod_work_dir,
-                                 param, comm, status)
+                          slot_id,
+                          module_input,
+                          mod_exec_name,
+                          mod_work_dir,
+                          param, comm, status)
 
         # Launch an MPI process 
         executor = MPIPoolExecutor(max_workers=1)
         future = executor.submit(launch.run())
         return runtime_module_status_file
-#=================================END MODULE CLASS DEFINITION==========================
+#---------------------- end def execute():----------------------------------------
+
+#====================== end class Module: ========================================
