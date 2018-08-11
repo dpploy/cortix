@@ -9,7 +9,6 @@ Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
 import os
-from mpi4py import MPI
 from mpi4py.futures import MPIPoolExecutor
 from cortix.src.utils.configtree import ConfigTree
 from cortix.src.launcher import Launcher
@@ -17,8 +16,7 @@ from cortix.src.launcher import Launcher
 
 class Module:
     """
-    This is the main class definition of the Cortix Module
-    functionality.
+    The Module class encapsulates a computational module of some scientific domain.
     """
 
     def __init__(self, parent_work_dir=None, mod_lib_name=None, \
@@ -34,15 +32,15 @@ class Module:
         self.mod_name = self.config_node.get_node_name()
         self.mod_type = self.config_node.get_node_type()
 
-        # Specify module library with upstream information (override in _Setup() 
+        # Specify module library with upstream information (override in _Setup()
         # if needed)
         self.mod_lib_parent_dir = mod_lib_parent_dir
         self.mod_lib_name = mod_lib_name
 
-        self.executable_name = 'null-executableName'
-        self.executable_path = 'null-executablePath'
-        self.input_file_name = 'null-inputFileName'
-        self.input_file_path = 'null-inputFilePath'
+        self.executable_name = 'null-executable_name'
+        self.executable_path = 'null-executable_path'
+        self.input_file_name = 'null-input_file_name'
+        self.input_file_path = 'null-input_file_path'
 
         self.ports = list()  # list of (portName, portType, portMultiplicity)
 
@@ -52,18 +50,18 @@ class Module:
             text = text.strip()
 
             if self.mod_type != 'native':
-                if tag == 'executableName':
+                if tag == 'executable_name':
                     self.executable_name = text
 
-            if tag == 'executablePath':
+            if tag == 'executable_path':
                 if text[-1] != '/':
                     text += '/'
                 self.executable_path = text
 
-            if tag == 'inputFileName':
+            if tag == 'input_file_name':
                 self.input_file_name = text
 
-            if tag == 'inputFilePath':
+            if tag == 'input_file_path':
                 if text[-1] != '/':
                     text += '/'
                 self.input_file_path = text
@@ -76,8 +74,8 @@ class Module:
                 self.mod_lib_name = val
 
                 node = ConfigTree(elem)
-                sub_node = node.get_sub_node('parentDir')
-                assert sub_node is not None, 'missing parentDir.'
+                sub_node = node.get_sub_node('parent_dir')
+                assert sub_node is not None, 'missing parent_dir.'
 
                 self.mod_lib_parent_dir = sub_node.text.strip()
 
@@ -111,7 +109,7 @@ class Module:
                 assert len(tmp) == 4
                 store = (tmp['portName'], tmp['portType'], tmp['portMode'], \
                          tmp['portMultiplicity'])
-                self.ports.append(store) # (portName, portType, portMode, 
+                self.ports.append(store) # (portName, portType, portMode,
                                          #  portMultiplicity)
                 tmp = None
                 store = None
@@ -232,7 +230,7 @@ class Module:
                           mod_work_dir,
                           param, comm, status)
 
-        # Launch an MPI process 
+        # Launch an MPI process
         executor = MPIPoolExecutor(max_workers=1)
         future = executor.submit(launch.run())
         return runtime_module_status_file

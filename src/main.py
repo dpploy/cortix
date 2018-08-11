@@ -11,8 +11,6 @@ Tue Dec 10 11:21:30 EDT 2013
 #*********************************************************************************
 import os
 import logging
-from mpi4py import MPI
-from cortix.src.task import Task
 from cortix.src.simulation import Simulation
 from cortix.src.utils.configtree import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
@@ -44,7 +42,7 @@ class Cortix():
         % (self.name, name)
 
         # Read the work directory name
-        node = self.config_tree.get_sub_node("workDir")
+        node = self.config_tree.get_sub_node("work_dir")
         work_dir = node.text.strip()
         if work_dir[-1] != '/':
             work_dir += '/'
@@ -74,11 +72,11 @@ class Cortix():
         console_handler_level = None
 
         for child in node:
-            if child.tag == "fileHandler":
+            if child.tag == "file_handler":
                 file_handler_level = child.get("level").strip()
                 file_handler = set_logger_level(file_handler, logger_name, \
                                                 file_handler_level)
-            if child.tag == "consoleHandler":
+            if child.tag == "console_handler":
                 console_handler_level = child.get("level").strip()
                 console_handler = set_logger_level(console_handler, logger_name, \
                                                    console_handler_level)
@@ -137,8 +135,3 @@ class Cortix():
 #---------------------- end def __del__():----------------------------------------
 
 #====================== end class Cortix: ========================================
-# Unit testing. Usage: -> python cortix.py
-if __name__ == "__main__":
-    # TODO: THIS FAILS SINCE THERE DOES NOT EXIST A cortix-config.xml
-    print('Unit testing for Cortix')
-    Cortix("cortix-config.xml")

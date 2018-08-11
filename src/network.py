@@ -56,10 +56,10 @@ class Network:
                 for (key, val) in tmp.items():
                     if key == 'fromModuleSlot':
                         self.runtime_cortix_comm_file[val] = \
-                        'null-runtimeCortixCommFile'
+                        'null-runtime_cortix_comm_file'
                     if key == 'toModuleSlot':
                         self.runtime_cortix_comm_file[val] = \
-                        'null-runtimeCortixCommFile'
+                        'null-runtime_cortix_comm_file'
                 vtx1 = tmp['fromModuleSlot']
                 vtx2 = tmp['toModuleSlot']
                 self.nx_graph.add_edge(vtx1, vtx2,
@@ -93,13 +93,13 @@ class Network:
         return self.slot_names
 #---------------------- end def get_slot_names():---------------------------------
 
-    def set_runtime_cortix_comm_file(self, slot_name, full_path_filename):
+    def set_runtime_cortix_comm_file(self, slot_name, full_path_file_name):
         """
         Sets the runtime cortix communications file to the one specified
-        by full_path_filename
+        by full_path_file_name
         """
 
-        self.runtime_cortix_comm_file[slot_name] = full_path_filename
+        self.runtime_cortix_comm_file[slot_name] = full_path_file_name
 #---------------------- end def set_runtime_cortix_comm_file():-------------------
 
     def get_runtime_cortix_comm_file(self, slot_name):
