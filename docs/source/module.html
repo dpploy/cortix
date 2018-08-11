@@ -1,0 +1,154 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>module module &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-module">
+<span id="module-module"></span><h1>module module<a class="headerlink" href="#module-module" title="Permalink to this headline">¶</a></h1>
+<p>Cortix Module class defintion.</p>
+<p>Cortix: a program for system-level modules coupling, execution, and analysis.</p>
+<p>Valmor F. de Almeida <a class="reference external" href="mailto:dealmeidav&#37;&#52;&#48;ornl&#46;gov">dealmeidav<span>&#64;</span>ornl<span>&#46;</span>gov</a>; vfda
+Tue Dec 10 11:21:30 EDT 2013</p>
+<dl class="class">
+<dt id="module.Module">
+<em class="property">class </em><code class="descclassname">module.</code><code class="descname">Module</code><span class="sig-paren">(</span><em>parent_work_dir=None</em>, <em>mod_lib_name=None</em>, <em>mod_lib_parent_dir=None</em>, <em>mod_config_node=&lt;cortix.src.utils.configtree.ConfigTree object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>This is the main class definition of the Cortix Module
+functionality.</p>
+<dl class="method">
+<dt id="module.Module.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><em>slot_id</em>, <em>runtime_cortix_param_file</em>, <em>runtime_cortix_comm_file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spawns a worker process to execute the module.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="module.Module.get_library_name">
+<code class="descname">get_library_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_library_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_library_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the module’s library name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="module.Module.get_library_parent_dir">
+<code class="descname">get_library_parent_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_library_parent_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_library_parent_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the library’s parent directory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="module.Module.get_name">
+<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the module name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="module.Module.get_port_mode">
+<code class="descname">get_port_mode</code><span class="sig-paren">(</span><em>port_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_port_mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_port_mode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the port mode specified by port_name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="module.Module.get_port_names">
+<code class="descname">get_port_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_port_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_port_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list containing the name of all of the module’s ports</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="module.Module.get_port_type">
+<code class="descname">get_port_type</code><span class="sig-paren">(</span><em>port_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_port_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_port_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retuns the port type specified by port_name</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="module.Module.get_ports">
+<code class="descname">get_ports</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of the module’s ports.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="module.Module.has_port_name">
+<code class="descname">has_port_name</code><span class="sig-paren">(</span><em>port_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.has_port_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.has_port_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns true iff a port with the name
+port_name is available in the module.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Valmor F. de Almeida.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.
+    </div>
+  </body>
+</html>
