@@ -1,26 +1,20 @@
 # -*- coding: utf-8 -*-
-
 """
 This file contains the class definition of ConfigTree,
 which aids in parsing the XML configuration files used
 within the Cortix project.
 
+Cortix: a program for system-level modules coupling, execution, and analysis.
+
 Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
-
-Cortix: a program for system-level modules
-        coupling, execution, and analysis.
-
 Tue Dec 10 11:21:30 EDT 2013
 """
-
 #*********************************************************************************
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import ElementTree
 #*********************************************************************************
 
-#========================BEGIN CONFIG_TREE CLASS DEFINITION================================
 class ConfigTree:
-
     """
     This class generates objects that hold an ElementTree node of an XML tree
     structure. The level of the node depends on the argument passed when creating the
@@ -30,6 +24,7 @@ class ConfigTree:
     """
 
     def __init__(self, config_tree_node=None, config_file_name=None):
+
         if config_tree_node is not None:
             assert isinstance(config_tree_node, Element), "-> config_tree_node invalid."
             self.config_tree_node = config_tree_node
@@ -41,31 +36,40 @@ class ConfigTree:
             tree = ElementTree()
             tree.parse(config_file_name)
             self.config_tree_node = tree.getroot()
+#---------------------- end def __init__():---------------------------------------
 
     def get_root_node(self):
         """Returns the Element tree's root node"""
+
         return self.config_tree_node
+#---------------------- end def get_root_node:():----------------------------------
 
     def get_node_tag(self):
         """
         Returns the tag associated with the root node
         of the element tree.
         """
+
         return self.config_tree_node.tag
+#---------------------- end def get_node_tag:():----------------------------------
 
     def get_node_name(self):
         """
         Returns the name associated with the root
         node of the element tree
         """
+
         return self.config_tree_node.get('name')
+#---------------------- end def get_node_name:():---------------------------------
 
     def get_node_type(self):
         """
         Returns the type associated with the root
         node of the element tree.
         """
+
         return self.config_tree_node.get('type')
+#---------------------- end def get_node_type:():---------------------------------
 
     def get_sub_node(self, tag):
         """
@@ -73,7 +77,9 @@ class ConfigTree:
         specified by the parameter tag.
         """
         assert isinstance(tag, str), 'tag invalid'
+
         return self.config_tree_node.find(tag)
+#---------------------- end def get_sub_node:():----------------------------------
 
     def get_all_sub_nodes(self, tag):
         """
@@ -81,22 +87,21 @@ class ConfigTree:
         tree that contain a given tag.
         """
         assert isinstance(tag, str), 'tag invalid'
+
         return self.config_tree_node.findall(tag)
+#---------------------- end def get_all_sub_nodes:():-----------------------------
 
     def get_node_children(self):
         """
         Returns a list of all the nodes in the
         element tree.
         """
+
         children = list()
         for child in self.config_tree_node:
             children.append((child, child.tag, child.items(), child.text))
+
         return children
+#---------------------- end def get_note_children:():-----------------------------
 
-#========================END CONFIG_TREE CLASS DEFINITION===========================
-
-# Unit testing. Usage: -> python configtree.py
-if __name__ == "__main__":
-    print('Unit testing for ConfigTree')
-    # TODO: FIX THE UNIT TEST, IT FAILS DUE TO THE LACK OF INPUT FILE
-    ConfigTree(config_file_name="cortix-config.xml")
+#====================== end class ConfigTree: =+++_===============================
