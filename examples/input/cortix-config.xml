@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <!-- Configuration of Cortix -->
 
-<cortixConfig version="0.1">
+<cortix_config version="0.1">
 
 <!-- ****************************************************************************** -->
 <!--                     CORTIX object starts here                                  -->
@@ -15,11 +15,11 @@
  <name>cortix-dev1</name>
 
  <logger level="DEBUG">
-  <fileHandler level="DEBUG"> </fileHandler>
-  <consoleHandler level="INFO"> </consoleHandler>
+  <file_handler level="DEBUG"> </file_handler>
+  <console_handler level="INFO"> </console_handler>
  </logger>
 
- <workDir>/tmp/</workDir>
+ <work_dir>/tmp/</work_dir>
 
  <!-- ============================================================================= -->
  <!--                Simulation object starts here                                  -->
@@ -30,8 +30,8 @@
  <simulation name="dev1">
 
   <logger level="DEBUG">
-   <fileHandler level="DEBUG"> </fileHandler>
-   <consoleHandler level="INFO"> </consoleHandler>
+   <file_handler level="DEBUG"> </file_handler>
+   <console_handler level="INFO"> </console_handler>
   </logger>
 
   <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
@@ -42,207 +42,207 @@
   <!--NB: each task name must match a network name below-->
 
   <task name="solo-pyplot" >
-   <startTime unit="hour">1.0</startTime>
-   <evolveTime unit="hour">45.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
+   <start_time unit="hour">1.0</start_time>
+   <evolve_time unit="hour">16.0</evolve_time>
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="solo-fueldepot" >
-   <evolveTime unit="hour">2.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
+   <evolve_time unit="hour">2.0</evolve_time>
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="solo-shear" >
-   <evolveTime unit="hour">12.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
+   <evolve_time unit="hour">12.0</evolve_time>
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="solo-fuel-accum" >
-   <evolveTime unit="hour">24.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
+   <evolve_time unit="hour">24.0</evolve_time>
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="solo-dissolverA">
-   <evolveTime unit="hour">1.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
+   <evolve_time unit="hour">1.0</evolve_time>
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="solo-condenser">
-   <evolveTime unit="hour">18.0</evolveTime> <!-- 18h max -->
-   <timeStep unit="minute">1.0</timeStep>
+   <evolve_time unit="hour">18.0</evolve_time> <!-- 18h max -->
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="solo-tank">
-   <evolveTime unit="hour">42.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
+   <evolve_time unit="hour">42.0</evolve_time>
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="solo-plume" >
-   <evolveTime unit="hour">12.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
+   <evolve_time unit="hour">12.0</evolve_time>
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="solo-cooltower" >
-   <evolveTime unit="hour">1.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
+   <evolve_time unit="hour">1.0</evolve_time>
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="solo-solventxtract" >
-   <evolveTime unit="hour">14.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
+   <evolve_time unit="hour">14.0</evolve_time>
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="fueldepot-chopper">
-<!--   <evolveTime unit="hour">108.0</evolveTime> --> <!-- all assemblies -->
-<!--   <evolveTime unit="hour">36.0</evolveTime> --> <!-- 1 assembly -->
-   <evolveTime unit="hour">108.0</evolveTime> 
-   <timeStep unit="minute">1.0</timeStep>
+<!--   <evolve_time unit="hour">108.0</evolve_time> --> <!-- all assemblies -->
+<!--   <evolve_time unit="hour">36.0</evolve_time> --> <!-- 1 assembly -->
+   <evolve_time unit="hour">108.0</evolve_time> 
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="fueldepot-chopper-storage">
-<!--   <evolveTime unit="hour">24.0</evolveTime> -->
-   <evolveTime unit="hour">12.0</evolveTime> 
-   <timeStep unit="minute">1.0</timeStep>
+<!--   <evolve_time unit="hour">24.0</evolve_time> -->
+   <evolve_time unit="hour">12.0</evolve_time> 
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="fueldepot-dissolverFpot">
-<!--   <evolveTime unit="hour">28.0</evolveTime> -->
-<!--   <evolveTime unit="hour">42.0</evolveTime>  -->
-<!--   <evolveTime unit="hour">18.0</evolveTime>  -->
-   <evolveTime unit="hour">35.0</evolveTime>  
-   <timeStep unit="minute">1.0</timeStep>
+<!--   <evolve_time unit="hour">28.0</evolve_time> -->
+<!--   <evolve_time unit="hour">42.0</evolve_time>  -->
+<!--   <evolve_time unit="hour">18.0</evolve_time>  -->
+   <evolve_time unit="hour">35.0</evolve_time>  
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="fueldepot-chopper-dissolver">
-<!--   <evolveTime unit="hour">28.0</evolveTime> -->
-<!--   <evolveTime unit="hour">42.0</evolveTime>  -->
-<!--   <evolveTime unit="hour">18.0</evolveTime>  -->
-   <evolveTime unit="hour">18.0</evolveTime>  
-   <timeStep unit="minute">1.0</timeStep>
+<!--   <evolve_time unit="hour">28.0</evolve_time> -->
+<!--   <evolve_time unit="hour">42.0</evolve_time>  -->
+<!--   <evolve_time unit="hour">18.0</evolve_time>  -->
+   <evolve_time unit="hour">18.0</evolve_time>  
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="fueldepot-chopper-dissolver-tank">
-<!--   <evolveTime unit="hour">24.0</evolveTime> -->
-<!--   <evolveTime unit="hour">17.0</evolveTime>  one batch -->
-   <evolveTime unit="hour">42.0</evolveTime> 
-   <timeStep unit="minute">1.0</timeStep>
+<!--   <evolve_time unit="hour">24.0</evolve_time> -->
+<!--   <evolve_time unit="hour">17.0</evolve_time>  one batch -->
+   <evolve_time unit="hour">42.0</evolve_time> 
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="tank-feedprep">
-   <evolveTime unit="hour">42.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
+   <evolve_time unit="hour">42.0</evolve_time>
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="fueldepot-chopper-dissolver-tank-feedprep">
-<!--   <evolveTime unit="hour">28.0</evolveTime> -->
-<!--   <evolveTime unit="hour">16.0</evolveTime> -->
-   <evolveTime unit="hour">42.0</evolveTime> 
-   <timeStep unit="minute">1.0</timeStep>
+<!--   <evolve_time unit="hour">28.0</evolve_time> -->
+<!--   <evolve_time unit="hour">16.0</evolve_time> -->
+   <evolve_time unit="hour">42.0</evolve_time> 
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="fueldepot-chopper-dissolver-tank-feedprep-solventxtract">
-<!--   <evolveTime unit="hour">28.0</evolveTime> -->
-   <evolveTime unit="hour">14.0</evolveTime> 
-   <timeStep unit="minute">1.0</timeStep>
+<!--   <evolve_time unit="hour">28.0</evolve_time> -->
+   <evolve_time unit="hour">14.0</evolve_time> 
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="shear-dissolve-offgas">
-   <evolveTime unit="hour">22.0</evolveTime> 
-<!-- <evolveTime unit="hour">5.0</evolveTime> -->
-   <timeStep unit="minute">1.0</timeStep>
+   <evolve_time unit="hour">22.0</evolve_time> 
+<!-- <evolve_time unit="hour">5.0</evolve_time> -->
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="shear-dissolve">
-   <evolveTime unit="hour">24.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
+   <evolve_time unit="hour">24.0</evolve_time>
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
   <task name="shear-double-dissolve-single-condense">
-   <evolveTime unit="hour">14.0</evolveTime>
-   <timeStep unit="minute">1.0</timeStep>
+   <evolve_time unit="hour">14.0</evolve_time>
+   <time_step unit="minute">1.0</time_step>
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
   </task>
 
@@ -257,15 +257,15 @@
 
   <application name="dev1">
 
-   <moduleLibrary name='headend-lib'>
-    <parentDir>
+   <module_library name='headend-lib'>
+    <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing 
-    </parentDir>
-   </moduleLibrary>
+    </parent_dir>
+   </module_library>
 
    <logger level="DEBUG">
-    <fileHandler level="DEBUG"> </fileHandler>
-    <consoleHandler level="INFO"> </consoleHandler>
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
    </logger>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -275,15 +275,15 @@
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="fueldepot" type="native">
     <library name='headend-lib'>
-     <parentDir>
+     <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing 
-     </parentDir>
+     </parent_dir>
     </library>
-    <inputFileName>fueldepot.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
+    <input_file_name>fueldepot.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -299,15 +299,15 @@
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="chopper" type="native">
     <library name='headend-lib'>
-     <parentDir>
+     <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing 
-     </parentDir>
+     </parent_dir>
     </library>
-    <inputFileName>chopper.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
+    <input_file_name>chopper.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -322,15 +322,15 @@
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="oldchopper" type="native">
     <library name='vfda-lib'>
-     <parentDir>
+     <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing 
-     </parentDir>
+     </parent_dir>
     </library>
-    <inputFileName>oldchopper.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
+    <input_file_name>oldchopper.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -347,11 +347,11 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="storage" type="native">
-    <inputFileName>storage.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
+    <input_file_name>storage.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -368,15 +368,15 @@
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="dissolverA" type="native">
     <library name='vfda-lib'>
-     <parentDir>
+     <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing 
-     </parentDir>
+     </parent_dir>
     </library>
-    <inputFileName>dissolver.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
+    <input_file_name>dissolver.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -394,15 +394,15 @@
 <!--      /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing  -->
    <module name="dissolver" type="native">
     <library name='headend-lib'>
-     <parentDir>
+     <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing  
-     </parentDir>
+     </parent_dir>
     </library>
-    <inputFileName>dissolver.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
+    <input_file_name>dissolver.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -423,15 +423,15 @@
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="tank" type="native">
     <library name='ornl-lib'>
-     <parentDir>
+     <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing 
-     </parentDir>
+     </parent_dir>
     </library>
-    <inputFileName>tank.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
+    <input_file_name>tank.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -449,11 +449,11 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="feedprep" type="native">
-    <inputFileName>feedprep.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
+    <input_file_name>feedprep.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -471,11 +471,11 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="solventxtract" type="native">
-    <inputFileName>solventxtract.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
+    <input_file_name>solventxtract.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -494,15 +494,15 @@
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="condenser" type="native">
     <library name='headend-lib'>
-     <parentDir>
+     <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing 
-     </parentDir>
+     </parent_dir>
     </library>
-    <inputFileName>condenser.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
+    <input_file_name>condenser.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -517,11 +517,11 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="scrubber" type="native">
-    <inputFileName>scrubber.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
+    <input_file_name>scrubber.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -531,11 +531,11 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="filter" type="native">
-    <inputFileName>filter.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
+    <input_file_name>filter.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -545,11 +545,11 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="offgas" type="native">
-    <inputFileName>offgas.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
+    <input_file_name>offgas.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -560,15 +560,15 @@
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="dissolverFpot" type="native">
     <library name='srnl-lib'>
-     <parentDir>
+     <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing  
-     </parentDir>
+     </parent_dir>
     </library>
-    <inputFileName>dissolverFpot.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
+    <input_file_name>dissolverFpot.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -591,17 +591,17 @@
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="plume" type="wrapped">
     <library name='srnl-lib'>
-     <parentDir>
+     <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing 
-     </parentDir>
+     </parent_dir>
     </library>
-    <inputFileName>plume.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
-    <executableName>pfpl</executableName>
-    <executablePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/facility_pfpl/</executablePath>
+    <input_file_name>plume.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
+    <executable_name>pfpl</executable_name>
+    <executable_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/facility_pfpl/</executable_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -614,17 +614,17 @@
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="cooltower" type="wrapped">
     <library name='srnl-lib'>
-     <parentDir>
+     <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing 
-     </parentDir>
+     </parent_dir>
     </library>
-    <inputFileName>cooltower.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
-    <executableName>cttool.x</executableName>
-    <executablePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/srnl-lib/cooltower/bin/</executablePath>
+    <input_file_name>cooltower.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
+    <executable_name>cttool.x</executable_name>
+    <executable_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/srnl-lib/cooltower/bin/</executable_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -637,15 +637,15 @@
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <module name="support.viz.pyplot" type="native">
     <library name='cortix'>
-     <parentDir>
+     <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev
-     </parentDir>
+     </parent_dir>
     </library>
-    <inputFileName>pyplot.input</inputFileName>
-    <inputFilePath>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</inputFilePath>
+    <input_file_name>pyplot.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Ports have four types: 1) use, 2) provide, 3) input 4) output -->
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
@@ -671,8 +671,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="solo-pyplot">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -684,8 +684,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="solo-fueldepot">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -701,8 +701,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="solo-shear">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -716,8 +716,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="solo-fuel-accum">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -729,8 +729,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="solo-dissolverA">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -743,8 +743,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="solo-condenser">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -757,8 +757,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="solo-tank">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -770,8 +770,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="solo-cooltower">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -783,8 +783,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="solo-plume">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -796,8 +796,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="solo-solventxtract">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -811,8 +811,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="fueldepot-chopper">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -830,8 +830,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="fueldepot-chopper-storage">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -851,8 +851,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="fueldepot-chopper-dissolver">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -875,8 +875,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="fueldepot-dissolverFpot">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -899,8 +899,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="tank-feedprep">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -918,8 +918,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="fueldepot-chopper-dissolver-tank">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -945,8 +945,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="fueldepot-chopper-dissolver-tank-feedprep">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -977,8 +977,8 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
    <network name="fueldepot-chopper-dissolver-tank-feedprep-solventxtract">
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -1010,8 +1010,8 @@
    <network name="shear-dissolve-offgas">
    <!-- Network name must match a task name-->
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -1052,8 +1052,8 @@
    <network name="shear-dissolve">
    <!-- Network name must match a task name-->
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -1080,8 +1080,8 @@
    <network name="shear-double-dissolve-single-condense">
    <!-- Network name must match a task name-->
     <logger level="DEBUG">
-     <fileHandler level="DEBUG"> </fileHandler>
-     <consoleHandler level="INFO"> </consoleHandler>
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
     </logger>
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
@@ -1122,4 +1122,4 @@
  <!-- ============================================================================= -->
  </simulation>
 
-</cortixConfig>
+</cortix_config>
