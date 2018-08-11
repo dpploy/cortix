@@ -2,8 +2,7 @@
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
-Cortix: a program for system-level modules
-        coupling, execution, and analysis.
+Cortix: a program for system-level modules coupling, execution, and analysis.
 
 Tue Dec 10 11:21:30 EDT 2013
 """
@@ -19,7 +18,7 @@ from cortix.src.utils.set_logger_level import set_logger_level
 class Task:
     """
     This class defines the implementation of a Task in the Cortix Project.
-    A Task is piece of work done by a simulation.
+    A Task is a portion of work done by a simulation.
     """
 
     def __init__(self, parent_work_dir=None, task_config_node=ConfigTree()):
@@ -55,12 +54,12 @@ class Task:
         console_handler.setLevel(logging.NOTSET)
 
         for child in node:
-            if child.tag == 'fileHandler':
+            if child.tag == 'file_handler':
                 # file handler
                 file_handle_level = child.get('level').strip()
                 file_handle = set_logger_level(file_handle, logger_name, \
                                                file_handle_level)
-            if child.tag == 'consoleHandler':
+            if child.tag == 'console_handler':
                 # console handler
                 console_handle_level = child.get('level').strip()
                 console_handler = set_logger_level(console_handler,\
@@ -81,42 +80,42 @@ class Task:
         self.log.debug('logger console handler level: %s', console_handle_level)
 
         self.start_time = self.evolve_time = self.time_step = 0.0
-        self.start_time_unit = 'null-startTimeUnit'
-        self.evolve_time_unit = 'null-evolveTimeUnit'
-        self.time_step_unit = 'null-timeStepUnit'
-        self.runtime_cortix_param_file = 'null-runtimeCortixParamFile'
+        self.start_time_unit = 'null-start_time_unit'
+        self.evolve_time_unit = 'null-evolve_time_unit'
+        self.time_step_unit = 'null-time_step_unit'
+        self.runtime_cortix_param_file = 'null-runtime_cortix_param_file'
 
-        self.log.debug('start _Setup()')
+        self.log.debug('start __init__()')
         for child in self.config_node.get_node_children():
             (elem, tag, items, text) = child
-            if tag == 'startTime':
+            if tag == 'start_time':
                 for (key, value) in items:
                     if key == 'unit':
                         self.start_time_unit = value
                 self.start_time = float(text.strip())
 
-            if tag == 'evolveTime':
+            if tag == 'evolve_time':
                 for (key, value) in items:
                     if key == 'unit':
                         self.evolve_time_unit = value
                 self.evolve_time = float(text.strip())
 
-            if tag == 'timeStep':
+            if tag == 'time_step':
                 for (key, value) in items:
                     if key == 'unit':
                         self.time_step_unit = value
                 self.time_step = float(text.strip())
 
-        if self.start_time_unit == 'null-startTimeUnit':
+        if self.start_time_unit == 'null-start_time_unit':
             self.start_time_unit = self.evolve_time_unit
-        assert self.evolve_time_unit != 'null-evolveTimeUnit', \
+        assert self.evolve_time_unit != 'null-evolve_time_unit', \
         'invalid time unit = %r' %(self.evolve_time_unit)
 
-        self.log.debug('startTime value = %s', str(self.start_time))
-        self.log.debug('startTime unit  = %s', str(self.start_time_unit))
-        self.log.debug('evolveTime value = %s', str(self.evolve_time))
-        self.log.debug('evolveTime unit  = %s', str(self.evolve_time_unit))
-        self.log.debug('end _Setup()')
+        self.log.debug('start_time value = %s', str(self.start_time))
+        self.log.debug('start_time unit  = %s', str(self.start_time_unit))
+        self.log.debug('evolve_time value = %s', str(self.evolve_time))
+        self.log.debug('evolve_time unit  = %s', str(self.evolve_time_unit))
+        self.log.debug('end __init__()')
         self.log.info('created task: %s', self.name)
 #---------------------- end def __init__():---------------------------------------
 

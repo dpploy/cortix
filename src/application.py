@@ -6,6 +6,9 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 Tue Dec 10 11:21:30 EDT 2013
+
+:doc: `my_hdr`
+
 """
 #*********************************************************************************
 import os
@@ -18,8 +21,30 @@ from cortix.src.network import Network
 #*********************************************************************************
 
 class Application:
-    """
-    An Application object is the composition of Module objects and Network objects.
+    r"""
+    An Application is a singleton class composed of Module objects, and Network
+    objects; the latter involve Module objects in various combinations. Each
+    combination is assigned to a Network object.
+
+    Attributes
+    ----------
+     networks: list(str)
+         List of names of network objects.
+     network: `Network`
+         Network object.
+     modules: list(str)
+         List of names of Cortix Module objects.
+     module: `Module`
+         Cortix Module object.
+
+    Note
+    ----
+      Add type annotation to all methods?
+
+      Here is some math:
+
+      .. math::
+          k = \alpha\,e^{-\frac{\Delta G}{R T}}
     """
 
     def __init__(self, app_work_dir=None, app_config_node=ConfigTree()):
@@ -39,13 +64,13 @@ class Application:
         assert os.path.isdir(app_work_dir), "Work directory not available."
 
         # Set the module library for the whole application
-        node = app_config_node.get_sub_node('moduleLibrary')
+        node = app_config_node.get_sub_node('module_library')
         self.module_lib_name = node.get("name").strip()
         sub_node = ConfigTree(node)
-        assert sub_node.get_node_tag() == "moduleLibrary", "FATAL."
+        assert sub_node.get_node_tag() == "module_library", "FATAL."
         for child in sub_node.get_node_children():
             (elem, tag, attributes, text) = child
-            if tag == 'parentDir':
+            if tag == 'parent_dir':
                 self.module_lib_full_parent_dir = text.strip()
 
         if self.module_lib_full_parent_dir[-1] == '/':
@@ -70,12 +95,12 @@ class Application:
         console_handler.setLevel(logging.NOTSET)
 
         for child in node:
-            if child.tag == 'fileHandler':
+            if child.tag == 'file_handler':
                 # file handler
                 file_handler_level = child.get('level').strip()
                 file_handler = set_logger_level(file_handler, logger_name, \
                                                 file_handler_level)
-            if child.tag == 'consoleHandler':
+            if child.tag == 'console_handler':
                 # console handler
                 console_handler_level = child.get('level').strip()
                 console_handler = set_logger_level(console_handler, logger_name,
@@ -105,8 +130,7 @@ class Application:
 
     def get_networks(self):
         """
-        Returns a list of the
-        application's networks.
+        Returns a list of the application's networks.
         """
 
         return self.networks
@@ -114,8 +138,7 @@ class Application:
 
     def get_network(self, name):
         """
-        Returns a network with a given name.
-        None if the name doesn't exist.
+        Returns a network with a given name.  None if the name doesn't exist.
         """
 
         for net in self.networks:
@@ -134,8 +157,7 @@ class Application:
 
     def get_module(self, name):
         """
-        Returns a module with a given name.
-        None if the name doesn't exist.
+        Returns a module with a given name.  None if the name doesn't exist.
         """
         for mod in self.modules:
             if mod.get_name() == name:
@@ -153,8 +175,8 @@ class Application:
 
     def __setup_networks(self):
         """
-        A helper function used by the Application constructor
-        to setup the networks portion of the Application.
+        A helper function used by the Application constructor to setup the networks
+        portion of the Application.
         """
 
         self.log.debug("start _SetupNetworks()")
@@ -171,8 +193,8 @@ class Application:
 
     def __setup_modules(self):
         """
-        A helper function used by the Application constructor
-        to setup the modules portion of the Application.
+        A helper function used by the Application constructor to setup the modules
+        portion of the Application.
         """
 
         self.log.debug("Start _SetupModules()")
@@ -204,8 +226,3 @@ class Application:
 #---------------------- end def __setup_modules():--------------------------------
 
 #====================== end class Application: ===================================
-
-#*********************************************************************************
-# Unit testing. Usage: -> python application.py
-if __name__ == "__main__":
-    print("Unit testing for Application")

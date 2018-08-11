@@ -20,24 +20,23 @@ import xml.etree.ElementTree as ElementTree
 
 class Launcher():
     """
-    The Launcher class handles the main funcitonality of
-    stepping through the simulation time, and monitoring
-    its progress.
+    The Launcher class handles the main funcitonality of stepping through the
+    simulation time, and monitoring its progress.
     """
 
     def __init__(self, mod_lib_name, module_name, slot_id,
                  input_full_path_file_name,
                  exec_full_path_file_name,
                  work_dir,
-                 cortix_param_full_path_filename,
-                 cortix_comm_full_path_filename,
+                 cortix_param_full_path_file_name,
+                 cortix_comm_full_path_file_name,
                  runtime_status_full_path):
 
         self.module_name = module_name
         self.slot_id = slot_id
         self.input_full_path_file_name = input_full_path_file_name
-        self.cortix_param_full_path_filename = cortix_param_full_path_filename
-        self.cortix_comm_full_path_filename = cortix_comm_full_path_filename
+        self.cortix_param_full_path_file_name = cortix_param_full_path_file_name
+        self.cortix_comm_full_path_file_name = cortix_comm_full_path_file_name
         self.runtime_status_full_path = runtime_status_full_path
         self.exec_full_path_file_name = exec_full_path_file_name
         self.work_dir = work_dir
@@ -48,7 +47,7 @@ class Launcher():
         log.setLevel(logging.DEBUG)
 
         # create file handler for logs
-        full_path_task_dir = self.cortix_comm_full_path_filename[:self.cortix_comm_full_path_filename.rfind('/')] + '/'
+        full_path_task_dir = self.cortix_comm_full_path_file_name[:self.cortix_comm_full_path_file_name.rfind('/')] + '/'
         file_handle = logging.FileHandler(full_path_task_dir + 'launcher.log')
         file_handle.setLevel(logging.DEBUG)
 
@@ -69,8 +68,8 @@ class Launcher():
 
         log.info('created logger')
         log.debug('input file: %s', self.input_full_path_file_name)
-        log.debug('param file: %s', self.cortix_param_full_path_filename)
-        log.debug('comm file: %s', self.cortix_comm_full_path_filename)
+        log.debug('param file: %s', self.cortix_param_full_path_file_name)
+        log.debug('comm file: %s', self.cortix_comm_full_path_file_name)
 
         lib_module_driver = mod_lib_name + '.' + module_name + '.cortix-driver'
         log.info('module driver: %s', lib_module_driver)
@@ -94,14 +93,14 @@ class Launcher():
         'file %r not available;stop.' % self.input_full_path_file_name
 
         # Read the Cortix parameter file: cortix-param.xml
-        # cortix_param_full_path_filename
+        # cortix_param_full_path_file_name
 
-        assert os.path.isfile(self.cortix_param_full_path_filename), \
-        'file %r not available;stop.' % self.cortix_param_full_path_filename
+        assert os.path.isfile(self.cortix_param_full_path_file_name), \
+        'file %r not available;stop.' % self.cortix_param_full_path_file_name
 
-        tree = ElementTree.parse(self.cortix_param_full_path_filename)
+        tree = ElementTree.parse(self.cortix_param_full_path_file_name)
         cortix_param_xml_root_node = tree.getroot()
-        node = cortix_param_xml_root_node.find('startTime')
+        node = cortix_param_xml_root_node.find('start_time')
         start_time_unit = node.get('unit')
         start_time = float(node.text.strip())
 
@@ -114,7 +113,7 @@ class Launcher():
         else:
             assert False, 'time unit invalid: %r' % (start_time_unit)
 
-        node = cortix_param_xml_root_node.find('evolveTime')
+        node = cortix_param_xml_root_node.find('evolve_time')
         evolve_time_unit = node.get('unit')
         evolve_time = float(node.text.strip())
 
@@ -127,7 +126,7 @@ class Launcher():
         else:
             assert False, 'time unit invalid: %r' % (evolve_time_unit)
 
-        node = cortix_param_xml_root_node.find('timeStep')
+        node = cortix_param_xml_root_node.find('time_step')
         time_step_unit = node.get('unit')
         time_step = float(node.text.strip())
 
@@ -140,10 +139,10 @@ class Launcher():
         else:
             assert False, 'time unit invalid: %r' % (time_step_unit)
 
-        assert os.path.isfile(self.cortix_comm_full_path_filename),\
-        'file %r not available;stop.' % self.cortix_comm_full_path_filename
+        assert os.path.isfile(self.cortix_comm_full_path_file_name),\
+        'file %r not available;stop.' % self.cortix_comm_full_path_file_name
 
-        tree = ElementTree.parse(self.cortix_comm_full_path_filename)
+        tree = ElementTree.parse(self.cortix_comm_full_path_file_name)
         cortix_comm_xml_root_node = tree.getroot()
 
         # setup ports
@@ -195,7 +194,7 @@ class Launcher():
             self.log.debug('run(%s', str(round(facility_time, 3)) + '[min]): ')
             start_time = time.time()
 
-            # Data exchange at facility_time (at start_time, this is here for provide 
+            # Data exchange at facility_time (at start_time, this is here for provide
             # state)
             guest_driver.CallPorts(facility_time)
 
@@ -238,7 +237,7 @@ class Launcher():
 
         fout = MPI.File.Open(comm, self.runtime_status_full_path, amode)
         fout.Write(b'<?xml version="1.0" encoding="UTF-8"?>\n')
-        fout.Write(b'<!-- Written by _launcher.py -->\n')
+        fout.Write(b'<!-- Written by Launcher::__set_runtime_status.py -->\n')
 
         today = datetime.datetime.today()
         fout.Write("".join('<!-- ' + str(today) + ' -->\n').encode())
