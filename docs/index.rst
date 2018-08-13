@@ -4,9 +4,9 @@
    contain the root `toctree` directive.
 
 Cortix - Welcome to Cortix's documentation!
-==================================
+===========================================
 .. image:: ../cortix-cover.png
-.. include:: README.rst
+.. include:: include.rst
 
 .. toctree::
    :maxdepth: 4
