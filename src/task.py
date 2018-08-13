@@ -11,8 +11,6 @@
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
-
-Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
 import os

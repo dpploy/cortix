@@ -13,9 +13,6 @@ which aids in parsing the XML configuration files used
 within the Cortix project.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
-
-Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
-Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
 from xml.etree.ElementTree import Element

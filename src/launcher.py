@@ -11,9 +11,6 @@
 Launcher functionality of the Cortix Class.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
-
-Valmor F. de Almeida dealmeidav@ornl.gov; vfda
-Sat Jun  6 22:43:33 EDT 2015
 """
 #*********************************************************************************
 import os
