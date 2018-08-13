@@ -19,7 +19,6 @@ notes
 *.html
 *.csv
 mytags
-docs
 createtags
 *.plt
 support/actor
