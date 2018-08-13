@@ -11,7 +11,6 @@ Welcome to Cortix's documentation!
    :caption: Contents:
 
    src_rst
-   support_rst
 
 Indices and tables
 ==================
