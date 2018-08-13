@@ -1,6 +1,13 @@
 #!/usr/bin/env python
+# This file is part of the Cortix toolkit evironment
+# https://github.com/dpploy/...
+#
+# All rights reserved, see COPYRIGHT for full restrictions.
+# https://github.com/dpploy/COPYRIGHT
+#
+# Licensed under the GNU General Public License v. 3, please see LICENSE file.
+# https://www.gnu.org/licenses/gpl-3.0.txt
 """
-Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 Cortix: a program for system-level modules coupling, execution, and analysis.
 
 Cortix is a library and it is used by means of a driver. This file is a simple example
@@ -12,8 +19,6 @@ driver examples can be created.
 
 Cortix is written in python language and it is imported as an namespace package
 as of python 3.3 or later.
-
-Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
 import os
@@ -22,6 +27,7 @@ from cortix import Cortix
 #*********************************************************************************
 
 def main():
+
  pwd                   = os.path.dirname(__file__)
  full_path_config_file = os.path.join(pwd, 'input/cortix-config.xml')
 

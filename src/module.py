@@ -1,11 +1,16 @@
 # -*- coding: utf-8 -*-
+# This file is part of the Cortix toolkit evironment
+# https://github.com/dpploy/...
+#
+# All rights reserved, see COPYRIGHT for full restrictions.
+# https://github.com/dpploy/COPYRIGHT
+#
+# Licensed under the GNU General Public License v. 3, please see LICENSE file.
+# https://www.gnu.org/licenses/gpl-3.0.txt
 """
 Cortix Module class defintion.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
-
-Valmor F. de Almeida dealmeidav@ornl.gov; vfda
-Tue Dec 10 11:21:30 EDT 2013
 """
 #*********************************************************************************
 import os
