@@ -9,14 +9,10 @@ For unit testing do at the linux command prompt:
 
 Sat Sep  5 12:51:34 EDT 2015
 """
-
 #*******************************************************************************
 import os, sys
-
-from ._quantity import _Quantity  # constructor
 #*******************************************************************************
 
-#*******************************************************************************
 class Quantity():
 
 #todo: this probably should not have a "value" for the same reason as Specie.
@@ -41,13 +37,10 @@ class Quantity():
      assert type(name) == type(str()), 'oops not string.'
      self._unit = unit;    
 
-     # constructor
-     _Quantity( self, 
-                name,
-                formalName,
-                value,
-                unit
-              )
+     self._name       = name
+     self._formalName = formalName
+     self._value      = value 
+     self._unit       = unit 
 
      return
 
