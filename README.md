@@ -6,7 +6,7 @@
  <li>Cortix is a Python library for system-level module coupling, execution, and analysis.</li>
  <li>Cortix takes as input a collection of computational modules and provides an environment
   for the coupling of those modules into a single simulation.</li> 
- <li>Cortix handles...
+ <li>Cortix handles
    <ul>
     <li>Communication between the modules</li>
     <li>Numerical integration</li>
@@ -38,15 +38,15 @@ or anywhere else in your system, e.g.
 
   /somepath/cortix
 
-Then add either /somepath/myproject to $PYTHONPATH or /somepath to $PYTHONPATH .
+Then add either /somepath/myproject to $PYTHONPATH or /somepath to $PYTHONPATH,
+respectively.
 
-Cortix has an examples directory (examples/) which contains examples for input
+Cortix has a directory (examples/) that contains examples for input
 files and a driver file. At the moment these input files are past files used in the 
 development of Cortix.
 
 A driver file is needed to run Cortix. 
-There is an example in the repository examples directory (driver-cortix.py).
-This driver can be copied to say:
+There is an example (examples/driver-cortix.py) that can be copied to say:
 
    /somepath/driver-test.py
 
@@ -55,18 +55,23 @@ or
    /somepath/myproject/driver-test.py
 
 An input configuration (xml) file is also needed. An example is provided in 
-the repository examples/input directory (cortix-config.xml).
+the in the examples/input/ directory (cortix-config.xml).
 
-Then to run Cortix, enter the directory of the driver and run the driver.
+Then to run Cortix, enter the directory of the driver and run the driver
 
-Alternatively, Cortix can run from its own directory. Enter the /somepath/cortix/
-and run the driver.
+ ./driver-test.py
+
+which will run an MPI process for Cortix and an additional MPI process for each 
+launched module in its own MPI process (or pool of processes; to be implemented 
+in the future).
 
 To capture the Cortix screen output of log messages and other messages, do
 
   /driver-cortix.py >& screen.out
 
-under Linux (inspect the output file screen.out when the run is finished)
+under Linux (inspect the output file screen.out when the run is finished).
+Extensive logging of runtime information is stored in the <work_dir> directory
+specified in the cortix-config.xml input file.
 
 <h2>Maintainers</h2>
 <ul>
