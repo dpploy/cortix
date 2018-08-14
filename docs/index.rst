@@ -3,8 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Cortix's documentation!
-==================================
+Cortix - Welcome to Cortix's documentation!
+===========================================
+.. image:: ../cortix-cover.png
+.. include:: include.rst
 
 .. toctree::
    :maxdepth: 4
