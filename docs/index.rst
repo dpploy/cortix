@@ -6,7 +6,7 @@
 Cortix - Welcome to Cortix's documentation!
 ===========================================
 .. image:: ../cortix-cover.png
-.. include:: include.rst
+.. include:: readme_converted.rst
 
 .. toctree::
    :maxdepth: 4
