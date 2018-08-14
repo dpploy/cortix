@@ -1,5 +1,15 @@
 .. raw:: html
 
+   <h1>
+
+Cortix
+
+.. raw:: html
+
+   </h1>
+
+.. raw:: html
+
    <p align="center">
 
 .. raw:: html
@@ -47,41 +57,17 @@ simulation.
 
    <li>
 
-Cortix handles…
+Cortix handles
 
 .. raw:: html
 
    <ul>
 
-.. raw:: html
+::
 
-   <li>
-
-Communication between the modules
-
-.. raw:: html
-
-   </li>
-
-.. raw:: html
-
-   <li>
-
-Numerical integration
-
-.. raw:: html
-
-   </li>
-
-.. raw:: html
-
-   <li>
-
-Data visualization
-
-.. raw:: html
-
-   </li>
+    <li>Communication between the modules</li>
+    <li>Numerical integration</li>
+    <li>Data visualization</li>
 
 .. raw:: html
 
@@ -186,15 +172,14 @@ or anywhere else in your system, e.g.
 /somepath/cortix
 
 Then add either /somepath/myproject to $PYTHONPATH or /somepath to
-$PYTHONPATH .
+$PYTHONPATH, respectively.
 
-Cortix has an examples directory (examples/) which contains examples for
-input files and a driver file. At the moment these input files are past
-files used in the development of Cortix.
+Cortix has a directory (examples/) that contains examples for input
+files and a driver file. At the moment these input files are past files
+used in the development of Cortix.
 
-A driver file is needed to run Cortix. There is an example in the
-repository examples directory (driver-cortix.py). This driver can be
-copied to say:
+A driver file is needed to run Cortix. There is an example
+(examples/driver-cortix.py) that can be copied to say:
 
 /somepath/driver-test.py
 
@@ -203,13 +188,15 @@ or
 /somepath/myproject/driver-test.py
 
 An input configuration (xml) file is also needed. An example is provided
-in the repository examples/input directory (cortix-config.xml).
+in the in the examples/input/ directory (cortix-config.xml).
 
-Then to run Cortix, enter the directory of the driver and run the
-driver.
+Then to run Cortix, enter the directory of the driver and run the driver
 
-Alternatively, Cortix can run from its own directory. Enter the
-/somepath/cortix/ and run the driver.
+./driver-test.py
+
+which will run an MPI process for Cortix and an additional MPI process
+for each launched module in its own MPI process (or pool of processes;
+to be implemented in the future).
 
 To capture the Cortix screen output of log messages and other messages,
 do
@@ -217,7 +204,8 @@ do
 /driver-cortix.py >& screen.out
 
 under Linux (inspect the output file screen.out when the run is
-finished)
+finished). Extensive logging of runtime information is stored in the
+directory specified in the cortix-config.xml input file.
 
 .. raw:: html
 
@@ -237,7 +225,7 @@ Maintainers
 
    <li>
 
-Valmor F. de Almeida: Valmor_deAlmeida@uml.edu
+Valmor F. de Almeida: Valmor\_deAlmeida@uml.edu
 
 .. raw:: html
 
@@ -275,7 +263,7 @@ Documentation
 
    <li>
 
-Gilberto E. Alas: gilbert_alas@student.uml.edu
+Gilberto E. Alas: gilbert\_alas@student.uml.edu
 
 .. raw:: html
 
