@@ -1,8 +1,0 @@
-utils
-=====
-
-.. toctree::
-   :maxdepth: 4
-
-   configtree
-   set_logger_level
