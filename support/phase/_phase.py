@@ -13,7 +13,7 @@ import pandas
 from copy import deepcopy
 
 from ..specie.interface   import Specie
-from ..quantity.interface import Quantity
+from ..quantity import Quantity
 #*******************************************************************************
 
 #*******************************************************************************
