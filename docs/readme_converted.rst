@@ -63,11 +63,35 @@ Cortix handles
 
    <ul>
 
-::
+.. raw:: html
 
-    <li>Communication between the modules</li>
-    <li>Numerical integration</li>
-    <li>Data visualization</li>
+   <li>
+
+Communication between the modules
+
+.. raw:: html
+
+   </li>
+
+.. raw:: html
+
+   <li>
+
+Numerical integration
+
+.. raw:: html
+
+   </li>
+
+.. raw:: html
+
+   <li>
+
+Data visualization
+
+.. raw:: html
+
+   </li>
 
 .. raw:: html
 
@@ -225,7 +249,7 @@ Maintainers
 
    <li>
 
-Valmor F. de Almeida: Valmor\_deAlmeida@uml.edu
+Valmor F. de Almeida: Valmor_deAlmeida@uml.edu
 
 .. raw:: html
 
@@ -263,7 +287,7 @@ Documentation
 
    <li>
 
-Gilberto E. Alas: gilbert\_alas@student.uml.edu
+Gilberto E. Alas: gilbert_alas@student.uml.edu
 
 .. raw:: html
 
