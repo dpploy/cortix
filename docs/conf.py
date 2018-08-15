@@ -23,11 +23,6 @@ import sys
 sys.path.insert(0, os.path.abspath('../src'))
 sys.path.insert(0, os.path.abspath('../src/utils'))
 sys.path.insert(0, os.path.abspath('../support'))
-sys.path.insert(0, os.path.abspath('../support/fuelbucket'))
-sys.path.insert(0, os.path.abspath('../support/fuelbundle'))
-sys.path.insert(0, os.path.abspath('../support/fuelsegments'))
-sys.path.insert(0, os.path.abspath('../support/fuelslug'))
-sys.path.insert(0, os.path.abspath('../support/quantity'))
 
 # -- General configuration ------------------------------------------------
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
@@ -46,9 +46,7 @@ Sat May  9 21:40:48 EDT 2015 created; vfda
 #*******************************************************************************
 import os, sys
 
-from ._specie import _Specie              # constructor
-from ._updatemolarmass import _UpdateMolarMass  
-from ._reorderformula  import _ReorderFormula
+from cortix.support.periodictable import ELEMENTS
 #*******************************************************************************
 
 #*******************************************************************************
@@ -67,17 +65,57 @@ class Specie():
                massCC      = 0.0,      # default unit: g/L
                flag        = None   ):
 
-     # constructor
-     _Specie( self, 
-              name,
-              formulaName,
-              phase,
-              atoms,
-              molarCC,
-              massCC,
-              flag    )
 
+   assert type(name) == type(str()), 'oops not string.'
+   self._name = name;    
+
+   assert type(formulaName) == type(str()), 'oops not string.'
+   self._formulaName = formulaName; 
+
+   assert type(phase) == type(str()), 'oops not string.'
+   self._phase = phase;   
+
+   assert type(atoms) == type(list()), 'oops not list.'
+   self._atoms = atoms;   
+
+   self._flag = flag  # flag can be any type
+
+   self._molarMass = 0.0
+   self._molarHeatPwr = 0.0
+   self._molarGammaPwr = 0.0
+   self._molarRadioactivity = 0.0
+
+   self._molarMassUnit = 'g/mole'
+
+   self._molarHeatPwrUnit = 'W/mole'
+   self._molarGammaPwrUnit = 'W/mole'
+   self._molarRadioactivityUnit = 'Ci/mole'
+
+   self._molarRadioactivityFractions = list()
+
+   self._molarCCUnit = 'mole/L'
+   self._massCCUnit  = 'g/L'
+
+   self.__UpdateMolarMass()
+
+   if self._molarMass == 0.0:
+     self._molarCC = 0.0
+     self._massCC  = 0.0
      return
+
+   assert type(molarCC) == type(float()), 'oops not a float.'
+   assert molarCC >= 0.0, 'oops negative value.'
+   self._molarCC = molarCC
+   self._massCC  = molarCC * self._molarMass
+
+   assert type(massCC) == type(float()), 'oops not a float.'
+   assert massCC >= 0.0, 'oops negative value.'
+   if self._massCC == 0.0: 
+      self._massCC  = massCC 
+      self._molarCC = massCC / self._molarMass
+
+   return
+
 
 #*******************************************************************************
 
@@ -171,7 +209,7 @@ class Specie():
      if len(atoms) != 0:
         assert type(atoms[-1]) == type(str()), 'oops not string.'
      self._atoms = atoms
-     _UpdateMolarMass(self)
+     self.__UpdateMolarMass()
  atoms = property(GetAtoms,SetAtoms,None,None)
 
  # New interface 
@@ -182,7 +220,7 @@ class Specie():
      if len(atoms) != 0:
         assert type(atoms[-1]) == type(str()), 'oops not string.'
      self._atoms = atoms
-     _UpdateMolarMass(self)
+     self.__UpdateMolarMass()
  formula = property(GetFormula,SetFormula,None,None)
 
  def GetNAtoms(self): # number of ficticious atoms in the species (see NB above)
@@ -231,14 +269,134 @@ class Specie():
 #*******************************************************************************
 # Internal helpers 
 
+ def __UpdateMolarMass( self ):
+
+  if len(self._atoms) == 0: return
+
+  for entry in self._atoms:
+      assert type(entry) == type(str()), 'oops'
+      tmp = entry.split('*')
+      nuclide = tmp[-1]
+      element = nuclide.split('-')[0]
+      assert element in ELEMENTS, 'element = %r'%(element)
+
+  self._nAtoms        = 0
+  self._nNuclideTypes = 0
+
+  nuclides = dict()
+
+  nAtoms = 0
+  summ = 0.0
+  for entry in self._atoms:
+    assert type(entry) == type(str()), 'oops'
+    # format example:  3.2*O-18, or 3*O or O or O-16
+    tmp = entry.split('*')
+    multiple  = 1.0
+    # single nuclide    
+    if len(tmp) == 1: 
+       nuclide = tmp[0]
+    # multiple nuclide
+    elif len(tmp) == 2: 
+       multiple = float(tmp[0])
+       nuclide = tmp[1]
+    else:
+     assert False
+ 
+    nuclides[ nuclide ] = multiple
+    nAtoms += multiple
+ 
+    try: 
+      tmp = nuclide.split('-')
+      if len(tmp) == 1:
+         element = ELEMENTS[tmp[0]]
+         molarMass = element.exactmass # from isotopic composition
+         if molarMass == 0.0: molarMass = element.mass
+      elif len(tmp) == 2:
+         element = ELEMENTS[tmp[0]].isotopes[int(tmp[1].strip('m'))]
+         molarMass = element.mass
+      else:
+         assert False
+    except KeyError:
+      summ += multiple * 0.0
+    else:
+      summ += multiple * molarMass    
+ 
+  self._molarMass = summ
+#   print( summ )
+  self._nAtoms        = nAtoms
+  self._nNuclideTypes = len(nuclides)
+
+  return
+
+
+ def __ReorderFormula( self ):
+
+  atoms1 = self._atoms[:] # shallow copy
+  atoms2 = list()
+
+  if len(self._atoms) <= 1: return atoms1
+
+  if len(self._atoms) > 1:
+
+    # save the multiplier value as a string type of scientific notation
+    for entry in self._atoms:
+
+      assert type(entry) == type(str()), 'oops'
+
+      # format example:  3.2*O-18, or 3*O or O or O-16
+      tmp = entry.split('*')
+
+      multiplier = 0.0
+
+      if len(tmp) == 1:
+         continue
+      elif len(tmp) == 2: 
+         multiplier = float(tmp[0])
+      else:
+         assert False
+
+      assert multiplier != 0.0, 'multiplier = %r'%(multiplier)
+  
+      multiplier = '{0:9.3e}'.format( multiplier )
+
+      atoms1[ self._atoms.index( entry ) ] = multiplier+'*'+tmp[1]
+
+    # order in decreasing order of multiplier magnitude
+    multipliers_lst = list()
+  
+    for entry in atoms1:
+  
+      tmp = entry.split('*')
+  
+      multiplier = 0.0
+  
+      if len(tmp) == 1:
+         continue
+      elif len(tmp) == 2: 
+         multiplier = float(tmp[0])
+      else:
+         assert False
+
+      multipliers_lst.append( float( multiplier ) )
+
+
+    sortedAtoms_lst = [ a for (i,a) in sorted( zip(multipliers_lst,atoms1), 
+                                                key=lambda pair: pair[0],
+                                                reverse=True ) ]
+
+    atoms2 = sortedAtoms_lst
+
+  return atoms2
+
+
 
 #*******************************************************************************
 # Printing of data members
  def __str__( self ):
      s = '\n\t Specie(): name=%s;'+' formulaName=%s;'+' phase=%s;'+'\n\t formula=%s;'+'\n\t # atoms=%s;'+' # nuclide types=%s;'+' molar mass=%9.3e[%s];'+' molar cc=%9.3e[%s];'+' mass cc=%9.3e[%s];'+'\n\t flag=%s;'+'\n\t molar radioactivity=%9.3e[%s];'+'\n\t radioactivity  dens.=%9.3e[%s];'+'\n\t molar heat pwr=%9.3e[%s];'+'\n\t heat pwr dens.=%9.3e[%s];'+'\n\t molar gamma pwr=%9.3e[%s];'+'\n\t gamma pwr dens.=%9.3e[%s];'+'\n\t atoms=%s;'+'\n\t molar radioactivity fractions=%s'
-     return s % (self.name, self.formulaName, self.phase, _ReorderFormula(self), self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarRadioactivity*self.molarCC,'[Ci/cc]',self.molarHeatPwr, self.molarHeatPwrUnit, self.molarHeatPwr*self.molarCC,'[W/cc]',self.molarGammaPwr, self.molarGammaPwrUnit,self.molarGammaPwr*self.molarCC,'[W/cc]',[ i.split('*')[-1] for i in self.formula],['%9.3e'%i for i in self.molarRadioactivityFractions])
+     return s % (self.name, self.formulaName, self.phase, self.__ReorderFormula(), self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarRadioactivity*self.molarCC,'[Ci/cc]',self.molarHeatPwr, self.molarHeatPwrUnit, self.molarHeatPwr*self.molarCC,'[W/cc]',self.molarGammaPwr, self.molarGammaPwrUnit,self.molarGammaPwr*self.molarCC,'[W/cc]',[ i.split('*')[-1] for i in self.formula],['%9.3e'%i for i in self.molarRadioactivityFractions])
 
  def __repr__( self ):
      s = '\n\t Specie(): name=%s;'+' formulaName=%s;'+' phase=%s;'+'\n\t formula=%s;'+'\n\t # atoms=%s;'+' # nuclide types=%s;'+' molar mass=%9.3e[%s];'+' molar cc=%9.3e[%s];'+' mass cc=%9.3e[%s];'+'\n\t flag=%s;'+'\n\t molar radioactivity=%9.3e[%s];'+'\n\t radioactivity  dens.=%9.3e[%s];'+'\n\t molar heat pwr=%9.3e[%s];'+'\n\t heat pwr dens.=%9.3e[%s];'+'\n\t molar gamma pwr=%9.3e[%s];'+'\n\t gamma pwr dens.=%9.3e[%s];'+'\n\t atoms=%s;'+'\n\t molar radioactivity fractions=%s'
-     return s % (self.name, self.formulaName, self.phase, _ReorderFormula(self), self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarRadioactivity*self.molarCC,'[Ci/cc]',self.molarHeatPwr, self.molarHeatPwrUnit, self.molarHeatPwr*self.molarCC,'[W/cc]',self.molarGammaPwr, self.molarGammaPwrUnit, self.molarGammaPwr*self.molarCC,'[W/cc]',[ i.split('*')[-1] for i in self.formula],['%9.3e'%i for i in self.molarRadioactivityFractions])
+     return s % (self.name, self.formulaName, self.phase, self.__ReorderFormula(), self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarRadioactivity*self.molarCC,'[Ci/cc]',self.molarHeatPwr, self.molarHeatPwrUnit, self.molarHeatPwr*self.molarCC,'[W/cc]',self.molarGammaPwr, self.molarGammaPwrUnit, self.molarGammaPwr*self.molarCC,'[W/cc]',[ i.split('*')[-1] for i in self.formula],['%9.3e'%i for i in self.molarRadioactivityFractions])
 #*******************************************************************************

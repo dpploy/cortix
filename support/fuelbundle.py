@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
@@ -23,8 +23,6 @@ import os, sys
 import math
 import pandas
 from copy import deepcopy
-
-from ._fuelbundle import _FuelBundle  # constructor
 #*******************************************************************************
 
 #*******************************************************************************
@@ -35,14 +33,14 @@ class FuelBundle():
                specs = pandas.DataFrame()
              ):
 
-     # constructor
-     _FuelBundle( self, 
-                  specs
-                )
+     assert type(specs) == type(pandas.DataFrame()), 'oops not pandas table.'
+
+     self._specs = specs
+
+     self._solidPhase = None
+     self._gasPhase   = None
 
      return
-
-#*******************************************************************************
 
 #*******************************************************************************
 # Setters and Getters methods

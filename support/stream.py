@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
@@ -11,8 +11,10 @@ Sat Aug 15 17:24:02 EDT 2015
 
 #*******************************************************************************
 import os, sys
-from ._stream  import _Stream
 import pandas
+
+from cortix.support.specie   import Specie
+from cortix.support.quantity import Quantity
 #*******************************************************************************
 
 #*******************************************************************************
@@ -27,10 +29,49 @@ class Stream():
 
      # constructor
      # THIS WILL CREATE AN ORDERED "STREAM"; values must be in order!
-     _Stream( self, timeStamp, species, quantities, values )
 
-     return
-#*******************************************************************************
+  assert type(timeStamp) == type(float())
+
+  self.timeStamp = timeStamp
+
+  if species is not None: 
+     assert type(species) == type(list())
+     if len(species) > 0:
+        assert type(species[-1]) == type(Specie())
+
+  if quantities is not None: 
+     assert type(quantities) == type(list())
+     if len(quantities) > 0:
+        assert type(quantities[-1]) == type(Quantity())
+
+#  assert type(value) == type(float())
+
+# List of quantities and species objects
+  self.species    = species       # list
+  self.quantities = quantities    # list
+
+  names = list() # note order of names; values must be in the same order; caution
+
+  for specie in self.species:
+      names.append(specie.name)
+
+  for quant in self.quantities:
+      names.append(quant.name)
+
+# ORDERED data; caution!!
+# Table data stream 
+  self.stream = pandas.DataFrame( index=[timeStamp], columns = names )
+  if type(values) == type(float()): 
+     self.stream.fillna( values, inplace = True )
+  else:
+     self.stream.fillna( 0.0, inplace = True )
+
+  if type(values) == type(list()) and len(values) == len(names):
+     for (name,val) in zip( names, values):
+         self.stream.loc[timeStamp,name] = val
+   
+  return
+
 
 #*******************************************************************************
 # Setters and Getters methods

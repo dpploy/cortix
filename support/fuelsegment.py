@@ -1,25 +1,78 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
-Valmor F. de Almeida dealmeidav@ornl.gov; vfda
+Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
-Fuel segment support class
+Fuel segment 
 
-A FuelSegment object describes the full composition and geometry of a fuel
-segment.
+VFdALib support classes 
 
-Thu Jun 25 18:16:06 EDT 2015
+Sat Jun 27 14:46:49 EDT 2015
 """
-#*********************************************************************************
+#*******************************************************************************
 import os, sys, io, time, datetime
 import math, random
-from ..periodictable import ELEMENTS
-from ..periodictable import SERIES
+import pandas
+
+from cortix.support.periodictable import ELEMENTS
+from cortix.support.periodictable import SERIES
+from cortix.support.specie        import Specie 
+#*******************************************************************************
+
+#*******************************************************************************
+class FuelSegment():
+
+#Todo: Species should not be here. Need to replace by Phase instead.
+#      Chopper will be affected
+
+ def __init__( self, 
+               geometry = pandas.Series(),
+               species  = list()
+             ):
+
+  assert type(geometry) == type(pandas.Series()), 'fatal.'
+  assert type(species)  == type(list()), 'fatal.'
+  if type(species) == type(list()) and len(species) > 0:
+     assert type(species[0]) == type(Specie())
+
+  self.attributeNames = \
+  ['nSegments','fuelVolume','fuelDiameter','fuelLength','mass','massDens','massCC','nuclides','isotopes','radioactivity','radioactivityDens','gamma','gammaDens','heat','heatDens','molarHeatPwr','molarGammaPwr']
+
+  self._geometry = geometry
+  self._species  = species
+
+
+#*******************************************************************************
+
+#*******************************************************************************
+# Setters and Getters methods
+#-------------------------------------------------------------------------------
+# These are passing arguments by value effectively. Because the python objects
+# passed into/out of the function are immutable.
+
+ def GetGeometry(self):
+     return self._geometry
+ geometry = property(GetGeometry,None,None,None)
+
+ def GetSpecies(self):
+     return self._species
+ species = property(GetSpecies,None,None,None)
+
+ def GetSpecie(self, name):
+     for specie in self._species:
+       if specie.name == name: return specie
+     return None 
+ specie = property(GetSpecie,None,None,None)
+
+ def GetAttribute(self, name, symbol=None, series=None):
+     return self.__GetAttribute( name, symbol, series )
+
+
 #*********************************************************************************
 
 # Get stored fuel segment property either overall or on a nuclide basis 
 
 #---------------------------------------------------------------------------------
-def _GetAttribute(self, attributeName, nuclide=None, series=None ):
+ def __GetAttribute(self, attributeName, nuclide=None, series=None ):
 
   assert attributeName in self.attributeNames, ' attribute name: %r; options: %r; fail.' % (attributeName,self.attributeNames)
 
@@ -45,7 +98,7 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
 #.................................................................................
 # fuel volume
 
-  if attributeName == 'fuelVolume':   return  __GetFuelSegmentVolume( self )
+  if attributeName == 'fuelVolume':   return  self.__GetFuelSegmentVolume()
 #.................................................................................
 # segment volume
 
@@ -84,7 +137,7 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
         if attributeName == 'massCC' or attributeName == 'massDens': 
           return massCC
         else:
-          volume = __GetFuelSegmentVolume( self )
+          volume = self.__GetFuelSegmentVolume()
           return massCC * volume
 # radioactivity 
      if attributeName == 'radioactivtyDens' or attributeName == 'radioactivity':
@@ -94,7 +147,7 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
         if attributeName == 'radioactivityDens': 
           return radDens
         else:
-          volume = __GetFuelSegmentVolume( self )
+          volume = self.__GetFuelSegmentVolume()
           return radDens * volume
 # gamma          
      if attributeName == 'gammaDens' or attributeName == 'gamma':
@@ -104,7 +157,7 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
         if attributeName == 'gammaDens': 
           return gammaDens
         else:
-          volume = __GetFuelSegmentVolume( self )
+          volume = self.__GetFuelSegmentVolume()
           return gammaDens * volume
 # heat           
      if attributeName == 'heatDens' or attributeName == 'heat':
@@ -114,7 +167,7 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
         if attributeName == 'heatDens': 
           return heatDens
         else:
-          volume = __GetFuelSegmentVolume( self )
+          volume = self.__GetFuelSegmentVolume()
           return heatDens * volume
 
 #.................................................................................
@@ -158,7 +211,7 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
 #     density = self.propertyDensities[ colName ].sum()
 #
 #     if attributeDens is False:  
-#        volume = __GetFuelSegmentVolume( self )
+#        volume = self.__GetFuelSegmentVolume()
 #        prop = density * volume
 #        return prop
 #     else:
@@ -175,7 +228,7 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
 #       density += self.propertyDensities.loc[isotope,colName]
 #
 #     if attributeDens is False:  
-#        volume = __GetFuelSegmentVolume( self )
+#        volume = self.__GetFuelSegmentVolume()
 #        prop = density * volume
 #        return prop
 #     else:
@@ -228,7 +281,7 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
 
            massCC += spc.molarCC * moleFraction * nuclideMolarMass
 
-       return  massCC * __GetFuelSegmentVolume( self )
+       return  massCC * self.__GetFuelSegmentVolume()
 
   # chemical element given (only atomic number given)
     elif len(nuclide.split('-')) == 1: 
@@ -272,14 +325,14 @@ def _GetAttribute(self, attributeName, nuclide=None, series=None ):
 
            massCC += spc.molarCC * moleFraction * formulaNuclideMolarMass
 
-       return  massCC * __GetFuelSegmentVolume( self )
+       return  massCC * self.__GetFuelSegmentVolume()
 
     else:
 
       assert False
 
 #---------------------------------------------------------------------------------
-def __GetFuelSegmentVolume(self):
+ def __GetFuelSegmentVolume(self):
  
   fuelLength = self.geometry['fuel length [cm]'] 
   fuelDiam   = self.geometry['fuel diameter [cm]']
@@ -289,3 +342,14 @@ def __GetFuelSegmentVolume(self):
   return volume
 
 #*********************************************************************************
+
+#*******************************************************************************
+# Printing of data members
+ def __str__( self ):
+     s = 'FuelSegment(): %s\n %s\n'
+     return s % (self._geometry, self._species)
+
+ def __repr__( self ):
+     s = 'FuelSegment(): %s\n %s\n'
+     return s % (self._geometry, self._species)
+#*******************************************************************************
