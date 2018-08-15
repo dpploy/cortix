@@ -27,4 +27,4 @@ record*
 .idea
 pylintrc
 docs/_build
-docs/src_rst
+docs/*_rst

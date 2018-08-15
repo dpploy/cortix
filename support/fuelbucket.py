@@ -1,13 +1,13 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
 This FuelBucket class is a container for usage with other plant-level process modules.
 It is meant to represent a fuel bucket of a metal fuel reactor.
 
----------
+----------
 ATTENTION:
----------
+----------
 
 This container uses Phase() for phases (cladding and fuel). Therefore user is 
 responsible to make the "history" of the phases consistent. See Phase() info.
@@ -23,8 +23,6 @@ import os, sys
 import math
 import pandas
 from copy import deepcopy
-
-from ._fuelbucket import _FuelBucket  # constructor
 #*******************************************************************************
 
 #*******************************************************************************
@@ -35,10 +33,14 @@ class FuelBucket():
                specs = pandas.DataFrame()
              ):
 
-     # constructor
-     _FuelBucket( self, 
-                  specs
-                )
+     assert type(specs) == type(pandas.DataFrame()), 'oops not pandas table.'
+
+     self._specs = specs
+
+     self._solidPhase    = None
+
+     self._fuelPhase     = None
+     self._claddingPhase = None
 
      return
 

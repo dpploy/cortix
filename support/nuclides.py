@@ -1,23 +1,63 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 """
-Valmor F. de Almeida dealmeidav@ornl.gov; vfda
+Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
-Nuclides container 
+Nuclides container.
+The purpose of the this container is to store and query a table of nuclides.
+Typically the table is filled in with data from an ORIGEN calculation or 
+some other fission/transmutation code.
 
-Thu Jun 25 18:16:06 EDT 2015
+VFdALib support classes 
+
+Sat Jun 27 14:46:49 EDT 2015
 """
-#*********************************************************************************
+
+#*******************************************************************************
 import os, sys, io, time, datetime
 import math, random
+import pandas
 
 from cortix.support.periodictable import ELEMENTS
 from cortix.support.periodictable import SERIES
+#*******************************************************************************
+
+#*******************************************************************************
+class Nuclides():
+
+ def __init__( self, 
+               propertyDensities = pandas.DataFrame()
+             ):
+
+  assert type(propertyDensities) == type(pandas.DataFrame()), 'fatal.'
+
+  self.attributeNames = \
+   ['nuclides', 'isotopes', 'massDens', 'massCC','radioactivityDens', 'thermalDens','heatDens','gammaDens']
+
+  self.chemicalElementSeries = \
+  ['alkali metals', 'alkali earth metals', 'lanthanides', 'actinides', 
+   'transition metals','noble gases','metalloids','fission products','nonmetals',
+   'oxide fission products','halogens', 'minor actinides', 'volatile fission products','poor metals']
+
+  self.propertyDensities = propertyDensities; 
+
+  return
+
+#*******************************************************************************
+# Setters and Getters methods
+#-------------------------------------------------------------------------------
+# These are passing arguments by value effectively. Because the python objects
+# passed into/out of the function are immutable.
+
+ def GetAttribute(self, name, symbol=None, series=None):
+     return self.__GetAttribute( name, symbol, series )
+
+
 #*********************************************************************************
 
 # Get property either overall or on a nuclide basis 
 
 #---------------------------------------------------------------------------------
-def _GetAttribute(self, attributeName, symbol=None, series=None ):
+ def __GetAttribute(self, attributeName, symbol=None, series=None ):
 
   assert attributeName in self.attributeNames, ' attribute name: %r; options: %r; fail.' % (attributeName,self.attributeNames)
 
@@ -201,3 +241,14 @@ def _GetAttribute(self, attributeName, symbol=None, series=None ):
     return float(density) # avoid numpy.float64.type
 
 #*********************************************************************************
+
+#*******************************************************************************
+# Printing of data members
+# def __str__( self ):
+#     s = ' %5s %5s %5s '+' molar mass: %6s '+' molar cc: %6s '+' mass cc: %6s '+' flag: %s '+'# atoms: %s'+' atoms: %s\n'
+#     return s % (self.name, self.formulaName, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)
+#
+# def __repr__( self ):
+#     s = ' %5s %5s %5s '+' molar mass: %6s '+' molar cc: %6s '+' mass cc: %6s '+' flag: %s '+'# atoms: %s'+' atoms: %s\n'
+#     return s % (self.name, self.formulaName, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)
+#*******************************************************************************
