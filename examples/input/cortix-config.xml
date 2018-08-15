@@ -646,7 +646,7 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="support.viz.pyplot" type="native">
+   <module name="modulib.pyplot" type="native">
     <library name='cortix'>
      <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev
@@ -688,7 +688,7 @@
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence-input" toModuleSlot="support.viz.pyplot:0" toPort="pyplot-solo-input"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence-input" toModuleSlot="modulib.pyplot:0" toPort="pyplot-solo-input"/> 
    </network>
 
 
@@ -721,7 +721,7 @@
     <connect fromModuleSlot="oldchopper:0" fromPort="solids-input" toModuleSlot="oldchopper:0" toPort="Fuel_Solid"/> 
     <connect fromModuleSlot="oldchopper:0" fromPort="gas-input" toModuleSlot="oldchopper:0" toPort="Gas_Release"/> 
     <connect fromModuleSlot="oldchopper:0" fromPort="fines-input" toModuleSlot="oldchopper:0" toPort="Particulate"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="oldchopper:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="oldchopper:0" toPort="off-gas"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -747,8 +747,8 @@
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
     <connect fromModuleSlot="dissolverA:0" fromPort="solids-input" toModuleSlot="dissolverA:0" toPort="dissolver-solo-input"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="vapor"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="vapor"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -762,7 +762,7 @@
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
     <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="condenser:0" toPort="condenser-solo-input"/> 
     <connect fromModuleSlot="condenser:0" fromPort="persistent-output" toModuleSlot="condenser:0" toPort="condensate"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="state"/>  
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="state"/>  
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -775,7 +775,7 @@
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
     <connect fromModuleSlot="tank:0" fromPort="liquid" toModuleSlot="tank:0" toPort="tank-solo-input"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="tank:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="tank:0" toPort="state"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -788,7 +788,7 @@
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
     <connect fromModuleSlot="cooltower:0" fromPort="water-input" toModuleSlot="cooltower:0" toPort="cooltower-solo-input"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="cooltower:0" toPort="cold-water"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="cooltower:0" toPort="cold-water"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -801,7 +801,7 @@
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
     <connect fromModuleSlot="plume:0" fromPort="offgas-input" toModuleSlot="plume:0" toPort="plume-solo-input"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-tables" toModuleSlot="plume:0" toPort="puff"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-tables" toModuleSlot="plume:0" toPort="puff"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -814,9 +814,9 @@
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
     <connect fromModuleSlot="solventxtract:0" fromPort="liquid-input" toModuleSlot="solventxtract:0" toPort="solventxtract-solo-input"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="solventxtract:0" toPort="status-signal"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="solventxtract:0" toPort="state"/> 
-<!--    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="solventxtract:0" toPort="product-plot"/> -->
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="solventxtract:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="solventxtract:0" toPort="state"/> 
+<!--    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="solventxtract:0" toPort="product-plot"/> -->
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -834,8 +834,8 @@
 <!--
     <connect fromModuleSlot="chopper:0" fromPort="persistent-output" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
 -->
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -852,11 +852,11 @@
     <connect fromModuleSlot="chopper:0" fromPort="fuel-bundle" toModuleSlot="fueldepot:0" toPort="fuel-bundle"/> 
     <connect fromModuleSlot="chopper:0" fromPort="go-signal" toModuleSlot="storage:0" toPort="status-signal"/> 
     <connect fromModuleSlot="storage:0" fromPort="fuel-segments" toModuleSlot="chopper:0" toPort="fuel-segments"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
-    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="storage:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="storage:0" toPort="status-signal"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -876,11 +876,11 @@
     <connect fromModuleSlot="dissolver:0" fromPort="persistent-output" toModuleSlot="dissolver:0" toPort="vapor-table"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="persistent-output" toModuleSlot="dissolver:0" toPort="vapor"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="persistent-output" toModuleSlot="dissolver:0" toPort="product"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
-    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="status-signal"/> 
-    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
-<!--    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="product-plot"/>  -->
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
+<!--    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="product-plot"/>  -->
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -900,10 +900,10 @@
 <!--
     <connect fromModuleSlot="dissolverFpot:0" fromPort="persistent-output" toModuleSlot="dissolverFpot:0" toPort="solution"/> 
 -->
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverFpot:0" toPort="status-signal"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverFpot:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverFpot:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverFpot:0" toPort="state"/> 
 <!--
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverFpot:0" toPort="solution-plot"/>  
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverFpot:0" toPort="solution-plot"/>  
 -->
    </network>
 
@@ -920,10 +920,10 @@
     <connect fromModuleSlot="tank:0" fromPort="go-signal" toModuleSlot="feedprep:0" toPort="status-signal"/> 
     <connect fromModuleSlot="feedprep:0" fromPort="liquid" toModuleSlot="tank:0" toPort="product"/> 
     <connect fromModuleSlot="feedprep:0" fromPort="persistent-output" toModuleSlot="feedprep:0" toPort="product"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="tank:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="tank:0" toPort="status-signal"/>  
-    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="tank:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="tank:0" toPort="status-signal"/>  
+    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="status-signal"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -944,13 +944,13 @@
     <connect fromModuleSlot="dissolver:0" fromPort="persistent-output" toModuleSlot="dissolver:0" toPort="vapor"/> 
     <connect fromModuleSlot="dissolver:0" fromPort="go-signal" toModuleSlot="tank:0" toPort="status-signal"/> 
     <connect fromModuleSlot="tank:0" fromPort="liquid" toModuleSlot="dissolver:0" toPort="product"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
-    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="status-signal"/> 
-    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
-<!--    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="product-plot"/>  -->
-    <connect fromModuleSlot="support.viz.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="status-signal"/>  
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
+<!--    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="product-plot"/>  -->
+    <connect fromModuleSlot="modulib.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="status-signal"/>  
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -974,15 +974,15 @@
     <connect fromModuleSlot="tank:0" fromPort="go-signal" toModuleSlot="feedprep:0" toPort="status-signal"/> 
     <connect fromModuleSlot="feedprep:0" fromPort="liquid" toModuleSlot="tank:0" toPort="product"/> 
     <connect fromModuleSlot="feedprep:0" fromPort="persistent-output" toModuleSlot="feedprep:0" toPort="product"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
-    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="status-signal"/> 
-    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="status-signal"/>  
-    <connect fromModuleSlot="support.viz.pyplot:3" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="state"/> 
-<!--    <connect fromModuleSlot="support.viz.pyplot:3" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="product-plot"/> -->
-    <connect fromModuleSlot="support.viz.pyplot:3" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="status-signal"/>  
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="status-signal"/>  
+    <connect fromModuleSlot="modulib.pyplot:3" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="state"/> 
+<!--    <connect fromModuleSlot="modulib.pyplot:3" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="product-plot"/> -->
+    <connect fromModuleSlot="modulib.pyplot:3" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="status-signal"/>  
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -1005,16 +1005,16 @@
     <connect fromModuleSlot="feedprep:0" fromPort="liquid" toModuleSlot="tank:0" toPort="product"/> 
     <connect fromModuleSlot="feedprep:0" fromPort="go-signal" toModuleSlot="solventxtract:0" toPort="status-signal"/> 
     <connect fromModuleSlot="solventxtract:0" fromPort="liquid" toModuleSlot="feedprep:0" toPort="product"/> 
-<!--    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> -->
-    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="status-signal"/> 
-    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
-<!--    <connect fromModuleSlot="support.viz.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="product-plot"/>  -->
-<!--    <connect fromModuleSlot="support.viz.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="status-signal"/>  -->
-    <connect fromModuleSlot="support.viz.pyplot:2" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:2" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="status-signal"/>  
-    <connect fromModuleSlot="support.viz.pyplot:3" fromPort="time-sequence" toModuleSlot="solventxtract:0" toPort="status-signal"/>  
+<!--    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="status-signal"/> -->
+    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="status-signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="state"/> 
+<!--    <connect fromModuleSlot="modulib.pyplot:1" fromPort="time-sequence" toModuleSlot="dissolver:0" toPort="product-plot"/>  -->
+<!--    <connect fromModuleSlot="modulib.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:2" fromPort="time-sequence" toModuleSlot="tank:0" toPort="status-signal"/>  -->
+    <connect fromModuleSlot="modulib.pyplot:2" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:2" fromPort="time-sequence" toModuleSlot="feedprep:0" toPort="status-signal"/>  
+    <connect fromModuleSlot="modulib.pyplot:3" fromPort="time-sequence" toModuleSlot="solventxtract:0" toPort="status-signal"/>  
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -1043,19 +1043,19 @@
 <!--
     <connect fromModuleSlot="plume" fromPort="off-gas" toModuleSlot="offgas" toPort="off-gas"/> 
 -->
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="oldchopper:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="signal"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="vapor"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="scrubber:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="filter:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="offgas:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="oldchopper:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="vapor"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="scrubber:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="filter:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="offgas:0" toPort="off-gas"/> 
 <!--
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-tables" toModuleSlot="plume:0" toPort="time-puff"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-tables" toModuleSlot="plume:0" toPort="time-puff"/> 
 -->
    </network>
 
@@ -1077,14 +1077,14 @@
     <connect fromModuleSlot="dissolverA:0" fromPort="solids" toModuleSlot="storage:0" toPort="fuel-segments"/> 
     <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolverA:0" toPort="vapor"/> 
     <connect fromModuleSlot="dissolverA:0" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="signal"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="vapor"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="vapor"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
    </network>
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
@@ -1109,17 +1109,17 @@
     <connect fromModuleSlot="dissolverA:0" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
     <connect fromModuleSlot="condenser:0" fromPort="vapor" toModuleSlot="dissolverA:1" toPort="vapor"/> 
     <connect fromModuleSlot="dissolverA:1" fromPort="condensate" toModuleSlot="condenser:0" toPort="condensate"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="signal"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="vapor"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:1" toPort="signal"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:1" toPort="vapor"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:1" toPort="state"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
-    <connect fromModuleSlot="support.viz.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="chopper:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="storage:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="vapor"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:0" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:1" toPort="signal"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:1" toPort="vapor"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="dissolverA:1" toPort="state"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="off-gas"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="condenser:0" toPort="condensate"/> 
    </network>
 
    <!--                  Network objects end here                                   -->
