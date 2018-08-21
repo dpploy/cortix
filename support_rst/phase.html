@@ -1,0 +1,213 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>phase module &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-phase">
+<span id="phase-module"></span><h1>phase module<a class="headerlink" href="#module-phase" title="Permalink to this headline">¶</a></h1>
+<p>Author: Valmor F. de Almeida <a class="reference external" href="mailto:dealmeidav&#37;&#52;&#48;ornl&#46;gov">dealmeidav<span>&#64;</span>ornl<span>&#46;</span>gov</a>; vfda</p>
+<p>Phase <em>history</em> container. When you think of a phase value, think of that value at
+a specific point in time.</p>
+<div class="section" id="attention">
+<h2>ATTENTION:<a class="headerlink" href="#attention" title="Permalink to this headline">¶</a></h2>
+<p>The species (list of Specie) AND quantities (list of Quantity) data members
+have ARBITRARY density values either at an arbitrary point in the history or at
+no point in the history. This needs to be removed in the future.</p>
+<p>To obtain history values, associated to the phase, at a particular point in time,
+use the GetValue() method to access the history data frame (pandas) via columns and
+rows. The corresponding values in species and quantities are OVERRIDEN and NOT to
+be used through the phase interface.</p>
+<p>VFdALib support classes</p>
+<p>Sat Sep  5 01:26:53 EDT 2015</p>
+<dl class="class">
+<dt id="phase.Phase">
+<em class="property">class </em><code class="descclassname">phase.</code><code class="descname">Phase</code><span class="sig-paren">(</span><em>timeStamp=None</em>, <em>species=None</em>, <em>quantities=None</em>, <em>value=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="phase.Phase.AddQuantity">
+<code class="descname">AddQuantity</code><span class="sig-paren">(</span><em>newQuant</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.AddQuantity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.AddQuantity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.AddRow">
+<code class="descname">AddRow</code><span class="sig-paren">(</span><em>timeStamp</em>, <em>rowValues</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.AddRow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.AddRow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.AddSpecie">
+<code class="descname">AddSpecie</code><span class="sig-paren">(</span><em>newSpecie</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.AddSpecie"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.AddSpecie" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.ClearHistory">
+<code class="descname">ClearHistory</code><span class="sig-paren">(</span><em>value=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.ClearHistory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.ClearHistory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.GetActors">
+<code class="descname">GetActors</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.GetActors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.GetActors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.GetColumn">
+<code class="descname">GetColumn</code><span class="sig-paren">(</span><em>actor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.GetColumn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.GetColumn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.GetQuantities">
+<code class="descname">GetQuantities</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.GetQuantities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.GetQuantities" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.GetQuantity">
+<code class="descname">GetQuantity</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.GetQuantity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.GetQuantity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.GetRow">
+<code class="descname">GetRow</code><span class="sig-paren">(</span><em>timeStamp=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.GetRow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.GetRow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.GetSpecie">
+<code class="descname">GetSpecie</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.GetSpecie"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.GetSpecie" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.GetSpecies">
+<code class="descname">GetSpecies</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.GetSpecies"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.GetSpecies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.GetTimeStamps">
+<code class="descname">GetTimeStamps</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.GetTimeStamps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.GetTimeStamps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.GetValue">
+<code class="descname">GetValue</code><span class="sig-paren">(</span><em>actor</em>, <em>timeStamp=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.GetValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.GetValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.ResetHistory">
+<code class="descname">ResetHistory</code><span class="sig-paren">(</span><em>timeStamp=None</em>, <em>value=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.ResetHistory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.ResetHistory" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.ScaleRow">
+<code class="descname">ScaleRow</code><span class="sig-paren">(</span><em>timeStamp</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.ScaleRow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.ScaleRow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.SetSpecieId">
+<code class="descname">SetSpecieId</code><span class="sig-paren">(</span><em>name</em>, <em>val</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.SetSpecieId"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.SetSpecieId" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.SetValue">
+<code class="descname">SetValue</code><span class="sig-paren">(</span><em>actor</em>, <em>value</em>, <em>timeStamp=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.SetValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.SetValue" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase.Phase.WriteHTML">
+<code class="descname">WriteHTML</code><span class="sig-paren">(</span><em>fileName</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase.html#Phase.WriteHTML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase.Phase.WriteHTML" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="phase.Phase.quantities">
+<code class="descname">quantities</code><a class="headerlink" href="#phase.Phase.quantities" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="phase.Phase.species">
+<code class="descname">species</code><a class="headerlink" href="#phase.Phase.species" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="phase.Phase.timeStamps">
+<code class="descname">timeStamps</code><a class="headerlink" href="#phase.Phase.timeStamps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Valmor F. de Almeida.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.
+    </div>
+  </body>
+</html>

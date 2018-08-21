@@ -1,0 +1,442 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>fuelsegment &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fuelsegment</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Author: Valmor de Almeida dealmeidav@ornl.gov; vfda</span>
+
+<span class="sd">Fuel segment </span>
+
+<span class="sd">VFdALib support classes </span>
+
+<span class="sd">Sat Jun 27 14:46:49 EDT 2015</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1">#*******************************************************************************</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">io</span><span class="o">,</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">math</span><span class="o">,</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+
+<span class="kn">from</span> <span class="nn">cortix.support.periodictable</span> <span class="k">import</span> <span class="n">ELEMENTS</span>
+<span class="kn">from</span> <span class="nn">cortix.support.periodictable</span> <span class="k">import</span> <span class="n">SERIES</span>
+<span class="kn">from</span> <span class="nn">cortix.support.specie</span>        <span class="k">import</span> <span class="n">Specie</span> 
+<span class="c1">#*******************************************************************************</span>
+
+<span class="c1">#*******************************************************************************</span>
+<div class="viewcode-block" id="FuelSegment"><a class="viewcode-back" href="../support_rst/fuelsegment.html#fuelsegment.FuelSegment">[docs]</a><span class="k">class</span> <span class="nc">FuelSegment</span><span class="p">():</span>
+
+<span class="c1">#Todo: Species should not be here. Need to replace by Phase instead.</span>
+<span class="c1">#      Chopper will be affected</span>
+
+ <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> 
+               <span class="n">geometry</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(),</span>
+               <span class="n">species</span>  <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+             <span class="p">):</span>
+
+  <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">geometry</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">()),</span> <span class="s1">&#39;fatal.&#39;</span>
+  <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">species</span><span class="p">)</span>  <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="nb">list</span><span class="p">()),</span> <span class="s1">&#39;fatal.&#39;</span>
+  <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">species</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="nb">list</span><span class="p">())</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">species</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">species</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">Specie</span><span class="p">())</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">attributeNames</span> <span class="o">=</span> \
+  <span class="p">[</span><span class="s1">&#39;nSegments&#39;</span><span class="p">,</span><span class="s1">&#39;fuelVolume&#39;</span><span class="p">,</span><span class="s1">&#39;fuelDiameter&#39;</span><span class="p">,</span><span class="s1">&#39;fuelLength&#39;</span><span class="p">,</span><span class="s1">&#39;mass&#39;</span><span class="p">,</span><span class="s1">&#39;massDens&#39;</span><span class="p">,</span><span class="s1">&#39;massCC&#39;</span><span class="p">,</span><span class="s1">&#39;nuclides&#39;</span><span class="p">,</span><span class="s1">&#39;isotopes&#39;</span><span class="p">,</span><span class="s1">&#39;radioactivity&#39;</span><span class="p">,</span><span class="s1">&#39;radioactivityDens&#39;</span><span class="p">,</span><span class="s1">&#39;gamma&#39;</span><span class="p">,</span><span class="s1">&#39;gammaDens&#39;</span><span class="p">,</span><span class="s1">&#39;heat&#39;</span><span class="p">,</span><span class="s1">&#39;heatDens&#39;</span><span class="p">,</span><span class="s1">&#39;molarHeatPwr&#39;</span><span class="p">,</span><span class="s1">&#39;molarGammaPwr&#39;</span><span class="p">]</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span> <span class="o">=</span> <span class="n">geometry</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">_species</span>  <span class="o">=</span> <span class="n">species</span>
+
+
+<span class="c1">#*******************************************************************************</span>
+
+<span class="c1">#*******************************************************************************</span>
+<span class="c1"># Setters and Getters methods</span>
+<span class="c1">#-------------------------------------------------------------------------------</span>
+<span class="c1"># These are passing arguments by value effectively. Because the python objects</span>
+<span class="c1"># passed into/out of the function are immutable.</span>
+
+<div class="viewcode-block" id="FuelSegment.GetGeometry"><a class="viewcode-back" href="../support_rst/fuelsegment.html#fuelsegment.FuelSegment.GetGeometry">[docs]</a> <span class="k">def</span> <span class="nf">GetGeometry</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span></div>
+ <span class="n">geometry</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetGeometry</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FuelSegment.GetSpecies"><a class="viewcode-back" href="../support_rst/fuelsegment.html#fuelsegment.FuelSegment.GetSpecies">[docs]</a> <span class="k">def</span> <span class="nf">GetSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_species</span></div>
+ <span class="n">species</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetSpecies</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FuelSegment.GetSpecie"><a class="viewcode-back" href="../support_rst/fuelsegment.html#fuelsegment.FuelSegment.GetSpecie">[docs]</a> <span class="k">def</span> <span class="nf">GetSpecie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+     <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_species</span><span class="p">:</span>
+       <span class="k">if</span> <span class="n">specie</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span> <span class="k">return</span> <span class="n">specie</span>
+     <span class="k">return</span> <span class="kc">None</span> </div>
+ <span class="n">specie</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetSpecie</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FuelSegment.GetAttribute"><a class="viewcode-back" href="../support_rst/fuelsegment.html#fuelsegment.FuelSegment.GetAttribute">[docs]</a> <span class="k">def</span> <span class="nf">GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">series</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetAttribute</span><span class="p">(</span> <span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">series</span> <span class="p">)</span></div>
+
+
+<span class="c1">#*********************************************************************************</span>
+
+<span class="c1"># Get stored fuel segment property either overall or on a nuclide basis </span>
+
+<span class="c1">#---------------------------------------------------------------------------------</span>
+ <span class="k">def</span> <span class="nf">__GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attributeName</span><span class="p">,</span> <span class="n">nuclide</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">series</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+
+  <span class="k">assert</span> <span class="n">attributeName</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributeNames</span><span class="p">,</span> <span class="s1">&#39; attribute name: </span><span class="si">%r</span><span class="s1">; options: </span><span class="si">%r</span><span class="s1">; fail.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">attributeName</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">attributeNames</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="n">nuclide</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">nuclide</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span> <span class="c1"># sanity check</span>
+
+  <span class="k">if</span> <span class="n">nuclide</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="k">assert</span> <span class="n">series</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;fail.&#39;</span>
+  <span class="k">if</span> <span class="n">series</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="k">assert</span> <span class="n">nuclide</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;fail.&#39;</span>
+
+  <span class="k">if</span> <span class="n">series</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span><span class="s1">&#39; not implemented.&#39;</span>
+
+  <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;isotopes&#39;</span><span class="p">:</span> <span class="k">assert</span> <span class="n">nuclide</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;need a nuclide symbol.&#39;</span>
+
+<span class="c1">#.................................................................................</span>
+<span class="c1"># # of segments</span>
+
+  <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;nSegments&#39;</span><span class="p">:</span>  <span class="k">return</span> <span class="mi">1</span>
+
+<span class="c1">#.................................................................................</span>
+<span class="c1"># segmentId   </span>
+
+  <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;segmentId&#39;</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">[</span><span class="s1">&#39;segment id&#39;</span><span class="p">]</span> 
+
+<span class="c1">#.................................................................................</span>
+<span class="c1"># fuel volume</span>
+
+  <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;fuelVolume&#39;</span><span class="p">:</span>   <span class="k">return</span>  <span class="bp">self</span><span class="o">.</span><span class="n">__GetFuelSegmentVolume</span><span class="p">()</span>
+<span class="c1">#.................................................................................</span>
+<span class="c1"># segment volume</span>
+
+  <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;segmentVolume&#39;</span><span class="p">:</span> 
+ 
+    <span class="n">claddingLength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">[</span><span class="s1">&#39;cladding length [cm]&#39;</span><span class="p">]</span> 
+    <span class="n">claddingDiam</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">[</span><span class="s1">&#39;OD [cm]&#39;</span><span class="p">]</span>
+    <span class="n">volume</span> <span class="o">=</span> <span class="n">claddingLength</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">claddingDiam</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="n">volume</span>
+
+<span class="c1">#.................................................................................</span>
+<span class="c1"># fuel diameter      </span>
+
+  <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;fuelDiameter&#39;</span><span class="p">:</span> 
+ 
+    <span class="n">fuelDiam</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">[</span><span class="s1">&#39;fuel diameter [cm]&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">fuelDiam</span>
+
+<span class="c1">#.................................................................................</span>
+<span class="c1"># fuel length        </span>
+
+  <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;fuelLength&#39;</span><span class="p">:</span> 
+ 
+    <span class="n">fuelLength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">[</span><span class="s1">&#39;fuel length [cm]&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">fuelLength</span>
+
+<span class="c1">#.................................................................................</span>
+<span class="c1"># fuel segment overall quantities</span>
+  <span class="k">if</span> <span class="n">nuclide</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">series</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+<span class="c1"># mass or mass concentration</span>
+     <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;massCC&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;massDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;mass&#39;</span><span class="p">:</span> 
+        <span class="n">massCC</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">spc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_species</span><span class="p">:</span>
+            <span class="n">massCC</span> <span class="o">+=</span> <span class="n">spc</span><span class="o">.</span><span class="n">massCC</span>
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;massCC&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;massDens&#39;</span><span class="p">:</span> 
+          <span class="k">return</span> <span class="n">massCC</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetFuelSegmentVolume</span><span class="p">()</span>
+          <span class="k">return</span> <span class="n">massCC</span> <span class="o">*</span> <span class="n">volume</span>
+<span class="c1"># radioactivity </span>
+     <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;radioactivtyDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;radioactivity&#39;</span><span class="p">:</span>
+        <span class="n">radDens</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">spc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_species</span><span class="p">:</span>
+            <span class="n">radDens</span> <span class="o">+=</span> <span class="n">spc</span><span class="o">.</span><span class="n">molarRadioactivity</span> <span class="o">*</span> <span class="n">spc</span><span class="o">.</span><span class="n">molarCC</span>
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;radioactivityDens&#39;</span><span class="p">:</span> 
+          <span class="k">return</span> <span class="n">radDens</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetFuelSegmentVolume</span><span class="p">()</span>
+          <span class="k">return</span> <span class="n">radDens</span> <span class="o">*</span> <span class="n">volume</span>
+<span class="c1"># gamma          </span>
+     <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;gammaDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;gamma&#39;</span><span class="p">:</span>
+        <span class="n">gammaDens</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">spc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_species</span><span class="p">:</span>
+            <span class="n">gammaDens</span> <span class="o">+=</span> <span class="n">spc</span><span class="o">.</span><span class="n">molarGammaPwr</span> <span class="o">*</span> <span class="n">spc</span><span class="o">.</span><span class="n">molarCC</span>
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;gammaDens&#39;</span><span class="p">:</span> 
+          <span class="k">return</span> <span class="n">gammaDens</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetFuelSegmentVolume</span><span class="p">()</span>
+          <span class="k">return</span> <span class="n">gammaDens</span> <span class="o">*</span> <span class="n">volume</span>
+<span class="c1"># heat           </span>
+     <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;heatDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span>
+        <span class="n">heatDens</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">spc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_species</span><span class="p">:</span>
+            <span class="n">heatDens</span> <span class="o">+=</span> <span class="n">spc</span><span class="o">.</span><span class="n">molarHeatPwr</span> <span class="o">*</span> <span class="n">spc</span><span class="o">.</span><span class="n">molarCC</span>
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;heatDens&#39;</span><span class="p">:</span> 
+          <span class="k">return</span> <span class="n">heatDens</span>
+        <span class="k">else</span><span class="p">:</span>
+          <span class="n">volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetFuelSegmentVolume</span><span class="p">()</span>
+          <span class="k">return</span> <span class="n">heatDens</span> <span class="o">*</span> <span class="n">volume</span>
+
+<span class="c1">#.................................................................................</span>
+<span class="c1"># radioactivity               </span>
+
+  <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;radioactivityDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;radioactivity&#39;</span><span class="p">:</span> 
+     <span class="k">assert</span> <span class="kc">False</span>
+     <span class="n">colName</span> <span class="o">=</span> <span class="s1">&#39;Radioactivity Dens. [Ci/cc]&#39;</span>
+
+<span class="c1">#.................................................................................</span>
+<span class="c1"># thermal                     </span>
+
+  <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;thermalDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;thermal&#39;</span> <span class="ow">or</span>  \
+     <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;heatDens&#39;</span>    <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span> 
+     <span class="k">assert</span> <span class="kc">False</span>
+     <span class="n">colName</span> <span class="o">=</span> <span class="s1">&#39;Thermal Dens. [W/cc]&#39;</span>
+
+<span class="c1">#.................................................................................</span>
+<span class="c1"># gamma                       </span>
+
+  <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;gammaDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;gamma&#39;</span><span class="p">:</span> 
+     <span class="k">assert</span> <span class="kc">False</span>
+     <span class="n">colName</span> <span class="o">=</span> <span class="s1">&#39;Gamma Dens. [W/cc]&#39;</span>
+
+<span class="c1">#.................................................................................</span>
+<span class="c1">##################################################################################</span>
+<span class="c1">#.................................................................................</span>
+
+<span class="c1">#  if attributeName[-4:] == &#39;Dens&#39; or attributeName[-2:] == &#39;CC&#39;: </span>
+<span class="c1">#     attributeDens = True</span>
+<span class="c1">#  else:</span>
+<span class="c1">#     attributeDens = False </span>
+
+<span class="c1">#.................................................................................</span>
+<span class="c1"># all nuclide content of the fuel added</span>
+
+<span class="c1">#  if nuclide is None and series is None:</span>
+<span class="c1">#</span>
+<span class="c1">#     density = 0.0</span>
+<span class="c1">#</span>
+<span class="c1">#     density = self.propertyDensities[ colName ].sum()</span>
+<span class="c1">#</span>
+<span class="c1">#     if attributeDens is False:  </span>
+<span class="c1">#        volume = self.__GetFuelSegmentVolume()</span>
+<span class="c1">#        prop = density * volume</span>
+<span class="c1">#        return prop</span>
+<span class="c1">#     else:</span>
+<span class="c1">#        return density</span>
+
+<span class="c1">#.................................................................................</span>
+<span class="c1"># get chemical element series</span>
+
+<span class="c1">#  if series is not None:</span>
+<span class="c1"># </span>
+<span class="c1">#     density = 0.0</span>
+<span class="c1">#</span>
+<span class="c1">#     for isotope in isotopes:</span>
+<span class="c1">#       density += self.propertyDensities.loc[isotope,colName]</span>
+<span class="c1">#</span>
+<span class="c1">#     if attributeDens is False:  </span>
+<span class="c1">#        volume = self.__GetFuelSegmentVolume()</span>
+<span class="c1">#        prop = density * volume</span>
+<span class="c1">#        return prop</span>
+<span class="c1">#     else:</span>
+<span class="c1">#        return density</span>
+   
+<span class="c1">#.................................................................................</span>
+<span class="c1"># get specific nuclide (either the isotopes of the nuclide or the specific isotope) property</span>
+
+  <span class="k">if</span> <span class="n">nuclide</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+    <span class="c1"># a particular nuclide given (atomic number and atomic mass number)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nuclide</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> 
+
+       <span class="n">nuclideMassNumber</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nuclide</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">))</span>
+       <span class="n">nuclideSymbol</span>     <span class="o">=</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+       <span class="n">nuclideMolarMass</span>  <span class="o">=</span> <span class="n">ELEMENTS</span><span class="p">[</span><span class="n">nuclideSymbol</span><span class="p">]</span><span class="o">.</span><span class="n">isotopes</span><span class="p">[</span><span class="n">nuclideMassNumber</span><span class="p">]</span><span class="o">.</span><span class="n">mass</span>
+
+       <span class="n">massCC</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+       <span class="k">for</span> <span class="n">spc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_species</span><span class="p">:</span>
+
+         <span class="n">formula</span> <span class="o">=</span> <span class="n">spc</span><span class="o">.</span><span class="n">atoms</span>
+
+         <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">formula</span><span class="p">:</span>
+
+           <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># no multiplier (implies 1.0)</span>
+
+             <span class="n">formulaNuclideSymbol</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+             <span class="k">if</span> <span class="n">formulaNuclideSymbol</span> <span class="o">==</span> <span class="n">nuclideSymbol</span><span class="p">:</span> <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span>
+
+             <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">nuclide</span><span class="p">:</span> 
+                <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">1.0</span>
+             <span class="k">else</span><span class="p">:</span>
+                <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+           <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="c1"># with multiplier</span>
+
+             <span class="n">formulaNuclideSymbol</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+             <span class="k">if</span> <span class="n">formulaNuclideSymbol</span> <span class="o">==</span> <span class="n">nuclideSymbol</span><span class="p">:</span> <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span>
+
+             <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">nuclide</span><span class="p">:</span> 
+                <span class="n">moleFraction</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> 
+             <span class="k">else</span><span class="p">:</span>
+                <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+           <span class="k">else</span><span class="p">:</span>
+             <span class="k">assert</span> <span class="kc">False</span>
+
+           <span class="n">massCC</span> <span class="o">+=</span> <span class="n">spc</span><span class="o">.</span><span class="n">molarCC</span> <span class="o">*</span> <span class="n">moleFraction</span> <span class="o">*</span> <span class="n">nuclideMolarMass</span>
+
+       <span class="k">return</span>  <span class="n">massCC</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetFuelSegmentVolume</span><span class="p">()</span>
+
+  <span class="c1"># chemical element given (only atomic number given)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">nuclide</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> 
+
+       <span class="n">massCC</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+       <span class="k">for</span> <span class="n">spc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_species</span><span class="p">:</span>
+
+         <span class="n">formula</span> <span class="o">=</span> <span class="n">spc</span><span class="o">.</span><span class="n">atoms</span>
+
+         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">formula</span><span class="p">:</span>
+
+           <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+           <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span> <span class="c1"># no multiplier (implies 1.0)</span>
+
+             <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span>
+             <span class="n">formulaNuclideSymbol</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+             <span class="n">formulaNuclideMassNumber</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">))</span>
+             <span class="n">formulaNuclideMolarMass</span> <span class="o">=</span> <span class="n">ELEMENTS</span><span class="p">[</span><span class="n">formulaNuclideSymbol</span><span class="p">]</span><span class="o">.</span><span class="n">isotopes</span><span class="p">[</span><span class="n">formulaNuclideMassNumber</span><span class="p">]</span><span class="o">.</span><span class="n">mass</span>
+
+             <span class="k">if</span> <span class="n">formulaNuclideSymbol</span> <span class="o">==</span> <span class="n">nuclide</span><span class="p">:</span> 
+                <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">1.0</span>
+             <span class="k">else</span><span class="p">:</span>
+                <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+           <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span> <span class="c1"># with multiplier</span>
+
+             <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span>
+             <span class="n">formulaNuclideSymbol</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+             <span class="n">formulaNuclideMassNumber</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">))</span>
+             <span class="n">formulaNuclideMolarMass</span> <span class="o">=</span> <span class="n">ELEMENTS</span><span class="p">[</span><span class="n">formulaNuclideSymbol</span><span class="p">]</span><span class="o">.</span><span class="n">isotopes</span><span class="p">[</span><span class="n">formulaNuclideMassNumber</span><span class="p">]</span><span class="o">.</span><span class="n">mass</span>
+
+             <span class="k">if</span> <span class="n">formulaNuclideSymbol</span> <span class="o">==</span> <span class="n">nuclide</span><span class="p">:</span> 
+                <span class="n">moleFraction</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> 
+             <span class="k">else</span><span class="p">:</span>
+                <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+           <span class="k">else</span><span class="p">:</span>
+             <span class="k">assert</span> <span class="kc">False</span>
+
+           <span class="n">massCC</span> <span class="o">+=</span> <span class="n">spc</span><span class="o">.</span><span class="n">molarCC</span> <span class="o">*</span> <span class="n">moleFraction</span> <span class="o">*</span> <span class="n">formulaNuclideMolarMass</span>
+
+       <span class="k">return</span>  <span class="n">massCC</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetFuelSegmentVolume</span><span class="p">()</span>
+
+    <span class="k">else</span><span class="p">:</span>
+
+      <span class="k">assert</span> <span class="kc">False</span>
+
+<span class="c1">#---------------------------------------------------------------------------------</span>
+ <span class="k">def</span> <span class="nf">__GetFuelSegmentVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+ 
+  <span class="n">fuelLength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">[</span><span class="s1">&#39;fuel length [cm]&#39;</span><span class="p">]</span> 
+  <span class="n">fuelDiam</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">geometry</span><span class="p">[</span><span class="s1">&#39;fuel diameter [cm]&#39;</span><span class="p">]</span>
+
+  <span class="n">volume</span> <span class="o">=</span> <span class="n">fuelLength</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">fuelDiam</span><span class="o">/</span><span class="mf">2.0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+  <span class="k">return</span> <span class="n">volume</span>
+
+<span class="c1">#*********************************************************************************</span>
+
+<span class="c1">#*******************************************************************************</span>
+<span class="c1"># Printing of data members</span>
+ <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+     <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;FuelSegment(): </span><span class="si">%s</span><span class="se">\n</span><span class="s1"> </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
+     <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_species</span><span class="p">)</span>
+
+ <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+     <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;FuelSegment(): </span><span class="si">%s</span><span class="se">\n</span><span class="s1"> </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
+     <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_geometry</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_species</span><span class="p">)</span></div>
+<span class="c1">#*******************************************************************************</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Valmor F. de Almeida.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.
+    </div>
+  </body>
+</html>

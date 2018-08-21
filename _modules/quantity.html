@@ -1,0 +1,181 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>quantity &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for quantity</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Author: Valmor de Almeida dealmeidav@ornl.gov; vfda</span>
+
+<span class="sd">This Quantity class is to be used with other classes in plant-level process modules.</span>
+
+<span class="sd">For unit testing do at the linux command prompt:</span>
+<span class="sd">    python quantity.py</span>
+
+<span class="sd">Sat Sep  5 12:51:34 EDT 2015</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1">#*******************************************************************************</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="c1">#*******************************************************************************</span>
+
+<div class="viewcode-block" id="Quantity"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity">[docs]</a><span class="k">class</span> <span class="nc">Quantity</span><span class="p">():</span>
+
+<span class="c1">#todo: this probably should not have a &quot;value&quot; for the same reason as Specie.</span>
+<span class="c1">#      this needs some thinking.</span>
+
+ <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> 
+               <span class="n">name</span>       <span class="o">=</span> <span class="s1">&#39;null-quantity&#39;</span><span class="p">,</span>
+               <span class="n">formalName</span> <span class="o">=</span> <span class="s1">&#39;null-quantity&#39;</span><span class="p">,</span>
+               <span class="n">value</span>      <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span>
+               <span class="n">unit</span>       <span class="o">=</span> <span class="s1">&#39;null-unit&#39;</span>
+             <span class="p">):</span>
+
+     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="nb">str</span><span class="p">()),</span> <span class="s1">&#39;oops not string.&#39;</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span><span class="p">;</span>    
+
+     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">formalName</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="nb">str</span><span class="p">()),</span> <span class="s1">&#39;oops not string.&#39;</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span> <span class="o">=</span> <span class="n">formalName</span><span class="p">;</span>    
+
+     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="nb">float</span><span class="p">()),</span> <span class="s1">&#39;oops not value.&#39;</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>   
+
+     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="nb">str</span><span class="p">()),</span> <span class="s1">&#39;oops not string.&#39;</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span> <span class="o">=</span> <span class="n">unit</span><span class="p">;</span>    
+
+     <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>       <span class="o">=</span> <span class="n">name</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span> <span class="o">=</span> <span class="n">formalName</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>      <span class="o">=</span> <span class="n">value</span> 
+     <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span>       <span class="o">=</span> <span class="n">unit</span> 
+
+     <span class="k">return</span>
+
+<span class="c1">#*******************************************************************************</span>
+
+<span class="c1">#*******************************************************************************</span>
+<span class="c1"># Setters and Getters methods</span>
+<span class="c1">#-------------------------------------------------------------------------------</span>
+<span class="c1"># These are passing arguments by value effectively. Because the python objects</span>
+<span class="c1"># passed into/out of the function are immutable.</span>
+
+<div class="viewcode-block" id="Quantity.SetName"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetName">[docs]</a> <span class="k">def</span> <span class="nf">SetName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">n</span><span class="p">):</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">n</span></div>
+<div class="viewcode-block" id="Quantity.get_name"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.get_name">[docs]</a> <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span></div>
+ <span class="n">name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_name</span><span class="p">,</span><span class="n">SetName</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Quantity.SetValue"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetValue">[docs]</a> <span class="k">def</span> <span class="nf">SetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">v</span><span class="p">):</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">v</span></div>
+<div class="viewcode-block" id="Quantity.GetValue"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.GetValue">[docs]</a> <span class="k">def</span> <span class="nf">GetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span></div>
+ <span class="n">value</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetValue</span><span class="p">,</span><span class="n">SetValue</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Quantity.SetFormalName"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetFormalName">[docs]</a> <span class="k">def</span> <span class="nf">SetFormalName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fn</span><span class="p">):</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span> <span class="o">=</span> <span class="n">fn</span></div>
+<div class="viewcode-block" id="Quantity.GetFormalName"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.GetFormalName">[docs]</a> <span class="k">def</span> <span class="nf">GetFormalName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span></div>
+ <span class="n">formalName</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetFormalName</span><span class="p">,</span><span class="n">SetFormalName</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Quantity.SetUnit"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetUnit">[docs]</a> <span class="k">def</span> <span class="nf">SetUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">):</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span> <span class="o">=</span> <span class="n">f</span></div>
+<div class="viewcode-block" id="Quantity.GetUnit"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.GetUnit">[docs]</a> <span class="k">def</span> <span class="nf">GetUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span></div>
+ <span class="n">unit</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetUnit</span><span class="p">,</span><span class="n">SetUnit</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="c1">#*******************************************************************************</span>
+<span class="c1"># Internal helpers </span>
+
+<span class="c1">#*******************************************************************************</span>
+<span class="c1"># Printing of data members</span>
+ <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+     <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> Quantity(): </span><span class="se">\n\t</span><span class="s1"> name=</span><span class="si">%s</span><span class="s1">; formalName=</span><span class="si">%s</span><span class="s1">; value=</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">]&#39;</span>
+     <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">formalName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+
+ <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+     <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> Quantity(): </span><span class="se">\n\t</span><span class="s1"> name=</span><span class="si">%s</span><span class="s1">; formalName=</span><span class="si">%s</span><span class="s1">; value=</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">]&#39;</span>
+     <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">formalName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
+<span class="c1">#*******************************************************************************</span>
+<span class="c1"># Usage: -&gt; python interface.py</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+   <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Unit testing for Quantity&#39;</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Valmor F. de Almeida.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.5.
+    </div>
+  </body>
+</html>

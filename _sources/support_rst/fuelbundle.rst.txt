@@ -1,0 +1,7 @@
+fuelbundle module
+=================
+
+.. automodule:: fuelbundle
+    :members:
+    :undoc-members:
+    :show-inheritance:
