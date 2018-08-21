@@ -6,7 +6,7 @@
 rm -rf *_rst
 
 # Update the readme.md convert
- pandoc -s -o readme_converted.rst ../README.md  
+ pandoc -f markdown_github -t rst -o readme_converted.rst ../README.md  
 
 # Build docs for src project
 sphinx-apidoc -o src_rst ../src
