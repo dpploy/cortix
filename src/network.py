@@ -143,7 +143,3 @@ class Network:
 #---------------------- end def __repr__():---------------------------------------
 
 #====================== end class Network: =======================================
-
-# Unit testing. Usage: -> python network.py
-if __name__ == "__main__":
-    print('Unit testing for network')

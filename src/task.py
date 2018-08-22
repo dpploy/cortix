@@ -271,7 +271,3 @@ class Task:
 
 
 #====================== end class Task: ==========================================
-
-# Unit testing. Usage: -> python task.py
-if __name__ == "__main__":
-    print('Unit testing for Task')
