@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit evironment
-# https://github.com/dpploy/...
+# https://github.com/dpploy/cortix
 #
 # All rights reserved, see COPYRIGHT for full restrictions.
-# https://github.com/dpploy/COPYRIGHT
+# https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
 #
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
@@ -201,10 +201,10 @@ class Launcher():
 
             # Data exchange at facility_time (at start_time, this is here for provide
             # state)
-            guest_driver.CallPorts(facility_time)
+            guest_driver.call_ports(facility_time)
 
             # Advance to facility_time + time_step
-            guest_driver.Execute(facility_time, time_step)
+            guest_driver.execute(facility_time, time_step)
 
             end_time = time.time()
             self.log.debug('elapsed time (s): %s', \
