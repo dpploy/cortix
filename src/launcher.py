@@ -201,10 +201,10 @@ class Launcher():
 
             # Data exchange at facility_time (at start_time, this is here for provide
             # state)
-            guest_driver.CallPorts(facility_time)
+            guest_driver.call_ports(facility_time)
 
             # Advance to facility_time + time_step
-            guest_driver.Execute(facility_time, time_step)
+            guest_driver.execute(facility_time, time_step)
 
             end_time = time.time()
             self.log.debug('elapsed time (s): %s', \
