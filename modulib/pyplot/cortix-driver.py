@@ -58,7 +58,7 @@ class CortixDriver():
 #---------------------------------------------------------------------------------
 # Call all ports at facilityTime
 
- def CallPorts( self, facilityTime=0.0 ):
+ def call_ports( self, facilityTime=0.0 ):
 
   s = 'CallPorts(): facility time [min] = ' + str(facilityTime)
   self.__log.debug(s)
@@ -70,7 +70,7 @@ class CortixDriver():
 #---------------------------------------------------------------------------------
 # Evolve system from facilityTime to facilityTime + timeStep
 
- def Execute( self, facilityTime=0.0 , timeStep=0.0 ):
+ def execute( self, facilityTime=0.0 , timeStep=0.0 ):
 
   s = 'Execute(): facility time [min] = ' + str(facilityTime)
   self.__log.debug(s)
