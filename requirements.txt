@@ -1,0 +1,5 @@
+networkx==2.1
+matplotlib==2.2.3
+numpy==1.15.1
+mpi4py==3.0.0
+pandas==0.23.4
