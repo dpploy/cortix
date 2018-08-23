@@ -1,6 +1,0 @@
-{
-  "test_mpi4py_file.py": true,
-  "test_mpi4py_io.py": true,
-  "test_mpi4py_spawn.py": true,
-  "test_temp.py::test": true
-}
