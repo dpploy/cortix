@@ -8,11 +8,10 @@
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
 """
-Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
-
 Cortix driver for guest module.
 Module developer must implement its public methods.
 
+Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 Tue Jun 24 01:03:45 EDT 2014
 """
 #*********************************************************************************
@@ -22,7 +21,6 @@ import logging
 from .pyplot  import PyPlot
 #*********************************************************************************
 
-#*********************************************************************************
 class CortixDriver():
 
  def __init__( self,
@@ -36,17 +34,17 @@ class CortixDriver():
              ):
 
   # Sanity test
-  assert type(slotId) is int, '-> slotId type %r is invalid.' % type(slotId)
-  assert type(ports)  is list, '-> ports type %r is invalid.' % type(ports)
+  assert isinstance(slotId, int), '-> slotId type %r is invalid.' % type(slotId)
+  assert isinstance(ports, list), '-> ports type %r is invalid.'  % type(ports)
   assert len(ports) > 0
-  assert type(startTime) is float, '-> time type %r is invalid.' % type(startTime)
-  assert type(finalTime) is float, '-> time type %r is invalid.' % type(finalTime)
+  assert isinstance(startTime,float), '-> time type %r is invalid.' % type(startTime)
+  assert isinstance(finalTime, float), '-> time type %r is invalid.' % type(finalTime)
 
   # Logging
   self.__log = logging.getLogger('launcher-viz.pyplot_'+str(slotId)+'.cortixdriver')
   self.__log.debug('initializing an object of CortixDriver()' )
 
-  self.__pyPlot = PyPlot( slotId, 
+  self.__pyplot = PyPlot( slotId, 
                           inputFullPathFileName, 
                           workDir,
                           ports, 
@@ -54,32 +52,32 @@ class CortixDriver():
                           finalTime )
 
   return
-
-#---------------------------------------------------------------------------------
-# Call all ports at facilityTime
+#---------------------- end def __init__():---------------------------------------
 
  def call_ports( self, facilityTime=0.0 ):
+  """
+  Call all ports at facilityTime
+  """
 
   s = 'CallPorts(): facility time [min] = ' + str(facilityTime)
   self.__log.debug(s)
  
-  self.__pyPlot.CallPorts( facilityTime ) 
+  self.__pyplot.call_ports( facilityTime ) 
 
   return
+#---------------------- end def call_ports():-------------------------------------
  
-#---------------------------------------------------------------------------------
-# Evolve system from facilityTime to facilityTime + timeStep
-
  def execute( self, facilityTime=0.0 , timeStep=0.0 ):
+  """
+  Evolve system from facilityTime to facilityTime + timeStep
+  """
 
   s = 'Execute(): facility time [min] = ' + str(facilityTime)
   self.__log.debug(s)
 
-  self.__pyPlot.Execute( facilityTime, timeStep )
+  self.__pyplot.execute( facilityTime, timeStep )
 
   return
+#---------------------- end def execute():----------------------------------------
 
-#*********************************************************************************
-# Usage: -> python cortix-driver.py
-if __name__ == "__main__":
- print('Unit testing for CortixDriver')
+#====================== end class CortixDriver: ==================================

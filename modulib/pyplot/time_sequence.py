@@ -1,4 +1,12 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# This file is part of the Cortix toolkit evironment
+# https://github.com/dpploy/cortix
+#
+# All rights reserved, see COPYRIGHT for full restrictions.
+# https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
+#
+# Licensed under the GNU General Public License v. 3, please see LICENSE file.
+# https://www.gnu.org/licenses/gpl-3.0.txt
 """
 Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
@@ -17,7 +25,6 @@ import xml.etree.ElementTree as ElementTree
 from threading import Lock
 #*********************************************************************************
 
-#*********************************************************************************
 class TimeSequence():
 
  def __init__( self,
@@ -53,10 +60,11 @@ class TimeSequence():
   self.__tree = None
 
   if fileType == 'xml': 
-     self.__ReadXML()
+     self.__read_xml()
 
 #  s = 'TimeSequence::__init__(): built object'
 #  self.__log.debug(s)
+#---------------------- end def __init__():---------------------------------------
 
 #---------------------------------------------------------------------------------
 # Accessors (note: all accessors of member data can potentially change the
@@ -123,12 +131,11 @@ class TimeSequence():
   return variables
 
 #*********************************************************************************
-# Helper internal methods
+# Private helper functions (internal use: __)
 
-#---------------------------------------------------------------------------------
- def __ReadXML(self):
+ def __read_xml(self):
 
-  s = 'TimeSequence::__ReadXML(): try reading: '+ self.__fileName
+  s = 'TimeSequence::__read_xml(): try reading: '+ self.__fileName
   self.__log.debug(s)
 
   found = False
@@ -171,8 +178,4 @@ class TimeSequence():
   # end of while found is False
 
   return 
-
-#*********************************************************************************
-# Unit testing. Usage: -> python configtree.py
-if __name__ == "__main__":
-  print('Unit testing for TimeSequence')
+#---------------------- end def __read_xml():-------------------------------------

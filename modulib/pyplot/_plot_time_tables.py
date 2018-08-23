@@ -18,15 +18,15 @@ from matplotlib.ticker import MultipleLocator
 #*********************************************************************************
 
 #---------------------------------------------------------------------------------
-def _PlotTimeTables( self, initialTime=0.0, finalTime=0.0 ):
+def _plot_time_tables( self, initialTime=0.0, finalTime=0.0 ):
 
   nTimeSteps = len(self.timeTablesData.keys())
   if nTimeSteps == 0: return
 
-  s = '_PlotTimeTables(): plotting tables'
+  s = '_plot_time_tables(): plotting tables'
   self.log.debug(s)
 
-#  s = '_PlotTimeTables(): timeTablesData keys = '+str(self.timeTablesData.items())
+#  s = '_plot_time_tables(): timeTablesData keys = '+str(self.timeTablesData.items())
 #  self.log.debug(s)
 
 

@@ -19,7 +19,7 @@ from matplotlib.ticker import MultipleLocator
 # All time sequences on hold will be plotted here and the temporary storage of
 # these time sequences will be cleared at the end.
 
-def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
+def _plot_time_seq_dashboard( self, initialTime=0.0, finalTime=0.0 ):
 
   nRows = 3
   nCols = 1
@@ -27,17 +27,17 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
   nSequences = len(self.timeSequences_tmp)
   if nSequences == 0: return
 
-  s = '_PlotTimeSeqDashboard(): from: '+str(initialTime)+' to '+str(finalTime)
+  s = '_plot_time_seq_dashboard(): from: '+str(initialTime)+' to '+str(finalTime)
   self.log.debug(s)
 
-  s = '_PlotTimeSeqDashboard(): # of sequences: '+str(nSequences)
+  s = '_plot_time_seq_dashboard(): # of sequences: '+str(nSequences)
   self.log.debug(s)
 
   nVar = 0
   for seq in self.timeSequences_tmp:
     nVar += seq.GetNVariables()
 
-  s = '_PlotTimeSeqDashboard(): # of variables: '+str(nVar)
+  s = '_plot_time_seq_dashboard(): # of variables: '+str(nVar)
   self.log.debug(s)
 
   # multiple sequences are stored coming from various sources
@@ -63,7 +63,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
         figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash).zfill(2)+'.png'
         fig.savefig(figName,dpi=200,fomat='pdf')
         plt.close( figNum )
-        s = '_PlotTimeSeqDashboard(): created plot: '+figName
+        s = '_plot_time_seq_dashboard(): created plot: '+figName
         self.log.debug(s)
         iDash += 1
       # end of: if iVar != 0: # flush any current figure
@@ -124,7 +124,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
 #      assert len(data.shape) == 2, 'not a 2-column shape: %r in var %r of %r; stop.' % (data.shape,varName,varLegend)
     if len(data.shape) != 2: 
-      s = '_PlotTimeSeqDashboard(): bad data; variable: '+varName+' unit: '+varUnit+' legend: '+varLegend+' shape: '+str(data.shape)+' skipping...'
+      s = '_plot_time_seq_dashboard(): bad data; variable: '+varName+' unit: '+varUnit+' legend: '+varLegend+' shape: '+str(data.shape)+' skipping...'
       self.log.warn(s)
       continue #  simply skip bad data and log
 
@@ -296,7 +296,7 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
 
     ax.legend( loc='best', prop={'size':7} )
 
-    s = '_PlotTimeSeqDashboard(): plotted '+varName+' from '+varLegend
+    s = '_plot_time_seq_dashboard(): plotted '+varName+' from '+varLegend
     self.log.debug(s)
 
   # end of: for iVar in range(nVar):
@@ -304,10 +304,10 @@ def _PlotTimeSeqDashboard( self, initialTime=0.0, finalTime=0.0 ):
   figName = 'pyplot_'+str(self.slotId)+'-timeseq-dashboard-'+str(iDash).zfill(2)+'.png'
   fig.savefig(figName,dpi=200,fomat='png')
   plt.close( figNum )
-  s = '_PlotTimeSeqDashboard(): created plot: '+figName
+  s = '_plot_time_seq_dashboard(): created plot: '+figName
   self.log.debug(s)
 
-  s = '_PlotTimeSeqDashboard(): done with plotting'
+  s = '_plot_time_seq_dashboard(): done with plotting'
   self.log.debug(s)
 
   # clear timeSequences_tmp
