@@ -55,7 +55,7 @@ Linux
 
 Most Linux distros will provide an evironment with the needed dependencies.
 
-Macs
+MacOSX
 ----
 
 
