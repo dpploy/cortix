@@ -9,7 +9,7 @@ Tue Jun 24 01:03:45 EDT 2014
 import os, sys, io, time, datetime
 import numpy as npy
 import matplotlib
-matplotlib.use('Agg')
+matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MultipleLocator
