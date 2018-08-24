@@ -1,5 +1,5 @@
 Cortix
-------
+======
 
 |image0|
 
@@ -24,11 +24,23 @@ a ``Simulation`` involving ``Tasks``.
 Dependencies
 ------------
 
--  Python >= 3.6.5
+-  Core
+-  python >= 3.6.5
 -  mpi4py >= 3.0.0 (use openmpi >= 3.1.1)
 -  networkx >= 1.11
--  matplotlib >= 2.2.2
 -  numpy >= 1.10.4
+-  matplotlib >= 2.2.2
+-  sphinx >= 1.6.5
+-  pandoc >= 1.19
+-  pytest==3.7.2
+
+-  Support
+-  pandas >= 0.19
+
+-  Modulib
+-  pandas >= 0.19
+-  scikits.odes==2.4.0.dev0
+-  sundials >= 2.7
 
 Usage
 -----
@@ -58,14 +70,29 @@ messages (and other standard output messages), issue the bash command
 information is stored in the ``<work_dir>`` directory specified in the
 ``cortix-config.xml`` input file.
 
+Testing
+-------
+
+Testing is facilitated through PyTest. To execute the tests, run the
+``py.test`` command from the tests directory.
+
+Linux
+-----
+
+Most Linux distros will provide an evironment with the needed
+dependencies.
+
+Macs
+----
+
 Developers
 ----------
 
 -  Valmor F. de Almeida: Valmor\_\ deAlmeida@uml.edu
 -  Taha M. Azzaoui: tazzaoui@cs.uml.edu
 
-Contributors
-------------
+Documentation
+-------------
 
 -  Gilberto E. Alas: gilberto\_\ alas@student.uml.edu
 

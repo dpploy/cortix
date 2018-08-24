@@ -46,9 +46,8 @@
   <div class="section" id="cortix">
 <h1>Cortix<a class="headerlink" href="#cortix" title="Permalink to this headline">¶</a></h1>
 <p><img alt="image0" src="cortix-cover.png" /></p>
-</div>
 <div class="section" id="what-is-cortix">
-<h1>What is Cortix?<a class="headerlink" href="#what-is-cortix" title="Permalink to this headline">¶</a></h1>
+<h2>What is Cortix?<a class="headerlink" href="#what-is-cortix" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Cortix is a Python library for system-level module coupling,
 execution, and
@@ -66,17 +65,27 @@ simulation.</li>
 a <code class="docutils literal"><span class="pre">Simulation</span></code> involving <code class="docutils literal"><span class="pre">Tasks</span></code>.</p>
 </div>
 <div class="section" id="dependencies">
-<h1>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h1>
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Python &gt;= 3.6.5</li>
+<li>Core</li>
+<li>python &gt;= 3.6.5</li>
 <li>mpi4py &gt;= 3.0.0 (use openmpi &gt;= 3.1.1)</li>
 <li>networkx &gt;= 1.11</li>
-<li>matplotlib &gt;= 2.2.2</li>
 <li>numpy &gt;= 1.10.4</li>
+<li>matplotlib &gt;= 2.2.2</li>
+<li>sphinx &gt;= 1.6.5</li>
+<li>pandoc &gt;= 1.19</li>
+<li>pytest==3.7.2</li>
+<li>Support</li>
+<li>pandas &gt;= 0.19</li>
+<li>Modulib</li>
+<li>pandas &gt;= 0.19</li>
+<li>scikits.odes==2.4.0.dev0</li>
+<li>sundials &gt;= 2.7</li>
 </ul>
 </div>
 <div class="section" id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <p>Cortix is a library and it is best used when copied to its own
 directory, say inside a project directory of your choice, <em>e.g.</em>,
 <code class="docutils literal"><span class="pre">/somepath/myproject/cortix/</span></code>, or anywhere else in your system,
@@ -101,18 +110,32 @@ messages (and other standard output messages), issue the bash command
 information is stored in the <code class="docutils literal"><span class="pre">&lt;work_dir&gt;</span></code> directory specified in the
 <code class="docutils literal"><span class="pre">cortix-config.xml</span></code> input file.</p>
 </div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+<p>Testing is facilitated through PyTest. To execute the tests, run the
+<code class="docutils literal"><span class="pre">py.test</span></code> command from the tests directory.</p>
+</div>
+<div class="section" id="linux">
+<h2>Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h2>
+<p>Most Linux distros will provide an evironment with the needed
+dependencies.</p>
+</div>
+<div class="section" id="macs">
+<h2>Macs<a class="headerlink" href="#macs" title="Permalink to this headline">¶</a></h2>
+</div>
 <div class="section" id="developers">
-<h1>Developers<a class="headerlink" href="#developers" title="Permalink to this headline">¶</a></h1>
+<h2>Developers<a class="headerlink" href="#developers" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Valmor F. de Almeida: Valmor_<a class="reference external" href="mailto:deAlmeida&#37;&#52;&#48;uml&#46;edu">deAlmeida<span>&#64;</span>uml<span>&#46;</span>edu</a></li>
 <li>Taha M. Azzaoui: <a class="reference external" href="mailto:tazzaoui&#37;&#52;&#48;cs&#46;uml&#46;edu">tazzaoui<span>&#64;</span>cs<span>&#46;</span>uml<span>&#46;</span>edu</a></li>
 </ul>
 </div>
-<div class="section" id="contributors">
-<h1>Contributors<a class="headerlink" href="#contributors" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li>Gilberto E. Alas: gilberto_<a class="reference external" href="mailto:alas&#37;&#52;&#48;student&#46;uml&#46;edu">alas<span>&#64;</span>student<span>&#46;</span>uml<span>&#46;</span>edu</a></li>
 </ul>
+</div>
 </div>
 
 

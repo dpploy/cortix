@@ -47,10 +47,10 @@
   <h1>Source code for launcher</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># This file is part of the Cortix toolkit evironment</span>
-<span class="c1"># https://github.com/dpploy/...</span>
+<span class="c1"># https://github.com/dpploy/cortix</span>
 <span class="c1">#</span>
 <span class="c1"># All rights reserved, see COPYRIGHT for full restrictions.</span>
-<span class="c1"># https://github.com/dpploy/COPYRIGHT</span>
+<span class="c1"># https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt</span>
 <span class="c1">#</span>
 <span class="c1"># Licensed under the GNU General Public License v. 3, please see LICENSE file.</span>
 <span class="c1"># https://www.gnu.org/licenses/gpl-3.0.txt</span>
@@ -248,10 +248,10 @@
 
             <span class="c1"># Data exchange at facility_time (at start_time, this is here for provide</span>
             <span class="c1"># state)</span>
-            <span class="n">guest_driver</span><span class="o">.</span><span class="n">CallPorts</span><span class="p">(</span><span class="n">facility_time</span><span class="p">)</span>
+            <span class="n">guest_driver</span><span class="o">.</span><span class="n">call_ports</span><span class="p">(</span><span class="n">facility_time</span><span class="p">)</span>
 
             <span class="c1"># Advance to facility_time + time_step</span>
-            <span class="n">guest_driver</span><span class="o">.</span><span class="n">Execute</span><span class="p">(</span><span class="n">facility_time</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
+            <span class="n">guest_driver</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">facility_time</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
 
             <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;elapsed time (s): </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> \
