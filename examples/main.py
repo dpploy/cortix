@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit evironment
 # https://github.com/dpploy/cortix
@@ -16,9 +17,6 @@ may be sufficient since many simulation/tasks can be ran via one object.
 
 As Cortix evolves additional complexity may be added to this driver and/or other
 driver examples can be created.
-
-Cortix is written in python language and it is imported as an namespace package
-as of python 3.3 or later.
 """
 #*********************************************************************************
 import os
@@ -40,35 +38,12 @@ def main():
  rank = comm.Get_rank()
 
  if (rank == 0):
-  cortix1 = Cortix( 'cortix-dev1', full_path_config_file )
-#  cortix1.run_simulations( task_name='solo-pyplot' )
-  cortix1.run_simulations( task_name='solo-fueldepot' )
-# sys.exit(0)
+  cortix1 = Cortix( 'cortix1', full_path_config_file )
+  cortix1.run_simulations( task_name='solo-pyplot' )  # see cortix-config.xml
 
-# tested
-#cortix1.run_simulations( task_name='solo-pyplot' )
- #cortix1.run_simulations( task_name='solo-fueldepot' )
-# cortix1.RunSimulations( taskName='solo-shear' )     # oldchopper
-# cortix1.RunSimulations( taskName='solo-dissolverA' ) # olddissolver
-# cortix1.RunSimulations( taskName='solo-plume' )
-# cortix1.RunSimulations( taskName='solo-cooltower' )
-# cortix1.RunSimulations( taskName='fueldepot-chopper' )
-# cortix1.RunSimulations( taskName='fueldepot-chopper-storage' )
-# cortix1.RunSimulations( taskName='fueldepot-chopper-dissolver' )
-# cortix1.RunSimulations( taskName='fueldepot-chopper-dissolver-tank' )
-# cortix1.RunSimulations( taskName='fueldepot-chopper-dissolver-tank-feedprep' )
-# cortix1.RunSimulations( taskName='solo-condenser' )
-# cortix1.RunSimulations( taskName='solo-tank' )
-# cortix1.RunSimulations( taskName='tank-feedprep' )
-
-# testing
-# cortix1.RunSimulations( taskName='solo-solventxtract' )
-
-# untested
-# cortix1.RunSimulations( taskName='shear-dissolve-offgas' )
-# cortix1.RunSimulations( taskName='solo-fuel-accum' )
-# cortix1.RunSimulations( taskName='shear-dissolve' )
-# cortix1.RunSimulations( taskName='shear-double-dissolve-single-condense' )
+#  cortix1 = Cortix( 'cortix1', full_path_config_file )
+#  cortix1.run_simulations( task_name='solo-fueldepot' ) # see cortix-config.xml
+#---------------------- end def main():-------------------------------------------
 
 #*********************************************************************************
 # Usage: -> python cortix-main.py or ./cortix-main.py
