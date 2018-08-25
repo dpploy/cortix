@@ -12,7 +12,6 @@ notes
 *.xml
 *.ps
 *.shlv
-*.png
 *.dat
 *.inp
 *.msg
