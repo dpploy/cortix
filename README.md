@@ -1,7 +1,7 @@
 Cortix
 ======
 
-![](cortix-cover.png)
+![](docs/cortix-cover.png)
 
 What is Cortix?
 ---------------
