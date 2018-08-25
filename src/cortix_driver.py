@@ -25,7 +25,8 @@ import math
 import random
 import logging
 
-from .my_module import MyModule
+# uncomment
+#from .my_module import MyModule
 #*********************************************************************************
 
 class CortixDriver():
@@ -54,8 +55,10 @@ class CortixDriver():
   self.log = logging.getLogger( 'launcher-mymodule'+str(slotId)+'.cortixdriver' )
   self.log.info( 'initializing an object of CortixDriver()' )
 
-  self.my_module = MyModule( slotId, inputFullPathFileName, workDir, ports, 
-                             startTime, finalTime )
+  # Guest library module: MyModule
+  # unccomment
+  # self.my_module = MyModule( slotId, inputFullPathFileName, workDir, ports, 
+  #                            startTime, finalTime )
 
   return
 #---------------------- end def __init__():---------------------------------------
@@ -77,7 +80,8 @@ class CortixDriver():
 
   startTime = time.time()
  
-  self.my_module.call_ports( facilityTime ) 
+  # uncomment
+  # self.my_module.call_ports( facilityTime ) 
 
   endTime = time.time()
 
@@ -105,7 +109,8 @@ class CortixDriver():
 
   startTime = time.time()
 
-  self.my_module.execute( facilityTime, timeStep )
+  # uncomment
+  # self.my_module.execute( facilityTime, timeStep )
 
   endTime = time.time()
 
