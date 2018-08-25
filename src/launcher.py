@@ -189,29 +189,34 @@ class Launcher():
         self.__set_runtime_status('running')
         self.log.info("__set_runtime_status(self, 'running')")
 
-        facility_time = start_time
+        cortix_time = start_time
 
-        while facility_time <= final_time:
-            self.log.debug('****************************************************************************')
-            self.log.debug('CORTIX::LAUNCHER->***->LAUNCHER->***->LAUNCHER->***->LAUNCHER->***->LAUNCHER')
-            self.log.debug('****************************************************************************')
+        while cortix_time <= final_time:
+            s=''
+            self.log.debug(s)
+            s='****************************************************************************'
+            self.log.debug(s)
+            s = 'CORTIX::LAUNCHER->***->LAUNCHER->***->LAUNCHER->***->LAUNCHER->***->LAUNCHER'
+            self.log.debug(s)
+            s='****************************************************************************'
+            self.log.debug(s)
 
-            self.log.debug('run(%s', str(round(facility_time, 3)) + '[min]): ')
+            self.log.debug('run(%s', str(round(cortix_time, 3)) + '[min]): ')
             start_time = time.time()
 
-            # Data exchange at facility_time (at start_time, this is here for provide
+            # Data exchange at cortix_time (at start_time, this is here for provide
             # state)
-            guest_driver.call_ports(facility_time)
+            guest_driver.call_ports(cortix_time)
 
-            # Advance to facility_time + time_step
-            guest_driver.execute(facility_time, time_step)
+            # Advance to cortix_time + time_step
+            guest_driver.execute(cortix_time, time_step)
 
             end_time = time.time()
             self.log.debug('elapsed time (s): %s', \
                            str(round(end_time - start_time, 2)))
 
-            self.log.info('run(%s', str(round(facility_time, 3)) + '[min]) ')
-            facility_time += time_step
+            self.log.info('run(%s', str(round(cortix_time, 3)) + '[min]) ')
+            cortix_time += time_step
 
         self.__set_runtime_status('finished')
         self.log.info("__set_runtime_status(self, 'finished'")

@@ -35,90 +35,97 @@ class CortixDriver():
  """
 
  def __init__( self,
-               slotId,
-               inputFullPathFileName,
-               execFullPathFileName,
-               workDir,
+               slot_id,
+               input_full_path_file_name,
+               exec_full_path_file_name,
+               work_dir,
                ports=list(),
-               startTime=0.0,
-               finalTime=0.0  
+               cortix_start_time=0.0,
+               cortix_final_time=0.0  
              ):
 
   # Sanity test
-  assert isinstance(slotId, int), '-> slotId type %r is invalid.' % type(slotId)
+  assert isinstance(slot_id, int), '-> slot_id type %r is invalid.' % type(slot_id)
   assert isinstance(ports, list), '-> ports type %r is invalid.'  % type(ports)
   assert len(ports) > 0
-  assert isinstance(startTime,float), '-> time type %r is invalid.' % type(startTime)
-  assert isinstance(finalTime, float), '-> time type %r is invalid.' % type(finalTime)
+  assert isinstance(cortix_start_time,float), '-> time type %r is invalid.' % type(cortix_start_time)
+  assert isinstance(cortix_final_time, float), '-> time type %r is invalid.' % type(cortix_final_time)
 
   # Logging
-  self.log = logging.getLogger( 'launcher-mymodule'+str(slotId)+'.cortixdriver' )
+  self.log = logging.getLogger( 'launcher-mymodule'+str(slot_id)+'.cortixdriver' )
   self.log.info( 'initializing an object of CortixDriver()' )
 
   # Guest library module: MyModule
-  # unccomment
-  # self.my_module = MyModule( slotId, inputFullPathFileName, workDir, ports, 
-  #                            startTime, finalTime )
+  # uncomment
+  # self.my_module = MyModule( slot_id, input_full_path_file_name, work_dir, ports, 
+  #                            cortix_start_time, cortix_final_time )
+
+  self.time_stamp = None # temporary
 
   return
 #---------------------- end def __init__():---------------------------------------
 
- def call_ports( self, facilityTime=0.0 ):
+ def call_ports( self, cortix_time=0.0 ):
   """
-  Call all ports at facilityTime
+  Call all ports at cortix_time
   """
 
-  s = '=========================================================='
-  self.log.debug(s)
-  s = 'CORTIX::DRIVER->***->DRIVER->***->DRIVER->***->DRIVER->***'
-  self.log.debug(s)
-  s = '=========================================================='
-  self.log.debug(s)
+  self.__log_debug(facility_time, 'call_ports')
 
-  s = 'call_ports('+str(round(facilityTime,2))+'[mytimeunit]):'
-  self.log.debug(s)
-
-  startTime = time.time()
- 
   # uncomment
-  # self.my_module.call_ports( facilityTime ) 
+  # self.my_module.call_ports( cortix_time ) 
 
-  endTime = time.time()
-
-  s = 'call_ports('+str(round(facilityTime,2))+'[mytimeunit]): '
-  m = 'elapsed time (s): '+str(round(endTime-startTime,2))
-  self.log.debug(s+m)
+  self.__log_debug(facility_time, 'call_ports')
 
   return
 #---------------------- end def call_ports():-------------------------------------
 
- def execute( self, facilityTime=0.0, timeStep=0.0 ):
+ def execute( self, cortix_time=0.0, timeStep=0.0 ):
   """
-  Evolve system from facilityTime to facilityTime + timeStep
+  Evolve system from cortix_time to cortix_time + timeStep
   """
 
-  s = '=========================================================='
-  self.log.debug(s)
-  s = 'CORTIX::DRIVER->***->DRIVER->***->DRIVER->***->DRIVER->***'
-  self.log.debug(s)
-  s = '=========================================================='
-  self.log.debug(s)
-
-  s = 'execute('+str(round(facilityTime,2))+'[mytimeunit]:)'
-  self.log.debug(s)
-
-  startTime = time.time()
+  self.__log_debug(facility_time, 'execute')
 
   # uncomment
-  # self.my_module.execute( facilityTime, timeStep )
+  # self.my_module.execute( cortix_time, timeStep )
 
-  endTime = time.time()
-
-  s = 'execute('+str(round(facilityTime,2))+'[mytimeunit]): '
-  m = 'elapsed time (s): '+str(round(endTime-startTime,2))
-  self.log.debug(s+m)
+  self.__log_debug(facility_time, 'execute')
 
   return
 #---------------------- end def execute():----------------------------------------
+
+#*********************************************************************************
+# Private helper functions (internal use: __)
+
+ def __log_debug(self, facility_time=0.0, caller='null-function-name'):
+
+  if self.time_stamp == None:
+      s = ''
+      self.__log.debug(s)
+      s = '=========================================================='
+      self.__log.debug(s)
+      s = 'CORTIX::DRIVER->***->DRIVER->***->DRIVER->***->DRIVER->***'
+      self.__log.debug(s)
+      s = '=========================================================='
+      self.__log.debug(s)
+
+      s = caller+'('+str(round(facility_time,2))+'[min]):'
+      self.__log.debug(s)
+
+      self.time_stamp = time.time()
+
+  else:
+
+      end_time = time.time()
+
+      s = caller+'('+str(round(facility_time,2))+'[min]): '
+      m = 'elapsed time (s): '+str(round(end_time-self.time_stamp,2))
+      self.__log.debug(s+m)
+
+      self.time_stamp = None
+
+  return
+#---------------------- end def __log_debug():------------------------------------
 
 #====================== end class CortixDriver: ==================================
