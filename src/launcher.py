@@ -76,7 +76,7 @@ class Launcher():
         log.debug('param file: %s', self.cortix_param_full_path_file_name)
         log.debug('comm file: %s', self.cortix_comm_full_path_file_name)
 
-        lib_module_driver = mod_lib_name + '.' + module_name + '.cortix-driver'
+        lib_module_driver = mod_lib_name + '.' + module_name + '.cortix_driver'
         log.info('module driver: %s', lib_module_driver)
 
         # import and log the python module driver
