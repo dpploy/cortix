@@ -8,4 +8,4 @@
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
 #
-from .src.main import Cortix
+from .src.cortix import Cortix
