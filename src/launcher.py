@@ -181,9 +181,9 @@ class Launcher():
                                                    self.work_dir,
                                                    ports, start_time, final_time)
 
-        self.log.info('guest_driver = CortixDriver( slotId=%s', str(self.slot_id) + ',file='\
-                      + self.input_full_path_file_name + ',ports=' + str(ports) + ',start_time='\
-                      + str(start_time) + ',final_time=' + str(final_time) +' )')
+        self.log.info('guest_driver = CortixDriver( slot_id=%s', str(self.slot_id) + ',file='\
+                      + self.input_full_path_file_name + ',ports=' + str(ports) + ',cortix_start_time='\
+                      + str(start_time) + ',cortix_final_time=' + str(final_time) +' )')
 
         # Evolve the module
         self.__set_runtime_status('running')
@@ -192,6 +192,7 @@ class Launcher():
         cortix_time = start_time
 
         while cortix_time <= final_time:
+
             s=''
             self.log.debug(s)
             s='****************************************************************************'
@@ -204,18 +205,19 @@ class Launcher():
             self.log.debug('run(%s', str(round(cortix_time, 3)) + '[min]): ')
             start_time = time.time()
 
-            # Data exchange at cortix_time (at start_time, this is here for provide
-            # state)
+            # Data exchange at cortix_time (call ports first)
             guest_driver.call_ports(cortix_time)
 
-            # Advance to cortix_time + time_step
+            # Advance to cortix_time + time_step (call execute second)
             guest_driver.execute(cortix_time, time_step)
 
             end_time = time.time()
-            self.log.debug('elapsed time (s): %s', \
-                           str(round(end_time - start_time, 2)))
+            s = 'elapsed time (s): %s', str(round(end_time - start_time, 2))
+            self.log.debug(s)
 
-            self.log.info('run(%s', str(round(cortix_time, 3)) + '[min]) ')
+            s = 'run(%s', str(round(cortix_time, 3)) + '[min]) '
+            self.log.info(s)
+
             cortix_time += time_step
 
         self.__set_runtime_status('finished')

@@ -28,7 +28,7 @@ import xml.etree.ElementTree as ElementTree
 from threading import Lock
 
 from ._plot_time_seq_dashboard import _plot_time_seq_dashboard
-from ._plot_time_tables     import _plot_time_tables
+from ._plot_time_tables import _plot_time_tables
 
 # internal methods
 from   .time_sequence import TimeSequence
