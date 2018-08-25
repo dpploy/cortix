@@ -1,0 +1,210 @@
+============================= test session starts ==============================
+platform linux -- Python 3.6.5, pytest-3.2.2, py-1.4.34, pluggy-0.4.0
+rootdir: /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/cortix, inifile:
+collected 10 items
+
+tests/test_cortix_config_exists.py F
+tests/test_matplotlib.py .
+tests/test_mpi4py.py .
+tests/test_networkx.py .
+tests/test_numpy.py .
+tests/test_object_instantiation.py .
+tests/test_odes.py F
+tests/test_pandas.py F
+tests/test_scikit_odes.py .
+tests/test_solo_pyplot.py F
+
+=================================== FAILURES ===================================
+__________________________ test_cortix_config_exists ___________________________
+
+    def test_cortix_config_exists():
+        '''
+        Test to make sure a configuration file exists
+        in the input directory.
+        '''
+>       assert os.path.isfile("../examples/input/cortix-config.xml")
+E       AssertionError: assert False
+E        +  where False = <function isfile at 0x7f0dae81d9d8>('../examples/input/cortix-config.xml')
+E        +    where <function isfile at 0x7f0dae81d9d8> = <module 'posixpath' from '/usr/lib64/python3.6/posixpath.py'>.isfile
+E        +      where <module 'posixpath' from '/usr/lib64/python3.6/posixpath.py'> = os.path
+
+tests/test_cortix_config_exists.py:19: AssertionError
+__________________________________ test_odes ___________________________________
+
+    def test_odes():
+        """
+        Solve a test ODE and make sure the results are accurate
+        """
+        sols = []
+>       with open("test_odes_sols.pickle", "rb") as test_vals:
+E       FileNotFoundError: [Errno 2] No such file or directory: 'test_odes_sols.pickle'
+
+tests/test_odes.py:29: FileNotFoundError
+_________________________________ test_pandas __________________________________
+
+    def test_pandas():
+        '''
+        Test for the pandas dependency
+        '''
+        try:
+>           import pandas
+
+tests/test_pandas.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/lib64/python3.6/site-packages/pandas/__init__.py:39: in <module>
+    from pandas.core.api import *
+/usr/lib64/python3.6/site-packages/pandas/core/api.py:10: in <module>
+    from pandas.core.groupby import Grouper
+/usr/lib64/python3.6/site-packages/pandas/core/groupby.py:40: in <module>
+    from pandas.core.frame import DataFrame
+/usr/lib64/python3.6/site-packages/pandas/core/frame.py:72: in <module>
+    from pandas.core.series import Series
+/usr/lib64/python3.6/site-packages/pandas/core/series.py:2972: in <module>
+    import pandas.tools.plotting as _gfx  # noqa
+/usr/lib64/python3.6/site-packages/pandas/tools/plotting.py:34: in <module>
+    import pandas.tseries.converter as conv
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    from datetime import datetime, timedelta
+    import datetime as pydt
+    import numpy as np
+    
+    from dateutil.relativedelta import relativedelta
+    
+>   import matplotlib.units as units
+E   AttributeError: module 'matplotlib' has no attribute 'units'
+
+/usr/lib64/python3.6/site-packages/pandas/tseries/converter.py:7: AttributeError
+_______________________________ test_solo_pyplot _______________________________
+
+    def test_solo_pyplot():
+        '''
+        Run solo_pyplot and make sure the correct output is generated
+        '''
+        pwd = os.path.dirname(__file__)
+        full_path_config_file = os.path.join(pwd, '../examples/input/cortix-config.xml')
+        comm = MPI.COMM_WORLD
+        rank = comm.Get_rank()
+        os.system("cp ../examples/input/state.xml /tmp")
+        if rank == 0:
+            cortix1 = Cortix('cortix-dev1', full_path_config_file)
+>           cortix1.run_simulations(task_name="solo-pyplot")
+
+tests/test_solo_pyplot.py:28: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/main.py:116: in run_simulations
+    sim.execute(task_name)
+src/simulation.py:108: in execute
+    task.execute(self.application)
+src/task.py:141: in execute
+    status_file = mod.execute(slot_id, param_file, comm_file)
+src/module.py:236: in execute
+    param, comm, status)
+src/launcher.py:83: in __init__
+    self.py_module = importlib.import_module(lib_module_driver)
+/usr/lib64/python3.6/importlib/__init__.py:126: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+<frozen importlib._bootstrap>:994: in _gcd_import
+    ???
+<frozen importlib._bootstrap>:971: in _find_and_load
+    ???
+<frozen importlib._bootstrap>:955: in _find_and_load_unlocked
+    ???
+<frozen importlib._bootstrap>:665: in _load_unlocked
+    ???
+<frozen importlib._bootstrap_external>:678: in exec_module
+    ???
+<frozen importlib._bootstrap>:219: in _call_with_frames_removed
+    ???
+modulib/pyplot/cortix-driver.py:21: in <module>
+    from .pyplot  import PyPlot
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """
+    #*********************************************************************************
+    import os, sys, io, time, datetime
+    import logging
+    import xml.etree.ElementTree as ElementTree
+    import numpy as np
+    import matplotlib
+    matplotlib.use('Agg', warn=False)
+>   import matplotlib.pyplot as plt
+E   AttributeError: module 'matplotlib' has no attribute 'pyplot'
+
+modulib/pyplot/pyplot.py:23: AttributeError
+----------------------------- Captured stderr call -----------------------------
+cp: cannot stat '../examples/input/state.xml': No such file or directory
+2018-08-24 23:18:24,652 - cortix-dev1 - INFO - Created Cortix logger: cortix-dev1
+2018-08-24 23:18:24,652 - cortix-dev1 - INFO - Created Cortix logger: cortix-dev1
+2018-08-24 23:18:24,652 - cortix-dev1 - INFO - Created Cortix work directory: /tmp/cortix-dev1-wrk/
+2018-08-24 23:18:24,652 - cortix-dev1 - INFO - Created Cortix work directory: /tmp/cortix-dev1-wrk/
+2018-08-24 23:18:24,676 - dev1.sim - INFO - created Simulation logger: dev1
+2018-08-24 23:18:24,676 - dev1.sim - INFO - created Simulation logger: dev1
+2018-08-24 23:18:24,677 - dev1.app - INFO - Created Application logger: dev1
+2018-08-24 23:18:24,677 - dev1.app - INFO - Created Application logger: dev1
+2018-08-24 23:18:24,682 - dev1.app - INFO - Created application: dev1
+2018-08-24 23:18:24,682 - dev1.app - INFO - Created application: dev1
+2018-08-24 23:18:24,682 - dev1.sim - INFO - created simulation: dev1
+2018-08-24 23:18:24,682 - dev1.sim - INFO - created simulation: dev1
+2018-08-24 23:18:24,682 - cortix-dev1 - INFO - Created Cortix object cortix-dev1
+2018-08-24 23:18:24,682 - cortix-dev1 - INFO - Created Cortix object cortix-dev1
+2018-08-24 23:18:24,707 - solo-pyplot - INFO - created logger: solo-pyplot
+2018-08-24 23:18:24,708 - solo-pyplot - INFO - created task: solo-pyplot
+2018-08-24 23:18:24,761 - launcher-modulib.pyplot_0 - INFO - created logger
+2018-08-24 23:18:24,761 - launcher-modulib.pyplot_0 - INFO - module driver: cortix.modulib.pyplot.cortix-driver
+====================== 4 failed, 6 passed in 6.46 seconds ======================
+Exception ignored in: <bound method Cortix.__del__ of <cortix.src.main.Cortix object at 0x7f0d85c5ceb8>>
+Traceback (most recent call last):
+  File "/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/cortix/src/main.py", line 138, in __del__
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1306, in info
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1442, in _log
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1452, in handle
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1514, in callHandlers
+  File "/usr/lib64/python3.6/logging/__init__.py", line 863, in handle
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1069, in emit
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1059, in _open
+NameError: name 'open' is not defined
+Exception ignored in: <bound method Simulation.__del__ of <cortix.src.simulation.Simulation object at 0x7f0d85a9e160>>
+Traceback (most recent call last):
+  File "/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/cortix/src/simulation.py", line 116, in __del__
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1306, in info
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1442, in _log
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1452, in handle
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1514, in callHandlers
+  File "/usr/lib64/python3.6/logging/__init__.py", line 863, in handle
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1069, in emit
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1059, in _open
+NameError: name 'open' is not defined
+Exception ignored in: <bound method Task.__del__ of <cortix.src.task.Task object at 0x7f0d85c38438>>
+Traceback (most recent call last):
+  File "/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/cortix/src/task.py", line 237, in __del__
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1306, in info
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1442, in _log
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1452, in handle
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1514, in callHandlers
+  File "/usr/lib64/python3.6/logging/__init__.py", line 863, in handle
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1069, in emit
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1059, in _open
+NameError: name 'open' is not defined
+Exception ignored in: <bound method Application.__del__ of <cortix.src.application.Application object at 0x7f0d85a9e358>>
+Traceback (most recent call last):
+  File "/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/cortix/src/application.py", line 172, in __del__
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1306, in info
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1442, in _log
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1452, in handle
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1514, in callHandlers
+  File "/usr/lib64/python3.6/logging/__init__.py", line 863, in handle
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1069, in emit
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1059, in _open
+NameError: name 'open' is not defined
+Exception ignored in: <bound method Launcher.__del__ of <cortix.src.launcher.Launcher object at 0x7f0d862cb2e8>>
+Traceback (most recent call last):
+  File "/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/cortix/src/launcher.py", line 222, in __del__
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1306, in info
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1442, in _log
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1452, in handle
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1514, in callHandlers
+  File "/usr/lib64/python3.6/logging/__init__.py", line 863, in handle
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1069, in emit
+  File "/usr/lib64/python3.6/logging/__init__.py", line 1059, in _open
+NameError: name 'open' is not defined

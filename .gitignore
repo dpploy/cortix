@@ -30,3 +30,4 @@ pylintrc
 docs/_build
 docs/*_rst
 docs/readme_converted.rst
+.cache/

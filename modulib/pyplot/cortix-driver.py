@@ -9,7 +9,7 @@
 # https://www.gnu.org/licenses/gpl-3.0.txt
 """
 Cortix driver for guest module.
-Module developer must implement its public methods.
+Module developers must implement its public methods.
 
 Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 Tue Jun 24 01:03:45 EDT 2014
