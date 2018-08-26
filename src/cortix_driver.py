@@ -21,8 +21,6 @@ import sys
 import io
 import time
 import datetime
-import math
-import random
 import logging
 
 # uncomment
@@ -120,10 +118,13 @@ class CortixDriver():
       end_time = time.time()
 
       s = caller+'('+str(round(facility_time,2))+'[min]): '
-      m = 'elapsed time (s): '+str(round(end_time-self.time_stamp,2))
+      m = 'CPU elapsed time (s): '+str(round(end_time-self.time_stamp,2))
       self.__log.debug(s+m)
 
       self.time_stamp = None
+      if caller == 'execute':
+          s = ''
+          self.log.debug(s)
 
   return
 #---------------------- end def __log_debug():------------------------------------

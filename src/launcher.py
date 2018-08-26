@@ -65,7 +65,7 @@ class Launcher():
         file_handle.setFormatter(formatter)
         console_handle.setFormatter(formatter)
 
-        # add the handlers to the logger
+        # add handles to the logger
         log.addHandler(file_handle)
         log.addHandler(console_handle)
 
@@ -181,9 +181,14 @@ class Launcher():
                                                    self.work_dir,
                                                    ports, start_time, final_time)
 
-        self.log.info('guest_driver = CortixDriver( slot_id=%s', str(self.slot_id) + ',file='\
-                      + self.input_full_path_file_name + ',ports=' + str(ports) + ',cortix_start_time='\
-                      + str(start_time) + ',cortix_final_time=' + str(final_time) +' )')
+        s='guest_driver = CortixDriver( slot_id='+str(self.slot_id) + \
+          ', input file=' + self.input_full_path_file_name + \
+          ', exec file=' + self.exec_full_path_file_name + \
+          ', work dir=' + self.work_dir + \
+          ', ports=' + str(ports) + \
+          ', cortix_start_time=' + str(start_time) + \
+          ', cortix_final_time=' + str(final_time) +' )'
+        self.log.info(s)
 
         # Evolve the module
         self.__set_runtime_status('running')
@@ -195,14 +200,18 @@ class Launcher():
 
             s=''
             self.log.debug(s)
-            s='****************************************************************************'
+            s='**************************************************************' + \
+              '**************'
             self.log.debug(s)
-            s = 'CORTIX::LAUNCHER->***->LAUNCHER->***->LAUNCHER->***->LAUNCHER->***->LAUNCHER'
+            s = 'CORTIX::LAUNCHER->***->LAUNCHER->***->LAUNCHER->***->' + \
+                'LAUNCHER->***->LAUNCHER'
             self.log.debug(s)
-            s='****************************************************************************'
+            s='**************************************************************' + \
+              '**************'
             self.log.debug(s)
 
-            self.log.debug('run(%s', str(round(cortix_time, 3)) + '[min]): ')
+            s = 'run(' + str(round(cortix_time, 3)) + '[min]): '
+            self.log.debug(s)
             start_time = time.time()
 
             # Data exchange at cortix_time (call ports first)
@@ -212,10 +221,10 @@ class Launcher():
             guest_driver.execute(cortix_time, time_step)
 
             end_time = time.time()
-            s = 'elapsed time (s): %s', str(round(end_time - start_time, 2))
+            s = 'CPU elapsed time (s): ' + str(round(end_time - start_time, 2))
             self.log.debug(s)
 
-            s = 'run(%s', str(round(cortix_time, 3)) + '[min]) '
+            s = 'run(' + str(round(cortix_time, 3)) + '[min]) '
             self.log.info(s)
 
             cortix_time += time_step
