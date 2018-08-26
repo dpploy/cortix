@@ -6,7 +6,10 @@
 rm -rf *_rst
 
 # Update the readme.md convert
- pandoc -f markdown_github -t rst -o readme_converted.rst ../README.md  
+ pandoc -f markdown_github -t rst -o readme_converted.rst ../README.md
+
+# Correct the path to cortix-cover.png in readme_converted.rst
+sed -i 's+docs/cortix-cover.png+cortix-cover.png+g' readme_converted.rst
 
 # Build docs for src project
 sphinx-apidoc -o src_rst ../src
