@@ -13,10 +13,11 @@ What is Cortix?
    provides an
    environment for the coupling of those modules into a single
    simulation.
--  Cortix handles
--  Communication between the modules
--  Numerical integration
--  Data visualization
+-  Cortix handles:
+
+   -  Communication between the modules
+   -  Numerical integration
+   -  Data visualization
 
 The basic concepts in Cortix are the creation of an ``Application`` and
 a ``Simulation`` involving ``Tasks``.
@@ -25,22 +26,25 @@ Dependencies
 ------------
 
 -  Core
--  python >= 3.6.5
--  mpi4py >= 3.0.0 (use openmpi >= 3.1.1)
--  networkx >= 1.11
--  numpy >= 1.10.4
--  matplotlib >= 2.2.2
--  sphinx >= 1.6.5
--  pandoc >= 1.19
--  pytest==3.7.2
+
+   -  python >= 3.6.5
+   -  mpi4py >= 3.0.0 (use openmpi >= 3.1.1)
+   -  networkx >= 1.11
+   -  numpy >= 1.10.4
+   -  matplotlib >= 2.2.2
+   -  sphinx >= 1.6.5
+   -  pandoc >= 1.19
+   -  pytest==3.7.2
 
 -  Support
--  pandas >= 0.19
+
+   -  pandas >= 0.19
 
 -  Modulib
--  pandas >= 0.19
--  scikits.odes==2.4.0.dev0
--  sundials >= 2.7
+
+   -  pandas >= 0.19
+   -  scikits.odes==2.4.0.dev0
+   -  sundials >= 2.7
 
 Usage
 -----
@@ -82,8 +86,8 @@ Linux
 Most Linux distros will provide an evironment with the needed
 dependencies.
 
-Macs
-----
+Mac OS X
+--------
 
 Developers
 ----------

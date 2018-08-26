@@ -5,7 +5,7 @@
 
 Cortix - Welcome to Cortix's documentation!
 ===========================================
-.. image:: ../cortix-cover.png
+.. image:: cortix-cover.png
 .. include:: readme_converted.rst
 
 .. toctree::

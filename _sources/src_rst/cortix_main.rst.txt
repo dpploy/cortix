@@ -1,0 +1,7 @@
+cortix\_main module
+===================
+
+.. automodule:: cortix_main
+    :members:
+    :undoc-members:
+    :show-inheritance:

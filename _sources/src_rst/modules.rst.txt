@@ -5,8 +5,9 @@ src
    :maxdepth: 4
 
    application
+   cortix_driver
+   cortix_main
    launcher
-   main
    module
    network
    simulation
