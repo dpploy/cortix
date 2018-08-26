@@ -1,6 +1,3 @@
-Cortix
-======
-
 |image0|
 
 What is Cortix?
