@@ -100,16 +100,16 @@ class CortixDriver():
 
   if self.time_stamp == None:
       s = ''
-      self.__log.debug(s)
+      self.log.debug(s)
       s = '=========================================================='
-      self.__log.debug(s)
+      self.log.debug(s)
       s = 'CORTIX::DRIVER->***->DRIVER->***->DRIVER->***->DRIVER->***'
-      self.__log.debug(s)
+      self.log.debug(s)
       s = '=========================================================='
-      self.__log.debug(s)
+      self.log.debug(s)
 
       s = caller+'('+str(round(facility_time,2))+'[min]):'
-      self.__log.debug(s)
+      self.log.debug(s)
 
       self.time_stamp = time.time()
 
@@ -119,7 +119,7 @@ class CortixDriver():
 
       s = caller+'('+str(round(facility_time,2))+'[min]): '
       m = 'CPU elapsed time (s): '+str(round(end_time-self.time_stamp,2))
-      self.__log.debug(s+m)
+      self.log.debug(s+m)
 
       self.time_stamp = None
       if caller == 'execute':
