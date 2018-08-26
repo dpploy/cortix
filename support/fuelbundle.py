@@ -229,11 +229,11 @@ class FuelBundle():
 #*******************************************************************************
 # Printing of data members
  def __str__( self ):
-     s = 'FuelBundle(): %s\n %s\n %s\n'
+     s = 'FuelBundle():\n %s\n %s\n %s\n'
      return s % (self._specs, self._solidPhase, self._gasPhase)
 
  def __repr__( self ):
-     s = 'FuelBundle(): %s\n %s\n %s\n'
+     s = 'FuelBundle():\n %s\n %s\n %s\n'
      return s % (self._specs, self._solidPhase, self._gasPhase)
 #*******************************************************************************
 # Usage: -> python interface.py
