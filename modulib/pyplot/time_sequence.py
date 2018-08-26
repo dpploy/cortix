@@ -55,7 +55,7 @@ class TimeSequence():
 
   assert type(logger) is logging.Logger, 'wrong type; stop.'
   assert logger is not None, 'must give a logger; stop.' 
-  self.__log = logger
+  self.log = logger
      
   self.__tree = None
 
@@ -63,7 +63,7 @@ class TimeSequence():
      self.__read_xml()
 
 #  s = 'TimeSequence::__init__(): built object'
-#  self.__log.debug(s)
+#  self.log.debug(s)
 #---------------------- end def __init__():---------------------------------------
 
 #---------------------------------------------------------------------------------
@@ -136,7 +136,7 @@ class TimeSequence():
  def __read_xml(self):
 
   s = 'TimeSequence::__read_xml(): try reading: '+ self.__fileName
-  self.__log.debug(s)
+  self.log.debug(s)
 
   found = False
 
@@ -149,7 +149,7 @@ class TimeSequence():
     except ElementTree.ParseError as error:
       mutex.release()
       s = 'TimeSequence(): '+self.__fileName+' unavailable. Error code: '+str(error.code)+'; File position: '+str(error.position)+'. Retrying...'
-      self.__log.debug(s)
+      self.log.debug(s)
       time.sleep(0.1)
       continue
 

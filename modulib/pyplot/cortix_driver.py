@@ -8,76 +8,123 @@
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
 """
-Cortix driver for guest module.
-Module developers must implement its public methods.
-
-Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
-Tue Jun 24 01:03:45 EDT 2014
+Cortix driver for guest modules.
+Module developers must implement the public methods in this driver.
+Ideally, this implementation should be minimal.         
+Developers should use this class to wrap their module (MyModule) implemented in a
+file named my_module.py. This file will be placed inside the developer's module
+directory which is pointed to in the Cortix config.xml file.
 """
 #*********************************************************************************
-import os, sys, io, time, datetime
+import os
+import sys
+import io
+import time
+import datetime
 import logging
 
-from .pyplot  import PyPlot
+from .pyplot import PyPlot
 #*********************************************************************************
 
 class CortixDriver():
 
  def __init__( self,
-               slotId,
-               inputFullPathFileName,
-               execFullPathFileName,
-               workDir,
+               slot_id,
+               input_full_path_file_name,
+               exec_full_path_file_name,
+               work_dir,
                ports=list(),
-               startTime = 0.0,
-               finalTime = 0.0  # evolution time
+               cortix_start_time = 0.0,
+               cortix_final_time = 0.0  # evolution time
              ):
 
   # Sanity test
-  assert isinstance(slotId, int), '-> slotId type %r is invalid.' % type(slotId)
+  assert isinstance(slot_id, int), '-> slot_id type %r is invalid.' % type(slot_id)
   assert isinstance(ports, list), '-> ports type %r is invalid.'  % type(ports)
   assert len(ports) > 0
-  assert isinstance(startTime,float), '-> time type %r is invalid.' % type(startTime)
-  assert isinstance(finalTime, float), '-> time type %r is invalid.' % type(finalTime)
+  assert isinstance(cortix_start_time,float), '-> time type %r is invalid.' % \
+         type(cortix_start_time)
+  assert isinstance(cortix_final_time, float), '-> time type %r is invalid.' % \
+         type(cortix_final_time)
 
   # Logging
-  self.__log = logging.getLogger('launcher-viz.pyplot_'+str(slotId)+'.cortixdriver')
-  self.__log.debug('initializing an object of CortixDriver()' )
+  self.log = logging.getLogger('launcher-modulib.pyplot_'+str(slot_id)+'.cortixdriver')
+  self.log.debug('initializing an object of CortixDriver()' )
 
-  self.__pyplot = PyPlot( slotId, 
-                          inputFullPathFileName, 
-                          workDir,
-                          ports, 
-                          startTime, 
-                          finalTime )
+  self.pyplot = PyPlot( slot_id, 
+                        input_full_path_file_name, 
+                        work_dir,
+                        ports, 
+                        cortix_start_time, 
+                        cortix_final_time )
+
+  self.time_stamp = None # temporary
 
   return
 #---------------------- end def __init__():---------------------------------------
 
- def call_ports( self, facilityTime=0.0 ):
+ def call_ports( self, cortix_time=0.0 ):
   """
-  Call all ports at facilityTime
+  Call all ports at cortix_time
   """
 
-  s = 'CallPorts(): facility time [min] = ' + str(facilityTime)
-  self.__log.debug(s)
- 
-  self.__pyplot.call_ports( facilityTime ) 
+  self.__log_debug(cortix_time, 'call_ports')
+
+  self.pyplot.call_ports( cortix_time ) 
+
+  self.__log_debug(cortix_time, 'call_ports')
 
   return
 #---------------------- end def call_ports():-------------------------------------
  
- def execute( self, facilityTime=0.0 , timeStep=0.0 ):
+ def execute( self, cortix_time=0.0 , time_step=0.0 ):
   """
-  Evolve system from facilityTime to facilityTime + timeStep
+  Evolve system from cortix_time to cortix_time + time_step
   """
 
-  s = 'Execute(): facility time [min] = ' + str(facilityTime)
-  self.__log.debug(s)
+  self.__log_debug(cortix_time, 'execute')
 
-  self.__pyplot.execute( facilityTime, timeStep )
+  self.pyplot.execute( cortix_time, time_step )
+
+  self.__log_debug(cortix_time, 'execute')
 
   return
 #---------------------- end def execute():----------------------------------------
+
+#*********************************************************************************
+# Private helper functions (internal use: __)
+
+ def __log_debug(self, cortix_time=0.0, caller='null-function-name'):
+
+   if self.time_stamp == None:
+       s = ''
+       self.log.debug(s)
+       s = '=========================================================='
+       self.log.debug(s)
+       s = 'CORTIX::DRIVER->***->DRIVER->***->DRIVER->***->DRIVER->***'
+       self.log.debug(s)
+       s = '=========================================================='
+       self.log.debug(s)
+ 
+       s = caller+'('+str(round(cortix_time,2))+'[min]):'
+       self.log.debug(s)
+ 
+       self.time_stamp = time.time()
+ 
+   else:
+ 
+       end_time = time.time()
+ 
+       s = caller+'('+str(round(cortix_time,2))+'[min]): '
+       m = 'CPU elapsed time (s): '+str(round(end_time-self.time_stamp,2))
+       self.log.debug(s+m)
+ 
+       self.time_stamp = None
+       if caller == 'execute':
+          s = ''
+          self.log.debug(s)
+ 
+   return
+#---------------------- end def __log_debug():------------------------------------
 
 #====================== end class CortixDriver: ==================================
