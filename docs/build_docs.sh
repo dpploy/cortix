@@ -10,7 +10,7 @@ rm -rf *_rst
 
 # Correct the path to cortix-cover.png in readme_converted.rst
 sed -i 's+docs/cortix-cover.png+cortix-cover.png+g' readme_converted.rst
-# Remove Cortix double heading
+# Remove Cortix double heading (first 3 lines of the file)
 sed -i -e 1,3d readme_converted.rst
 
 # Build docs for src project
