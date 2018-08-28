@@ -26,7 +26,7 @@ def test_odes():
     Solve a test ODE and make sure the results are accurate
     """
     sols = []
-    with open("test_odes_sols.pickle", "rb") as test_vals:
+    with open("input/test_odes_sols.pickle", "rb") as test_vals:
         real_sols = pickle.load(test_vals)
     t0, y0 = 1, np.array([0.5, 0.5])  # initial condition
     solution = ode('cvode', van_der_pol, old_api=False).solve(np.linspace(t0,500,200), y0)
