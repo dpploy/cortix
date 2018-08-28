@@ -50,7 +50,7 @@
          ../../../cortix/modulib
      </parent_dir>
     </library>
-    <input_file_name>pyplot.input</input_file_name>
+    <input_file_name>pyplot-test.input</input_file_name>
     <input_file_path>input/</input_file_path>
     <logger level="DEBUG">
      <file_handler level="DEBUG"> </file_handler>
