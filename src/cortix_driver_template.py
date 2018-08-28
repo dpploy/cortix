@@ -27,7 +27,7 @@ import logging
 #from .my_module import MyModule
 #*********************************************************************************
 
-class CortixDriver():
+class CortixDriverTemplate():
  """
   Cortix driver for guest modules.
  """
