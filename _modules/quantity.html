@@ -64,89 +64,97 @@
 
 <span class="sd">Sat Sep  5 12:51:34 EDT 2015</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="c1">#*******************************************************************************</span>
-<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
-<span class="c1">#*******************************************************************************</span>
+<span class="c1"># *******************************************************************************</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="c1"># *******************************************************************************</span>
+
 
 <div class="viewcode-block" id="Quantity"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity">[docs]</a><span class="k">class</span> <span class="nc">Quantity</span><span class="p">():</span>
 
-<span class="c1">#todo: this probably should not have a &quot;value&quot; for the same reason as Specie.</span>
-<span class="c1">#      this needs some thinking.</span>
+    <span class="c1"># todo: this probably should not have a &quot;value&quot; for the same reason as Specie.</span>
+    <span class="c1">#      this needs some thinking.</span>
 
- <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> 
-               <span class="n">name</span>       <span class="o">=</span> <span class="s1">&#39;null-quantity&#39;</span><span class="p">,</span>
-               <span class="n">formalName</span> <span class="o">=</span> <span class="s1">&#39;null-quantity&#39;</span><span class="p">,</span>
-               <span class="n">value</span>      <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span>
-               <span class="n">unit</span>       <span class="o">=</span> <span class="s1">&#39;null-unit&#39;</span>
-             <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">name</span><span class="o">=</span><span class="s1">&#39;null-quantity&#39;</span><span class="p">,</span>
+                 <span class="n">formalName</span><span class="o">=</span><span class="s1">&#39;null-quantity&#39;</span><span class="p">,</span>
+                 <span class="n">value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span>
+                 <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;null-unit&#39;</span>
+                 <span class="p">):</span>
 
-     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="nb">str</span><span class="p">()),</span> <span class="s1">&#39;oops not string.&#39;</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span><span class="p">;</span>    
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">str</span><span class="p">())),</span> <span class="s1">&#39;oops not string.&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
 
-     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">formalName</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="nb">str</span><span class="p">()),</span> <span class="s1">&#39;oops not string.&#39;</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span> <span class="o">=</span> <span class="n">formalName</span><span class="p">;</span>    
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">formalName</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">str</span><span class="p">())),</span> <span class="s1">&#39;oops not string.&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span> <span class="o">=</span> <span class="n">formalName</span>
 
-     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="nb">float</span><span class="p">()),</span> <span class="s1">&#39;oops not value.&#39;</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>   
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">float</span><span class="p">())),</span> <span class="s1">&#39;oops not value.&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span>
 
-     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="nb">str</span><span class="p">()),</span> <span class="s1">&#39;oops not string.&#39;</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span> <span class="o">=</span> <span class="n">unit</span><span class="p">;</span>    
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">str</span><span class="p">())),</span> <span class="s1">&#39;oops not string.&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span> <span class="o">=</span> <span class="n">unit</span>
 
-     <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>       <span class="o">=</span> <span class="n">name</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span> <span class="o">=</span> <span class="n">formalName</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">_value</span>      <span class="o">=</span> <span class="n">value</span> 
-     <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span>       <span class="o">=</span> <span class="n">unit</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span> <span class="o">=</span> <span class="n">formalName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span> <span class="o">=</span> <span class="n">unit</span>
 
-     <span class="k">return</span>
+        <span class="k">return</span>
 
-<span class="c1">#*******************************************************************************</span>
+<span class="c1"># *******************************************************************************</span>
 
-<span class="c1">#*******************************************************************************</span>
+<span class="c1"># *******************************************************************************</span>
 <span class="c1"># Setters and Getters methods</span>
-<span class="c1">#-------------------------------------------------------------------------------</span>
+<span class="c1"># -------------------------------------------------------------------------------</span>
 <span class="c1"># These are passing arguments by value effectively. Because the python objects</span>
 <span class="c1"># passed into/out of the function are immutable.</span>
 
-<div class="viewcode-block" id="Quantity.SetName"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetName">[docs]</a> <span class="k">def</span> <span class="nf">SetName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">n</span><span class="p">):</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">n</span></div>
-<div class="viewcode-block" id="Quantity.get_name"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.get_name">[docs]</a> <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span></div>
- <span class="n">name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_name</span><span class="p">,</span><span class="n">SetName</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+<div class="viewcode-block" id="Quantity.SetName"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetName">[docs]</a>    <span class="k">def</span> <span class="nf">SetName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">n</span></div>
 
-<div class="viewcode-block" id="Quantity.SetValue"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetValue">[docs]</a> <span class="k">def</span> <span class="nf">SetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">v</span><span class="p">):</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">v</span></div>
-<div class="viewcode-block" id="Quantity.GetValue"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.GetValue">[docs]</a> <span class="k">def</span> <span class="nf">GetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span></div>
- <span class="n">value</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetValue</span><span class="p">,</span><span class="n">SetValue</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+<div class="viewcode-block" id="Quantity.get_name"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span></div>
+    <span class="n">name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_name</span><span class="p">,</span> <span class="n">SetName</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Quantity.SetFormalName"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetFormalName">[docs]</a> <span class="k">def</span> <span class="nf">SetFormalName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fn</span><span class="p">):</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span> <span class="o">=</span> <span class="n">fn</span></div>
-<div class="viewcode-block" id="Quantity.GetFormalName"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.GetFormalName">[docs]</a> <span class="k">def</span> <span class="nf">GetFormalName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span></div>
- <span class="n">formalName</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetFormalName</span><span class="p">,</span><span class="n">SetFormalName</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+<div class="viewcode-block" id="Quantity.SetValue"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetValue">[docs]</a>    <span class="k">def</span> <span class="nf">SetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">v</span></div>
 
-<div class="viewcode-block" id="Quantity.SetUnit"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetUnit">[docs]</a> <span class="k">def</span> <span class="nf">SetUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">):</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span> <span class="o">=</span> <span class="n">f</span></div>
-<div class="viewcode-block" id="Quantity.GetUnit"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.GetUnit">[docs]</a> <span class="k">def</span> <span class="nf">GetUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span></div>
- <span class="n">unit</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetUnit</span><span class="p">,</span><span class="n">SetUnit</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
+<div class="viewcode-block" id="Quantity.GetValue"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.GetValue">[docs]</a>    <span class="k">def</span> <span class="nf">GetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span></div>
+    <span class="n">value</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetValue</span><span class="p">,</span> <span class="n">SetValue</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<span class="c1">#*******************************************************************************</span>
-<span class="c1"># Internal helpers </span>
+<div class="viewcode-block" id="Quantity.SetFormalName"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetFormalName">[docs]</a>    <span class="k">def</span> <span class="nf">SetFormalName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span> <span class="o">=</span> <span class="n">fn</span></div>
 
-<span class="c1">#*******************************************************************************</span>
+<div class="viewcode-block" id="Quantity.GetFormalName"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.GetFormalName">[docs]</a>    <span class="k">def</span> <span class="nf">GetFormalName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span></div>
+    <span class="n">formalName</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetFormalName</span><span class="p">,</span> <span class="n">SetFormalName</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Quantity.SetUnit"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetUnit">[docs]</a>    <span class="k">def</span> <span class="nf">SetUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span> <span class="o">=</span> <span class="n">f</span></div>
+
+<div class="viewcode-block" id="Quantity.GetUnit"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.GetUnit">[docs]</a>    <span class="k">def</span> <span class="nf">GetUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span></div>
+    <span class="n">unit</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetUnit</span><span class="p">,</span> <span class="n">SetUnit</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># *******************************************************************************</span>
+<span class="c1"># Internal helpers</span>
+
+<span class="c1"># *******************************************************************************</span>
 <span class="c1"># Printing of data members</span>
- <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-     <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> Quantity(): </span><span class="se">\n\t</span><span class="s1"> name=</span><span class="si">%s</span><span class="s1">; formalName=</span><span class="si">%s</span><span class="s1">; value=</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">]&#39;</span>
-     <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">formalName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> Quantity(): </span><span class="se">\n\t</span><span class="s1"> name=</span><span class="si">%s</span><span class="s1">; formalName=</span><span class="si">%s</span><span class="s1">; value=</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">]&#39;</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">formalName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
 
- <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
-     <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> Quantity(): </span><span class="se">\n\t</span><span class="s1"> name=</span><span class="si">%s</span><span class="s1">; formalName=</span><span class="si">%s</span><span class="s1">; value=</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">]&#39;</span>
-     <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">formalName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
-<span class="c1">#*******************************************************************************</span>
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> Quantity(): </span><span class="se">\n\t</span><span class="s1"> name=</span><span class="si">%s</span><span class="s1">; formalName=</span><span class="si">%s</span><span class="s1">; value=</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">]&#39;</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">formalName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
+
+
+<span class="c1"># *******************************************************************************</span>
 <span class="c1"># Usage: -&gt; python interface.py</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-   <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Unit testing for Quantity&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Unit testing for Quantity&#39;</span><span class="p">)</span>
 </pre></div>
 
           </div>
@@ -155,14 +163,12 @@
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
 <h3><a href="../index.html">Table Of Contents</a></h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../src_rst/modules.html">src</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../src_rst/utils_rst/modules.html">utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">pyplot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../examples_rst/input_rst/modules.html">input</a></li>
 </ul>
 
 <div id="searchbox" style="display: none" role="search">

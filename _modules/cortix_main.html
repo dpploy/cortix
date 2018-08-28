@@ -45,7 +45,8 @@
           <div class="body" role="main">
             
   <h1>Source code for cortix_main</h1><div class="highlight"><pre>
-<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># This file is part of the Cortix toolkit evironment</span>
 <span class="c1"># https://github.com/dpploy/cortix</span>
 <span class="c1">#</span>
@@ -59,13 +60,14 @@
 
 <span class="sd">Cortix: a program for system-level modules coupling, execution, and analysis.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="c1">#*********************************************************************************</span>
+<span class="c1"># *********************************************************************************</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">cortix.src.simulation</span> <span class="k">import</span> <span class="n">Simulation</span>
 <span class="kn">from</span> <span class="nn">cortix.src.utils.configtree</span> <span class="k">import</span> <span class="n">ConfigTree</span>
 <span class="kn">from</span> <span class="nn">cortix.src.utils.set_logger_level</span> <span class="k">import</span> <span class="n">set_logger_level</span>
-<span class="c1">#*********************************************************************************</span>
+<span class="c1"># *********************************************************************************</span>
+
 
 <div class="viewcode-block" id="Cortix"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix">[docs]</a><span class="k">class</span> <span class="nc">Cortix</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -89,8 +91,8 @@
 
         <span class="c1"># check</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">,</span>\
-        <span class="s2">&quot;Cortix object name </span><span class="si">%r</span><span class="s2"> conflicts with cortix-config.xml </span><span class="si">%r</span><span class="s2">&quot;</span> \
-        <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+            <span class="s2">&quot;Cortix object name </span><span class="si">%r</span><span class="s2"> conflicts with cortix-config.xml </span><span class="si">%r</span><span class="s2">&quot;</span> \
+            <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
         <span class="c1"># Read the work directory name</span>
         <span class="n">node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_tree</span><span class="o">.</span><span class="n">get_sub_node</span><span class="p">(</span><span class="s2">&quot;work_dir&quot;</span><span class="p">)</span>
@@ -125,15 +127,16 @@
         <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;file_handler&quot;</span><span class="p">:</span>
                 <span class="n">file_handler_level</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;level&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                <span class="n">file_handler</span> <span class="o">=</span> <span class="n">set_logger_level</span><span class="p">(</span><span class="n">file_handler</span><span class="p">,</span> <span class="n">logger_name</span><span class="p">,</span> \
+                <span class="n">file_handler</span> <span class="o">=</span> <span class="n">set_logger_level</span><span class="p">(</span><span class="n">file_handler</span><span class="p">,</span> <span class="n">logger_name</span><span class="p">,</span>
                                                 <span class="n">file_handler_level</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;console_handler&quot;</span><span class="p">:</span>
                 <span class="n">console_handler_level</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;level&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                <span class="n">console_handler</span> <span class="o">=</span> <span class="n">set_logger_level</span><span class="p">(</span><span class="n">console_handler</span><span class="p">,</span> <span class="n">logger_name</span><span class="p">,</span> \
+                <span class="n">console_handler</span> <span class="o">=</span> <span class="n">set_logger_level</span><span class="p">(</span><span class="n">console_handler</span><span class="p">,</span> <span class="n">logger_name</span><span class="p">,</span>
                                                    <span class="n">console_handler_level</span><span class="p">)</span>
 
         <span class="c1"># Formatter added to handlers</span>
-        <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(name)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(name)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">file_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
         <span class="n">console_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
 
@@ -143,7 +146,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Created Cortix logger: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Logger level: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">logger_level</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Logger file handler level: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file_handler_level</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Logger console handler level: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">console_handler_level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;Logger console handler level: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">console_handler_level</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Created Cortix work directory: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">)</span>
 
         <span class="c1"># Setup simulations (one or more as specified in the config file)</span>
@@ -151,7 +156,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__setup_simulations</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Created Cortix object </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-<span class="c1">#---------------------- end def __init__():---------------------------------------</span>
+<span class="c1"># ---------------------- end def __init__():------------------------------</span>
 
 <div class="viewcode-block" id="Cortix.run_simulations"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.run_simulations">[docs]</a>    <span class="k">def</span> <span class="nf">run_simulations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -161,9 +166,9 @@
 
         <span class="k">for</span> <span class="n">sim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">simulations</span><span class="p">:</span>
             <span class="n">sim</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">task_name</span><span class="p">)</span></div>
-<span class="c1">#---------------------- end def run_simulations():--------------------------------</span>
+<span class="c1"># ---------------------- end def run_simulations():-----------------------</span>
 
-<span class="c1">#*********************************************************************************</span>
+<span class="c1"># *********************************************************************************</span>
 <span class="c1"># Private helper functions (internal use: __)</span>
 
     <span class="k">def</span> <span class="nf">__setup_simulations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -174,18 +179,20 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">for</span> <span class="n">sim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_tree</span><span class="o">.</span><span class="n">get_all_sub_nodes</span><span class="p">(</span><span class="s1">&#39;simulation&#39;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;SetupSimulations(): simulation name: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;SetupSimulations(): simulation name: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">sim</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">))</span>
             <span class="n">sim_config_tree</span> <span class="o">=</span> <span class="n">ConfigTree</span><span class="p">(</span><span class="n">sim</span><span class="p">)</span>
             <span class="n">simulation</span> <span class="o">=</span> <span class="n">Simulation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">sim_config_tree</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">simulations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span>
-<span class="c1">#---------------------- end def __setup_simulations():----------------------------</span>
+<span class="c1"># ---------------------- end def __setup_simulations():-------------------</span>
 
     <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Destroyed Cortix object: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
-<span class="c1">#---------------------- end def __del__():----------------------------------------</span>
+<span class="c1"># ---------------------- end def __del__():-------------------------------</span>
 
-<span class="c1">#====================== end class Cortix: ========================================</span>
+<span class="c1"># ====================== end class Cortix: ===============================</span>
 </pre></div>
 
           </div>
@@ -194,14 +201,12 @@
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
 <h3><a href="../index.html">Table Of Contents</a></h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../src_rst/modules.html">src</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../src_rst/utils_rst/modules.html">utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">pyplot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../examples_rst/input_rst/modules.html">input</a></li>
 </ul>
 
 <div id="searchbox" style="display: none" role="search">

@@ -59,141 +59,146 @@
 
 <span class="sd">Stream container</span>
 
-<span class="sd">VFdALib support classes </span>
+<span class="sd">VFdALib support classes</span>
 
 <span class="sd">Sat Aug 15 17:24:02 EDT 2015</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
-<span class="c1">#*******************************************************************************</span>
-<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
+<span class="c1"># *******************************************************************************</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
 
-<span class="kn">from</span> <span class="nn">cortix.support.specie</span>   <span class="k">import</span> <span class="n">Specie</span>
+<span class="kn">from</span> <span class="nn">cortix.support.specie</span> <span class="k">import</span> <span class="n">Specie</span>
 <span class="kn">from</span> <span class="nn">cortix.support.quantity</span> <span class="k">import</span> <span class="n">Quantity</span>
-<span class="c1">#*******************************************************************************</span>
+<span class="c1"># *******************************************************************************</span>
 
-<span class="c1">#*******************************************************************************</span>
+<span class="c1"># *******************************************************************************</span>
+
+
 <div class="viewcode-block" id="Stream"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream">[docs]</a><span class="k">class</span> <span class="nc">Stream</span><span class="p">():</span>
 
- <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> 
-               <span class="n">timeStamp</span><span class="p">,</span>
-               <span class="n">species</span>    <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>   
-               <span class="n">quantities</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>   
-               <span class="n">values</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
-             <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">timeStamp</span><span class="p">,</span>
+                 <span class="n">species</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">quantities</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">values</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+                 <span class="p">):</span>
 
-     <span class="c1"># constructor</span>
-     <span class="c1"># THIS WILL CREATE AN ORDERED &quot;STREAM&quot;; values must be in order!</span>
+        <span class="c1"># constructor</span>
+        <span class="c1"># THIS WILL CREATE AN ORDERED &quot;STREAM&quot;; values must be in order!</span>
 
-  <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">timeStamp</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="nb">float</span><span class="p">())</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">timeStamp</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">float</span><span class="p">()))</span>
 
-  <span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span> <span class="o">=</span> <span class="n">timeStamp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span> <span class="o">=</span> <span class="n">timeStamp</span>
 
-  <span class="k">if</span> <span class="n">species</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
-     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">species</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="nb">list</span><span class="p">())</span>
-     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">species</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">species</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">Specie</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">species</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">species</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">list</span><span class="p">()))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">species</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">species</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nb">type</span><span class="p">(</span><span class="n">Specie</span><span class="p">()))</span>
 
-  <span class="k">if</span> <span class="n">quantities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
-     <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">quantities</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="nb">list</span><span class="p">())</span>
-     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">quantities</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">quantities</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="n">Quantity</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">quantities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quantities</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">list</span><span class="p">()))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">quantities</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quantities</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nb">type</span><span class="p">(</span><span class="n">Quantity</span><span class="p">()))</span>
 
 <span class="c1">#  assert type(value) == type(float())</span>
 
 <span class="c1"># List of quantities and species objects</span>
-  <span class="bp">self</span><span class="o">.</span><span class="n">species</span>    <span class="o">=</span> <span class="n">species</span>       <span class="c1"># list</span>
-  <span class="bp">self</span><span class="o">.</span><span class="n">quantities</span> <span class="o">=</span> <span class="n">quantities</span>    <span class="c1"># list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">species</span> <span class="o">=</span> <span class="n">species</span>       <span class="c1"># list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quantities</span> <span class="o">=</span> <span class="n">quantities</span>    <span class="c1"># list</span>
 
-  <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span> <span class="c1"># note order of names; values must be in the same order; caution</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>  <span class="c1"># note order of names; values must be in the same order; caution</span>
 
-  <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
-      <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">specie</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
+            <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">specie</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
-  <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantities</span><span class="p">:</span>
-      <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">quant</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantities</span><span class="p">:</span>
+            <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">quant</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
 <span class="c1"># ORDERED data; caution!!</span>
-<span class="c1"># Table data stream </span>
-  <span class="bp">self</span><span class="o">.</span><span class="n">stream</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">],</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">names</span> <span class="p">)</span>
-  <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="nb">float</span><span class="p">()):</span> 
-     <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span> <span class="n">values</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span>
-  <span class="k">else</span><span class="p">:</span>
-     <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span> <span class="p">)</span>
+<span class="c1"># Table data stream</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="n">names</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">float</span><span class="p">())):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-  <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="nb">list</span><span class="p">())</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
-     <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span> <span class="n">names</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
-         <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-   
-  <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">list</span><span class="p">()))</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+        <span class="k">return</span>
 
 
-<span class="c1">#*******************************************************************************</span>
+<span class="c1"># *******************************************************************************</span>
 <span class="c1"># Setters and Getters methods</span>
-<span class="c1">#-------------------------------------------------------------------------------</span>
+<span class="c1"># -------------------------------------------------------------------------------</span>
 <span class="c1"># These are passing arguments by value effectively. Because the python objects</span>
 <span class="c1"># passed into/out of the function are immutable.</span>
 
-<div class="viewcode-block" id="Stream.GetTimeStamp"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetTimeStamp">[docs]</a> <span class="k">def</span> <span class="nf">GetTimeStamp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span>    </div>
+<div class="viewcode-block" id="Stream.GetTimeStamp"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetTimeStamp">[docs]</a>    <span class="k">def</span> <span class="nf">GetTimeStamp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span></div>
 
-<div class="viewcode-block" id="Stream.GetActors"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetActors">[docs]</a> <span class="k">def</span> <span class="nf">GetActors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-     <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Stream.GetActors"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetActors">[docs]</a>    <span class="k">def</span> <span class="nf">GetActors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Stream.GetSpecie"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetSpecie">[docs]</a> <span class="k">def</span> <span class="nf">GetSpecie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-     <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
-         <span class="k">if</span> <span class="n">specie</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">specie</span>
-     <span class="k">return</span> <span class="kc">None</span> </div>
+<div class="viewcode-block" id="Stream.GetSpecie"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetSpecie">[docs]</a>    <span class="k">def</span> <span class="nf">GetSpecie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">specie</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">specie</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Stream.GetSpecies"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetSpecies">[docs]</a> <span class="k">def</span> <span class="nf">GetSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span></div>
+<div class="viewcode-block" id="Stream.GetSpecies"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">GetSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span></div>
 
-<div class="viewcode-block" id="Stream.GetQuantities"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetQuantities">[docs]</a> <span class="k">def</span> <span class="nf">GetQuantities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantities</span></div>
+<div class="viewcode-block" id="Stream.GetQuantities"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetQuantities">[docs]</a>    <span class="k">def</span> <span class="nf">GetQuantities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantities</span></div>
 
-<div class="viewcode-block" id="Stream.SetSpecieId"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.SetSpecieId">[docs]</a> <span class="k">def</span> <span class="nf">SetSpecieId</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-     <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
-         <span class="k">if</span> <span class="n">specie</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
-            <span class="n">specie</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="n">val</span>
-            <span class="k">return</span> </div>
+<div class="viewcode-block" id="Stream.SetSpecieId"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.SetSpecieId">[docs]</a>    <span class="k">def</span> <span class="nf">SetSpecieId</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">specie</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">specie</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="n">val</span>
+                <span class="k">return</span></div>
 
-<div class="viewcode-block" id="Stream.GetQuantity"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetQuantity">[docs]</a> <span class="k">def</span> <span class="nf">GetQuantity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-     <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantities</span><span class="p">:</span>
-         <span class="k">if</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">quant</span>
-     <span class="k">return</span> <span class="kc">None</span> </div>
+<div class="viewcode-block" id="Stream.GetQuantity"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetQuantity">[docs]</a>    <span class="k">def</span> <span class="nf">GetQuantity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantities</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">quant</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
 
-<div class="viewcode-block" id="Stream.GetRow"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetRow">[docs]</a> <span class="k">def</span> <span class="nf">GetRow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeStamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-     <span class="k">if</span> <span class="n">timeStamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span><span class="p">,:])</span>
-     <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="n">timeStamp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;timeStamp = </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">timeStamp</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,:])</span></div>
-
-<div class="viewcode-block" id="Stream.GetValue"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetValue">[docs]</a> <span class="k">def</span> <span class="nf">GetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">timeStamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-     <span class="k">assert</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">columns</span>
-     <span class="k">if</span> <span class="n">timeStamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span><span class="p">,</span><span class="n">actor</span><span class="p">]</span>
-     <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="n">timeStamp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">index</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,</span><span class="n">actor</span><span class="p">]</span></div>
-
-<div class="viewcode-block" id="Stream.SetValue"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.SetValue">[docs]</a> <span class="k">def</span> <span class="nf">SetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeStamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-     <span class="k">assert</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">columns</span>
-     <span class="k">if</span> <span class="n">timeStamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-           <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span><span class="p">,</span><span class="n">actor</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+<div class="viewcode-block" id="Stream.GetRow"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetRow">[docs]</a>    <span class="k">def</span> <span class="nf">GetRow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeStamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">timeStamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span><span class="p">,</span> <span class="p">:])</span>
         <span class="k">else</span><span class="p">:</span>
-           <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span><span class="p">,</span><span class="n">actor</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-     <span class="k">else</span><span class="p">:</span>
-        <span class="k">assert</span> <span class="n">timeStamp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;timeStamp = </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">timeStamp</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-           <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,</span><span class="n">actor</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-           <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,</span><span class="n">actor</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div></div>
+            <span class="k">assert</span> <span class="n">timeStamp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;timeStamp = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">timeStamp</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,</span> <span class="p">:])</span></div>
 
-<span class="c1">#*******************************************************************************</span>
+<div class="viewcode-block" id="Stream.GetValue"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetValue">[docs]</a>    <span class="k">def</span> <span class="nf">GetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">timeStamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">columns</span>
+        <span class="k">if</span> <span class="n">timeStamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">actor</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">timeStamp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">index</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">actor</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Stream.SetValue"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.SetValue">[docs]</a>    <span class="k">def</span> <span class="nf">SetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeStamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">columns</span>
+        <span class="k">if</span> <span class="n">timeStamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">actor</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">actor</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">timeStamp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;timeStamp = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="n">timeStamp</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">actor</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">actor</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div></div>
+
+<span class="c1"># *******************************************************************************</span>
 <span class="c1"># Printing of data members</span>
 <span class="c1"># def __str__( self ):</span>
 <span class="c1">#     s = &#39; %5s %5s %5s &#39;+&#39; molar mass: %6s &#39;+&#39; molar cc: %6s &#39;+&#39; mass cc: %6s &#39;+&#39; flag: %s &#39;+&#39;# atoms: %s&#39;+&#39; atoms: %s\n&#39;</span>
@@ -202,7 +207,7 @@
 <span class="c1"># def __repr__( self ):</span>
 <span class="c1">#     s = &#39; %5s %5s %5s &#39;+&#39; molar mass: %6s &#39;+&#39; molar cc: %6s &#39;+&#39; mass cc: %6s &#39;+&#39; flag: %s &#39;+&#39;# atoms: %s&#39;+&#39; atoms: %s\n&#39;</span>
 <span class="c1">#     return s % (self.name, self.formulaName, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)</span>
-<span class="c1">#*******************************************************************************</span>
+<span class="c1"># *******************************************************************************</span>
 </pre></div>
 
           </div>
@@ -211,14 +216,12 @@
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
 <h3><a href="../index.html">Table Of Contents</a></h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../src_rst/modules.html">src</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../src_rst/utils_rst/modules.html">utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">pyplot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../examples_rst/input_rst/modules.html">input</a></li>
 </ul>
 
 <div id="searchbox" style="display: none" role="search">

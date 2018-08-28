@@ -45,7 +45,8 @@
           <div class="body" role="main">
             
   <h1>Source code for module</h1><div class="highlight"><pre>
-<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># This file is part of the Cortix toolkit evironment</span>
 <span class="c1"># https://github.com/dpploy/cortix</span>
 <span class="c1">#</span>
@@ -59,25 +60,28 @@
 
 <span class="sd">Cortix: a program for system-level modules coupling, execution, and analysis.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="c1">#*********************************************************************************</span>
+<span class="c1"># *********************************************************************************</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">mpi4py.futures</span> <span class="k">import</span> <span class="n">MPIPoolExecutor</span>
 <span class="kn">from</span> <span class="nn">cortix.src.utils.configtree</span> <span class="k">import</span> <span class="n">ConfigTree</span>
 <span class="kn">from</span> <span class="nn">cortix.src.launcher</span> <span class="k">import</span> <span class="n">Launcher</span>
-<span class="c1">#*********************************************************************************</span>
+<span class="c1"># *********************************************************************************</span>
+
 
 <div class="viewcode-block" id="Module"><a class="viewcode-back" href="../src_rst/module.html#module.Module">[docs]</a><span class="k">class</span> <span class="nc">Module</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    The Module class encapsulates a computational module of some scientific domain.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_work_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mod_lib_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> \
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_work_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mod_lib_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">mod_lib_parent_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mod_config_node</span><span class="o">=</span><span class="n">ConfigTree</span><span class="p">()):</span>
 
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parent_work_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s2">&quot;-&gt; parent_work_dir is invalid.&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">parent_work_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s2">&quot;-&gt; parent_work_dir is invalid.&quot;</span>
 
         <span class="c1"># Inherit a configuration tree</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mod_config_node</span><span class="p">,</span> <span class="n">ConfigTree</span><span class="p">),</span> <span class="s2">&quot;-&gt; mod_config_node is invalid.&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">mod_config_node</span><span class="p">,</span> <span class="n">ConfigTree</span><span class="p">),</span> <span class="s2">&quot;-&gt; mod_config_node is invalid.&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config_node</span> <span class="o">=</span> <span class="n">mod_config_node</span>
 
         <span class="c1"># Read the module name and type</span>
@@ -137,7 +141,7 @@
             <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;port&#39;</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;only &lt;= 3 attributes allowed.&quot;</span>
 
-                <span class="n">tmp</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span> <span class="c1"># store port name and three attributes</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># store port name and three attributes</span>
 
                 <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
                     <span class="n">key</span> <span class="o">=</span> <span class="n">attribute</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -145,13 +149,13 @@
 
                     <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span>
                         <span class="k">assert</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;use&#39;</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;provide&#39;</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span> <span class="ow">or</span> \
-                        <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="s1">&#39;port attribute value invalid.&#39;</span>
+                            <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="s1">&#39;port attribute value invalid.&#39;</span>
                         <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;portName&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text</span>  <span class="c1"># portName</span>
                         <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;portType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>   <span class="c1"># portType</span>
                     <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;mode&#39;</span><span class="p">:</span>
                         <span class="n">file_value</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
                         <span class="k">assert</span> <span class="n">file_value</span> <span class="o">==</span> <span class="s1">&#39;file&#39;</span> <span class="ow">or</span> <span class="n">file_value</span> <span class="o">==</span> <span class="s1">&#39;directory&#39;</span><span class="p">,</span>\
-                        <span class="s1">&#39;port attribute value invalid.&#39;</span>
+                            <span class="s1">&#39;port attribute value invalid.&#39;</span>
                         <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;portMode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
                     <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;multiplicity&#39;</span><span class="p">:</span>
                         <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;portMultiplicity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>  <span class="c1"># portMultiplicity</span>
@@ -159,13 +163,13 @@
                         <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;invalid port attribute. fatal.&#39;</span>
 
                 <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
-                <span class="n">store</span> <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;portName&#39;</span><span class="p">],</span> <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;portType&#39;</span><span class="p">],</span> <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;portMode&#39;</span><span class="p">],</span> \
+                <span class="n">store</span> <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;portName&#39;</span><span class="p">],</span> <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;portType&#39;</span><span class="p">],</span> <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;portMode&#39;</span><span class="p">],</span>
                          <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;portMultiplicity&#39;</span><span class="p">])</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">store</span><span class="p">)</span> <span class="c1"># (portName, portType, portMode,</span>
-                                         <span class="c1">#  portMultiplicity)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>  <span class="c1"># (portName, portType, portMode,</span>
+                <span class="c1">#  portMultiplicity)</span>
                 <span class="n">tmp</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">store</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="c1">#---------------------- end def __init__():---------------------------------------</span>
+<span class="c1"># ---------------------- end def __init__():------------------------------</span>
 
 <div class="viewcode-block" id="Module.get_name"><a class="viewcode-back" href="../src_rst/module.html#module.Module.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -173,7 +177,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_name</span></div>
-<span class="c1">#---------------------- end def get_name():---------------------------------------</span>
+<span class="c1"># ---------------------- end def get_name():------------------------------</span>
 
 <div class="viewcode-block" id="Module.get_library_name"><a class="viewcode-back" href="../src_rst/module.html#module.Module.get_library_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_library_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -181,7 +185,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_lib_name</span></div>
-<span class="c1">#---------------------- end def get_library_name():-------------------------------</span>
+<span class="c1"># ---------------------- end def get_library_name():----------------------</span>
 
 <div class="viewcode-block" id="Module.get_library_parent_dir"><a class="viewcode-back" href="../src_rst/module.html#module.Module.get_library_parent_dir">[docs]</a>    <span class="k">def</span> <span class="nf">get_library_parent_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -189,7 +193,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_lib_parent_dir</span></div>
-<span class="c1">#---------------------- end def get_library_parent_dir():-------------------------</span>
+<span class="c1"># ---------------------- end def get_library_parent_dir():----------------</span>
 
 <div class="viewcode-block" id="Module.get_ports"><a class="viewcode-back" href="../src_rst/module.html#module.Module.get_ports">[docs]</a>    <span class="k">def</span> <span class="nf">get_ports</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -197,7 +201,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">ports</span></div>
-<span class="c1">#---------------------- end def get_ports():--------------------------------------</span>
+<span class="c1"># ---------------------- end def get_ports():-----------------------------</span>
 
 <div class="viewcode-block" id="Module.get_port_type"><a class="viewcode-back" href="../src_rst/module.html#module.Module.get_port_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_port_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -209,7 +213,7 @@
             <span class="k">if</span> <span class="n">port</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">port_name</span><span class="p">:</span>
                 <span class="n">port_type</span> <span class="o">=</span> <span class="n">port</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">port_type</span></div>
-<span class="c1">#---------------------- end def get_port_type():----------------------------------</span>
+<span class="c1"># ---------------------- end def get_port_type():-------------------------</span>
 
 <div class="viewcode-block" id="Module.get_port_mode"><a class="viewcode-back" href="../src_rst/module.html#module.Module.get_port_mode">[docs]</a>    <span class="k">def</span> <span class="nf">get_port_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -221,7 +225,7 @@
             <span class="k">if</span> <span class="n">port</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">port_name</span><span class="p">:</span>
                 <span class="n">port_mode</span> <span class="o">=</span> <span class="n">port</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">port_mode</span></div>
-<span class="c1">#---------------------- end def get_port_mode():----------------------------------</span>
+<span class="c1"># ---------------------- end def get_port_mode():-------------------------</span>
 
 <div class="viewcode-block" id="Module.get_port_names"><a class="viewcode-back" href="../src_rst/module.html#module.Module.get_port_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_port_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -232,7 +236,7 @@
         <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
             <span class="n">port_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">port</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">port_names</span></div>
-<span class="c1">#---------------------- end def get_port_names():---------------------------------</span>
+<span class="c1"># ---------------------- end def get_port_names():------------------------</span>
 
 <div class="viewcode-block" id="Module.has_port_name"><a class="viewcode-back" href="../src_rst/module.html#module.Module.has_port_name">[docs]</a>    <span class="k">def</span> <span class="nf">has_port_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -244,9 +248,10 @@
             <span class="k">if</span> <span class="n">port</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">port_name</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="kc">False</span></div>
-<span class="c1">#---------------------- end def has_port_name():----------------------------------</span>
+<span class="c1"># ---------------------- end def has_port_name():-------------------------</span>
 
-<div class="viewcode-block" id="Module.execute"><a class="viewcode-back" href="../src_rst/module.html#module.Module.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot_id</span><span class="p">,</span> <span class="n">runtime_cortix_param_file</span><span class="p">,</span> <span class="n">runtime_cortix_comm_file</span><span class="p">):</span>
+<div class="viewcode-block" id="Module.execute"><a class="viewcode-back" href="../src_rst/module.html#module.Module.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot_id</span><span class="p">,</span> <span class="n">runtime_cortix_param_file</span><span class="p">,</span>
+                <span class="n">runtime_cortix_comm_file</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Spawns a worker process to execute the module.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -255,7 +260,7 @@
         <span class="n">param</span> <span class="o">=</span> <span class="n">runtime_cortix_param_file</span>
         <span class="n">comm</span> <span class="o">=</span> <span class="n">runtime_cortix_comm_file</span>
 
-        <span class="n">full_path_comm_dir</span> <span class="o">=</span> <span class="n">comm</span><span class="p">[:</span><span class="n">comm</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)]</span><span class="o">+</span><span class="s1">&#39;/&#39;</span>
+        <span class="n">full_path_comm_dir</span> <span class="o">=</span> <span class="n">comm</span><span class="p">[:</span><span class="n">comm</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
         <span class="n">runtime_module_status_file</span> <span class="o">=</span> <span class="n">full_path_comm_dir</span> <span class="o">+</span> <span class="s1">&#39;runtime-status.xml&#39;</span>
 
         <span class="n">status</span> <span class="o">=</span> <span class="n">runtime_module_status_file</span>
@@ -264,12 +269,14 @@
         <span class="n">mod_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mod_name</span>
 
         <span class="c1"># provide for all modules for additional work IO data</span>
-        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">full_path_comm_dir</span><span class="p">),</span> <span class="s1">&#39;module directory not available.&#39;</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span>
+            <span class="n">full_path_comm_dir</span><span class="p">),</span> <span class="s1">&#39;module directory not available.&#39;</span>
         <span class="n">mod_work_dir</span> <span class="o">=</span> <span class="n">full_path_comm_dir</span> <span class="o">+</span> <span class="s1">&#39;wrk/&#39;</span>
 
         <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;mkdir -p &#39;</span> <span class="o">+</span> <span class="n">mod_work_dir</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">mod_work_dir</span><span class="p">),</span> <span class="s1">&#39;module work directory not available.&#39;</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span>
+            <span class="n">mod_work_dir</span><span class="p">),</span> <span class="s1">&#39;module work directory not available.&#39;</span>
 
         <span class="c1"># only for wrapped modules</span>
         <span class="n">mod_exec_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">executable_path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">executable_name</span>
@@ -287,9 +294,9 @@
         <span class="n">future</span> <span class="o">=</span> <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">launch</span><span class="o">.</span><span class="n">run</span><span class="p">())</span>
 
         <span class="k">return</span> <span class="n">runtime_module_status_file</span></div></div>
-<span class="c1">#---------------------- end def execute():----------------------------------------</span>
+<span class="c1"># ---------------------- end def execute():-------------------------------</span>
 
-<span class="c1">#====================== end class Module: ========================================</span>
+<span class="c1"># ====================== end class Module: ===============================</span>
 </pre></div>
 
           </div>
@@ -298,14 +305,12 @@
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
 <h3><a href="../index.html">Table Of Contents</a></h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../src_rst/modules.html">src</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../src_rst/utils_rst/modules.html">utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">pyplot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../examples_rst/input_rst/modules.html">input</a></li>
 </ul>
 
 <div id="searchbox" style="display: none" role="search">

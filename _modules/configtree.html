@@ -45,7 +45,8 @@
           <div class="body" role="main">
             
   <h1>Source code for configtree</h1><div class="highlight"><pre>
-<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># This file is part of the Cortix toolkit evironment</span>
 <span class="c1"># https://github.com/dpploy/cortix</span>
 <span class="c1">#</span>
@@ -61,10 +62,11 @@
 
 <span class="sd">Cortix: a program for system-level modules coupling, execution, and analysis.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="c1">#*********************************************************************************</span>
+<span class="c1"># *********************************************************************************</span>
 <span class="kn">from</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">import</span> <span class="n">Element</span>
 <span class="kn">from</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">import</span> <span class="n">ElementTree</span>
-<span class="c1">#*********************************************************************************</span>
+<span class="c1"># *********************************************************************************</span>
+
 
 <div class="viewcode-block" id="ConfigTree"><a class="viewcode-back" href="../src_rst/utils_rst/configtree.html#configtree.ConfigTree">[docs]</a><span class="k">class</span> <span class="nc">ConfigTree</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -78,23 +80,25 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_tree_node</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="n">config_tree_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config_tree_node</span><span class="p">,</span> <span class="n">Element</span><span class="p">),</span> <span class="s2">&quot;-&gt; config_tree_node invalid.&quot;</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">config_tree_node</span><span class="p">,</span> <span class="n">Element</span><span class="p">),</span> <span class="s2">&quot;-&gt; config_tree_node invalid.&quot;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">config_tree_node</span> <span class="o">=</span> <span class="n">config_tree_node</span>
 
         <span class="k">if</span> <span class="n">config_file_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config_file_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s2">&quot;-&gt; configFileName not a str.&quot;</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">config_file_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s2">&quot;-&gt; configFileName not a str.&quot;</span>
             <span class="k">assert</span> <span class="n">config_tree_node</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;node and file not allowed together.&quot;</span>
 
             <span class="n">tree</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="p">()</span>
             <span class="n">tree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">config_file_name</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">config_tree_node</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
-<span class="c1">#---------------------- end def __init__():---------------------------------------</span>
+<span class="c1"># ---------------------- end def __init__():------------------------------</span>
 
 <div class="viewcode-block" id="ConfigTree.get_root_node"><a class="viewcode-back" href="../src_rst/utils_rst/configtree.html#configtree.ConfigTree.get_root_node">[docs]</a>    <span class="k">def</span> <span class="nf">get_root_node</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the Element tree&#39;s root node&quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_tree_node</span></div>
-<span class="c1">#---------------------- end def get_root_node:():----------------------------------</span>
+<span class="c1"># ---------------------- end def get_root_node:():------------------------</span>
 
 <div class="viewcode-block" id="ConfigTree.get_node_tag"><a class="viewcode-back" href="../src_rst/utils_rst/configtree.html#configtree.ConfigTree.get_node_tag">[docs]</a>    <span class="k">def</span> <span class="nf">get_node_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -103,7 +107,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_tree_node</span><span class="o">.</span><span class="n">tag</span></div>
-<span class="c1">#---------------------- end def get_node_tag:():----------------------------------</span>
+<span class="c1"># ---------------------- end def get_node_tag:():-------------------------</span>
 
 <div class="viewcode-block" id="ConfigTree.get_node_name"><a class="viewcode-back" href="../src_rst/utils_rst/configtree.html#configtree.ConfigTree.get_node_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_node_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -112,7 +116,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_tree_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span></div>
-<span class="c1">#---------------------- end def get_node_name:():---------------------------------</span>
+<span class="c1"># ---------------------- end def get_node_name:():------------------------</span>
 
 <div class="viewcode-block" id="ConfigTree.get_node_type"><a class="viewcode-back" href="../src_rst/utils_rst/configtree.html#configtree.ConfigTree.get_node_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_node_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -121,7 +125,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_tree_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span></div>
-<span class="c1">#---------------------- end def get_node_type:():---------------------------------</span>
+<span class="c1"># ---------------------- end def get_node_type:():------------------------</span>
 
 <div class="viewcode-block" id="ConfigTree.get_sub_node"><a class="viewcode-back" href="../src_rst/utils_rst/configtree.html#configtree.ConfigTree.get_sub_node">[docs]</a>    <span class="k">def</span> <span class="nf">get_sub_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -131,7 +135,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;tag invalid&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_tree_node</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span></div>
-<span class="c1">#---------------------- end def get_sub_node:():----------------------------------</span>
+<span class="c1"># ---------------------- end def get_sub_node:():-------------------------</span>
 
 <div class="viewcode-block" id="ConfigTree.get_all_sub_nodes"><a class="viewcode-back" href="../src_rst/utils_rst/configtree.html#configtree.ConfigTree.get_all_sub_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_sub_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -141,7 +145,7 @@
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;tag invalid&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_tree_node</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">tag</span><span class="p">)</span></div>
-<span class="c1">#---------------------- end def get_all_sub_nodes:():-----------------------------</span>
+<span class="c1"># ---------------------- end def get_all_sub_nodes:():--------------------</span>
 
 <div class="viewcode-block" id="ConfigTree.get_node_children"><a class="viewcode-back" href="../src_rst/utils_rst/configtree.html#configtree.ConfigTree.get_node_children">[docs]</a>    <span class="k">def</span> <span class="nf">get_node_children</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -154,9 +158,9 @@
             <span class="n">children</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">child</span><span class="p">,</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="p">,</span> <span class="n">child</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">child</span><span class="o">.</span><span class="n">text</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">children</span></div></div>
-<span class="c1">#---------------------- end def get_note_children:():-----------------------------</span>
+<span class="c1"># ---------------------- end def get_note_children:():--------------------</span>
 
-<span class="c1">#====================== end class ConfigTree: =+++_===============================</span>
+<span class="c1"># ====================== end class ConfigTree: =+++_======================</span>
 </pre></div>
 
           </div>
@@ -165,14 +169,12 @@
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
 <h3><a href="../index.html">Table Of Contents</a></h3>
-<p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../src_rst/modules.html">src</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../src_rst/utils_rst/modules.html">utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">pyplot</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../examples_rst/input_rst/modules.html">input</a></li>
 </ul>
 
 <div id="searchbox" style="display: none" role="search">
