@@ -19,10 +19,12 @@
 #
 import os
 import sys
-#sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../src'))
 sys.path.insert(0, os.path.abspath('../src/utils'))
 sys.path.insert(0, os.path.abspath('../support'))
+sys.path.insert(0, os.path.abspath('../modulib'))
+sys.path.insert(0, os.path.abspath('../modulib/pyplot'))
 
 # -- General configuration ------------------------------------------------
 
