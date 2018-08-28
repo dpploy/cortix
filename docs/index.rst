@@ -7,12 +7,16 @@ Cortix documentation
 ====================
 .. include:: readme_converted.rst
 
+Table of Contents
+-----------------
 .. toctree::
+   src_rst/modules
+   src_rst/utils_rst/modules
+   support_rst/modules
+   modulib_rst/modules
+   examples_rst/modules
+   examples_rst/input_rst/modules
    :maxdepth: 4
-   :caption: Contents:
-
-   src_rst
-   support_rst
 
 Indices and tables
 ==================
@@ -20,3 +24,5 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+.. include:: hyperlinks.rst
