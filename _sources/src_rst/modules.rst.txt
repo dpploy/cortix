@@ -5,7 +5,7 @@ src
    :maxdepth: 4
 
    application
-   cortix_driver
+   cortix_driver_template
    cortix_main
    launcher
    module

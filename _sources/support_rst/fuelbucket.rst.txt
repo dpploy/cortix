@@ -1,7 +1,0 @@
-fuelbucket module
-=================
-
-.. automodule:: fuelbucket
-    :members:
-    :undoc-members:
-    :show-inheritance:
