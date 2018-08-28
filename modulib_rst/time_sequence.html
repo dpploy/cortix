@@ -1,0 +1,156 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>time_sequence module &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="examples" href="../examples_rst/modules.html" />
+    <link rel="prev" title="pyplot module" href="pyplot.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../examples_rst/modules.html" title="examples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pyplot.html" title="pyplot module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">pyplot</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-time_sequence">
+<span id="time-sequence-module"></span><h1>time_sequence module<a class="headerlink" href="#module-time_sequence" title="Permalink to this headline">¶</a></h1>
+<p>Valmor F. de Almeida <a class="reference external" href="mailto:dealmeidav&#37;&#52;&#48;ornl&#46;gov">dealmeidav<span>&#64;</span>ornl<span>&#46;</span>gov</a>; vfda</p>
+<p>Pyplot module.</p>
+<p>This class manages time-sequence data in XML or tabular formats.
+It is a helper for reading and manipulating stored file data in Cortix.
+The XML data is a ElementTree object.</p>
+<p>Sat Jul 19 12:13:05 EDT 2014</p>
+<dl class="class">
+<dt id="time_sequence.TimeSequence">
+<em class="property">class </em><code class="descclassname">time_sequence.</code><code class="descname">TimeSequence</code><span class="sig-paren">(</span><em>fileName=None</em>, <em>fileType=None</em>, <em>initialTime=0.0</em>, <em>finalTime=0.0</em>, <em>logger=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/time_sequence.html#TimeSequence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#time_sequence.TimeSequence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="time_sequence.TimeSequence.GetNVariables">
+<code class="descname">GetNVariables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/time_sequence.html#TimeSequence.GetNVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#time_sequence.TimeSequence.GetNVariables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="time_sequence.TimeSequence.GetTimeUnit">
+<code class="descname">GetTimeUnit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/time_sequence.html#TimeSequence.GetTimeUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#time_sequence.TimeSequence.GetTimeUnit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="time_sequence.TimeSequence.GetVariableNames">
+<code class="descname">GetVariableNames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/time_sequence.html#TimeSequence.GetVariableNames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#time_sequence.TimeSequence.GetVariableNames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="time_sequence.TimeSequence.GetVariables">
+<code class="descname">GetVariables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/time_sequence.html#TimeSequence.GetVariables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#time_sequence.TimeSequence.GetVariables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="time_sequence.TimeSequence.get_name">
+<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/time_sequence.html#TimeSequence.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#time_sequence.TimeSequence.get_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../src_rst/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../src_rst/utils_rst/modules.html">utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">pyplot</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cortix_driver.html">cortix_driver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyplot.html">pyplot module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">time_sequence module</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples_rst/input_rst/modules.html">input</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../examples_rst/modules.html" title="examples"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pyplot.html" title="pyplot module"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >pyplot</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Valmor F. de Almeida.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+    </div>
+  </body>
+</html>

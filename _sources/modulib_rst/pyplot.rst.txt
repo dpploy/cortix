@@ -1,0 +1,7 @@
+pyplot module
+=============
+
+.. automodule:: pyplot
+    :members:
+    :undoc-members:
+    :show-inheritance:

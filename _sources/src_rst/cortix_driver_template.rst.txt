@@ -1,0 +1,7 @@
+cortix\_driver\_template module
+===============================
+
+.. automodule:: cortix_driver_template
+    :members:
+    :undoc-members:
+    :show-inheritance:
