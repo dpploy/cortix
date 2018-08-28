@@ -13,12 +13,14 @@ import os
 from mpi4py import MPI
 from cortix import Cortix
 
+
 def test_solo_pyplot():
     '''
     Run solo_pyplot and make sure the correct output is generated
     '''
     pwd = os.path.dirname(__file__)
-    full_path_config_file = os.path.join(pwd, 'input/cortix-testing-config.xml')
+    full_path_config_file = os.path.join(
+        pwd, 'input/cortix-testing-config.xml')
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     os.system("cp input/testing-state.xml /tmp")
@@ -28,6 +30,7 @@ def test_solo_pyplot():
     for i in range(14):
         assert os.path.exists("pyplot_0-timeseq-dashboard-%02d.png" % i)
     os.system("rm -f *.png")
+
 
 if __name__ == "__main__":
     test_solo_pyplot()

@@ -18,34 +18,37 @@ may be sufficient since many simulation/tasks can be ran via one object.
 As Cortix evolves additional complexity may be added to this driver and/or other
 driver examples can be created.
 """
-#*********************************************************************************
+# *********************************************************************************
 import os
 from mpi4py import MPI
-from cortix import Cortix 
-#*********************************************************************************
+from cortix import Cortix
+# *********************************************************************************
+
 
 def main():
 
- pwd                   = os.path.dirname(__file__)
- full_path_config_file = os.path.join(pwd, 'input/cortix-config.xml')
+    pwd = os.path.dirname(__file__)
+    full_path_config_file = os.path.join(pwd, 'input/cortix-config.xml')
 
- # NB: if another instantiation of Cortix occurs, the cortix wrk directory specified
- #     in the cortix configuration file must be different, else the logging facility 
- #     will have log file collision.
+    # NB: if another instantiation of Cortix occurs, the cortix wrk directory specified
+    #     in the cortix configuration file must be different, else the logging facility
+    #     will have log file collision.
 
- comm = MPI.COMM_WORLD
- size = comm.Get_size()
- rank = comm.Get_rank()
+    comm = MPI.COMM_WORLD
+    size = comm.Get_size()
+    rank = comm.Get_rank()
 
- if (rank == 0):
-  cortix1 = Cortix( 'cortix1', full_path_config_file )
-  cortix1.run_simulations( task_name='solo-pyplot' )  # see cortix-config.xml
+    if (rank == 0):
+        cortix1 = Cortix('cortix1', full_path_config_file)
+        cortix1.run_simulations(
+            task_name='solo-pyplot')  # see cortix-config.xml
 
 #  cortix1 = Cortix( 'cortix1', full_path_config_file )
 #  cortix1.run_simulations( task_name='solo-fueldepot' ) # see cortix-config.xml
-#---------------------- end def main():-------------------------------------------
+# ---------------------- end def main():----------------------------------
 
-#*********************************************************************************
+
+# *********************************************************************************
 # Usage: -> python cortix-main.py or ./cortix-main.py
 if __name__ == "__main__":
- main()
+    main()

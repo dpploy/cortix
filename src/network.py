@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit evironment
 # https://github.com/dpploy/cortix
@@ -8,15 +9,16 @@
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
 """
-Network class for the Cortix project. A network defines the connectivity between 
+Network class for the Cortix project. A network defines the connectivity between
 Cortix modules.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
 """
-#*********************************************************************************
+# *********************************************************************************
 import networkx as nx
 from cortix.src.utils.configtree import ConfigTree
-#*********************************************************************************
+# *********************************************************************************
+
 
 class Network:
     """
@@ -26,7 +28,7 @@ class Network:
     def __init__(self, net_config_node=ConfigTree()):
 
         assert isinstance(net_config_node, ConfigTree), \
-        '-> net_config_node is invalid.'
+            '-> net_config_node is invalid.'
 
         self.config_node = net_config_node
         self.name = self.config_node.get_node_name()
@@ -43,14 +45,14 @@ class Network:
             (element, tag, attributes, text) = child
             if tag == 'connect':
                 assert text is None, 'non empty text, %r, in %r network: ' \
-                % (text, self.name)
+                    % (text, self.name)
 
             tmp = dict()
 
             if tag == 'connect':
                 for (key, value) in attributes:
                     assert key not in tmp.keys(), \
-                    'repeated key in attribute of %r network' % self.name
+                        'repeated key in attribute of %r network' % self.name
                     value = value.strip()
                     if key == 'fromModuleSlot':
                         value = value.replace(':', '_')
@@ -61,18 +63,19 @@ class Network:
                 for (key, val) in tmp.items():
                     if key == 'fromModuleSlot':
                         self.runtime_cortix_comm_file[val] = \
-                        'null-runtime_cortix_comm_file'
+                            'null-runtime_cortix_comm_file'
                     if key == 'toModuleSlot':
                         self.runtime_cortix_comm_file[val] = \
-                        'null-runtime_cortix_comm_file'
+                            'null-runtime_cortix_comm_file'
                 vtx1 = tmp['fromModuleSlot']
                 vtx2 = tmp['toModuleSlot']
                 self.nx_graph.add_edge(vtx1, vtx2,
                                        fromPort=tmp['fromPort'],
                                        toPort=tmp['toPort'])
 
-        self.slot_names = [name for name in self.runtime_cortix_comm_file.keys()]
-#---------------------- end def __init__():---------------------------------------
+        self.slot_names = [
+            name for name in self.runtime_cortix_comm_file.keys()]
+# ---------------------- end def __init__():------------------------------
 
     def get_name(self):
         """
@@ -80,7 +83,7 @@ class Network:
         """
 
         return self.name
-#---------------------- end def get_name():---------------------------------------
+# ---------------------- end def get_name():------------------------------
 
     def get_connectivity(self):
         """
@@ -88,7 +91,7 @@ class Network:
         """
 
         return self.connectivity
-#---------------------- end def get_connectivity():-------------------------------
+# ---------------------- end def get_connectivity():----------------------
 
     def get_slot_names(self):
         """
@@ -96,7 +99,7 @@ class Network:
         """
 
         return self.slot_names
-#---------------------- end def get_slot_names():---------------------------------
+# ---------------------- end def get_slot_names():------------------------
 
     def set_runtime_cortix_comm_file(self, slot_name, full_path_file_name):
         """
@@ -105,7 +108,7 @@ class Network:
         """
 
         self.runtime_cortix_comm_file[slot_name] = full_path_file_name
-#---------------------- end def set_runtime_cortix_comm_file():-------------------
+# ---------------------- end def set_runtime_cortix_comm_file():----------
 
     def get_runtime_cortix_comm_file(self, slot_name):
         """
@@ -116,7 +119,7 @@ class Network:
         if slot_name in self.runtime_cortix_comm_file:
             return self.runtime_cortix_comm_file[slot_name]
         return None
-#---------------------- end def get_runtime_cortix_comm_file():-------------------
+# ---------------------- end def get_runtime_cortix_comm_file():----------
 
     def get_nx_graph(self):
         """
@@ -124,7 +127,7 @@ class Network:
         """
 
         return self.nx_graph
-#---------------------- end def get_nx_graph():-----------------------------------
+# ---------------------- end def get_nx_graph():--------------------------
 
     def __str__(self):
         """
@@ -132,7 +135,7 @@ class Network:
         """
 
         return 'Network data members: name=%5s' % (self.name)
-#---------------------- end def __str__():----------------------------------------
+# ---------------------- end def __str__():-------------------------------
 
     def __repr__(self):
         """
@@ -140,6 +143,6 @@ class Network:
         """
 
         return 'Network data members: name=%5s' % (self.name)
-#---------------------- end def __repr__():---------------------------------------
+# ---------------------- end def __repr__():------------------------------
 
-#====================== end class Network: =======================================
+# ====================== end class Network: ==============================

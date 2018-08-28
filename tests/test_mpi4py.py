@@ -11,6 +11,7 @@
 
 import importlib
 
+
 def test_mpi4py():
     '''
     Test for the mpi4py dependency
@@ -21,6 +22,7 @@ def test_mpi4py():
     except ImportError:
         found = False
     assert found == True
+
 
 if __name__ == "__main__":
     test_mpi4py()

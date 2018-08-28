@@ -12,6 +12,7 @@
 import importlib
 import sys
 
+
 def test_matplotlib():
     '''
     Test for the matplotlib dependency
@@ -23,6 +24,7 @@ def test_matplotlib():
     except ImportError:
         found = False
     assert found == True
+
 
 if __name__ == "__main__":
     test_matplotlib()

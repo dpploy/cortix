@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit evironment
 # https://github.com/dpploy/cortix
@@ -12,14 +13,15 @@ Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
 """
-#*********************************************************************************
+# *********************************************************************************
 import os
 import time
 import logging
 from xml.etree.cElementTree import ElementTree
 from cortix.src.utils.configtree import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
-#*********************************************************************************
+# *********************************************************************************
+
 
 class Task:
     """
@@ -33,7 +35,7 @@ class Task:
 
         # Inherit a configuration tree
         assert isinstance(task_config_node, ConfigTree), \
-        '-> task_config_node not a ConfigTree.'
+            '-> task_config_node not a ConfigTree.'
         self.config_node = task_config_node
 
         # Read the simulation name
@@ -63,16 +65,17 @@ class Task:
             if child.tag == 'file_handler':
                 # file handler
                 file_handle_level = child.get('level').strip()
-                file_handle = set_logger_level(file_handle, logger_name, \
+                file_handle = set_logger_level(file_handle, logger_name,
                                                file_handle_level)
             if child.tag == 'console_handler':
                 # console handler
                 console_handle_level = child.get('level').strip()
-                console_handler = set_logger_level(console_handler,\
+                console_handler = set_logger_level(console_handler,
                                                    logger_name, console_handle_level)
 
         # formatter added to handlers
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         file_handle.setFormatter(formatter)
         console_handler.setFormatter(formatter)
 
@@ -83,7 +86,9 @@ class Task:
         self.log.info('created logger: %s', self.name)
         self.log.debug('logger level: %s', logger_level)
         self.log.debug('logger file handler level: %s', file_handle_level)
-        self.log.debug('logger console handler level: %s', console_handle_level)
+        self.log.debug(
+            'logger console handler level: %s',
+            console_handle_level)
 
         self.start_time = self.evolve_time = self.time_step = 0.0
         self.start_time_unit = 'null-start_time_unit'
@@ -115,7 +120,7 @@ class Task:
         if self.start_time_unit == 'null-start_time_unit':
             self.start_time_unit = self.evolve_time_unit
         assert self.evolve_time_unit != 'null-evolve_time_unit', \
-        'invalid time unit = %r' %(self.evolve_time_unit)
+            'invalid time unit = %r' % (self.evolve_time_unit)
 
         self.log.debug('start_time value = %s', str(self.start_time))
         self.log.debug('start_time unit  = %s', str(self.start_time_unit))
@@ -123,7 +128,7 @@ class Task:
         self.log.debug('evolve_time unit  = %s', str(self.evolve_time_unit))
         self.log.debug('end __init__()')
         self.log.info('created task: %s', self.name)
-#---------------------- end def __init__():---------------------------------------
+# ---------------------- end def __init__():------------------------------
 
     def execute(self, application):
         """
@@ -147,9 +152,9 @@ class Task:
         while status == 'running':
             time.sleep(10)  # hard coded; fix me.
             (status, slot_names) = self.__get_runtime_status(runtime_status_files)
-            self.log.info('runtime status: %s; module slots running: %s', status, \
+            self.log.info('runtime status: %s; module slots running: %s', status,
                           str(slot_names))
-#---------------------- end def execute():---------------------------------------
+# ---------------------- end def execute():-------------------------------
 
     def get_name(self):
         """
@@ -157,7 +162,7 @@ class Task:
         """
 
         return self.name
-#---------------------- end def get_name():---------------------------------------
+# ---------------------- end def get_name():------------------------------
 
     def get_work_dir(self):
         """
@@ -166,7 +171,7 @@ class Task:
         """
 
         return self.work_dir
-#---------------------- end def get_work_dir():-----------------------------------
+# ---------------------- end def get_work_dir():--------------------------
 
     def get_start_time(self):
         """
@@ -174,7 +179,7 @@ class Task:
         """
 
         return self.start_time
-#---------------------- end def get_start_time():---------------------------------
+# ---------------------- end def get_start_time():------------------------
 
     def get_start_time_unit(self):
         """
@@ -182,7 +187,7 @@ class Task:
         """
 
         return self.start_time_unit
-#---------------------- end def get_start_time_unit():----------------------------
+# ---------------------- end def get_start_time_unit():-------------------
 
     def get_evolve_time(self):
         """
@@ -190,7 +195,7 @@ class Task:
         """
 
         return self.evolve_time
-#---------------------- end def get_evolve_time():--------------------------------
+# ---------------------- end def get_evolve_time():-----------------------
 
     def get_evolve_time_unit(self):
         """
@@ -198,7 +203,7 @@ class Task:
         """
 
         return self.evolve_time_unit
-#---------------------- end def get_evolve_time_unit():---------------------------
+# ---------------------- end def get_evolve_time_unit():------------------
 
     def get_time_step(self):
         """
@@ -207,7 +212,7 @@ class Task:
         """
 
         return self.time_step
-#---------------------- end def get_time_step():----------------------------------
+# ---------------------- end def get_time_step():-------------------------
 
     def get_time_step_unit(self):
         """
@@ -215,7 +220,7 @@ class Task:
         """
 
         return self.time_step_unit
-#---------------------- end def get_time_step_unit():-----------------------------
+# ---------------------- end def get_time_step_unit():--------------------
 
     def set_runtime_cortix_param_file(self, full_path):
         """
@@ -223,7 +228,7 @@ class Task:
         """
 
         self.runtime_cortix_param_file = full_path
-#---------------------- end def set_runtime_cortix_param_file():------------------
+# ---------------------- end def set_runtime_cortix_param_file():---------
 
     def get_runtime_cortix_param_file(self):
         """
@@ -231,13 +236,13 @@ class Task:
         """
 
         return self.runtime_cortix_param_file
-#---------------------- end def get_runtime_cortix_param_file():------------------
+# ---------------------- end def get_runtime_cortix_param_file():---------
 
     def __del__(self):
         self.log.info('destroyed task: %s', self.name)
-#---------------------- end def __del__():----------------------------------------
+# ---------------------- end def __del__():-------------------------------
 
-#*********************************************************************************
+# *********************************************************************************
 # Private helper functions (internal use: __)
 
     def __get_runtime_status(self, runtime_status_files):
@@ -253,7 +258,7 @@ class Task:
                 time.sleep(0.1)
 
             assert os.path.isfile(status_file), 'runtime status file %r not found.' \
-            % status_file
+                % status_file
 
             tree = ElementTree()
             tree.parse(status_file)
@@ -267,7 +272,7 @@ class Task:
                 running_module_slots.append(slot_name)
 
         return (task_status, running_module_slots)
-#---------------------- end def __get_runtime_status():---------------------------
+# ---------------------- end def __get_runtime_status():------------------
 
 
-#====================== end class Task: ==========================================
+# ====================== end class Task: =================================

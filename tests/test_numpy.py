@@ -11,6 +11,7 @@
 
 import importlib
 
+
 def test_numpy():
     '''
     Test for the numpy dependency
@@ -21,6 +22,7 @@ def test_numpy():
     except ImportError:
         found = False
     assert found == True
+
 
 if __name__ == "__main__":
     test_numpy()
