@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit evironment
 # https://github.com/dpploy/cortix
@@ -14,10 +15,11 @@ within the Cortix project.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
 """
-#*********************************************************************************
+# *********************************************************************************
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import ElementTree
-#*********************************************************************************
+# *********************************************************************************
+
 
 class ConfigTree:
     """
@@ -31,23 +33,25 @@ class ConfigTree:
     def __init__(self, config_tree_node=None, config_file_name=None):
 
         if config_tree_node is not None:
-            assert isinstance(config_tree_node, Element), "-> config_tree_node invalid."
+            assert isinstance(
+                config_tree_node, Element), "-> config_tree_node invalid."
             self.config_tree_node = config_tree_node
 
         if config_file_name is not None:
-            assert isinstance(config_file_name, str), "-> configFileName not a str."
+            assert isinstance(
+                config_file_name, str), "-> configFileName not a str."
             assert config_tree_node is None, "node and file not allowed together."
 
             tree = ElementTree()
             tree.parse(config_file_name)
             self.config_tree_node = tree.getroot()
-#---------------------- end def __init__():---------------------------------------
+# ---------------------- end def __init__():------------------------------
 
     def get_root_node(self):
         """Returns the Element tree's root node"""
 
         return self.config_tree_node
-#---------------------- end def get_root_node:():----------------------------------
+# ---------------------- end def get_root_node:():------------------------
 
     def get_node_tag(self):
         """
@@ -56,7 +60,7 @@ class ConfigTree:
         """
 
         return self.config_tree_node.tag
-#---------------------- end def get_node_tag:():----------------------------------
+# ---------------------- end def get_node_tag:():-------------------------
 
     def get_node_name(self):
         """
@@ -65,7 +69,7 @@ class ConfigTree:
         """
 
         return self.config_tree_node.get('name')
-#---------------------- end def get_node_name:():---------------------------------
+# ---------------------- end def get_node_name:():------------------------
 
     def get_node_type(self):
         """
@@ -74,7 +78,7 @@ class ConfigTree:
         """
 
         return self.config_tree_node.get('type')
-#---------------------- end def get_node_type:():---------------------------------
+# ---------------------- end def get_node_type:():------------------------
 
     def get_sub_node(self, tag):
         """
@@ -84,7 +88,7 @@ class ConfigTree:
         assert isinstance(tag, str), 'tag invalid'
 
         return self.config_tree_node.find(tag)
-#---------------------- end def get_sub_node:():----------------------------------
+# ---------------------- end def get_sub_node:():-------------------------
 
     def get_all_sub_nodes(self, tag):
         """
@@ -94,7 +98,7 @@ class ConfigTree:
         assert isinstance(tag, str), 'tag invalid'
 
         return self.config_tree_node.findall(tag)
-#---------------------- end def get_all_sub_nodes:():-----------------------------
+# ---------------------- end def get_all_sub_nodes:():--------------------
 
     def get_node_children(self):
         """
@@ -107,6 +111,6 @@ class ConfigTree:
             children.append((child, child.tag, child.items(), child.text))
 
         return children
-#---------------------- end def get_note_children:():-----------------------------
+# ---------------------- end def get_note_children:():--------------------
 
-#====================== end class ConfigTree: =+++_===============================
+# ====================== end class ConfigTree: =+++_======================

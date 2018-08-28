@@ -11,6 +11,7 @@
 
 import importlib
 
+
 def test_networkx():
     '''
     Test for the networkx dependency
@@ -21,6 +22,7 @@ def test_networkx():
     except ImportError:
         found = False
     assert found == True
+
 
 if __name__ == "__main__":
     test_networkx()

@@ -168,6 +168,7 @@ class Element(object):
         values: Isotope(relative atomic mass, abundance, mass number)
 
     """
+
     def __init__(self, number, symbol, name, **kwargs):
         self.number = number
         self.symbol = symbol
@@ -294,11 +295,14 @@ class Element(object):
 import numpy as np
 infinity = np.inf
 # replace infinity with math.inf for python 3.5 or greater
+
+
 class Isotope(object):
     """Isotope relative atomic mass, abundance, massnumber."""
     __slots__ = ['mass', 'abundance', 'massnumber', 'halfLife', 'halfLifeUnit']
 
-    def __init__(self, mass=0.0, abundance=1.0, massnumber=0, halfLife=infinity, halfLifeUnit='s'):
+    def __init__(self, mass=0.0, abundance=1.0, massnumber=0,
+                 halfLife=infinity, halfLifeUnit='s'):
         self.mass = mass
         self.abundance = abundance
         self.massnumber = massnumber
@@ -307,7 +311,7 @@ class Isotope(object):
 
     def __str__(self):
         return "%i, %.4f, %.6f%%, %.4f, %s" % (self.massnumber, self.mass,
-                                     self.abundance * 100, self.halfLife, self.halfLifeUnit)
+                                               self.abundance * 100, self.halfLife, self.halfLifeUnit)
 
     def __repr__(self):
         return "Isotope(%s, %s, %s, %s, %s)" % (
@@ -316,6 +320,7 @@ class Isotope(object):
 
 class ElementsDict(object):
     """Ordered dict of Elements with lookup by number, symbol, and name."""
+
     def __init__(self, *elements):
         self._list = []
         self._dict = {}
@@ -349,8 +354,9 @@ class ElementsDict(object):
             try:
                 start, stop, step = key.indices(len(self._list))
                 return self._list[slice(start - 1, stop - 1, step)]
-            except:
+            except BaseException:
                 raise KeyError
+
 
 ELEMENTS = ElementsDict(
     Element(
@@ -364,7 +370,7 @@ ELEMENTS = ElementsDict(
         ionenergy=(13.5984, ),
         isotopes={1: Isotope(1.0078250321, 0.999885, 1),
                   2: Isotope(2.014101778, 0.000115, 2),
-                  3: Isotope(3.0160492777, 0.000, 3, 12.32, 'y')}), # y -> year
+                  3: Isotope(3.0160492777, 0.000, 3, 12.32, 'y')}),  # y -> year
     Element(
         2, 'He', 'Helium',
         group=18, period=1, block='s', series=2,
@@ -397,7 +403,7 @@ ELEMENTS = ElementsDict(
         oxistates='2*',
         ionenergy=(9.3227, 18.211, 153.893, 217.713, ),
         isotopes={9: Isotope(9.0121821, 1.0, 9),
-                 10: Isotope(10.01353382, 0.0, 10, 1.51, 'My')}), # My -> Mega year
+                  10: Isotope(10.01353382, 0.0, 10, 1.51, 'My')}),  # My -> Mega year
     Element(
         5, 'B', 'Boron',
         group=13, period=2, block='p', series=5,
@@ -784,7 +790,7 @@ ELEMENTS = ElementsDict(
                   72: Isotope(71.9220762, 0.2754, 72),
                   73: Isotope(72.9234594, 0.0773, 73),
                   74: Isotope(73.9211782, 0.3628, 74),
-                  76: Isotope(75.9214027, 0.0761, 76, 1.58, 'Zy')}), # Zetta year
+                  76: Isotope(75.9214027, 0.0761, 76, 1.58, 'Zy')}),  # Zetta year
     Element(
         33, 'As', 'Arsenic',
         group=15, period=4, block='p', series=5,
@@ -813,7 +819,7 @@ ELEMENTS = ElementsDict(
                   78: Isotope(77.9173095, 0.2377, 78),
                   79: Isotope(78.9184991, 0.0000, 79, 295, 'ky'),
                   80: Isotope(79.9165218, 0.4961, 80),
-                  82: Isotope(81.9167, 0.0873, 82, 97, 'Ey')}), # Exa year
+                  82: Isotope(81.9167, 0.0873, 82, 97, 'Ey')}),  # Exa year
     Element(
         35, 'Br', 'Bromine',
         group=17, period=4, block='p', series=6,
@@ -842,7 +848,7 @@ ELEMENTS = ElementsDict(
                   82: Isotope(81.9134846, 0.1158, 82),
                   83: Isotope(82.914136, 0.1149, 83),
                   84: Isotope(83.911507, 0.57, 84),
-                  85: Isotope(84.9125273 , 0.00, 85, 10.776, 'y'),
+                  85: Isotope(84.9125273, 0.00, 85, 10.776, 'y'),
                   86: Isotope(85.9106103, 0.173, 86)}),
     Element(
         37, 'Rb', 'Rubidium',
@@ -886,7 +892,7 @@ ELEMENTS = ElementsDict(
                    206.0, 374.0, ),
         isotopes={88: Isotope(87.9095011, 0.0, 88),
                   89: Isotope(88.9058479, 1.0, 89),
-                  90: Isotope(89.9071519, 0.0, 90, 64.0, 'h'), # hour
+                  90: Isotope(89.9071519, 0.0, 90, 64.0, 'h'),  # hour
                   91: Isotope(90.9073048, 0.0, 91, 58.51, 'd')}),
     Element(
         40, 'Zr', 'Zirconium',
@@ -900,10 +906,10 @@ ELEMENTS = ElementsDict(
         isotopes={90: Isotope(89.9047037, 0.5145, 90),
                   91: Isotope(90.905645, 0.1122, 91),
                   92: Isotope(91.9050401, 0.1715, 92),
-                  93: Isotope(92.9064760, 0.0000, 93, 1.53, 'My'), # Mega year
+                  93: Isotope(92.9064760, 0.0000, 93, 1.53, 'My'),  # Mega year
                   94: Isotope(93.9063158, 0.1738, 94),
                   95: Isotope(94.9080426, 0.1738, 95, 64.032, 'd'),
-                  96: Isotope(95.908276, 0.028, 96, 24.0, 'Ey')}), # Exa year
+                  96: Isotope(95.908276, 0.028, 96, 24.0, 'Ey')}),  # Exa year
     Element(
         41, 'Nb', 'Niobium',
         group=5, period=5, block='d', series=8,
@@ -916,7 +922,7 @@ ELEMENTS = ElementsDict(
                    102.6, 125.0, ),
         isotopes={93: Isotope(92.9063775, 1.0, 93),
                   94: Isotope(93.9072839, 0.0, 94),
-                  95: Isotope(94.9068358, 0.0, 95, 34.991 , 's')}),
+                  95: Isotope(94.9068358, 0.0, 95, 34.991, 's')}),
     Element(
         42, 'Mo', 'Molybdenum',
         group=6, period=5, block='d', series=8,
@@ -975,7 +981,7 @@ ELEMENTS = ElementsDict(
         ionenergy=(7.4589, 18.08, 31.06, ),
         isotopes={102: Isotope(101.9068432, 0.0, 102, 207.0, 'd'),
                   103: Isotope(102.905504, 1.0, 103),
-                  106: Isotope(105.9072871, 0.0, 106, 29.8, 's')}), # second
+                  106: Isotope(105.9072871, 0.0, 106, 29.8, 's')}),  # second
     Element(
         46, 'Pd', 'Palladium',
         group=10, period=5, block='d', series=8,
@@ -1019,10 +1025,11 @@ ELEMENTS = ElementsDict(
                   110: Isotope(109.903006, 0.1249, 110),
                   111: Isotope(110.904182, 0.128, 111),
                   112: Isotope(111.9027572, 0.2413, 112),
-                  113: Isotope(112.9044009, 0.1222, 113, 7.7, 'Py'), # Peta year
+                  # Peta year
+                  113: Isotope(112.9044009, 0.1222, 113, 7.7, 'Py'),
                   114: Isotope(113.9033581, 0.2873, 114),
                   115: Isotope(114.9054310, 0.0000, 115, 53.46, 'h'),
-                  116: Isotope(115.904755, 0.0749, 116, 30.0, 'Ey')}), # Exa year
+                  116: Isotope(115.904755, 0.0749, 116, 30.0, 'Ey')}),  # Exa year
     Element(
         49, 'In', 'Indium',
         group=13, period=5, block='p', series=7,
@@ -1033,7 +1040,7 @@ ELEMENTS = ElementsDict(
         oxistates='3*',
         ionenergy=(5.7864, 18.869, 28.03, 28.03, ),
         isotopes={113: Isotope(112.904061, 0.0429, 113),
-                  115: Isotope(114.903878, 0.9571, 115, 441.0, 'Ty')}), # Tera year
+                  115: Isotope(114.903878, 0.9571, 115, 441.0, 'Ty')}),  # Tera year
     Element(
         50, 'Sn', 'Tin',
         group=14, period=5, block='p', series=7,
@@ -1053,10 +1060,10 @@ ELEMENTS = ElementsDict(
                   120: Isotope(119.9021966, 0.3258, 120),
                   121: Isotope(120.9042355, 0.0000, 121, 27.03, 'h'),
                   122: Isotope(121.9034401, 0.0463, 122),
-                  123: Isotope(122.9057208 , 0.0463, 123, 129.2, 'd'),
+                  123: Isotope(122.9057208, 0.0463, 123, 129.2, 'd'),
                   124: Isotope(123.9052746, 0.0579, 124),
                   125: Isotope(124.9077841, 0.0000, 125, 9.64, 'd'),
-                  126: Isotope(125.907653, 0.0000, 126, 230.0, 'ky')}), # kilo year
+                  126: Isotope(125.907653, 0.0000, 126, 230.0, 'ky')}),  # kilo year
     Element(
         51, 'Sb', 'Antimony',
         group=15, period=5, block='p', series=5,
@@ -1068,7 +1075,7 @@ ELEMENTS = ElementsDict(
         ionenergy=(8.6084, 16.53, 25.3, 44.2, 56.0,
                    108.0, ),
         isotopes={121: Isotope(120.903818, 0.5721, 121),
-                  122: Isotope(121.9051737, 0.0000, 122, 2.7238, 'd'), 
+                  122: Isotope(121.9051737, 0.0000, 122, 2.7238, 'd'),
                   123: Isotope(122.9042157, 0.4279, 123),
                   124: Isotope(123.9059357, 0.0000, 124, 60.2, 'd'),
                   125: Isotope(124.9052538, 0.0000, 125, 2.75856, 'y'),
@@ -1086,14 +1093,16 @@ ELEMENTS = ElementsDict(
         isotopes={120: Isotope(119.90402, 0.0009, 120),
                   121: Isotope(120.904936, 0.0000, 121, 19.16, 'd'),
                   122: Isotope(121.9030471, 0.0255, 122),
-                  123: Isotope(122.904273, 0.0089, 123, 600.0, 'Ty'), # >600 Tera year
+                  # >600 Tera year
+                  123: Isotope(122.904273, 0.0089, 123, 600.0, 'Ty'),
                   124: Isotope(123.9028195, 0.0474, 124),
                   125: Isotope(124.9044247, 0.0707, 125),
                   126: Isotope(125.9033055, 0.1884, 126),
                   127: Isotope(126.9052263, 0.0000, 127, 9.35, 'h'),
-                  128: Isotope(127.9044614, 0.3174, 128, 2.2, 'Yy'), # Yotta year
-                  129: Isotope(128.9062244, 0.0000, 129, 69.6, 'm'), # minute    
-                  130: Isotope(129.9062228, 0.3408, 130, 790.0, 'Ey')}), # Exa year
+                  # Yotta year
+                  128: Isotope(127.9044614, 0.3174, 128, 2.2, 'Yy'),
+                  129: Isotope(128.9062244, 0.0000, 129, 69.6, 'm'),  # minute
+                  130: Isotope(129.9062228, 0.3408, 130, 790.0, 'Ey')}),  # Exa year
     Element(
         53, 'I', 'Iodine',
         group=17, period=5, block='p', series=6,
@@ -1104,7 +1113,7 @@ ELEMENTS = ElementsDict(
         oxistates='7, 5, 1, -1*',
         ionenergy=(10.4513, 19.131, 33.0, ),
         isotopes={127: Isotope(126.904468, 1.0, 127),
-                  129: Isotope(128.9049877, 0.0, 129, 15.7, 'My')}), # Mega year
+                  129: Isotope(128.9049877, 0.0, 129, 15.7, 'My')}),  # Mega year
     Element(
         54, 'Xe', 'Xenon',
         group=18, period=5, block='p', series=2,
@@ -1136,9 +1145,10 @@ ELEMENTS = ElementsDict(
         oxistates='1*',
         ionenergy=(3.8939, 25.1, ),
         isotopes={133: Isotope(132.905447, 1.0, 133),
-                  134: Isotope(133.906718475, 0.0, 134, 2.0648, 'y'), 
-                  135: Isotope(134.9059770, 0.0, 135, 2.3, 'My'),      # Mega year
-                  136: Isotope(135.9073116, 0.0, 136, 13.16, 'd'), 
+                  134: Isotope(133.906718475, 0.0, 134, 2.0648, 'y'),
+                  # Mega year
+                  135: Isotope(134.9059770, 0.0, 135, 2.3, 'My'),
+                  136: Isotope(135.9073116, 0.0, 136, 13.16, 'd'),
                   137: Isotope(136.90708947, 0.0, 137, 30.1671, 'y')}),
     Element(
         56, 'Ba', 'Barium',
@@ -1167,7 +1177,8 @@ ELEMENTS = ElementsDict(
         oxistates='3*',
         ionenergy=(5.5769, 11.06, 19.175, ),
         isotopes={137: Isotope(136.906494, 0.0, 137),
-                  138: Isotope(137.9071119, 0.090, 138, 102.0, 'Gy' ), # Giga year
+                  # Giga year
+                  138: Isotope(137.9071119, 0.090, 138, 102.0, 'Gy'),
                   139: Isotope(138.906348, 0.9991, 139)}),
     Element(
         58, 'Ce', 'Cerium',
@@ -1195,7 +1206,7 @@ ELEMENTS = ElementsDict(
         oxistates='4, 3*',
         ionenergy=(5.473, 10.55, 21.62, 38.95, 57.45, ),
         isotopes={141: Isotope(140.907648, 1.0, 141),
-                  144: Isotope(143.9133052, 0.0, 144, 17.28, 'm')}), # minute
+                  144: Isotope(143.9133052, 0.0, 144, 17.28, 'm')}),  # minute
     Element(
         60, 'Nd', 'Neodymium',
         group=3, period=6, block='f', series=9,
@@ -1207,12 +1218,13 @@ ELEMENTS = ElementsDict(
         ionenergy=(5.525, 10.72, ),
         isotopes={142: Isotope(141.907719, 0.272, 142),
                   143: Isotope(142.90981, 0.122, 143),
-                  144: Isotope(143.910083, 0.238, 144, 2.29, 'Py'), # Peta year
+                  # Peta year
+                  144: Isotope(143.910083, 0.238, 144, 2.29, 'Py'),
                   145: Isotope(144.912569, 0.083, 145),
                   146: Isotope(145.913112, 0.172, 146),
-                  147: Isotope(146.9161004, 0.000, 147, 10.98, 'd'), # day
+                  147: Isotope(146.9161004, 0.000, 147, 10.98, 'd'),  # day
                   148: Isotope(147.916889, 0.057, 148),
-                  150: Isotope(149.9208909, 0.056, 150, 6.7, 'Ey')}), # Exa year
+                  150: Isotope(149.9208909, 0.056, 150, 6.7, 'Ey')}),  # Exa year
     Element(
         61, 'Pm', 'Promethium',
         group=3, period=6, block='f', series=9,
@@ -1593,7 +1605,7 @@ ELEMENTS = ElementsDict(
         oxistates='4*',
         ionenergy=(6.3067, 11.5, 20.0, 28.8, ),
         isotopes={230: Isotope(230.0331338, 0.0, 230, 75.38, 'ky'),  # kilo year
-                  232: Isotope(232.0380504, 1.0, 232, 14.05, 'Gy' )}), # Giga year
+                  232: Isotope(232.0380504, 1.0, 232, 14.05, 'Gy')}),  # Giga year
     Element(
         91, 'Pa', 'Protactinium',
         group=3, period=7, block='f', series=10,
@@ -1604,7 +1616,7 @@ ELEMENTS = ElementsDict(
         oxistates='5*, 4',
         ionenergy=(5.89, ),
         isotopes={231: Isotope(231.0358789, 0.0, 231, 32.76, 'ky'),
-                  233: Isotope(233.0402473, 0.0, 233, 26.967, 'd')}), # day
+                  233: Isotope(233.0402473, 0.0, 233, 26.967, 'd')}),  # day
     Element(
         92, 'U', 'Uranium',
         group=3, period=7, block='f', series=10,
@@ -1614,12 +1626,14 @@ ELEMENTS = ElementsDict(
         eleconfig='[Rn] 5f3 6d 7s2',
         oxistates='6*, 5, 4, 3',
         ionenergy=(6.1941, ),
-        isotopes={233: Isotope(233.0396352, 0.000, 233, 159.2, 'ky'), # kilo year
+        isotopes={233: Isotope(233.0396352, 0.000, 233, 159.2, 'ky'),  # kilo year
                   234: Isotope(234.0409521, 0.0055, 234, 245.5, 'ky'),
-                  235: Isotope(235.0439299, 0.0072, 235, 704, 'My'), # Mega year
-                  236: Isotope(236.0455680, 0.00, 236, 23.42, 'My'), # Mega year
-                  237: Isotope(237.0487302, 0.00, 237, 6.75, 'd'), # day
-                  238: Isotope(238.0507826, 0.992745, 238, 4.468, 'Gy')}), # Giga year
+                  # Mega year
+                  235: Isotope(235.0439299, 0.0072, 235, 704, 'My'),
+                  # Mega year
+                  236: Isotope(236.0455680, 0.00, 236, 23.42, 'My'),
+                  237: Isotope(237.0487302, 0.00, 237, 6.75, 'd'),  # day
+                  238: Isotope(238.0507826, 0.992745, 238, 4.468, 'Gy')}),  # Giga year
     Element(
         93, 'Np', 'Neptunium',
         group=3, period=7, block='f', series=10,
@@ -1643,11 +1657,12 @@ ELEMENTS = ElementsDict(
         ionenergy=(6.026, ),
         isotopes={236: Isotope(236.0460580, 0.0, 236, 2.858, 'y'),
                   238: Isotope(238.0495599, 0.0, 238, 87.7, 'y'),
-                  239: Isotope(239.0521634, 0.0, 239, 24.11, 'ky'), # kilo year
+                  # kilo year
+                  239: Isotope(239.0521634, 0.0, 239, 24.11, 'ky'),
                   240: Isotope(240.0538135, 0.0, 240, 6.564, 'ky'),
                   241: Isotope(241.0568515, 0.0, 241, 14.35, 'y'),
                   242: Isotope(242.0587426, 0.0, 242, 375.0, 'ky'),
-                  244: Isotope(244.0642039 , 0.0, 244, 80.0, 'My')}), # Mega year
+                  244: Isotope(244.0642039, 0.0, 244, 80.0, 'My')}),  # Mega year
     Element(
         95, 'Am', 'Americium',
         group=3, period=7, block='f', series=10,
@@ -2745,4 +2760,3 @@ if __name__ == "__main__":
         print(repr(ele), '\n')
     import doctest
     doctest.testmod(verbose=False)
-

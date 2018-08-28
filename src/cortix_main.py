@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit evironment
 # https://github.com/dpploy/cortix
@@ -12,13 +13,14 @@ The Cortix class definition.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
 """
-#*********************************************************************************
+# *********************************************************************************
 import os
 import logging
 from cortix.src.simulation import Simulation
 from cortix.src.utils.configtree import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
-#*********************************************************************************
+# *********************************************************************************
+
 
 class Cortix():
     """
@@ -42,8 +44,8 @@ class Cortix():
 
         # check
         assert self.name == name,\
-        "Cortix object name %r conflicts with cortix-config.xml %r" \
-        % (self.name, name)
+            "Cortix object name %r conflicts with cortix-config.xml %r" \
+            % (self.name, name)
 
         # Read the work directory name
         node = self.config_tree.get_sub_node("work_dir")
@@ -78,15 +80,16 @@ class Cortix():
         for child in node:
             if child.tag == "file_handler":
                 file_handler_level = child.get("level").strip()
-                file_handler = set_logger_level(file_handler, logger_name, \
+                file_handler = set_logger_level(file_handler, logger_name,
                                                 file_handler_level)
             if child.tag == "console_handler":
                 console_handler_level = child.get("level").strip()
-                console_handler = set_logger_level(console_handler, logger_name, \
+                console_handler = set_logger_level(console_handler, logger_name,
                                                    console_handler_level)
 
         # Formatter added to handlers
-        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         file_handler.setFormatter(formatter)
         console_handler.setFormatter(formatter)
 
@@ -96,7 +99,9 @@ class Cortix():
         self.log.info("Created Cortix logger: %s", self.name)
         self.log.debug("Logger level: %s", logger_level)
         self.log.debug("Logger file handler level: %s", file_handler_level)
-        self.log.debug("Logger console handler level: %s", console_handler_level)
+        self.log.debug(
+            "Logger console handler level: %s",
+            console_handler_level)
         self.log.info("Created Cortix work directory: %s", self.work_dir)
 
         # Setup simulations (one or more as specified in the config file)
@@ -104,7 +109,7 @@ class Cortix():
         self.__setup_simulations()
 
         self.log.info("Created Cortix object %s", self.name)
-#---------------------- end def __init__():---------------------------------------
+# ---------------------- end def __init__():------------------------------
 
     def run_simulations(self, task_name=None):
         """
@@ -114,9 +119,9 @@ class Cortix():
 
         for sim in self.simulations:
             sim.execute(task_name)
-#---------------------- end def run_simulations():--------------------------------
+# ---------------------- end def run_simulations():-----------------------
 
-#*********************************************************************************
+# *********************************************************************************
 # Private helper functions (internal use: __)
 
     def __setup_simulations(self):
@@ -127,15 +132,17 @@ class Cortix():
         """
 
         for sim in self.config_tree.get_all_sub_nodes('simulation'):
-            self.log.debug("SetupSimulations(): simulation name: %s", sim.get('name'))
+            self.log.debug(
+                "SetupSimulations(): simulation name: %s",
+                sim.get('name'))
             sim_config_tree = ConfigTree(sim)
             simulation = Simulation(self.work_dir, sim_config_tree)
             self.simulations.append(simulation)
-#---------------------- end def __setup_simulations():----------------------------
+# ---------------------- end def __setup_simulations():-------------------
 
     def __del__(self):
 
         self.log.info("Destroyed Cortix object: %s", self.name)
-#---------------------- end def __del__():----------------------------------------
+# ---------------------- end def __del__():-------------------------------
 
-#====================== end class Cortix: ========================================
+# ====================== end class Cortix: ===============================

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit evironment
 # https://github.com/dpploy/cortix
@@ -12,9 +13,10 @@ This file contains a helper function used by
 functions across the Cortix project to set
 the level of the logger.
 """
-#*********************************************************************************
+# *********************************************************************************
 import logging
-#*********************************************************************************
+# *********************************************************************************
+
 
 def set_logger_level(handler, handler_name, handler_level):
     """
@@ -40,5 +42,4 @@ def set_logger_level(handler, handler_name, handler_level):
             % (handler_name, handler_level)
 
     return handler
-#---------------------- end def set_logger_level():-------------------------------
-
+# ---------------------- end def set_logger_level():----------------------

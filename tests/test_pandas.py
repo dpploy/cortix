@@ -11,6 +11,7 @@
 
 import importlib
 
+
 def test_pandas():
     '''
     Test for the pandas dependency
@@ -21,6 +22,7 @@ def test_pandas():
     except ImportError:
         found = False
     assert found == True
+
 
 if __name__ == "__main__":
     test_pandas()

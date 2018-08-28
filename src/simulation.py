@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit evironment
 # https://github.com/dpploy/cortix
@@ -12,7 +13,7 @@ Simulation class of Cortix.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
 """
-#*********************************************************************************
+# *********************************************************************************
 import os
 import logging
 from mpi4py import MPI
@@ -20,7 +21,8 @@ from cortix.src.task import Task
 from cortix.src.application import Application
 from cortix.src.utils.configtree import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
-#*********************************************************************************
+# *********************************************************************************
+
 
 class Simulation:
     """
@@ -31,7 +33,8 @@ class Simulation:
         assert isinstance(parent_work_dir, str), "-> parentWorkDir invalid."
 
         # Inherit a configuration tree
-        assert isinstance(sim_config_node, ConfigTree), "-> sim_config_node invalid."
+        assert isinstance(
+            sim_config_node, ConfigTree), "-> sim_config_node invalid."
         self.config_node = sim_config_node
 
         # Read the simulation name
@@ -60,16 +63,17 @@ class Simulation:
         for child in node:
             if child.tag == "file_handler":
                 file_handler_level = child.get("level").strip()
-                file_handler = set_logger_level(file_handler, logger_name, \
+                file_handler = set_logger_level(file_handler, logger_name,
                                                 file_handler_level)
 
             if child.tag == 'console_handler':
                 console_handler_level = child.get('level').strip()
-                console_handler = set_logger_level(console_handler, logger_name, \
-                                  console_handler_level)
+                console_handler = set_logger_level(console_handler, logger_name,
+                                                   console_handler_level)
 
         # formatter added to handlers
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
         console_handler.setFormatter(formatter)
 
@@ -80,19 +84,21 @@ class Simulation:
         self.log.info("created Simulation logger: %s", self.name)
         self.log.debug("'logger level: %s", logger_level)
         self.log.debug("logger file handler level: %s", file_handler_level)
-        self.log.debug("logger console handler level: %s", console_handler_level)
+        self.log.debug(
+            "logger console handler level: %s",
+            console_handler_level)
 
         for app_node in self.config_node.get_all_sub_nodes("application"):
             app_config_node = ConfigTree(app_node)
             assert app_config_node.get_node_name() == app_node.get("name"), \
-            "check failed"
+                "check failed"
             self.application = Application(self.work_dir, app_config_node)
             self.log.debug("created application: %s", app_node.get('name'))
 
         # Stores the task(s) created by the execute method
         self.tasks = list()
         self.log.info("created simulation: %s", self.name)
-#---------------------- end def __init__():---------------------------------------
+# ---------------------- end def __init__():------------------------------
 
     def execute(self, task_name=None):
         """
@@ -106,17 +112,18 @@ class Simulation:
             for task in self.tasks:
                 if task.get_name() == task_name:
                     task.execute(self.application)
-                    self.log.debug("called task.execute() on task %s", task_name)
+                    self.log.debug(
+                        "called task.execute() on task %s", task_name)
 
         self.log.debug("end execute(%s)", task_name)
-#---------------------- end def execute():----------------------------------------
+# ---------------------- end def execute():-------------------------------
 
     def __del__(self):
 
         self.log.info("destroyed simulation: %s", self.name)
-#---------------------- end def __del__():----------------------------------------
+# ---------------------- end def __del__():-------------------------------
 
-#*********************************************************************************
+# *********************************************************************************
 # Private helper functions (internal use: __)
 
     def __setup_task(self, task_name):
@@ -132,8 +139,8 @@ class Simulation:
         # rank = comm.Get_rank()
         # size = comm.Get_size()
 
-        cmode = MPI.MODE_WRONLY|MPI.MODE_CREATE
-        amode = MPI.MODE_WRONLY|MPI.MODE_APPEND
+        cmode = MPI.MODE_WRONLY | MPI.MODE_CREATE
+        amode = MPI.MODE_WRONLY | MPI.MODE_APPEND
 
         for task_node in self.config_node.get_all_sub_nodes('task'):
             if task_node.get('name') != task_name:
@@ -155,7 +162,8 @@ class Simulation:
         # create subdirectory with task name
         task_name = task.get_name()
         task_work_dir = task.get_work_dir()
-        assert os.path.isdir(task_work_dir), "directory %r invalid." % task_work_dir
+        assert os.path.isdir(
+            task_work_dir), "directory %r invalid." % task_work_dir
 
         # set the parameters for the task in the cortix param file
         task_file = task_work_dir + 'cortix-param.xml'
@@ -167,18 +175,18 @@ class Simulation:
 
         start_time = task.get_start_time()
         start_time_unit = task.get_start_time_unit()
-        fout.Write("".join('<start_time unit="'+start_time_unit+'"'+'>'+\
-                   str(start_time)+'</start_time>\n').encode())
+        fout.Write("".join('<start_time unit="' + start_time_unit + '"' + '>' +
+                           str(start_time) + '</start_time>\n').encode())
 
         evolve_time = task.get_evolve_time()
         evolve_time_unit = task.get_evolve_time_unit()
-        fout.Write("".join('<evolve_time unit="'+evolve_time_unit+'"'+'>'+\
-                   str(evolve_time)+'</evolve_time>\n').encode())
+        fout.Write("".join('<evolve_time unit="' + evolve_time_unit + '"' + '>' +
+                           str(evolve_time) + '</evolve_time>\n').encode())
 
         time_step = task.get_time_step()
         time_step_unit = task.get_time_step_unit()
-        fout.Write("".join('<time_step unit="'+time_step_unit+'"'+'>'+\
-                   str(time_step)+'</time_step>\n').encode())
+        fout.Write("".join('<time_step unit="' + time_step_unit + '"' + '>' +
+                           str(time_step) + '</time_step>\n').encode())
 
         fout.Write(b'</cortix_param>')
         fout.Close()
@@ -188,7 +196,7 @@ class Simulation:
         # Using the tasks and network create the runtime module directories and comm
         # files
         for net in networks:
-            if net.get_name() == task_name: # Warning: net and task name must match
+            if net.get_name() == task_name:  # Warning: net and task name must match
                 connect = net.get_connectivity()
                 to_module_to_port_visited = dict()
                 for con in connect:
@@ -204,62 +212,67 @@ class Simulation:
                     to_module = self.application.get_module(to_module_name)
 
                     assert to_module is not None, \
-                    'module %r does not exist in application' % to_module_name
+                        'module %r does not exist in application' % to_module_name
 
                     assert to_module.has_port_name(to_port), \
-                    'module %r has no port %r.' % (to_module.get_name(), to_port)
+                        'module %r has no port %r.' % (
+                            to_module.get_name(), to_port)
 
                     assert to_module.get_port_type(to_port) is not None,\
-                    'network name: %r, module name: %r, to_port: %r port type \
-                    invalid %r' % (net.get_name(), to_module.get_name(), to_port, \
+                        'network name: %r, module name: %r, to_port: %r port type \
+                    invalid %r' % (net.get_name(), to_module.get_name(), to_port,
                                    type(to_module.get_port_type(to_port)))
 
                     to_module_slot_work_dir = task_work_dir + to_module_slot + '/'
 
                     if to_module.get_port_type(to_port) != 'input':
                         assert to_module.get_port_type(to_port) == 'provide', \
-                        'port type %r invalid. Module %r, port %r' \
-                        % (to_module.get_port_type(to_port), to_module.get_name(), \
-                           to_port)
+                            'port type %r invalid. Module %r, port %r' \
+                            % (to_module.get_port_type(to_port), to_module.get_name(),
+                               to_port)
 
                     # "to" is who receives the "call", hence the provider
                     to_module_slot_comm_file = to_module_slot_work_dir + \
-                                               'cortix-comm.xml'
+                        'cortix-comm.xml'
 
                     if not os.path.isdir(to_module_slot_work_dir):
                         os.system("mkdir -p " + to_module_slot_work_dir)
 
                     if not os.path.isfile(to_module_slot_comm_file):
-                        fout = MPI.File.Open(comm, to_module_slot_comm_file, cmode)
+                        fout = MPI.File.Open(
+                            comm, to_module_slot_comm_file, cmode)
                         fout.Write(b'<?xml version="1.0" encoding="UTF-8"?>\n')
-                        fout.Write(b'<!-- Written by Simulation::__setup_task() -->\n')
+                        fout.Write(
+                            b'<!-- Written by Simulation::__setup_task() -->\n')
                         fout.Write(b'<cortix_comm>\n')
 
                     if to_port not in to_module_to_port_visited[to_module_slot]:
-                        fout = MPI.File.Open(comm, to_module_slot_comm_file, amode)
+                        fout = MPI.File.Open(
+                            comm, to_module_slot_comm_file, amode)
                         # this is the cortix info for modules providing data
                         to_port_mode = to_module.get_port_mode(to_port)
                         if to_port_mode.split('.')[0] == 'file':
                             ext = to_port_mode.split('.')[1]
-                            log_str = '<port name="'+to_port+'" type="provide" file="'\
-                                      +to_module_slot_work_dir+to_port+'.'+ext+'"/>\n'
+                            log_str = '<port name="' + to_port + '" type="provide" file="'\
+                                      + to_module_slot_work_dir + to_port + '.' + ext + '"/>\n'
                         elif to_port_mode == 'directory':
-                            log_str = '<port name="'+to_port+\
-                                      '" type="provide" directory="'+\
-                                      to_module_slot_work_dir+to_port+'"/>\n'
+                            log_str = '<port name="' + to_port +\
+                                      '" type="provide" directory="' +\
+                                      to_module_slot_work_dir + to_port + '"/>\n'
                         else:
                             assert False, 'invalid port mode. fatal.'
 
                         fout.Write(log_str.encode())
                         fout.Close()
-                        to_module_to_port_visited[to_module_slot].append(to_port)
+                        to_module_to_port_visited[to_module_slot].append(
+                            to_port)
 
                     debug_str = '__setup_task():: comm module: ' + to_module_slot + \
                                 '; network: ' + task_name + ' ' + log_str
                     self.log.debug(debug_str)
 
                     # register the cortix-comm file for the network
-                    net.set_runtime_cortix_comm_file(to_module_slot, \
+                    net.set_runtime_cortix_comm_file(to_module_slot,
                                                      to_module_slot_comm_file)
 
                     # Now do the ports that will function as use ports
@@ -269,48 +282,52 @@ class Simulation:
                     from_module = self.application.get_module(from_module_name)
 
                     assert from_module.has_port_name(from_port), \
-                    'module %r has no port %r' % (from_module_name, from_port)
+                        'module %r has no port %r' % (
+                            from_module_name, from_port)
 
                     assert from_module.get_port_type(from_port) is not None, \
-                    'network name: %r, module name: %r, from_port: %r port type invalid %r'\
-                      % (net.get_name(), from_module.get_name(), from_port, \
-                         type(from_module.get_port_type(from_port)))
+                        'network name: %r, module name: %r, from_port: %r port type invalid %r'\
+                        % (net.get_name(), from_module.get_name(), from_port,
+                           type(from_module.get_port_type(from_port)))
 
                     from_module_slot_work_dir = task_work_dir + from_module_slot + '/'
 
                     if from_module.get_port_type(from_port) != 'output':
                         assert from_module.get_port_type(from_port) == 'use', \
-                        'port type %r invalid. Module %r, port %r' % \
-                        (from_module.get_port_type(from_port), \
-                         from_module.get_name(), from_port)
+                            'port type %r invalid. Module %r, port %r' % \
+                            (from_module.get_port_type(from_port),
+                             from_module.get_name(), from_port)
 
                         # "from" is who makes the "call", hence the user
                         from_module_slot_comm_file = from_module_slot_work_dir + \
-                                                     'cortix-comm.xml'
+                            'cortix-comm.xml'
 
                         if not os.path.isdir(from_module_slot_work_dir):
-                            os.system('mkdir -p '+ from_module_slot_work_dir)
+                            os.system('mkdir -p ' + from_module_slot_work_dir)
 
                         if not os.path.isfile(from_module_slot_comm_file):
-                            fout = MPI.File.Open(comm, from_module_slot_comm_file, \
+                            fout = MPI.File.Open(comm, from_module_slot_comm_file,
                                                  cmode)
-                            fout.Write(b'<?xml version="1.0" encoding="UTF-8"?>\n')
-                            fout.Write(b'<!-- Written by Simulation::__setup_task() -->\n')
+                            fout.Write(
+                                b'<?xml version="1.0" encoding="UTF-8"?>\n')
+                            fout.Write(
+                                b'<!-- Written by Simulation::__setup_task() -->\n')
                             fout.Write(b'<cortix_comm>\n')
                             fout.Close()
 
-                        fout = MPI.File.Open(comm, from_module_slot_comm_file, amode)
+                        fout = MPI.File.Open(
+                            comm, from_module_slot_comm_file, amode)
 
                         # this is the cortix info for modules using data
                         assert from_module.get_port_type(from_port) == 'use', \
-                        'from_port must be use type.'
+                            'from_port must be use type.'
 
                         to_port_mode = to_module.get_port_mode(to_port)
                         if to_port_mode.split('.')[0] == 'file':
                             ext = to_port_mode.split('.')[1]
                             log_str = '<port name="' + from_port + \
                                       '" type="use" file="' + \
-                                      to_module_slot_work_dir + to_port +'.' + ext + \
+                                      to_module_slot_work_dir + to_port + '.' + ext + \
                                       '"/>\n'
                         elif to_port_mode == 'directory':
                             log_str = '<port name="' + from_port + \
@@ -328,7 +345,7 @@ class Simulation:
                         self.log.debug(debug_str)
 
                 # register the cortix-comm file for the network
-                net.set_runtime_cortix_comm_file(from_module_slot, \
+                net.set_runtime_cortix_comm_file(from_module_slot,
                                                  from_module_slot_comm_file)
 
         # finish forming the XML documents for port types
@@ -343,6 +360,6 @@ class Simulation:
                 fout.Close()
 
         self.log.debug('end __setup_task()')
-#---------------------- end def __setup_task():-----------------------------------
+# ---------------------- end def __setup_task():--------------------------
 
-#====================== end class Simulation: ====================================
+# ====================== end class Simulation: ===========================

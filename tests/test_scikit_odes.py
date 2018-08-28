@@ -11,6 +11,7 @@
 
 import importlib
 
+
 def test_scikit_odes():
     '''
     Test for the scikit.odes dependency
@@ -21,6 +22,7 @@ def test_scikit_odes():
     except ImportError:
         found = False
     assert found == True
+
 
 if __name__ == "__main__":
     test_scikit_odes()

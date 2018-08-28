@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit evironment
 # https://github.com/dpploy/cortix
@@ -12,7 +13,7 @@ Launcher functionality of the Cortix Class.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
 """
-#*********************************************************************************
+# *********************************************************************************
 import os
 import logging
 import time
@@ -21,7 +22,8 @@ from mpi4py import MPI
 from mpi4py.futures import MPIPoolExecutor
 import importlib
 import xml.etree.ElementTree as ElementTree
-#*********************************************************************************
+# *********************************************************************************
+
 
 class Launcher():
     """
@@ -47,12 +49,13 @@ class Launcher():
         self.work_dir = work_dir
 
         # Create logger for this driver and its imported pymodule
-        log = logging.getLogger('launcher-' + self.module_name + '_' + \
+        log = logging.getLogger('launcher-' + self.module_name + '_' +
                                 str(self.slot_id))
         log.setLevel(logging.DEBUG)
 
         # create file handler for logs
-        full_path_task_dir = self.cortix_comm_full_path_file_name[:self.cortix_comm_full_path_file_name.rfind('/')] + '/'
+        full_path_task_dir = self.cortix_comm_full_path_file_name[:self.cortix_comm_full_path_file_name.rfind(
+            '/')] + '/'
         file_handle = logging.FileHandler(full_path_task_dir + 'launcher.log')
         file_handle.setLevel(logging.DEBUG)
 
@@ -61,7 +64,8 @@ class Launcher():
         console_handle.setLevel(logging.INFO)
 
         # create formatter and add it to the handlers
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         file_handle.setFormatter(formatter)
         console_handle.setFormatter(formatter)
 
@@ -82,7 +86,7 @@ class Launcher():
         # import and log the python module driver
         self.py_module = importlib.import_module(lib_module_driver)
         log.info('imported pyModule: %s', str(self.py_module))
-#---------------------- end def __init__():---------------------------------------
+# ---------------------- end def __init__():------------------------------
 
     def run(self):
         """
@@ -95,13 +99,13 @@ class Launcher():
         # This input file may be empty or used by this driver and/or the
         # native/wrapped module.
         assert os.path.isfile(self.input_full_path_file_name), \
-        'file %r not available;stop.' % self.input_full_path_file_name
+            'file %r not available;stop.' % self.input_full_path_file_name
 
         # Read the Cortix parameter file: cortix-param.xml
         # cortix_param_full_path_file_name
 
         assert os.path.isfile(self.cortix_param_full_path_file_name), \
-        'file %r not available;stop.' % self.cortix_param_full_path_file_name
+            'file %r not available;stop.' % self.cortix_param_full_path_file_name
 
         tree = ElementTree.parse(self.cortix_param_full_path_file_name)
         cortix_param_xml_root_node = tree.getroot()
@@ -111,9 +115,9 @@ class Launcher():
 
         if start_time_unit == 'minute':
             start_time *= 1.0
-        elif  start_time_unit == 'hour':
+        elif start_time_unit == 'hour':
             start_time *= 60.0
-        elif  start_time_unit == 'day':
+        elif start_time_unit == 'day':
             start_time *= 24.0 * 60.0
         else:
             assert False, 'time unit invalid: %r' % (start_time_unit)
@@ -145,7 +149,7 @@ class Launcher():
             assert False, 'time unit invalid: %r' % (time_step_unit)
 
         assert os.path.isfile(self.cortix_comm_full_path_file_name),\
-        'file %r not available;stop.' % self.cortix_comm_full_path_file_name
+            'file %r not available;stop.' % self.cortix_comm_full_path_file_name
 
         tree = ElementTree.parse(self.cortix_comm_full_path_file_name)
         cortix_comm_xml_root_node = tree.getroot()
@@ -171,7 +175,8 @@ class Launcher():
         self.log.debug('ports: %s', str(ports))
 
         # Run module_name
-        self.log.info('entered Run %s', self.module_name + '_' + str(self.slot_id) + ' section')
+        self.log.info('entered Run %s', self.module_name +
+                      '_' + str(self.slot_id) + ' section')
         final_time = start_time + evolve_time
 
         # Create the guest code driver
@@ -181,13 +186,13 @@ class Launcher():
                                                    self.work_dir,
                                                    ports, start_time, final_time)
 
-        s='guest_driver = CortixDriver( slot_id='+str(self.slot_id) + \
-          ', input file=' + self.input_full_path_file_name + \
-          ', exec file=' + self.exec_full_path_file_name + \
-          ', work dir=' + self.work_dir + \
-          ', ports=' + str(ports) + \
-          ', cortix_start_time=' + str(start_time) + \
-          ', cortix_final_time=' + str(final_time) +' )'
+        s = 'guest_driver = CortixDriver( slot_id=' + str(self.slot_id) + \
+            ', input file=' + self.input_full_path_file_name + \
+            ', exec file=' + self.exec_full_path_file_name + \
+            ', work dir=' + self.work_dir + \
+            ', ports=' + str(ports) + \
+            ', cortix_start_time=' + str(start_time) + \
+            ', cortix_final_time=' + str(final_time) + ' )'
         self.log.info(s)
 
         # Evolve the module
@@ -198,16 +203,16 @@ class Launcher():
 
         while cortix_time <= final_time:
 
-            s=''
+            s = ''
             self.log.debug(s)
-            s='**************************************************************' + \
-              '**************'
+            s = '**************************************************************' + \
+                '**************'
             self.log.debug(s)
             s = 'CORTIX::LAUNCHER->***->LAUNCHER->***->LAUNCHER->***->' + \
                 'LAUNCHER->***->LAUNCHER'
             self.log.debug(s)
-            s='**************************************************************' + \
-              '**************'
+            s = '**************************************************************' + \
+                '**************'
             self.log.debug(s)
 
             s = 'run(' + str(round(cortix_time, 3)) + '[min]): '
@@ -231,14 +236,15 @@ class Launcher():
 
         self.__set_runtime_status('finished')
         self.log.info("__set_runtime_status(self, 'finished'")
-#---------------------- end def run():--------------------------------------------
+# ---------------------- end def run():-----------------------------------
 
     def __del__(self):
 
-        self.log.info('destroyed launcher-%s', self.module_name+'_'+str(self.slot_id))
-#---------------------- end def __del__():---------------------------
+        self.log.info('destroyed launcher-%s',
+                      self.module_name + '_' + str(self.slot_id))
+# ---------------------- end def __del__():---------------------------
 
-#*********************************************************************************
+# *********************************************************************************
 # Private helper functions (internal use: __)
 
     def __set_runtime_status(self, status):
@@ -251,7 +257,7 @@ class Launcher():
         comm = MPI.COMM_WORLD
         # rank = comm.Get_rank()
         # size = comm.Get_size()
-        amode = MPI.MODE_WRONLY|MPI.MODE_CREATE
+        amode = MPI.MODE_WRONLY | MPI.MODE_CREATE
 
         status = status.strip()
         assert status == 'running' or status == 'finished', 'status invalid.'
@@ -267,6 +273,6 @@ class Launcher():
         fout.Write(b'</runtime>\n')
 
         fout.Close()
-#---------------------- end def __set_runtime_status():---------------------------
+# ---------------------- end def __set_runtime_status():------------------
 
-#====================== end class Launcher: ======================================
+# ====================== end class Launcher: =============================

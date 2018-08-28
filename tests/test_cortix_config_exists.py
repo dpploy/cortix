@@ -11,12 +11,14 @@
 
 import os
 
+
 def test_cortix_config_exists():
     '''
     Test to make sure a configuration file exists
     in the input directory.
     '''
     assert os.path.isfile("input/cortix-testing-config.xml")
+
 
 if __name__ == "__main__":
     test_cortix_config_exists()

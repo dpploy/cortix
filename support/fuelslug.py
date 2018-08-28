@@ -10,283 +10,346 @@
 """
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
-Fuel slug 
+Fuel slug
 
 ----------
 ATTENTION:
 ----------
-This container requires two Phase() containers which are by definition histories. 
+This container requires two Phase() containers which are by definition histories.
 The history is not checked. Therefore any inconsistency will be propagated forward.
 A fuel slug has two solid phases: cladding and fuel. The user will decide how to
 best use the underlying history data in the Phase() container of each phase.
 
-VFdALib support classes 
+VFdALib support classes
 
 Thu Dec 15 16:18:39 EST 2016
 """
 
-#*******************************************************************************
-import os, sys, io, time, datetime
-import math, random
+# *******************************************************************************
+import os
+import sys
+import io
+import time
+import datetime
+import math
+import random
 import pandas
 from copy import deepcopy
 
 from cortix.support.periodictable import ELEMENTS
 from cortix.support.periodictable import SERIES
-from cortix.support.phase         import Phase
-#*******************************************************************************
+from cortix.support.phase import Phase
+# *******************************************************************************
 
-#*******************************************************************************
+# *******************************************************************************
+
+
 class FuelSlug():
 
- def __init__( self, 
-               specs         = pandas.Series(),
-               fuelPhase     = Phase(),
-               claddingPhase = Phase()
-             ):
+    def __init__(self,
+                 specs=pandas.Series(),
+                 fuelPhase=Phase(),
+                 claddingPhase=Phase()
+                 ):
 
-  assert type(specs)         == type(pandas.Series()), 'fatal.'
-  assert type(fuelPhase)     == type(Phase()), 'fatal.'
-  assert type(claddingPhase) == type(Phase()), 'fatal.'
+        assert isinstance(specs, type(pandas.Series())), 'fatal.'
+        assert isinstance(fuelPhase, type(Phase())), 'fatal.'
+        assert isinstance(claddingPhase, type(Phase())), 'fatal.'
 
-  self.attributeNames = \
-  ['nSlugs','slugType','slugVolume','slugArea','fuelVolume','claddingVolume','fuelArea','claddingArea','equivalentCladdingVolume','equivalentCladdingArea','equivalentFuelVolume','equivalentFuelArea','fuelLength','slugLength','fuelMass','fuelMassDens','fuelMassCC','claddingMass','claddingMassDens','claddingMassCC','nuclides','isotopes','radioactivity','radioactivityDens','gamma','gammaDens','heat','heatDens','molarHeatPwr','molarGammaPwr']
+        self.attributeNames = \
+            ['nSlugs',
+             'slugType',
+             'slugVolume',
+             'slugArea',
+             'fuelVolume',
+             'claddingVolume',
+             'fuelArea',
+             'claddingArea',
+             'equivalentCladdingVolume',
+             'equivalentCladdingArea',
+             'equivalentFuelVolume',
+             'equivalentFuelArea',
+             'fuelLength',
+             'slugLength',
+             'fuelMass',
+             'fuelMassDens',
+             'fuelMassCC',
+             'claddingMass',
+             'claddingMassDens',
+             'claddingMassCC',
+             'nuclides',
+             'isotopes',
+             'radioactivity',
+             'radioactivityDens',
+             'gamma',
+             'gammaDens',
+             'heat',
+             'heatDens',
+             'molarHeatPwr',
+             'molarGammaPwr']
 
-  # own internal copy
-  self._specs         = deepcopy( specs )
-  self._fuelPhase     = deepcopy( fuelPhase )
-  self._claddingPhase = deepcopy( claddingPhase )
+        # own internal copy
+        self._specs = deepcopy(specs)
+        self._fuelPhase = deepcopy(fuelPhase)
+        self._claddingPhase = deepcopy(claddingPhase)
 
-  # setup the equivalent cladding hollow sphere
-  pi = math.pi
+        # setup the equivalent cladding hollow sphere
+        pi = math.pi
 
-  area   = self.__GetAttribute( 'claddingArea' )
-  volume = self.__GetAttribute( 'claddingVolume' )
+        area = self.__GetAttribute('claddingArea')
+        volume = self.__GetAttribute('claddingVolume')
 
-  ro = math.sqrt( area/4/pi )
-  ri = ( ro**3 - volume*3/4/pi )**(1/3)
+        ro = math.sqrt(area / 4 / pi)
+        ri = (ro**3 - volume * 3 / 4 / pi)**(1 / 3)
 
-  self._claddingHollowSphereRo = ro
-  self._claddingHollowSphereRi = ri
+        self._claddingHollowSphereRo = ro
+        self._claddingHollowSphereRi = ri
 
-  area   = self.__GetAttribute( 'fuelArea' )
-  volume = self.__GetAttribute( 'fuelVolume' )
+        area = self.__GetAttribute('fuelArea')
+        volume = self.__GetAttribute('fuelVolume')
 
-  ro = math.sqrt( area/4/pi )
-  ri = ( ro**3 - volume*3/4/pi )**(1/3)
+        ro = math.sqrt(area / 4 / pi)
+        ri = (ro**3 - volume * 3 / 4 / pi)**(1 / 3)
 
-  self._fuelHollowSphereRo = ro
-  self._fuelHollowSphereRi = ri
+        self._fuelHollowSphereRo = ro
+        self._fuelHollowSphereRi = ri
 
-  return
+        return
 
 
-#*******************************************************************************
+# *******************************************************************************
 
-#*******************************************************************************
+# *******************************************************************************
 
-#*******************************************************************************
+# *******************************************************************************
 # Setters and Getters methods
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # These are passing arguments by value effectively. Because the python objects
 # passed into/out of the function are immutable.
 
- def GetSpecs(self):
-     return self._specs
- specs = property(GetSpecs,None,None,None)
+    def GetSpecs(self):
+        return self._specs
+    specs = property(GetSpecs, None, None, None)
 
- def GetFuelPhase(self):
-     return self._fuelPhase
- fuelPhase = property(GetFuelPhase,None,None,None)
+    def GetFuelPhase(self):
+        return self._fuelPhase
+    fuelPhase = property(GetFuelPhase, None, None, None)
 
- def GetCladdingPhase(self):
-     return self._claddingPhase
- claddingPhase = property(GetCladdingPhase,None,None,None)
+    def GetCladdingPhase(self):
+        return self._claddingPhase
+    claddingPhase = property(GetCladdingPhase, None, None, None)
 
- def GetAttribute(self, name, phase=None, symbol=None, series=None):
-     return self.__GetAttribute( name, symbol, series )
+    def GetAttribute(self, name, phase=None, symbol=None, series=None):
+        return self.__GetAttribute(name, symbol, series)
 
- def ReduceCladdingVolume(self, dissolvedVolume ):
-     self.__ReduceCladdingVolume( dissolvedVolume )
+    def ReduceCladdingVolume(self, dissolvedVolume):
+        self.__ReduceCladdingVolume(dissolvedVolume)
 
- def ReduceFuelVolume(self, dissolvedVolume ):
-     self.__ReduceFuelVolume( dissolvedVolume )
+    def ReduceFuelVolume(self, dissolvedVolume):
+        self.__ReduceFuelVolume(dissolvedVolume)
 
 
-# Get stored fuel slug property either overall or on a nuclide basis 
-#---------------------------------------------------------------------------------
- def __GetAttribute(self, attributeName, nuclide=None, series=None ):
+# Get stored fuel slug property either overall or on a nuclide basis
+# ---------------------------------------------------------------------------------
 
-  assert attributeName in self.attributeNames, ' attribute name: %r; options: %r; fail.' % (attributeName,self.attributeNames)
 
-  if nuclide is not None: assert len(nuclide.split('*')) == 1 # sanity check
+    def __GetAttribute(self, attributeName, nuclide=None, series=None):
 
-  if nuclide is not None: assert series  is None, 'fail.'
-  if series  is not None: assert nuclide is None, 'fail.'
+        assert attributeName in self.attributeNames, ' attribute name: %r; options: %r; fail.' % (
+            attributeName, self.attributeNames)
 
-  if series is not None: assert False,' not implemented.'
+        if nuclide is not None:
+            assert len(nuclide.split('*')) == 1  # sanity check
 
-  if attributeName == 'isotopes': assert nuclide is not None, 'need a nuclide symbol.'
+        if nuclide is not None:
+            assert series is None, 'fail.'
+        if series is not None:
+            assert nuclide is None, 'fail.'
 
-#.................................................................................
+        if series is not None:
+            assert False, ' not implemented.'
+
+        if attributeName == 'isotopes':
+            assert nuclide is not None, 'need a nuclide symbol.'
+
+# .................................................................................
 # # of slugs
 
-  if attributeName == 'nSlugs':  return 1
+        if attributeName == 'nSlugs':
+            return 1
 
-#.................................................................................
-# slugId   
+# .................................................................................
+# slugId
 
-  if attributeName == 'slugType': return self._specs['Slug type'] 
+        if attributeName == 'slugType':
+            return self._specs['Slug type']
 
-#.................................................................................
+# .................................................................................
 # slug volume
 
-  if attributeName == 'slugVolume': return  __GetSlugVolume( self )
+        if attributeName == 'slugVolume':
+            return __GetSlugVolume(self)
 
-#.................................................................................
+# .................................................................................
 # fuel volume
 
-  if attributeName == 'fuelVolume': return  __GetFuelVolume( self )
+        if attributeName == 'fuelVolume':
+            return __GetFuelVolume(self)
 
-#.................................................................................
+# .................................................................................
 # equivalent fuel volume
 
-  if attributeName == 'equivalentFuelVolume': return  __GetEquivalentFuelVolume( self )
+        if attributeName == 'equivalentFuelVolume':
+            return __GetEquivalentFuelVolume(self)
 
-#.................................................................................
+# .................................................................................
 # cladding volume
 
-  if attributeName == 'claddingVolume': return  __GetCladdingVolume( self )
+        if attributeName == 'claddingVolume':
+            return __GetCladdingVolume(self)
 
-#.................................................................................
+# .................................................................................
 # equivalent cladding volume
 
-  if attributeName == 'equivalentCladdingVolume':   return  __GetEquivalentCladdingVolume( self )
+        if attributeName == 'equivalentCladdingVolume':
+            return __GetEquivalentCladdingVolume(self)
 
-#.................................................................................
-# fuel area   
+# .................................................................................
+# fuel area
 
-  if attributeName == 'fuelArea': return  __GetFuelArea( self )
+        if attributeName == 'fuelArea':
+            return __GetFuelArea(self)
 
-#.................................................................................
-# equivalent fuel area   
+# .................................................................................
+# equivalent fuel area
 
-  if attributeName == 'equivalentFuelArea':   return  __GetEquivalentFuelArea( self )
+        if attributeName == 'equivalentFuelArea':
+            return __GetEquivalentFuelArea(self)
 
-#.................................................................................
-# cladding area   
+# .................................................................................
+# cladding area
 
-  if attributeName == 'claddingArea': return  __GetCladdingArea( self )
-  if attributeName == 'slugArea':     return  __GetCladdingArea( self )
+        if attributeName == 'claddingArea':
+            return __GetCladdingArea(self)
+        if attributeName == 'slugArea':
+            return __GetCladdingArea(self)
 
-#.................................................................................
-# equivalent cladding area   
+# .................................................................................
+# equivalent cladding area
 
-  if attributeName == 'equivalentCladdingArea':   return  __GetEquivalentCladdingArea( self )
+        if attributeName == 'equivalentCladdingArea':
+            return __GetEquivalentCladdingArea(self)
 
-#.................................................................................
-# fuel length        
+# .................................................................................
+# fuel length
 
-  if attributeName == 'fuelLength':  return __GetFuelLength( self )
+        if attributeName == 'fuelLength':
+            return __GetFuelLength(self)
 
-#.................................................................................
+# .................................................................................
 # fuel slug overall quantities
-  if nuclide is None and series is None:
+        if nuclide is None and series is None:
 
+            # mass or mass concentration
+            if attributeName == 'fuelMassCC' or attributeName == 'fuelMassDens' or attributeName == 'fuelMass':
+                mass = self._fuelPhase.GetValue('mass')
+                if attributeName == 'fuelMass':
+                    return mass
+                else:
+                    #          volume = __GetFuelVolume( self )
+                    volume = __GetEquivalentFuelVolume(self)
+                    if volume == 0.0:
+                        assert abs(
+                            volume - self._fuelPhase.GetValue('volume')) < 1e-8
+                        return mass
+                    else:
+                        assert abs(
+                            volume - self._fuelPhase.GetValue('volume')) / volume * 100.0 < 0.1
+                        return mass / volume
 # mass or mass concentration
-     if attributeName == 'fuelMassCC' or attributeName == 'fuelMassDens' or attributeName == 'fuelMass': 
-        mass = self._fuelPhase.GetValue('mass')
-        if attributeName == 'fuelMass':
-          return mass
-        else:
-#          volume = __GetFuelVolume( self )
-          volume = __GetEquivalentFuelVolume( self )
-          if volume == 0.0:
-             assert abs(volume - self._fuelPhase.GetValue('volume')) < 1e-8
-             return mass
-          else:
-             assert abs(volume - self._fuelPhase.GetValue('volume'))/volume*100.0 < 0.1
-             return mass / volume
-# mass or mass concentration
-     if attributeName == 'claddingMassCC' or attributeName == 'claddingMassDens' or attributeName == 'claddingMass': 
-        mass = self._claddingPhase.GetValue('mass')
-        if attributeName == 'claddingMass':
-          return mass
-        else:
-#          volume = __GetCladdingVolume( self )
-          volume = __GetEquivalentCladdingVolume(self)
-          if volume == 0.0:
-            assert abs(volume - self._claddingPhase.GetValue('volume')) < 1e-8
-            return mass
-          else:
-            assert abs(volume - self._claddingPhase.GetValue('volume'))/volume*100.0 < 0.1
-            return mass / volume
-# radioactivity 
-     if attributeName == 'radioactivtyDens' or attributeName == 'radioactivity':
-        radioactivity = self._fuelPhase.GetValue('radioactivity')
-        if attributeName == 'radioactivity': 
-          return radioactivity
-        else:
-          volume = __GetFuelVolume( self )
-          if volume == 0.0:
-            assert abs(volume - self._fuelPhase.GetValue('volume')) < 1e-8
-            return radioactivity 
-          else:
-            assert abs(volume - self._fuelPhase.GetValue('volume'))/volume*100.0 < 0.1
-            return radioactivity / volume
-# gamma          
-     if attributeName == 'gammaDens' or attributeName == 'gamma':
-        gammaDens = 0.0
-        for spc in self._fuelPhase.species:
-            gammaDens += spc.molarGammaPwr * spc.molarCC
-        if attributeName == 'gammaDens': 
-          return gammaDens
-        else:
-          volume = __GetFuelVolume( self )
-          return gammaDens * volume
-# heat           
-     if attributeName == 'heatDens' or attributeName == 'heat':
-        heatDens = 0.0
-        for spc in self._fuelPhase.species:
-            heatDens += spc.molarHeatPwr * spc.molarCC
-        if attributeName == 'heatDens': 
-          return heatDens
-        else:
-          volume = __GetFuelVolume( self )
-          return heatDens * volume
+            if attributeName == 'claddingMassCC' or attributeName == 'claddingMassDens' or attributeName == 'claddingMass':
+                mass = self._claddingPhase.GetValue('mass')
+                if attributeName == 'claddingMass':
+                    return mass
+                else:
+                    #          volume = __GetCladdingVolume( self )
+                    volume = __GetEquivalentCladdingVolume(self)
+                    if volume == 0.0:
+                        assert abs(
+                            volume - self._claddingPhase.GetValue('volume')) < 1e-8
+                        return mass
+                    else:
+                        assert abs(
+                            volume - self._claddingPhase.GetValue('volume')) / volume * 100.0 < 0.1
+                        return mass / volume
+# radioactivity
+            if attributeName == 'radioactivtyDens' or attributeName == 'radioactivity':
+                radioactivity = self._fuelPhase.GetValue('radioactivity')
+                if attributeName == 'radioactivity':
+                    return radioactivity
+                else:
+                    volume = __GetFuelVolume(self)
+                    if volume == 0.0:
+                        assert abs(
+                            volume - self._fuelPhase.GetValue('volume')) < 1e-8
+                        return radioactivity
+                    else:
+                        assert abs(
+                            volume - self._fuelPhase.GetValue('volume')) / volume * 100.0 < 0.1
+                        return radioactivity / volume
+# gamma
+            if attributeName == 'gammaDens' or attributeName == 'gamma':
+                gammaDens = 0.0
+                for spc in self._fuelPhase.species:
+                    gammaDens += spc.molarGammaPwr * spc.molarCC
+                if attributeName == 'gammaDens':
+                    return gammaDens
+                else:
+                    volume = __GetFuelVolume(self)
+                    return gammaDens * volume
+# heat
+            if attributeName == 'heatDens' or attributeName == 'heat':
+                heatDens = 0.0
+                for spc in self._fuelPhase.species:
+                    heatDens += spc.molarHeatPwr * spc.molarCC
+                if attributeName == 'heatDens':
+                    return heatDens
+                else:
+                    volume = __GetFuelVolume(self)
+                    return heatDens * volume
 
-#.................................................................................
-# radioactivity               
+# .................................................................................
+# radioactivity
 
-  if attributeName == 'radioactivityDens' or attributeName == 'radioactivity': 
-     assert False
-     colName = 'Radioactivity Dens. [Ci/cc]'
+        if attributeName == 'radioactivityDens' or attributeName == 'radioactivity':
+            assert False
+            colName = 'Radioactivity Dens. [Ci/cc]'
 
-#.................................................................................
-# thermal                     
+# .................................................................................
+# thermal
 
-  if attributeName == 'thermalDens' or attributeName == 'thermal' or  \
-     attributeName == 'heatDens'    or attributeName == 'heat': 
-     assert False
-     colName = 'Thermal Dens. [W/cc]'
+        if attributeName == 'thermalDens' or attributeName == 'thermal' or  \
+           attributeName == 'heatDens' or attributeName == 'heat':
+            assert False
+            colName = 'Thermal Dens. [W/cc]'
 
-#.................................................................................
-# gamma                       
+# .................................................................................
+# gamma
 
-  if attributeName == 'gammaDens' or attributeName == 'gamma': 
-     assert False
-     colName = 'Gamma Dens. [W/cc]'
+        if attributeName == 'gammaDens' or attributeName == 'gamma':
+            assert False
+            colName = 'Gamma Dens. [W/cc]'
 
-#.................................................................................
-##################################################################################
-#.................................................................................
+# .................................................................................
+##########################################################################
+# .................................................................................
 
-#  if attributeName[-4:] == 'Dens' or attributeName[-2:] == 'CC': 
+#  if attributeName[-4:] == 'Dens' or attributeName[-2:] == 'CC':
 #     attributeDens = True
 #  else:
-#     attributeDens = False 
+#     attributeDens = False
 
-#.................................................................................
+# .................................................................................
 # all nuclide content of the fuel added
 
 #  if nuclide is None and series is None:
@@ -295,405 +358,443 @@ class FuelSlug():
 #
 #     density = self.propertyDensities[ colName ].sum()
 #
-#     if attributeDens is False:  
+#     if attributeDens is False:
 #        volume = __GetFuelSlugVolume( self )
 #        prop = density * volume
 #        return prop
 #     else:
 #        return density
 
-#.................................................................................
+# .................................................................................
 # get chemical element series
 
 #  if series is not None:
-# 
+#
 #     density = 0.0
 #
 #     for isotope in isotopes:
 #       density += self.propertyDensities.loc[isotope,colName]
 #
-#     if attributeDens is False:  
+#     if attributeDens is False:
 #        volume = __GetFuelSlugVolume( self )
 #        prop = density * volume
 #        return prop
 #     else:
 #        return density
-   
-#.................................................................................
-# get specific nuclide (either the isotopes of the nuclide or the specific isotope) property
 
-  if nuclide is not None:
+# .................................................................................
+# get specific nuclide (either the isotopes of the nuclide or the specific
+# isotope) property
 
-    # a particular nuclide given (atomic number and atomic mass number)
-    if len(nuclide.split('-')) == 2: 
+        if nuclide is not None:
 
-       nuclideMassNumber = int(nuclide.split('-')[1].strip('m'))
-       nuclideSymbol     = nuclide.split('-')[0]
-       nuclideMolarMass  = ELEMENTS[nuclideSymbol].isotopes[nuclideMassNumber].mass
+            # a particular nuclide given (atomic number and atomic mass number)
+            if len(nuclide.split('-')) == 2:
 
-       massCC = 0.0
+                nuclideMassNumber = int(nuclide.split('-')[1].strip('m'))
+                nuclideSymbol = nuclide.split('-')[0]
+                nuclideMolarMass = ELEMENTS[nuclideSymbol].isotopes[nuclideMassNumber].mass
 
-       for spc in self._fuelPhase.species:
+                massCC = 0.0
 
-         formula = spc.atoms
+                for spc in self._fuelPhase.species:
 
-         moleFraction = 0.0
+                    formula = spc.atoms
 
-         for item in formula:
+                    moleFraction = 0.0
 
-           if len(item.split('*')) == 1: # no multiplier (implies 1.0)
+                    for item in formula:
 
-             formulaNuclideSymbol = item.split('-')[0].strip()
-             if formulaNuclideSymbol == nuclideSymbol: assert len(item.split('-')) == 2
+                        if len(item.split('*')
+                               ) == 1:  # no multiplier (implies 1.0)
 
-             if item.split('*')[0].strip() == nuclide: 
-                moleFraction = 1.0
-             else:
-                moleFraction = 0.0
+                            formulaNuclideSymbol = item.split('-')[0].strip()
+                            if formulaNuclideSymbol == nuclideSymbol:
+                                assert len(item.split('-')) == 2
 
-           elif len(item.split('*')) == 2: # with multiplier
+                            if item.split('*')[0].strip() == nuclide:
+                                moleFraction = 1.0
+                            else:
+                                moleFraction = 0.0
 
-             formulaNuclideSymbol = item.split('*')[1].split('-')[0].strip()
-             if formulaNuclideSymbol == nuclideSymbol: assert len(item.split('*')[1].split('-')) == 2
+                        elif len(item.split('*')) == 2:  # with multiplier
 
-             if item.split('*')[1].strip() == nuclide: 
-                moleFraction = float(item.split('*')[0].strip()) 
-             else:
-                moleFraction = 0.0
+                            formulaNuclideSymbol = item.split(
+                                '*')[1].split('-')[0].strip()
+                            if formulaNuclideSymbol == nuclideSymbol:
+                                assert len(item.split('*')[1].split('-')) == 2
 
-           else:
-             assert False
+                            if item.split('*')[1].strip() == nuclide:
+                                moleFraction = float(
+                                    item.split('*')[0].strip())
+                            else:
+                                moleFraction = 0.0
 
-           massCC += spc.molarCC * moleFraction * nuclideMolarMass
+                        else:
+                            assert False
 
-       return  massCC * __GetFuelVolume( self )
+                        massCC += spc.molarCC * moleFraction * nuclideMolarMass
 
-  # chemical element given (only atomic number given)
-    elif len(nuclide.split('-')) == 1: 
+                return massCC * __GetFuelVolume(self)
 
-       massCC = 0.0
+        # chemical element given (only atomic number given)
+            elif len(nuclide.split('-')) == 1:
 
-       for spc in self._fuelPhase.species:
+                massCC = 0.0
 
-         formula = spc.atoms
+                for spc in self._fuelPhase.species:
 
-         for item in formula:
+                    formula = spc.atoms
 
-           moleFraction = 0.0
+                    for item in formula:
 
-           if len(item.split('*')) == 1: # no multiplier (implies 1.0)
+                        moleFraction = 0.0
 
-             assert len(item.split('-')) == 2
-             formulaNuclideSymbol = item.split('-')[0].strip()
-             formulaNuclideMassNumber = int(item.split('-')[1].strip('m'))
-             formulaNuclideMolarMass = ELEMENTS[formulaNuclideSymbol].isotopes[formulaNuclideMassNumber].mass
+                        if len(item.split('*')
+                               ) == 1:  # no multiplier (implies 1.0)
 
-             if formulaNuclideSymbol == nuclide: 
-                moleFraction = 1.0
-             else:
-                moleFraction = 0.0
+                            assert len(item.split('-')) == 2
+                            formulaNuclideSymbol = item.split('-')[0].strip()
+                            formulaNuclideMassNumber = int(
+                                item.split('-')[1].strip('m'))
+                            formulaNuclideMolarMass = ELEMENTS[formulaNuclideSymbol].isotopes[formulaNuclideMassNumber].mass
 
-           elif len(item.split('*')) == 2: # with multiplier
+                            if formulaNuclideSymbol == nuclide:
+                                moleFraction = 1.0
+                            else:
+                                moleFraction = 0.0
 
-             assert len(item.split('*')[1].split('-')) == 2
-             formulaNuclideSymbol = item.split('*')[1].split('-')[0].strip()
-             formulaNuclideMassNumber = int(item.split('*')[1].split('-')[1].strip('m'))
-             formulaNuclideMolarMass = ELEMENTS[formulaNuclideSymbol].isotopes[formulaNuclideMassNumber].mass
+                        elif len(item.split('*')) == 2:  # with multiplier
 
-             if formulaNuclideSymbol == nuclide: 
-                moleFraction = float(item.split('*')[0].strip()) 
-             else:
-                moleFraction = 0.0
+                            assert len(item.split('*')[1].split('-')) == 2
+                            formulaNuclideSymbol = item.split(
+                                '*')[1].split('-')[0].strip()
+                            formulaNuclideMassNumber = int(
+                                item.split('*')[1].split('-')[1].strip('m'))
+                            formulaNuclideMolarMass = ELEMENTS[formulaNuclideSymbol].isotopes[formulaNuclideMassNumber].mass
 
-           else:
-             assert False
+                            if formulaNuclideSymbol == nuclide:
+                                moleFraction = float(
+                                    item.split('*')[0].strip())
+                            else:
+                                moleFraction = 0.0
 
-           massCC += spc.molarCC * moleFraction * formulaNuclideMolarMass
+                        else:
+                            assert False
 
-       return  massCC * __GetFuelVolume( self )
+                        massCC += spc.molarCC * moleFraction * formulaNuclideMolarMass
 
-    else:
+                return massCC * __GetFuelVolume(self)
 
-      assert False
+            else:
 
-#---------------------------------------------------------------------------------
- def __GetSlugLength(self):
+                assert False
 
-  return self._specs['Slug length [cm]'] 
+# ---------------------------------------------------------------------------------
+    def __GetSlugLength(self):
 
-#---------------------------------------------------------------------------------
- def __GetFuelLength(self):
+        return self._specs['Slug length [cm]']
 
-  slugLength = __GetSlugLength(self)
+# ---------------------------------------------------------------------------------
+    def __GetFuelLength(self):
 
-  cladEndCapThickness = self._specs['Cladding end cap thickness [cm]']
-  fuelLength = slugLength - 2.0*cladEndCapThickness
+        slugLength = __GetSlugLength(self)
 
-  return fuelLength
+        cladEndCapThickness = self._specs['Cladding end cap thickness [cm]']
+        fuelLength = slugLength - 2.0 * cladEndCapThickness
 
-#---------------------------------------------------------------------------------
- def __GetSlugVolume(self):
- 
-  slugLength  = __GetSlugLength(self)
+        return fuelLength
 
-  outerSlugOuterRadius = self._specs['Outer slug OD [cm]'] / 2.0
-  outerSlugInnerRadius = self._specs['Outer slug ID [cm]'] / 2.0
-  outerSlugVolume = slugLength * math.pi * \
-                    ( outerSlugOuterRadius**2 - outerSlugInnerRadius**2 )
-  innerSlugOuterRadius = self._specs['Inner slug OD [cm]'] / 2.0
-  innerSlugInnerRadius = self._specs['Inner slug ID [cm]'] / 2.0
-  innerSlugVolume = slugLength * math.pi * \
-                    ( innerSlugOuterRadius**2 - innerSlugInnerRadius**2 )
+# ---------------------------------------------------------------------------------
+    def __GetSlugVolume(self):
 
-  return outerSlugVolume + innerSlugVolume
+        slugLength = __GetSlugLength(self)
 
-#---------------------------------------------------------------------------------
- def __GetFuelVolume(self):
- 
-  fuelLength = __GetFuelLength(self)
+        outerSlugOuterRadius = self._specs['Outer slug OD [cm]'] / 2.0
+        outerSlugInnerRadius = self._specs['Outer slug ID [cm]'] / 2.0
+        outerSlugVolume = slugLength * math.pi * \
+            (outerSlugOuterRadius**2 - outerSlugInnerRadius**2)
+        innerSlugOuterRadius = self._specs['Inner slug OD [cm]'] / 2.0
+        innerSlugInnerRadius = self._specs['Inner slug ID [cm]'] / 2.0
+        innerSlugVolume = slugLength * math.pi * \
+            (innerSlugOuterRadius**2 - innerSlugInnerRadius**2)
 
-  cladWallThickness = self._specs['Cladding wall thickness [cm]']
-  outerFuelOuterRadius = self._specs['Outer slug OD [cm]']/2.0 - cladWallThickness
-  outerFuelInnerRadius = self._specs['Outer slug ID [cm]']/2.0 + cladWallThickness
+        return outerSlugVolume + innerSlugVolume
 
-  outerFuelVolume = fuelLength * math.pi*( outerFuelOuterRadius**2 - outerFuelInnerRadius**2)
+# ---------------------------------------------------------------------------------
+    def __GetFuelVolume(self):
 
-  innerFuelOuterRadius = self._specs['Inner slug OD [cm]']/2.0 - cladWallThickness
-  innerFuelInnerRadius = self._specs['Inner slug ID [cm]']/2.0 + cladWallThickness
+        fuelLength = __GetFuelLength(self)
 
-  innerFuelVolume = fuelLength * math.pi*( innerFuelOuterRadius**2 - innerFuelInnerRadius**2)
+        cladWallThickness = self._specs['Cladding wall thickness [cm]']
+        outerFuelOuterRadius = self._specs['Outer slug OD [cm]'] / \
+            2.0 - cladWallThickness
+        outerFuelInnerRadius = self._specs['Outer slug ID [cm]'] / \
+            2.0 + cladWallThickness
 
-  volume = outerFuelVolume + innerFuelVolume
+        outerFuelVolume = fuelLength * math.pi * \
+            (outerFuelOuterRadius**2 - outerFuelInnerRadius**2)
 
-  return volume
+        innerFuelOuterRadius = self._specs['Inner slug OD [cm]'] / \
+            2.0 - cladWallThickness
+        innerFuelInnerRadius = self._specs['Inner slug ID [cm]'] / \
+            2.0 + cladWallThickness
 
-#---------------------------------------------------------------------------------
- def __GetCladdingVolume(self):
+        innerFuelVolume = fuelLength * math.pi * \
+            (innerFuelOuterRadius**2 - innerFuelInnerRadius**2)
 
-   slugVolume = __GetSlugVolume(self)
-   fuelVolume = __GetFuelVolume(self)
+        volume = outerFuelVolume + innerFuelVolume
 
-   return slugVolume - fuelVolume
+        return volume
 
-#---------------------------------------------------------------------------------
- def __GetFuelArea(self):
+# ---------------------------------------------------------------------------------
+    def __GetCladdingVolume(self):
 
-  pi = math.pi 
+        slugVolume = __GetSlugVolume(self)
+        fuelVolume = __GetFuelVolume(self)
 
-  cladWallThickness = self._specs['Cladding wall thickness [cm]']
-  slugLength = self._specs['Slug length [cm]'] 
+        return slugVolume - fuelVolume
 
-  outerSlugFuelArea = 0.0
+# ---------------------------------------------------------------------------------
+    def __GetFuelArea(self):
 
-  # side walls
-  outerSlugOuterRadius = self._specs['Outer slug OD [cm]']/2.0 
-  outerSlugFuelArea   += 2.0*pi * (outerSlugOuterRadius-cladWallThickness) * slugLength
-  outerSlugInnerRadius = self._specs['Outer slug ID [cm]']/2.0 
-  outerSlugFuelArea   += 2.0*pi * (outerSlugInnerRadius+cladWallThickness) * slugLength
-  # add bottom and top areas
-  outerSlugFuelArea       += 2.0*pi * ( (outerSlugOuterRadius-cladWallThickness)**2 - (outerSlugInnerRadius+cladWallThickness)**2 )
+        pi = math.pi
 
-  innerSlugFuelArea = 0.0
+        cladWallThickness = self._specs['Cladding wall thickness [cm]']
+        slugLength = self._specs['Slug length [cm]']
 
-  # side walls
-  innerSlugOuterRadius = self._specs['Inner slug OD [cm]']/2.0 
-  innerSlugFuelArea       += 2.0*pi * (innerSlugOuterRadius-cladWallThickness) * slugLength
-  innerSlugInnerRadius = self._specs['Inner slug ID [cm]']/2.0 
-  innerSlugFuelArea       += 2.0*pi * (innerSlugInnerRadius+cladWallThickness) * slugLength
-  # add bottom and top areas
-  innerSlugFuelArea       += 2.0*pi *  ( (innerSlugOuterRadius-cladWallThickness)**2 - (innerSlugInnerRadius+cladWallThickness)**2 ) 
+        outerSlugFuelArea = 0.0
 
-  return outerSlugFuelArea + innerSlugFuelArea
+        # side walls
+        outerSlugOuterRadius = self._specs['Outer slug OD [cm]'] / 2.0
+        outerSlugFuelArea += 2.0 * pi * \
+            (outerSlugOuterRadius - cladWallThickness) * slugLength
+        outerSlugInnerRadius = self._specs['Outer slug ID [cm]'] / 2.0
+        outerSlugFuelArea += 2.0 * pi * \
+            (outerSlugInnerRadius + cladWallThickness) * slugLength
+        # add bottom and top areas
+        outerSlugFuelArea += 2.0 * pi * \
+            ((outerSlugOuterRadius - cladWallThickness)**2 -
+             (outerSlugInnerRadius + cladWallThickness)**2)
 
-#---------------------------------------------------------------------------------
- def __GetCladdingArea(self):
+        innerSlugFuelArea = 0.0
 
-  slugLength = self._specs['Slug length [cm]'] 
+        # side walls
+        innerSlugOuterRadius = self._specs['Inner slug OD [cm]'] / 2.0
+        innerSlugFuelArea += 2.0 * pi * \
+            (innerSlugOuterRadius - cladWallThickness) * slugLength
+        innerSlugInnerRadius = self._specs['Inner slug ID [cm]'] / 2.0
+        innerSlugFuelArea += 2.0 * pi * \
+            (innerSlugInnerRadius + cladWallThickness) * slugLength
+        # add bottom and top areas
+        innerSlugFuelArea += 2.0 * pi * \
+            ((innerSlugOuterRadius - cladWallThickness)**2 -
+             (innerSlugInnerRadius + cladWallThickness)**2)
 
-  outerSlugArea = 0.0
+        return outerSlugFuelArea + innerSlugFuelArea
 
-  # side walls
-  outerSlugOuterRadius = self._specs['Outer slug OD [cm]']/2.0 
-  outerSlugArea       += 2.0*math.pi * outerSlugOuterRadius * slugLength
-  outerSlugInnerRadius = self._specs['Outer slug ID [cm]']/2.0 
-  outerSlugArea       += 2.0*math.pi * outerSlugInnerRadius * slugLength
-  # add bottom and top areas
-  outerSlugArea       += 2.0 * math.pi * (outerSlugOuterRadius**2 - outerSlugInnerRadius**2)
+# ---------------------------------------------------------------------------------
+    def __GetCladdingArea(self):
 
-  innerSlugArea = 0.0
+        slugLength = self._specs['Slug length [cm]']
 
-  # side walls
-  innerSlugOuterRadius = self._specs['Inner slug OD [cm]']/2.0 
-  innerSlugArea       += 2.0*math.pi * innerSlugOuterRadius * slugLength
-  innerSlugInnerRadius = self._specs['Inner slug ID [cm]']/2.0 
-  innerSlugArea       += 2.0*math.pi * innerSlugInnerRadius * slugLength
-  # add bottom and top areas
-  innerSlugArea       += 2.0 * math.pi * (innerSlugOuterRadius**2 - innerSlugInnerRadius**2)
+        outerSlugArea = 0.0
 
-  return outerSlugArea + innerSlugArea
+        # side walls
+        outerSlugOuterRadius = self._specs['Outer slug OD [cm]'] / 2.0
+        outerSlugArea += 2.0 * math.pi * outerSlugOuterRadius * slugLength
+        outerSlugInnerRadius = self._specs['Outer slug ID [cm]'] / 2.0
+        outerSlugArea += 2.0 * math.pi * outerSlugInnerRadius * slugLength
+        # add bottom and top areas
+        outerSlugArea += 2.0 * math.pi * \
+            (outerSlugOuterRadius**2 - outerSlugInnerRadius**2)
 
-#---------------------------------------------------------------------------------
- def __GetEquivalentCladdingArea(self):
+        innerSlugArea = 0.0
 
-  ro = self._claddingHollowSphereRo 
+        # side walls
+        innerSlugOuterRadius = self._specs['Inner slug OD [cm]'] / 2.0
+        innerSlugArea += 2.0 * math.pi * innerSlugOuterRadius * slugLength
+        innerSlugInnerRadius = self._specs['Inner slug ID [cm]'] / 2.0
+        innerSlugArea += 2.0 * math.pi * innerSlugInnerRadius * slugLength
+        # add bottom and top areas
+        innerSlugArea += 2.0 * math.pi * \
+            (innerSlugOuterRadius**2 - innerSlugInnerRadius**2)
 
-  area = 4.0*math.pi * ro
+        return outerSlugArea + innerSlugArea
 
-  return area
+# ---------------------------------------------------------------------------------
+    def __GetEquivalentCladdingArea(self):
 
-#---------------------------------------------------------------------------------
- def __GetEquivalentCladdingVolume(self):
+        ro = self._claddingHollowSphereRo
 
-  ro = self._claddingHollowSphereRo 
-  ri = self._claddingHollowSphereRi 
+        area = 4.0 * math.pi * ro
 
-  volume = 4.0/3.0*math.pi * (ro**3 - ri**3)
+        return area
 
-  return volume
+# ---------------------------------------------------------------------------------
+    def __GetEquivalentCladdingVolume(self):
 
-#---------------------------------------------------------------------------------
- def __GetEquivalentFuelVolume(self):
+        ro = self._claddingHollowSphereRo
+        ri = self._claddingHollowSphereRi
 
-  ro = self._fuelHollowSphereRo 
-  ri = self._fuelHollowSphereRi 
+        volume = 4.0 / 3.0 * math.pi * (ro**3 - ri**3)
 
-  volume = 4.0/3.0*math.pi * (ro**3 - ri**3)
+        return volume
 
-  return volume
+# ---------------------------------------------------------------------------------
+    def __GetEquivalentFuelVolume(self):
 
-#---------------------------------------------------------------------------------
- def __GetEquivalentFuelArea(self):
+        ro = self._fuelHollowSphereRo
+        ri = self._fuelHollowSphereRi
 
-  ro = self._fuelHollowSphereRo 
+        volume = 4.0 / 3.0 * math.pi * (ro**3 - ri**3)
 
-  area = 4.0*math.pi * ro
+        return volume
 
-  return area
+# ---------------------------------------------------------------------------------
+    def __GetEquivalentFuelArea(self):
 
+        ro = self._fuelHollowSphereRo
 
-#*********************************************************************************
-# Shrink the volume based on the equivalent cladding hollow sphere 
+        area = 4.0 * math.pi * ro
 
-#---------------------------------------------------------------------------------
- def __ReduceCladdingVolume(self, dissolvedVolume ):
+        return area
 
-  assert dissolvedVolume >=0.0, 'dissolved volume= %r; failed.' % (dissolvedVolume)
 
-  if dissolvedVolume == 0.0: return
+# *********************************************************************************
+# Shrink the volume based on the equivalent cladding hollow sphere
 
-  if self._claddingHollowSphereRo == self._claddingHollowSphereRi: return
+# ---------------------------------------------------------------------------------
 
-  dV = dissolvedVolume
-  pi = math.pi
 
-  # get this first
-  massDens = _GetAttribute( self, 'claddingMassDens' )
+    def __ReduceCladdingVolume(self, dissolvedVolume):
 
-#.................................................................................
+        assert dissolvedVolume >= 0.0, 'dissolved volume= %r; failed.' % (
+            dissolvedVolume)
+
+        if dissolvedVolume == 0.0:
+            return
+
+        if self._claddingHollowSphereRo == self._claddingHollowSphereRi:
+            return
+
+        dV = dissolvedVolume
+        pi = math.pi
+
+        # get this first
+        massDens = _GetAttribute(self, 'claddingMassDens')
+
+# .................................................................................
 # reduce the volume of the cladding hollow sphere
 
-  ro = self._claddingHollowSphereRo 
-  ri = self._claddingHollowSphereRi
+        ro = self._claddingHollowSphereRo
+        ri = self._claddingHollowSphereRi
 
-  volume = 4.0/3.0*pi * ( ro**3 - ri**3 )
+        volume = 4.0 / 3.0 * pi * (ro**3 - ri**3)
 
-  if dV < volume:
+        if dV < volume:
 
-    ro = ( ri**3 + 3.0/4.0/pi*(volume - dV) )**(1/3)
-    self._claddingHollowSphereRo = ro
+            ro = (ri**3 + 3.0 / 4.0 / pi * (volume - dV))**(1 / 3)
+            self._claddingHollowSphereRo = ro
 
-  else:
+        else:
 
-    self._claddingHollowSphereRo = 0.0
-    self._claddingHollowSphereRi = 0.0
+            self._claddingHollowSphereRo = 0.0
+            self._claddingHollowSphereRi = 0.0
 
-    cladWallThickness   = self._specs['Cladding wall thickness [cm]']
-    cladEndCapThickness = self._specs['Cladding end cap thickness [cm]']
+            cladWallThickness = self._specs['Cladding wall thickness [cm]']
+            cladEndCapThickness = self._specs['Cladding end cap thickness [cm]']
 
-    self._specs['Inner slug ID [cm]'] += cladWallThickness
-    self._specs['Inner slug OD [cm]'] -= cladWallThickness
-    self._specs['Outer slug ID [cm]'] += cladWallThickness
-    self._specs['Outer slug OD [cm]'] -= cladWallThickness
+            self._specs['Inner slug ID [cm]'] += cladWallThickness
+            self._specs['Inner slug OD [cm]'] -= cladWallThickness
+            self._specs['Outer slug ID [cm]'] += cladWallThickness
+            self._specs['Outer slug OD [cm]'] -= cladWallThickness
 
-    self._specs['Slug length [cm]'] -= 2.0*cladEndCapThickness
+            self._specs['Slug length [cm]'] -= 2.0 * cladEndCapThickness
 
-    self._specs['Cladding wall thickness [cm]']    = 0.0
-    self._specs['Cladding end cap thickness [cm]'] = 0.0
+            self._specs['Cladding wall thickness [cm]'] = 0.0
+            self._specs['Cladding end cap thickness [cm]'] = 0.0
 
-#.................................................................................
+# .................................................................................
 # Update the history of the cladding phase
 
-  volume   = _GetAttribute( self, 'equivalentCladdingVolume' )
-  self._claddingPhase.SetValue('volume',volume) 
+        volume = _GetAttribute(self, 'equivalentCladdingVolume')
+        self._claddingPhase.SetValue('volume', volume)
 
-  self._claddingPhase.SetValue('mass',massDens*volume)
+        self._claddingPhase.SetValue('mass', massDens * volume)
 
 
-#---------------------------------------------------------------------------------
- def __ReduceFuelVolume(self, dissolvedVolume ):
+# ---------------------------------------------------------------------------------
 
-  assert dissolvedVolume >=0.0, 'dissolved volume= %r; failed.' % (dissolvedVolume)
 
-  if dissolvedVolume == 0.0: return
+    def __ReduceFuelVolume(self, dissolvedVolume):
 
-  if self._fuelHollowSphereRo == self._fuelHollowSphereRi: return
+        assert dissolvedVolume >= 0.0, 'dissolved volume= %r; failed.' % (
+            dissolvedVolume)
 
-  assert self._claddingHollowSphereRo == 0.0
-  assert self._claddingHollowSphereRi == 0.0
+        if dissolvedVolume == 0.0:
+            return
 
-  dV = dissolvedVolume
-  pi = math.pi
+        if self._fuelHollowSphereRo == self._fuelHollowSphereRi:
+            return
 
-  # get this first
-  massDens = _GetAttribute( self, 'fuelMassDens' )
+        assert self._claddingHollowSphereRo == 0.0
+        assert self._claddingHollowSphereRi == 0.0
 
-#.................................................................................
+        dV = dissolvedVolume
+        pi = math.pi
+
+        # get this first
+        massDens = _GetAttribute(self, 'fuelMassDens')
+
+# .................................................................................
 # reduce the volume of the fuel hollow sphere
 
-  ro = self._fuelHollowSphereRo 
-  ri = self._fuelHollowSphereRi
+        ro = self._fuelHollowSphereRo
+        ri = self._fuelHollowSphereRi
 
-  volume = 4.0/3.0*pi * ( ro**3 - ri**3 )
+        volume = 4.0 / 3.0 * pi * (ro**3 - ri**3)
 
-  if dV < volume:
+        if dV < volume:
 
-    ro = ( ri**3 + 3.0/4.0/pi*(volume - dV) )**(1/3)
-    self._fuelHollowSphereRo = ro
+            ro = (ri**3 + 3.0 / 4.0 / pi * (volume - dV))**(1 / 3)
+            self._fuelHollowSphereRo = ro
 
-  else:
+        else:
 
-    self._fuelHollowSphereRo = 0.0
-    self._fuelHollowSphereRi = 0.0
+            self._fuelHollowSphereRo = 0.0
+            self._fuelHollowSphereRi = 0.0
 
-    self._specs['Inner slug ID [cm]'] = 0.0
-    self._specs['Inner slug OD [cm]'] = 0.0
-    self._specs['Outer slug ID [cm]'] = 0.0
-    self._specs['Outer slug OD [cm]'] = 0.0
+            self._specs['Inner slug ID [cm]'] = 0.0
+            self._specs['Inner slug OD [cm]'] = 0.0
+            self._specs['Outer slug ID [cm]'] = 0.0
+            self._specs['Outer slug OD [cm]'] = 0.0
 
-    self._specs['Slug length [cm]'] = 0.0
+            self._specs['Slug length [cm]'] = 0.0
 
-    self._specs['Cladding wall thickness [cm]']    = 0.0
-    self._specs['Cladding end cap thickness [cm]'] = 0.0
+            self._specs['Cladding wall thickness [cm]'] = 0.0
+            self._specs['Cladding end cap thickness [cm]'] = 0.0
 
-#.................................................................................
+# .................................................................................
 # Update the history of the fuel phase
 
-  volume   = _GetAttribute( self, 'equivalentFuelVolume' )
-  self._fuelPhase.SetValue('volume',volume) 
+        volume = _GetAttribute(self, 'equivalentFuelVolume')
+        self._fuelPhase.SetValue('volume', volume)
 
-  self._fuelPhase.SetValue('mass',massDens*volume)
-
-
-#*********************************************************************************
+        self._fuelPhase.SetValue('mass', massDens * volume)
 
 
-#*******************************************************************************
+# *********************************************************************************
+
+
+# *******************************************************************************
 # Printing of data members
- def __str__( self ):
-     s = 'FuelSlug(): \n\t specs \n\t %s \n\t fuelPhase \n\t %s \n\t claddingPhase \n\t %s'
-     return s % (self._specs, self._fuelPhase, self._claddingPhase)
 
- def __repr__( self ):
-     s = 'FuelSlug(): \n\t specs \n\t %s \n\t fuelPhase \n\t %s \n\t claddingPhase \n\t %s'
-     return s % (self._specs, self._fuelPhase, self._claddingPhase)
-#*******************************************************************************
+    def __str__(self):
+        s = 'FuelSlug(): \n\t specs \n\t %s \n\t fuelPhase \n\t %s \n\t claddingPhase \n\t %s'
+        return s % (self._specs, self._fuelPhase, self._claddingPhase)
+
+    def __repr__(self):
+        s = 'FuelSlug(): \n\t specs \n\t %s \n\t fuelPhase \n\t %s \n\t claddingPhase \n\t %s'
+        return s % (self._specs, self._fuelPhase, self._claddingPhase)
+# *******************************************************************************

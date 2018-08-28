@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit evironment
 # https://github.com/dpploy/cortix
@@ -12,7 +13,7 @@ Application class for Cortix.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
 """
-#*********************************************************************************
+# *********************************************************************************
 import os
 import sys
 import logging
@@ -20,7 +21,8 @@ from cortix.src.utils.configtree import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
 from cortix.src.module import Module
 from cortix.src.network import Network
-#*********************************************************************************
+# *********************************************************************************
+
 
 class Application:
     r"""
@@ -54,8 +56,10 @@ class Application:
         assert isinstance(app_work_dir, str), "-> app_work_dir is invalid"
 
         # Inherit a configuration tree
-        assert isinstance(app_config_node, ConfigTree), "-> app_config_node invalid"
-        assert isinstance(app_config_node.get_node_tag(), str), "empty xml tree."
+        assert isinstance(
+            app_config_node, ConfigTree), "-> app_config_node invalid"
+        assert isinstance(app_config_node.get_node_tag(),
+                          str), "empty xml tree."
         self.config_node = app_config_node
 
         # Read the application name
@@ -83,7 +87,7 @@ class Application:
 
         # Create the logging facility for the singleton object
         node = app_config_node.get_sub_node("logger")
-        logger_name = self.name + ".app" # postfix to avoid clash of loggers
+        logger_name = self.name + ".app"  # postfix to avoid clash of loggers
         self.log = logging.getLogger(logger_name)
         self.log.setLevel(logging.NOTSET)
 
@@ -100,7 +104,7 @@ class Application:
             if child.tag == 'file_handler':
                 # file handler
                 file_handler_level = child.get('level').strip()
-                file_handler = set_logger_level(file_handler, logger_name, \
+                file_handler = set_logger_level(file_handler, logger_name,
                                                 file_handler_level)
             if child.tag == 'console_handler':
                 # console handler
@@ -109,7 +113,8 @@ class Application:
                                                    console_handler_level)
 
         # formatter added to handlers
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
         file_handler.setFormatter(formatter)
         console_handler.setFormatter(formatter)
 
@@ -119,7 +124,9 @@ class Application:
         self.log.info("Created Application logger: %s", self.name)
         self.log.debug("logger level: %s", logger_level)
         self.log.debug("logger file handler level: %s", file_handler_level)
-        self.log.debug("logger console handler level: %s", console_handler_level)
+        self.log.debug(
+            "logger console handler level: %s",
+            console_handler_level)
 
         self.modules = list()
         self.__setup_modules()
@@ -128,7 +135,7 @@ class Application:
         self.__setup_networks()
 
         self.log.info("Created application: %s", self.name)
-#---------------------- end def __init__():---------------------------------------
+# ---------------------- end def __init__():------------------------------
 
     def get_networks(self):
         """
@@ -136,7 +143,7 @@ class Application:
         """
 
         return self.networks
-#---------------------- end def get_networks():-----------------------------------
+# ---------------------- end def get_networks():--------------------------
 
     def get_network(self, name):
         """
@@ -147,7 +154,7 @@ class Application:
             if net.get_name() == name:
                 return net
         return None
-#---------------------- end def get_network():------------------------------------
+# ---------------------- end def get_network():---------------------------
 
     def get_modules(self):
         """
@@ -155,7 +162,7 @@ class Application:
         """
 
         return self.modules
-#---------------------- end def get_modules():------------------------------------
+# ---------------------- end def get_modules():---------------------------
 
     def get_module(self, name):
         """
@@ -165,14 +172,14 @@ class Application:
             if mod.get_name() == name:
                 return mod
         return None
-#---------------------- end def get_module():-------------------------------------
+# ---------------------- end def get_module():----------------------------
 
     def __del__(self):
 
         self.log.info("destroyed application: %s", self.name)
-#---------------------- end def __del__():----------------------------------------
+# ---------------------- end def __del__():-------------------------------
 
-#*********************************************************************************
+# *********************************************************************************
 # Private helper functions (internal use: __)
 
     def __setup_networks(self):
@@ -191,7 +198,7 @@ class Application:
             self.log.debug("appended network %s", net_node.get("name"))
 
         self.log.debug("end _SetupNetworks()")
-#---------------------- end def __setup_networks():-------------------------------
+# ---------------------- end def __setup_networks():----------------------
 
     def __setup_modules(self):
         """
@@ -204,7 +211,7 @@ class Application:
 
             mod_config_node = ConfigTree(mode_node)
             assert mod_config_node.get_node_name() == mode_node.get('name'), \
-            'check failed'
+                'check failed'
 
             new_module = Module(self.work_dir, self.module_lib_name,
                                 self.module_lib_full_parent_dir, mod_config_node)
@@ -218,13 +225,13 @@ class Application:
                 if new_module.get_name() == mod_name:
                     if new_module.get_library_parent_dir() == mod_lib_dir_name:
                         assert new_module.get_library_name != mod_lib_name, \
-                        "duplicate module; ABORT."
+                            "duplicate module; ABORT."
 
             # add module to list
             self.modules.append(new_module)
             self.log.debug("appended module %s", mode_node.get('name'))
 
         self.log.debug("end _SetupModules()")
-#---------------------- end def __setup_modules():--------------------------------
+# ---------------------- end def __setup_modules():-----------------------
 
-#====================== end class Application: ===================================
+# ====================== end class Application: ==========================
