@@ -14,7 +14,7 @@ sed -i 's+docs/cortix-cover.png+cortix-cover.png+g' readme_converted.rst
 # Remove Cortix double heading
 sed -i -e 1,3d readme_converted.rst
 
-# Build docs for src project
+# Build docs for src directory
 sphinx-apidoc -o src_rst ../src
 
 # Build docs for src/utils subdirectory
