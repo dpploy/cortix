@@ -10,7 +10,6 @@
 # https://www.gnu.org/licenses/gpl-3.0.txt
 
 import os
-import sys
 from mpi4py import MPI
 from cortix import Cortix
 
@@ -19,10 +18,10 @@ def test_solo_pyplot():
     Run solo_pyplot and make sure the correct output is generated
     '''
     pwd = os.path.dirname(__file__)
-    full_path_config_file = os.path.join(pwd, '../examples/input/cortix-config.xml')
+    full_path_config_file = os.path.join(pwd, 'input/cortix-testing-config.xml')
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
-    os.system("cp ../examples/input/state.xml /tmp")
+    os.system("cp input/testing-state.xml /tmp")
     if rank == 0:
         cortix1 = Cortix('cortix-dev1', full_path_config_file)
         cortix1.run_simulations(task_name="solo-pyplot")
