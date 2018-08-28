@@ -135,7 +135,6 @@ class Specie():
 # These are passing arguments by value effectively. Because the python objects
 # passed into/out of the function are immutable.
 
-
     def get_name(self):
         return self._name
 
@@ -444,7 +443,6 @@ class Specie():
 
 # *******************************************************************************
 # Printing of data members
-
 
     def __str__(self):
         s = '\n\t Specie(): name=%s;' + ' formulaName=%s;' + ' phase=%s;' + '\n\t formula=%s;' + '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + ' molar cc=%9.3e[%s];' + ' mass cc=%9.3e[%s];' + '\n\t flag=%s;' + '\n\t molar radioactivity=%9.3e[%s];' + \

@@ -152,7 +152,6 @@ class FuelSlug():
 # Get stored fuel slug property either overall or on a nuclide basis
 # ---------------------------------------------------------------------------------
 
-
     def __GetAttribute(self, attributeName, nuclide=None, series=None):
 
         assert attributeName in self.attributeNames, ' attribute name: %r; options: %r; fail.' % (
@@ -666,7 +665,6 @@ class FuelSlug():
 
 # ---------------------------------------------------------------------------------
 
-
     def __ReduceCladdingVolume(self, dissolvedVolume):
 
         assert dissolvedVolume >= 0.0, 'dissolved volume= %r; failed.' % (
@@ -725,7 +723,6 @@ class FuelSlug():
 
 
 # ---------------------------------------------------------------------------------
-
 
     def __ReduceFuelVolume(self, dissolvedVolume):
 

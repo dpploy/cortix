@@ -105,7 +105,6 @@ class FuelSegment():
 
 # ---------------------------------------------------------------------------------
 
-
     def __GetAttribute(self, attributeName, nuclide=None, series=None):
 
         assert attributeName in self.attributeNames, ' attribute name: %r; options: %r; fail.' % (
