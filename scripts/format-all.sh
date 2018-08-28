@@ -1,16 +1,13 @@
-#/usr/bin/env bash
-
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit evironment
-# https://github.com/dpploy/...
+# https://github.com/dpploy/cortix
 #
 # All rights reserved, see COPYRIGHT for full restrictions.
-# https://github.com/dpploy/COPYRIGHT
+# https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
 #
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
-
-# This script uses the autopep8 python module
-# to format python code according to pep8 standards. 
 
 # Usage: ./format-all.sh
 
