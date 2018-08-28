@@ -8,24 +8,16 @@
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
 """
-Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
-
 This FuelBucket class is a container for usage with other plant-level process modules.
 It is meant to represent a fuel bucket of a metal fuel reactor.
-
 ----------
 ATTENTION:
 ----------
-
 This container uses Phase() for phases (cladding and fuel). Therefore user is 
 responsible to make the "history" of the phases consistent. See Phase() info.
 
-For unit testing do at the linux command prompt:
-    python interface.py
-
-Mon Dec 12 00:32:35 EST 2016
+Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 """
-
 #*******************************************************************************
 import os, sys
 import math
@@ -33,10 +25,8 @@ import pandas
 from copy import deepcopy
 #*******************************************************************************
 
-#*******************************************************************************
 class FuelBucket():
 
-#*******************************************************************************
  def __init__( self, 
                specs = pandas.DataFrame()
              ):
@@ -53,8 +43,6 @@ class FuelBucket():
      return
 
 #*******************************************************************************
-
-#*******************************************************************************
 # Setters and Getters methods
 #-------------------------------------------------------------------------------
 # These are passing arguments by value effectively. Because the python objects
@@ -63,12 +51,12 @@ class FuelBucket():
  #------
  # Start: Pre-irradiation information
  def get_name(self):
-     return self.__get_name()
+     return self._specs.loc['Name',1]
  name = property(get_name,None,None,None)
 
- def GetSlugType(self):
-     return self.__GetSlugType()
- slugType = property(GetSlugType,None,None,None)
+ def get_slug_type(self):
+     return self.__get_slug_type()
+ slugType = property(get_slug_type,None,None,None)
 
  def GetNSlugs(self): 
      return self.__GetNSlugs()
@@ -182,10 +170,8 @@ class FuelBucket():
 #*******************************************************************************
 # Internal class helpers 
 
- def __get_name(self):
-     return self._specs.loc['Name',1]
 
- def __GetSlugType(self):
+ def __get_slug_type(self):
      return self._specs.loc['Slug type',1]
 
  def __GetNSlugs(self):
