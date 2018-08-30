@@ -13,7 +13,7 @@ Simulation class of Cortix.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
 """
-# *********************************************************************************
+#*********************************************************************************
 import os
 import logging
 from mpi4py import MPI
@@ -21,7 +21,7 @@ from cortix.src.task import Task
 from cortix.src.application import Application
 from cortix.src.utils.configtree import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
-# *********************************************************************************
+#*********************************************************************************
 
 class Simulation:
     """
@@ -34,26 +34,26 @@ class Simulation:
         # Inherit a configuration tree
         assert isinstance(
             sim_config_node, ConfigTree), "-> sim_config_node invalid."
-        self.config_node = sim_config_node
+        self.__config_node = sim_config_node
 
         # Read the simulation name
-        self.name = sim_config_node.get_node_name()
+        self.__name = sim_config_node.get_node_name()
 
         # Create the cortix/simulation work directory
-        self.work_dir = parent_work_dir + "sim_" + self.name + '/'
+        self.__work_dir = parent_work_dir + "sim_" + self.__name + '/'
 
-        os.system("mkdir -p " + self.work_dir)
+        os.system("mkdir -p " + self.__work_dir)
 
         # Create the logging facility for each object
         node = sim_config_node.get_sub_node("logger")
-        logger_name = self.name + ".sim"
-        self.log = logging.getLogger(logger_name)
-        self.log.setLevel(logging.NOTSET)
+        logger_name = self.__name + ".sim"
+        self.__log = logging.getLogger(logger_name)
+        self.__log.setLevel(logging.NOTSET)
 
         logger_level = node.get('level').strip()
-        self.log = set_logger_level(self.log, logger_name, logger_level)
+        self.__log = set_logger_level(self.__log, logger_name, logger_level)
 
-        file_handler = logging.FileHandler(self.work_dir + 'sim.log')
+        file_handler = logging.FileHandler(self.__work_dir + 'sim.log')
         file_handler.setLevel(logging.NOTSET)
 
         console_handler = logging.StreamHandler()
@@ -77,57 +77,57 @@ class Simulation:
         console_handler.setFormatter(formatter)
 
         # add handlers to logger
-        self.log.addHandler(file_handler)
-        self.log.addHandler(console_handler)
+        self.__log.addHandler(file_handler)
+        self.__log.addHandler(console_handler)
 
-        self.log.info("created Simulation logger: %s", self.name)
-        self.log.debug("'logger level: %s", logger_level)
-        self.log.debug("logger file handler level: %s", file_handler_level)
-        self.log.debug(
+        self.__log.info("created Simulation logger: %s", self.__name)
+        self.__log.debug("'logger level: %s", logger_level)
+        self.__log.debug("logger file handler level: %s", file_handler_level)
+        self.__log.debug(
             "logger console handler level: %s",
             console_handler_level)
 
-        for app_node in self.config_node.get_all_sub_nodes("application"):
+        for app_node in self.__config_node.get_all_sub_nodes("application"):
             app_config_node = ConfigTree(app_node)
             assert app_config_node.get_node_name() == app_node.get("name"), \
                 "check failed"
-            self.application = Application(self.work_dir, app_config_node)
-            self.log.debug("created application: %s", app_node.get('name'))
+            self.__application = Application(self.__work_dir, app_config_node)
+            self.__log.debug("created application: %s", app_node.get('name'))
 
         # Stores the task(s) created by the execute method
-        self.tasks = list()
-        self.log.info("created simulation: %s", self.name)
-# ---------------------- end def __init__():------------------------------
+        self.__tasks = list()
+        self.__log.info("created simulation: %s", self.__name)
+#----------------------- end def __init__():--------------------------------------
 
     def execute(self, task_name=None):
         """
         This method allows for the execution of a simulation by executing each
         task, if any.
         """
-        self.log.debug("start execute(%s)", task_name)
+        self.__log.debug("start execute(%s)", task_name)
 
         if task_name is not None:
 
             self.__setup_task(task_name)
 
-            for task in self.tasks:
+            for task in self.__tasks:
 
-                if task.get_name() == task_name:
+                if task.name == task_name:
 
-                    task.execute(self.application)
+                    task.execute(self.__application)
 
-                    self.log.debug(
+                    self.__log.debug(
                         "called task.execute() on task %s", task_name)
 
-        self.log.debug("end execute(%s)", task_name)
-# ---------------------- end def execute():-------------------------------
+        self.__log.debug("end execute(%s)", task_name)
+#----------------------- end def execute():---------------------------------------
 
     def __del__(self):
 
-        self.log.info("destroyed simulation: %s", self.name)
-# ---------------------- end def __del__():-------------------------------
+        self.__log.info("destroyed simulation: %s", self.__name)
+#----------------------- end def __del__():---------------------------------------
 
-# *********************************************************************************
+#*********************************************************************************
 # Private helper functions (internal use: __)
 
     def __setup_task(self, task_name):
@@ -136,7 +136,7 @@ class Simulation:
         It sets up the set of tasks defined in the Cortix config for a simulation.
         """
 
-        self.log.debug("start __setup_task()")
+        self.__log.debug("start __setup_task()")
         task = None
 
         comm = MPI.COMM_WORLD
@@ -146,26 +146,26 @@ class Simulation:
         cmode = MPI.MODE_WRONLY | MPI.MODE_CREATE
         amode = MPI.MODE_WRONLY | MPI.MODE_APPEND
 
-        for task_node in self.config_node.get_all_sub_nodes('task'):
+        for task_node in self.__config_node.get_all_sub_nodes('task'):
             if task_node.get('name') != task_name:
                 continue
 
             task_config_node = ConfigTree(task_node)
-            task = Task(self.work_dir, task_config_node)
-            self.tasks.append(task)
+            task = Task(self.__work_dir, task_config_node)
+            self.__tasks.append(task)
 
-            self.log.debug("appended task: %s", task_node.get("name"))
+            self.__log.debug("appended task: %s", task_node.get("name"))
 
         if task is None:
-            self.log.debug('no task to exectute; done here.')
-            self.log.debug('end __setup_task()')
+            self.__log.debug('no task to exectute; done here.')
+            self.__log.debug('end __setup_task()')
             return
 
-        networks = self.application.get_networks()
+        networks = self.__application.networks
 
         # create subdirectory with task name
-        task_name = task.get_name()
-        task_work_dir = task.get_work_dir()
+        task_name = task.name
+        task_work_dir = task.work_dir
         assert os.path.isdir(
             task_work_dir), "directory %r invalid." % task_work_dir
 
@@ -177,18 +177,18 @@ class Simulation:
         fout.Write(b'<!-- Written by Simulation::__setup_task() -->\n')
         fout.Write(b'<cortix_param>\n')
 
-        start_time = task.get_start_time()
-        start_time_unit = task.get_start_time_unit()
+        start_time = task.start_time
+        start_time_unit = task.start_time_unit
         fout.Write("".join('<start_time unit="' + start_time_unit + '"' + '>' +
                            str(start_time) + '</start_time>\n').encode())
 
-        evolve_time = task.get_evolve_time()
-        evolve_time_unit = task.get_evolve_time_unit()
+        evolve_time = task.evolve_time
+        evolve_time_unit = task.evolve_time_unit
         fout.Write("".join('<evolve_time unit="' + evolve_time_unit + '"' + '>' +
                            str(evolve_time) + '</evolve_time>\n').encode())
 
-        time_step = task.get_time_step()
-        time_step_unit = task.get_time_step_unit()
+        time_step = task.time_step
+        time_step_unit = task.time_step_unit
         fout.Write("".join('<time_step unit="' + time_step_unit + '"' + '>' +
                            str(time_step) + '</time_step>\n').encode())
 
@@ -200,8 +200,8 @@ class Simulation:
         # Using the tasks and network create the runtime module directories and comm
         # files
         for net in networks:
-            if net.get_name() == task_name:  # Warning: net and task name must match
-                connect = net.get_connectivity()
+            if net.name == task_name:  # Warning: net and task name must match
+                connect = net.connectivity
                 to_module_to_port_visited = dict()
                 for con in connect:
                     # Start with the ports that will function as a provide port or
@@ -213,7 +213,7 @@ class Simulation:
                         to_module_to_port_visited[to_module_slot] = list()
 
                     to_module_name = to_module_slot.split('_')[0]
-                    to_module = self.application.get_module(to_module_name)
+                    to_module = self.__application.get_module(to_module_name)
 
                     assert to_module is not None, \
                         'module %r does not exist in application' % to_module_name
@@ -273,7 +273,7 @@ class Simulation:
 
                     debug_str = '__setup_task():: comm module: ' + to_module_slot + \
                                 '; network: ' + task_name + ' ' + log_str
-                    self.log.debug(debug_str)
+                    self.__log.debug(debug_str)
 
                     # register the cortix-comm file for the network
                     net.set_runtime_cortix_comm_file(to_module_slot,
@@ -283,7 +283,7 @@ class Simulation:
                     from_module_slot = con['fromModuleSlot']
                     from_port = con['fromPort']
                     from_module_name = from_module_slot.split('_')[0]
-                    from_module = self.application.get_module(from_module_name)
+                    from_module = self.__application.get_module(from_module_name)
 
                     assert from_module.has_port_name(from_port), \
                         'module %r has no port %r' % (
@@ -346,7 +346,7 @@ class Simulation:
                         debug_str = '__setup_task():: comm module: ' + \
                                     from_module_slot + '; network: ' + task_name + \
                                     ' ' + log_str
-                        self.log.debug(debug_str)
+                        self.__log.debug(debug_str)
 
                 # register the cortix-comm file for the network
                 net.set_runtime_cortix_comm_file(from_module_slot,
@@ -354,8 +354,7 @@ class Simulation:
 
         # finish forming the XML documents for port types
         for net in networks:
-            slot_names = net.get_slot_names()
-            for slot_name in slot_names:
+            for slot_name in net.slot_names:
                 comm_file = net.get_runtime_cortix_comm_file(slot_name)
                 if comm_file == 'null-runtime_cortix_comm_file':
                     continue
@@ -363,7 +362,7 @@ class Simulation:
                 fout.Write(b'</cortix_comm>')
                 fout.Close()
 
-        self.log.debug('end __setup_task()')
-# ---------------------- end def __setup_task():--------------------------
+        self.__log.debug('end __setup_task()')
+#----------------------- end def __setup_task():----------------------------------
 
-# ====================== end class Simulation: ===========================
+#======================= end class Simulation: ===================================
