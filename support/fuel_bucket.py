@@ -26,307 +26,276 @@ import pandas
 from copy import deepcopy
 #*************************************************************************
 
-
 class FuelBucket():
 
     def __init__(self,
                  specs=pandas.DataFrame()
-                 ):
+                ):
 
         assert isinstance(specs, type(pandas.DataFrame())
                           ), 'oops not pandas table.'
 
-        self._specs = specs
+        self.__specs = specs
 
-        self._solidPhase = None
+        self.__solid_phase = None
 
-        self._fuelPhase = None
-        self._claddingPhase = None
+        self.__fuel_phase = None
+        self.__cladding_phase = None
 
         return
-
-#*************************************************************************
-# Setters and Getters methods
-#-------------------------------------------------------------------------
-# These are passing arguments by value effectively. Because the python objects
-# passed into/out of the function are immutable.
+ # ---------------------- end def __init__():------------------------------
 
     #------
     # Start: Pre-irradiation information
+
     def get_name(self):
-        return self._specs.loc['Name', 1]
+        return self.__specs.loc['Name', 1]
     name = property(get_name, None, None, None)
 
     def get_slug_type(self):
-        return self.__get_slug_type()
-    slugType = property(get_slug_type, None, None, None)
+        return self.__specs.loc['Slug type', 1]
+    slug_type = property(get_slug_type, None, None, None)
 
-    def GetNSlugs(self):
-        return self.__GetNSlugs()
-    nSlugs = property(GetNSlugs, None, None, None)
+    def get_n_slugs(self):
+        return self.__get_n_slugs()
+    n_slugs = property(get_n_slugs, None, None, None)
 
-    def GetFuelEnrichment(self):
-        return self.__GetFuelEnrichment()
-    fuelEnrichment = property(GetFuelEnrichment, None, None, None)
+    def get_fuel_enrichment(self):
+        return self.__get_fuel_enrichment()
+    fuel_enrichment = property(get_fuel_enrichment, None, None, None)
 
-    def GetFreshUMass(self):
-        return self.__GetFreshUMass()
-    freshUMass = property(GetFreshUMass, None, None, None)
+    def get_fresh_u_mass(self):
+        return self.__get_fresh_u_mass()
+    fresh_u_mass = property(get_fresh_u_mass, None, None, None)
 
-    def GetFreshU238Mass(self):
-        return self.__GetFreshU238UMass()
-    freshU238Mass = property(GetFreshU238Mass, None, None, None)
+    def get_fresh_u238_mass(self):
+        return self.__get_fresh_u238_mass()
+    fresh_u238_mass = property(get_fresh_u238_mass, None, None, None)
 
-    def GetFreshU235Mass(self):
+    def get_fresh_u235_mass(self):
         return self.__GetFreshU235UMass()
-    freshU235Mass = property(GetFreshU235Mass, None, None, None)
+    fresh_u235_mass = property(get_fresh_u235_mass, None, None, None)
 
-    def GetCladdingMass(self):
-        return self.__GetCladdingMass()
-    claddingMass = property(GetCladdingMass, None, None, None)
+    def get_cladding_mass(self):
+        return self.__get_cladding_mass()
+    cladding_mass = property(get_cladding_mass, None, None, None)
 
     # End: Pre-irradiation information
     #------
 
-    def GetSlugLength(self):
-        return self.__GetSlugLength()
+    def get_slug_length(self):
+        return self.__get_slug_length()
 
-    def SetSlugLength(self, x):
-        self.__SetSlugLength(x)
-    slugLength = property(GetSlugLength, SetSlugLength, None, None)
+    def set_slug_length(self, x):
+        self.__set_slug_length(x)
+    slug_length = property(get_slug_length, set_slug_length, None, None)
 
-    def GetOuterSlugOD(self):
-        return self.__GetOuterSlugOD()
-    outerSlugOD = property(GetOuterSlugOD, None, None, None)
+    def get_outer_slug_od(self):
+        return self.__get_outer_slug_od()
+    outer_slug_od = property(get_outer_slug_od, None, None, None)
 
-    def GetOuterSlugID(self):
-        return self.__GetOuterSlugID()
-    outerSlugID = property(GetOuterSlugID, None, None, None)
+    def get_outer_slug_id(self):
+        return self.__get_outer_slug_id()
+    outer_slug_id = property(get_outer_slug_id, None, None, None)
 
-    def GetInnerSlugOD(self):
-        return self.__GetInnerSlugOD()
-    innerSlugOD = property(GetInnerSlugOD, None, None, None)
+    def get_inner_slug_od(self):
+        return self.__get_inner_slug_od()
+    inner_slug_od = property(get_inner_slug_od, None, None, None)
 
-    def GetInnerSlugID(self):
-        return self.__GetInnerSlugID()
-    innerSlugID = property(GetInnerSlugID, None, None, None)
+    def get_inner_slug_id(self):
+        return self.__get_inner_slug_id()
+    inner_slug_id = property(get_inner_slug_id, None, None, None)
 
-    def GetCladdingWallThickness(self):
-        return self.__GetCladdingWallThickness()
-    claddingWallThickness = property(
-        GetCladdingWallThickness, None, None, None)
+    def get_cladding_wall_thickness(self):
+        return self.__get_cladding_wall_thickness()
+    cladding_wall_thickness = property(
+        get_cladding_wall_thickness, None, None, None)
 
-    def GetCladdingEndThickness(self):
-        return self.__GetCladdingEndThickness()
-    claddingEndThickness = property(GetCladdingEndThickness, None, None, None)
+    def get_cladding_end_thickness(self):
+        return self.__get_cladding_end_thickness()
+    cladding_end_thickness = property(get_cladding_end_thickness, None, None, None)
 
-    def GetSlugFuelVolume(self):
-        return self.__GetSlugFuelVolume()
-    slugFuelVolume = property(GetSlugFuelVolume, None, None, None)
+    def get_slug_fuel_volume(self): return self.__get_slug_fuel_volume()
+    slug_fuel_volume = property(get_slug_fuel_volume, None, None, None)
 
-    def GetFuelVolume(self):
-        return self.__GetFuelVolume()
-    fuelVolume = property(GetFuelVolume, None, None, None)
+    def get_fuel_volume(self):
+        return self.__get_fuel_volume()
+    fuel_volume = property(get_fuel_volume, None, None, None)
 
-    def GetSlugCladdingVolume(self):
-        return self.__GetSlugCladdingVolume()
-    slugCladdingVolume = property(GetSlugCladdingVolume, None, None, None)
+    def get_slug_cladding_volume(self):
+        return self.__get_slug_cladding_volume()
+    slug_cladding_volume = property(get_slug_cladding_volume, None, None, None)
 
-    def GetCladdingVolume(self):
-        return self.__GetCladdingVolume()
-    claddingVolume = property(GetCladdingVolume, None, None, None)
+    def get_cladding_volume(self):
+        return self.__get_cladding_volume()
+    cladding_volume = property(get_cladding_volume, None, None, None)
 
-    def GetFuelMass(self):
-        return self.__GetFuelMass()
-    fuelMass = property(GetFuelMass, None, None, None)
+    def get_fuel_mass(self):
+        return self.__fuel_phase.GetValue('mass') # mass of the solid phase
+    fuel_mass = property(get_fuel_mass, None, None, None)
 
-    def GetFuelMassUnit(self):
-        return self.__GetFuelMassUnit()
-    fuelMassUnit = property(GetFuelMassUnit, None, None, None)
+    def get_fuel_mass_unit(self):
+        return self.__fuel_phase.GetQuantity('mass').unit # mass of the solid phase
+    fuel_mass_unit = property(get_fuel_mass_unit, None, None, None)
 
-    def GetRadioactivity(self):
-        return self.__GetRadioactivity()
-    radioactivity = property(GetRadioactivity, None, None, None)
+    def get_radioactivity(self):   # radioactivity of the fuel bucket (fix me)
+        return self.__fuel_phase.GetValue('radioactivity')
+    radioactivity = property(get_radioactivity, None, None, None)
 
-    def GetGammaPwr(self):
-        return self.__GetGammaPwr()
-    gammaPwr = property(GetGammaPwr, None, None, None)
+    def get_gamma_pwr(self):
+        return self.__fuel_phase.GetValue('gamma')   # gamma pwr of the fuel bucket
+    gamma_pwr = property(get_gamma_pwr, None, None, None)
 
-    def GetHeatPwr(self):
-        return self.__GetHeatPwr()
-    heatPwr = property(GetHeatPwr, None, None, None)
+    def get_heat_pwr(self):
+        return self.__fuel_phase.GetValue('heat')   # heat pwr of the fuel bucket
+    heat_pwr = property(get_heat_pwr, None, None, None)
 
-    def GetFuelRadioactivity(self):
-        return self.__GetFuelRadioactivity()
-    fuelRadioactivity = property(GetFuelRadioactivity, None, None, None)
+    def get_fuel_radioactivity(self):         # radioactivity of the solid phase
+        return self.__fuel_phase.GetValue('radioactivity')
+    fuel_radioactivity = property(get_fuel_radioactivity, None, None, None)
 
-    def GetFuelPhase(self):
-        return self._fuelPhase
+    def get_fuel_phase(self):
+        return self.__fuel_phase
 
-    def SetFuelPhase(self, phase):
-        self._fuelPhase = deepcopy(phase)
-    fuelPhase = property(GetFuelPhase, SetFuelPhase, None, None)
+    def set_fuel_phase(self, phase):
+        self.__fuel_phase = deepcopy(phase)
+    fuel_phase = property(get_fuel_phase, set_fuel_phase, None, None)
 
-    def GetCladdingPhase(self):
-        return self._claddingPhase
+    def get_cladding_phase(self):
+        return self.__cladding_phase
 
-    def SetCladdingPhase(self, phase):
-        self._claddingPhase = deepcopy(phase)
-    claddingPhase = property(GetCladdingPhase, SetCladdingPhase, None, None)
+    def set_cladding_phase(self, phase):
+        self.__cladding_phase = deepcopy(phase)
+    cladding_phase = property(get_cladding_phase, set_cladding_phase, None, None)
 
-#*************************************************************************
-# Internal class helpers
+# *********************************************************************************
+# Private helper functions (internal use: __)
 
-    def __get_slug_type(self):
-        return self._specs.loc['Slug type', 1]
+    def __get_n_slugs(self):
+        return int(self.__specs.loc['Number of slugs', 1])
 
-    def __GetNSlugs(self):
-        return int(self._specs.loc['Number of slugs', 1])
+    def __get_fuel_enrichment(self):
+        return float(self.__specs.loc['Enrichment [U-235 wt%]', 1])
 
-    def __GetFuelEnrichment(self):
-        return float(self._specs.loc['Enrichment [U-235 wt%]', 1])
-
-    def __GetOuterSlugFreshUMass(self):
+    def __get_outer_slug_fresh_u_mass(self):
         return float(
-            self._specs.loc['U mass outer slug [kg]', 1]) * 1000.0  # [g]
+            self.__specs.loc['U mass outer slug [kg]', 1]) * 1000.0  # [g]
 
-    def __GetInnerSlugFreshUMass(self):
+    def __get_inner_slug_fresh_u_mass(self):
         return float(
-            self._specs.loc['U mass inner slug [kg]', 1]) * 1000.0  # [g]
+            self.__specs.loc['U mass inner slug [kg]', 1]) * 1000.0  # [g]
 
-    def __GetOuterSlugCladdingMass(self):
+    def __get_outer_slug_cladding_mass(self):
         return float(
-            self._specs.loc['Cladding mass outer slug [kg]', 1]) * 1000.0  # [g]
+            self.__specs.loc['Cladding mass outer slug [kg]', 1]) * 1000.0  # [g]
 
-    def __GetInnerSlugCladdingMass(self):
+    def __get_inner_slug_cladding_mass(self):
         return float(
-            self._specs.loc['Cladding mass inner slug [kg]', 1]) * 1000.0  # [g]
+            self.__specs.loc['Cladding mass inner slug [kg]', 1]) * 1000.0  # [g]
 
-    def __GetFreshUMass(self):
-        nSlugs = self.__GetNSlugs()
-        uMassOuterSlug = self.__GetOuterSlugFreshUMass()
-        uMassInnerSlug = self.__GetInnerSlugFreshUMass()
-        return nSlugs * (uMassOuterSlug + uMassInnerSlug)
+    def __get_fresh_u_mass(self):
+        n_slugs = self.__get_n_slugs()
+        uMassOuterSlug = self.__get_outer_slug_fresh_u_mass()
+        uMassInnerSlug = self.__get_inner_slug_fresh_u_mass()
+        return n_slugs * (uMassOuterSlug + uMassInnerSlug)
 
-    def __GetFreshU238Mass(self):
-        totalUMass = self.__GetFreshUMass()
-        fuelEnrichment = self.__GetFuelEnrichment()
+    def __get_fresh_u238_mass(self):
+        totalUMass = self.__get_fresh_u_mass()
+        fuelEnrichment = self.__get_fuel_enrichment()
         return totalUMass * (1.0 - fuelEnrichment / 100.0)
 
-    def __GetFreshU235Mass(self):
-        totalUMass = self.__GetFreshUMass()
-        fuelEnrichment = self.__GetFuelEnrichment()
+    def __get_fresh_u235_mass(self):
+        totalUMass = self.__get_fresh_u_mass()
+        fuelEnrichment = self.__get_fuel_enrichment()
         return totalUMass * fuelEnrichment / 100.0
 
-    def __GetCladdingMass(self):
-        nSlugs = self.__GetNSlugs()
-        cladMassOuterSlug = self.__GetOuterSlugCladdingMass()
-        cladMassInnerSlug = self.__GetInnerSlugCladdingMass()
-        return nSlugs * (cladMassOuterSlug + cladMassInnerSlug)
+    def __get_cladding_mass(self):
+        n_slugs = self.__get_n_slugs()
+        cladMassOuterSlug = self.__get_outer_slug_cladding_mass()
+        cladMassInnerSlug = self.__get_inner_slug_cladding_mass()
+        return n_slugs * (cladMassOuterSlug + cladMassInnerSlug)
 
-    def __GetSlugLength(self):
-        return float(self._specs.loc['Slug length [in]', 1]) * 2.54  # cm
+    def __get_slug_length(self):
+        return float(self.__specs.loc['Slug length [in]', 1]) * 2.54  # cm
 
-    def __SetSlugLength(self, x):
-        self._specs.loc['Slug length [in]', 1] = x / 2.54  # in
+    def __set_slug_length(self, x):
+        self.__specs.loc['Slug length [in]', 1] = x / 2.54  # in
         return
 
-    def __GetOuterSlugOD(self):
-        return float(self._specs.loc['Outer slug O.D. [in]', 1]) * 2.54  # cm
+    def __get_outer_slug_od(self):
+        return float(self.__specs.loc['Outer slug O.D. [in]', 1]) * 2.54  # cm
 
-    def __GetOuterSlugID(self):
-        return float(self._specs.loc['Outer slug I.D. [in]', 1]) * 2.54  # cm
+    def __get_outer_slug_id(self):
+        return float(self.__specs.loc['Outer slug I.D. [in]', 1]) * 2.54  # cm
 
-    def __GetInnerSlugOD(self):
-        return float(self._specs.loc['Inner slug O.D. [in]', 1]) * 2.54  # cm
+    def __get_inner_slug_od(self):
+        return float(self.__specs.loc['Inner slug O.D. [in]', 1]) * 2.54  # cm
 
-    def __GetInnerSlugID(self):
-        return float(self._specs.loc['Inner slug I.D. [in]', 1]) * 2.54  # cm
+    def __get_inner_slug_id(self):
+        return float(self.__specs.loc['Inner slug I.D. [in]', 1]) * 2.54  # cm
 
-    def __GetCladdingWallThickness(self):
+    def __get_cladding_wall_thickness(self):
         return float(
-            self._specs.loc['Cladding wall thickness [mm]', 1]) / 10.0  # cm
+            self.__specs.loc['Cladding wall thickness [mm]', 1]) / 10.0  # cm
 
-    def __GetCladdingEndThickness(self):
+    def __get_cladding_end_thickness(self):
         return float(
-            self._specs.loc['Cladding end cap thickness [mm]', 1]) / 10.0  # cm
+            self.__specs.loc['Cladding end cap thickness [mm]', 1]) / 10.0  # cm
 
-    def __GetSlugFuelVolume(self):
-        slugLength = self.__GetSlugLength()
-        cladWallThickness = self.__GetCladdingWallThickness()
-        cladEndThickness = self.__GetCladdingEndThickness()
+    def __get_slug_fuel_volume(self):
+        slugLength = self.__get_slug_length()
+        cladWallThickness = self.__get_cladding_wall_thickness()
+        cladEndThickness = self.__get_cladding_end_thickness()
         fuelLength = slugLength - 2.0 * cladEndThickness
-        fuelOuterSlugOuterRadius = self.__GetOuterSlugOD() / 2.0 - cladWallThickness
-        fuelOuterSlugInnerRadius = self.__GetOuterSlugID() / 2.0 + cladWallThickness
+        fuelOuterSlugOuterRadius = self.__get_outer_slug_od() / 2.0 - cladWallThickness
+        fuelOuterSlugInnerRadius = self.__get_outer_slug_id() / 2.0 + cladWallThickness
         outerVolume = fuelLength * math.pi * \
             (fuelOuterSlugOuterRadius**2 - fuelOuterSlugInnerRadius**2)
-        fuelInnerSlugOuterRadius = self.__GetInnerSlugOD() / 2.0 - cladWallThickness
-        fuelInnerSlugInnerRadius = self.__GetInnerSlugID() / 2.0 + cladWallThickness
+        fuelInnerSlugOuterRadius = self.__get_inner_slug_od() / 2.0 - cladWallThickness
+        fuelInnerSlugInnerRadius = self.__get_inner_slug_id() / 2.0 + cladWallThickness
         innerVolume = fuelLength * math.pi * \
             (fuelInnerSlugOuterRadius**2 - fuelInnerSlugInnerRadius**2)
         return outerVolume + innerVolume
 
-    def __GetSlugVolume(self):
-        slugLength = self.__GetSlugLength()
-        outerSlugOuterRadius = self.__GetOuterSlugOD() / 2.0
-        outerSlugInnerRadius = self.__GetOuterSlugID() / 2.0
+    def __get_slug_volume(self):
+        slugLength = self.__get_slug_length()
+        outerSlugOuterRadius = self.__get_outer_slug_od() / 2.0
+        outerSlugInnerRadius = self.__get_outer_slug_id() / 2.0
         outerVolume = slugLength * math.pi * \
             (outerSlugOuterRadius**2 - outerSlugInnerRadius**2)
-        innerSlugOuterRadius = self.__GetInnerSlugOD() / 2.0
-        innerSlugInnerRadius = self.__GetInnerSlugID() / 2.0
+        innerSlugOuterRadius = self.__get_inner_slug_od() / 2.0
+        innerSlugInnerRadius = self.__get_inner_slug_id() / 2.0
         innerVolume = slugLength * math.pi * \
             (innerSlugOuterRadius**2 - innerSlugInnerRadius**2)
         return outerVolume + innerVolume
 
-    def __GetSlugCladdingVolume(self):
-        return self.__GetSlugVolume() - self.__GetSlugFuelVolume()
+    def __get_slug_cladding_volume(self):
+        return self.__get_slug_volume() - self.__get_slug_fuel_volume()
 
-    def __GetFuelVolume(self):
-        slugFuelVolume = self.__GetSlugFuelVolume()
-        nFuelSlugs = self.__GetNSlugs()
+    def __get_fuel_volume(self):
+        slugFuelVolume = self.__get_slug_fuel_volume()
+        nFuelSlugs = self.__get_n_slugs()
         return slugFuelVolume * nFuelSlugs
 
-    def __GetCladdingVolume(self):
-        slugCladdingVolume = self.__GetSlugCladdingVolume()
-        nFuelSlugs = self.__GetNSlugs()
+    def __get_cladding_volume(self):
+        slugCladdingVolume = self.__get_slug_cladding_volume()
+        nFuelSlugs = self.__get_n_slugs()
         return slugCladdingVolume * nFuelSlugs
-
-    def __GetFuelMass(self):  # mass of the solid phase
-        return self._fuelPhase.GetValue('mass')
-
-    def __GetFuelMassUnit(self):  # mass of the solid phase
-        return self._fuelPhase.GetQuantity('mass').unit
-
-    def __GetFuelRadioactivity(self):  # radioactivity of the solid phase
-        return self._fuelPhase.GetValue('radioactivity')
-
-    def __GetRadioactivity(self):  # radioactivity of the fuel bucket (fix this)
-        return self._fuelPhase.GetValue('radioactivity')
-
-    def __GetGammaPwr(self):  # gamma pwr of the fuel bucket
-        return self._fuelPhase.GetValue('gamma')
-
-    def __GetHeatPwr(self):  # heat pwr of the fuel bucket
-        return self._fuelPhase.GetValue('heat')
 
 #*************************************************************************
 # Printing of data members
     def __str__(self):
         s = '\nFuelBucket():\n\t*******\n\t specs:\n\t*******\n\t %s\n'
-        t = '\t***********\n\t fuelPhase:\n\t**********\n\t %s\n'
-        u = '\t***************\n\t claddingPhase:\n\t***************\n\t %s\n'
+        t = '\t************\n\t fuel_phase:\n\t**********\n\t %s\n'
+        u = '\t***************\n\t cladding_phase:\n\t*****************\n\t %s\n'
         stu = s + t + u
-        return stu % (self._specs, self._fuelPhase, self._claddingPhase)
+        return stu % (self.__specs, self.__fuel_phase, self.__cladding_phase)
 
     def __repr__(self):
         s = '\nFuelBucket():\n\t*******\n\t specs:\n\t*******\n\t %s\n'
-        t = '\t***********\n\t fuelPhase:\n\t**********\n\t %s\n'
-        u = '\t***************\n\t claddingPhase:\n\t***************\n\t %s\n'
+        t = '\t************\n\t fuel_phase:\n\t**********\n\t %s\n'
+        u = '\t****************\n\t cladding_phase:\n\t****************\n\t %s\n'
         stu = s + t + u
-        return stu % (self._specs, self._fuelPhase, self._claddingPhase)
+        return stu % (self.__specs, self.__fuel_phase, self.__cladding_phase)
 
-
-#*************************************************************************
-# Usage: -> python interface.py
-if __name__ == "__main__":
-    print('Unit testing for FuelBucket')
+# ====================== end class FuelBucket: ===================================

@@ -23,7 +23,6 @@ from cortix.src.utils.configtree import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
 # *********************************************************************************
 
-
 class Simulation:
     """
     Cortix Simulation element as defined in the Cortix config.
@@ -108,10 +107,15 @@ class Simulation:
         self.log.debug("start execute(%s)", task_name)
 
         if task_name is not None:
+
             self.__setup_task(task_name)
+
             for task in self.tasks:
+
                 if task.get_name() == task_name:
+
                     task.execute(self.application)
+
                     self.log.debug(
                         "called task.execute() on task %s", task_name)
 
