@@ -22,11 +22,10 @@ from cortix.src.utils.configtree import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
 # *********************************************************************************
 
-
 class Task:
     """
-    This class defines the implementation of a Task in the Cortix Project.
-    A Task is a portion of work done by a simulation.
+    A Task is work done by a Simulation handled by Cortix.
+    A Task will use a given Application.
     """
 
     def __init__(self, parent_work_dir=None, task_config_node=ConfigTree()):
@@ -136,6 +135,7 @@ class Task:
         """
         network = application.get_network(self.name)
         runtime_status_files = dict()
+
         for slot_name in network.get_slot_names():
             module_name = slot_name.split('_')[0]
             slot_id = int(slot_name.split('_')[1])

@@ -35,61 +35,61 @@ class Module:
         # Inherit a configuration tree
         assert isinstance(
             mod_config_node, ConfigTree), "-> mod_config_node is invalid."
-        self.config_node = mod_config_node
+        self.__config_node = mod_config_node
 
         # Read the module name and type
-        self.mod_name = self.config_node.get_node_name()
-        self.mod_type = self.config_node.get_node_type()
+        self.__mod_name = self.__config_node.get_node_name()
+        self.__mod_type = self.__config_node.get_node_type()
 
         # Specify module library with upstream information (override in _Setup()
         # if needed)
-        self.mod_lib_parent_dir = mod_lib_parent_dir
-        self.mod_lib_name = mod_lib_name
+        self.__mod_lib_parent_dir = mod_lib_parent_dir
+        self.__mod_lib_name = mod_lib_name
 
-        self.executable_name = 'null-executable_name'
-        self.executable_path = 'null-executable_path'
-        self.input_file_name = 'null-input_file_name'
-        self.input_file_path = 'null-input_file_path'
+        self.__executable_name = 'null-executable_name'
+        self.__executable_path = 'null-executable_path'
+        self.__input_file_name = 'null-input_file_name'
+        self.__input_file_path = 'null-input_file_path'
 
-        self.ports = list()  # list of (portName, portType, portMultiplicity)
+        self.__ports = list()  # list of (portName, portType, portMultiplicity)
 
         # Save config data
-        for child in self.config_node.get_node_children():
+        for child in self.__config_node.get_node_children():
             (elem, tag, attributes, text) = child
             text = text.strip()
 
-            if self.mod_type != 'native':
+            if self.__mod_type != 'native':
                 if tag == 'executable_name':
-                    self.executable_name = text
+                    self.__executable_name = text
 
             if tag == 'executable_path':
                 if text[-1] != '/':
                     text += '/'
-                self.executable_path = text
+                self.__executable_path = text
 
             if tag == 'input_file_name':
-                self.input_file_name = text
+                self.__input_file_name = text
 
             if tag == 'input_file_path':
                 if text[-1] != '/':
                     text += '/'
-                self.input_file_path = text
+                self.__input_file_path = text
 
             if tag == 'library':
                 assert len(attributes) == 1, 'only name of library allowed.'
                 key = attributes[0][0]
                 assert key == 'name', 'invalid attribute.'
                 val = attributes[0][1].strip()
-                self.mod_lib_name = val
+                self.__mod_lib_name = val
 
                 node = ConfigTree(elem)
                 sub_node = node.get_sub_node('parent_dir')
                 assert sub_node is not None, 'missing parent_dir.'
 
-                self.mod_lib_parent_dir = sub_node.text.strip()
+                self.__mod_lib_parent_dir = sub_node.text.strip()
 
-                if self.mod_lib_parent_dir[-1] == '/':
-                    self.mod_lib_parent_dir.strip('/')
+                if self.__mod_lib_parent_dir[-1] == '/':
+                    self.__mod_lib_parent_dir.strip('/')
 
             if tag == 'port':
                 assert len(attributes) == 3, "only <= 3 attributes allowed."
@@ -118,7 +118,7 @@ class Module:
                 assert len(tmp) == 4
                 store = (tmp['portName'], tmp['portType'], tmp['portMode'],
                          tmp['portMultiplicity'])
-                self.ports.append(store)  # (portName, portType, portMode,
+                self.__ports.append(store)  # (portName, portType, portMode,
                 #  portMultiplicity)
                 tmp = None
                 store = None
@@ -129,7 +129,8 @@ class Module:
         Returns the module name
         """
 
-        return self.mod_name
+        return self.__mod_name
+    name = property(get_name, None, None, None)
 # ---------------------- end def get_name():------------------------------
 
     def get_library_name(self):
@@ -137,7 +138,8 @@ class Module:
         Returns the module's library name.
         """
 
-        return self.mod_lib_name
+        return self.__mod_lib_name
+    lib_name = property(get_library_name, None, None, None)
 # ---------------------- end def get_library_name():----------------------
 
     def get_library_parent_dir(self):
@@ -145,7 +147,8 @@ class Module:
         Returns the library's parent directory.
         """
 
-        return self.mod_lib_parent_dir
+        return self.__mod_lib_parent_dir
+    lib_parent_dir = property(get_library_parent_dir, None, None, None)
 # ---------------------- end def get_library_parent_dir():----------------
 
     def get_ports(self):
@@ -153,7 +156,8 @@ class Module:
         Returns a list of the module's ports.
         """
 
-        return self.ports
+        return self.__ports
+    ports = property(get_ports, None, None, None)
 # ---------------------- end def get_ports():-----------------------------
 
     def get_port_type(self, port_name):
@@ -162,7 +166,7 @@ class Module:
         """
 
         port_type = None
-        for port in self.ports:
+        for port in self.__ports:
             if port[0] == port_name:
                 port_type = port[1]
         return port_type
@@ -174,7 +178,7 @@ class Module:
         """
 
         port_mode = None
-        for port in self.ports:
+        for port in self.__ports:
             if port[0] == port_name:
                 port_mode = port[2]
         return port_mode
@@ -186,9 +190,10 @@ class Module:
         """
 
         port_names = list()
-        for port in self.ports:
+        for port in self.__ports:
             port_names.append(port[0])
         return port_names
+    port_names = property(get_port_names, None, None, None)
 # ---------------------- end def get_port_names():------------------------
 
     def has_port_name(self, port_name):
@@ -197,7 +202,7 @@ class Module:
         port_name is available in the module.
         """
 
-        for port in self.ports:
+        for port in self.__ports:
             if port[0] == port_name:
                 return True
         return False
@@ -209,7 +214,7 @@ class Module:
         Spawns a worker process to execute the module.
         """
 
-        module_input = self.input_file_path + self.input_file_name
+        module_input = self.__input_file_path + self.__input_file_name
         param = runtime_cortix_param_file
         comm = runtime_cortix_comm_file
 
@@ -218,8 +223,8 @@ class Module:
 
         status = runtime_module_status_file
 
-        mod_lib_name = self.mod_lib_name
-        mod_name = self.mod_name
+        mod_lib_name = self.__mod_lib_name
+        mod_name = self.__mod_name
 
         # provide for all modules for additional work IO data
         assert os.path.isdir(
@@ -232,7 +237,7 @@ class Module:
             mod_work_dir), 'module work directory not available.'
 
         # only for wrapped modules
-        mod_exec_name = self.executable_path + self.executable_name
+        mod_exec_name = self.__executable_path + self.__executable_name
 
         # run module on its own thread using file IO communication
         launch = Launcher(mod_lib_name, mod_name,
