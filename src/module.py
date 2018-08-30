@@ -13,21 +13,20 @@ Cortix Module class defintion.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
 """
-# *********************************************************************************
+#**********************************************************************************
 import os
 from mpi4py.futures import MPIPoolExecutor
 from cortix.src.utils.configtree import ConfigTree
 from cortix.src.launcher import Launcher
-# *********************************************************************************
-
+#**********************************************************************************
 
 class Module:
     """
     The Module class encapsulates a computational module of some scientific domain.
     """
 
-    def __init__(self, parent_work_dir=None, mod_lib_name=None,
-                 mod_lib_parent_dir=None, mod_config_node=ConfigTree()):
+    def __init__(self, parent_work_dir=None, library_name=None,
+                 library_parent_dir=None, mod_config_node=ConfigTree()):
 
         assert isinstance(
             parent_work_dir, str), "-> parent_work_dir is invalid."
@@ -43,8 +42,8 @@ class Module:
 
         # Specify module library with upstream information (override in _Setup()
         # if needed)
-        self.__mod_lib_parent_dir = mod_lib_parent_dir
-        self.__mod_lib_name = mod_lib_name
+        self.__library_parent_dir = library_parent_dir
+        self.__library_name = library_name
 
         self.__executable_name = 'null-executable_name'
         self.__executable_path = 'null-executable_path'
@@ -80,16 +79,16 @@ class Module:
                 key = attributes[0][0]
                 assert key == 'name', 'invalid attribute.'
                 val = attributes[0][1].strip()
-                self.__mod_lib_name = val
+                self.__library_name = val
 
                 node = ConfigTree(elem)
                 sub_node = node.get_sub_node('parent_dir')
                 assert sub_node is not None, 'missing parent_dir.'
 
-                self.__mod_lib_parent_dir = sub_node.text.strip()
+                self.__library_parent_dir = sub_node.text.strip()
 
-                if self.__mod_lib_parent_dir[-1] == '/':
-                    self.__mod_lib_parent_dir.strip('/')
+                if self.__library_parent_dir[-1] == '/':
+                    self.__library_parent_dir.strip('/')
 
             if tag == 'port':
                 assert len(attributes) == 3, "only <= 3 attributes allowed."
@@ -122,43 +121,43 @@ class Module:
                 #  portMultiplicity)
                 tmp = None
                 store = None
-# ---------------------- end def __init__():------------------------------
+#----------------------- end def __init__():--------------------------------------
 
-    def get_name(self):
+    def __get_name(self):
         """
         Returns the module name
         """
 
         return self.__mod_name
-    name = property(get_name, None, None, None)
-# ---------------------- end def get_name():------------------------------
+    name = property(__get_name, None, None, None)
+#----------------------- end def __get_name():------------------------------------
 
-    def get_library_name(self):
+    def __get_library_name(self):
         """
         Returns the module's library name.
         """
 
-        return self.__mod_lib_name
-    lib_name = property(get_library_name, None, None, None)
-# ---------------------- end def get_library_name():----------------------
+        return self.__library_name
+    library_name = property(__get_library_name, None, None, None)
+#----------------------- end def get_library_name():------------------------------
 
-    def get_library_parent_dir(self):
+    def __get_library_parent_dir(self):
         """
         Returns the library's parent directory.
         """
 
-        return self.__mod_lib_parent_dir
-    lib_parent_dir = property(get_library_parent_dir, None, None, None)
-# ---------------------- end def get_library_parent_dir():----------------
+        return self.__library_parent_dir
+    library_parent_dir = property(__get_library_parent_dir, None, None, None)
+#----------------------- end def __get_library_parent_dir():----------------------
 
-    def get_ports(self):
+    def __get_ports(self):
         """
-        Returns a list of the module's ports.
+       `list(tuple)`: Module's ports
         """
 
         return self.__ports
-    ports = property(get_ports, None, None, None)
-# ---------------------- end def get_ports():-----------------------------
+    ports = property(__get_ports, None, None, None)
+#----------------------- end def get_ports():-------------------------------------
 
     def get_port_type(self, port_name):
         """
@@ -170,7 +169,7 @@ class Module:
             if port[0] == port_name:
                 port_type = port[1]
         return port_type
-# ---------------------- end def get_port_type():-------------------------
+#----------------------- end def get_port_type():---------------------------------
 
     def get_port_mode(self, port_name):
         """
@@ -182,9 +181,9 @@ class Module:
             if port[0] == port_name:
                 port_mode = port[2]
         return port_mode
-# ---------------------- end def get_port_mode():-------------------------
+#----------------------- end def get_port_mode():---------------------------------
 
-    def get_port_names(self):
+    def __get_port_names(self):
         """
         Returns a list containing the name of all of the module's ports
         """
@@ -193,8 +192,8 @@ class Module:
         for port in self.__ports:
             port_names.append(port[0])
         return port_names
-    port_names = property(get_port_names, None, None, None)
-# ---------------------- end def get_port_names():------------------------
+    port_names = property(__get_port_names, None, None, None)
+#----------------------- end def get_port_names():--------------------------------
 
     def has_port_name(self, port_name):
         """
@@ -206,7 +205,7 @@ class Module:
             if port[0] == port_name:
                 return True
         return False
-# ---------------------- end def has_port_name():-------------------------
+#----------------------- end def has_port_name():---------------------------------
 
     def execute(self, slot_id, runtime_cortix_param_file,
                 runtime_cortix_comm_file):
@@ -223,7 +222,7 @@ class Module:
 
         status = runtime_module_status_file
 
-        mod_lib_name = self.__mod_lib_name
+        library_name = self.__library_name
         mod_name = self.__mod_name
 
         # provide for all modules for additional work IO data
@@ -240,7 +239,7 @@ class Module:
         mod_exec_name = self.__executable_path + self.__executable_name
 
         # run module on its own thread using file IO communication
-        launch = Launcher(mod_lib_name, mod_name,
+        launch = Launcher(library_name, mod_name,
                           slot_id,
                           module_input,
                           mod_exec_name,
@@ -252,6 +251,6 @@ class Module:
         future = executor.submit(launch.run())
 
         return runtime_module_status_file
-# ---------------------- end def execute():-------------------------------
+#----------------------- end def execute():---------------------------------------
 
-# ====================== end class Module: ===============================
+#======================= end class Module: =======================================
