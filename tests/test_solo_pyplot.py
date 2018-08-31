@@ -23,7 +23,7 @@ def test_solo_pyplot():
         pwd, 'input/cortix-testing-config.xml')
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
-    os.system("cp input/testing-state.xml /tmp")
+    os.system("cp input/state.xml /tmp")
     if rank == 0:
         cortix1 = Cortix('cortix-dev1', full_path_config_file)
         cortix1.run_simulations(task_name="solo-pyplot")
