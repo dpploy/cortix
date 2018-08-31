@@ -40,8 +40,7 @@ class Module:
         self.__mod_name = self.__config_node.get_node_name()
         self.__mod_type = self.__config_node.get_node_type()
 
-        # Specify module library with upstream information (override in _Setup()
-        # if needed)
+        # Specify module library with upstream information 
         self.__library_parent_dir = library_parent_dir
         self.__library_name = library_name
 
@@ -50,7 +49,7 @@ class Module:
         self.__input_file_name = 'null-input_file_name'
         self.__input_file_path = 'null-input_file_path'
 
-        self.__ports = list()  # list of (portName, portType, portMultiplicity)
+        self.__ports = list()  # list of (port_name, port_type, port_multiplicity)
 
         # Save config data
         for child in self.__config_node.get_node_children():
@@ -102,23 +101,23 @@ class Module:
                     if key == 'type':
                         assert val == 'use' or val == 'provide' or val == 'input' or \
                             val == 'output', 'port attribute value invalid.'
-                        tmp['portName'] = text  # portName
-                        tmp['portType'] = val   # portType
+                        tmp['port_name'] = text  # port_name
+                        tmp['port_type'] = val   # port_type
                     elif key == 'mode':
                         file_value = val.split('.')[0]
                         assert file_value == 'file' or file_value == 'directory',\
                             'port attribute value invalid.'
-                        tmp['portMode'] = val
+                        tmp['port_mode'] = val
                     elif key == 'multiplicity':
-                        tmp['portMultiplicity'] = int(val)  # portMultiplicity
+                        tmp['port_multiplicity'] = int(val)  # port_multiplicity
                     else:
                         assert False, 'invalid port attribute. fatal.'
 
                 assert len(tmp) == 4
-                store = (tmp['portName'], tmp['portType'], tmp['portMode'],
-                         tmp['portMultiplicity'])
-                self.__ports.append(store)  # (portName, portType, portMode,
-                #  portMultiplicity)
+                store = (tmp['port_name'], tmp['port_type'], tmp['port_mode'],
+                         tmp['port_multiplicity'])
+                self.__ports.append(store)  # (port_name, port_type, port_mode,
+                #  port_multiplicity)
                 tmp = None
                 store = None
 #----------------------- end def __init__():--------------------------------------

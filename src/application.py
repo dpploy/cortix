@@ -189,7 +189,7 @@ class Application:
         portion of the Application.
         """
 
-        self.__log.debug("start _SetupNetworks()")
+        self.__log.debug("start __setup_networks()")
 
         for net_node in self.__config_node.get_all_sub_nodes("network"):
             net_config_node = ConfigTree(net_node)
@@ -198,7 +198,7 @@ class Application:
             self.__networks.append(network)
             self.__log.debug("appended network %s", net_node.get("name"))
 
-        self.__log.debug("end _SetupNetworks()")
+        self.__log.debug("end __setup_networks()")
 #----------------------- end def __setup_networks():------------------------------
 
     def __setup_modules(self):
@@ -207,7 +207,7 @@ class Application:
         portion of the Application.
         """
 
-        self.__log.debug("Start _SetupModules()")
+        self.__log.debug("Start __setup_modules()")
         for mode_node in self.__config_node.get_all_sub_nodes('module'):
 
             mod_config_node = ConfigTree(mode_node)
@@ -231,7 +231,7 @@ class Application:
             self.__modules.append(new_module)
             self.__log.debug("appended module %s", mode_node.get('name'))
 
-        self.__log.debug("end _SetupModules()")
+        self.__log.debug("end __setup_modules()")
 #----------------------- end def __setup_modules():-------------------------------
 
 #======================= end class Application: ==================================

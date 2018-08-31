@@ -142,8 +142,10 @@ class Task:
             mod = application.get_module(module_name)
             param_file = self.__runtime_cortix_param_file
             comm_file = network.get_runtime_cortix_comm_file(slot_name)
+
             # Run module in the slot
             status_file = mod.execute(slot_id, param_file, comm_file)
+
             assert status_file is not None, 'module launching failed.'
             runtime_status_files[slot_name] = status_file
 

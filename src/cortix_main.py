@@ -13,13 +13,13 @@ The Cortix class definition.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
 """
-# *********************************************************************************
+#*********************************************************************************
 import os
 import logging
 from cortix.src.simulation import Simulation
 from cortix.src.utils.configtree import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
-# *********************************************************************************
+#*********************************************************************************
 
 class Cortix():
     """
@@ -108,19 +108,20 @@ class Cortix():
         self.__setup_simulations()
 
         self.__log.info("Created Cortix object %s", self.__name)
-# ---------------------- end def __init__():--------------------------------------
+#----------------------- end def __init__():--------------------------------------
 
     def run_simulations(self, task_name=None):
         """
         This method runs every simulation
         defined by the Cortix object.
+        At the moment this is done one simulation at a time.
         """
 
         for sim in self.__simulations: 
             sim.execute(task_name)
-# ---------------------- end def run_simulations():-----------------------
+#----------------------- end def run_simulations():-------------------------------
 
-# *********************************************************************************
+#*********************************************************************************
 # Private helper functions (internal use: __)
 
     def __setup_simulations(self):
@@ -132,16 +133,16 @@ class Cortix():
 
         for sim in self.__config_tree.get_all_sub_nodes('simulation'):
             self.__log.debug(
-                "SetupSimulations(): simulation name: %s",
+                "__setup_simulations(): simulation name: %s",
                 sim.get('name'))
             sim_config_tree = ConfigTree(sim)
             simulation = Simulation(self.__work_dir, sim_config_tree)
             self.__simulations.append(simulation)
-# ---------------------- end def __setup_simulations():-------------------
+#----------------------- end def __setup_simulations():---------------------------
 
     def __del__(self):
 
         self.__log.info("Destroyed Cortix object: %s", self.__name)
-# ---------------------- end def __del__():-------------------------------
+#----------------------- end def __del__():---------------------------------------
 
-# ====================== end class Cortix: ===============================
+#======================= end class Cortix: =======================================
