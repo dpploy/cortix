@@ -102,7 +102,7 @@ class Simulation:
     def execute(self, task_name=None):
         """
         This method allows for the execution of a simulation by executing each
-        task, if any.
+        task, if any. Execution proceeds one task at a time.
         """
         self.__log.debug("start execute(%s)", task_name)
 
