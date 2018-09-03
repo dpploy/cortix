@@ -53,19 +53,19 @@ class Phase():
 
         if timeStamp is None:
             timeStamp = 0.0
-        assert isinstance(timeStamp, type(float()))
+        assert isinstance(timeStamp, float)
 
         if species is not None:
-            assert isinstance(species, type(list()))
+            assert isinstance(species, list)
             if len(species) > 0:
-                assert isinstance(species[-1], type(Specie()))
+                assert isinstance(species[-1], Specie)
 
         if quantities is not None:
-            assert isinstance(quantities, type(list()))
+            assert isinstance(quantities, list)
             if len(quantities) > 0:
-                assert isinstance(quantities[-1], type(Quantity()))
+                assert isinstance(quantities[-1], Quantity)
 
-        assert isinstance(value, type(float()))
+        assert isinstance(value, float)
 
 # List of species and quantities objects; columns of data frame are named
 # by objects
@@ -132,7 +132,7 @@ class Phase():
         return None
 
     def AddSpecie(self, newSpecie):
-        assert isinstance(newSpecie, type(Specie()))
+        assert isinstance(newSpecie, Specie)
         assert newSpecie.name not in list(
             self._phase.columns), 'quantity: %r exists. Current names: %r' % (newQuant, self._phase.columns)
         speciesFormulae = [specie.formulaName for specie in self._species]
@@ -148,7 +148,7 @@ class Phase():
         self._phase = df.fillna(0.0)
 
     def AddQuantity(self, newQuant):
-        assert isinstance(newQuant, type(Quantity()))
+        assert isinstance(newQuant, Quantity)
         assert newQuant.name not in list(
             self._phase.columns), 'quantity: %r exists. Current names: %r' % (newQuant, self._phase.columns)
         quantFormalNames = [quant.formalName for quant in self._quantities]
@@ -241,13 +241,13 @@ class Phase():
         else:
             assert timeStamp in self._phase.index, 'missing timeStamp = %r' % (
                 timeStamp)
-        assert isinstance(actor, type(str()))
+        assert isinstance(actor, str)
         assert actor in self._phase.columns
         self._phase.loc[timeStamp, actor] = float(value)
         return
 
     def WriteHTML(self, fileName):
-        assert isinstance(fileName, type(str()))
+        assert isinstance(fileName, str)
         tmp = pandas.DataFrame(self._phase)
         columnNames = tmp.columns
         speciesNames = [specie.name for specie in self._species]

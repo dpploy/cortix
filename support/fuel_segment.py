@@ -37,10 +37,10 @@ class FuelSegment():
                  species = list()
                  ):
 
-        assert isinstance(geometry, type(pandas.Series())), 'fatal.'
-        assert isinstance(species, type(list())), 'fatal.'
-        if isinstance(species, type(list())) and len(species) > 0:
-            assert isinstance(species[0], type(Specie()))
+        assert isinstance(geometry, pandas.Series), 'fatal.'
+        assert isinstance(species, list), 'fatal.'
+        if isinstance(species, list) and len(species) > 0:
+            assert isinstance(species[0], Specie)
 
         self.attribute_names = \
             ['n-segments',

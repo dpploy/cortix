@@ -52,7 +52,7 @@ class Application:
 
     def __init__(self, app_work_dir=None, app_config_node=ConfigTree()):
 
-        assert isinstance(app_work_dir, str), "-> app_work_dir is invalid"
+        assert isinstance(app_work_dir, str), '-> app_work_dir is invalid'
 
         # Inherit a configuration tree
         assert isinstance(
@@ -70,9 +70,9 @@ class Application:
 
         # Set the module library for the whole application
         node = app_config_node.get_sub_node('module_library')
-        self.__module_lib_name = node.get("name").strip()
+        self.__module_lib_name = node.get('name').strip()
         sub_node = ConfigTree(node)
-        assert sub_node.get_node_tag() == "module_library", "FATAL."
+        assert sub_node.get_node_tag() == 'module_library', 'FATAL.'
         for child in sub_node.get_node_children():
             (elem, tag, attributes, text) = child
             if tag == 'parent_dir':
@@ -86,14 +86,14 @@ class Application:
 
         # Create the logging facility for the singleton object
         node = app_config_node.get_sub_node("logger")
-        logger_name = self.__name + ".app"  # postfix to avoid clash of loggers
+        logger_name = 'app:'+self.__name # prefix to avoid clash of loggers
         self.__log = logging.getLogger(logger_name)
         self.__log.setLevel(logging.NOTSET)
 
-        logger_level = node.get("level").strip()
+        logger_level = node.get('level').strip()
         self.__log = set_logger_level(self.__log, logger_name, logger_level)
 
-        file_handler = logging.FileHandler(self.__work_dir + "app.log")
+        file_handler = logging.FileHandler(self.__work_dir + 'app.log')
         file_handler.setLevel(logging.NOTSET)
 
         console_handler = logging.StreamHandler()
@@ -120,11 +120,11 @@ class Application:
         # add handlers to logger
         self.__log.addHandler(file_handler)
         self.__log.addHandler(console_handler)
-        self.__log.info("Created Application logger: %s", self.__name)
-        self.__log.debug("logger level: %s", logger_level)
-        self.__log.debug("logger file handler level: %s", file_handler_level)
+        self.__log.info('Created Application logger: %s', self.__name)
+        self.__log.debug('logger level: %s', logger_level)
+        self.__log.debug('logger file handler level: %s', file_handler_level)
         self.__log.debug(
-            "logger console handler level: %s",
+            'logger console handler level: %s',
             console_handler_level)
 
         self.__modules = list()
@@ -133,7 +133,7 @@ class Application:
         self.__networks = list()
         self.__setup_networks()
 
-        self.__log.info("Created application: %s", self.__name)
+        self.__log.info('Created application: %s', self.__name)
 #----------------------- end def __init__():--------------------------------------
 
     def __get_networks(self):
@@ -177,7 +177,7 @@ class Application:
 
     def __del__(self):
 
-        self.__log.info("destroyed application: %s", self.__name)
+        self.__log.info('destroyed application: %s', self.__name)
 #----------------------- end def __del__():---------------------------------------
 
 #*********************************************************************************
@@ -189,7 +189,7 @@ class Application:
         portion of the Application.
         """
 
-        self.__log.debug("start __setup_networks()")
+        self.__log.debug('start __setup_networks()')
 
         for net_node in self.__config_node.get_all_sub_nodes("network"):
             net_config_node = ConfigTree(net_node)

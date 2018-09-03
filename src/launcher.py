@@ -18,9 +18,9 @@ import os
 import logging
 import time
 import datetime
-from mpi4py import MPI
 import importlib
 import xml.etree.ElementTree as ElementTree
+import concurrent.futures
 #*********************************************************************************
 
 class Launcher():
@@ -79,17 +79,21 @@ class Launcher():
         log.debug('comm file: %s', self.__cortix_comm_full_path_file_name)
 
         lib_module_driver = mod_lib_name + '.' + module_name + '.cortix_driver'
-        log.info('module driver: %s', lib_module_driver)
+        log.info('import module driver: %s', lib_module_driver)
 
-        # import and log the python module driver
-        self.__py_module = importlib.import_module(lib_module_driver)
+        try:
+         self.__py_module = importlib.import_module(lib_module_driver)
+        except Exception as error:
+         log.error('importlib error: ', error)
+
         log.info('imported pyModule: %s', str(self.__py_module))
 #----------------------- end def __init__():--------------------------------------
 
-    def run(self):
+#    def run(self):
+#    def run(self, executor):
         """
         Function used to timestep through the modules.
-        Runs the simulation from start to end, and moinitors
+        Runs the simulation from start to end, and monitors
         its progress at each time step.
         """
 
@@ -101,7 +105,6 @@ class Launcher():
 
         # Read the Cortix parameter file: cortix-param.xml
         # cortix_param_full_path_file_name
-
         assert os.path.isfile(self.__cortix_param_full_path_file_name), \
             'file %r not available;stop.' % self.__cortix_param_full_path_file_name
 
@@ -219,9 +222,13 @@ class Launcher():
 
             # Data exchange at cortix_time (call ports first)
             guest_driver.call_ports(cortix_time)
+#            future = executor.submit(guest_driver.call_ports, cortix_time)
+#            while future.running(): 
+#                time.sleep(0.1)
 
             # Advance to cortix_time + time_step (call execute second)
             guest_driver.execute(cortix_time, time_step)
+#            future = executor.submit(guest_driver.execute, cortix_time, time_step)
 
             end_time = time.time()
             s = 'CPU elapsed time (s): ' + str(round(end_time - start_time, 2))
@@ -247,30 +254,24 @@ class Launcher():
 
     def __set_runtime_status(self, status):
         """
-        Helper function used by the launcher
-        constructor to output status of the
+        Helper function used by the launcher constructor to output status of the
         current run.
         """
-
-        comm = MPI.COMM_WORLD
-        # rank = comm.Get_rank()
-        # size = comm.Get_size()
-        amode = MPI.MODE_WRONLY | MPI.MODE_CREATE
 
         status = status.strip()
         assert status == 'running' or status == 'finished', 'status invalid.'
 
-        fout = MPI.File.Open(comm, self.__runtime_status_full_path, amode)
-        fout.Write(b'<?xml version="1.0" encoding="UTF-8"?>\n')
-        fout.Write(b'<!-- Written by Launcher::__set_runtime_status.py -->\n')
+        fout = open(self.__runtime_status_full_path, 'w')
+        fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+        fout.write('<!-- Written by Launcher::__set_runtime_status.py -->\n')
 
         today = datetime.datetime.today()
-        fout.Write("".join('<!-- ' + str(today) + ' -->\n').encode())
-        fout.Write(b'<runtime>\n')
-        fout.Write("".join('<status>' + status + '</status>\n').encode())
-        fout.Write(b'</runtime>\n')
+        fout.write('<!-- ' + str(today) + ' -->\n')
+        fout.write('<runtime>\n')
+        fout.write('<status>' + status + '</status>\n')
+        fout.write('</runtime>\n')
 
-        fout.Close()
+        fout.close()
 #----------------------- end def __set_runtime_status():--------------------------
 
 #======================= end class Launcher: =====================================

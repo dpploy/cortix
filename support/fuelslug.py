@@ -52,9 +52,9 @@ class FuelSlug():
                  claddingPhase=Phase()
                  ):
 
-        assert isinstance(specs, type(pandas.Series())), 'fatal.'
-        assert isinstance(fuelPhase, type(Phase())), 'fatal.'
-        assert isinstance(claddingPhase, type(Phase())), 'fatal.'
+        assert isinstance(specs, pandas.Series), 'fatal.'
+        assert isinstance(fuelPhase, Phase), 'fatal.'
+        assert isinstance(claddingPhase, Phase), 'fatal.'
 
         self.attributeNames = \
             ['nSlugs',

@@ -51,11 +51,9 @@ class CortixDriver():
             type(cortix_final_time)
 
         # Logging
-        self.log = logging.getLogger(
-            'launcher-modulib.pyplot_' +
-            str(slot_id) +
-            '.cortixdriver')
-        self.log.debug('initializing an object of CortixDriver()')
+        self.__log = logging.getLogger('launcher-modulib.pyplot_' + str(slot_id) +\
+                                      '.cortix_driver')
+        self.__log.debug('initializing an object of CortixDriver()')
 
         self.pyplot = PyPlot(slot_id,
                              input_full_path_file_name,
@@ -64,7 +62,7 @@ class CortixDriver():
                              cortix_start_time,
                              cortix_final_time)
 
-        self.time_stamp = None  # temporary
+        self.__time_stamp = None  # temporary
 
         return
 # ---------------------- end def __init__():------------------------------
@@ -102,20 +100,20 @@ class CortixDriver():
 
     def __log_debug(self, cortix_time=0.0, caller='null-function-name'):
 
-        if self.time_stamp is None:
+        if self.__time_stamp is None:
             s = ''
-            self.log.debug(s)
+            self.__log.debug(s)
             s = '=========================================================='
-            self.log.debug(s)
+            self.__log.debug(s)
             s = 'CORTIX::DRIVER->***->DRIVER->***->DRIVER->***->DRIVER->***'
-            self.log.debug(s)
+            self.__log.debug(s)
             s = '=========================================================='
-            self.log.debug(s)
+            self.__log.debug(s)
 
             s = caller + '(' + str(round(cortix_time, 2)) + '[min]):'
-            self.log.debug(s)
+            self.__log.debug(s)
 
-            self.time_stamp = time.time()
+            self.__time_stamp = time.time()
 
         else:
 
@@ -123,13 +121,13 @@ class CortixDriver():
 
             s = caller + '(' + str(round(cortix_time, 2)) + '[min]): '
             m = 'CPU elapsed time (s): ' + \
-                str(round(end_time - self.time_stamp, 2))
-            self.log.debug(s + m)
+                str(round(end_time - self.__time_stamp, 2))
+            self.__log.debug(s + m)
 
-            self.time_stamp = None
+            self.__time_stamp = None
             if caller == 'execute':
                 s = ''
-                self.log.debug(s)
+                self.__log.debug(s)
 
         return
 # ---------------------- end def __log_debug():---------------------------

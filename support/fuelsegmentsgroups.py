@@ -26,7 +26,7 @@ import datetime
 import math
 import random
 
-from cortix.support.fuelsegment import FuelSegment
+from cortix.support.fuel_segment import FuelSegment
 # *******************************************************************************
 
 # *******************************************************************************
@@ -52,8 +52,8 @@ class FuelSegmentsGroups():
         assert key not in self.groups.keys()
 
         if fuelSegments is not None:
-            assert isinstance(fuelSegments, type(list()))
-            assert isinstance(fuelSegments[-1], type(FuelSegment()))
+            assert isinstance(fuelSegments, list)
+            assert isinstance(fuelSegments[-1], FuelSegment)
             self.groups[key] = fuelSegments
         else:
             self.groups[key] = list()
@@ -111,12 +111,12 @@ class FuelSegmentsGroups():
             attribute = 0
 
             for (key, fuelSegments) in self.groups.items():
-                assert isinstance(fuelSegments, type(list())), 'fail.'
+                assert isinstance(fuelSegments, list), 'fail.'
                 if len(fuelSegments) == 0:
                     continue  # this will reduce the average value
                 groupAttribute = 0
                 for fuelSegment in fuelSegments:
-                    groupAttribute += fuelSegment.GetAttribute(
+                    groupAttribute += fuelSegment.get_attribute(
                         attributeName, symbol, series)
 
                 if attributeName[-4:] == 'Dens' or attributeName[-2:] == 'CC':
@@ -144,7 +144,7 @@ class FuelSegmentsGroups():
             attribute = 0
 
             for fuelSegment in fuelSegments:
-                attribute += fuelSegment.GetAttribute(
+                attribute += fuelSegment.get_attribute(
                     attributeName, symbol, series)
 
             if attribute != 0 and \
@@ -204,7 +204,7 @@ class FuelSegmentsGroups():
         if fuelSegments is None:
             fuelSegments = list()
         else:
-            assert isinstance(fuelSegments, type(list())), 'fail.'
+            assert isinstance(fuelSegments, list), 'fail.'
 
         if groupKey in self.groups.keys():
             self.groups[groupKey] += fuelSegments
@@ -222,8 +222,8 @@ class FuelSegmentsGroups():
         nSegments = len(fuelSegments)
 
         for fuelSegment in fuelSegments:
-            if fuelSegment.GetAttribute(
-                    'segmentId') == fuelSegment_remove.GetAttribute('segmentId'):
+            if fuelSegment.get_attribute(
+                    'segmentId') == fuelSegment_remove.get_attribute('segmentId'):
                 fuelSegments.remove(fuelSegment)
 
         assert len(self.groups[groupKey]) == nSegments - 1, 'fatal.'

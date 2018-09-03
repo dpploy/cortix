@@ -35,8 +35,7 @@ class FuelBundle():
                  specs=pandas.DataFrame()
                  ):
 
-        assert isinstance(specs, type(pandas.DataFrame())
-                          ), 'oops not pandas table.'
+        assert isinstance(specs, pandas.DataFrame), 'oops not pandas table.'
 
         self.__specs = specs
 
@@ -107,7 +106,7 @@ class FuelBundle():
     # mass of the solid phase (gas phase in plenum not added)
     def get_fuel_mass(self):
         return self.__solid_phase.GetValue('mass')
-    fuelMass = property(get_fuel_mass, None, None, None)
+    fuel_mass = property(get_fuel_mass, None, None, None)
 
     def get_fuel_mass_unit(self):
         return self.__solid_phase.GetQuantity('mass').unit
