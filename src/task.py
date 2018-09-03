@@ -129,7 +129,7 @@ class Task:
         self.__log.info('created task: %s', self.__name)
 #----------------------- end def __init__():--------------------------------------
 
-    def execute(self, application, pool_executor):
+    def execute(self, application):
         """
         This method is used to execute (accomplish) the given task.
         """
@@ -148,8 +148,7 @@ class Task:
             # Run module in the slot
             self.__log.info('call execute on module: %s:%s',module_name,slot_id)
 
-            status_file = module.execute(slot_id, param_file, comm_file, \
-                                         pool_executor)
+            status_file = module.execute(slot_id, param_file, comm_file)
 
             assert status_file is not None, \
                    'module launching failed; module name: %r' % module_name

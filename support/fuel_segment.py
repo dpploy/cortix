@@ -84,11 +84,15 @@ class FuelSegment():
 # Get stored fuel segment property either overall or on a nuclide basis
     def get_attribute(self, name, nuclide=None, series=None):
 
-        assert attribute_name in self.attribute_names, ' attribute name: %r; options: %r; fail.' % (
-            attribute_name, self.attribute_names)
+        attribute_name = name
+
+        assert attribute_name in self.attribute_names, \
+               'attribute_name: %r; options: %r; fail.' % \
+               (attribute_name, self.attribute_names)
 
         if nuclide is not None:
-            assert len(nuclide.split('*')) == 1  # sanity check
+            assert isinstance(nuclide,str), 'type(nuclide) = %r' % type(nuclide)
+            assert len(nuclide.split('*')) == 1, 'nuclide = %r' % nuclide # sanity check
 
         if nuclide is not None:
             assert series is None, 'fail.'
@@ -108,9 +112,9 @@ class FuelSegment():
             return 1
 
 # .................................................................................
-# segmentId
+# segment id 
 
-        if attribute_name == 'segmentId':
+        if attribute_name == 'segment-id':
             return self.__geometry['segment id']
 
 # .................................................................................
@@ -152,7 +156,7 @@ class FuelSegment():
             if attribute_name == 'mass-cc' or attribute_name == 'mass-dens' or attribute_name == 'mass':
                 mass_cc = 0.0
                 for spc in self.__species:
-                    mass_cc += spc.mass_cc
+                    mass_cc += spc.massCC
                 if attribute_name == 'mass-cc' or attribute_name == 'mass-dens':
                     return mass_cc
                 else:
@@ -162,7 +166,7 @@ class FuelSegment():
             if attribute_name == 'radioactivtyDens' or attribute_name == 'radioactivity':
                 radDens = 0.0
                 for spc in self.__species:
-                    radDens += spc.molarRadioactivity * spc.molar_cc
+                    radDens += spc.molarRadioactivity * spc.molarCC
                 if attribute_name == 'radioactivity-dens':
                     return radDens
                 else:
@@ -172,7 +176,7 @@ class FuelSegment():
             if attribute_name == 'gamma-dens' or attribute_name == 'gamma':
                 gamma_dens = 0.0
                 for spc in self.__species:
-                    gamma_dens += spc.molarGammaPwr * spc.molar_cc
+                    gamma_dens += spc.molarGammaPwr * spc.molarCC
                 if attribute_name == 'gamma-dens':
                     return gamma_dens
                 else:
@@ -182,7 +186,7 @@ class FuelSegment():
             if attribute_name == 'heat-dens' or attribute_name == 'heat':
                 heat_dens = 0.0
                 for spc in self.__species:
-                    heat_dens += spc.molar_heat_pwr * spc.molar_cc
+                    heat_dens += spc.molarHeatPwr * spc.molarCC
                 if attribute_name == 'heat-dens':
                     return heat_dens
                 else:
@@ -304,7 +308,7 @@ class FuelSegment():
                         else:
                             assert False
 
-                        mass_cc += spc.molar_cc * mole_fraction * nuclideMolarMass
+                        mass_cc += spc.molarCC * mole_fraction * nuclideMolarMass
 
                 return mass_cc * self.__get_fuel_segment_volume()
 
@@ -353,7 +357,7 @@ class FuelSegment():
                         else:
                             assert False
 
-                        mass_cc += spc.molar_cc * mole_fraction * formula_nuclide_molar_mass
+                        mass_cc += spc.molarCC * mole_fraction * formula_nuclide_molar_mass
 
                 return mass_cc * self.__get_fuel_segment_volume()
 

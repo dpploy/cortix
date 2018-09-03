@@ -135,12 +135,12 @@ class Specie():
 # These are passing arguments by value effectively. Because the python objects
 # passed into/out of the function are immutable.
 
-    def get_name(self):
+    def GetName(self):
         return self._name
 
     def SetName(self, n):
         self._name = n
-    name = property(get_name, SetName, None, None)
+    name = property(GetName, SetName, None, None)
 
     def GetFormulaName(self):
         return self._formulaName

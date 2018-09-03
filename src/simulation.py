@@ -98,7 +98,7 @@ class Simulation:
         self.__log.info("created simulation: %s", self.__name)
 #----------------------- end def __init__():--------------------------------------
 
-    def execute(self, task_name=None, pool_executor=None):
+    def execute(self, task_name=None):
         """
         This method allows for the execution of a simulation by executing each
         task, if any. Execution proceeds one task at a time.
@@ -115,7 +115,7 @@ class Simulation:
 
                     self.__log.debug("call execute(%s)", task_name)
 
-                    task.execute(self.__application, pool_executor)
+                    task.execute(self.__application)
 
                     self.__log.debug(
                         'called task.execute() on task %s', task_name)

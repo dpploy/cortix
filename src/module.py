@@ -206,7 +206,7 @@ class Module:
 #----------------------- end def has_port_name():---------------------------------
 
     def execute(self, slot_id, runtime_cortix_param_file,
-                runtime_cortix_comm_file, pool_executor):
+                runtime_cortix_comm_file):
         """
         Spawns a worker process to execute the module.
         """
@@ -238,22 +238,17 @@ class Module:
         mod_exec_name = self.__executable_path + self.__executable_name
 
         # the laucher "loads" the module dynamically and provides the method for
-        # the executor to submit to the worker
-#        launch = Launcher( library_name, mod_name,
-#                           slot_id,
-#                           module_input,
-#                           mod_exec_name,
-#                           mod_work_dir,
-#                           param, comm, status )
+        # threading 
+        launch = Launcher( library_name, mod_name,
+                           slot_id,
+                           module_input,
+                           mod_exec_name,
+                           mod_work_dir,
+                           param, comm, status )
 
         # run module on its own process (file IO communication will take place 
         # between modules)
-#        launch.run(pool_executor) 
-#        future = pool_executor.submit(launch.run())
-        future = pool_executor.submit( Launcher, library_name, mod_name,
-                                                 slot_id, module_input,
-                                                 mod_exec_name, mod_work_dir,
-                                                 param, comm, status )
+        launch.start() # this start a thread and runs the run() method of launch
 
         return runtime_module_status_file
 #----------------------- end def execute():---------------------------------------

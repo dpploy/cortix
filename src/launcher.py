@@ -18,12 +18,13 @@ import os
 import logging
 import time
 import datetime
+from threading import Thread
 import importlib
 import xml.etree.ElementTree as ElementTree
 import concurrent.futures
 #*********************************************************************************
 
-class Launcher():
+class Launcher(Thread):
     """
     The Launcher class handles the main funcitonality of stepping through the
     simulation time, and monitoring its progress.
@@ -87,10 +88,11 @@ class Launcher():
          log.error('importlib error: ', error)
 
         log.info('imported pyModule: %s', str(self.__py_module))
+
+        super(Launcher, self).__init__()
 #----------------------- end def __init__():--------------------------------------
 
-#    def run(self):
-#    def run(self, executor):
+    def run(self):
         """
         Function used to timestep through the modules.
         Runs the simulation from start to end, and monitors
@@ -222,13 +224,9 @@ class Launcher():
 
             # Data exchange at cortix_time (call ports first)
             guest_driver.call_ports(cortix_time)
-#            future = executor.submit(guest_driver.call_ports, cortix_time)
-#            while future.running(): 
-#                time.sleep(0.1)
 
             # Advance to cortix_time + time_step (call execute second)
             guest_driver.execute(cortix_time, time_step)
-#            future = executor.submit(guest_driver.execute, cortix_time, time_step)
 
             end_time = time.time()
             s = 'CPU elapsed time (s): ' + str(round(end_time - start_time, 2))

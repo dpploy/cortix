@@ -18,9 +18,6 @@ import os
 import logging
 from cortix.src.simulation import Simulation
 from cortix.src.utils.configtree import ConfigTree
-from mpi4py.futures import MPIPoolExecutor
-from concurrent.futures import ThreadPoolExecutor
-from concurrent.futures import ProcessPoolExecutor
 from cortix.src.utils.set_logger_level import set_logger_level
 #*********************************************************************************
 
@@ -31,21 +28,11 @@ class Cortix():
     the user with an interface to the simulations.
     """
 
-    def __init__(self, name=None, config_file="cortix-config.xml", pool_executor=None):
+    def __init__(self, name=None, config_file="cortix-config.xml"):
 
         assert name is not None, "must give Cortix object a name"
         assert isinstance(config_file, str), "-> configFile not a str."
         self.__config_file = config_file
-
-        assert isinstance(pool_executor,MPIPoolExecutor) or \
-               isinstance(pool_executor,ProcessPoolExecutor) or \
-               isinstance(pool_executor,ThreadPoolExecutor) 
-
-        # Only one excutor is allowed; to avoid infinite recursion.
-        # At the moment, this precludes multiple instantiations of Cortix.
-        # Todo: modify in the future if multiple instances of Cortix will be used 
-        # in the user code.
-        self.__pool_executor = pool_executor
 
         # Create a configuration tree
         self.__config_tree = ConfigTree(config_file_name=self.__config_file)
@@ -131,7 +118,7 @@ class Cortix():
         """
 
         for sim in self.__simulations: 
-            sim.execute(task_name, self.__pool_executor)
+            sim.execute(task_name)
 #----------------------- end def run_simulations():-------------------------------
 
 #*********************************************************************************
