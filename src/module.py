@@ -15,7 +15,6 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 """
 #**********************************************************************************
 import os
-from mpi4py.futures import MPIPoolExecutor
 from cortix.src.utils.configtree import ConfigTree
 from cortix.src.launcher import Launcher
 #**********************************************************************************
@@ -32,8 +31,8 @@ class Module:
             parent_work_dir, str), "-> parent_work_dir is invalid."
 
         # Inherit a configuration tree
-        assert isinstance(
-            mod_config_node, ConfigTree), "-> mod_config_node is invalid."
+        assert isinstance(mod_config_node, ConfigTree), \
+               "-> mod_config_node is invalid."
         self.__config_node = mod_config_node
 
         # Read the module name and type
@@ -225,29 +224,31 @@ class Module:
         mod_name = self.__mod_name
 
         # provide for all modules for additional work IO data
-        assert os.path.isdir(
-            full_path_comm_dir), 'module directory not available.'
+        assert os.path.isdir(full_path_comm_dir), \
+               'module directory %r not available.' % full_path_comm_dir
+ 
         mod_work_dir = full_path_comm_dir + 'wrk/'
 
         os.system('mkdir -p ' + mod_work_dir)
 
-        assert os.path.isdir(
-            mod_work_dir), 'module work directory not available.'
+        assert os.path.isdir(mod_work_dir), \
+               'module work directory %r not available.' % mod_work_dir
 
-        # only for wrapped modules
+        # only for wrapped modules (deprecated; remove in the future)
         mod_exec_name = self.__executable_path + self.__executable_name
 
-        # run module on its own thread using file IO communication
-        launch = Launcher(library_name, mod_name,
-                          slot_id,
-                          module_input,
-                          mod_exec_name,
-                          mod_work_dir,
-                          param, comm, status)
+        # the laucher "loads" the module dynamically and provides the method for
+        # threading 
+        launch = Launcher( library_name, mod_name,
+                           slot_id,
+                           module_input,
+                           mod_exec_name,
+                           mod_work_dir,
+                           param, comm, status )
 
-        # Launch an MPI process
-        executor = MPIPoolExecutor(max_workers=1)
-        future = executor.submit(launch.run())
+        # run module on its own process (file IO communication will take place 
+        # between modules)
+        launch.start() # this start a thread and runs the run() method of launch
 
         return runtime_module_status_file
 #----------------------- end def execute():---------------------------------------

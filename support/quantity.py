@@ -35,16 +35,16 @@ class Quantity():
                  unit='null-unit'
                  ):
 
-        assert isinstance(name, type(str())), 'oops not string.'
+        assert isinstance(name, str), 'oops not string.'
         self._name = name
 
-        assert isinstance(formalName, type(str())), 'oops not string.'
+        assert isinstance(formalName, str), 'oops not string.'
         self._formalName = formalName
 
-        assert isinstance(value, type(float())), 'oops not value.'
+        assert isinstance(value, float), 'oops not value.'
         self._value = value
 
-        assert isinstance(name, type(str())), 'oops not string.'
+        assert isinstance(name, str), 'oops not string.'
         self._unit = unit
 
         self._name = name

@@ -16,7 +16,6 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 #*********************************************************************************
 import os
 import logging
-from mpi4py import MPI
 from cortix.src.task import Task
 from cortix.src.application import Application
 from cortix.src.utils.configtree import ConfigTree
@@ -29,24 +28,24 @@ class Simulation:
     """
 
     def __init__(self, parent_work_dir=None, sim_config_node=ConfigTree()):
-        assert isinstance(parent_work_dir, str), "-> parentWorkDir invalid."
+        assert isinstance(parent_work_dir, str), '-> parentWorkDir invalid.'
 
         # Inherit a configuration tree
         assert isinstance(
-            sim_config_node, ConfigTree), "-> sim_config_node invalid."
+            sim_config_node, ConfigTree), '-> sim_config_node invalid.'
         self.__config_node = sim_config_node
 
         # Read the simulation name
         self.__name = sim_config_node.get_node_name()
 
         # Create the cortix/simulation work directory
-        self.__work_dir = parent_work_dir + "sim_" + self.__name + '/'
+        self.__work_dir = parent_work_dir + 'sim_' + self.__name + '/'
 
-        os.system("mkdir -p " + self.__work_dir)
+        os.system('mkdir -p ' + self.__work_dir)
 
         # Create the logging facility for each object
         node = sim_config_node.get_sub_node("logger")
-        logger_name = self.__name + ".sim"
+        logger_name = 'sim:' + self.__name 
         self.__log = logging.getLogger(logger_name)
         self.__log.setLevel(logging.NOTSET)
 
@@ -104,8 +103,8 @@ class Simulation:
         This method allows for the execution of a simulation by executing each
         task, if any. Execution proceeds one task at a time.
         """
-        self.__log.debug("start execute(%s)", task_name)
-
+        self.__log.debug("prepare to execute(%s)", task_name)
+   
         if task_name is not None:
 
             self.__setup_task(task_name)
@@ -114,10 +113,12 @@ class Simulation:
 
                 if task.name == task_name:
 
+                    self.__log.debug("call execute(%s)", task_name)
+
                     task.execute(self.__application)
 
                     self.__log.debug(
-                        "called task.execute() on task %s", task_name)
+                        'called task.execute() on task %s', task_name)
 
         self.__log.debug("end execute(%s)", task_name)
 #----------------------- end def execute():---------------------------------------
@@ -136,29 +137,25 @@ class Simulation:
         It sets up the set of tasks defined in the Cortix config for a simulation.
         """
 
-        self.__log.debug("start __setup_task()")
+        self.__log.debug('start __setup_task(%s)', task_name)
         task = None
-
-        comm = MPI.COMM_WORLD
-        # rank = comm.Get_rank()
-        # size = comm.Get_size()
-
-        cmode = MPI.MODE_WRONLY | MPI.MODE_CREATE
-        amode = MPI.MODE_WRONLY | MPI.MODE_APPEND
 
         for task_node in self.__config_node.get_all_sub_nodes('task'):
             if task_node.get('name') != task_name:
                 continue
 
             task_config_node = ConfigTree(task_node)
+
+            # create task
             task = Task(self.__work_dir, task_config_node)
+
             self.__tasks.append(task)
 
             self.__log.debug("appended task: %s", task_node.get("name"))
 
         if task is None:
             self.__log.debug('no task to exectute; done here.')
-            self.__log.debug('end __setup_task()')
+            self.__log.debug('end __setup_task(%s)', task_name)
             return
 
         networks = self.__application.networks
@@ -166,34 +163,33 @@ class Simulation:
         # create subdirectory with task name
         task_name = task.name
         task_work_dir = task.work_dir
-        assert os.path.isdir(
-            task_work_dir), "directory %r invalid." % task_work_dir
+        assert os.path.isdir(task_work_dir), "directory %r invalid." % task_work_dir
 
         # set the parameters for the task in the cortix param file
         task_file = task_work_dir + 'cortix-param.xml'
 
-        fout = MPI.File.Open(comm, task_file, cmode)
-        fout.Write(b'<?xml version="1.0" encoding="UTF-8"?>\n')
-        fout.Write(b'<!-- Written by Simulation::__setup_task() -->\n')
-        fout.Write(b'<cortix_param>\n')
+        fout = open(task_file, 'w')
+        fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+        fout.write('<!-- Written by Simulation::__setup_task() -->\n')
+        fout.write('<cortix_param>\n')
 
         start_time = task.start_time
         start_time_unit = task.start_time_unit
-        fout.Write("".join('<start_time unit="' + start_time_unit + '"' + '>' +
-                           str(start_time) + '</start_time>\n').encode())
+        fout.write('<start_time unit="' + start_time_unit + '"' + '>' +
+                           str(start_time) + '</start_time>\n')
 
         evolve_time = task.evolve_time
         evolve_time_unit = task.evolve_time_unit
-        fout.Write("".join('<evolve_time unit="' + evolve_time_unit + '"' + '>' +
-                           str(evolve_time) + '</evolve_time>\n').encode())
+        fout.write('<evolve_time unit="' + evolve_time_unit + '"' + '>' +
+                           str(evolve_time) + '</evolve_time>\n')
 
         time_step = task.time_step
         time_step_unit = task.time_step_unit
-        fout.Write("".join('<time_step unit="' + time_step_unit + '"' + '>' +
-                           str(time_step) + '</time_step>\n').encode())
+        fout.write('<time_step unit="' + time_step_unit + '"' + '>' +
+                           str(time_step) + '</time_step>\n')
 
-        fout.Write(b'</cortix_param>')
-        fout.Close()
+        fout.write('</cortix_param>')
+        fout.close()
 
         task.set_runtime_cortix_param_file(task_file)
 
@@ -240,19 +236,16 @@ class Simulation:
                         'cortix-comm.xml'
 
                     if not os.path.isdir(to_module_slot_work_dir):
-                        os.system("mkdir -p " + to_module_slot_work_dir)
+                        os.system('mkdir -p ' + to_module_slot_work_dir)
 
                     if not os.path.isfile(to_module_slot_comm_file):
-                        fout = MPI.File.Open(
-                            comm, to_module_slot_comm_file, cmode)
-                        fout.Write(b'<?xml version="1.0" encoding="UTF-8"?>\n')
-                        fout.Write(
-                            b'<!-- Written by Simulation::__setup_task() -->\n')
-                        fout.Write(b'<cortix_comm>\n')
+                        fout = open(to_module_slot_comm_file,'w')
+                        fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+                        fout.write('<!-- Written by Simulation::__setup_task() -->\n')
+                        fout.write('<cortix_comm>\n')
 
                     if to_port not in to_module_to_port_visited[to_module_slot]:
-                        fout = MPI.File.Open(
-                            comm, to_module_slot_comm_file, amode)
+                        fout = open(to_module_slot_comm_file,'a')
                         # this is the cortix info for modules providing data
                         to_port_mode = to_module.get_port_mode(to_port)
                         if to_port_mode.split('.')[0] == 'file':
@@ -266,8 +259,8 @@ class Simulation:
                         else:
                             assert False, 'invalid port mode. fatal.'
 
-                        fout.Write(log_str.encode())
-                        fout.Close()
+                        fout.write(log_str)
+                        fout.close()
                         to_module_to_port_visited[to_module_slot].append(
                             to_port)
 
@@ -310,17 +303,13 @@ class Simulation:
                             os.system('mkdir -p ' + from_module_slot_work_dir)
 
                         if not os.path.isfile(from_module_slot_comm_file):
-                            fout = MPI.File.Open(comm, from_module_slot_comm_file,
-                                                 cmode)
-                            fout.Write(
-                                b'<?xml version="1.0" encoding="UTF-8"?>\n')
-                            fout.Write(
-                                b'<!-- Written by Simulation::__setup_task() -->\n')
-                            fout.Write(b'<cortix_comm>\n')
-                            fout.Close()
+                            fout = open(from_module_slot_comm_file,'w')
+                            fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+                            fout.write('<!-- Written by Simulation::__setup_task() -->\n')
+                            fout.write('<cortix_comm>\n')
+                            fout.close() # is this right?
 
-                        fout = MPI.File.Open(
-                            comm, from_module_slot_comm_file, amode)
+                        fout = open(from_module_slot_comm_file,'a')
 
                         # this is the cortix info for modules using data
                         assert from_module.get_port_type(from_port) == 'use', \
@@ -340,8 +329,8 @@ class Simulation:
                         else:
                             assert False, 'invalid port mode. fatal.'
 
-                        fout.Write(log_str.encode())
-                        fout.Close()
+                        fout.write(log_str)
+                        fout.close()
 
                         debug_str = '__setup_task():: comm module: ' + \
                                     from_module_slot + '; network: ' + task_name + \
@@ -358,11 +347,11 @@ class Simulation:
                 comm_file = net.get_runtime_cortix_comm_file(slot_name)
                 if comm_file == 'null-runtime_cortix_comm_file':
                     continue
-                fout = MPI.File.Open(comm, comm_file, amode)
-                fout.Write(b'</cortix_comm>')
-                fout.Close()
+                fout = open(comm_file, 'a')
+                fout.write('</cortix_comm>')
+                fout.close()
 
-        self.__log.debug('end __setup_task()')
+        self.__log.debug('end __setup_task(%s)', task_name)
 #----------------------- end def __setup_task():----------------------------------
 
 #======================= end class Simulation: ===================================

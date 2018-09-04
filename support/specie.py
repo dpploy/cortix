@@ -76,16 +76,16 @@ class Specie():
                  massCC=0.0,      # default unit: g/L
                  flag=None):
 
-        assert isinstance(name, type(str())), 'oops not string.'
+        assert isinstance(name, str), 'oops not string.'
         self._name = name
 
-        assert isinstance(formulaName, type(str())), 'oops not string.'
+        assert isinstance(formulaName, str), 'oops not string.'
         self._formulaName = formulaName
 
-        assert isinstance(phase, type(str())), 'oops not string.'
+        assert isinstance(phase, str), 'oops not string.'
         self._phase = phase
 
-        assert isinstance(atoms, type(list())), 'oops not list.'
+        assert isinstance(atoms, list), 'oops not list.'
         self._atoms = atoms
 
         self._flag = flag  # flag can be any type
@@ -113,12 +113,12 @@ class Specie():
             self._massCC = 0.0
             return
 
-        assert isinstance(molarCC, type(float())), 'oops not a float.'
+        assert isinstance(molarCC, float), 'oops not a float.'
         assert molarCC >= 0.0, 'oops negative value.'
         self._molarCC = molarCC
         self._massCC = molarCC * self._molarMass
 
-        assert isinstance(massCC, type(float())), 'oops not a float.'
+        assert isinstance(massCC, float), 'oops not a float.'
         assert massCC >= 0.0, 'oops negative value.'
         if self._massCC == 0.0:
             self._massCC = massCC
@@ -135,12 +135,12 @@ class Specie():
 # These are passing arguments by value effectively. Because the python objects
 # passed into/out of the function are immutable.
 
-    def get_name(self):
+    def GetName(self):
         return self._name
 
     def SetName(self, n):
         self._name = n
-    name = property(get_name, SetName, None, None)
+    name = property(GetName, SetName, None, None)
 
     def GetFormulaName(self):
         return self._formulaName
@@ -185,11 +185,11 @@ class Specie():
         return self._molarRadioactivityFractions
 
     def SetMolarRadioactivityFractions(self, fracs):
-        assert isinstance(fracs, type(list())), 'oops not list.'
+        assert isinstance(fracs, list), 'oops not list.'
         if len(fracs) > 0:
             assert len(fracs) == len(self._atoms), 'oops not right length,'
         if len(fracs) != 0:
-            assert isinstance(fracs[-1], type(float())), 'oops not float.'
+            assert isinstance(fracs[-1], float), 'oops not float.'
         self._molarRadioactivityFractions = fracs
     molarRadioactivityFractions = property(
         GetMolarRadioactivityFractions,
@@ -249,9 +249,9 @@ class Specie():
         return self._atoms
 
     def SetAtoms(self, atoms):
-        assert isinstance(atoms, type(list())), 'oops not list.'
+        assert isinstance(atoms, list), 'oops not list.'
         if len(atoms) != 0:
-            assert isinstance(atoms[-1], type(str())), 'oops not string.'
+            assert isinstance(atoms[-1], str), 'oops not string.'
         self._atoms = atoms
         self.__UpdateMolarMass()
     atoms = property(GetAtoms, SetAtoms, None, None)
@@ -261,9 +261,9 @@ class Specie():
         return self._atoms
 
     def SetFormula(self, atoms):
-        assert isinstance(atoms, type(list())), 'oops not list.'
+        assert isinstance(atoms, list), 'oops not list.'
         if len(atoms) != 0:
-            assert isinstance(atoms[-1], type(str())), 'oops not string.'
+            assert isinstance(atoms[-1], str), 'oops not string.'
         self._atoms = atoms
         self.__UpdateMolarMass()
     formula = property(GetFormula, SetFormula, None, None)
@@ -326,7 +326,7 @@ class Specie():
             return
 
         for entry in self._atoms:
-            assert isinstance(entry, type(str())), 'oops'
+            assert isinstance(entry, str), 'oops'
             tmp = entry.split('*')
             nuclide = tmp[-1]
             element = nuclide.split('-')[0]
@@ -340,7 +340,7 @@ class Specie():
         nAtoms = 0
         summ = 0.0
         for entry in self._atoms:
-            assert isinstance(entry, type(str())), 'oops'
+            assert isinstance(entry, str), 'oops'
             # format example:  3.2*O-18, or 3*O or O or O-16
             tmp = entry.split('*')
             multiple = 1.0
@@ -394,7 +394,7 @@ class Specie():
             # save the multiplier value as a string type of scientific notation
             for entry in self._atoms:
 
-                assert isinstance(entry, type(str())), 'oops'
+                assert isinstance(entry, str), 'oops'
 
                 # format example:  3.2*O-18, or 3*O or O or O-16
                 tmp = entry.split('*')

@@ -41,19 +41,19 @@ class Stream():
         # constructor
         # THIS WILL CREATE AN ORDERED "STREAM"; values must be in order!
 
-        assert isinstance(timeStamp, type(float()))
+        assert isinstance(timeStamp, float)
 
         self.timeStamp = timeStamp
 
         if species is not None:
-            assert isinstance(species, type(list()))
+            assert isinstance(species, list)
             if len(species) > 0:
-                assert isinstance(species[-1], type(Specie()))
+                assert isinstance(species[-1], Specie)
 
         if quantities is not None:
-            assert isinstance(quantities, type(list()))
+            assert isinstance(quantities, list)
             if len(quantities) > 0:
-                assert isinstance(quantities[-1], type(Quantity()))
+                assert isinstance(quantities[-1], Quantity)
 
 #  assert type(value) == type(float())
 
@@ -72,12 +72,12 @@ class Stream():
 # ORDERED data; caution!!
 # Table data stream
         self.stream = pandas.DataFrame(index=[timeStamp], columns=names)
-        if isinstance(values, type(float())):
+        if isinstance(values, float):
             self.stream.fillna(values, inplace=True)
         else:
             self.stream.fillna(0.0, inplace=True)
 
-        if isinstance(values, type(list())) and len(values) == len(names):
+        if isinstance(values, list) and len(values) == len(names):
             for (name, val) in zip(names, values):
                 self.stream.loc[timeStamp, name] = val
 

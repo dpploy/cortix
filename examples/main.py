@@ -40,8 +40,7 @@ def main():
 
     if (rank == 0):
         cortix1 = Cortix('cortix1', full_path_config_file)
-        cortix1.run_simulations(
-            task_name='solo-pyplot')  # see cortix-config.xml
+        cortix1.run_simulations( task_name='solo-pyplot')  # see cortix-config.xml
 
 #  cortix1 = Cortix( 'cortix1', full_path_config_file )
 #  cortix1.run_simulations( task_name='solo-fueldepot' ) # see cortix-config.xml
@@ -49,6 +48,5 @@ def main():
 
 
 # *********************************************************************************
-# Usage: -> python cortix-main.py or ./cortix-main.py
 if __name__ == "__main__":
     main()

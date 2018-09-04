@@ -34,10 +34,10 @@ class Task:
 
         # Inherit a configuration tree
         assert isinstance(task_config_node, ConfigTree), \
-            '-> task_config_node not a ConfigTree.'
+            '-> task_config_node not a ConfigTree: %r.' % type(task_config_node)
         self.__config_node = task_config_node
 
-        # Read the simulation name
+        # Read the task name
         self.__name = self.__config_node.get_node_name()
 
         # Set the work directory (previously created)
@@ -47,7 +47,7 @@ class Task:
 
         # Create the logging facility for the object
         node = task_config_node.get_sub_node('logger')
-        logger_name = self.__name
+        logger_name = 'task:'+self.__name
         self.__log = logging.getLogger(logger_name)
         self.__log.setLevel(logging.NOTSET)
 
@@ -137,22 +137,28 @@ class Task:
         runtime_status_files = dict()
 
         for slot_name in network.slot_names:
+
             module_name = slot_name.split('_')[0]
             slot_id = int(slot_name.split('_')[1])
-            mod = application.get_module(module_name)
+
+            module = application.get_module(module_name)
             param_file = self.__runtime_cortix_param_file
             comm_file = network.get_runtime_cortix_comm_file(slot_name)
 
             # Run module in the slot
-            status_file = mod.execute(slot_id, param_file, comm_file)
+            self.__log.info('call execute on module: %s:%s',module_name,slot_id)
 
-            assert status_file is not None, 'module launching failed.'
+            status_file = module.execute(slot_id, param_file, comm_file)
+
+            assert status_file is not None, \
+                   'module launching failed; module name: %r' % module_name
+
             runtime_status_files[slot_name] = status_file
 
         # monitor runtime status
         status = 'running'
         while status == 'running':
-            time.sleep(10)  # hard coded; fix me.
+            time.sleep(5)  # hard coded; fix me.
             (status, slot_names) = self.__get_runtime_status(runtime_status_files)
             self.__log.info('runtime status: %s; module slots running: %s', status,
                           str(slot_names))
@@ -259,6 +265,8 @@ class Task:
     def __get_runtime_status(self, runtime_status_files):
         """
         Helper funcion for montioring the status of the task.
+        It reads the status files of all modules and reports which ones are still
+        running.
         """
 
         task_status = 'finished'

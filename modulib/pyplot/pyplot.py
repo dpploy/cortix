@@ -64,10 +64,8 @@ class PyPlot():
             finalTime, float), '-> time type %r is invalid.' % type(finalTime)
 
         # Logger
-        self.log = logging.getLogger(
-            'launcher-viz.pyplot_' +
-            str(slotId) +
-            '.cortixdriver.pyplot')
+        self.log = logging.getLogger('launcher-modulib.pyplot_' + str(slotId) +
+                                     '.cortix_driver.pyplot')
         self.log.info('initializing an object of PyPlot()')
 
         # Member data
@@ -203,14 +201,14 @@ class PyPlot():
             if portFile is None:
                 return None
 
-            maxNTrials = 50
-            nTrials = 0
-            while os.path.isfile(portFile) is False and nTrials <= maxNTrials:
-                nTrials += 1
+            max_n_trials = 50
+            n_trials = 0
+            while os.path.isfile(portFile) is False and n_trials <= max_n_trials:
+                n_trials += 1
                 time.sleep(0.1)
 
-            if nTrials >= 10:
-                s = '__get_port_file(): waited ' + str(nTrials) + \
+            if n_trials > max_n_trials:
+                s = '__get_port_file(): waited ' + str(n_trials) + \
                     ' trials for port: ' + portFile
                 self.log.warn(s)
 

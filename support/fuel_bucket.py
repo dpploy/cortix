@@ -32,8 +32,7 @@ class FuelBucket():
                  specs=pandas.DataFrame()
                 ):
 
-        assert isinstance(specs, type(pandas.DataFrame())
-                          ), 'oops not pandas table.'
+        assert isinstance(specs, pandas.DataFrame), 'oops not pandas table.'
 
         self.__specs = specs
 
