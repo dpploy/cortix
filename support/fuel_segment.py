@@ -92,6 +92,7 @@ class FuelSegment():
 
         if nuclide is not None:
             assert isinstance(nuclide,str), 'type(nuclide) = %r' % type(nuclide)
+            # no multipliers for now (see below: codes is almost ready for it)
             assert len(nuclide.split('*')) == 1, 'nuclide = %r' % nuclide # sanity check
 
         if nuclide is not None:
@@ -259,7 +260,7 @@ class FuelSegment():
 
 # .................................................................................
 # get specific nuclide (either the isotopes of the nuclide or the specific
-# isotope) property
+# isotope) property: note the most complex case handled is, say: 2*Cs-133.
 
         if nuclide is not None:
 
