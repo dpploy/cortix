@@ -78,7 +78,7 @@ class Network:
 
     def __get_name(self):
         """
-        Returns the network name
+        `str`:Network name
         """
 
         return self.__name
@@ -87,7 +87,7 @@ class Network:
 
     def __get_connectivity(self):
         """
-        Returns a list of the network connectivity
+        `list(dict)`:List of the network connectivity
         """
 
         return self.__connectivity
@@ -96,7 +96,7 @@ class Network:
 
     def __get_slot_names(self):
         """
-        Returns a list of the network's slot names.
+        `list(str)`:List of network slot names
         """
 
         return self.__slot_names
@@ -125,7 +125,7 @@ class Network:
 
     def __get_nx_graph(self):
         """
-        Returns the NXGraph corresponding the network
+        `str`:NXGraph corresponding to network
         """
 
         return self.__nx_graph

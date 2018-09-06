@@ -166,7 +166,7 @@ class Task:
 
     def __get_name(self):
         """
-        Returns the name of the task.
+        `str`:Task name
         """
 
         return self.__name
@@ -175,8 +175,7 @@ class Task:
 
     def __get_work_dir(self):
         """
-        Returns the working directory
-        of the task specification.
+        `str`:Working directory of task specification
         """
 
         return self.__work_dir
@@ -185,7 +184,7 @@ class Task:
 
     def __get_start_time(self):
         """
-        Returns the task's initial time
+        `float`:Task initial time
         """
 
         return self.__start_time
@@ -194,7 +193,7 @@ class Task:
 
     def __get_start_time_unit(self):
         """
-        Returns the unit of the task's initial time
+        `str`:Task initial time unit
         """
 
         return self.__start_time_unit
@@ -203,7 +202,7 @@ class Task:
 
     def __get_evolve_time(self):
         """
-        Returns the tasks's final time
+        `float`:Task final time
         """
 
         return self.__evolve_time
@@ -212,7 +211,7 @@ class Task:
 
     def __get_evolve_time_unit(self):
         """
-        Returns the unit of the task's final time.
+        `str`:Task final time unit
         """
 
         return self.__evolve_time_unit
@@ -221,8 +220,7 @@ class Task:
 
     def __get_time_step(self):
         """
-        Returns the magnitude of an incremental step
-        in the task's time.
+        `float`:Magnitude of incremental step in the task's time
         """
 
         return self.__time_step
@@ -231,7 +229,7 @@ class Task:
 
     def __get_time_step_unit(self):
         """
-        Returns the unit of the tasks's time step
+        `str`:Time step unit
         """
 
         return self.__time_step_unit
@@ -248,7 +246,7 @@ class Task:
 
     def __get_runtime_cortix_param_file(self):
         """
-        Returns the taks's config file.
+        `str`:Task's config file
         """
 
         return self.__runtime_cortix_param_file

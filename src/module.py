@@ -39,7 +39,7 @@ class Module:
         self.__mod_name = self.__config_node.get_node_name()
         self.__mod_type = self.__config_node.get_node_type()
 
-        # Specify module library with upstream information 
+        # Specify module library with upstream information
         self.__library_parent_dir = library_parent_dir
         self.__library_name = library_name
 
@@ -123,7 +123,7 @@ class Module:
 
     def __get_name(self):
         """
-        Returns the module name
+        `str`:Module name
         """
 
         return self.__mod_name
@@ -132,7 +132,7 @@ class Module:
 
     def __get_library_name(self):
         """
-        Returns the module's library name.
+        `str`:Module library name
         """
 
         return self.__library_name
@@ -141,7 +141,7 @@ class Module:
 
     def __get_library_parent_dir(self):
         """
-        Returns the library's parent directory.
+        `str`:Library parent directory
         """
 
         return self.__library_parent_dir
@@ -159,7 +159,7 @@ class Module:
 
     def get_port_type(self, port_name):
         """
-        Retuns the port type specified by port_name
+        Returns the port type specified by port_name
         """
 
         port_type = None
@@ -183,7 +183,7 @@ class Module:
 
     def __get_port_names(self):
         """
-        Returns a list containing the name of all of the module's ports
+        `list(tuple)`:List of names of module's ports
         """
 
         port_names = list()
@@ -195,7 +195,7 @@ class Module:
 
     def has_port_name(self, port_name):
         """
-        Returns true iff a port with the name
+        Returns true if a port with the name
         port_name is available in the module.
         """
 
@@ -226,7 +226,7 @@ class Module:
         # provide for all modules for additional work IO data
         assert os.path.isdir(full_path_comm_dir), \
                'module directory %r not available.' % full_path_comm_dir
- 
+
         mod_work_dir = full_path_comm_dir + 'wrk/'
 
         os.system('mkdir -p ' + mod_work_dir)
@@ -238,7 +238,7 @@ class Module:
         mod_exec_name = self.__executable_path + self.__executable_name
 
         # the laucher "loads" the module dynamically and provides the method for
-        # threading 
+        # threading
         launch = Launcher( library_name, mod_name,
                            slot_id,
                            module_input,
@@ -246,7 +246,7 @@ class Module:
                            mod_work_dir,
                            param, comm, status )
 
-        # run module on its own process (file IO communication will take place 
+        # run module on its own process (file IO communication will take place
         # between modules)
         launch.start() # this start a thread and runs the run() method of launch
 

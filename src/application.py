@@ -28,26 +28,6 @@ class Application:
     An Application is a singleton class composed of Module objects, and Network
     objects; the latter involve Module objects in various combinations. Each
     combination is assigned to a Network object.
-
-    Attributes
-    ----------
-     networks: list(str)
-         List of names of network objects.
-     network: `Network`
-         Network object.
-     modules: list(str)
-         List of names of Cortix Module objects.
-     module: `Module`
-         Cortix Module object.
-
-    Note
-    ----
-      Add type annotation to all methods?
-
-      Here is some math:
-
-      .. math::
-          k = \alpha\,e^{-\frac{\Delta G}{R T}}
     """
 
     def __init__(self, app_work_dir=None, app_config_node=ConfigTree()):
@@ -138,7 +118,7 @@ class Application:
 
     def __get_networks(self):
         """
-        Returns a list of the application's networks.
+        `list(str)`:List of names of network objects
         """
 
         return self.__networks
@@ -158,7 +138,7 @@ class Application:
 
     def __get_modules(self):
         """
-        Returns a list of the application's modules
+        `list(str)`:List of names of Cortix module objects
         """
 
         return self.__modules
