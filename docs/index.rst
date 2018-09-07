@@ -11,12 +11,10 @@ Table of Contents
 -----------------
 .. toctree::
    src_rst/modules
-   src_rst/utils_rst/modules
    support_rst/modules
    modulib_rst/modules
    examples_rst/modules
-   examples_rst/input_rst/modules
-   :maxdepth: 4
+   :maxdepth: 2
 
 Indices and tables
 ==================

@@ -2,8 +2,10 @@
 
 # This file is used to build the sphinx documentation
 
+# Editing of the generated .rst files may be necessary when adding new files
+
 # Clean up
-rm -rf *_rst
+# rm -rf *_rst
 
 # Update the readme.md convert
 pandoc -f markdown_github -t rst -o readme_converted.rst ../README.md
@@ -24,7 +26,10 @@ sphinx-apidoc -o src_rst/utils_rst ../src/utils
 sphinx-apidoc -o support_rst ../support
 
 # Build docs for modulib directory
-sphinx-apidoc -o modulib_rst ../modulib/pyplot
+sphinx-apidoc -o modulib_rst
+
+# Build docs for pyplot subdirectory
+sphinx-apidoc -o modulib_rst/pyplot_rst ../modulib/pyplot
 
 # Build docs for examples directory
 sphinx-apidoc -o examples_rst ../examples
