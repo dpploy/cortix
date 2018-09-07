@@ -1,5 +1,3 @@
-======
-
 |image1|
 
 What is Cortix?
