@@ -1,5 +1,5 @@
-simulation module
-=================
+simulation
+==========
 
 .. automodule:: simulation
     :members:

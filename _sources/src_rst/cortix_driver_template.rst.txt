@@ -1,5 +1,5 @@
-cortix\_driver\_template module
-===============================
+cortix\_driver\_template
+========================
 
 .. automodule:: cortix_driver_template
     :members:

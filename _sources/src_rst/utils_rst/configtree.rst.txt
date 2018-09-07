@@ -1,5 +1,5 @@
-configtree module
-=================
+configtree
+==========
 
 .. automodule:: configtree
     :members:

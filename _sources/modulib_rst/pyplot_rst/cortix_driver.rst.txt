@@ -1,5 +1,5 @@
-cortix\_driver module
-=====================
+cortix\_driver
+==============
 
 .. automodule:: cortix_driver
     :members:

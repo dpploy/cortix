@@ -1,5 +1,5 @@
-specie module
-=============
+specie
+======
 
 .. automodule:: specie
     :members:

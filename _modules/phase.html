@@ -100,19 +100,19 @@
 
         <span class="k">if</span> <span class="n">timeStamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">timeStamp</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">timeStamp</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">float</span><span class="p">()))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">timeStamp</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">species</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">species</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">list</span><span class="p">()))</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">species</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">species</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">species</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nb">type</span><span class="p">(</span><span class="n">Specie</span><span class="p">()))</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">species</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">Specie</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">quantities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quantities</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">list</span><span class="p">()))</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quantities</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">quantities</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quantities</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="nb">type</span><span class="p">(</span><span class="n">Quantity</span><span class="p">()))</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quantities</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">Quantity</span><span class="p">)</span>
 
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">float</span><span class="p">()))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
 
 <span class="c1"># List of species and quantities objects; columns of data frame are named</span>
 <span class="c1"># by objects</span>
@@ -179,7 +179,7 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Phase.AddSpecie"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.AddSpecie">[docs]</a>    <span class="k">def</span> <span class="nf">AddSpecie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newSpecie</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">newSpecie</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">Specie</span><span class="p">()))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">newSpecie</span><span class="p">,</span> <span class="n">Specie</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">newSpecie</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> <span class="s1">&#39;quantity: </span><span class="si">%r</span><span class="s1"> exists. Current names: </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">newQuant</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="n">speciesFormulae</span> <span class="o">=</span> <span class="p">[</span><span class="n">specie</span><span class="o">.</span><span class="n">formulaName</span> <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_species</span><span class="p">]</span>
@@ -195,7 +195,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Phase.AddQuantity"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.AddQuantity">[docs]</a>    <span class="k">def</span> <span class="nf">AddQuantity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newQuant</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">newQuant</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">Quantity</span><span class="p">()))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">newQuant</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">newQuant</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> <span class="s1">&#39;quantity: </span><span class="si">%r</span><span class="s1"> exists. Current names: </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">newQuant</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="n">quantFormalNames</span> <span class="o">=</span> <span class="p">[</span><span class="n">quant</span><span class="o">.</span><span class="n">formalName</span> <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quantities</span><span class="p">]</span>
@@ -288,13 +288,13 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">assert</span> <span class="n">timeStamp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;missing timeStamp = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
                 <span class="n">timeStamp</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">str</span><span class="p">()))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span><span class="o">.</span><span class="n">columns</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">actor</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Phase.WriteHTML"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.WriteHTML">[docs]</a>    <span class="k">def</span> <span class="nf">WriteHTML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">):</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="nb">str</span><span class="p">()))</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_phase</span><span class="p">)</span>
         <span class="n">columnNames</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">columns</span>
         <span class="n">speciesNames</span> <span class="o">=</span> <span class="p">[</span><span class="n">specie</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_species</span><span class="p">]</span>
@@ -338,7 +338,6 @@
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../src_rst/modules.html">src</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../src_rst/utils_rst/modules.html">utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>

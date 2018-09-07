@@ -1,4 +1,6 @@
-|image0|
+======
+
+|image1|
 
 What is Cortix?
 ---------------
@@ -97,5 +99,7 @@ Documentation
 
 -  Gilberto E. Alas: gilberto\_\ alas@student.uml.edu
 
-.. |image0| image:: cortix-cover.png
+.. |Build Status| image:: https://travis-ci.org/dpploy/cortix.svg?branch=master
+   :target: https://travis-ci.org/dpploy/cortix
+.. |image1| image:: cortix-cover.png
 

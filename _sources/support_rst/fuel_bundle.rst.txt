@@ -1,7 +1,7 @@
-pyplot module
-=============
+fuel\_bundle
+============
 
-.. automodule:: pyplot
+.. automodule:: fuel_bundle
     :members:
     :undoc-members:
     :show-inheritance:

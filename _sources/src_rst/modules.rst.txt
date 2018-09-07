@@ -2,7 +2,7 @@ src
 ===
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
    application
    cortix_driver_template
@@ -12,3 +12,4 @@ src
    network
    simulation
    task
+   utils_rst/modules.rst

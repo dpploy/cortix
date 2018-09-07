@@ -1,7 +1,0 @@
-fuelsegment module
-==================
-
-.. automodule:: fuelsegment
-    :members:
-    :undoc-members:
-    :show-inheritance:

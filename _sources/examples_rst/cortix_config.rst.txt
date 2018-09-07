@@ -1,4 +1,0 @@
-cortix_config
-=============
-
-.. literalinclude:: ../../examples/input/cortix-config.xml

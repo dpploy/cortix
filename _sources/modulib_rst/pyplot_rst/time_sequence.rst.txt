@@ -1,5 +1,5 @@
-time\_sequence module
-=====================
+time\_sequence
+==============
 
 .. automodule:: time_sequence
     :members:

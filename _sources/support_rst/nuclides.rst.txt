@@ -1,5 +1,5 @@
-nuclides module
-===============
+nuclides
+========
 
 .. automodule:: nuclides
     :members:

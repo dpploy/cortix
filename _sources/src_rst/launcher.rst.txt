@@ -1,5 +1,5 @@
-launcher module
-===============
+launcher
+========
 
 .. automodule:: launcher
     :members:

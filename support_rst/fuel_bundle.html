@@ -1,0 +1,371 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>fuel_bundle &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="fuel_segment" href="fuel_segment.html" />
+    <link rel="prev" title="fuel_bucket" href="fuel_bucket.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fuel_segment.html" title="fuel_segment"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="fuel_bucket.html" title="fuel_bucket"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">support</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-fuel_bundle">
+<span id="fuel-bundle"></span><h1>fuel_bundle<a class="headerlink" href="#module-fuel_bundle" title="Permalink to this headline">¶</a></h1>
+<p>This FuelBundle class is a container for usage with other plant-level process modules.
+It is meant to represent a fuel bundle of an oxide fuel LWR reactor.
+There are three main data structures:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li>fuel bundle specs</li>
+<li>solid phase</li>
+<li>gas phase</li>
+</ol>
+</div></blockquote>
+<p>The container user will have to provide all the data and from then on, this class
+will help acess the data.
+The printing methods reveal the contained data.</p>
+<p>Author: Valmor de Almeida <a class="reference external" href="mailto:dealmeidav&#37;&#52;&#48;ornl&#46;gov">dealmeidav<span>&#64;</span>ornl<span>&#46;</span>gov</a>; vfda
+Sun Dec 27 15:06:55 EST 2015</p>
+<dl class="class">
+<dt id="fuel_bundle.FuelBundle">
+<em class="property">class </em><code class="descclassname">fuel_bundle.</code><code class="descname">FuelBundle</code><span class="sig-paren">(</span><em>specs=Empty DataFrame Columns: [] Index: []</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.fresh_u235_mass">
+<code class="descname">fresh_u235_mass</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fresh_u235_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.fresh_u238_mass">
+<code class="descname">fresh_u238_mass</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fresh_u238_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.fresh_u_mass">
+<code class="descname">fresh_u_mass</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fresh_u_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.fuel_enrichment">
+<code class="descname">fuel_enrichment</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_enrichment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.fuel_mass">
+<code class="descname">fuel_mass</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.fuel_mass_unit">
+<code class="descname">fuel_mass_unit</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_mass_unit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.fuel_pin_length">
+<code class="descname">fuel_pin_length</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_pin_length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.fuel_pin_radius">
+<code class="descname">fuel_pin_radius</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_pin_radius" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.fuel_pin_volume">
+<code class="descname">fuel_pin_volume</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_pin_volume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.fuel_radioactivity">
+<code class="descname">fuel_radioactivity</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_radioactivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.fuel_rod_od">
+<code class="descname">fuel_rod_od</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_rod_od" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.fuel_volume">
+<code class="descname">fuel_volume</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_volume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.gamma_pwr">
+<code class="descname">gamma_pwr</code><a class="headerlink" href="#fuel_bundle.FuelBundle.gamma_pwr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.gas_mass">
+<code class="descname">gas_mass</code><a class="headerlink" href="#fuel_bundle.FuelBundle.gas_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.gas_phase">
+<code class="descname">gas_phase</code><a class="headerlink" href="#fuel_bundle.FuelBundle.gas_phase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.gas_radioactivity">
+<code class="descname">gas_radioactivity</code><a class="headerlink" href="#fuel_bundle.FuelBundle.gas_radioactivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_fresh_U235_mass">
+<code class="descname">get_fresh_U235_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_fresh_U235_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fresh_U235_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_fresh_u238_mass">
+<code class="descname">get_fresh_u238_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_fresh_u238_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fresh_u238_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_fresh_u_mass">
+<code class="descname">get_fresh_u_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_fresh_u_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fresh_u_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_fuel_enrichment">
+<code class="descname">get_fuel_enrichment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_fuel_enrichment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_enrichment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_fuel_mass">
+<code class="descname">get_fuel_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_fuel_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_fuel_mass_unit">
+<code class="descname">get_fuel_mass_unit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_fuel_mass_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_mass_unit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_fuel_pin_length">
+<code class="descname">get_fuel_pin_length</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_fuel_pin_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_pin_length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_fuel_pin_radius">
+<code class="descname">get_fuel_pin_radius</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_fuel_pin_radius"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_pin_radius" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_fuel_pin_volume">
+<code class="descname">get_fuel_pin_volume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_fuel_pin_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_pin_volume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_fuel_radioactivity">
+<code class="descname">get_fuel_radioactivity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_fuel_radioactivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_radioactivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_fuel_rod_od">
+<code class="descname">get_fuel_rod_od</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_fuel_rod_od"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_rod_od" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_fuel_volume">
+<code class="descname">get_fuel_volume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_fuel_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_volume" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_gamma_pwr">
+<code class="descname">get_gamma_pwr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_gamma_pwr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_gamma_pwr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_gas_mass">
+<code class="descname">get_gas_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_gas_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_gas_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_gas_phase">
+<code class="descname">get_gas_phase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_gas_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_gas_phase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_gas_radioactivity">
+<code class="descname">get_gas_radioactivity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_gas_radioactivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_gas_radioactivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_heat_pwr">
+<code class="descname">get_heat_pwr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_heat_pwr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_heat_pwr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_n_fuel_rods">
+<code class="descname">get_n_fuel_rods</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_n_fuel_rods"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_n_fuel_rods" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_name">
+<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_radioactivity">
+<code class="descname">get_radioactivity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_radioactivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_radioactivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.get_solid_phase">
+<code class="descname">get_solid_phase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.get_solid_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_solid_phase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.heat_pwr">
+<code class="descname">heat_pwr</code><a class="headerlink" href="#fuel_bundle.FuelBundle.heat_pwr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.n_fuel_rods">
+<code class="descname">n_fuel_rods</code><a class="headerlink" href="#fuel_bundle.FuelBundle.n_fuel_rods" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.name">
+<code class="descname">name</code><a class="headerlink" href="#fuel_bundle.FuelBundle.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.radioactivity">
+<code class="descname">radioactivity</code><a class="headerlink" href="#fuel_bundle.FuelBundle.radioactivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.set_fuel_pin_length">
+<code class="descname">set_fuel_pin_length</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.set_fuel_pin_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.set_fuel_pin_length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.set_gas_phase">
+<code class="descname">set_gas_phase</code><span class="sig-paren">(</span><em>phase</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.set_gas_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.set_gas_phase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bundle.FuelBundle.set_solid_phase">
+<code class="descname">set_solid_phase</code><span class="sig-paren">(</span><em>phase</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bundle.html#FuelBundle.set_solid_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.set_solid_phase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="fuel_bundle.FuelBundle.solid_phase">
+<code class="descname">solid_phase</code><a class="headerlink" href="#fuel_bundle.FuelBundle.solid_phase" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../src_rst/modules.html">src</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">support</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="actor.html">actor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fuel_bucket.html">fuel_bucket</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">fuel_bundle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fuel_segment.html">fuel_segment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fuelsegmentsgroups.html">fuelsegmentsgroups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fuelslug.html">fuelslug</a></li>
+<li class="toctree-l2"><a class="reference internal" href="nuclides.html">nuclides</a></li>
+<li class="toctree-l2"><a class="reference internal" href="periodictable.html">periodictable</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phase.html">phase</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quantity.html">quantity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specie.html">specie</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stream.html">stream</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="fuel_segment.html" title="fuel_segment"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="fuel_bucket.html" title="fuel_bucket"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >support</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Valmor F. de Almeida.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+    </div>
+  </body>
+</html>

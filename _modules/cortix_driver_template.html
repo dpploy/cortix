@@ -74,7 +74,6 @@
 <span class="c1">#from .my_module import MyModule</span>
 <span class="c1">#*************************************************************************</span>
 
-
 <div class="viewcode-block" id="CortixDriverTemplate"><a class="viewcode-back" href="../src_rst/cortix_driver_template.html#cortix_driver_template.CortixDriverTemplate">[docs]</a><span class="k">class</span> <span class="nc">CortixDriverTemplate</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">     Cortix driver for guest modules.</span>
@@ -102,18 +101,18 @@
             <span class="n">cortix_final_time</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;-&gt; time type </span><span class="si">%r</span><span class="s1"> is invalid.&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">cortix_final_time</span><span class="p">)</span>
 
         <span class="c1"># Logging</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span>
             <span class="s1">&#39;launcher-mymodule&#39;</span> <span class="o">+</span>
             <span class="nb">str</span><span class="p">(</span><span class="n">slot_id</span><span class="p">)</span> <span class="o">+</span>
             <span class="s1">&#39;.cortixdriver&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;initializing an object of CortixDriver()&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;initializing an object of CortixDriver()&#39;</span><span class="p">)</span>
 
         <span class="c1"># Guest library module: MyModule</span>
         <span class="c1"># uncomment</span>
         <span class="c1"># self.my_module = MyModule( slot_id, input_full_path_file_name, work_dir, ports,</span>
         <span class="c1">#                            cortix_start_time, cortix_final_time )</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">time_stamp</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># temporary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__time_stamp</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># temporary</span>
 
         <span class="k">return</span>
 <span class="c1">#---------------------- end def __init__():-------------------------------</span>
@@ -153,20 +152,20 @@
 
     <span class="k">def</span> <span class="nf">__log_debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">facility_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">caller</span><span class="o">=</span><span class="s1">&#39;null-function-name&#39;</span><span class="p">):</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_stamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__time_stamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
             <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;==========================================================&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
             <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;CORTIX::DRIVER-&gt;***-&gt;DRIVER-&gt;***-&gt;DRIVER-&gt;***-&gt;DRIVER-&gt;***&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
             <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;==========================================================&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
             <span class="n">s</span> <span class="o">=</span> <span class="n">caller</span> <span class="o">+</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">facility_time</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;[min]):&#39;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">time_stamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__time_stamp</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
         <span class="k">else</span><span class="p">:</span>
 
@@ -174,13 +173,13 @@
 
             <span class="n">s</span> <span class="o">=</span> <span class="n">caller</span> <span class="o">+</span> <span class="s1">&#39;(&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">facility_time</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;[min]): &#39;</span>
             <span class="n">m</span> <span class="o">=</span> <span class="s1">&#39;CPU elapsed time (s): &#39;</span> <span class="o">+</span> \
-                <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">end_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_stamp</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="n">m</span><span class="p">)</span>
+                <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">end_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__time_stamp</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span> <span class="o">+</span> <span class="n">m</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">time_stamp</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__time_stamp</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="n">caller</span> <span class="o">==</span> <span class="s1">&#39;execute&#39;</span><span class="p">:</span>
                 <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
         <span class="k">return</span></div>
 <span class="c1">#---------------------- end def __log_debug():----------------------------</span>
@@ -196,7 +195,6 @@
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../src_rst/modules.html">src</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../src_rst/utils_rst/modules.html">utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>

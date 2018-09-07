@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>module module &#8212; Cortix 0.1.0 documentation</title>
+    <title>module &#8212; Cortix 0.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -23,8 +23,8 @@
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="network module" href="network.html" />
-    <link rel="prev" title="launcher module" href="launcher.html" /> 
+    <link rel="next" title="network" href="network.html" />
+    <link rel="prev" title="launcher" href="launcher.html" /> 
   </head>
   <body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -37,10 +37,10 @@
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="network.html" title="network module"
+          <a href="network.html" title="network"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="launcher.html" title="launcher module"
+          <a href="launcher.html" title="launcher"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">src</a> &#187;</li> 
@@ -53,12 +53,12 @@
           <div class="body" role="main">
             
   <div class="section" id="module-module">
-<span id="module-module"></span><h1>module module<a class="headerlink" href="#module-module" title="Permalink to this headline">¶</a></h1>
+<span id="module"></span><h1>module<a class="headerlink" href="#module-module" title="Permalink to this headline">¶</a></h1>
 <p>Cortix Module class defintion.</p>
 <p>Cortix: a program for system-level modules coupling, execution, and analysis.</p>
 <dl class="class">
 <dt id="module.Module">
-<em class="property">class </em><code class="descclassname">module.</code><code class="descname">Module</code><span class="sig-paren">(</span><em>parent_work_dir=None</em>, <em>mod_lib_name=None</em>, <em>mod_lib_parent_dir=None</em>, <em>mod_config_node=&lt;cortix.src.utils.configtree.ConfigTree object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">module.</code><code class="descname">Module</code><span class="sig-paren">(</span><em>parent_work_dir=None</em>, <em>library_name=None</em>, <em>library_parent_dir=None</em>, <em>mod_config_node=&lt;cortix.src.utils.configtree.ConfigTree object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>The Module class encapsulates a computational module of some scientific domain.</p>
 <dl class="method">
@@ -68,52 +68,52 @@
 </dd></dl>
 
 <dl class="method">
-<dt id="module.Module.get_library_name">
-<code class="descname">get_library_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_library_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_library_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the module’s library name.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="module.Module.get_library_parent_dir">
-<code class="descname">get_library_parent_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_library_parent_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_library_parent_dir" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the library’s parent directory.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="module.Module.get_name">
-<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the module name</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="module.Module.get_port_mode">
 <code class="descname">get_port_mode</code><span class="sig-paren">(</span><em>port_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_port_mode"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_port_mode" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the port mode specified by port_name</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="module.Module.get_port_names">
-<code class="descname">get_port_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_port_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_port_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list containing the name of all of the module’s ports</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="module.Module.get_port_type">
 <code class="descname">get_port_type</code><span class="sig-paren">(</span><em>port_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_port_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_port_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retuns the port type specified by port_name</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="module.Module.get_ports">
-<code class="descname">get_ports</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_ports" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a list of the module’s ports.</p>
+<dd><p>Returns the port type specified by port_name</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="module.Module.has_port_name">
 <code class="descname">has_port_name</code><span class="sig-paren">(</span><em>port_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.has_port_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.has_port_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns true iff a port with the name
+<dd><p>Returns true if a port with the name
 port_name is available in the module.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.library_name">
+<code class="descname">library_name</code><a class="headerlink" href="#module.Module.library_name" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>str</cite> – Module library name</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.library_parent_dir">
+<code class="descname">library_parent_dir</code><a class="headerlink" href="#module.Module.library_parent_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>str</cite> – Library parent directory</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.name">
+<code class="descname">name</code><a class="headerlink" href="#module.Module.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>str</cite> – Module name</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.port_names">
+<code class="descname">port_names</code><a class="headerlink" href="#module.Module.port_names" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>list(tuple)</cite> – List of names of module’s ports</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.ports">
+<code class="descname">ports</code><a class="headerlink" href="#module.Module.ports" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>list(tuple)</cite> – Module’s ports</p>
 </dd></dl>
 
 </dd></dl>
@@ -129,17 +129,17 @@ port_name is available in the module.</p>
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="application.html">application module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cortix_driver_template.html">cortix_driver_template module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cortix_main.html">cortix_main module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="launcher.html">launcher module</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">module module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="network.html">network module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="simulation.html">simulation module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="task.html">task module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="application.html">application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cortix_driver_template.html">cortix_driver_template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cortix_main.html">cortix_main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="launcher.html">launcher</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="network.html">network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulation.html">simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task.html">task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils_rst/modules.html">utils</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="utils_rst/modules.html">utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>
@@ -169,10 +169,10 @@ port_name is available in the module.</p>
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="network.html" title="network module"
+          <a href="network.html" title="network"
              >next</a> |</li>
         <li class="right" >
-          <a href="launcher.html" title="launcher module"
+          <a href="launcher.html" title="launcher"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li> 

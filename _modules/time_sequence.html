@@ -77,7 +77,7 @@
 <span class="c1"># *********************************************************************************</span>
 
 
-<div class="viewcode-block" id="TimeSequence"><a class="viewcode-back" href="../modulib_rst/time_sequence.html#time_sequence.TimeSequence">[docs]</a><span class="k">class</span> <span class="nc">TimeSequence</span><span class="p">():</span>
+<div class="viewcode-block" id="TimeSequence"><a class="viewcode-back" href="../modulib_rst/pyplot_rst/time_sequence.html#time_sequence.TimeSequence">[docs]</a><span class="k">class</span> <span class="nc">TimeSequence</span><span class="p">():</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">fileName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>   <span class="c1"># full path file name</span>
@@ -122,21 +122,21 @@
 <span class="c1"># Accessors (note: all accessors of member data can potentially change the</span>
 <span class="c1"># python object referenced to). See NB below.</span>
 
-<div class="viewcode-block" id="TimeSequence.get_name"><a class="viewcode-back" href="../modulib_rst/time_sequence.html#time_sequence.TimeSequence.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TimeSequence.get_name"><a class="viewcode-back" href="../modulib_rst/pyplot_rst/time_sequence.html#time_sequence.TimeSequence.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">root</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TimeSequence.GetTimeUnit"><a class="viewcode-back" href="../modulib_rst/time_sequence.html#time_sequence.TimeSequence.GetTimeUnit">[docs]</a>    <span class="k">def</span> <span class="nf">GetTimeUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TimeSequence.GetTimeUnit"><a class="viewcode-back" href="../modulib_rst/pyplot_rst/time_sequence.html#time_sequence.TimeSequence.GetTimeUnit">[docs]</a>    <span class="k">def</span> <span class="nf">GetTimeUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
         <span class="n">timeNode</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">timeNode</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="TimeSequence.GetNVariables"><a class="viewcode-back" href="../modulib_rst/time_sequence.html#time_sequence.TimeSequence.GetNVariables">[docs]</a>    <span class="k">def</span> <span class="nf">GetNVariables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TimeSequence.GetNVariables"><a class="viewcode-back" href="../modulib_rst/pyplot_rst/time_sequence.html#time_sequence.TimeSequence.GetNVariables">[docs]</a>    <span class="k">def</span> <span class="nf">GetNVariables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
         <span class="n">varNodes</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;var&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">varNodes</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="TimeSequence.GetVariableNames"><a class="viewcode-back" href="../modulib_rst/time_sequence.html#time_sequence.TimeSequence.GetVariableNames">[docs]</a>    <span class="k">def</span> <span class="nf">GetVariableNames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TimeSequence.GetVariableNames"><a class="viewcode-back" href="../modulib_rst/pyplot_rst/time_sequence.html#time_sequence.TimeSequence.GetVariableNames">[docs]</a>    <span class="k">def</span> <span class="nf">GetVariableNames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
         <span class="n">varNodes</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;var&#39;</span><span class="p">)</span>
@@ -145,7 +145,7 @@
             <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">names</span></div>
 
-<div class="viewcode-block" id="TimeSequence.GetVariables"><a class="viewcode-back" href="../modulib_rst/time_sequence.html#time_sequence.TimeSequence.GetVariables">[docs]</a>    <span class="k">def</span> <span class="nf">GetVariables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TimeSequence.GetVariables"><a class="viewcode-back" href="../modulib_rst/pyplot_rst/time_sequence.html#time_sequence.TimeSequence.GetVariables">[docs]</a>    <span class="k">def</span> <span class="nf">GetVariables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># variables[(name,unit,timeUnit,legend)] = [(time,val),(time,val),..,]</span>
         <span class="n">variables</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
@@ -248,7 +248,6 @@
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../src_rst/modules.html">src</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../src_rst/utils_rst/modules.html">utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>

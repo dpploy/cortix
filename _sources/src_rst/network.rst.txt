@@ -1,5 +1,5 @@
-network module
-==============
+network
+=======
 
 .. automodule:: network
     :members:

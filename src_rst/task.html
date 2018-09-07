@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>task module &#8212; Cortix 0.1.0 documentation</title>
+    <title>task &#8212; Cortix 0.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript">
@@ -24,7 +24,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="utils" href="utils_rst/modules.html" />
-    <link rel="prev" title="simulation module" href="simulation.html" /> 
+    <link rel="prev" title="simulation" href="simulation.html" /> 
   </head>
   <body>
     <div class="related" role="navigation" aria-label="related navigation">
@@ -40,7 +40,7 @@
           <a href="utils_rst/modules.html" title="utils"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="simulation.html" title="simulation module"
+          <a href="simulation.html" title="simulation"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">src</a> &#187;</li> 
@@ -53,81 +53,79 @@
           <div class="body" role="main">
             
   <div class="section" id="module-task">
-<span id="task-module"></span><h1>task module<a class="headerlink" href="#module-task" title="Permalink to this headline">¶</a></h1>
+<span id="task"></span><h1>task<a class="headerlink" href="#module-task" title="Permalink to this headline">¶</a></h1>
 <p>Valmor F. de Almeida <a class="reference external" href="mailto:dealmeidav&#37;&#52;&#48;ornl&#46;gov">dealmeidav<span>&#64;</span>ornl<span>&#46;</span>gov</a>; vfda</p>
 <p>Cortix: a program for system-level modules coupling, execution, and analysis.</p>
 <dl class="class">
 <dt id="task.Task">
 <em class="property">class </em><code class="descclassname">task.</code><code class="descname">Task</code><span class="sig-paren">(</span><em>parent_work_dir=None</em>, <em>task_config_node=&lt;cortix.src.utils.configtree.ConfigTree object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/task.html#Task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#task.Task" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>This class defines the implementation of a Task in the Cortix Project.
-A Task is a portion of work done by a simulation.</p>
+<p>A Task is work done by a Simulation handled by Cortix.
+A Task will use a given Application.</p>
+<dl class="attribute">
+<dt id="task.Task.evolve_time">
+<code class="descname">evolve_time</code><a class="headerlink" href="#task.Task.evolve_time" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>float</cite> – Task final time</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="task.Task.evolve_time_unit">
+<code class="descname">evolve_time_unit</code><a class="headerlink" href="#task.Task.evolve_time_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>str</cite> – Task final time unit</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="task.Task.execute">
 <code class="descname">execute</code><span class="sig-paren">(</span><em>application</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/task.html#Task.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#task.Task.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>This method is used to execute (accomplish) the given task.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="task.Task.get_evolve_time">
-<code class="descname">get_evolve_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/task.html#Task.get_evolve_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#task.Task.get_evolve_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the tasks’s final time</p>
+<dl class="attribute">
+<dt id="task.Task.name">
+<code class="descname">name</code><a class="headerlink" href="#task.Task.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>str</cite> – Task name</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="task.Task.get_evolve_time_unit">
-<code class="descname">get_evolve_time_unit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/task.html#Task.get_evolve_time_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#task.Task.get_evolve_time_unit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the unit of the task’s final time.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="task.Task.get_name">
-<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/task.html#Task.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#task.Task.get_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the name of the task.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="task.Task.get_runtime_cortix_param_file">
-<code class="descname">get_runtime_cortix_param_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/task.html#Task.get_runtime_cortix_param_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#task.Task.get_runtime_cortix_param_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the taks’s config file.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="task.Task.get_start_time">
-<code class="descname">get_start_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/task.html#Task.get_start_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#task.Task.get_start_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the task’s initial time</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="task.Task.get_start_time_unit">
-<code class="descname">get_start_time_unit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/task.html#Task.get_start_time_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#task.Task.get_start_time_unit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the unit of the task’s initial time</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="task.Task.get_time_step">
-<code class="descname">get_time_step</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/task.html#Task.get_time_step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#task.Task.get_time_step" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the magnitude of an incremental step
-in the task’s time.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="task.Task.get_time_step_unit">
-<code class="descname">get_time_step_unit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/task.html#Task.get_time_step_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#task.Task.get_time_step_unit" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the unit of the tasks’s time step</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="task.Task.get_work_dir">
-<code class="descname">get_work_dir</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/task.html#Task.get_work_dir"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#task.Task.get_work_dir" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the working directory
-of the task specification.</p>
+<dl class="attribute">
+<dt id="task.Task.runtime_cortix_param_file">
+<code class="descname">runtime_cortix_param_file</code><a class="headerlink" href="#task.Task.runtime_cortix_param_file" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>str</cite> – Task’s config file</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="task.Task.set_runtime_cortix_param_file">
 <code class="descname">set_runtime_cortix_param_file</code><span class="sig-paren">(</span><em>full_path</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/task.html#Task.set_runtime_cortix_param_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#task.Task.set_runtime_cortix_param_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the task config file to the specified file.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="task.Task.start_time">
+<code class="descname">start_time</code><a class="headerlink" href="#task.Task.start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>float</cite> – Task initial time</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="task.Task.start_time_unit">
+<code class="descname">start_time_unit</code><a class="headerlink" href="#task.Task.start_time_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>str</cite> – Task initial time unit</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="task.Task.time_step">
+<code class="descname">time_step</code><a class="headerlink" href="#task.Task.time_step" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>float</cite> – Magnitude of incremental step in the task’s time</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="task.Task.time_step_unit">
+<code class="descname">time_step_unit</code><a class="headerlink" href="#task.Task.time_step_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>str</cite> – Time step unit</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="task.Task.work_dir">
+<code class="descname">work_dir</code><a class="headerlink" href="#task.Task.work_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p><cite>str</cite> – Working directory of task specification</p>
 </dd></dl>
 
 </dd></dl>
@@ -143,17 +141,17 @@ of the task specification.</p>
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="application.html">application module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cortix_driver_template.html">cortix_driver_template module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cortix_main.html">cortix_main module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="launcher.html">launcher module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="module.html">module module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="network.html">network module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="simulation.html">simulation module</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">task module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="application.html">application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cortix_driver_template.html">cortix_driver_template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cortix_main.html">cortix_main</a></li>
+<li class="toctree-l2"><a class="reference internal" href="launcher.html">launcher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="module.html">module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="network.html">network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulation.html">simulation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils_rst/modules.html">utils</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="utils_rst/modules.html">utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>
@@ -186,7 +184,7 @@ of the task specification.</p>
           <a href="utils_rst/modules.html" title="utils"
              >next</a> |</li>
         <li class="right" >
-          <a href="simulation.html" title="simulation module"
+          <a href="simulation.html" title="simulation"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li> 

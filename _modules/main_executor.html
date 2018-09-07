@@ -1,0 +1,166 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>main_executor &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for main_executor</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># This file is part of the Cortix toolkit evironment</span>
+<span class="c1"># https://github.com/dpploy/...</span>
+<span class="c1">#</span>
+<span class="c1"># All rights reserved, see COPYRIGHT for full restrictions.</span>
+<span class="c1"># https://github.com/dpploy/COPYRIGHT</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the GNU General Public License v. 3, please see LICENSE file.</span>
+<span class="c1"># https://www.gnu.org/licenses/gpl-3.0.txt</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Cortix: a program for system-level modules coupling, execution, and analysis.</span>
+
+<span class="sd">Cortix is a library and it is used by means of a driver. This file is a simple example</span>
+<span class="sd">of a driver. Many Cortix objects can be ran simultaneously; a single object</span>
+<span class="sd">may be sufficient since many simulation/tasks can be ran via one object.</span>
+
+<span class="sd">As Cortix evolves additional complexity may be added to this driver and/or other</span>
+<span class="sd">driver examples can be created.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1">#*********************************************************************************</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">mpi4py</span> <span class="k">import</span> <span class="n">MPI</span>
+<span class="kn">from</span> <span class="nn">mpi4py.futures</span> <span class="k">import</span> <span class="n">MPIPoolExecutor</span>
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="k">import</span> <span class="n">ThreadPoolExecutor</span>
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="k">import</span> <span class="n">ProcessPoolExecutor</span>
+<span class="kn">from</span> <span class="nn">cortix</span> <span class="k">import</span> <span class="n">Cortix</span> 
+<span class="c1">#*********************************************************************************</span>
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../examples_rst/main_executor.html#main_executor.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+
+ <span class="n">pwd</span>                   <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+ <span class="n">full_path_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pwd</span><span class="p">,</span> <span class="s1">&#39;input/cortix-config.xml&#39;</span><span class="p">)</span>
+
+ <span class="c1"># NB: if another instantiation of Cortix occurs, the cortix wrk directory specified</span>
+ <span class="c1">#     in the cortix configuration file must be different, else the logging facility </span>
+ <span class="c1">#     will have log file collision.</span>
+
+<span class="c1"># comm = MPI.COMM_WORLD</span>
+<span class="c1"># size = comm.Get_size()</span>
+<span class="c1"># rank = comm.Get_rank()</span>
+<span class="c1"># print(&#39;size = &#39;,size)</span>
+<span class="c1"># print(&#39;rank = &#39;,rank)</span>
+
+<span class="c1"># if (rank == 0):</span>
+<span class="c1"># Create a PoolExecutor (only one excutor is allowed; to avoid recursion)</span>
+<span class="c1"># at the moment, this precludes multiple instantiations of Cortix.</span>
+<span class="c1"># Todo: modify in the future if multiple instances of Cortix will be used </span>
+<span class="c1"># in the user code.</span>
+<span class="c1">#</span>
+<span class="c1"># MPI development (pool status: broken)</span>
+<span class="c1"># pool_executor = MPIPoolExecutor()</span>
+<span class="c1"># usage: mpiexec -n 4 python -m mpi4py.futures main.py</span>
+<span class="c1"># pool_executor.bootup(wait=True)</span>
+
+<span class="c1"># concurrent.futures development (pool status: working for thread, issues for process)</span>
+ <span class="n">pool_executor</span> <span class="o">=</span> <span class="n">ThreadPoolExecutor</span><span class="p">()</span>
+<span class="c1"># pool_executor = ProcessPoolExecutor()</span>
+<span class="c1">#</span>
+ <span class="n">cortix1</span> <span class="o">=</span> <span class="n">Cortix</span><span class="p">(</span> <span class="s1">&#39;cortix-dev1&#39;</span><span class="p">,</span> <span class="n">full_path_config_file</span><span class="p">,</span> <span class="n">pool_executor</span> <span class="p">)</span> <span class="c1"># see cortix-config.xml</span>
+<span class="c1">#</span>
+<span class="c1"># usage: uncomment only one at a time</span>
+<span class="c1"># cortix1.run_simulations( task_name=&#39;solo-pyplot&#39; )</span>
+ <span class="n">cortix1</span><span class="o">.</span><span class="n">run_simulations</span><span class="p">(</span> <span class="n">task_name</span><span class="o">=</span><span class="s1">&#39;solo-fueldepot&#39;</span> <span class="p">)</span></div>
+<span class="c1"># cortix1.run_simulations( task_name=&#39;fueldepot-chopper&#39; )</span>
+<span class="c1">#---------------------- end def main():-------------------------------------------</span>
+
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Usage: -&gt; python cortix-main.py or ./cortix-main.py</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+ <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../src_rst/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Valmor F. de Almeida.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+    </div>
+  </body>
+</html>

@@ -60,16 +60,14 @@
 
 <span class="sd">Cortix: a program for system-level modules coupling, execution, and analysis.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="c1"># *********************************************************************************</span>
+<span class="c1">#*********************************************************************************</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">mpi4py</span> <span class="k">import</span> <span class="n">MPI</span>
 <span class="kn">from</span> <span class="nn">cortix.src.task</span> <span class="k">import</span> <span class="n">Task</span>
 <span class="kn">from</span> <span class="nn">cortix.src.application</span> <span class="k">import</span> <span class="n">Application</span>
 <span class="kn">from</span> <span class="nn">cortix.src.utils.configtree</span> <span class="k">import</span> <span class="n">ConfigTree</span>
 <span class="kn">from</span> <span class="nn">cortix.src.utils.set_logger_level</span> <span class="k">import</span> <span class="n">set_logger_level</span>
-<span class="c1"># *********************************************************************************</span>
-
+<span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="Simulation"><a class="viewcode-back" href="../src_rst/simulation.html#simulation.Simulation">[docs]</a><span class="k">class</span> <span class="nc">Simulation</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -77,31 +75,31 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_work_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sim_config_node</span><span class="o">=</span><span class="n">ConfigTree</span><span class="p">()):</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parent_work_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s2">&quot;-&gt; parentWorkDir invalid.&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parent_work_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;-&gt; parentWorkDir invalid.&#39;</span>
 
         <span class="c1"># Inherit a configuration tree</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span>
-            <span class="n">sim_config_node</span><span class="p">,</span> <span class="n">ConfigTree</span><span class="p">),</span> <span class="s2">&quot;-&gt; sim_config_node invalid.&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">config_node</span> <span class="o">=</span> <span class="n">sim_config_node</span>
+            <span class="n">sim_config_node</span><span class="p">,</span> <span class="n">ConfigTree</span><span class="p">),</span> <span class="s1">&#39;-&gt; sim_config_node invalid.&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__config_node</span> <span class="o">=</span> <span class="n">sim_config_node</span>
 
         <span class="c1"># Read the simulation name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">sim_config_node</span><span class="o">.</span><span class="n">get_node_name</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">sim_config_node</span><span class="o">.</span><span class="n">get_node_name</span><span class="p">()</span>
 
         <span class="c1"># Create the cortix/simulation work directory</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">=</span> <span class="n">parent_work_dir</span> <span class="o">+</span> <span class="s2">&quot;sim_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span> <span class="o">=</span> <span class="n">parent_work_dir</span> <span class="o">+</span> <span class="s1">&#39;sim_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
 
-        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;mkdir -p &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;mkdir -p &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span><span class="p">)</span>
 
         <span class="c1"># Create the logging facility for each object</span>
         <span class="n">node</span> <span class="o">=</span> <span class="n">sim_config_node</span><span class="o">.</span><span class="n">get_sub_node</span><span class="p">(</span><span class="s2">&quot;logger&quot;</span><span class="p">)</span>
-        <span class="n">logger_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.sim&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">logger_name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">)</span>
+        <span class="n">logger_name</span> <span class="o">=</span> <span class="s1">&#39;sim:&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">logger_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">)</span>
 
         <span class="n">logger_level</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">set_logger_level</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="n">logger_name</span><span class="p">,</span> <span class="n">logger_level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span> <span class="o">=</span> <span class="n">set_logger_level</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="p">,</span> <span class="n">logger_name</span><span class="p">,</span> <span class="n">logger_level</span><span class="p">)</span>
 
-        <span class="n">file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span> <span class="o">+</span> <span class="s1">&#39;sim.log&#39;</span><span class="p">)</span>
+        <span class="n">file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span> <span class="o">+</span> <span class="s1">&#39;sim.log&#39;</span><span class="p">)</span>
         <span class="n">file_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">)</span>
 
         <span class="n">console_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
@@ -125,52 +123,59 @@
         <span class="n">console_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
 
         <span class="c1"># add handlers to logger</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">file_handler</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console_handler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">file_handler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console_handler</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;created Simulation logger: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;&#39;logger level: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">logger_level</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;logger file handler level: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file_handler_level</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;created Simulation logger: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;&#39;logger level: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">logger_level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;logger file handler level: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file_handler_level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
             <span class="s2">&quot;logger console handler level: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">console_handler_level</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">app_node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_node</span><span class="o">.</span><span class="n">get_all_sub_nodes</span><span class="p">(</span><span class="s2">&quot;application&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">app_node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__config_node</span><span class="o">.</span><span class="n">get_all_sub_nodes</span><span class="p">(</span><span class="s2">&quot;application&quot;</span><span class="p">):</span>
             <span class="n">app_config_node</span> <span class="o">=</span> <span class="n">ConfigTree</span><span class="p">(</span><span class="n">app_node</span><span class="p">)</span>
             <span class="k">assert</span> <span class="n">app_config_node</span><span class="o">.</span><span class="n">get_node_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">app_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">),</span> \
                 <span class="s2">&quot;check failed&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">application</span> <span class="o">=</span> <span class="n">Application</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">app_config_node</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;created application: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">app_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__application</span> <span class="o">=</span> <span class="n">Application</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span><span class="p">,</span> <span class="n">app_config_node</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;created application: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">app_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">))</span>
 
         <span class="c1"># Stores the task(s) created by the execute method</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;created simulation: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-<span class="c1"># ---------------------- end def __init__():------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tasks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;created simulation: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">)</span>
+<span class="c1">#----------------------- end def __init__():--------------------------------------</span>
 
 <div class="viewcode-block" id="Simulation.execute"><a class="viewcode-back" href="../src_rst/simulation.html#simulation.Simulation.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        This method allows for the execution of a simulation by executing each</span>
-<span class="sd">        task, if any.</span>
+<span class="sd">        task, if any. Execution proceeds one task at a time.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;start execute(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">task_name</span><span class="p">)</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;prepare to execute(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">task_name</span><span class="p">)</span>
+   
         <span class="k">if</span> <span class="n">task_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__setup_task</span><span class="p">(</span><span class="n">task_name</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">task_name</span><span class="p">:</span>
-                    <span class="n">task</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                        <span class="s2">&quot;called task.execute() on task </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">task_name</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;end execute(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">task_name</span><span class="p">)</span></div>
-<span class="c1"># ---------------------- end def execute():-------------------------------</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__setup_task</span><span class="p">(</span><span class="n">task_name</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tasks</span><span class="p">:</span>
+
+                <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">task_name</span><span class="p">:</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;call execute(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">task_name</span><span class="p">)</span>
+
+                    <span class="n">task</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__application</span><span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="s1">&#39;called task.execute() on task </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">task_name</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;end execute(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">task_name</span><span class="p">)</span></div>
+<span class="c1">#----------------------- end def execute():---------------------------------------</span>
 
     <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;destroyed simulation: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-<span class="c1"># ---------------------- end def __del__():-------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;destroyed simulation: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">)</span>
+<span class="c1">#----------------------- end def __del__():---------------------------------------</span>
 
-<span class="c1"># *********************************************************************************</span>
+<span class="c1">#*********************************************************************************</span>
 <span class="c1"># Private helper functions (internal use: __)</span>
 
     <span class="k">def</span> <span class="nf">__setup_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="p">):</span>
@@ -179,72 +184,67 @@
 <span class="sd">        It sets up the set of tasks defined in the Cortix config for a simulation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;start __setup_task()&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;start __setup_task(</span><span class="si">%s</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">task_name</span><span class="p">)</span>
         <span class="n">task</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
-        <span class="c1"># rank = comm.Get_rank()</span>
-        <span class="c1"># size = comm.Get_size()</span>
-
-        <span class="n">cmode</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">MODE_WRONLY</span> <span class="o">|</span> <span class="n">MPI</span><span class="o">.</span><span class="n">MODE_CREATE</span>
-        <span class="n">amode</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">MODE_WRONLY</span> <span class="o">|</span> <span class="n">MPI</span><span class="o">.</span><span class="n">MODE_APPEND</span>
-
-        <span class="k">for</span> <span class="n">task_node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config_node</span><span class="o">.</span><span class="n">get_all_sub_nodes</span><span class="p">(</span><span class="s1">&#39;task&#39;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">task_node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__config_node</span><span class="o">.</span><span class="n">get_all_sub_nodes</span><span class="p">(</span><span class="s1">&#39;task&#39;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">task_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="n">task_name</span><span class="p">:</span>
                 <span class="k">continue</span>
 
             <span class="n">task_config_node</span> <span class="o">=</span> <span class="n">ConfigTree</span><span class="p">(</span><span class="n">task_node</span><span class="p">)</span>
-            <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">work_dir</span><span class="p">,</span> <span class="n">task_config_node</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;appended task: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">task_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">))</span>
+            <span class="c1"># create task</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span><span class="p">,</span> <span class="n">task_config_node</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">__tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;appended task: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">task_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="n">task</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;no task to exectute; done here.&#39;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;end __setup_task()&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;no task to exectute; done here.&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;end __setup_task(</span><span class="si">%s</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">task_name</span><span class="p">)</span>
             <span class="k">return</span>
 
-        <span class="n">networks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">get_networks</span><span class="p">()</span>
+        <span class="n">networks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__application</span><span class="o">.</span><span class="n">networks</span>
 
         <span class="c1"># create subdirectory with task name</span>
-        <span class="n">task_name</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
-        <span class="n">task_work_dir</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_work_dir</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span>
-            <span class="n">task_work_dir</span><span class="p">),</span> <span class="s2">&quot;directory </span><span class="si">%r</span><span class="s2"> invalid.&quot;</span> <span class="o">%</span> <span class="n">task_work_dir</span>
+        <span class="n">task_name</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">task_work_dir</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">work_dir</span>
+        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">task_work_dir</span><span class="p">),</span> <span class="s2">&quot;directory </span><span class="si">%r</span><span class="s2"> invalid.&quot;</span> <span class="o">%</span> <span class="n">task_work_dir</span>
 
         <span class="c1"># set the parameters for the task in the cortix param file</span>
         <span class="n">task_file</span> <span class="o">=</span> <span class="n">task_work_dir</span> <span class="o">+</span> <span class="s1">&#39;cortix-param.xml&#39;</span>
 
-        <span class="n">fout</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">task_file</span><span class="p">,</span> <span class="n">cmode</span><span class="p">)</span>
-        <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&lt;!-- Written by Simulation::__setup_task() --&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&lt;cortix_param&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">fout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">task_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;!-- Written by Simulation::__setup_task() --&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;cortix_param&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="n">start_time</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_start_time</span><span class="p">()</span>
-        <span class="n">start_time_unit</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_start_time_unit</span><span class="p">()</span>
-        <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&lt;start_time unit=&quot;&#39;</span> <span class="o">+</span> <span class="n">start_time_unit</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="s1">&#39;&gt;&#39;</span> <span class="o">+</span>
-                           <span class="nb">str</span><span class="p">(</span><span class="n">start_time</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&lt;/start_time&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">start_time</span>
+        <span class="n">start_time_unit</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">start_time_unit</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;start_time unit=&quot;&#39;</span> <span class="o">+</span> <span class="n">start_time_unit</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="s1">&#39;&gt;&#39;</span> <span class="o">+</span>
+                           <span class="nb">str</span><span class="p">(</span><span class="n">start_time</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&lt;/start_time&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="n">evolve_time</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_evolve_time</span><span class="p">()</span>
-        <span class="n">evolve_time_unit</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_evolve_time_unit</span><span class="p">()</span>
-        <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&lt;evolve_time unit=&quot;&#39;</span> <span class="o">+</span> <span class="n">evolve_time_unit</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="s1">&#39;&gt;&#39;</span> <span class="o">+</span>
-                           <span class="nb">str</span><span class="p">(</span><span class="n">evolve_time</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&lt;/evolve_time&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="n">evolve_time</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">evolve_time</span>
+        <span class="n">evolve_time_unit</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">evolve_time_unit</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;evolve_time unit=&quot;&#39;</span> <span class="o">+</span> <span class="n">evolve_time_unit</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="s1">&#39;&gt;&#39;</span> <span class="o">+</span>
+                           <span class="nb">str</span><span class="p">(</span><span class="n">evolve_time</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&lt;/evolve_time&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="n">time_step</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_time_step</span><span class="p">()</span>
-        <span class="n">time_step_unit</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">get_time_step_unit</span><span class="p">()</span>
-        <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&lt;time_step unit=&quot;&#39;</span> <span class="o">+</span> <span class="n">time_step_unit</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="s1">&#39;&gt;&#39;</span> <span class="o">+</span>
-                           <span class="nb">str</span><span class="p">(</span><span class="n">time_step</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&lt;/time_step&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+        <span class="n">time_step</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">time_step</span>
+        <span class="n">time_step_unit</span> <span class="o">=</span> <span class="n">task</span><span class="o">.</span><span class="n">time_step_unit</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;time_step unit=&quot;&#39;</span> <span class="o">+</span> <span class="n">time_step_unit</span> <span class="o">+</span> <span class="s1">&#39;&quot;&#39;</span> <span class="o">+</span> <span class="s1">&#39;&gt;&#39;</span> <span class="o">+</span>
+                           <span class="nb">str</span><span class="p">(</span><span class="n">time_step</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;&lt;/time_step&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
-        <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&lt;/cortix_param&gt;&#39;</span><span class="p">)</span>
-        <span class="n">fout</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/cortix_param&gt;&#39;</span><span class="p">)</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
         <span class="n">task</span><span class="o">.</span><span class="n">set_runtime_cortix_param_file</span><span class="p">(</span><span class="n">task_file</span><span class="p">)</span>
 
         <span class="c1"># Using the tasks and network create the runtime module directories and comm</span>
         <span class="c1"># files</span>
         <span class="k">for</span> <span class="n">net</span> <span class="ow">in</span> <span class="n">networks</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">net</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">task_name</span><span class="p">:</span>  <span class="c1"># Warning: net and task name must match</span>
-                <span class="n">connect</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">get_connectivity</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">net</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">task_name</span><span class="p">:</span>  <span class="c1"># Warning: net and task name must match</span>
+                <span class="n">connect</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span>
                 <span class="n">to_module_to_port_visited</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
                 <span class="k">for</span> <span class="n">con</span> <span class="ow">in</span> <span class="n">connect</span><span class="p">:</span>
                     <span class="c1"># Start with the ports that will function as a provide port or</span>
@@ -256,7 +256,7 @@
                         <span class="n">to_module_to_port_visited</span><span class="p">[</span><span class="n">to_module_slot</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
                     <span class="n">to_module_name</span> <span class="o">=</span> <span class="n">to_module_slot</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">to_module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">get_module</span><span class="p">(</span><span class="n">to_module_name</span><span class="p">)</span>
+                    <span class="n">to_module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__application</span><span class="o">.</span><span class="n">get_module</span><span class="p">(</span><span class="n">to_module_name</span><span class="p">)</span>
 
                     <span class="k">assert</span> <span class="n">to_module</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
                         <span class="s1">&#39;module </span><span class="si">%r</span><span class="s1"> does not exist in application&#39;</span> <span class="o">%</span> <span class="n">to_module_name</span>
@@ -283,19 +283,16 @@
                         <span class="s1">&#39;cortix-comm.xml&#39;</span>
 
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">to_module_slot_work_dir</span><span class="p">):</span>
-                        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;mkdir -p &quot;</span> <span class="o">+</span> <span class="n">to_module_slot_work_dir</span><span class="p">)</span>
+                        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;mkdir -p &#39;</span> <span class="o">+</span> <span class="n">to_module_slot_work_dir</span><span class="p">)</span>
 
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">to_module_slot_comm_file</span><span class="p">):</span>
-                        <span class="n">fout</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span>
-                            <span class="n">comm</span><span class="p">,</span> <span class="n">to_module_slot_comm_file</span><span class="p">,</span> <span class="n">cmode</span><span class="p">)</span>
-                        <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                        <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span>
-                            <span class="sa">b</span><span class="s1">&#39;&lt;!-- Written by Simulation::__setup_task() --&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                        <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&lt;cortix_comm&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="n">fout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">to_module_slot_comm_file</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+                        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;!-- Written by Simulation::__setup_task() --&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;cortix_comm&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
                     <span class="k">if</span> <span class="n">to_port</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_module_to_port_visited</span><span class="p">[</span><span class="n">to_module_slot</span><span class="p">]:</span>
-                        <span class="n">fout</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span>
-                            <span class="n">comm</span><span class="p">,</span> <span class="n">to_module_slot_comm_file</span><span class="p">,</span> <span class="n">amode</span><span class="p">)</span>
+                        <span class="n">fout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">to_module_slot_comm_file</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
                         <span class="c1"># this is the cortix info for modules providing data</span>
                         <span class="n">to_port_mode</span> <span class="o">=</span> <span class="n">to_module</span><span class="o">.</span><span class="n">get_port_mode</span><span class="p">(</span><span class="n">to_port</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">to_port_mode</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;file&#39;</span><span class="p">:</span>
@@ -309,14 +306,14 @@
                         <span class="k">else</span><span class="p">:</span>
                             <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;invalid port mode. fatal.&#39;</span>
 
-                        <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="n">log_str</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
-                        <span class="n">fout</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+                        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">log_str</span><span class="p">)</span>
+                        <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
                         <span class="n">to_module_to_port_visited</span><span class="p">[</span><span class="n">to_module_slot</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                             <span class="n">to_port</span><span class="p">)</span>
 
                     <span class="n">debug_str</span> <span class="o">=</span> <span class="s1">&#39;__setup_task():: comm module: &#39;</span> <span class="o">+</span> <span class="n">to_module_slot</span> <span class="o">+</span> \
                                 <span class="s1">&#39;; network: &#39;</span> <span class="o">+</span> <span class="n">task_name</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">log_str</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">debug_str</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">debug_str</span><span class="p">)</span>
 
                     <span class="c1"># register the cortix-comm file for the network</span>
                     <span class="n">net</span><span class="o">.</span><span class="n">set_runtime_cortix_comm_file</span><span class="p">(</span><span class="n">to_module_slot</span><span class="p">,</span>
@@ -326,7 +323,7 @@
                     <span class="n">from_module_slot</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;fromModuleSlot&#39;</span><span class="p">]</span>
                     <span class="n">from_port</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;fromPort&#39;</span><span class="p">]</span>
                     <span class="n">from_module_name</span> <span class="o">=</span> <span class="n">from_module_slot</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">from_module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">application</span><span class="o">.</span><span class="n">get_module</span><span class="p">(</span><span class="n">from_module_name</span><span class="p">)</span>
+                    <span class="n">from_module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__application</span><span class="o">.</span><span class="n">get_module</span><span class="p">(</span><span class="n">from_module_name</span><span class="p">)</span>
 
                     <span class="k">assert</span> <span class="n">from_module</span><span class="o">.</span><span class="n">has_port_name</span><span class="p">(</span><span class="n">from_port</span><span class="p">),</span> \
                         <span class="s1">&#39;module </span><span class="si">%r</span><span class="s1"> has no port </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
@@ -353,17 +350,13 @@
                             <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;mkdir -p &#39;</span> <span class="o">+</span> <span class="n">from_module_slot_work_dir</span><span class="p">)</span>
 
                         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">from_module_slot_comm_file</span><span class="p">):</span>
-                            <span class="n">fout</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">from_module_slot_comm_file</span><span class="p">,</span>
-                                                 <span class="n">cmode</span><span class="p">)</span>
-                            <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span>
-                                <span class="sa">b</span><span class="s1">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                            <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span>
-                                <span class="sa">b</span><span class="s1">&#39;&lt;!-- Written by Simulation::__setup_task() --&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                            <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&lt;cortix_comm&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                            <span class="n">fout</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+                            <span class="n">fout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">from_module_slot_comm_file</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+                            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;!-- Written by Simulation::__setup_task() --&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;cortix_comm&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                            <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span> <span class="c1"># is this right?</span>
 
-                        <span class="n">fout</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span>
-                            <span class="n">comm</span><span class="p">,</span> <span class="n">from_module_slot_comm_file</span><span class="p">,</span> <span class="n">amode</span><span class="p">)</span>
+                        <span class="n">fout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">from_module_slot_comm_file</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
 
                         <span class="c1"># this is the cortix info for modules using data</span>
                         <span class="k">assert</span> <span class="n">from_module</span><span class="o">.</span><span class="n">get_port_type</span><span class="p">(</span><span class="n">from_port</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;use&#39;</span><span class="p">,</span> \
@@ -383,13 +376,13 @@
                         <span class="k">else</span><span class="p">:</span>
                             <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;invalid port mode. fatal.&#39;</span>
 
-                        <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="n">log_str</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
-                        <span class="n">fout</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+                        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">log_str</span><span class="p">)</span>
+                        <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
                         <span class="n">debug_str</span> <span class="o">=</span> <span class="s1">&#39;__setup_task():: comm module: &#39;</span> <span class="o">+</span> \
                                     <span class="n">from_module_slot</span> <span class="o">+</span> <span class="s1">&#39;; network: &#39;</span> <span class="o">+</span> <span class="n">task_name</span> <span class="o">+</span> \
                                     <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">log_str</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">debug_str</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">debug_str</span><span class="p">)</span>
 
                 <span class="c1"># register the cortix-comm file for the network</span>
                 <span class="n">net</span><span class="o">.</span><span class="n">set_runtime_cortix_comm_file</span><span class="p">(</span><span class="n">from_module_slot</span><span class="p">,</span>
@@ -397,19 +390,18 @@
 
         <span class="c1"># finish forming the XML documents for port types</span>
         <span class="k">for</span> <span class="n">net</span> <span class="ow">in</span> <span class="n">networks</span><span class="p">:</span>
-            <span class="n">slot_names</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">get_slot_names</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">slot_name</span> <span class="ow">in</span> <span class="n">slot_names</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">slot_name</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">slot_names</span><span class="p">:</span>
                 <span class="n">comm_file</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">get_runtime_cortix_comm_file</span><span class="p">(</span><span class="n">slot_name</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">comm_file</span> <span class="o">==</span> <span class="s1">&#39;null-runtime_cortix_comm_file&#39;</span><span class="p">:</span>
                     <span class="k">continue</span>
-                <span class="n">fout</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">File</span><span class="o">.</span><span class="n">Open</span><span class="p">(</span><span class="n">comm</span><span class="p">,</span> <span class="n">comm_file</span><span class="p">,</span> <span class="n">amode</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">Write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;&lt;/cortix_comm&gt;&#39;</span><span class="p">)</span>
-                <span class="n">fout</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+                <span class="n">fout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">comm_file</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
+                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/cortix_comm&gt;&#39;</span><span class="p">)</span>
+                <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;end __setup_task()&#39;</span><span class="p">)</span></div>
-<span class="c1"># ---------------------- end def __setup_task():--------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;end __setup_task(</span><span class="si">%s</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">task_name</span><span class="p">)</span></div>
+<span class="c1">#----------------------- end def __setup_task():----------------------------------</span>
 
-<span class="c1"># ====================== end class Simulation: ===========================</span>
+<span class="c1">#======================= end class Simulation: ===================================</span>
 </pre></div>
 
           </div>
@@ -420,7 +412,6 @@
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../src_rst/modules.html">src</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../src_rst/utils_rst/modules.html">utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>

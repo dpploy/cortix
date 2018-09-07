@@ -2,11 +2,12 @@ support
 =======
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
 
+   actor
    fuel_bucket
-   fuelbundle
-   fuelsegment
+   fuel_bundle
+   fuel_segment
    fuelsegmentsgroups
    fuelslug
    nuclides
