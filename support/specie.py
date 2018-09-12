@@ -11,6 +11,7 @@
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
 This Specie class is to be used with other classes in plant-level process modules.
+
 NB: Species is always used either in singular or plural cases, the class
     named here reflects one species. If many species are used in an external
     context, the species object name can be used without conflict.

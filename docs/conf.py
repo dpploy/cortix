@@ -25,6 +25,7 @@ sys.path.insert(0, os.path.abspath('../src/utils'))
 sys.path.insert(0, os.path.abspath('../support'))
 sys.path.insert(0, os.path.abspath('../examples'))
 sys.path.insert(0, os.path.abspath('../examples/input'))
+sys.path.insert(0, os.path.abspath('../modulib'))
 sys.path.insert(0, os.path.abspath('../modulib/pyplot'))
 
 # -- General configuration ------------------------------------------------
