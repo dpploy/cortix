@@ -52,6 +52,7 @@ Most Linux distros will provide an evironment with the needed dependencies.
 
 ## Mac OS X
 
+In development.
 
 ## Developers 
 
