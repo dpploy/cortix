@@ -5,7 +5,6 @@
 [![PyPI version](https://badge.fury.io/py/cortix.svg)](https://badge.fury.io/py/cortix)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/Django.svg)
 ![AUR](https://img.shields.io/aur/license/yaourt.svg)
-
 ![](cortix/docs/cortix-cover.png)
 
 ## What is Cortix?
