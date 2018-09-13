@@ -13,6 +13,7 @@ import os
 from mpi4py import MPI
 from cortix import Cortix
 
+
 def test_solo_pyplot():
     '''
     Run solo_pyplot and make sure the correct output is generated
