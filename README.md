@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/dpploy/cortix.svg?branch=master)](https://travis-ci.org/dpploy/cortix)
-# Cortix ([PyPi](https://pypi.org/project/cortix/))
+# Cortix
 
 ![](docs/cortix-cover.png)
 
