@@ -20,25 +20,13 @@
 
 The basic concepts in Cortix are the creation of an `Application` and a `Simulation` involving `Tasks`.
 
-## Dependencies
+## Installing
 
-* Core
-    - python &gt;= 3.6.5
-    - mpi4py &gt;= 3.0.0 (use openmpi &gt;= 3.1.1)
-    - networkx &gt;= 1.11
-    - numpy &gt;= 1.10.4
-    - matplotlib &gt;= 2.2.2
-    - sphinx &gt;= 1.6.5
-    - pandoc &gt;= 1.19
-    - pytest==3.7.2
-
-* Support
-    - pandas &gt;= 0.19
-
-* Modulib
-    - pandas &gt;= 0.19
-    - scikits.odes==2.4.0.dev0
-    - sundials &gt;= 2.7
+Cortix can be installed on any Unix-based machine via pip. Simply run 
+```
+pip install cortix
+```
+to install the latest version of cortix.
 
 ## Usage
 
@@ -49,13 +37,6 @@ Cortix has a directory (`examples/`) that contains examples for input files, and
 ## Testing
 
 Testing is facilitated through <a href="http://pytest.org">PyTest</a>. To execute the tests, run the ```py.test``` command from the tests directory.
-
-## Linux
-
-Most Linux distros will provide an evironment with the needed dependencies.
-
-## Mac OS X
-
 
 ## Developers 
 
