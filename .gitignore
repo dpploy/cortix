@@ -3,6 +3,7 @@
 __pycache__
 .pytest_cache
 notes
+readme_converted.rst
 .*.swp
 *.pdf
 *.patch
