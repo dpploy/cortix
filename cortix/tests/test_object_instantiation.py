@@ -13,7 +13,6 @@ import os
 from mpi4py import MPI
 from cortix import Cortix
 
-
 def test_object_instantiation():
     '''
     Test for successful object instantiation

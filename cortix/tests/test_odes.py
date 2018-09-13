@@ -10,7 +10,6 @@
 # https://www.gnu.org/licenses/gpl-3.0.txt
 
 
-import matplotlib.pyplot as plt
 import numpy as np
 from scikits.odes import ode
 import pickle
