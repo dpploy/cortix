@@ -8,8 +8,8 @@ before_install:
     - sudo apt-get update
     - sudo apt-get install -y libopenblas-dev liblapack-dev gfortran cmake liblapack-dev libopenmpi-dev openmpi-bin libsuitesparse-dev
 install:
-    - sh install_sundials.sh
+    - sh scripts/install_sundials.sh
     - pip install -r requirements.txt
+    - pip install cortix
 script:
-    - export PYTHONPATH=$PYTHONPATH:$(pwd)/..
-    - cd tests && py.test --timeout 200 -n $(nproc)
+    - cd cortix/tests && py.test
