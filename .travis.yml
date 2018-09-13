@@ -10,6 +10,7 @@ before_install:
 install:
     - sh scripts/install_sundials.sh
     - pip install -r requirements.txt
+    - pip install cortix
 script:
     - export PYTHONPATH=$PYTHONPATH:$(pwd)/..
     - cd cortix/tests && py.test
