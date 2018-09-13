@@ -12,4 +12,4 @@ install:
     - pip install -r requirements.txt
 script:
     - export PYTHONPATH=$PYTHONPATH:$(pwd)/..
-    - cd tests && py.test --timeout 200 -n $(nproc)
+    - cd cortix/tests && py.test -n $(nproc)
