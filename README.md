@@ -1,9 +1,10 @@
+# Cortix
+========
+
 [![Build Status](https://travis-ci.org/dpploy/cortix.svg?branch=master)](https://travis-ci.org/dpploy/cortix)
 [![PyPI version](https://badge.fury.io/py/cortix.svg)](https://badge.fury.io/py/cortix)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/Django.svg)
 ![AUR](https://img.shields.io/aur/license/yaourt.svg)
-
-# Cortix
 
 ![](cortix/docs/cortix-cover.png)
 
