@@ -12,7 +12,6 @@
 import importlib
 import sys
 
-
 def test_matplotlib():
     '''
     Test for the matplotlib dependency
