@@ -23,8 +23,7 @@ mytags
 createtags
 *.plt
 video*
-record*
 .idea
 pylintrc
-docs/_build
+cortix/docs/_build
 .cache/
