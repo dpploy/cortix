@@ -1,6 +1,9 @@
-======
-
-|image1|
+| |Build Status|
+| |PyPI version|
+| |PyPI - Python Version|
+| |AUR|
+| ---
+| |image4|
 
 What is Cortix?
 ---------------
@@ -21,29 +24,16 @@ What is Cortix?
 The basic concepts in Cortix are the creation of an ``Application`` and
 a ``Simulation`` involving ``Tasks``.
 
-Dependencies
-------------
+Installing
+----------
 
--  Core
+Cortix can be installed on any Unix-based machine via pip. Simply run
 
-   -  python >= 3.6.5
-   -  mpi4py >= 3.0.0 (use openmpi >= 3.1.1)
-   -  networkx >= 1.11
-   -  numpy >= 1.10.4
-   -  matplotlib >= 2.2.2
-   -  sphinx >= 1.6.5
-   -  pandoc >= 1.19
-   -  pytest==3.7.2
+::
 
--  Support
+    pip install cortix
 
-   -  pandas >= 0.19
-
--  Modulib
-
-   -  pandas >= 0.19
-   -  scikits.odes==2.4.0.dev0
-   -  sundials >= 2.7
+to install the latest version of cortix.
 
 Usage
 -----
@@ -79,15 +69,6 @@ Testing
 Testing is facilitated through PyTest. To execute the tests, run the
 ``py.test`` command from the tests directory.
 
-Linux
------
-
-Most Linux distros will provide an evironment with the needed
-dependencies.
-
-Mac OS X
---------
-
 Developers
 ----------
 
@@ -101,5 +82,9 @@ Documentation
 
 .. |Build Status| image:: https://travis-ci.org/dpploy/cortix.svg?branch=master
    :target: https://travis-ci.org/dpploy/cortix
-.. |image1| image:: cortix-cover.png
+.. |PyPI version| image:: https://badge.fury.io/py/cortix.svg
+   :target: https://badge.fury.io/py/cortix
+.. |PyPI - Python Version| image:: https://img.shields.io/pypi/pyversions/Django.svg
+.. |AUR| image:: https://img.shields.io/aur/license/yaourt.svg
+.. |image4| image:: cortix/cortix-cover.png
 

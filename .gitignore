@@ -25,5 +25,5 @@ createtags
 video*
 .idea
 pylintrc
-docs/_build
+cortix/docs/_build
 .cache/
