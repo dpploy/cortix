@@ -1,0 +1,21 @@
+# Valmor F. de Almeida: dealmeidavf@gmail.com
+# start ffmpeg recording of desktop
+# desktop size of laptop
+# resulting video may be about 7.5 min long play; 11,200 frames
+#ffmpeg -f x11grab -r 25 -s 1434x805 -i :0.0+0,24 -vcodec libx264  -threads 0 video.mkv
+ffmpeg -f x11grab -r 3 -s 1434x805 -i :0.0+0,0 -vcodec libx264 video.mkv 
+#
+# view Cortix plots and refresh every 2 seconds
+# feh -R 2 --geometry 700x530 *.png &
+#
+# extract frames from mkv video (could be over 10000 frames)
+# mp4 videos generation on Linux most likely will not run on a Mac/Windows
+# ffmpeg -i video.mkv -qscale 0 -r 25 -s 1434x805 -f image2 frame-%05d.png
+#
+# make mp4 movie from frames (mp4 not playable on mac's or windows???)
+# ffmpeg -f image2 -r 25 -s 1434x805 -i frame-%05d.png -qscale 0 video.mp4
+#
+# use handbrake to convert to a compatible mp4 or figure it out how to do it in ffmpeg
+#
+# drop frames to play faster (reduce frames by 0.25; 4x faster)
+# ffmpeg -i video.mp4 -filter:v "setpts=0.25*PTS" video4x.mp4
