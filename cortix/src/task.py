@@ -23,10 +23,10 @@ from cortix.src.utils.set_logger_level import set_logger_level
 #*********************************************************************************
 
 class Task:
-    """
+    '''
     A Task is work done by a Simulation handled by Cortix.
     A Task will use a given Application.
-    """
+    '''
 
     def __init__(self, parent_work_dir=None, task_config_node=ConfigTree()):
 
@@ -130,16 +130,16 @@ class Task:
 #----------------------- end def __init__():--------------------------------------
 
     def execute(self, application):
-        """
+        '''
         This method is used to execute (accomplish) the given task.
-        """
+        '''
         network = application.get_network(self.__name)
         runtime_status_files = dict()
 
         for slot_name in network.slot_names:
 
-            module_name = slot_name.split('_')[0]
-            slot_id = int(slot_name.split('_')[1])
+            module_name = '_'.join( slot_name.split('_')[:-1] )
+            slot_id = int(slot_name.split('_')[-1])
 
             module = application.get_module(module_name)
             param_file = self.__runtime_cortix_param_file

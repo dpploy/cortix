@@ -164,10 +164,10 @@ class Application:
 # Private helper functions (internal use: __)
 
     def __setup_networks(self):
-        """
+        '''
         A helper function used by the Application constructor to setup the networks
         portion of the Application.
-        """
+        '''
 
         self.__log.debug('start __setup_networks()')
 

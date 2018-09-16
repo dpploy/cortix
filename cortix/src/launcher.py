@@ -113,17 +113,17 @@ class Launcher(Thread):
         tree = ElementTree.parse(self.__cortix_param_full_path_file_name)
         cortix_param_xml_root_node = tree.getroot()
         node = cortix_param_xml_root_node.find('start_time')
-        start_time_unit = node.get('unit')
-        start_time = float(node.text.strip())
+        cortix_start_time_unit = node.get('unit')
+        cortix_start_time = float(node.text.strip())
 
-        if start_time_unit == 'minute':
-            start_time *= 1.0
-        elif start_time_unit == 'hour':
-            start_time *= 60.0
-        elif start_time_unit == 'day':
-            start_time *= 24.0 * 60.0
+        if cortix_start_time_unit == 'minute':
+            cortix_start_time *= 1.0
+        elif cortix_start_time_unit == 'hour':
+            cortix_start_time *= 60.0
+        elif cortix_start_time_unit == 'day':
+            cortix_start_time *= 24.0 * 60.0
         else:
-            assert False, 'time unit invalid: %r' % (start_time_unit)
+            assert False, 'time unit invalid: %r' % (cortix_start_time_unit)
 
         node = cortix_param_xml_root_node.find('evolve_time')
         evolve_time_unit = node.get('unit')
@@ -180,31 +180,33 @@ class Launcher(Thread):
         # Run module_name
         self.__log.info('entered Run %s', self.__module_name +
                       '_' + str(self.__slot_id) + ' section')
-        final_time = start_time + evolve_time
+        cortix_final_time = cortix_start_time + evolve_time
 
         # Create the guest code driver
         guest_driver = self.__py_module.CortixDriver(self.__slot_id,
                                                    self.__input_full_path_file_name,
                                                    self.__exec_full_path_file_name,
                                                    self.__work_dir,
-                                                   ports, start_time, final_time)
+                                                   ports, 
+                                                   cortix_start_time, 
+                                                   cortix_final_time)
 
         s = 'guest_driver = CortixDriver( slot_id=' + str(self.__slot_id) + \
             ', input file=' + self.__input_full_path_file_name + \
             ', exec file=' + self.__exec_full_path_file_name + \
             ', work dir=' + self.__work_dir + \
             ', ports=' + str(ports) + \
-            ', cortix_start_time=' + str(start_time) + \
-            ', cortix_final_time=' + str(final_time) + ' )'
+            ', cortix_start_time=' + str(cortix_start_time) + \
+            ', cortix_final_time=' + str(cortix_final_time) + ' )'
         self.__log.info(s)
 
         # Evolve the module
         self.__set_runtime_status('running')
         self.__log.info("__set_runtime_status(self, 'running')")
 
-        cortix_time = start_time
+        cortix_time = cortix_start_time
 
-        while cortix_time <= final_time:
+        while cortix_time <= cortix_final_time:
 
             s = ''
             self.__log.debug(s)

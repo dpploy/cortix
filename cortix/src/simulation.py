@@ -23,9 +23,9 @@ from cortix.src.utils.set_logger_level import set_logger_level
 #*********************************************************************************
 
 class Simulation:
-    """
+    '''
     Cortix Simulation element as defined in the Cortix config.
-    """
+    '''
 
     def __init__(self, parent_work_dir=None, sim_config_node=ConfigTree()):
         assert isinstance(parent_work_dir, str), '-> parentWorkDir invalid.'
@@ -99,12 +99,12 @@ class Simulation:
 #----------------------- end def __init__():--------------------------------------
 
     def execute(self, task_name=None):
-        """
+        '''
         This method allows for the execution of a simulation by executing each
         task, if any. Execution proceeds one task at a time.
-        """
+        '''
         self.__log.debug("prepare to execute(%s)", task_name)
-   
+
         if task_name is not None:
 
             self.__setup_task(task_name)
@@ -132,10 +132,10 @@ class Simulation:
 # Private helper functions (internal use: __)
 
     def __setup_task(self, task_name):
-        """
+        '''
         This is a helper function used by the execute() method.
         It sets up the set of tasks defined in the Cortix config for a simulation.
-        """
+        '''
 
         self.__log.debug('start __setup_task(%s)', task_name)
         task = None
@@ -208,7 +208,7 @@ class Simulation:
                     if to_module_slot not in to_module_to_port_visited.keys():
                         to_module_to_port_visited[to_module_slot] = list()
 
-                    to_module_name = to_module_slot.split('_')[0]
+                    to_module_name = '_'.join( to_module_slot.split('_')[:-1] )
                     to_module = self.__application.get_module(to_module_name)
 
                     assert to_module is not None, \
@@ -216,11 +216,11 @@ class Simulation:
 
                     assert to_module.has_port_name(to_port), \
                         'module %r has no port %r.' % (
-                            to_module.get_name(), to_port)
+                            to_module.name, to_port)
 
                     assert to_module.get_port_type(to_port) is not None,\
                         'network name: %r, module name: %r, to_port: %r port type \
-                    invalid %r' % (net.get_name(), to_module.get_name(), to_port,
+                    invalid %r' % (net.name, to_module.name, to_port,
                                    type(to_module.get_port_type(to_port)))
 
                     to_module_slot_work_dir = task_work_dir + to_module_slot + '/'
@@ -228,7 +228,7 @@ class Simulation:
                     if to_module.get_port_type(to_port) != 'input':
                         assert to_module.get_port_type(to_port) == 'provide', \
                             'port type %r invalid. Module %r, port %r' \
-                            % (to_module.get_port_type(to_port), to_module.get_name(),
+                            % (to_module.get_port_type(to_port), to_module.name,
                                to_port)
 
                     # "to" is who receives the "call", hence the provider
@@ -272,10 +272,11 @@ class Simulation:
                     net.set_runtime_cortix_comm_file(to_module_slot,
                                                      to_module_slot_comm_file)
 
-                    # Now do the ports that will function as use ports
+                    # Now do the ports that will function as use ports or
+                    # output ports
                     from_module_slot = con['fromModuleSlot']
                     from_port = con['fromPort']
-                    from_module_name = from_module_slot.split('_')[0]
+                    from_module_name = '_'.join( from_module_slot.split('_')[:-1] )
                     from_module = self.__application.get_module(from_module_name)
 
                     assert from_module.has_port_name(from_port), \
@@ -284,7 +285,7 @@ class Simulation:
 
                     assert from_module.get_port_type(from_port) is not None, \
                         'network name: %r, module name: %r, from_port: %r port type invalid %r'\
-                        % (net.get_name(), from_module.get_name(), from_port,
+                        % (net.name, from_module.name, from_port,
                            type(from_module.get_port_type(from_port)))
 
                     from_module_slot_work_dir = task_work_dir + from_module_slot + '/'
@@ -293,7 +294,7 @@ class Simulation:
                         assert from_module.get_port_type(from_port) == 'use', \
                             'port type %r invalid. Module %r, port %r' % \
                             (from_module.get_port_type(from_port),
-                             from_module.get_name(), from_port)
+                             from_module.name, from_port)
 
                         # "from" is who makes the "call", hence the user
                         from_module_slot_comm_file = from_module_slot_work_dir + \

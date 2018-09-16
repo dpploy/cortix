@@ -7,14 +7,9 @@
 #
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
-"""
-Cortix driver for guest modules.
-Module developers must implement the public methods in this driver.
-Ideally, this implementation should be minimal.
-Developers should use this class to wrap their module (MyModule) implemented in a
-file named my_module.py. This file will be placed inside the developer's module
-directory which is pointed to in the Cortix config.xml file.
-"""
+'''
+Droplet module example in Cortix.
+'''
 #*************************************************************************
 import os
 import sys
@@ -24,13 +19,13 @@ import datetime
 import logging
 
 # uncomment
-#from .my_module import MyModule
+from .droplet import Droplet
 #*************************************************************************
 
-class CortixDriverTemplate():
-    """
+class CortixDriver():
+    '''
      Cortix driver for guest modules.
-    """
+    '''
 
     def __init__(self,
                  slot_id,
@@ -54,14 +49,14 @@ class CortixDriverTemplate():
             cortix_final_time, float), '-> time type %r is invalid.' % type(cortix_final_time)
 
         # Logging
-        self.__log = logging.getLogger( 'launcher-mymodule' + str(slot_id) +
+        self.__log = logging.getLogger( 'launcher-droplet' + str(slot_id) + 
                                         '.cortixdriver')
         self.__log.info('initializing an object of CortixDriver()')
 
-        # Guest library module: MyModule
+        # Guest library module: Droplet
         # uncomment
-        # self.my_module = MyModule( slot_id, input_full_path_file_name, work_dir, ports,
-        #                            cortix_start_time, cortix_final_time )
+        self.__droplet = Droplet( slot_id, input_full_path_file_name, work_dir, ports,
+                                  cortix_start_time, cortix_final_time )
 
         self.__time_stamp = None  # temporary
 
@@ -75,8 +70,7 @@ class CortixDriverTemplate():
 
         self.__log_debug(cortix_time, 'call_ports')
 
-        # uncomment
-        # self.my_module.call_ports( cortix_time )
+        self.__droplet.call_ports( cortix_time )
 
         self.__log_debug(cortix_time, 'call_ports')
 
@@ -90,8 +84,7 @@ class CortixDriverTemplate():
 
         self.__log_debug(cortix_time, 'execute')
 
-        # uncomment
-        # self.my_module.execute( cortix_time, timeStep )
+        self.__droplet.execute( cortix_time, timeStep )
 
         self.__log_debug(cortix_time, 'execute')
 
