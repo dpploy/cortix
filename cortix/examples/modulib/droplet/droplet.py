@@ -12,13 +12,12 @@ Droplet module example in Cortix.
 '''
 #*********************************************************************************
 import os, sys, io, time
-import datetime
 import logging
 
 from cortix.support.quantity import Quantity
 from cortix.support.specie   import Specie
 from cortix.support.phase    import Phase
-from collections import namedtuple
+from collections             import namedtuple
 #*********************************************************************************
 
 class Droplet():
@@ -107,7 +106,7 @@ class Droplet():
   water_mass_cc = 1.00 # [g/cc]
   self.__liquid_phase.SetValue( 'water', water_mass_cc, cortix_start_time )
 
-  x_0 = 1000.0  # initial height [m]
+  x_0 = 1000.0  # initial height [m] above ground at 0
   self.__liquid_phase.SetValue( 'height', x_0, cortix_start_time )
 
   v_0 = 0.0     # initial speed  [m/s]
@@ -153,6 +152,9 @@ class Droplet():
 # Provide data to port files
   if provide_port_name == 'output' and port_file is not None: 
    self.__provide_persistent_output( port_file, at_time )
+
+  if provide_port_name == 'state' and port_file is not None: 
+   self.__provide_state( port_file, at_time )
 
   return
 #---------------------- end def __provide_data():---------------------------------
@@ -219,8 +221,10 @@ class Droplet():
 
  def __provide_persistent_output( self, port_file, at_time ):
    '''
-   This may return a None port_file
+   Provide data that will remain in disk after the simulation ends.
    '''
+   import datetime
+
    # if the first time step, write the header of a table data file
    if at_time == self.__start_time:
 
@@ -267,6 +271,369 @@ class Droplet():
    return
 #---------------------- end def __provide_persistent_output():--------------------
 
+ def __provide_state( self, port_file, at_time ):
+   '''
+   Provide the internal state of the module. This is typically used by an other
+   module such as '.cortix.modulib.pyplot'; this XML file type is now deprecated.
+   '''
+   import datetime
+   import xml.etree.ElementTree as ElementTree
+   from threading import Lock
+
+   pyplot_scale = 'linear'
+   gDec  = self.gramDecimals
+   ccDec = self.ccDecimals   
+
+   # write header
+   if at_time == self.__start_time:
+
+    assert os.path.isfile(port_file) is False, 'port_file %r exists; stop.' % port_file
+
+    tree = ElementTree.ElementTree()
+    root_node = tree.getroot()
+
+    a = ElementTree.Element('time-sequence')
+    a.set('name','droplet_'+str(self.__slot_id)+'-state')
+
+    b = ElementTree.SubElement(a,'comment')
+    today = datetime.datetime.today()
+    b.set('author','cortix.examples.modulib.droplet')
+    b.set('version','0.1')
+
+    b = ElementTree.SubElement(a,'comment')
+    today = datetime.datetime.today()
+    b.set('today',str(today))
+
+    b = ElementTree.SubElement(a,'time')
+    b.set('unit','second')
+
+    '''
+    # setup the headers
+    # liquid phase
+    for specie in self.liquidPhase.GetSpecies():
+        b = ElementTree.SubElement(a,'var')
+        formulaName = specie.formulaName
+        b.set('name',formulaName)
+        if specie.name == 'hno3':
+           unit = 'M'
+        else:
+           unit = specie.massCCUnit
+        b.set('unit',unit)
+        b.set('legend','Dissolver_'+str(self.__slot_id)+'-state')
+        b.set('scale',self.pyplotScale)
+
+    for quant in self.liquidPhase.GetQuantities():
+        b = ElementTree.SubElement(a,'var')
+        formalName = quant.formalName
+        b.set('name',formalName)
+        unit = quant.unit
+        b.set('unit',unit)
+        b.set('legend','Dissolver_'+str(self.__slot_id)+'-state')
+        b.set('scale',self.pyplotScale)
+
+    #-------------
+    # vapor phase
+    #-------------
+    for specie in self.vaporPhase.GetSpecies():
+        b = ElementTree.SubElement(a,'var')
+        formulaName = specie.formulaName
+        b.set('name',formulaName)
+#        unit = specie.massCCUnit
+        unit = 'gram/min'
+        b.set('unit',unit)
+        b.set('legend','Dissolver_'+str(self.__slot_id)+'-state')
+        b.set('scale',self.pyplotScale)
+
+    for quant in self.vaporPhase.GetQuantities():
+        b = ElementTree.SubElement(a,'var')
+        formalName = quant.formalName
+        b.set('name',formalName)
+        unit = quant.unit
+        b.set('unit',unit)
+        b.set('legend','Dissolver_'+str(self.__slot_id)+'-state')
+        b.set('scale',self.pyplotScale)
+
+    # derived quantities
+
+    """
+    # U
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','U-VI(a)')
+    b.set('unit','g/L')
+    b.set('legend','Dissolver_'+str(self.__slot_id)+'-state')
+    b.set('scale',self.pyplotScale)
+
+    # Pu
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Pu-IV(a)')
+    b.set('unit','g/L')
+    b.set('legend','Dissolver_'+str(self.__slot_id)+'-state')
+    b.set('scale',self.pyplotScale)
+
+    # FP
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','FP(a)')
+    b.set('unit','g/L')
+    b.set('legend','Dissolver_'+str(self.__slot_id)+'-state')
+    b.set('scale',self.pyplotScale)
+
+    # Liquid phase gamma pwr
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Liq. Gamma(a)')
+    b.set('unit','W/L')
+    b.set('legend','Dissolver_'+str(self.__slot_id)+'-state')
+    b.set('scale',self.pyplotScale)
+
+    # Liquid phase radioactivity 
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Liq. Radioact.(a)')
+    b.set('unit','Ci/L')
+    b.set('legend','Dissolver_'+str(self.__slot_id)+'-state')
+    b.set('scale',self.pyplotScale)
+
+    # Liquid phase thermo power   
+    b = ElementTree.SubElement(a,'var')
+    b.set('name','Liq. Decay Heat(a)')
+    b.set('unit','W/L')
+    b.set('legend','Dissolver_'+str(self.__slot_id)+'-state')
+    b.set('scale',self.pyplotScale)
+    """
+
+    # write values for all variables
+    b = ElementTree.SubElement(a,'timeStamp')
+    b.set('value',str(atTime))
+
+    values = list()
+
+    #-----------
+    # solid fuel
+    #-----------
+    for quant in self.solidPhase.GetQuantities():
+        val = self.solidPhase.GetValue( quant.name, atTime )
+        values.append( val )
+
+    for var in self.fuelStateSpec:
+        attributeName = var[1]
+        nuclideSymbol = var[2]
+        nuclideSeries = var[3]
+
+        value = 0.0
+
+        for fuelSeg in self.fuelSegments:
+            volume = fuelSeg.GetAttribute( name='fuelVolume' )
+            if volume == 0.0: continue
+            value += fuelSeg.GetAttribute( name=attributeName,
+                                           symbol=nuclideSymbol,
+                                           series=nuclideSeries  )
+        values.append( value )
+
+    #-------------
+    # liquid phase
+    #-------------
+    for specie in self.liquidPhase.GetSpecies():
+        val = self.liquidPhase.GetValue( specie.name, atTime )
+        values.append( val )
+    for quant in self.liquidPhase.GetQuantities():
+        val = self.liquidPhase.GetValue( quant.name, atTime )
+        values.append( val )
+
+    #-------------
+    # vapor phase
+    #-------------
+    volFlowRate = self.vaporPhase.GetValue('volFlowRate', atTime)
+    for specie in self.vaporPhase.GetSpecies():
+        val = self.vaporPhase.GetValue( specie.name, atTime )
+        values.append( val * volFlowRate )
+    for quant in self.vaporPhase.GetQuantities():
+        val = self.vaporPhase.GetValue( quant.name, atTime )
+        values.append( val )
+
+    # derived quantities
+#    values += [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+#    values += [0.0, 0.0]
+
+    # flush out data
+    text = str()
+    for value in values:
+        text += str(round(value,6)) + ',' 
+
+    text = text[:-1]
+
+    b.text = text 
+
+    tree = ElementTree.ElementTree(a)
+
+    tree.write( port_file, xml_declaration=True, encoding="unicode", method="xml" )
+
+  #-------------------------------------------------------------------------------
+  # if not the first time step then parse the existing history file and append
+  else:
+
+    mutex = Lock()
+    mutex.acquire()
+
+    tree = ElementTree.parse( port_file )
+    root_node = tree.getroot()
+
+    a = ElementTree.Element('timeStamp')
+    a.set('value',str(atTime))
+
+    # all variables values
+    values = list()
+
+    # correct the header for the FP oxide specie
+    if self.uMassLoaded != 0.0:
+       varNodes = root_node.findall('var')
+       for var in varNodes:
+           if var.attrib['name'][:7] == 'FP(NO3)':
+              fpnName = self.liquidPhase.GetSpecie('fpn').formulaName
+              var.set( 'name', fpnName )
+              break
+
+    # solid fuel
+    for quant in self.solidPhase.GetQuantities():
+        val = self.solidPhase.GetValue( quant.name, atTime )
+        values.append( val )
+
+    for var in self.fuelStateSpec:
+        attributeName = var[1]
+        nuclideSymbol = var[2]
+        nuclideSeries = var[3]
+
+        value = 0.0
+
+        for fuelSeg in self.fuelSegments:
+            volume = fuelSeg.GetAttribute( name='fuelVolume' )
+            if volume == 0.0: continue 
+            value += fuelSeg.GetAttribute( name   = attributeName,
+                                           symbol = nuclideSymbol,
+                                           series = nuclideSeries  )
+        values.append( value )
+
+    # liquid phase
+    for specie in self.liquidPhase.GetSpecies():
+        val = self.liquidPhase.GetValue( specie.name, atTime )
+        values.append( val )
+    for quant in self.liquidPhase.GetQuantities():
+        val = self.liquidPhase.GetValue( quant.name, atTime )
+        values.append( val )
+
+    # vapor phase
+    volFlowRate = self.vaporPhase.GetValue('volFlowRate', atTime)
+    for specie in self.vaporPhase.GetSpecies():
+        val = self.vaporPhase.GetValue( specie.name, atTime )
+        values.append( val * volFlowRate )
+    for quant in self.vaporPhase.GetQuantities():
+        val = self.vaporPhase.GetValue( quant.name, atTime )
+        values.append( val )
+
+    """
+    # derived quantities
+    # U
+    rho_u6n = self.liquidPhase.GetValue( 'u6n', atTime )
+    u6n_aqu = self.liquidPhase.GetSpecie('u6n')
+    c_u6n = rho_u6n / u6n_aqu.molarMass
+    c_u6 = c_u6n
+    try:
+       self.uIsotopicMolarMass
+    except AttributeError:
+       rho_u6 = 0.0
+    else:
+       rho_u6 = c_u6 * self.uIsotopicMolarMass
+
+    values += [rho_u6]
+
+    # Pu
+    rho_pu4n = self.liquidPhase.GetValue( 'pu4n', atTime )
+    pu4n_aqu = self.liquidPhase.GetSpecie('pu4n')
+    c_pu4n = rho_pu4n / pu4n_aqu.molarMass
+    c_pu4 = c_pu4n
+    try:
+       self.puIsotopicMolarMass
+    except AttributeError:
+       rho_pu4 = 0.0
+    else:
+       rho_pu4 = c_pu4 * self.puIsotopicMolarMass
+
+    values += [rho_pu4]
+
+    # FP
+    rho_fpn = self.liquidPhase.GetValue( 'fpn', atTime )
+    fpn_aqu = self.liquidPhase.GetSpecie('fpn')
+    c_fpn = rho_fpn / fpn_aqu.molarMass
+    c_fp = c_fpn
+    try:
+       self.puIsotopicMolarMass
+    except AttributeError:
+       rho_fp = 0.0
+    else:
+       rho_fp = c_fp * self.puIsotopicMolarMass
+
+    values += [rho_fp]
+
+    # Liquid phase gamma power
+    rho_u6n = self.liquidPhase.GetValue( 'u6n', atTime )
+    c_u6n = rho_u6n / u6n_aqu.molarMass
+    gammaU6n = c_u6n * u6n_aqu.molarGammaPwr
+    rho_pu4n = self.liquidPhase.GetValue( 'pu4n', atTime )
+    c_pu4n = rho_pu4n / pu4n_aqu.molarMass
+    gammaPu4n = c_pu4n * pu4n_aqu.molarGammaPwr
+    rho_fpn = self.liquidPhase.GetValue( 'fpn', atTime )
+    c_fpn = rho_fpn / fpn_aqu.molarMass
+    gammaFPn = c_fpn * fpn_aqu.molarGammaPwr
+    
+    gammaPwr = gammaU6n + gammaPu4n + gammaFPn 
+
+    values += [gammaPwr]
+
+    # Liquid phase radioactivity 
+    c_u6n = rho_u6n / u6n_aqu.molarMass
+    radioactU6n = c_u6n * u6n_aqu.molarRadioactivity
+    c_pu4n = rho_pu4n / pu4n_aqu.molarMass
+    radioactPu4n = c_pu4n * pu4n_aqu.molarRadioactivity
+    c_fpn = rho_fpn / fpn_aqu.molarMass
+    radioactFPn = c_fpn * fpn_aqu.molarRadioactivity
+    
+    radioact = radioactU6n + radioactPu4n + radioactFPn 
+
+    values += [radioact]
+
+    # Liquid phase decay heat     
+    c_u6n = rho_u6n / u6n_aqu.molarMass
+    heatU6n = c_u6n * u6n_aqu.molarHeatPwr
+    c_pu4n = rho_pu4n / pu4n_aqu.molarMass
+    heatPu4n = c_pu4n * pu4n_aqu.molarHeatPwr
+    c_fpn = rho_fpn / fpn_aqu.molarMass
+    heatFPn = c_fpn * fpn_aqu.molarHeatPwr
+    
+    heat = heatU6n + heatPu4n + heatFPn 
+
+    values += [heat]
+    """
+
+    # flush out data
+    text = str()
+    for value in values:
+        text += str(round(value,8)) + ',' 
+
+    text = text[:-1]
+
+    a.text = text 
+
+    root_node.append(a)
+
+    tree.write( port_file, xml_declaration=True, encoding="unicode", method="xml" )
+
+    mutex.release()
+
+  return 
+
+#*********************************************************************************
+    '''
+
+
+#---------------------- end def __provide_state():--------------------------------
+
  def __evolve( self, cortix_time=0.0, time_step=0.0 ):
 
   import numpy as np
@@ -307,6 +674,10 @@ class Droplet():
 
   at_time = cortix_time + time_step 
   self.__liquid_phase.AddRow( at_time, values ) # repeat values for current time
+
+  if u_vec[0] <= 0.0: # ground impact sets result to zero
+   u_vec[0] = 0.0
+   u_vec[1] = 0.0
 
   self.__liquid_phase.SetValue( 'height', u_vec[0], at_time ) # update current values
   self.__liquid_phase.SetValue( 'speed',  u_vec[1], at_time ) # update current values

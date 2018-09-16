@@ -1,0 +1,188 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  This file is part of the Cortix toolkit evironment
+  https://github.com/dpploy/cortix
+  
+  All rights reserved, see COPYRIGHT for full restrictions.
+  https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
+ 
+  Licensed under the GNU General Public License v. 3, please see LICENSE file.
+  https://www.gnu.org/licenses/gpl-3.0.txt
+-->
+
+<!-- Configuration of Cortix -->
+
+<cortix_config version="0.1">
+
+<!-- ****************************************************************************** -->
+<!--                     CORTIX object starts here                                  -->
+
+<!-- Cortix instantiation definition -->
+<!-- NB: XML elements in this level must be unique across other configuration files if
+         multiple Cortix objects are used in the cortix-main.py program.
+         If this rule is not followed, there will be collision with file in/outputs;
+         including results files and logging files.-->
+
+ <name>cortix-droplet</name>
+
+ <logger level="DEBUG">
+  <file_handler level="DEBUG"> </file_handler>
+  <console_handler level="INFO"> </console_handler>
+ </logger>
+
+ <work_dir>/tmp/</work_dir>
+
+ <!-- ============================================================================= -->
+ <!--                Simulation object starts here                                  -->
+
+ <!-- Simulation definition -->
+ <!-- NB: each simulation has only one application -->
+
+ <simulation name="droplet">
+
+  <logger level="DEBUG">
+   <file_handler level="DEBUG"> </file_handler>
+   <console_handler level="INFO"> </console_handler>
+  </logger>
+
+  <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+  <!--                   Tasks objects start here                                   -->
+
+  <!-- Simulation: tasks -->
+  <!--NB: each task combines parameters for one named application connectivity-->
+  <!--NB: each task name must match a network name below-->
+
+  <task name="solo-droplet-fall" >
+   <start_time unit="minute">0.0</start_time>
+   <evolve_time unit="minute">0.28</evolve_time>
+   <time_step unit="minute">0.01</time_step>
+   <logger level="DEBUG">
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
+   </logger>
+  </task>
+
+  <task name="droplet-fall" >
+   <start_time unit="minute">0.0</start_time>
+   <evolve_time unit="minute">0.28</evolve_time>
+   <time_step unit="minute">0.01</time_step>
+   <logger level="DEBUG">
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
+   </logger>
+  </task>
+
+  <!--                   Tasks objects end here                                     -->
+  <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+
+  <!-- ############################################################################ -->
+  <!--                   Application object starts here                             -->
+
+  <!-- Simulation: application -->
+  <!-- NB: each simulation has only one application -->
+
+  <application name="droplet">
+
+   <module_library name='droplet_fall'>
+    <parent_dir>
+    /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/cortix/cortix/examples/modulib
+    </parent_dir>
+   </module_library>
+
+   <logger level="DEBUG">
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
+   </logger>
+
+   <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
+   <!--                  Modules objects starts here                                -->
+   <!-- Application: modules set -->
+
+   <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
+
+   <module name="modulib.pyplot" type="native">
+    <library name='cortix'>
+     <parent_dir>
+      /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev
+     </parent_dir>
+    </library>
+    <input_file_name>pyplot.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessin     g/cortix-dev/input/</input_file_path>
+    <logger level="DEBUG">
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
+    </logger>
+    <!-- Ports have four types: * use, * provide, * input, * output -->
+    <!-- The *input*, and *output* types allow for module self-connection; see networ     k section  -->
+    <port type="use"   mode="file.xml" multiplicity="1">time-sequence</port>
+   </module>
+
+   <module name="droplet" type="native">
+    <library name='cortix.examples.modulib'>
+     <parent_dir>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev</parent_dir>
+    </library>
+    <input_file_name>droplet.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
+    <logger level="DEBUG">
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
+    </logger>
+    <!-- Ports have four types: * use, * provide, * input, * output -->
+    <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
+    <port type="input"   mode="file.txt" multiplicity="1">input-data</port>
+    <port type="use"     mode="file.txt" multiplicity="1">input</port>
+    <port type="provide" mode="file.xml" multiplicity="1">state</port>
+    <port type="provide" mode="file.dat" multiplicity="1">output</port>
+    <port type="output"  mode="file.any" multiplicity="1">persistent-output</port>
+   </module>
+
+   <!--                  Modules objects end here                                   -->
+   <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
+
+   <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
+   <!--                  Network objects start here                                 -->
+
+   <!-- Application: networks -->
+   <!-- NB: each network has its own task definition above; with the same name -->
+   <!-- NB: the connect tag is ordered: *from* is the receiver; *to* is the provider-->
+   <!-- NB: port labels are the "names" of the ports; "not" a file name necessarily-->
+   <!-- NB: module labels must be composed with a "slot" number, say "name:x"-->
+
+   <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
+   <network name="solo-droplet-fall">
+    <logger level="DEBUG">
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
+    </logger>
+    <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
+    <connect fromModuleSlot="droplet:0" fromPort="input" toModuleSlot="droplet:0" toPort="input-data"/> 
+    <connect fromModuleSlot="droplet:0" fromPort="persistent-output" toModuleSlot="droplet:0" toPort="output"/> 
+   </network>
+
+   <network name="droplet-fall">
+    <logger level="DEBUG">
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
+    </logger>
+    <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
+    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
+    <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
+    <connect fromModuleSlot="droplet:0" fromPort="input" toModuleSlot="droplet:0" toPort="input-data"/> 
+    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence" toModuleSlot="droplet:0" toPort="state"/> 
+    <connect fromModuleSlot="droplet:0" fromPort="persistent-output" toModuleSlot="droplet:0" toPort="output"/> 
+   </network>
+
+   <!--                  Network objects end here                                   -->
+   <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
+
+  <!--                   Application object ends here                               -->
+  <!-- ############################################################################ -->
+  </application>
+
+ <!--                Simulation object ends here                                    -->
+ <!-- ============================================================================= -->
+ </simulation>
+
+</cortix_config>
