@@ -34,8 +34,8 @@ def main():
 
  cortix1 = Cortix( 'cortix-droplet', full_path_config_file ) # see cortix-config-droplet.xml
 #
- cortix1.run_simulations( task_name='solo-droplet-fall' )
-# cortix1.run_simulations( task_name='droplet-fall' )
+# cortix1.run_simulations( task_name='solo-droplet-fall' )
+ cortix1.run_simulations( task_name='droplet-fall' )
 
 #---------------------- end def main():-------------------------------------------
 
