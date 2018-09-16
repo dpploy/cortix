@@ -205,17 +205,17 @@ class Module:
         return False
 #----------------------- end def has_port_name():---------------------------------
 
-    def execute(self, slot_id, runtime_cortix_param_file,
-                runtime_cortix_comm_file):
+    def execute( self, slot_id, runtime_cortix_param_file,
+                 runtime_cortix_comm_file ):
         """
         Spawns a worker process to execute the module.
         """
 
         module_input = self.__input_file_path + self.__input_file_name
         param = runtime_cortix_param_file
-        comm = runtime_cortix_comm_file
+        comm  = runtime_cortix_comm_file
 
-        full_path_comm_dir = comm[:comm.rfind('/')] + '/'
+        full_path_comm_dir = comm[:comm.rfind('/')] + '/' # extract directory name
         runtime_module_status_file = full_path_comm_dir + 'runtime-status.xml'
 
         status = runtime_module_status_file

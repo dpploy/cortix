@@ -38,6 +38,11 @@ class Launcher(Thread):
                  cortix_comm_full_path_file_name,
                  runtime_status_full_path):
 
+        assert cortix_param_full_path_file_name[-1] is not '/', \
+               '%r'%cortix_param_full_path_file_name
+        assert cortix_comm_full_path_file_name[-1] is not '/' \
+               '%r'%cortix_comm_full_path_file_name
+
         self.__module_name = module_name
         self.__slot_id = slot_id
         self.__input_full_path_file_name = input_full_path_file_name
@@ -53,9 +58,10 @@ class Launcher(Thread):
         log.setLevel(logging.DEBUG)
 
         # create file handler for logs
-        full_path_task_dir = self.__cortix_comm_full_path_file_name[:self.__cortix_comm_full_path_file_name.rfind(
-            '/')] + '/'
-        file_handle = logging.FileHandler(full_path_task_dir + 'launcher.log')
+        i = self.__cortix_comm_full_path_file_name.rfind('/') 
+        directory = self.__cortix_comm_full_path_file_name[:i]
+        full_path_launcher_dir = directory + '/'
+        file_handle = logging.FileHandler(full_path_launcher_dir + 'launcher.log')
         file_handle.setLevel(logging.DEBUG)
 
         # create console handler with a higher log level
