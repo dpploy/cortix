@@ -136,17 +136,20 @@ class Network:
         '''
         Network to string conversion
         '''
-        s = 'Network data members: name=%s slot names=%s connectivity=%s'
-        return s % (self.__name, self.__slot_names, self.__connectivity)
+        s = 'Network data members:\n name=%s\n slot names=%s\n connectivity=%s\n runtime comm file= %s'
+        return s % (self.__name, self.__slot_names, self.__connectivity, 
+                    self.__runtime_cortix_comm_file)
 #----------------------- end def __str__():---------------------------------------
 
+        self.__runtime_cortix_comm_file = dict()
     def __repr__(self):
         '''
         Network to string conversion
         '''
 
-        s = 'Network data members: name=%s slot names=%s connectivity=%s'
-        return s % (self.__name, self.__slot_names, self.__connectivity)
+        s = 'Network data members:\n name=%s\n slot names=%s\n connectivity=%s\n runtime comm file= %s'
+        return s % (self.__name, self.__slot_names, self.__connectivity, 
+                    self.__runtime_cortix_comm_file)
 #----------------------- end def __repr__():--------------------------------------
 
 #======================= end class Network: ======================================

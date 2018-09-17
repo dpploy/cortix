@@ -141,9 +141,9 @@ class Task:
             module_name = '_'.join( slot_name.split('_')[:-1] )
             slot_id = int(slot_name.split('_')[-1])
 
-            module = application.get_module(module_name)
+            module     = application.get_module(module_name)
             param_file = self.__runtime_cortix_param_file
-            comm_file = network.get_runtime_cortix_comm_file(slot_name)
+            comm_file  = network.get_runtime_cortix_comm_file(slot_name)
 
             # Run module in the slot
             self.__log.info('call execute on module: %s:%s',module_name,slot_id)

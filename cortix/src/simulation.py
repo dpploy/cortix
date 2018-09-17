@@ -196,9 +196,17 @@ class Simulation:
         # Using the tasks and network create the runtime module directories and comm
         # files
         for net in networks:
-            if net.name == task_name:  # Warning: net and task name must match
+  
+            if net.name.strip() != task_name.strip():
+                s = '__setup_task():: net name: ' + \
+                    net.name + ' not equal to task name: ' + task_name + '; ignored.'
+                self.__log.warn(s)
+
+            if net.name.strip() == task_name.strip():  # net and task names must match
+
                 connect = net.connectivity
                 to_module_to_port_visited = dict()
+
                 for con in connect:
                     # Start with the ports that will function as a provide port or
                     # input port
@@ -339,15 +347,22 @@ class Simulation:
                         self.__log.debug(debug_str)
 
                 # register the cortix-comm file for the network
-                net.set_runtime_cortix_comm_file(from_module_slot,
-                                                 from_module_slot_comm_file)
+                net.set_runtime_cortix_comm_file( from_module_slot,
+                                                  from_module_slot_comm_file )
 
         # finish forming the XML documents for port types
         for net in networks:
             for slot_name in net.slot_names:
                 comm_file = net.get_runtime_cortix_comm_file(slot_name)
                 if comm_file == 'null-runtime_cortix_comm_file':
-                    continue
+                    if net.name != task_name:
+                       s = '__setup_task():: comm file for ' + slot_name + \
+                           ' in network ' + net.name + ' is ' + comm_file
+                       self.__log.warn(s)
+                       continue
+                    else: 
+                       assert False, 'FATAL ERROR building the comm file for module %r'%\
+                                    slot_name
                 fout = open(comm_file, 'a')
                 fout.write('</cortix_comm>')
                 fout.close()
