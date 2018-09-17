@@ -89,6 +89,10 @@ class PyPlot():
         # [(time,timeUnit)] = [column,column,...]
         self.timeTablesData = dict(list())
 
+        # sanity check
+        self.plotInterval    = self.finalTime/10.0
+        self.plotSlideWindow = 2.0 * self.plotInterval
+
 # .................................................................................
 # Input ports (if any)
 

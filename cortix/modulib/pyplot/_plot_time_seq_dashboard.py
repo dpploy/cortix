@@ -100,7 +100,7 @@ def _plot_time_seq_dashboard(self, initialTime=0.0, finalTime=0.0):
 
             axes = npy.array(axlst)
 
-            text = today + ': cortix.viz.PyPlot_' + \
+            text = today + ': Cortix.PyPlot_' + \
                 str(self.slotId) + ': Time-Sequence Dashboard'
             fig.text(.5, .95, text, horizontalalignment='center', fontsize=14)
 

@@ -51,7 +51,7 @@ def _plot_time_tables(self, initialTime=0.0, finalTime=0.0):
     axlst.append(fig.add_subplot(gs[1, 1]))
     axes = np.array(axlst)
 
-    text = 'cortix.viz.PyPlot: Time-Tables Dashboard'
+    text = 'Cortix.PyPlot: Time-Tables Dashboard'
     fig.text(.5, .95, text, horizontalalignment='center', fontsize=16)
 
     for (key, val) in self.timeTablesData.items():
