@@ -16,10 +16,11 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 #*********************************************************************************
 import os
 import logging
-from cortix.src.task import Task
-from cortix.src.application import Application
-from cortix.src.utils.configtree import ConfigTree
+from cortix.src.utils.configtree       import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
+
+from cortix.src.task        import Task
+from cortix.src.application import Application
 #*********************************************************************************
 
 class Simulation:
@@ -90,7 +91,10 @@ class Simulation:
             app_config_node = ConfigTree(app_node)
             assert app_config_node.get_node_name() == app_node.get("name"), \
                 "check failed"
+
+            # Create the application for this simulation
             self.__application = Application(self.__work_dir, app_config_node)
+
             self.__log.debug("created application: %s", app_node.get('name'))
 
         # Stores the task(s) created by the execute method
@@ -107,6 +111,7 @@ class Simulation:
 
         if task_name is not None:
 
+            # Create the task object for each task in this simulation
             self.__setup_task(task_name)
 
             for task in self.__tasks:

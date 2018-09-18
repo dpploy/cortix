@@ -31,7 +31,8 @@ class Droplet():
                work_dir,
                ports = list(),
                cortix_start_time = 0.0,
-               cortix_final_time = 0.0  
+               cortix_final_time = 0.0,
+               time_unit=None
              ):
 
 #.................................................................................
@@ -44,6 +45,8 @@ class Droplet():
          type(cortix_start_time)
   assert isinstance(cortix_final_time, float), '-> time type %r is invalid.' % \
          type(cortix_final_time)
+  assert isinstance(time_unit, str), '-> time unit type %r is invalid.' % \
+         type(time_unit)
 
   # Logging
   self.__log = logging.getLogger('launcher-droplet'+str(slot_id)+'.cortix_driver.droplet')
@@ -53,21 +56,27 @@ class Droplet():
 # Member data 
 
   self.__slot_id = slot_id
-  self.__ports  = ports
+  self.__ports   = ports
 
-  self.__start_time = cortix_start_time
-  self.__final_time = cortix_final_time
+  # Convert Cortix's time unit to Droplet's internal time unit
+  if time_unit == 'minute':
+     self.__time_unit_scale = 60.0
+  else:
+     assert False, 'Cortix time_unit: %r not acceptable.' % time_unit
+
+  self.__start_time = cortix_start_time * self.__time_unit_scale # Droplet time unit
+  self.__final_time = cortix_final_time * self.__time_unit_scale # Droplet time unit
 
   if work_dir[-1] != '/': work_dir = work_dir + '/'
   self.__wrkDir = work_dir
 
   # Signal to start operation
-  self.__goSignal = True    # start operation immediately
-  for port in self.__ports: # if there is a signal port, start operation accordingly
-      (port_name,port_type,this_port_file) = port
+  self.__goSignal = True     # start operation immediately
+  for port in self.__ports:  # if there is a signal port, start operation accordingly
+      (port_name, port_type, this_port_file) = port
       if port_name == 'go-signal' and port_type == 'use': self.__go_signal = False
 
-  self.__setup_time = 1.0  # min; a delay time before starting to run
+  self.__setup_time = 60.0  # time unit; a delay time before starting to run
 
 #.................................................................................
 # Input ports
@@ -123,6 +132,8 @@ class Droplet():
   Transfer data at cortix_time
   '''
 
+  cortix_time *= self.__time_unit_scale  # convert to Droplet time unit
+
   # provide data to all provide ports 
   self.__provide_data( provide_port_name='output', at_time=cortix_time )
   self.__provide_data( provide_port_name='state',  at_time=cortix_time )
@@ -137,6 +148,9 @@ class Droplet():
   '''
   Evolve system from cortix_time to cortix_time + time_step
   '''
+
+  cortix_time *= self.__time_unit_scale  # convert to Droplet time unit
+  time_step   *= self.__time_unit_scale  # convert to Droplet time unit
 
   s = 'execute('+str(round(cortix_time,2))+'[min]): '
   self.__log.debug(s)
@@ -191,10 +205,14 @@ class Droplet():
      assert provide_port_name is None
  
      for port in self.__ports:
-       (port_name,port_type,this_port_file) = port
-       if port_name == use_port_name and port_type == 'use': port_file = this_port_file
 
-     if port_file is None: return None
+       (port_name,port_type,this_port_file) = port
+
+       if port_name == use_port_name and port_type == 'use': 
+          port_file = this_port_file
+
+     if port_file is None: 
+        return None
  
      max_n_trials = 50
      n_trials     = 0
@@ -258,8 +276,8 @@ class Droplet():
 
    fout = open(port_file,'a')
 
-   # cortix time 
-   fout.write('%18.6e' % (at_time*60.0))
+   # Droplet time 
+   fout.write('%18.6e' % (at_time))
 
    # mass density   
    for specie in self.__liquid_phase.GetSpecies():
@@ -416,8 +434,7 @@ class Droplet():
     dt_u_vec[1] = - params.gravity      #  d_t u_2 = -g
     return
 
-  time_step_sec = time_step * 60.0
-  t_interval_sec = np.linspace(0.0, time_step_sec, num=2)
+  t_interval_sec = np.linspace(0.0, time_step, num=2)
 
   cvode = ode('cvode', rhs_fn, user_data=self.__params, old_api=False)
 
@@ -434,7 +451,8 @@ class Droplet():
   
   values = self.__liquid_phase.GetRow( cortix_time ) # values at previous time
 
-  at_time = cortix_time + time_step 
+  at_time = cortix_time + time_step  
+
   self.__liquid_phase.AddRow( at_time, values ) # repeat values for current time
 
   if u_vec[0] <= 0.0: # ground impact sets result to zero

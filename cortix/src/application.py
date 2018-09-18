@@ -19,7 +19,8 @@ import sys
 import logging
 from cortix.src.utils.configtree import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
-from cortix.src.module import Module
+
+from cortix.src.module  import Module
 from cortix.src.network import Network
 #*********************************************************************************
 

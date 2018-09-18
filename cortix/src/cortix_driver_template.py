@@ -39,7 +39,8 @@ class CortixDriverTemplate():
                  work_dir,
                  ports=list(),
                  cortix_start_time=0.0,
-                 cortix_final_time=0.0
+                 cortix_final_time=0.0,
+                 time_unit=None
                  ):
 
         # Sanity test
@@ -52,6 +53,8 @@ class CortixDriverTemplate():
             cortix_start_time, float), '-> time type %r is invalid.' % type(cortix_start_time)
         assert isinstance(
             cortix_final_time, float), '-> time type %r is invalid.' % type(cortix_final_time)
+        assert isinstance(
+            time_unit, str), '-> time unit %r is invalid.' % type(time_unit)
 
         # Logging
         self.__log = logging.getLogger( 'launcher-mymodule' + str(slot_id) +

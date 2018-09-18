@@ -88,8 +88,9 @@ class Launcher(Thread):
         lib_module_driver = mod_lib_name + '.' + module_name + '.cortix_driver'
         log.info('import module driver: %s', lib_module_driver)
 
+        # import a guest Cortix module through its driver
         try:
-         self.__py_module = importlib.import_module(lib_module_driver)
+         self.__py_module = importlib.import_module( lib_module_driver )
         except Exception as error:
          log.error('importlib error: ', error)
 
@@ -99,11 +100,15 @@ class Launcher(Thread):
 #----------------------- end def __init__():--------------------------------------
 
     def run(self):
-        """
+        '''
         Function used to timestep through the modules.
         Runs the simulation from start to end, and monitors
         its progress at each time step.
-        """
+        '''
+
+        # log info           
+        self.__log.info('entered run() %s', self.__module_name +
+                      '_' + str(self.__slot_id) )
 
         # Verify the module input file name with full path.
         # This input file may be empty or used by this driver and/or the
@@ -116,6 +121,7 @@ class Launcher(Thread):
         assert os.path.isfile(self.__cortix_param_full_path_file_name), \
             'file %r not available;stop.' % self.__cortix_param_full_path_file_name
 
+        # For now Cortix advances in unit of minutes; change this in the future
         tree = ElementTree.parse(self.__cortix_param_full_path_file_name)
         cortix_param_xml_root_node = tree.getroot()
         node = cortix_param_xml_root_node.find('start_time')
@@ -157,6 +163,9 @@ class Launcher(Thread):
         else:
             assert False, 'time unit invalid: %r' % (time_step_unit)
 
+        time_unit = 'minute'
+
+        # collect information from the Cortix communication file for this guest module
         assert os.path.isfile(self.__cortix_comm_full_path_file_name),\
             'file %r not available;stop.' % self.__cortix_comm_full_path_file_name
 
@@ -183,19 +192,18 @@ class Launcher(Thread):
         tree = None
         self.__log.debug('ports: %s', str(ports))
 
-        # Run module_name
-        self.__log.info('entered Run %s', self.__module_name +
-                      '_' + str(self.__slot_id) + ' section')
+        # Add evolve time to start time  
         cortix_final_time = cortix_start_time + evolve_time
 
         # Create the guest code driver
-        guest_driver = self.__py_module.CortixDriver(self.__slot_id,
-                                                   self.__input_full_path_file_name,
-                                                   self.__exec_full_path_file_name,
-                                                   self.__work_dir,
-                                                   ports, 
-                                                   cortix_start_time, 
-                                                   cortix_final_time)
+        guest_driver = self.__py_module.CortixDriver( self.__slot_id,
+                                                      self.__input_full_path_file_name,
+                                                      self.__exec_full_path_file_name,
+                                                      self.__work_dir,
+                                                      ports, 
+                                                      cortix_start_time, 
+                                                      cortix_final_time,
+                                                      time_unit )
 
         s = 'guest_driver = CortixDriver( slot_id=' + str(self.__slot_id) + \
             ', input file=' + self.__input_full_path_file_name + \
@@ -203,7 +211,8 @@ class Launcher(Thread):
             ', work dir=' + self.__work_dir + \
             ', ports=' + str(ports) + \
             ', cortix_start_time=' + str(cortix_start_time) + \
-            ', cortix_final_time=' + str(cortix_final_time) + ' )'
+            ', cortix_final_time=' + str(cortix_final_time) + \
+            ', time unit=minute )'
         self.__log.info(s)
 
         # Evolve the module
@@ -212,7 +221,12 @@ class Launcher(Thread):
 
         cortix_time = cortix_start_time
 
-        while cortix_time <= cortix_final_time:
+        before_final_time = True
+
+        while cortix_time <= cortix_final_time or before_final_time:
+
+            if cortix_time >= cortix_final_time:  # make sure the final time is reached
+               before_final_time = False          # or exceeded by a epsilon amount
 
             s = ''
             self.__log.debug(s)
@@ -226,22 +240,22 @@ class Launcher(Thread):
                 '**************'
             self.__log.debug(s)
 
-            s = 'run(' + str(round(cortix_time, 3)) + '[min]): '
+            s = 'run(' + str(round(cortix_time, 3)) + '[min]): ' # todo: change time unit
             self.__log.debug(s)
+            s = 'run(' + str(round(cortix_time, 3)) + '[min]) ' # todo: change time unit
+            self.__log.info(s)
+
             start_time = time.time()
 
             # Data exchange at cortix_time (call ports first)
-            guest_driver.call_ports(cortix_time)
+            guest_driver.call_ports( cortix_time )
 
             # Advance to cortix_time + time_step (call execute second)
-            guest_driver.execute(cortix_time, time_step)
+            guest_driver.execute( cortix_time, time_step )
 
             end_time = time.time()
             s = 'CPU elapsed time (s): ' + str(round(end_time - start_time, 2))
             self.__log.debug(s)
-
-            s = 'run(' + str(round(cortix_time, 3)) + '[min]) '
-            self.__log.info(s)
 
             cortix_time += time_step
 

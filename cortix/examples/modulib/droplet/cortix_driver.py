@@ -34,19 +34,20 @@ class CortixDriver():
                  work_dir,
                  ports=list(),
                  cortix_start_time=0.0,
-                 cortix_final_time=0.0
+                 cortix_final_time=0.0,
+                 time_unit=None
                  ):
 
         # Sanity test
-        assert isinstance(
-            slot_id, int), '-> slot_id type %r is invalid.' % type(slot_id)
-        assert isinstance(
-            ports, list), '-> ports type %r is invalid.' % type(ports)
+        assert isinstance(slot_id, int), '-> slot_id type %r is invalid.' % type(slot_id)
+        assert isinstance( ports, list), '-> ports type %r is invalid.' % type(ports)
         assert len(ports) > 0
-        assert isinstance(
-            cortix_start_time, float), '-> time type %r is invalid.' % type(cortix_start_time)
-        assert isinstance(
-            cortix_final_time, float), '-> time type %r is invalid.' % type(cortix_final_time)
+        assert isinstance(cortix_start_time, float), '-> time type %r is invalid.' % \
+               type(cortix_start_time)
+        assert isinstance(cortix_final_time, float), '-> time type %r is invalid.' % \
+               type(cortix_final_time)
+        assert isinstance(time_unit, str), '-> time unit type %r is invalid.' % \
+               type(time_unit)
 
         # Logging
         self.__log = logging.getLogger( 'launcher-droplet' + str(slot_id) + 
@@ -56,7 +57,7 @@ class CortixDriver():
         # Guest library module: Droplet
         # uncomment
         self.__droplet = Droplet( slot_id, input_full_path_file_name, work_dir, ports,
-                                  cortix_start_time, cortix_final_time )
+                                  cortix_start_time, cortix_final_time, time_unit )
 
         self.__time_stamp = None  # temporary
 

@@ -16,6 +16,7 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 #**********************************************************************************
 import os
 from cortix.src.utils.configtree import ConfigTree
+
 from cortix.src.launcher import Launcher
 #**********************************************************************************
 
