@@ -150,9 +150,11 @@ class Phase():
         self.__phase = df.fillna(0.0)
 
     def AddRow(self, try_time_stamp, rowValues):
+        assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
 
         time_stamp = self.__get_time_stamp( try_time_stamp )
-        assert time_stamp is None, 'illegal try_time_stamp: %r'%(try_time_stamp)
+        assert time_stamp is None, 'already used try_time_stamp: %r'%(try_time_stamp)
+        time_stamp = try_time_stamp
 
         assert len(rowValues) == len(self.__phase.columns)
         tmp = dict()
@@ -165,34 +167,46 @@ class Phase():
         return
 
     def GetRow(self, try_time_stamp=None):
+        if try_time_stamp is not None:
+           assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
         time_stamp = self.__get_time_stamp( try_time_stamp )
-        assert time_stamp is not None, 'illegal try_time_stamp: %r'%(try_time_stamp)
+        assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
         return list(self.__phase.loc[time_stamp, :])
 
     def GetColumn(self, actor):
-        assert actor in self.__phase.columns
+        assert isinstance(actor, str)
+        assert actor in self.__phase.columns, 'actor %r not in %r'% \
+                   (actor,self.__phase.columns)
         return list(self.__phase.loc[:, actor])
 
     def ScaleRow(self, try_time_stamp, value):
+        assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
         time_stamp = self.__get_time_stamp( try_time_stamp )
-        assert time_stamp is not None, 'illegal try_time_stamp: %r'%(try_time_stamp)
+        assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
+        assert isinstance(value, int) or isinstance(value, float) 
         self.__phase.loc[time_stamp, :] *= float(value)
         return
 
     # set species and quantities of history to a given value (default to zero value)
     # all time stamps are preserved
     def ClearHistory(self, value=0.0):
+        assert isinstance(value, int) or isinstance(value, float) 
         self.__phase.loc[:, :] = float(value)
         return
 
     # set species and quantities of history to a given value (default to zero value)
     # only one time stamp is preserved (default to last time stamp)
-    def ResetHistory(self, time_stamp=None, value=None):
-        if time_stamp is None:
-            values = self.GetRow()
-            time_stamp = self.__phase.index[-1]
-        else:
-            values = self.GetRow(time_stamp)
+    def ResetHistory(self, try_time_stamp=None, value=None):
+        if value is not None:
+           assert isinstance(value, int) or isinstance(value, float) 
+
+        if try_time_stamp is not None:
+           assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
+
+        time_stamp = self.__get_time_stamp( try_time_stamp )
+        assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
+
+        values = self.GetRow(time_stamp)  # save values
 
         columns = list(self.__phase.columns)
         assert len(columns) == len(values), 'FATAL: oops internal error.'
@@ -203,32 +217,41 @@ class Phase():
         if value is None:
             for v in values:
                 idx = values.index(v)
-                self.__phase.loc[time_stamp, columns[idx]] = v
+                self.__phase.loc[time_stamp, columns[idx]] = v  # restore values
         else:
-            self.__phase.loc[time_stamp, :] = float(value)
+            self.__phase.loc[time_stamp, :] = float(value)      # set user-give value
 
         return
 
     def GetValue(self, actor, try_time_stamp=None):
 
+        assert isinstance(actor, str)
         assert actor in self.__phase.columns, 'actor %r not in %r'% \
                    (actor,self.__phase.columns)
 
+        if try_time_stamp is not None:
+           assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
+
         time_stamp = self.__get_time_stamp( try_time_stamp )
-        assert time_stamp is not None, 'illegal try_time_stamp: %r'%(try_time_stamp)
+        assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
 
         return self.__phase.loc[time_stamp, actor]
 
 # old def SetValue(self, time_stamp, actor, value):
 # new
-    def SetValue(self, actor, value, time_stamp=None):
-        if time_stamp is None:
-            time_stamp = self.__phase.index[-1]
-        else:
-            assert time_stamp in self.__phase.index, 'missing time_stamp = %r' % (
-                time_stamp)
+    def SetValue(self, actor, value, try_time_stamp=None):
+
         assert isinstance(actor, str)
         assert actor in self.__phase.columns
+
+        assert isinstance(value, int) or isinstance(value, float) 
+
+        if try_time_stamp is not None:
+           assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
+
+        time_stamp = self.__get_time_stamp( try_time_stamp )
+        assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
+
         self.__phase.loc[time_stamp, actor] = float(value)
         return
 
