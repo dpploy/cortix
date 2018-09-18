@@ -121,47 +121,44 @@ class Phase():
                 return quant
         return None
 
-    def AddSpecie(self, newSpecie):
-        assert isinstance(newSpecie, Specie)
-        assert newSpecie.name not in list(
-            self.__phase.columns), 'quantity: %r exists. Current names: %r' % (newQuant, self.__phase.columns)
+    def AddSpecie(self, new_specie):
+        assert isinstance(new_specie, Specie)
+        assert new_specie.name not in list(self.__phase.columns), \
+               'new_specie: %r exists. Current names: %r' % \
+               (new_specie, self.__phase.columns)
         speciesFormulae = [specie.formulaName for specie in self.__species]
-        assert newSpecie.formulaName not in speciesFormulae
-        self.__species.append(newSpecie)
-        newName = newSpecie.name
-        col = pandas.DataFrame(
-            index=list(
-                self.__phase.index),
-            columns=[newName])
+        assert new_specie.formulaName not in speciesFormulae
+        self.__species.append(new_specie)
+        newName = new_specie.name
+        col = pandas.DataFrame( index=list(self.__phase.index), columns=[newName] )
         tmp = self.__phase
         df = tmp.join(col, how='outer')
         self.__phase = df.fillna(0.0)
 
     def AddQuantity(self, newQuant):
         assert isinstance(newQuant, Quantity)
-        assert newQuant.name not in list(
-            self.__phase.columns), 'quantity: %r exists. Current names: %r' % (newQuant, self.__phase.columns)
+        assert newQuant.name not in list(self.__phase.columns), \
+               'quantity: %r exists. Current names: %r' % \
+               (newQuant, self.__phase.columns)
         quantFormalNames = [quant.formalName for quant in self.__quantities]
         assert newQuant.formalName not in quantFormalNames
         self.__quantities.append(newQuant)
         newName = newQuant.name
-        col = pandas.DataFrame(
-            index=list(
-                self.__phase.index),
-            columns=[newName])
+        col = pandas.DataFrame( index=list( self.__phase.index), columns=[newName] )
         tmp = self.__phase
         df = tmp.join(col, how='outer')
         self.__phase = df.fillna(0.0)
 
-    def AddRow(self, timeStamp, rowValues):
+    def AddRow(self, try_time_stamp, rowValues):
 
-        assert timeStamp not in self.__phase.index
+        time_stamp = self.__get_time_stamp( try_time_stamp )
+        assert time_stamp is None, 'illegal try_time_stamp: %r'%(try_time_stamp)
 
         assert len(rowValues) == len(self.__phase.columns)
         tmp = dict()
         for (i, v) in zip(self.__phase.columns, rowValues):
             tmp[i] = float(v)
-        row = pandas.DataFrame( tmp, index=[timeStamp], 
+        row = pandas.DataFrame( tmp, index=[time_stamp], 
                                 columns=list( self.__phase.columns) )
         frames = [self.__phase, row]
         self.__phase = pandas.concat(frames)
