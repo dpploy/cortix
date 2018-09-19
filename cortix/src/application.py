@@ -19,7 +19,8 @@ import sys
 import logging
 from cortix.src.utils.configtree import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
-from cortix.src.module import Module
+
+from cortix.src.module  import Module
 from cortix.src.network import Network
 #*********************************************************************************
 
@@ -164,17 +165,19 @@ class Application:
 # Private helper functions (internal use: __)
 
     def __setup_networks(self):
-        """
+        '''
         A helper function used by the Application constructor to setup the networks
         portion of the Application.
-        """
+        '''
 
         self.__log.debug('start __setup_networks()')
 
         for net_node in self.__config_node.get_all_sub_nodes("network"):
             net_config_node = ConfigTree(net_node)
             assert net_config_node.get_node_name() == net_node.get('name'), 'check failed'
+
             network = Network(net_config_node)
+
             self.__networks.append(network)
             self.__log.debug("appended network %s", net_node.get("name"))
 
@@ -188,14 +191,14 @@ class Application:
         """
 
         self.__log.debug("Start __setup_modules()")
-        for mode_node in self.__config_node.get_all_sub_nodes('module'):
+        for mod_node in self.__config_node.get_all_sub_nodes('module'):
 
-            mod_config_node = ConfigTree(mode_node)
-            assert mod_config_node.get_node_name() == mode_node.get('name'), \
+            mod_config_node = ConfigTree(mod_node)
+            assert mod_config_node.get_node_name() == mod_node.get('name'), \
                 'check failed'
 
-            new_module = Module(self.__work_dir, self.__module_lib_name,
-                                self.__module_lib_full_parent_dir, mod_config_node)
+            new_module = Module( self.__work_dir, self.__module_lib_name,
+                                 self.__module_lib_full_parent_dir, mod_config_node)
 
             # check for a duplicate module before appending a new one
             for module in self.__modules:
@@ -209,7 +212,7 @@ class Application:
 
             # add module to list
             self.__modules.append(new_module)
-            self.__log.debug("appended module %s", mode_node.get('name'))
+            self.__log.debug("appended module %s", mod_node.get('name'))
 
         self.__log.debug("end __setup_modules()")
 #----------------------- end def __setup_modules():-------------------------------

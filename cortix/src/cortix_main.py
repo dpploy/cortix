@@ -8,11 +8,11 @@
 #
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
-"""
+'''
 The Cortix class definition.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
-"""
+'''
 #*********************************************************************************
 import os
 import logging
@@ -22,11 +22,11 @@ from cortix.src.utils.set_logger_level import set_logger_level
 #*********************************************************************************
 
 class Cortix():
-    """
+    '''
     The main Cortix class definition. This class encapsulates the
     concepts of simulations, tasks, and modules, for a given application providing 
     the user with an interface to the simulations.
-    """
+    '''
 
     def __init__(self, name=None, config_file="cortix-config.xml"):
 
@@ -111,11 +111,11 @@ class Cortix():
 #----------------------- end def __init__():--------------------------------------
 
     def run_simulations(self, task_name=None):
-        """
+        '''
         This method runs every simulation
         defined by the Cortix object.
         At the moment this is done one simulation at a time.
-        """
+        '''
 
         for sim in self.__simulations: 
             sim.execute(task_name)
@@ -125,11 +125,11 @@ class Cortix():
 # Private helper functions (internal use: __)
 
     def __setup_simulations(self):
-        """
+        '''
         This method is a helper function for the Cortix constructor
         whose purpose is to set up the simulations defined by the
         Cortix configuration.
-        """
+        '''
 
         for sim in self.__config_tree.get_all_sub_nodes('simulation'):
             self.__log.debug(

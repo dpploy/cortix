@@ -23,10 +23,10 @@ from cortix.src.utils.set_logger_level import set_logger_level
 #*********************************************************************************
 
 class Task:
-    """
+    '''
     A Task is work done by a Simulation handled by Cortix.
     A Task will use a given Application.
-    """
+    '''
 
     def __init__(self, parent_work_dir=None, task_config_node=ConfigTree()):
 
@@ -130,20 +130,20 @@ class Task:
 #----------------------- end def __init__():--------------------------------------
 
     def execute(self, application):
-        """
+        '''
         This method is used to execute (accomplish) the given task.
-        """
+        '''
         network = application.get_network(self.__name)
         runtime_status_files = dict()
 
         for slot_name in network.slot_names:
 
-            module_name = slot_name.split('_')[0]
-            slot_id = int(slot_name.split('_')[1])
+            module_name = '_'.join( slot_name.split('_')[:-1] )
+            slot_id = int(slot_name.split('_')[-1])
 
-            module = application.get_module(module_name)
+            module     = application.get_module(module_name)
             param_file = self.__runtime_cortix_param_file
-            comm_file = network.get_runtime_cortix_comm_file(slot_name)
+            comm_file  = network.get_runtime_cortix_comm_file(slot_name)
 
             # Run module in the slot
             self.__log.info('call execute on module: %s:%s',module_name,slot_id)
@@ -165,89 +165,89 @@ class Task:
 #----------------------- end def execute():---------------------------------------
 
     def __get_name(self):
-        """
+        '''
         `str`:Task name
-        """
+        '''
 
         return self.__name
     name = property(__get_name, None, None, None)
 #----------------------- end def get_name():--------------------------------------
 
     def __get_work_dir(self):
-        """
+        '''
         `str`:Working directory of task specification
-        """
+        '''
 
         return self.__work_dir
     work_dir = property(__get_work_dir, None, None, None)
 #----------------------- end def get_work_dir():----------------------------------
 
     def __get_start_time(self):
-        """
+        '''
         `float`:Task initial time
-        """
+        '''
 
         return self.__start_time
     start_time = property(__get_start_time, None, None, None)
 #----------------------- end def get_start_time():--------------------------------
 
     def __get_start_time_unit(self):
-        """
+        '''
         `str`:Task initial time unit
-        """
+        '''
 
         return self.__start_time_unit
     start_time_unit = property(__get_start_time_unit, None, None, None)
 #----------------------- end def get_start_time_unit():---------------------------
 
     def __get_evolve_time(self):
-        """
+        '''
         `float`:Task final time
-        """
+        '''
 
         return self.__evolve_time
     evolve_time = property(__get_evolve_time, None, None, None)
 #----------------------- end def get_evolve_time():-------------------------------
 
     def __get_evolve_time_unit(self):
-        """
+        '''
         `str`:Task final time unit
-        """
+        '''
 
         return self.__evolve_time_unit
     evolve_time_unit = property(__get_evolve_time_unit, None, None, None)
 #----------------------- end def get_evolve_time_unit():--------------------------
 
     def __get_time_step(self):
-        """
+        '''
         `float`:Magnitude of incremental step in the task's time
-        """
+        '''
 
         return self.__time_step
     time_step = property(__get_time_step, None, None, None)
 #----------------------- end def get_time_step():---------------------------------
 
     def __get_time_step_unit(self):
-        """
+        '''
         `str`:Time step unit
-        """
+        '''
 
         return self.__time_step_unit
     time_step_unit = property(__get_time_step_unit, None, None, None)
 #----------------------- end def get_time_step_unit():----------------------------
 
     def set_runtime_cortix_param_file(self, full_path):
-        """
+        '''
         Sets the task config file to the specified file.
-        """
+        '''
 
         self.__runtime_cortix_param_file = full_path
 #----------------------- end def set_runtime_cortix_param_file():-----------------
 
     def __get_runtime_cortix_param_file(self):
-        """
+        '''
         `str`:Task's config file
-        """
+        '''
 
         return self.__runtime_cortix_param_file
     runtime_cortix_param_file = property(__get_runtime_cortix_param_file, set_runtime_cortix_param_file, None, None)
@@ -261,11 +261,11 @@ class Task:
 # Private helper functions (internal use: __)
 
     def __get_runtime_status(self, runtime_status_files):
-        """
+        '''
         Helper funcion for montioring the status of the task.
         It reads the status files of all modules and reports which ones are still
         running.
-        """
+        '''
 
         task_status = 'finished'
         running_module_slots = list()

@@ -33,19 +33,18 @@ from threading import Lock
 class TimeSequence():
 
     def __init__(self,
-                 fileName=None,   # full path file name
-                 fileType=None,   # "xml"
+                 fileName,   # full path file name
+                 fileType,   # "xml"
                  initialTime=0.0,
                  finalTime=0.0,
+                 time_unit=None,
                  logger=None
                  ):
 
         assert isinstance(fileName, str), 'wrong type; stop.'
-        assert fileName is not None, 'must give a fileName; stop.'
         self.__fileName = fileName
 
         assert isinstance(fileType, str), 'wrong type; stop.'
-        assert fileType is not None, 'must give a fileType; stop.'
         self.__fileType = fileType
 
         assert isinstance(initialTime, float), 'wrong type; stop.'
@@ -53,6 +52,9 @@ class TimeSequence():
 
         assert isinstance(finalTime, float), 'wrong type; stop.'
         self.__finalTime = finalTime
+
+        assert isinstance(time_unit, str), 'wrong type; stop.'
+        self.__time_unit = time_unit
 
         assert finalTime >= initialTime, 'sanity check failed. stop.'
         assert initialTime >= 0.0, 'sanity check failed. stop.'
@@ -142,6 +144,9 @@ class TimeSequence():
 # Private helper functions (internal use: __)
 
     def __read_xml(self):
+        '''
+        Read the xml data file recursively until the desired time stamp is found.
+        '''
 
         s = 'TimeSequence::__read_xml(): try reading: ' + self.__fileName
         self.log.debug(s)
@@ -171,6 +176,9 @@ class TimeSequence():
             node = rootNode.find('time')
             timeUnit = node.get('unit').strip()
 
+            time_unit_scale = 1.0
+#            time_unit_scale = 60.0 # __get_time_unit_scale( timeUnit )
+
             # (cut-off) legacy stuff
             timeCutOff = node.get('cut-off')
             if timeCutOff is not None:
@@ -184,7 +192,7 @@ class TimeSequence():
 
                 timeStamp = float(n.get('value').strip())
 
-                if timeStamp == self.__finalTime:
+                if abs(timeStamp - self.__finalTime) <= 1.0e-5:
                     return
 
         # end of while found is False
