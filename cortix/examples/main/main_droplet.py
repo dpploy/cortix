@@ -36,6 +36,7 @@ def main():
 #
 # cortix1.run_simulations( task_name='solo-droplet-fall' )
  cortix1.run_simulations( task_name='droplet-fall' )
+# cortix1.run_simulations( task_name='solo-pyplot' )
 
 #---------------------- end def main():-------------------------------------------
 
