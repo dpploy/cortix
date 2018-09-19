@@ -10,16 +10,16 @@
 # https://www.gnu.org/licenses/gpl-3.0.txt
 
 import os
+from cortix import Cortix
 
-
-def test_cortix_config_exists():
+def test_droplet():
     '''
-    Test to make sure a configuration file exists
-    in the input directory.
+    Run the droplet example
     '''
-
-    assert os.path.isfile("input/cortix-config-pyplot.xml")
-    assert os.path.isfile("input/cortix-config-droplet.xml")
+    pwd = os.path.dirname(__file__)
+    full_path_config_file = os.path.join(pwd, 'input/cortix-config-droplet.xml')
+    cortix1 = Cortix('cortix-droplet', full_path_config_file)
+    cortix1.run_simulations(task_name="droplet-fall")
 
 if __name__ == "__main__":
-    test_cortix_config_exists()
+    test_droplet()
