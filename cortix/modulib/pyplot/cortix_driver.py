@@ -31,7 +31,7 @@ class CortixDriver():
                   ports=list(),
                   cortix_start_time=0.0,
                   cortix_final_time=0.0,  # start time + evolution time
-                  time_unit=None
+                  cortix_time_unit=None
                 ):
 
         # Sanity test
@@ -44,8 +44,8 @@ class CortixDriver():
             type(cortix_start_time)
         assert isinstance(cortix_final_time, float), '-> time type %r is invalid.' % \
             type(cortix_final_time)
-        assert isinstance(time_unit, str), '-> time unit type %r is invalid.' % \
-            type(time_unit)
+        assert isinstance(cortix_time_unit, str), '-> time unit type %r is invalid.' % \
+            type(cortix_time_unit)
 
         # Logging
         self.__log = logging.getLogger('launcher-modulib.pyplot_' + str(slot_id) +\
@@ -58,7 +58,7 @@ class CortixDriver():
                               ports,
                               cortix_start_time,
                               cortix_final_time,
-                              time_unit )
+                              cortix_time_unit )
 
         self.__time_stamp = None  # temporary
 
