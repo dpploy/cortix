@@ -19,7 +19,7 @@ def test_object_instantiation():
     '''
     pwd = os.path.dirname(__file__)
     full_path_config_file = os.path.join(
-        pwd, '../examples/input/cortix-config.xml')
+        pwd, 'input/cortix-config-pyplot.xml')
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     if rank == 0:
