@@ -160,6 +160,8 @@ class Launcher(Thread):
             time_step *= 60.0
         elif time_step_unit == 'day':
             time_step *= 24.0 * 60.0
+        elif time_step_unit == 'second':
+            time_step /= 60.0 
         else:
             assert False, 'time unit invalid: %r' % (time_step_unit)
 

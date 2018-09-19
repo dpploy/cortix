@@ -43,7 +43,7 @@ class PyPlot():
                  ports = list(),
                  cortix_start_time = 0.0,
                  cortix_final_time = 0.0,
-                 time_unit=None
+                 cortix_time_unit=None
                  ):
 
         # Sanity test
@@ -55,8 +55,8 @@ class PyPlot():
                            type(cortix_start_time)
         assert isinstance( cortix_final_time, float), '-> time type %r is invalid.' % \
                            type(cortix_final_time)
-        assert isinstance( time_unit, str), '-> time unit type %r is invalid.' % \
-                           type(time_unit)
+        assert isinstance( cortix_time_unit, str), '-> time unit type %r is invalid.' % \
+                           type(cortix_time_unit)
 
         # Logger
         self.__log = logging.getLogger('launcher-modulib.pyplot_' + str(slot_id) +
@@ -69,7 +69,7 @@ class PyPlot():
 
         self.__cortix_start_time = cortix_start_time
         self.__cortix_final_time = cortix_final_time
-        self.__time_unit = time_unit
+        self.__cortix_time_unit  = cortix_time_unit
 
         self.__plot_interval = 60.0   # minutes  (1 plot update every 60 min)
 #  self.__plot_interval    = 5.0   # minutes  (1 plot update every 60 min)
@@ -87,8 +87,8 @@ class PyPlot():
         self.__time_tables_data = dict(list())
 
         # sanity check
-#        self.__plot_interval    = self.__cortix_final_time/10.0
-#        self.__plot_slide_window_interval = 2.0 * self.__plot_interval
+        self.__plot_interval = self.__cortix_final_time / 10.0
+        self.__plot_slide_window_interval = 5 * self.__plot_interval
 
 #        self.__plot_interval = 0.01   # minutes  (1 plot update every 60 min)
 #        self.__plot_slide_window_interval = 5 * 0.01
@@ -165,8 +165,8 @@ class PyPlot():
         This operates on a given use port;
         '''
 
-        if (at_time % self.__plot_interval == 0.0 and \
-           at_time < self.__cortix_final_time) or \
+        if ( at_time % self.__plot_interval == 0.0 and \
+             at_time < self.__cortix_final_time ) or \
            at_time >= self.__cortix_final_time:
 
             # Access the port file
@@ -287,7 +287,8 @@ class PyPlot():
         else:
             initialTime = max(self.__cortix_start_time, at_time - self.__plot_slide_window_interval)
 
-        timeSequence = TimeSequence( port_file, 'xml', initialTime, at_time, self.__log )
+        timeSequence = TimeSequence( port_file, 'xml', initialTime, at_time, 
+                                     self.__cortix_time_unit, self.__log )
 
         self.__time_sequences_tmp.append(timeSequence)
 
@@ -432,7 +433,8 @@ class PyPlot():
                 fig = plt.figure(num=figNum)
 
                 gs = gridspec.GridSpec(nRows, nCols)
-                gs.update(left=0.08, right=0.98, wspace=0.4, hspace=0.4)
+#                gs.update(left=0.08, right=0.98, wspace=0.4, hspace=0.4)
+                gs.update(left=0.09, right=0.98, wspace=0.4, hspace=0.5)
 
                 axlst = list()
 
@@ -491,7 +493,7 @@ class PyPlot():
             if timeUnit == 'minute':
                 timeUnit = 'min'
 
-            data = npy.array(val)
+            data = npy.array(val)  # convert to numpy ndarray
 
 #      assert len(data.shape) == 2, 'not a 2-column shape: %r in var %r of %r; stop.' % (data.shape,varName,varLegend)
             if len(data.shape) != 2:
@@ -502,8 +504,9 @@ class PyPlot():
                 continue  # simply skip bad data and log
 
             x = data[:, 0]
-            if varScale == 'linear' or varScale == 'linear-linear' or \
-               varScale == 'linear-log' and x.max() >= 120.0:
+
+            if (varScale == 'linear' or varScale == 'linear-linear' or \
+                varScale == 'linear-log') and x.max() >= 120.0:
                 x /= 60.0
                 if timeUnit == 'min':
                     timeUnit = 'h'

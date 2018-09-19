@@ -32,7 +32,7 @@ class Droplet():
                ports = list(),
                cortix_start_time = 0.0,
                cortix_final_time = 0.0,
-               time_unit=None
+               cortix_time_unit=None
              ):
 
 #.................................................................................
@@ -45,8 +45,8 @@ class Droplet():
          type(cortix_start_time)
   assert isinstance(cortix_final_time, float), '-> time type %r is invalid.' % \
          type(cortix_final_time)
-  assert isinstance(time_unit, str), '-> time unit type %r is invalid.' % \
-         type(time_unit)
+  assert isinstance(cortix_time_unit, str), '-> time unit type %r is invalid.' % \
+         type(cortix_time_unit)
 
   # Logging
   self.__log = logging.getLogger('launcher-droplet'+str(slot_id)+'.cortix_driver.droplet')
@@ -59,10 +59,16 @@ class Droplet():
   self.__ports   = ports
 
   # Convert Cortix's time unit to Droplet's internal time unit
-  if time_unit == 'minute':
+  if cortix_time_unit == 'minute':
      self.__time_unit_scale = 60.0
+  elif cortix_time_unit == 'second': 
+     self.__time_unit_scale = 1.0
+  elif cortix_time_unit == 'hour': 
+     self.__time_unit_scale = 60.0*60.0
   else:
      assert False, 'Cortix time_unit: %r not acceptable.' % time_unit
+
+  self.__cortix_time_unit = cortix_time_unit
 
   self.__start_time = cortix_start_time * self.__time_unit_scale # Droplet time unit
   self.__final_time = cortix_final_time * self.__time_unit_scale # Droplet time unit
@@ -122,7 +128,7 @@ class Droplet():
   x_0 = 1000.0  # initial height [m] above ground at 0
   self.__liquid_phase.SetValue( 'height', x_0, cortix_start_time )
 
-  v_0 = 0.0     # initial speed  [m/s]
+  v_0 = 0.0     # initial vertical velocity [m/s]
   self.__liquid_phase.SetValue( 'speed', v_0, cortix_start_time )
 
 #---------------------- end def __init__():---------------------------------------
@@ -293,15 +299,18 @@ class Droplet():
 
    return
 #---------------------- end def __provide_persistent_output():--------------------
-
  def __provide_state( self, port_file, at_time ):
    '''
-   Provide the internal state of the module. This is typically used by an other
+   Provide the internal state of the module. This is typically used by another
    module such as '.cortix.modulib.pyplot'; this XML file type is now deprecated.
+   However to have a dynamic plotting option, create this history file in the
+   time unit of Cortix; that is, undo the time scaling.
    '''
    import datetime
    import xml.etree.ElementTree as ElementTree
    from threading import Lock
+
+   n_digits_precision = 8
 
    # write header
    if at_time == self.__start_time:
@@ -324,7 +333,7 @@ class Droplet():
     b.set('today',str(today))
 
     b = ElementTree.SubElement(a,'time')
-    b.set('unit','second')
+    b.set('unit',self.__cortix_time_unit)
 
     # setup the headers
     for specie in self.__liquid_phase.species:
@@ -347,7 +356,7 @@ class Droplet():
 
     # write values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
-    b.set('value',str(at_time))
+    b.set('value',str(round(at_time/self.__time_unit_scale,n_digits_precision)))
 
     values = list()
 
@@ -362,7 +371,7 @@ class Droplet():
     # flush out data
     text = str()
     for value in values:
-        text += str(round(value,8)) + ',' 
+        text += str(round(value,n_digits_precision)) + ',' 
 
     text = text[:-1]
 
@@ -383,7 +392,7 @@ class Droplet():
     root_node = tree.getroot()
 
     a = ElementTree.Element('timeStamp')
-    a.set('value',str(at_time))
+    a.set('value',str(round(at_time/self.__time_unit_scale,n_digits_precision)))
 
     # all variables values
     values = list()
@@ -398,7 +407,7 @@ class Droplet():
     # flush out data
     text = str()
     for value in values:
-        text += str(round(value,8)) + ',' 
+        text += str(round(value,n_digits_precision)) + ',' 
 
     text = text[:-1]
 
@@ -423,8 +432,9 @@ class Droplet():
 #                                                    
 # problem: d_t u = f(u)
 #              ~   ~ ~
-  x_0 = self.__liquid_phase.GetValue( 'height', cortix_time )
-  v_0 = self.__liquid_phase.GetValue( 'speed', cortix_time )
+
+  x_0 =   self.__liquid_phase.GetValue( 'height', cortix_time )
+  v_0 = - self.__liquid_phase.GetValue( 'speed', cortix_time )
 
   u_vec_0 = [x_0, v_0]
 
@@ -460,7 +470,7 @@ class Droplet():
    u_vec[1] = 0.0
 
   self.__liquid_phase.SetValue( 'height', u_vec[0], at_time ) # update current values
-  self.__liquid_phase.SetValue( 'speed',  u_vec[1], at_time ) # update current values
+  self.__liquid_phase.SetValue( 'speed',  abs(u_vec[1]), at_time ) # update current values
 
 #  print('u(t=',at_time*60,'[s]) = ',u_1)
   
