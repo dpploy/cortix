@@ -43,9 +43,16 @@ class Launcher(Thread):
         assert cortix_comm_full_path_file_name[-1] is not '/' \
                '%r'%cortix_comm_full_path_file_name
 
+        cortix_path = os.path.abspath(os.path.join(__file__, "../../.."))
+
+
+        if "$CORTIX" in input_full_path_file_name:
+            self.__input_full_path_file_name = input_full_path_file_name.replace("$CORTIX", cortix_path)
+        else:
+            self.__input_full_path_file_name = input_full_path_file_name
+
         self.__module_name = module_name
         self.__slot_id = slot_id
-        self.__input_full_path_file_name = input_full_path_file_name
         self.__cortix_param_full_path_file_name = cortix_param_full_path_file_name
         self.__cortix_comm_full_path_file_name = cortix_comm_full_path_file_name
         self.__runtime_status_full_path = runtime_status_full_path

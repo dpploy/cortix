@@ -30,7 +30,7 @@ from cortix import Cortix
 def main():
 
  pwd                   = os.path.dirname(__file__)
- full_path_config_file = os.path.join(pwd, 'input/cortix-config.xml')
+ full_path_config_file = os.path.join(pwd, '../input/cortix-config.xml')
 
  # NB: if another instantiation of Cortix occurs, the cortix wrk directory specified
  #     in the cortix configuration file must be different, else the logging facility 

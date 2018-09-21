@@ -95,7 +95,7 @@
 
    <module_library name='droplet'>
     <parent_dir>
-        ../examples/modulib
+        $CORTIX/cortix/examples/modulib
     </parent_dir>
    </module_library>
 
@@ -112,10 +112,10 @@
 
    <module name="droplet" type="native">
     <library name='cortix.examples.modulib'>
-        <parent_dir>../../</parent_dir>
+        <parent_dir>$CORTIX</parent_dir>
     </library>
     <input_file_name>droplet.input</input_file_name>
-    <input_file_path>input/</input_file_path>
+    <input_file_path>$CORTIX/cortix/examples/input</input_file_path>
     <logger level="DEBUG">
      <file_handler level="DEBUG"> </file_handler>
      <console_handler level="INFO"> </console_handler>
@@ -132,11 +132,11 @@
    <module name="modulib.pyplot" type="native">
     <library name='cortix'>
      <parent_dir>
-         ../../ 
+         $CORTIX 
      </parent_dir>
     </library>
-    <input_file_name>pyplot-test.input</input_file_name>
-    <input_file_path>input/</input_file_path>
+    <input_file_name>pyplot.input</input_file_name>
+    <input_file_path>$CORTIX/cortix/examples/input</input_file_path>
     <logger level="DEBUG">
      <file_handler level="DEBUG"> </file_handler>
      <console_handler level="INFO"> </console_handler>
