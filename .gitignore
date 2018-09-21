@@ -7,6 +7,7 @@ readme_converted.rst
 .*.swp
 *.pdf
 *.patch
+*.png
 *.gpg
 *.tar
 *.gz

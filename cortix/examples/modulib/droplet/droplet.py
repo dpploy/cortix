@@ -93,6 +93,8 @@ class Droplet():
 # Configuration member data   
 
   self.__pyplot_scale = 'linear'
+#  self.__ode_integrator = 'scikits.odes' # or 'scipy.integrate' 
+  self.__ode_integrator = 'scipy.integrate' 
 
 # Domain specific member data 
 
@@ -150,18 +152,18 @@ class Droplet():
   return
 #---------------------- end def call_ports():---------------------------------------
 
- def execute( self, cortix_time=0.0, time_step=0.0 ):
+ def execute( self, cortix_time=0.0, cortix_time_step=0.0 ):
   '''
-  Evolve system from cortix_time to cortix_time + time_step
+  Evolve system from cortix_time to cortix_time + cortix_time_step
   '''
 
-  cortix_time *= self.__time_unit_scale  # convert to Droplet time unit
-  time_step   *= self.__time_unit_scale  # convert to Droplet time unit
+  cortix_time      *= self.__time_unit_scale  # convert to Droplet time unit
+  cortix_time_step *= self.__time_unit_scale  # convert to Droplet time unit
 
   s = 'execute('+str(round(cortix_time,2))+'[min]): '
   self.__log.debug(s)
 
-  self.__evolve( cortix_time, time_step )
+  self.__evolve( cortix_time, cortix_time_step )
 
   return
 #---------------------- end def execute():----------------------------------------
@@ -423,15 +425,20 @@ class Droplet():
 
 #---------------------- end def __provide_state():--------------------------------
 
- def __evolve( self, cortix_time=0.0, time_step=0.0 ):
-
+ def __evolve( self, cortix_time=0.0, cortix_time_step=0.0 ):
+  '''
+  IVP ODE problem:
+  initial data at t=0, u_1(0) = x_0, u_2(0) = v_0 = \dot{u}_1(0)
+  problem: d_t u = f(u)
+  ''' 
   import numpy as np
-  from scikits.odes import ode
 
-# initial data at t=0, u_1(0) = x_0, u_2(0) = v_0 = \dot{u}_1(0)
-#                                                    
-# problem: d_t u = f(u)
-#              ~   ~ ~
+  if self.__ode_integrator == 'scikits.odes':
+     from scikits.odes import ode        # this requires the SUNDIALS ODE package 
+  elif self.__ode_integrator == 'scipy.integrate':
+     from scipy.integrate import odeint  # this ships with scipy 
+  else:
+     assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
 
   x_0 =   self.__liquid_phase.GetValue( 'height', cortix_time )
   v_0 = - self.__liquid_phase.GetValue( 'speed', cortix_time )
@@ -439,29 +446,50 @@ class Droplet():
   u_vec_0 = [x_0, v_0]
 
   # rhs function
-  def rhs_fn(t, u_vec, dt_u_vec, params):
-    dt_u_vec[0] = u_vec[1]              #  d_t u_1 = u_2
-    dt_u_vec[1] = - params.gravity      #  d_t u_2 = -g
-    return
+  if self.__ode_integrator == 'scikits.odes':
+    def rhs_fn(t, u_vec, dt_u_vec, params):
+      dt_u_vec[0] = u_vec[1]              #  d_t u_1 = u_2
+      dt_u_vec[1] = - params.gravity      #  d_t u_2 = -g
+      return
+  elif self.__ode_integrator == 'scipy.integrate':
+    def rhs_fn(u_vec, t, gravity):
+      dt_u_0 = u_vec[1]              #  d_t u_1 = u_2
+      dt_u_1 = - gravity             #  d_t u_2 = -g
+      return [dt_u_0, dt_u_1]
+  else:
+     assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
 
-  t_interval_sec = np.linspace(0.0, time_step, num=2)
+  t_interval_sec = np.linspace(0.0, cortix_time_step, num=2)
 
-  cvode = ode('cvode', rhs_fn, user_data=self.__params, old_api=False)
+  if self.__ode_integrator == 'scikits.odes':
+     cvode = ode('cvode', rhs_fn, user_data=self.__params, old_api=False)
+     solution = cvode.solve( t_interval_sec, u_vec_0 )  # solve for time interval 
 
-  solution = cvode.solve( t_interval_sec, u_vec_0 )  # solve for time interval 
+     results = solution.values
+     message = solution.message
 
-  results = solution.values
-  message = solution.message
+     assert solution.message == 'Successful function return.'
+     assert solution.errors.t is None, 'errors.t = %r'%solution.errors.t
+     assert solution.errors.y is None, 'errors.y = %r'%solution.errors.y
 
-  assert solution.message == 'Successful function return.'
-  assert solution.errors.t is None, 'errors.t = %r'%solution.errors.t
-  assert solution.errors.y is None, 'errors.y = %r'%solution.errors.y
+     u_vec = results.y[1,:] # solution vector at final time step
 
-  u_vec = results.y[1,:] # solution vector at final time step
-  
+  elif self.__ode_integrator == 'scipy.integrate':
+     u_vec_hist, info_dict = odeint( rhs_fn,
+                                     u_vec_0, t_interval_sec,
+                                     args=( self.__params.gravity, ), full_output=True
+                                   )
+
+     assert info_dict['message']=='Integration successful.',\
+            'Fatal: scipy.integrate.odeint failed %r'%info_dict['message']
+
+     u_vec = u_vec_hist[1,:]  # solution vector at final time step
+  else:
+     assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
+
   values = self.__liquid_phase.GetRow( cortix_time ) # values at previous time
 
-  at_time = cortix_time + time_step  
+  at_time = cortix_time + cortix_time_step  
 
   self.__liquid_phase.AddRow( at_time, values ) # repeat values for current time
 
