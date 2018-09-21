@@ -426,10 +426,11 @@ class Droplet():
 #---------------------- end def __provide_state():--------------------------------
 
  def __evolve( self, cortix_time=0.0, cortix_time_step=0.0 ):
-  '''
-  IVP ODE problem:
-  initial data at t=0, u_1(0) = x_0, u_2(0) = v_0 = \dot{u}_1(0)
-  problem: d_t u = f(u)
+  r'''
+  .. math::
+  ODE IVP problem:
+  Given the initial data at $t=0$, $u_1(0) = x_0$, $u_2(0) = v_0 = \dot{u}_1(0)$
+  solve $\frac{\mathtext{d}u}{\mathtext{d}t} = f(u)%
   ''' 
   import numpy as np
 
@@ -497,7 +498,7 @@ class Droplet():
    u_vec[0] = 0.0
    u_vec[1] = 0.0
 
-  self.__liquid_phase.SetValue( 'height', u_vec[0], at_time ) # update current values
+  self.__liquid_phase.SetValue( 'height', u_vec[0], at_time )      # update current values
   self.__liquid_phase.SetValue( 'speed',  abs(u_vec[1]), at_time ) # update current values
 
 #  print('u(t=',at_time*60,'[s]) = ',u_1)
