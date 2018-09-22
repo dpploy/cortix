@@ -95,7 +95,7 @@
 
    <module_library name='droplet'>
     <parent_dir>
-    /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/cortix/cortix/examples/modulib/
+        $CORTIX/cortix/examples/modulib
     </parent_dir>
    </module_library>
 
@@ -112,10 +112,10 @@
 
    <module name="droplet" type="native">
     <library name='cortix.examples.modulib'>
-     <parent_dir>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/cortix/</parent_dir>
+        <parent_dir>$CORTIX</parent_dir>
     </library>
     <input_file_name>droplet.input</input_file_name>
-    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
+    <input_file_path>$CORTIX/cortix/examples/input</input_file_path>
     <logger level="DEBUG">
      <file_handler level="DEBUG"> </file_handler>
      <console_handler level="INFO"> </console_handler>
@@ -152,11 +152,11 @@
    <module name="modulib.pyplot" type="native">
     <library name='cortix'>
      <parent_dir>
-      /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/cortix/
+         $CORTIX 
      </parent_dir>
     </library>
     <input_file_name>pyplot.input</input_file_name>
-    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
+    <input_file_path>$CORTIX/cortix/examples/input</input_file_path>
     <logger level="DEBUG">
      <file_handler level="DEBUG"> </file_handler>
      <console_handler level="INFO"> </console_handler>
