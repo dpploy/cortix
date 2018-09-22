@@ -1,0 +1,2 @@
+include cortix/examples/input/*
+include cortix/tests/input/*
