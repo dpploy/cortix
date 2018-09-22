@@ -87,17 +87,17 @@ class MyModule():
   return
 #---------------------- end def call_ports():---------------------------------------
 
- def execute( self, cortix_time=0.0, time_step=0.0 ):
+ def execute( self, cortix_time=0.0, cortix_time_step=0.0 ):
   '''
   Developer must implement this method.
-  Evolve system from cortix_time to cortix_time + time_step
+  Evolve system from cortix_time to cortix_time + cortix_time_step
   '''
 
   s = 'execute('+str(round(cortix_time,2))+'[min]): '
   self.__log.debug(s)
 
-  # Developer implements helper method  
-  self.__evolve( self, cortix_time, time_step ):
+  # Developer implements helper method, for example
+  #self.__evolve( self, cortix_time, cortix_time_step ):
 
   return
 #---------------------- end def execute():----------------------------------------
@@ -106,6 +106,9 @@ class MyModule():
 # Private helper functions (internal use: __)
 
  def __provide_data( self, provide_port_name=None, at_time=0.0 ):
+  '''
+  Example of how this internal method would look like
+  '''
 
 # Access the port file
   port_file = self.__get_port_file( provide_port_name = provide_port_name )
@@ -118,6 +121,9 @@ class MyModule():
 #---------------------- end def __provide_data():---------------------------------
 
  def __use_data( self, use_port_name=None, at_time=0.0 ):
+  '''
+  Example of how this internal method would look like
+  '''
 
 # Access the port file
   port_file = self.__get_port_file( use_port_name = use_port_name )
@@ -176,9 +182,5 @@ class MyModule():
  
    return port_file
 #---------------------- end def __get_port_file():--------------------------------
-
- def __evolve( self, cortix_time=None, time_step=0.0 ):
-
-#---------------------- end def __evolve():---------------------------------------
 
 #======================= end class MyModule: =====================================

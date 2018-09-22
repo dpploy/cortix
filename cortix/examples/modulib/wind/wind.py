@@ -8,7 +8,7 @@
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
 '''
-Droplet module example in Cortix.
+Wind module example in Cortix.
 '''
 #*********************************************************************************
 import os, sys, io, time
@@ -20,9 +20,9 @@ from cortix.support.phase    import Phase
 from collections             import namedtuple
 #*********************************************************************************
 
-class Droplet():
+class Wind():
  r'''
-  Droplet module used example in Cortix.
+  Wind module used example in Cortix.
  '''
 
  def __init__( self,
@@ -49,8 +49,8 @@ class Droplet():
          type(cortix_time_unit)
 
   # Logging
-  self.__log = logging.getLogger('launcher-droplet'+str(slot_id)+'.cortix_driver.droplet')
-  self.__log.info('initializing an object of Droplet()')
+  self.__log = logging.getLogger('launcher-wind'+str(slot_id)+'.cortix_driver.wind')
+  self.__log.info('initializing an object of Wind()')
 
 #.................................................................................
 # Member data 
@@ -58,7 +58,7 @@ class Droplet():
   self.__slot_id = slot_id
   self.__ports   = ports
 
-  # Convert Cortix's time unit to Droplet's internal time unit
+  # Convert Cortix's time unit to Wind's internal time unit
   if cortix_time_unit == 'minute':
      self.__time_unit_scale = 60.0
   elif cortix_time_unit == 'second': 
@@ -70,8 +70,8 @@ class Droplet():
 
   self.__cortix_time_unit = cortix_time_unit
 
-  self.__start_time = cortix_start_time * self.__time_unit_scale # Droplet time unit
-  self.__final_time = cortix_final_time * self.__time_unit_scale # Droplet time unit
+  self.__start_time = cortix_start_time * self.__time_unit_scale # Wind time unit
+  self.__final_time = cortix_final_time * self.__time_unit_scale # Wind time unit
 
   if work_dir[-1] != '/': work_dir = work_dir + '/'
   self.__wrkDir = work_dir
@@ -97,8 +97,6 @@ class Droplet():
   self.__ode_integrator = 'scipy.integrate' 
 
 # Domain specific member data 
-
-  gravity = 9.81 # [m/s^2] acceleration of gravity
 
   Params = namedtuple('Params',['gravity'])
   self.__params = Params( gravity ) 
@@ -140,7 +138,7 @@ class Droplet():
   Transfer data at cortix_time
   '''
 
-  cortix_time *= self.__time_unit_scale  # convert to Droplet time unit
+  cortix_time *= self.__time_unit_scale  # convert to Wind time unit
 
   # provide data to all provide ports 
   self.__provide_data( provide_port_name='output', at_time=cortix_time )
@@ -157,8 +155,8 @@ class Droplet():
   Evolve system from cortix_time to cortix_time + cortix_time_step
   '''
 
-  cortix_time      *= self.__time_unit_scale  # convert to Droplet time unit
-  cortix_time_step *= self.__time_unit_scale  # convert to Droplet time unit
+  cortix_time      *= self.__time_unit_scale  # convert to Wind time unit
+  cortix_time_step *= self.__time_unit_scale  # convert to Wind time unit
 
   s = 'execute('+str(round(cortix_time,2))+'[min]): '
   self.__log.debug(s)
@@ -262,8 +260,8 @@ class Droplet():
      assert os.path.isfile(port_file) is False, 'port_file %r exists; stop.' % port_file
      fout = open(port_file,'w')
 
-     fout.write('# name:   '+'droplet_'+str(self.__slot_id)); fout.write('\n')
-     fout.write('# author: '+'cortix.examples.modulib.droplet'); fout.write('\n')
+     fout.write('# name:   '+'wind_'+str(self.__slot_id)); fout.write('\n')
+     fout.write('# author: '+'cortix.examples.modulib.wind'); fout.write('\n')
      fout.write('# version:'+'0.1'); fout.write('\n')
      today = datetime.datetime.today()
      fout.write('# today:  '+str(today)); fout.write('\n')
@@ -284,7 +282,7 @@ class Droplet():
 
    fout = open(port_file,'a')
 
-   # Droplet time 
+   # Wind time 
    fout.write('%18.6e' % (at_time))
 
    # mass density   
@@ -323,11 +321,11 @@ class Droplet():
     root_node = tree.getroot()
 
     a = ElementTree.Element('time-sequence')
-    a.set('name','droplet_'+str(self.__slot_id)+'-state')
+    a.set('name','wind_'+str(self.__slot_id)+'-state')
 
     b = ElementTree.SubElement(a,'comment')
     today = datetime.datetime.today()
-    b.set('author','cortix.examples.modulib.droplet')
+    b.set('author','cortix.examples.modulib.wind')
     b.set('version','0.1')
 
     b = ElementTree.SubElement(a,'comment')
@@ -344,7 +342,7 @@ class Droplet():
         b.set('name',formula_name)
         unit = specie.massCCUnit
         b.set('unit',unit)
-        b.set('legend','Droplet_'+str(self.__slot_id)+'-state')
+        b.set('legend','Wind_'+str(self.__slot_id)+'-state')
         b.set('scale',self.__pyplot_scale)
 
     for quant in self.__liquid_phase.quantities:
@@ -353,7 +351,7 @@ class Droplet():
         b.set('name',formal_name)
         unit = quant.unit
         b.set('unit',unit)
-        b.set('legend','Droplet_'+str(self.__slot_id)+'-state')
+        b.set('legend','Wind_'+str(self.__slot_id)+'-state')
         b.set('scale',self.__pyplot_scale)
 
     # write values for all variables
@@ -506,4 +504,4 @@ class Droplet():
 #---------------------- end def __evolve():---------------------------------------
 
 
-#======================= end class Droplet: ======================================
+#======================= end class Wind: =========================================
