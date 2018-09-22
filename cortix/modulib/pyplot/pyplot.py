@@ -27,6 +27,7 @@ matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MultipleLocator
+import pickle 
 
 import xml.etree.ElementTree as ElementTree
 from threading import Lock
@@ -421,11 +422,15 @@ class PyPlot():
                 if iVar != 0:  # flush any current figure
                     figName = 'pyplot_' + \
                         str(self.__slot_id) + '-timeseq-dashboard-' + \
-                        str(iDash).zfill(2) + '.png'
-                    fig.savefig(figName, dpi=200, fomat='pdf')
+                        str(iDash).zfill(2) 
+                    fig.savefig(figName+'.png', dpi=200, fomat='png')
                     plt.close(figNum)
+
+                    pickle.dump( fig, open(figName+'.pickle','wb') )
+
                     s = '__plot_time_seq_dashboard(): created plot: ' + figName
                     self.__log.debug(s)
+
                     iDash += 1
                 # end of: if iVar != 0: # flush any current figure
 
@@ -741,9 +746,12 @@ class PyPlot():
     # end of: for iVar in range(nVar):
 
         figName = 'pyplot_' + str(self.__slot_id) + \
-            '-timeseq-dashboard-' + str(iDash).zfill(2) + '.png'
-        fig.savefig(figName, dpi=200, fomat='png')
+            '-timeseq-dashboard-' + str(iDash).zfill(2) 
+        fig.savefig(figName+'.png', dpi=200, fomat='png')
         plt.close(figNum)
+
+        pickle.dump( fig, open(figName+'.pickle','wb') )
+
         s = '__plot_time_seq_dashboard(): created plot: ' + figName
         self.__log.debug(s)
 
