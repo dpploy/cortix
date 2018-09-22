@@ -8,6 +8,7 @@ readme_converted.rst
 *.pdf
 *.patch
 *.png
+*.pickle
 *.gpg
 *.tar
 *.gz
