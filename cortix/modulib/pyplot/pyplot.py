@@ -44,7 +44,8 @@ class PyPlot():
                  ports = list(),
                  cortix_start_time = 0.0,
                  cortix_final_time = 0.0,
-                 cortix_time_unit=None
+                 cortix_time_step = 0.0,
+                 cortix_time_unit  = None
                  ):
 
         # Sanity test
@@ -56,6 +57,9 @@ class PyPlot():
                            type(cortix_start_time)
         assert isinstance( cortix_final_time, float), '-> time type %r is invalid.' % \
                            type(cortix_final_time)
+        assert isinstance( cortix_time_step, float), '-> time step type %r is invalid.' % \
+                           type(cortix_time_step)
+
         assert isinstance( cortix_time_unit, str), '-> time unit type %r is invalid.' % \
                            type(cortix_time_unit)
 
@@ -72,11 +76,11 @@ class PyPlot():
         self.__cortix_final_time = cortix_final_time
         self.__cortix_time_unit  = cortix_time_unit
 
-        self.__plot_interval = 60.0   # minutes  (1 plot update every 60 min)
-#  self.__plot_interval    = 5.0   # minutes  (1 plot update every 60 min)
-        # minutes  (width of the sliding window)
-        self.__plot_slide_window_interval = 5 * 60.0
-#  self.__plot_slide_window_interval = 6*60.0 # minutes  (width of the sliding window)
+        n_time_steps = ( cortix_final_time - cortix_start_time ) / cortix_time_step
+        # how often to plot
+        self.__plot_interval = round( n_time_steps / 5 )
+        # the width of the window to plot
+        self.__plot_slide_window_interval = 3 * self.__plot_interval
 
         # This holds all time sequences, potentially, one per use port. One time sequence
         # has all the data for one port connection.
@@ -86,13 +90,6 @@ class PyPlot():
         # Tables in xml format per Cortix convention
         # [(time,timeUnit)] = [column,column,...]
         self.__time_tables_data = dict(list())
-
-        # sanity check
-        self.__plot_interval = self.__cortix_final_time / 10.0
-        self.__plot_slide_window_interval = 5 * self.__plot_interval
-
-#        self.__plot_interval = 0.01   # minutes  (1 plot update every 60 min)
-#        self.__plot_slide_window_interval = 5 * 0.01
 
 # .................................................................................
 # Input ports (if any)
@@ -128,8 +125,8 @@ class PyPlot():
         Transfer data at cortix_time
         '''
 
-        if (cortix_time % self.__plot_interval == 0.0 and \
-           cortix_time < self.__cortix_final_time)        \
+        if (cortix_time % self.__plot_interval <= 1e-2 and \
+            cortix_time < self.__cortix_final_time)        \
            or cortix_time >= self.__cortix_final_time:
 
             # use ports in PyPlot have infinite multiplicity (implement
@@ -166,22 +163,18 @@ class PyPlot():
         This operates on a given use port;
         '''
 
-        if ( at_time % self.__plot_interval == 0.0 and \
-             at_time < self.__cortix_final_time ) or \
-           at_time >= self.__cortix_final_time:
-
-            # Access the port file
-            port_file = self.__get_port_file( usePortName = usePortName, 
-                                              usePortFile = usePortFile  )
+        # Access the port file
+        port_file = self.__get_port_file( usePortName = usePortName, 
+                                          usePortFile = usePortFile  )
 
 # Get data from port files
-            if usePortName == 'time-sequence' or usePortName == 'time-sequence-input' \
-               and port_file is not None:
+        if usePortName == 'time-sequence' or usePortName == 'time-sequence-input' \
+           and port_file is not None:
 
-                self.__get_time_sequence( port_file, at_time )
+            self.__get_time_sequence( port_file, at_time )
 
-            if usePortName == 'time-tables' and port_file is not None:
-                _GetTimeTables(self, port_file, at_time)
+        if usePortName == 'time-tables' and port_file is not None:
+            _GetTimeTables(self, port_file, at_time)
 
         return
 #----------------------- end def __use_data():------------------------------------
@@ -244,7 +237,7 @@ class PyPlot():
 
     def __plot_data(self, cortix_time=0.0, time_step=0.0):
 
-        if cortix_time % self.__plot_interval == 0.0 and \
+        if cortix_time % self.__plot_interval <= 1e-2 and \
            cortix_time < self.__cortix_final_time:
 
             s = '__plot_data(): cortix time [min] = ' + str(cortix_time)
@@ -265,13 +258,13 @@ class PyPlot():
             self.__plot_time_tables( from_time, to_time )
 
         elif cortix_time >= self.__cortix_final_time:
-
+ 
             s = '__plot_data(): cortix time [min] = ' + str(cortix_time)
             self.__log.debug(s)
 
-            self.__plot_time_seq_dashboard( 0.0, self.__cortix_final_time)  # plot all history
+            self.__plot_time_seq_dashboard( self.__cortix_start_time, self.__cortix_final_time)  # plot all history
 
-            self.__plot_time_tables( 0.0, self.__cortix_final_time )  # plot all history
+            self.__plot_time_tables( self.__cortix_start_time, self.__cortix_final_time )  # plot all history
 
 #----------------------- end def __plot_data():-----------------------------------
 

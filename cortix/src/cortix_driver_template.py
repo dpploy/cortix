@@ -7,14 +7,14 @@
 #
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
-"""
+'''
 Cortix driver for guest modules.
 Module developers must implement the public methods in this driver.
 Ideally, this implementation should be minimal.
 Developers should use this class to wrap their module (MyModule) implemented in a
 file named my_module.py. This file will be placed inside the developer's module
 directory which is pointed to in the Cortix config.xml file.
-"""
+'''
 #*************************************************************************
 import os
 import sys
@@ -28,9 +28,9 @@ import logging
 #*************************************************************************
 
 class CortixDriverTemplate():
-    """
+    '''
      Cortix driver for guest modules.
-    """
+    '''
 
     def __init__(self,
                  slot_id,
@@ -40,7 +40,8 @@ class CortixDriverTemplate():
                  ports=list(),
                  cortix_start_time=0.0,
                  cortix_final_time=0.0,
-                 cortix_time_unit=None
+                 cortix_time_unit=None,
+                 cortix_time_step=0.0
                  ):
 
         # Sanity test
@@ -53,8 +54,12 @@ class CortixDriverTemplate():
             cortix_start_time, float), '-> time type %r is invalid.' % type(cortix_start_time)
         assert isinstance(
             cortix_final_time, float), '-> time type %r is invalid.' % type(cortix_final_time)
+
         assert isinstance(
-            cortix_time_unit, str), '-> time unit %r is invalid.' % type(cortix_time_unit)
+            cortix_time_step, float), '-> time step type %r is invalid.' % type(cortix_time_step)
+
+        assert isinstance(
+            cortix_time_unit, str), '-> time unit type %r is invalid.' % type(cortix_time_unit)
 
         # Logging
         self.__log = logging.getLogger( 'launcher-mymodule' + str(slot_id) +

@@ -28,6 +28,7 @@ Sat Sep  5 01:26:53 EDT 2015
 import os
 import sys
 from copy import deepcopy
+import numpy as npy
 import pandas
 
 from cortix.support.specie   import Specie
@@ -159,7 +160,7 @@ class Phase():
         assert len(rowValues) == len(self.__phase.columns)
         tmp = dict()
         for (i, v) in zip(self.__phase.columns, rowValues):
-            tmp[i] = float(v)
+            tmp[i] = v
         row = pandas.DataFrame( tmp, index=[time_stamp], 
                                 columns=list( self.__phase.columns) )
         frames = [self.__phase, row]
@@ -183,22 +184,24 @@ class Phase():
         assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
         time_stamp = self.__get_time_stamp( try_time_stamp )
         assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
-        assert isinstance(value, int) or isinstance(value, float) 
-        self.__phase.loc[time_stamp, :] *= float(value)
+        assert isinstance(value, int) or isinstance(value, float) or \
+               isinstance(value, npy.ndarray)
+        self.__phase.loc[time_stamp, :] *= value
         return
 
     # set species and quantities of history to a given value (default to zero value)
     # all time stamps are preserved
     def ClearHistory(self, value=0.0):
         assert isinstance(value, int) or isinstance(value, float) 
-        self.__phase.loc[:, :] = float(value)
+        self.__phase.loc[:, :] = value
         return
 
     # set species and quantities of history to a given value (default to zero value)
     # only one time stamp is preserved (default to last time stamp)
     def ResetHistory(self, try_time_stamp=None, value=None):
         if value is not None:
-           assert isinstance(value, int) or isinstance(value, float) 
+           assert isinstance(value, int) or isinstance(value, float) or \
+                  isinstance(value, npy.ndarray)
 
         if try_time_stamp is not None:
            assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
@@ -211,15 +214,15 @@ class Phase():
         columns = list(self.__phase.columns)
         assert len(columns) == len(values), 'FATAL: oops internal error.'
 
-        self.__phase = pandas.DataFrame(index=[time_stamp], columns=columns)
-        self.__phase.fillna(0.0, inplace=True)
+        self.__phase = pandas.DataFrame( index=[time_stamp], columns=columns )
+        self.__phase.fillna( 0.0, inplace=True )
 
         if value is None:
             for v in values:
                 idx = values.index(v)
                 self.__phase.loc[time_stamp, columns[idx]] = v  # restore values
         else:
-            self.__phase.loc[time_stamp, :] = float(value)      # set user-give value
+            self.__phase.loc[time_stamp, :] = value   # set user-given value
 
         return
 
@@ -244,7 +247,8 @@ class Phase():
         assert isinstance(actor, str)
         assert actor in self.__phase.columns
 
-        assert isinstance(value, int) or isinstance(value, float) 
+        assert isinstance(value, int) or isinstance(value, float) or \
+               isinstance(value, npy.ndarray)
 
         if try_time_stamp is not None:
            assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
@@ -252,7 +256,7 @@ class Phase():
         time_stamp = self.__get_time_stamp( try_time_stamp )
         assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
 
-        self.__phase.loc[time_stamp, actor] = float(value)
+        self.__phase.loc[time_stamp, actor] = value
         return
 
     def WriteHTML(self, fileName):

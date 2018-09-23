@@ -20,8 +20,8 @@ Sat Sep  5 12:51:34 EDT 2015
 # *******************************************************************************
 import os
 import sys
+import numpy as npy
 # *******************************************************************************
-
 
 class Quantity():
 
@@ -31,7 +31,7 @@ class Quantity():
     def __init__(self,
                  name='null-quantity',
                  formalName='null-quantity',
-                 value=float(0.0),
+                 value=float(0.0),  # float, int, or npy.ndarray (float or int)
                  unit='null-unit'
                  ):
 
@@ -41,7 +41,12 @@ class Quantity():
         assert isinstance(formalName, str), 'oops not string.'
         self._formalName = formalName
 
-        assert isinstance(value, float), 'oops not value.'
+        assert isinstance(value, float) or isinstance(value, int) or  \
+               isinstance(value, npy.ndarray),'illegal value.'
+
+        if isinstance(value, npy.ndarray):
+           assert value.dtype[:4] == 'float' or value.dtype[:2] == 'int'
+
         self._value = value
 
         assert isinstance(name, str), 'oops not string.'

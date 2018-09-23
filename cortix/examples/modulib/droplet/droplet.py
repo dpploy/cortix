@@ -32,6 +32,7 @@ class Droplet():
                ports = list(),
                cortix_start_time = 0.0,
                cortix_final_time = 0.0,
+               cortix_time_step = 0.0,
                cortix_time_unit=None
              ):
 
@@ -45,6 +46,8 @@ class Droplet():
          type(cortix_start_time)
   assert isinstance(cortix_final_time, float), '-> time type %r is invalid.' % \
          type(cortix_final_time)
+  assert isinstance(cortix_time_step, float), '-> time step type %r is invalid.' % \
+         type(cortix_time_step)
   assert isinstance(cortix_time_unit, str), '-> time unit type %r is invalid.' % \
          type(cortix_time_unit)
 
