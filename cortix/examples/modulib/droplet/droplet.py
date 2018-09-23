@@ -434,7 +434,10 @@ class Droplet():
   .. math::
   ODE IVP problem:
   Given the initial data at $t=0$, $u_1(0) = x_0$, $u_2(0) = v_0 = \dot{u}_1(0)$
-  solve $\frac{\mathtext{d}u}{\mathtext{d}t} = f(u)%
+  solve $\frac{\mathtext{d}u}{\mathtext{d}t} = f(u)$.
+  When $u_1(t)$ is negative, bounce the droplet to a random height between
+  0 and $1.2 x_0$ and no velocity, and continue the time integration until
+  $t \le t_f$.
   ''' 
   import numpy as np
 
