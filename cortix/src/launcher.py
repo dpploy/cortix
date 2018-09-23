@@ -223,9 +223,9 @@ class Launcher(Thread):
             ', ports=' + str(ports) + \
             ', cortix_start_time=' + str(cortix_start_time) + \
             ', cortix_final_time=' + str(cortix_final_time) + \
-            ', cortix_time_unit=' + str(cortix_time_unit) + \
+            ', cortix_time_unit=' + cortix_time_unit + \
             ', cortix_time_step=' + str(cortix_time_step) + \
-            ', cortix_time_step_unit=', str(cortix_time_step_unit) 
+            ', cortix_time_step_unit=', cortix_time_step_unit
         self.__log.info(s)
 
         # Evolve the module
