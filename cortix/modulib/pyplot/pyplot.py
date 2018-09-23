@@ -550,6 +550,8 @@ class PyPlot():
                     varUnit = 'kPa'
                 if varUnit == 's':
                     varUnit = 'ks'
+                if varUnit == 'm':
+                    varUnit = 'km'
 
             if y.max() < 1e-6 and varScale != 'linear-log' and \
                     varScale != 'log-log' and varScale != 'log':

@@ -13,11 +13,12 @@ Droplet module example in Cortix.
 #*********************************************************************************
 import os, sys, io, time
 import logging
+from collections import namedtuple
+import numpy as npy
 
 from cortix.support.quantity import Quantity
 from cortix.support.specie   import Specie
 from cortix.support.phase    import Phase
-from collections             import namedtuple
 #*********************************************************************************
 
 class Droplet():
@@ -124,17 +125,17 @@ class Droplet():
   speed = Quantity( name='speed', formalName='Speed', unit='m/s' )
   quantities.append( speed )
 
-  self.__liquid_phase = Phase( cortix_start_time, species=species, quantities=quantities)
+  self.__liquid_phase = Phase( self.__start_time, species=species, quantities=quantities)
 
   # Initialize phase
   water_mass_cc = 0.99965 # [g/cc]
-  self.__liquid_phase.SetValue( 'water', water_mass_cc, cortix_start_time )
+  self.__liquid_phase.SetValue( 'water', water_mass_cc, self.__start_time )
 
   x_0 = 1000.0  # initial height [m] above ground at 0
-  self.__liquid_phase.SetValue( 'height', x_0, cortix_start_time )
+  self.__liquid_phase.SetValue( 'height', x_0, self.__start_time )
 
   v_0 = 0.0     # initial vertical velocity [m/s]
-  self.__liquid_phase.SetValue( 'speed', v_0, cortix_start_time )
+  self.__liquid_phase.SetValue( 'speed', v_0, self.__start_time )
 
 #---------------------- end def __init__():---------------------------------------
 
@@ -497,8 +498,10 @@ class Droplet():
 
   self.__liquid_phase.AddRow( at_time, values ) # repeat values for current time
 
-  if u_vec[0] <= 0.0: # ground impact sets result to zero
-   u_vec[0] = 0.0
+  if u_vec[0] <= 0.0: # ground impact bounces the drop to a different height near original
+   bounced_height = self.__liquid_phase.GetValue( 'height', self.__start_time )
+   bounced_height *= npy.random.random(1) * 1.2
+   u_vec[0] = bounced_height
    u_vec[1] = 0.0
 
   self.__liquid_phase.SetValue( 'height', u_vec[0], at_time )      # update current values
