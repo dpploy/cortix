@@ -35,6 +35,7 @@ class CortixDriver():
                  ports=list(),
                  cortix_start_time=0.0,
                  cortix_final_time=0.0,
+                 cortix_time_step=0.0,
                  time_unit=None
                  ):
 
@@ -46,6 +47,8 @@ class CortixDriver():
                type(cortix_start_time)
         assert isinstance(cortix_final_time, float), '-> time type %r is invalid.' % \
                type(cortix_final_time)
+        assert isinstance(cortix_time_step, float), '-> time step type %r is invalid.' % \
+               type(cortix_time_step)
         assert isinstance(time_unit, str), '-> time unit type %r is invalid.' % \
                type(time_unit)
 

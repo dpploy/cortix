@@ -13,11 +13,12 @@ Droplet module example in Cortix.
 #*********************************************************************************
 import os, sys, io, time
 import logging
+from collections import namedtuple
+import numpy as npy
 
 from cortix.support.quantity import Quantity
 from cortix.support.specie   import Specie
 from cortix.support.phase    import Phase
-from collections             import namedtuple
 #*********************************************************************************
 
 class Droplet():
@@ -32,6 +33,7 @@ class Droplet():
                ports = list(),
                cortix_start_time = 0.0,
                cortix_final_time = 0.0,
+               cortix_time_step = 0.0,
                cortix_time_unit=None
              ):
 
@@ -45,6 +47,8 @@ class Droplet():
          type(cortix_start_time)
   assert isinstance(cortix_final_time, float), '-> time type %r is invalid.' % \
          type(cortix_final_time)
+  assert isinstance(cortix_time_step, float), '-> time step type %r is invalid.' % \
+         type(cortix_time_step)
   assert isinstance(cortix_time_unit, str), '-> time unit type %r is invalid.' % \
          type(cortix_time_unit)
 
@@ -121,17 +125,17 @@ class Droplet():
   speed = Quantity( name='speed', formalName='Speed', unit='m/s' )
   quantities.append( speed )
 
-  self.__liquid_phase = Phase( cortix_start_time, species=species, quantities=quantities)
+  self.__liquid_phase = Phase( self.__start_time, species=species, quantities=quantities)
 
   # Initialize phase
   water_mass_cc = 0.99965 # [g/cc]
-  self.__liquid_phase.SetValue( 'water', water_mass_cc, cortix_start_time )
+  self.__liquid_phase.SetValue( 'water', water_mass_cc, self.__start_time )
 
   x_0 = 1000.0  # initial height [m] above ground at 0
-  self.__liquid_phase.SetValue( 'height', x_0, cortix_start_time )
+  self.__liquid_phase.SetValue( 'height', x_0, self.__start_time )
 
   v_0 = 0.0     # initial vertical velocity [m/s]
-  self.__liquid_phase.SetValue( 'speed', v_0, cortix_start_time )
+  self.__liquid_phase.SetValue( 'speed', v_0, self.__start_time )
 
 #---------------------- end def __init__():---------------------------------------
 
@@ -430,7 +434,10 @@ class Droplet():
   .. math::
   ODE IVP problem:
   Given the initial data at $t=0$, $u_1(0) = x_0$, $u_2(0) = v_0 = \dot{u}_1(0)$
-  solve $\frac{\mathtext{d}u}{\mathtext{d}t} = f(u)%
+  solve $\frac{\mathtext{d}u}{\mathtext{d}t} = f(u)$.
+  When $u_1(t)$ is negative, bounce the droplet to a random height between
+  0 and $1.2 x_0$ and no velocity, and continue the time integration until
+  $t \le t_f$.
   ''' 
   import numpy as np
 
@@ -494,8 +501,10 @@ class Droplet():
 
   self.__liquid_phase.AddRow( at_time, values ) # repeat values for current time
 
-  if u_vec[0] <= 0.0: # ground impact sets result to zero
-   u_vec[0] = 0.0
+  if u_vec[0] <= 0.0: # ground impact bounces the drop to a different height near original
+   bounced_height = self.__liquid_phase.GetValue( 'height', self.__start_time )
+   bounced_height *= npy.random.random(1) * 1.2
+   u_vec[0] = bounced_height
    u_vec[1] = 0.0
 
   self.__liquid_phase.SetValue( 'height', u_vec[0], at_time )      # update current values

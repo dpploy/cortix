@@ -32,6 +32,7 @@ class Wind():
                ports = list(),
                cortix_start_time = 0.0,
                cortix_final_time = 0.0,
+               cortix_time_step = 0.0,
                cortix_time_unit=None
              ):
 
@@ -45,6 +46,8 @@ class Wind():
          type(cortix_start_time)
   assert isinstance(cortix_final_time, float), '-> time type %r is invalid.' % \
          type(cortix_final_time)
+  assert isinstance(cortix_time_step, float), '-> time step type %r is invalid.' % \
+         type(cortix_time_step)
   assert isinstance(cortix_time_unit, str), '-> time unit type %r is invalid.' % \
          type(cortix_time_unit)
 
@@ -98,38 +101,39 @@ class Wind():
 
 # Domain specific member data 
 
-  Params = namedtuple('Params',['gravity'])
-  self.__params = Params( gravity ) 
+  shear_coeff = 0.4  # dimensionless
+  Params = namedtuple('Params',['shear_coeff'])
+  self.__params = Params( shear_coeff ) 
 
-  # Setup the material phase as a liquid 
+  # Setup the material phase as a gas
   species = list()
 
-  water = Specie( name='water', formulaName='H2O(l)', phase='liquid' )
-  water.massCCUnit = 'g/cc'
-  water.molarCCUnit = 'mole/cc'
+  air = Specie( name='air', formulaName='Air', phase='gas' )
+  air.massCCUnit = 'g/cc'
+  air.molarCCUnit = 'mole/cc'
 
-  species.append(water)
+  species.append(air)
 
   quantities = list()
 
-  # height
-  height = Quantity( name='height', formalName='Height', unit='m' )
-  quantities.append( height )
+  # altitude
+  altitude = Quantity( name='altitude', formalName='Altitude', unit='m' )
+  quantities.append( altitude )
   # speed
-  speed = Quantity( name='speed', formalName='Speed', unit='m/s' )
-  quantities.append( speed )
+  velocity = Quantity( name='velocity', formalName='Velocity', unit='m/s' )
+  quantities.append( velocity )
 
-  self.__liquid_phase = Phase( cortix_start_time, species=species, quantities=quantities)
+  self.__gas_phase = Phase( cortix_start_time, species=species, quantities=quantities)
 
   # Initialize phase
-  water_mass_cc = 0.99965 # [g/cc]
-  self.__liquid_phase.SetValue( 'water', water_mass_cc, cortix_start_time )
+  air_mass_cc = 0.1 # [g/cc]
+  self.__gas_phase.SetValue( 'water', water_mass_cc, cortix_start_time )
 
-  x_0 = 1000.0  # initial height [m] above ground at 0
-  self.__liquid_phase.SetValue( 'height', x_0, cortix_start_time )
+  x_0 = 1000.0  # initial altitude [m] above ground at 0
+  self.__gas_phase.SetValue( 'altitude', x_0, cortix_start_time )
 
   v_0 = 0.0     # initial vertical velocity [m/s]
-  self.__liquid_phase.SetValue( 'speed', v_0, cortix_start_time )
+  self.__gas_phase.SetValue( 'speed', v_0, cortix_start_time )
 
 #---------------------- end def __init__():---------------------------------------
 
@@ -181,6 +185,9 @@ class Wind():
   if provide_port_name == 'state' and port_file is not None: 
    self.__provide_state( port_file, at_time )
 
+  if provide_port_name == 'wind_velocity' and port_file is not None: 
+   self.__provide_wind_velocity( port_file, at_time )
+
   return
 #---------------------- end def __provide_data():---------------------------------
 
@@ -190,8 +197,8 @@ class Wind():
   port_file = self.__get_port_file( use_port_name = use_port_name )
  
 # Use data from port file
-  #if use_port_name == 'use-port-name' and port_file is not None:  
-  #   self.__use_mymodule_method( port_file, at_time )
+  if use_port_name == 'altitude' and port_file is not None:  
+     self.__use_altitude( port_file, at_time )
 
   return
 #---------------------- end def __use_data():-------------------------------------
@@ -269,10 +276,10 @@ class Wind():
 # write file header
      fout.write('%17s'%('Time[sec]'))
      # mass density   
-     for specie in self.__liquid_phase.GetSpecies():
+     for specie in self.__gas_phase.GetSpecies():
        fout.write('%18s'%(specie.formulaName+'['+specie.massCCUnit+']'))
      # quantities     
-     for quant in self.__liquid_phase.GetQuantities():
+     for quant in self.__gas_phase.GetQuantities():
        fout.write('%18s'%(quant.formalName+'['+quant.unit+']'))
 
      fout.write('\n')
@@ -286,12 +293,12 @@ class Wind():
    fout.write('%18.6e' % (at_time))
 
    # mass density   
-   for specie in self.__liquid_phase.GetSpecies():
-     rho = self.__liquid_phase.GetValue(specie.name, at_time)
+   for specie in self.__gas_phase.GetSpecies():
+     rho = self.__gas_phase.GetValue(specie.name, at_time)
      fout.write('%18.6e'%(rho))
      # quantities     
-   for quant in self.__liquid_phase.GetQuantities():
-     val = self.__liquid_phase.GetValue(quant.name, at_time)
+   for quant in self.__gas_phase.GetQuantities():
+     val = self.__gas_phase.GetValue(quant.name, at_time)
      fout.write('%18.6e'%(val))
 
    fout.write('\n')
@@ -336,7 +343,7 @@ class Wind():
     b.set('unit',self.__cortix_time_unit)
 
     # setup the headers
-    for specie in self.__liquid_phase.species:
+    for specie in self.__gas_phase.species:
         b = ElementTree.SubElement(a,'var')
         formula_name = specie.formulaName
         b.set('name',formula_name)
@@ -345,7 +352,7 @@ class Wind():
         b.set('legend','Wind_'+str(self.__slot_id)+'-state')
         b.set('scale',self.__pyplot_scale)
 
-    for quant in self.__liquid_phase.quantities:
+    for quant in self.__gas_phase.quantities:
         b = ElementTree.SubElement(a,'var')
         formal_name = quant.formalName 
         b.set('name',formal_name)
@@ -360,12 +367,12 @@ class Wind():
 
     values = list()
 
-    for specie in self.__liquid_phase.species:
-        val = self.__liquid_phase.GetValue( specie.name, at_time )
+    for specie in self.__gas_phase.species:
+        val = self.__gas_phase.GetValue( specie.name, at_time )
         values.append( val )
 
-    for quant in self.__liquid_phase.quantities:
-        val = self.__liquid_phase.GetValue( quant.name, at_time )
+    for quant in self.__gas_phase.quantities:
+        val = self.__gas_phase.GetValue( quant.name, at_time )
         values.append( val )
 
     # flush out data
@@ -397,11 +404,11 @@ class Wind():
     # all variables values
     values = list()
 
-    for specie in self.__liquid_phase.species:
-        val = self.__liquid_phase.GetValue( specie.name, at_time )
+    for specie in self.__gas_phase.species:
+        val = self.__gas_phase.GetValue( specie.name, at_time )
         values.append( val )
-    for quant in self.__liquid_phase.quantities:
-        val = self.__liquid_phase.GetValue( quant.name, at_time )
+    for quant in self.__gas_phase.quantities:
+        val = self.__gas_phase.GetValue( quant.name, at_time )
         values.append( val )
 
     # flush out data
@@ -439,8 +446,8 @@ class Wind():
   else:
      assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
 
-  x_0 =   self.__liquid_phase.GetValue( 'height', cortix_time )
-  v_0 = - self.__liquid_phase.GetValue( 'speed', cortix_time )
+  x_0 =   self.__gas_phase.GetValue( 'altitude', cortix_time )
+  v_0 = - self.__gas_phase.GetValue( 'speed', cortix_time )
 
   u_vec_0 = [x_0, v_0]
 
@@ -486,18 +493,18 @@ class Wind():
   else:
      assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
 
-  values = self.__liquid_phase.GetRow( cortix_time ) # values at previous time
+  values = self.__gas_phase.GetRow( cortix_time ) # values at previous time
 
   at_time = cortix_time + cortix_time_step  
 
-  self.__liquid_phase.AddRow( at_time, values ) # repeat values for current time
+  self.__gas_phase.AddRow( at_time, values ) # repeat values for current time
 
   if u_vec[0] <= 0.0: # ground impact sets result to zero
    u_vec[0] = 0.0
    u_vec[1] = 0.0
 
-  self.__liquid_phase.SetValue( 'height', u_vec[0], at_time )      # update current values
-  self.__liquid_phase.SetValue( 'speed',  abs(u_vec[1]), at_time ) # update current values
+  self.__gas_phase.SetValue( 'altitude', u_vec[0], at_time )      # update current values
+  self.__gas_phase.SetValue( 'speed',  abs(u_vec[1]), at_time ) # update current values
 
 #  print('u(t=',at_time*60,'[s]) = ',u_1)
   

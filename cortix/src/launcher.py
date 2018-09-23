@@ -8,11 +8,11 @@
 #
 # Licensed under the GNU General Public License v. 3, please see LICENSE file.
 # https://www.gnu.org/licenses/gpl-3.0.txt
-"""
+'''
 Launcher functionality of the Cortix Class.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
-"""
+'''
 #*********************************************************************************
 import os
 import logging
@@ -158,21 +158,21 @@ class Launcher(Thread):
             assert False, 'time unit invalid: %r' % (evolve_time_unit)
 
         node = cortix_param_xml_root_node.find('time_step')
-        time_step_unit = node.get('unit')
-        time_step = float(node.text.strip())
+        cortix_time_step_unit = node.get('unit')
+        cortix_time_step = float(node.text.strip())
 
-        if time_step_unit == 'minute':
-            time_step *= 1.0
-        elif time_step_unit == 'hour':
-            time_step *= 60.0
-        elif time_step_unit == 'day':
-            time_step *= 24.0 * 60.0
-        elif time_step_unit == 'second':
-            time_step /= 60.0 
+        if cortix_time_step_unit == 'minute':
+            cortix_time_step *= 1.0
+        elif cortix_time_step_unit == 'hour':
+            cortix_time_step *= 60.0
+        elif cortix_time_step_unit == 'day':
+            cortix_time_step *= 24.0 * 60.0
+        elif cortix_time_step_unit == 'second':
+            cortix_time_step /= 60.0 
         else:
-            assert False, 'time unit invalid: %r' % (time_step_unit)
+            assert False, 'time unit invalid: %r' % (cortix_time_step_unit)
 
-        time_unit = 'minute'
+        cortix_time_unit = 'minute'
 
         # collect information from the Cortix communication file for this guest module
         assert os.path.isfile(self.__cortix_comm_full_path_file_name),\
@@ -212,7 +212,9 @@ class Launcher(Thread):
                                                       ports, 
                                                       cortix_start_time, 
                                                       cortix_final_time,
-                                                      time_unit )
+                                                      cortix_time_step,
+                                                      cortix_time_unit 
+                                                    )
 
         s = 'guest_driver = CortixDriver( slot_id=' + str(self.__slot_id) + \
             ', input file=' + self.__input_full_path_file_name + \
@@ -221,7 +223,9 @@ class Launcher(Thread):
             ', ports=' + str(ports) + \
             ', cortix_start_time=' + str(cortix_start_time) + \
             ', cortix_final_time=' + str(cortix_final_time) + \
-            ', time unit=minute )'
+            ', cortix_time_unit=' + cortix_time_unit + \
+            ', cortix_time_step=' + str(cortix_time_step) + \
+            ', cortix_time_step_unit=', cortix_time_step_unit
         self.__log.info(s)
 
         # Evolve the module
@@ -259,14 +263,14 @@ class Launcher(Thread):
             # Data exchange at cortix_time (call ports first)
             guest_driver.call_ports( cortix_time )
 
-            # Advance to cortix_time + time_step (call execute second)
-            guest_driver.execute( cortix_time, time_step )
+            # Advance to cortix_time + cortix_time_step (call execute second)
+            guest_driver.execute( cortix_time, cortix_time_step )
 
             end_time = time.time()
             s = 'CPU elapsed time (s): ' + str(round(end_time - start_time, 2))
             self.__log.debug(s)
 
-            cortix_time += time_step
+            cortix_time += cortix_time_step
 
         self.__set_runtime_status('finished')
         self.__log.info("__set_runtime_status(self, 'finished'")
