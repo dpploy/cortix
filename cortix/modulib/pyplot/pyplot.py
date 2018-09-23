@@ -77,10 +77,16 @@ class PyPlot():
         self.__cortix_time_unit  = cortix_time_unit
 
         n_time_steps = ( cortix_final_time - cortix_start_time ) / cortix_time_step
+        n_of_times_to_plot = 10 # during the entire run
         # how often to plot
-        self.__plot_interval = round( n_time_steps / 5 )
+        self.__plot_interval = round( n_time_steps / n_of_times_to_plot )
         # the width of the window to plot
         self.__plot_slide_window_interval = 3 * self.__plot_interval
+
+        s = 'Plot interval = ' + str(self.__plot_interval) + ' [' + self.__cortix_time_unit + ']'
+        self.__log.info(s)
+        s = 'Plot slide window interval = ' + str(self.__plot_slide_window_interval) + ' [' + self.__cortix_time_unit + ']'
+        self.__log.info(s)
 
         # This holds all time sequences, potentially, one per use port. One time sequence
         # has all the data for one port connection.
