@@ -27,7 +27,10 @@ Cortix can be installed on any Unix-based machine or Mac OSX via pip. Run
 ```
 pip install --user cortix
 ```
-to install the latest version of cortix and similarly for the library dependencies.
+to install the latest version of cortix and its dependencies. After this first install upgrade to newer versions
+```
+pip install --upgrade cortix.
+```
 
 ## Usage
 
