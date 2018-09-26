@@ -33,7 +33,7 @@ to install the current version of cortix in PyPi. To install the dependencies ru
 pin install --user requirements.txt
 ```
 where `requirements.txt` is the file in the Cortix repository.
-After this first install upgrade to newer versions
+After this first install, upgrade to newer versions
 ```
 pip install --upgrade cortix.
 ```
