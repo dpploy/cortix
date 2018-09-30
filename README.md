@@ -5,6 +5,7 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/Django.svg)
 ![AUR](https://img.shields.io/aur/license/yaourt.svg)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/dpploy/cortix-nb/master)
+[![NBViewer](https://github.com/jupyter/design/blob/master/logos/Badges/nbviewer_badge.svg)](http://nbviewer.jupyter.org/github/dpploy/cortix-nb/)
 ---
 ![](cortix/docs/cortix-cover.png)
 
@@ -21,19 +22,29 @@
 
 The basic concepts in Cortix are the creation of an `Application` and a `Simulation` involving `Tasks`.
 
-## Installing
+## Pip install for users using PyPi
 
-Cortix can be installed on any Unix-based machine via pip. Simply run 
+Cortix can be installed on any Unix-based machine or Mac OSX via pip. Run 
 ```
-pip install cortix
+pip install --user cortix
 ```
-to install the latest version of cortix.
+to install the current version of cortix in PyPi. To install the dependencies run
+```
+pin install --user requirements.txt
+```
+where `requirements.txt` is the file in the Cortix repository.
+After this first install, upgrade to newer versions
+```
+pip install --upgrade cortix.
+```
 
-## Usage
+## Repository install for latest version of Cortix
 
-Cortix is a library and it is best used when copied to its own directory, say inside a project directory of your choice, *e.g.*, `/somepath/myproject/cortix/`, or anywhere else in your system, *e.g.*, `/somepath/cortix`. Then add either `/somepath/myproject/cortix to $PYTHONPATH` or `/somepath/cortix to $PYTHONPATH`, respectively.
+Either on a linux OS or Mac OS X, clone the Cortix repository. 
+Cortix is a library and it is best used when copied to its own directory, say inside a project directory of your choice, *e.g.*, `/somepath/myproject/cortix/`, or anywhere else in your system, *e.g.*, `/somepath/cortix`. Then add either `/somepath/myproject/cortix to $PYTHONPATH` or `/somepath/cortix to $PYTHONPATH`, respectively. This is done in the Linux shell through the startup file `.bashrc`. For instance: `export PYTHONPATH=$PYTHONPATH:/somepath/myproject/cortix`. A common case is:
+`export PYTHONPATH=$PYTHONPATH:$HOME/somepath/myproject/cortix`. Then the `.bashrc` file needs to be sourced: `source .bashrc`.
 
-Cortix has a directory (`examples/`) that contains examples for input files, and a driver file. At the moment these input files are past files used in the development of Cortix. A driver file is needed to run Cortix. There is an example (`examples/driver-cortix.py`) that can be copied to say: `/somepath/driver-test.py or /somepath/myproject/driver-test.py`. An input configuration (xml) file is also needed. An example is provided in the `examples/input/` directory (cortix-config.xml). Then to run Cortix, enter the directory of the driver and run the driver `./driver-test.py` which will run an MPI process for Cortix and an additional MPI process for each launched module as a single MPI process or as a pool of processes. To capture the Cortix screen output of log messages (and other standard output messages), issue the bash command `/driver-cortix.py >& screen.out` under Linux (inspect the output file `screen.out` when the run is finished). Extensive logging of runtime information is stored in the `<work_dir>` directory specified in the `cortix-config.xml` input file.
+Cortix has a directory (`examples/`) that contains examples for input files, and a driver file. At the moment these input files are past files used in the development of Cortix. A driver file is needed to run Cortix. There is an example directory (`examples/console_run/`) with some examples that can be copied to say: `/somepath/driver-test.py or /somepath/myproject/driver-test.py`. Alternatively, examples can be started from the `console_run` directory, *i.e.* `droplet_run.py`. An input configuration (xml) file is also needed. An example is provided in the `examples/input/` directory (cortix-config.xml). Cortix will run each module in a separate thread. To capture the Cortix screen output of log messages (and other standard output messages), issue the bash command `/driver-cortix.py >& screen.out` under Linux (inspect the output file `screen.out` when the run is finished). Extensive logging of runtime information is stored in the `<work_dir>` directory specified in the `cortix-config.xml` input file.
 
 ## Testing
 
