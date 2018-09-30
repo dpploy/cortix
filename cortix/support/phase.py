@@ -38,9 +38,9 @@ from cortix.support.quantity import Quantity
 class Phase():
 
     def __init__(self,
-                 time_stamp=None,
-                 species=None,
-                 quantities=None
+                 time_stamp = None,
+                 species    = None,
+                 quantities = None
                  ):
 
         if time_stamp is None:
@@ -77,9 +77,11 @@ class Phase():
                 names.append(quant.name)
                 quant.value = 0.0    # clear these values 
                                      # todo: eliminate them from Quantity in the future
-# Table data phase
-        self.__phase = pandas.DataFrame( index=[time_stamp], columns=names )
-        self.__phase.fillna( 0.0, inplace=True )
+
+# Table data phase without data type assigned; this is left to the user
+# Time stamps will always be float
+        self.__phase = pandas.DataFrame( index=[float(time_stamp)], columns=names )
+#        self.__phase.fillna( 0.0, inplace=True )  # dtype defaults to float
 
         return
 
@@ -99,14 +101,22 @@ class Phase():
     def GetSpecie(self, name):
         for specie in self.__species:
             if specie.name == name:
-                return specie
+                time_stamp = self.__get_time_stamp( None ) # get latest time stamp
+                assert name in self.__phase.columns, 'name %r not in %r'% \
+                   (name,self.__phase.columns)
+                specie.massCC = self.__phase.loc[time_stamp, name]
+                return specie  # return specie syncronized with the phase
         return None
 
     def GetSpecies(self):
+        for species in self.__species:
+          tmp = self.GetSpecie(species.name) # handy way to synchronize the whole list
         return self.__species
     species = property(GetSpecies, None, None, None)
 
     def GetQuantities(self):
+        for quant in self.__quantities:
+          tmp = self.GetQuantity(quant.name) # handy way to synchronize the whole list
         return self.__quantities
     quantities = property(GetQuantities, None, None, None)
 
@@ -119,7 +129,11 @@ class Phase():
     def GetQuantity(self, name):
         for quant in self.__quantities:
             if quant.name == name:
-                return quant
+                time_stamp = self.__get_time_stamp( None ) # get latest time stamp
+                assert name in self.__phase.columns, 'name %r not in %r'% \
+                   (name,self.__phase.columns)
+                quant.value = self.__phase.loc[time_stamp, name]
+                return quant  # return quantity syncronized with the phase
         return None
 
     def AddSpecie(self, new_specie):
@@ -134,7 +148,7 @@ class Phase():
         col = pandas.DataFrame( index=list(self.__phase.index), columns=[newName] )
         tmp = self.__phase
         df = tmp.join(col, how='outer')
-        self.__phase = df.fillna(0.0)
+        self.__phase = df.fillna(0.0)   # for species have float as default
 
     def AddQuantity(self, newQuant):
         assert isinstance(newQuant, Quantity)
@@ -145,31 +159,35 @@ class Phase():
         assert newQuant.formalName not in quantFormalNames
         self.__quantities.append(newQuant)
         newName = newQuant.name
-        col = pandas.DataFrame( index=list( self.__phase.index), columns=[newName] )
-        tmp = self.__phase
-        df = tmp.join(col, how='outer')
-        self.__phase = df.fillna(0.0)
 
-    def AddRow(self, try_time_stamp, rowValues):
-        assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
+        # create a col with object data type; user must fill out column 
+        col = pandas.DataFrame( index=list( self.__phase.index), columns=[newName],
+                                dtype=object )
+        tmp = self.__phase
+        df  = tmp.join(col, how='outer')
+#        self.__phase = df.fillna(newQuant.value)
+
+    def AddRow(self, try_time_stamp, row_values):
+        assert isinstance(row_values, list)
 
         time_stamp = self.__get_time_stamp( try_time_stamp )
-        assert time_stamp is None, 'already used try_time_stamp: %r'%(try_time_stamp)
+        assert time_stamp is None, 'already used time_stamp: %r'%(try_time_stamp)
         time_stamp = try_time_stamp
 
-        assert len(rowValues) == len(self.__phase.columns)
-        tmp = dict()
-        for (i, v) in zip(self.__phase.columns, rowValues):
-            tmp[i] = v
-        row = pandas.DataFrame( tmp, index=[time_stamp], 
-                                columns=list( self.__phase.columns) )
+        assert len(row_values) == self.__phase.columns.size
+
+        # create a row with object data type; users row_values data define data type
+        row = pandas.DataFrame( index=[time_stamp], 
+                                columns=list( self.__phase.columns ), dtype=object )
+
+        for (col,v) in zip(row.columns, row_values):
+            row.loc[time_stamp,col] = v
+
         frames = [self.__phase, row]
         self.__phase = pandas.concat(frames)
         return
 
     def GetRow(self, try_time_stamp=None):
-        if try_time_stamp is not None:
-           assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
         time_stamp = self.__get_time_stamp( try_time_stamp )
         assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
         return list(self.__phase.loc[time_stamp, :])
@@ -184,8 +202,7 @@ class Phase():
         assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
         time_stamp = self.__get_time_stamp( try_time_stamp )
         assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
-        assert isinstance(value, int) or isinstance(value, float) or \
-               isinstance(value, npy.ndarray)
+        assert isinstance(value, int) or isinstance(value, float) 
         self.__phase.loc[time_stamp, :] *= value
         return
 
@@ -247,8 +264,8 @@ class Phase():
         assert isinstance(actor, str)
         assert actor in self.__phase.columns
 
-        assert isinstance(value, int) or isinstance(value, float) or \
-               isinstance(value, npy.ndarray)
+#        assert isinstance(value, int) or isinstance(value, float) or \
+#               isinstance(value, npy.ndarray)
 
         if try_time_stamp is not None:
            assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
@@ -256,6 +273,19 @@ class Phase():
         time_stamp = self.__get_time_stamp( try_time_stamp )
         assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
 
+#        print('*value =', value)
+#        print('*type(value) =', type(value))
+#        print('*time_stamp =', time_stamp)
+#        print('*actor =', actor)
+#        print('*column values =', self.__phase[actor])
+#        print('*df =', self.__phase)
+#        print('*df.dtypes =', self.__phase.dtypes)
+#        print('*df.shape =', self.__phase.shape)
+#        print('')
+#        if isinstance(value,npy.ndarray):
+#           self.__phase[actor] = self.__phase.astype({actor:type(value)})
+#        print('*df.dtypes =', self.__phase.dtypes)
+#        print('')
         self.__phase.loc[time_stamp, actor] = value
         return
 
@@ -273,10 +303,8 @@ class Phase():
             elif col in quantityNames:
                 idx = quantityNames.index(col)
                 quant = self.__quantities[idx]
-                tmp.rename(
-                    columns={
-                        col: col + '[' + quant.unit + ']'},
-                    inplace=True)
+                tmp.rename( columns={ col: col + '[' + quant.unit + ']'},
+                            inplace=True )
             else:
                 assert False, 'oops fatal.'
         tmp.to_html(fileName)
