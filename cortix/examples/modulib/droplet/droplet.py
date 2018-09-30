@@ -14,6 +14,7 @@ Droplet module example in Cortix.
 import os, sys, io, time
 import logging
 from collections import namedtuple
+import math
 import numpy as npy
 
 from cortix.support.quantity import Quantity
@@ -110,7 +111,7 @@ class Droplet():
   # Setup the material phase as a liquid 
   species = list()
 
-  water = Specie( name='water', formulaName='H2O(l)', phase='liquid' )
+  water = Specie( name='water', formulaName='H2O(l)', phase='liquid', atoms=['2*H','O'] )
   water.massCCUnit = 'g/cc'
   water.molarCCUnit = 'mole/cc'
 
@@ -118,12 +119,12 @@ class Droplet():
 
   quantities = list()
 
-  # height
-  height = Quantity( name='height', formalName='Height', unit='m' )
-  quantities.append( height )
-  # speed
-  speed = Quantity( name='speed', formalName='Speed', unit='m/s' )
-  quantities.append( speed )
+  # spatial position
+  spatial_position = Quantity( name='spatial-position', formalName='Spatial Pos.', unit='m' )
+  quantities.append( spatial_position )
+  # velocity
+  velocity = Quantity( name='velocity', formalName='Veloc.', unit='m/s' )
+  quantities.append( velocity )
 
   self.__liquid_phase = Phase( self.__start_time, species=species, quantities=quantities)
 
@@ -131,11 +132,11 @@ class Droplet():
   water_mass_cc = 0.99965 # [g/cc]
   self.__liquid_phase.SetValue( 'water', water_mass_cc, self.__start_time )
 
-  x_0 = 1000.0  # initial height [m] above ground at 0
-  self.__liquid_phase.SetValue( 'height', x_0, self.__start_time )
+  x_0 = (0.0,0.0,1000.0)  # initial height [m] above ground at 0
+  self.__liquid_phase.SetValue( 'spatial-position', x_0, self.__start_time )
 
-  v_0 = 0.0     # initial vertical velocity [m/s]
-  self.__liquid_phase.SetValue( 'speed', v_0, self.__start_time )
+  v_0 = (0.0,0.0,0.0)     # initial velocity [m/s]
+  self.__liquid_phase.SetValue( 'velocity', v_0, self.__start_time )
 
 #---------------------- end def __init__():---------------------------------------
 
@@ -279,7 +280,11 @@ class Droplet():
        fout.write('%18s'%(specie.formulaName+'['+specie.massCCUnit+']'))
      # quantities     
      for quant in self.__liquid_phase.GetQuantities():
-       fout.write('%18s'%(quant.formalName+'['+quant.unit+']'))
+         if quant.name == 'spatial-position' or quant.name == 'velocity':
+            for i in range(3):
+                fout.write('%18s'%(quant.formalName+str(i+1)+'['+quant.unit+']'))
+         else:
+            fout.write('%18s'%(quant.formalName+'['+quant.unit+']'))
 
      fout.write('\n')
      fout.close()
@@ -298,7 +303,11 @@ class Droplet():
      # quantities     
    for quant in self.__liquid_phase.GetQuantities():
      val = self.__liquid_phase.GetValue(quant.name, at_time)
-     fout.write('%18.6e'%(val))
+     if quant.name == 'spatial-position' or quant.name == 'velocity':
+        for v in val:
+            fout.write('%18.6e'%(v))
+     else:
+        fout.write('%18.6e'%(val))
 
    fout.write('\n')
    fout.close()
@@ -323,14 +332,10 @@ class Droplet():
 
     assert os.path.isfile(port_file) is False, 'port_file %r exists; stop.' % port_file
 
-    tree = ElementTree.ElementTree()
-    root_node = tree.getroot()
-
     a = ElementTree.Element('time-sequence')
     a.set('name','droplet_'+str(self.__slot_id)+'-state')
 
     b = ElementTree.SubElement(a,'comment')
-    today = datetime.datetime.today()
     b.set('author','cortix.examples.modulib.droplet')
     b.set('version','0.1')
 
@@ -352,13 +357,22 @@ class Droplet():
         b.set('scale',self.__pyplot_scale)
 
     for quant in self.__liquid_phase.quantities:
-        b = ElementTree.SubElement(a,'var')
         formal_name = quant.formalName 
-        b.set('name',formal_name)
-        unit = quant.unit
-        b.set('unit',unit)
-        b.set('legend','Droplet_'+str(self.__slot_id)+'-state')
-        b.set('scale',self.__pyplot_scale)
+        if quant.name == 'spatial-position' or quant.name == 'velocity':
+           for i in range(3):
+               b = ElementTree.SubElement(a,'var')
+               b.set('name',formal_name+' '+str(i+1))
+               unit = quant.unit
+               b.set('unit',unit)
+               b.set('legend','Droplet_'+str(self.__slot_id)+'-state')
+               b.set('scale',self.__pyplot_scale)
+        else:
+           b = ElementTree.SubElement(a,'var')
+           b.set('name',formal_name)
+           unit = quant.unit
+           b.set('unit',unit)
+           b.set('legend','Droplet_'+str(self.__slot_id)+'-state')
+           b.set('scale',self.__pyplot_scale)
 
     # write values for all variables
     b = ElementTree.SubElement(a,'timeStamp')
@@ -372,7 +386,11 @@ class Droplet():
 
     for quant in self.__liquid_phase.quantities:
         val = self.__liquid_phase.GetValue( quant.name, at_time )
-        values.append( val )
+        if quant.name == 'spatial-position' or quant.name == 'velocity':
+           for v in val:
+               values.append( math.fabs(v) ) # pyplot can't take negative values
+        else:
+           values.append( val )
 
     # flush out data
     text = str()
@@ -388,7 +406,7 @@ class Droplet():
     tree.write( port_file, xml_declaration=True, encoding="unicode", method="xml" )
 
   #-------------------------------------------------------------------------------
-  # if not the first time step then parse the existing history file and append
+  # if not the first time step then parse the existing history file and append to it
    else:
 
     mutex = Lock()
@@ -408,7 +426,11 @@ class Droplet():
         values.append( val )
     for quant in self.__liquid_phase.quantities:
         val = self.__liquid_phase.GetValue( quant.name, at_time )
-        values.append( val )
+        if quant.name == 'spatial-position' or quant.name == 'velocity':
+           for v in val:
+               values.append( math.fabs(v) ) # pyplot can't take negative values
+        else:
+           values.append( val )
 
     # flush out data
     text = str()
@@ -439,8 +461,6 @@ class Droplet():
   0 and $1.2 x_0$ and no velocity, and continue the time integration until
   $t \le t_f$.
   ''' 
-  import numpy as np
-
   if self.__ode_integrator == 'scikits.odes':
      from scikits.odes import ode        # this requires the SUNDIALS ODE package 
   elif self.__ode_integrator == 'scipy.integrate':
@@ -448,26 +468,38 @@ class Droplet():
   else:
      assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
 
-  x_0 =   self.__liquid_phase.GetValue( 'height', cortix_time )
-  v_0 = - self.__liquid_phase.GetValue( 'speed', cortix_time )
+  x_0 = self.__liquid_phase.GetValue( 'spatial-position', cortix_time )
+  v_0 = self.__liquid_phase.GetValue( 'velocity', cortix_time )
 
-  u_vec_0 = [x_0, v_0]
+  u_vec_0 = x_0 + v_0 # concatenate tuples
 
   # rhs function
   if self.__ode_integrator == 'scikits.odes':
     def rhs_fn(t, u_vec, dt_u_vec, params):
-      dt_u_vec[0] = u_vec[1]              #  d_t u_1 = u_2
-      dt_u_vec[1] = - params.gravity      #  d_t u_2 = -g
+      dt_u_vec[0] = u_vec[3]              #  d_t u_1 = u_4
+      dt_u_vec[3] = 0.0                   #  d_t u_4 = 0 
+
+      dt_u_vec[1] = u_vec[4]              #  d_t u_2 = u_5
+      dt_u_vec[4] = 0.0                   #  d_t u_5 = 0 
+
+      dt_u_vec[2] = u_vec[5]              #  d_t u_3 = u_6
+      dt_u_vec[5] = - params.gravity      #  d_t u_6 = -g
       return
   elif self.__ode_integrator == 'scipy.integrate':
     def rhs_fn(u_vec, t, gravity):
-      dt_u_0 = u_vec[1]              #  d_t u_1 = u_2
-      dt_u_1 = - gravity             #  d_t u_2 = -g
-      return [dt_u_0, dt_u_1]
+      dt_u_0 = u_vec[3]              #  d_t u_1 = u_4
+      dt_u_3 = 0.0                   #  d_t u_4 = 0
+
+      dt_u_1 = u_vec[4]              #  d_t u_2 = u_5
+      dt_u_4 = 0.0                   #  d_t u_5 = 0 
+
+      dt_u_2 = u_vec[5]              #  d_t u_3 = u_6
+      dt_u_5 = - gravity             #  d_t u_6 = -g
+      return [dt_u_0, dt_u_1, dt_u_2, dt_u_3, dt_u_4, dt_u_5]
   else:
      assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
 
-  t_interval_sec = np.linspace(0.0, cortix_time_step, num=2)
+  t_interval_sec = npy.linspace(0.0, cortix_time_step, num=2)
 
   if self.__ode_integrator == 'scikits.odes':
      cvode = ode('cvode', rhs_fn, user_data=self.__params, old_api=False)
@@ -483,10 +515,10 @@ class Droplet():
      u_vec = results.y[1,:] # solution vector at final time step
 
   elif self.__ode_integrator == 'scipy.integrate':
-     u_vec_hist, info_dict = odeint( rhs_fn,
-                                     u_vec_0, t_interval_sec,
-                                     args=( self.__params.gravity, ), full_output=True
-                                   )
+     ( u_vec_hist, info_dict ) = odeint( rhs_fn,
+                                         u_vec_0, t_interval_sec,
+                                         args=( self.__params.gravity, ), full_output=True
+                                       )
 
      assert info_dict['message']=='Integration successful.',\
             'Fatal: scipy.integrate.odeint failed %r'%info_dict['message']
@@ -495,23 +527,23 @@ class Droplet():
   else:
      assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
 
+
   values = self.__liquid_phase.GetRow( cortix_time ) # values at previous time
 
   at_time = cortix_time + cortix_time_step  
 
   self.__liquid_phase.AddRow( at_time, values ) # repeat values for current time
 
-  if u_vec[0] <= 0.0: # ground impact bounces the drop to a different height near original
-   bounced_height = self.__liquid_phase.GetValue( 'height', self.__start_time )
-   bounced_height *= npy.random.random(1) * 1.2
-   u_vec[0] = bounced_height
-   u_vec[1] = 0.0
+  if u_vec[2] <= 0.0: # ground impact bounces the drop to a different height near original
+   position = self.__liquid_phase.GetValue( 'spatial-position', self.__start_time )
+   bounced_position = list(position)
+   bounced_position[2] *= npy.random.random(1) * 1.2
+   u_vec[0:3] = bounced_position[:]
+   u_vec[3:]  = 0.0
 
-  self.__liquid_phase.SetValue( 'height', u_vec[0], at_time )      # update current values
-  self.__liquid_phase.SetValue( 'speed',  abs(u_vec[1]), at_time ) # update current values
+  self.__liquid_phase.SetValue( 'spatial-position', tuple(u_vec[0:3]), at_time ) # update current values
+  self.__liquid_phase.SetValue( 'velocity', tuple(u_vec[3:]), at_time ) # update current values
 
-#  print('u(t=',at_time*60,'[s]) = ',u_1)
-  
 #---------------------- end def __evolve():---------------------------------------
 
 

@@ -125,6 +125,7 @@
     <port type="input"   mode="file.txt" multiplicity="1">input-data</port>
     <port type="use"     mode="file.txt" multiplicity="1">input</port>
     <port type="provide" mode="file.xml" multiplicity="1">state</port>
+    <port type="provide" mode="file.xml" multiplicity="1">droplet-position</port>
     <port type="provide" mode="file.dat" multiplicity="1">output</port>
     <port type="output"  mode="file.any" multiplicity="1">persistent-output</port>
    </module>
@@ -143,7 +144,7 @@
     <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
     <port type="input"   mode="file.txt" multiplicity="1">input-data</port>
     <port type="use"     mode="file.txt" multiplicity="1">input</port>
-    <port type="use"     mode="file.txt" multiplicity="1">altitude</port>
+    <port type="use"     mode="file.txt" multiplicity="1">spatial-position</port>
     <port type="provide" mode="file.xml" multiplicity="1">state</port>
     <port type="provide" mode="file.dat" multiplicity="1">wind-velocity</port>
     <port type="provide" mode="file.dat" multiplicity="1">output</port>
