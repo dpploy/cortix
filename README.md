@@ -37,6 +37,7 @@ After this first install, upgrade to newer versions
 ```
 pip install --upgrade cortix.
 ```
+whenever the PyPi version has been upgraded.
 
 ## Repository install for latest version of Cortix
 
