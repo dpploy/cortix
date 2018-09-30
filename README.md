@@ -12,12 +12,12 @@
 ## What is Cortix?
 
 * Cortix is a Python library for system-level module coupling, execution, and
-  analysis.
+  analysis of dynamical system models that exchange time-dependent data.
 * Cortix takes as input a collection of computational modules and provides an 
-  environment for the coupling of those modules into a single simulation.
-* Cortix handles:
-    - Communication between the modules
-    - Numerical integration
+  environment for the coupling of these modules into a single simulation.
+* Cortix supports:
+    - Communication between modules
+    - Time synchronization
     - Data visualization
 
 The basic concepts in Cortix are the creation of an `Application` and a `Simulation` involving `Tasks`.
