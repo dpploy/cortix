@@ -22,13 +22,13 @@
 
 The basic concepts in Cortix are the creation of an `Application` and a `Simulation` involving `Tasks`.
 
-## Pip install for users using PyPi
+## Pip install for users using PyPI
 
 Cortix can be installed on any Unix-based machine or Mac OSX via pip. Run 
 ```
 pip install --user cortix
 ```
-to install the current version of cortix in PyPi. To install the dependencies run
+to install the current version of cortix in PyPI. To install the dependencies run
 ```
 pin install --user requirements.txt
 ```
@@ -37,7 +37,7 @@ After this first install, upgrade to newer versions
 ```
 pip install --upgrade cortix.
 ```
-whenever the PyPi version has been upgraded.
+whenever the PyPI version has been upgraded (refer to the PyPI badge above).
 
 ## Repository install for latest version of Cortix
 
