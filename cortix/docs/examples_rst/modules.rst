@@ -4,7 +4,6 @@ examples
 .. toctree::
    :maxdepth: 2
 
-   main
-   main_executor
-   main_pthread
-   input_rst/modules.rst
+   console_run_rst/modules
+   input_rst/modules
+   modulib_rst/modules

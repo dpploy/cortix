@@ -125,7 +125,7 @@ class Network:
 
     def __get_nx_graph(self):
         '''
-        `str`:NXGraph corresponding to network
+        `networkx.MultiDiGraph`:NXGraph corresponding to network
         '''
 
         return self.__nx_graph
@@ -137,7 +137,7 @@ class Network:
         Network to string conversion
         '''
         s = 'Network data members:\n name=%s\n slot names=%s\n connectivity=%s\n runtime comm file= %s'
-        return s % (self.__name, self.__slot_names, self.__connectivity, 
+        return s % (self.__name, self.__slot_names, self.__connectivity,
                     self.__runtime_cortix_comm_file)
 #----------------------- end def __str__():---------------------------------------
 
@@ -148,7 +148,7 @@ class Network:
         '''
 
         s = 'Network data members:\n name=%s\n slot names=%s\n connectivity=%s\n runtime comm file= %s'
-        return s % (self.__name, self.__slot_names, self.__connectivity, 
+        return s % (self.__name, self.__slot_names, self.__connectivity,
                     self.__runtime_cortix_comm_file)
 #----------------------- end def __repr__():--------------------------------------
 

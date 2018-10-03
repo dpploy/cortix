@@ -5,6 +5,7 @@
 
 Cortix documentation
 ====================
+.. include:: hyperlinks.rst
 .. include:: readme_converted.rst
 
 Table of Contents
@@ -22,5 +23,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-.. include:: hyperlinks.rst

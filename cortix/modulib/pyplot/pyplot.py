@@ -27,12 +27,12 @@ matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MultipleLocator
-import pickle 
+import pickle
 
 import xml.etree.ElementTree as ElementTree
 from threading import Lock
 
-from .time_sequence import TimeSequence
+from cortix.modulib.pyplot.time_sequence import TimeSequence
 # *********************************************************************************
 
 class PyPlot():
@@ -170,7 +170,7 @@ class PyPlot():
         '''
 
         # Access the port file
-        port_file = self.__get_port_file( usePortName = usePortName, 
+        port_file = self.__get_port_file( usePortName = usePortName,
                                           usePortFile = usePortFile  )
 
 # Get data from port files
@@ -264,7 +264,7 @@ class PyPlot():
             self.__plot_time_tables( from_time, to_time )
 
         elif cortix_time >= self.__cortix_final_time:
- 
+
             s = '__plot_data(): cortix time [min] = ' + str(cortix_time)
             self.__log.debug(s)
 
@@ -287,7 +287,7 @@ class PyPlot():
         else:
             initialTime = max(self.__cortix_start_time, at_time - self.__plot_slide_window_interval)
 
-        timeSequence = TimeSequence( port_file, 'xml', initialTime, at_time, 
+        timeSequence = TimeSequence( port_file, 'xml', initialTime, at_time,
                                      self.__cortix_time_unit, self.__log )
 
         self.__time_sequences_tmp.append(timeSequence)
@@ -371,8 +371,8 @@ class PyPlot():
 #----------------------- end __get_time_tables():---------------------------------
 
     def __plot_time_seq_dashboard( self, initialTime=0.0, finalTime=0.0 ):
-        ''' 
-        All time sequences on hold will be plotted here and the temporary storage 
+        '''
+        All time sequences on hold will be plotted here and the temporary storage
         of these time sequences will be cleared at the end.
         '''
 
@@ -421,7 +421,7 @@ class PyPlot():
                 if iVar != 0:  # flush any current figure
                     figName = 'pyplot_' + \
                         str(self.__slot_id) + '-timeseq-dashboard-' + \
-                        str(iDash).zfill(2) 
+                        str(iDash).zfill(2)
                     fig.savefig(figName+'.png', dpi=200, fomat='png')
                     plt.close(figNum)
 
@@ -452,7 +452,7 @@ class PyPlot():
                             break
                     if count == nPlotsNeeded:
                         break
-    
+
                 axes = npy.array(axlst)
 
                 text = today + ': Cortix.PyPlot_' + \
@@ -747,7 +747,7 @@ class PyPlot():
     # end of: for iVar in range(nVar):
 
         figName = 'pyplot_' + str(self.__slot_id) + \
-            '-timeseq-dashboard-' + str(iDash).zfill(2) 
+            '-timeseq-dashboard-' + str(iDash).zfill(2)
         fig.savefig(figName+'.png', dpi=200, fomat='png')
         plt.close(figNum)
 
@@ -758,7 +758,7 @@ class PyPlot():
 
         s = '__plot_time_seq_dashboard(): done with plotting'
         self.__log.debug(s)
- 
+
     # clear __time_sequences_tmp
         self.__time_sequences_tmp = list()
 
@@ -823,7 +823,7 @@ class PyPlot():
                 for i in range(len(y)):
                     y[i] = float(y[i])
                 y = np.array(y)
-    
+
                 if k == 0 or k == 1:
                     y *= 1000.0
                     yUnit = 'm'

@@ -11,7 +11,7 @@
 pandoc -f markdown_github -t rst -o readme_converted.rst ../../README.md
 
 # Correct the path to cortix-cover.png in readme_converted.rst
-sed -i 's+docs/cortix-cover.png+cortix-cover.png+g' readme_converted.rst
+sed -i 's+cortix/docs/cortix-cover.png+cortix-cover.png+g' readme_converted.rst
 
 # Remove Cortix double heading
 sed -i -e 1,3d readme_converted.rst
@@ -33,6 +33,24 @@ sphinx-apidoc -o modulib_rst/pyplot_rst ../modulib/pyplot
 
 # Build docs for examples directory
 sphinx-apidoc -o examples_rst ../examples
+
+# Build docs for console_run subdirectory
+sphinx-apidoc -o examples_rst/console_run_rst ../examples/console_run
+
+# Build docs for input subdirectory
+sphinx-apidoc -o examples_rst/input_rst ..examples/input
+
+# Build docs for modulib subdirectory
+sphinx-apidoc -o examples_rst/modulib_rst ../examples/modulib
+
+# Build docs for droplet subdirectory
+sphinx-apidoc -o examples_rst/modulib_rst/droplet_rst ../examples/modulib/droplet
+
+# Build docs for wind subdirectory
+sphinx-apidoc -o examples_rst/modulib_rst/wind_rst ../examples/modulib/wind
+
+# Build docs for notebook_run subdirectory
+#sphinx-apidoc -o examples_rst/notebook_run_rst ../examples/notebook_run
 
 # Make documentation
 make clean
