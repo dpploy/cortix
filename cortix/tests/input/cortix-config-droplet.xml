@@ -52,9 +52,19 @@
   <!--NB: each task combines parameters for one named application connectivity-->
   <!--NB: each task name must match a network name below-->
 
+  <task name="droplet-fall" >
+   <start_time unit="minute">0.0</start_time>
+   <evolve_time unit="minute">2.5</evolve_time>
+   <time_step unit="second">0.5</time_step>
+   <logger level="DEBUG">
+    <file_handler level="DEBUG"> </file_handler>
+    <console_handler level="INFO"> </console_handler>
+   </logger>
+  </task>
+
   <task name="solo-pyplot" >
    <start_time unit="minute">0.0</start_time>
-   <evolve_time unit="minute">0.28</evolve_time>
+   <evolve_time unit="minute">2.5</evolve_time>
    <time_step unit="second">0.5</time_step>
    <logger level="DEBUG">
     <file_handler level="DEBUG"> </file_handler>
@@ -64,17 +74,7 @@
 
   <task name="solo-droplet-fall" >
    <start_time unit="minute">0.0</start_time>
-   <evolve_time unit="minute">0.28</evolve_time>
-   <time_step unit="second">0.5</time_step>
-   <logger level="DEBUG">
-    <file_handler level="DEBUG"> </file_handler>
-    <console_handler level="INFO"> </console_handler>
-   </logger>
-  </task>
-
-  <task name="droplet-fall" >
-   <start_time unit="minute">0.0</start_time>
-   <evolve_time unit="minute">0.28</evolve_time>
+   <evolve_time unit="minute">2.5</evolve_time>
    <time_step unit="second">0.5</time_step>
    <logger level="DEBUG">
     <file_handler level="DEBUG"> </file_handler>
@@ -125,6 +125,28 @@
     <port type="input"   mode="file.txt" multiplicity="1">input-data</port>
     <port type="use"     mode="file.txt" multiplicity="1">input</port>
     <port type="provide" mode="file.xml" multiplicity="1">state</port>
+    <port type="provide" mode="file.xml" multiplicity="1">droplet-position</port>
+    <port type="provide" mode="file.dat" multiplicity="1">output</port>
+    <port type="output"  mode="file.any" multiplicity="1">persistent-output</port>
+   </module>
+
+   <module name="wind" type="native">
+    <library name='cortix.examples.modulib'>
+     <parent_dir>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/cortix/</parent_dir>
+    </library>
+    <input_file_name>wind.input</input_file_name>
+    <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
+    <logger level="DEBUG">
+     <file_handler level="DEBUG"> </file_handler>
+     <console_handler level="INFO"> </console_handler>
+    </logger>
+    <!-- Ports have four types: * use, * provide, * input, * output -->
+    <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
+    <port type="input"   mode="file.txt" multiplicity="1">input-data</port>
+    <port type="use"     mode="file.txt" multiplicity="1">input</port>
+    <port type="use"     mode="file.txt" multiplicity="1">spatial-position</port>
+    <port type="provide" mode="file.xml" multiplicity="1">state</port>
+    <port type="provide" mode="file.dat" multiplicity="1">wind-velocity</port>
     <port type="provide" mode="file.dat" multiplicity="1">output</port>
     <port type="output"  mode="file.any" multiplicity="1">persistent-output</port>
    </module>
