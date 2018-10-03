@@ -175,7 +175,7 @@ class Task:
 
     def __get_work_dir(self):
         '''
-        `str`:Working directory of task specification
+        `str`:Working directory of task
         '''
 
         return self.__work_dir

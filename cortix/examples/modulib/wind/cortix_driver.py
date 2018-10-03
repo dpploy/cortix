@@ -19,7 +19,7 @@ import datetime
 import logging
 
 # uncomment
-from .wind import Wind
+from cortix.examples.modulib.wind.wind import Wind
 #*************************************************************************
 
 class CortixDriver():
@@ -53,11 +53,11 @@ class CortixDriver():
                type(time_unit)
 
         # Logging
-        self.__log = logging.getLogger( 'launcher-wind' + str(slot_id) + 
+        self.__log = logging.getLogger( 'launcher-wind' + str(slot_id) +
                                         '.cortixdriver')
         self.__log.info('initializing an object of CortixDriver()')
 
-        # Guest library module: Wind   
+        # Guest library module: Wind
         self.__wind = Wind( slot_id, input_full_path_file_name, work_dir, ports,
                             cortix_start_time, cortix_final_time, time_unit )
 

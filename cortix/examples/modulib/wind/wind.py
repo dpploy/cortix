@@ -13,11 +13,11 @@ Wind module example in Cortix.
 #*********************************************************************************
 import os, sys, io, time
 import logging
+from collections             import namedtuple
 
 from cortix.support.quantity import Quantity
 from cortix.support.specie   import Specie
 from cortix.support.phase    import Phase
-from collections             import namedtuple
 #*********************************************************************************
 
 class Wind():
@@ -119,21 +119,21 @@ class Wind():
   # altitude
   altitude = Quantity( name='altitude', formalName='Altitude', unit='m' )
   quantities.append( altitude )
-  # speed
+  # velocity
   velocity = Quantity( name='velocity', formalName='Velocity', unit='m/s' )
   quantities.append( velocity )
 
-  self.__gas_phase = Phase( cortix_start_time, species=species, quantities=quantities)
+  self.__gas_phase = Phase( self.__start_time, species=species, quantities=quantities)
 
   # Initialize phase
   air_mass_cc = 0.1 # [g/cc]
-  self.__gas_phase.SetValue( 'water', water_mass_cc, cortix_start_time )
+  self.__gas_phase.SetValue( 'water', water_mass_cc, self.__start_time )
 
   x_0 = 1000.0  # initial altitude [m] above ground at 0
-  self.__gas_phase.SetValue( 'altitude', x_0, cortix_start_time )
+  self.__gas_phase.SetValue( 'altitude', x_0, self.__start_time )
 
-  v_0 = 0.0     # initial vertical velocity [m/s]
-  self.__gas_phase.SetValue( 'speed', v_0, cortix_start_time )
+  v_0 = np.array([0.0,0.0,0.0])   # initial wind velocity [m/s]
+  self.__gas_phase.SetValue( 'velocity', v_0, self.__start_time )
 
 #---------------------- end def __init__():---------------------------------------
 
@@ -149,7 +149,7 @@ class Wind():
   self.__provide_data( provide_port_name='state',  at_time=cortix_time )
 
   # use data using the 'use-port-name' of the module
-  #self.__use_data( use_port_name='use-port-name', at_time=cortix_time )
+  self.__use_data( use_port_name='spatial-position', at_time=cortix_time )
 
   return
 #---------------------- end def call_ports():---------------------------------------

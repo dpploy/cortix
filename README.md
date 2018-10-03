@@ -21,30 +21,27 @@
 
 The basic concepts in Cortix are the creation of an `Application` and a `Simulation` involving `Tasks`.
 
-## Installation: Cortix can be installed on any Unix-based environment (Linux/Mac OS)
+## Installation: Cortix can be installed on any Unix-based environment
 
-## Installing via PyPi
+## Installing via PyPI
 ```
 pip install --user cortix
 ```
 
 ## Installing from source
-1. Clone this repository
+1. Clone this repository to install the current version of Cortix in PyPI. 
 ```
 git clone https://github.com/dpploy/cortix.git
 ```
-
 2. Install the required dependencies listed in requirements.txt
 ```
 pip install --user -r cortix/requirements.txt
 ```
-
 3. Add ```cortix```'s parent path to your ```$PYTHONPATH``` variable
 ```
 export PYTHONPATH=$PYTHONPATH:$(pwd)"
 ```
 Note: you may want to add this line to your ```.bashrc``` in order for it to be persistent
-
 
 ## Testing
 

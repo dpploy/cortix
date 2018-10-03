@@ -27,6 +27,8 @@ def run():
     full_path_config_file = os.path.join(pwd, '../input/cortix-config-droplet.xml')
     cortix = Cortix('cortix-droplet', full_path_config_file)
     cortix.run_simulations(task_name="droplet-fall")
+#    cortix.run_simulations(task_name="solo-droplet-fall")
+#    cortix.run_simulations(task_name="solo-pyplot") # this needs additional config
 #---------------------- end def run():--------------------------------------------
 
 #*********************************************************************************
