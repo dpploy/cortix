@@ -18,7 +18,7 @@ import time
 import datetime
 import logging
 
-from .pyplot import PyPlot
+from cortix.modulib.pyplot.pyplot import PyPlot
 # *********************************************************************************
 
 class CortixDriver():

@@ -19,7 +19,7 @@ import datetime
 import logging
 
 # uncomment
-from .droplet import Droplet
+from cortix.examples.modulib.droplet.droplet import Droplet
 #*************************************************************************
 
 class CortixDriver():
@@ -53,7 +53,7 @@ class CortixDriver():
                type(cortix_time_unit)
 
         # Logging
-        self.__log = logging.getLogger( 'launcher-droplet' + str(slot_id) + 
+        self.__log = logging.getLogger( 'launcher-droplet' + str(slot_id) +
                                         '.cortixdriver')
         self.__log.info('initializing an object of CortixDriver()')
 

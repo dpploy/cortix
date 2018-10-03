@@ -29,3 +29,4 @@ video*
 pylintrc
 cortix/docs/_build
 .cache/
+*.pyc
