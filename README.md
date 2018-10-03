@@ -39,7 +39,7 @@ pip install --user -r cortix/requirements.txt
 ```
 3. Add ```cortix```'s parent path to your ```$PYTHONPATH``` variable
 ```
-export PYTHONPATH=$PYTHONPATH:$(pwd)"
+export PYTHONPATH=$PYTHONPATH:$(pwd)
 ```
 Note: you may want to add this line to your ```.bashrc``` in order for it to be persistent
 
