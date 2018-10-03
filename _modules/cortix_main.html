@@ -55,11 +55,11 @@
 <span class="c1">#</span>
 <span class="c1"># Licensed under the GNU General Public License v. 3, please see LICENSE file.</span>
 <span class="c1"># https://www.gnu.org/licenses/gpl-3.0.txt</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">The Cortix class definition.</span>
 
 <span class="sd">Cortix: a program for system-level modules coupling, execution, and analysis.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&#39;&#39;&#39;</span>
 <span class="c1">#*********************************************************************************</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">logging</span>
@@ -69,11 +69,11 @@
 <span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="Cortix"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix">[docs]</a><span class="k">class</span> <span class="nc">Cortix</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    The main Cortix class definition. This class encapsulates the</span>
 <span class="sd">    concepts of simulations, tasks, and modules, for a given application providing </span>
 <span class="sd">    the user with an interface to the simulations.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_file</span><span class="o">=</span><span class="s2">&quot;cortix-config.xml&quot;</span><span class="p">):</span>
 
@@ -158,11 +158,11 @@
 <span class="c1">#----------------------- end def __init__():--------------------------------------</span>
 
 <div class="viewcode-block" id="Cortix.run_simulations"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.run_simulations">[docs]</a>    <span class="k">def</span> <span class="nf">run_simulations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        This method runs every simulation</span>
 <span class="sd">        defined by the Cortix object.</span>
 <span class="sd">        At the moment this is done one simulation at a time.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">for</span> <span class="n">sim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__simulations</span><span class="p">:</span> 
             <span class="n">sim</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">task_name</span><span class="p">)</span></div>
@@ -172,11 +172,11 @@
 <span class="c1"># Private helper functions (internal use: __)</span>
 
     <span class="k">def</span> <span class="nf">__setup_simulations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        This method is a helper function for the Cortix constructor</span>
 <span class="sd">        whose purpose is to set up the simulations defined by the</span>
 <span class="sd">        Cortix configuration.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">for</span> <span class="n">sim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__config_tree</span><span class="o">.</span><span class="n">get_all_sub_nodes</span><span class="p">(</span><span class="s1">&#39;simulation&#39;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>

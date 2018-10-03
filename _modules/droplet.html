@@ -1,0 +1,645 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>droplet &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for droplet</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># This file is part of the Cortix toolkit evironment</span>
+<span class="c1"># https://github.com/dpploy/cortix</span>
+<span class="c1">#</span>
+<span class="c1"># All rights reserved, see COPYRIGHT for full restrictions.</span>
+<span class="c1"># https://github.com/dpploy/COPYRIGHT....</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the GNU General Public License v. 3, please see LICENSE file.</span>
+<span class="c1"># https://www.gnu.org/licenses/gpl-3.0.txt</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Droplet module example in Cortix.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="c1">#*********************************************************************************</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">io</span><span class="o">,</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">npy</span>
+
+<span class="kn">from</span> <span class="nn">cortix.support.quantity</span> <span class="k">import</span> <span class="n">Quantity</span>
+<span class="kn">from</span> <span class="nn">cortix.support.specie</span>   <span class="k">import</span> <span class="n">Specie</span>
+<span class="kn">from</span> <span class="nn">cortix.support.phase</span>    <span class="k">import</span> <span class="n">Phase</span>
+<span class="c1">#*********************************************************************************</span>
+
+<div class="viewcode-block" id="Droplet"><a class="viewcode-back" href="../examples_rst/modulib_rst/droplet_rst/droplet.html#droplet.Droplet">[docs]</a><span class="k">class</span> <span class="nc">Droplet</span><span class="p">():</span>
+ <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  Droplet module used example in Cortix.</span>
+<span class="sd"> &#39;&#39;&#39;</span>
+
+ <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span>
+               <span class="n">slot_id</span><span class="p">,</span>
+               <span class="n">input_full_path_file_name</span><span class="p">,</span>
+               <span class="n">work_dir</span><span class="p">,</span>
+               <span class="n">ports</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(),</span>
+               <span class="n">cortix_start_time</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+               <span class="n">cortix_final_time</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+               <span class="n">cortix_time_step</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+               <span class="n">cortix_time_unit</span><span class="o">=</span><span class="kc">None</span>
+             <span class="p">):</span>
+
+<span class="c1">#.................................................................................</span>
+<span class="c1"># Sanity test</span>
+
+  <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">slot_id</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;-&gt; slot_id type </span><span class="si">%r</span><span class="s1"> is invalid.&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">slot_id</span><span class="p">)</span>
+  <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ports</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="s1">&#39;-&gt; ports type </span><span class="si">%r</span><span class="s1"> is invalid.&#39;</span>  <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">ports</span><span class="p">)</span>
+  <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">ports</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+  <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cortix_start_time</span><span class="p">,</span><span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;-&gt; time type </span><span class="si">%r</span><span class="s1"> is invalid.&#39;</span> <span class="o">%</span> \
+         <span class="nb">type</span><span class="p">(</span><span class="n">cortix_start_time</span><span class="p">)</span>
+  <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cortix_final_time</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;-&gt; time type </span><span class="si">%r</span><span class="s1"> is invalid.&#39;</span> <span class="o">%</span> \
+         <span class="nb">type</span><span class="p">(</span><span class="n">cortix_final_time</span><span class="p">)</span>
+  <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cortix_time_step</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;-&gt; time step type </span><span class="si">%r</span><span class="s1"> is invalid.&#39;</span> <span class="o">%</span> \
+         <span class="nb">type</span><span class="p">(</span><span class="n">cortix_time_step</span><span class="p">)</span>
+  <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cortix_time_unit</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;-&gt; time unit type </span><span class="si">%r</span><span class="s1"> is invalid.&#39;</span> <span class="o">%</span> \
+         <span class="nb">type</span><span class="p">(</span><span class="n">cortix_time_unit</span><span class="p">)</span>
+
+  <span class="c1"># Logging</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">__log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;launcher-droplet&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">slot_id</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.cortix_driver.droplet&#39;</span><span class="p">)</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;initializing an object of Droplet()&#39;</span><span class="p">)</span>
+
+<span class="c1">#.................................................................................</span>
+<span class="c1"># Member data </span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">__slot_id</span> <span class="o">=</span> <span class="n">slot_id</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">__ports</span>   <span class="o">=</span> <span class="n">ports</span>
+
+  <span class="c1"># Convert Cortix&#39;s time unit to Droplet&#39;s internal time unit</span>
+  <span class="k">if</span> <span class="n">cortix_time_unit</span> <span class="o">==</span> <span class="s1">&#39;minute&#39;</span><span class="p">:</span>
+     <span class="bp">self</span><span class="o">.</span><span class="n">__time_unit_scale</span> <span class="o">=</span> <span class="mf">60.0</span>
+  <span class="k">elif</span> <span class="n">cortix_time_unit</span> <span class="o">==</span> <span class="s1">&#39;second&#39;</span><span class="p">:</span> 
+     <span class="bp">self</span><span class="o">.</span><span class="n">__time_unit_scale</span> <span class="o">=</span> <span class="mf">1.0</span>
+  <span class="k">elif</span> <span class="n">cortix_time_unit</span> <span class="o">==</span> <span class="s1">&#39;hour&#39;</span><span class="p">:</span> 
+     <span class="bp">self</span><span class="o">.</span><span class="n">__time_unit_scale</span> <span class="o">=</span> <span class="mf">60.0</span><span class="o">*</span><span class="mf">60.0</span>
+  <span class="k">else</span><span class="p">:</span>
+     <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;Cortix time_unit: </span><span class="si">%r</span><span class="s1"> not acceptable.&#39;</span> <span class="o">%</span> <span class="n">time_unit</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_time_unit</span> <span class="o">=</span> <span class="n">cortix_time_unit</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">__start_time</span> <span class="o">=</span> <span class="n">cortix_start_time</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__time_unit_scale</span> <span class="c1"># Droplet time unit</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">__final_time</span> <span class="o">=</span> <span class="n">cortix_final_time</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__time_unit_scale</span> <span class="c1"># Droplet time unit</span>
+
+  <span class="k">if</span> <span class="n">work_dir</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span> <span class="n">work_dir</span> <span class="o">=</span> <span class="n">work_dir</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">__wrkDir</span> <span class="o">=</span> <span class="n">work_dir</span>
+
+  <span class="c1"># Signal to start operation</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">__goSignal</span> <span class="o">=</span> <span class="kc">True</span>     <span class="c1"># start operation immediately</span>
+  <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ports</span><span class="p">:</span>  <span class="c1"># if there is a signal port, start operation accordingly</span>
+      <span class="p">(</span><span class="n">port_name</span><span class="p">,</span> <span class="n">port_type</span><span class="p">,</span> <span class="n">this_port_file</span><span class="p">)</span> <span class="o">=</span> <span class="n">port</span>
+      <span class="k">if</span> <span class="n">port_name</span> <span class="o">==</span> <span class="s1">&#39;go-signal&#39;</span> <span class="ow">and</span> <span class="n">port_type</span> <span class="o">==</span> <span class="s1">&#39;use&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__go_signal</span> <span class="o">=</span> <span class="kc">False</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">__setup_time</span> <span class="o">=</span> <span class="mf">60.0</span>  <span class="c1"># time unit; a delay time before starting to run</span>
+
+<span class="c1">#.................................................................................</span>
+<span class="c1"># Input ports</span>
+<span class="c1"># Read input information if any</span>
+
+  <span class="c1">#fin = open(input_full_path_file_name,&#39;r&#39;)</span>
+
+<span class="c1"># Configuration member data   </span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">__pyplot_scale</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span>
+<span class="c1">#  self.__ode_integrator = &#39;scikits.odes&#39; # or &#39;scipy.integrate&#39; </span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">__ode_integrator</span> <span class="o">=</span> <span class="s1">&#39;scipy.integrate&#39;</span> 
+
+<span class="c1"># Domain specific member data </span>
+
+  <span class="n">gravity</span> <span class="o">=</span> <span class="mf">9.81</span> <span class="c1"># [m/s^2] acceleration of gravity</span>
+
+  <span class="n">Params</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;Params&#39;</span><span class="p">,[</span><span class="s1">&#39;gravity&#39;</span><span class="p">])</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">__params</span> <span class="o">=</span> <span class="n">Params</span><span class="p">(</span> <span class="n">gravity</span> <span class="p">)</span> 
+
+  <span class="c1"># Setup the material phase as a liquid </span>
+  <span class="n">species</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+  <span class="n">water</span> <span class="o">=</span> <span class="n">Specie</span><span class="p">(</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;water&#39;</span><span class="p">,</span> <span class="n">formulaName</span><span class="o">=</span><span class="s1">&#39;H2O(l)&#39;</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;liquid&#39;</span><span class="p">,</span> <span class="n">atoms</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;2*H&#39;</span><span class="p">,</span><span class="s1">&#39;O&#39;</span><span class="p">]</span> <span class="p">)</span>
+  <span class="n">water</span><span class="o">.</span><span class="n">massCCUnit</span> <span class="o">=</span> <span class="s1">&#39;g/cc&#39;</span>
+  <span class="n">water</span><span class="o">.</span><span class="n">molarCCUnit</span> <span class="o">=</span> <span class="s1">&#39;mole/cc&#39;</span>
+
+  <span class="n">species</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">water</span><span class="p">)</span>
+
+  <span class="n">quantities</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+  <span class="c1"># spatial position</span>
+  <span class="n">spatial_position</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;spatial-position&#39;</span><span class="p">,</span> <span class="n">formalName</span><span class="o">=</span><span class="s1">&#39;Spatial Pos.&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;m&#39;</span> <span class="p">)</span>
+  <span class="n">quantities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">spatial_position</span> <span class="p">)</span>
+  <span class="c1"># velocity</span>
+  <span class="n">velocity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;velocity&#39;</span><span class="p">,</span> <span class="n">formalName</span><span class="o">=</span><span class="s1">&#39;Veloc.&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;m/s&#39;</span> <span class="p">)</span>
+  <span class="n">quantities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">velocity</span> <span class="p">)</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span> <span class="o">=</span> <span class="n">Phase</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start_time</span><span class="p">,</span> <span class="n">species</span><span class="o">=</span><span class="n">species</span><span class="p">,</span> <span class="n">quantities</span><span class="o">=</span><span class="n">quantities</span><span class="p">)</span>
+
+  <span class="c1"># Initialize phase</span>
+  <span class="n">water_mass_cc</span> <span class="o">=</span> <span class="mf">0.99965</span> <span class="c1"># [g/cc]</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span> <span class="s1">&#39;water&#39;</span><span class="p">,</span> <span class="n">water_mass_cc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start_time</span> <span class="p">)</span>
+
+  <span class="n">x_0</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">1000.0</span><span class="p">)</span>  <span class="c1"># initial height [m] above ground at 0</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span> <span class="s1">&#39;spatial-position&#39;</span><span class="p">,</span> <span class="n">x_0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start_time</span> <span class="p">)</span>
+
+  <span class="n">v_0</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">0.0</span><span class="p">)</span>     <span class="c1"># initial velocity [m/s]</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span> <span class="s1">&#39;velocity&#39;</span><span class="p">,</span> <span class="n">v_0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start_time</span> <span class="p">)</span>
+
+<span class="c1">#---------------------- end def __init__():---------------------------------------</span>
+
+<div class="viewcode-block" id="Droplet.call_ports"><a class="viewcode-back" href="../examples_rst/modulib_rst/droplet_rst/droplet.html#droplet.Droplet.call_ports">[docs]</a> <span class="k">def</span> <span class="nf">call_ports</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">cortix_time</span><span class="o">=</span><span class="mf">0.0</span> <span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  Transfer data at cortix_time</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+
+  <span class="n">cortix_time</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__time_unit_scale</span>  <span class="c1"># convert to Droplet time unit</span>
+
+  <span class="c1"># provide data to all provide ports </span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">__provide_data</span><span class="p">(</span> <span class="n">provide_port_name</span><span class="o">=</span><span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="n">at_time</span><span class="o">=</span><span class="n">cortix_time</span> <span class="p">)</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">__provide_data</span><span class="p">(</span> <span class="n">provide_port_name</span><span class="o">=</span><span class="s1">&#39;state&#39;</span><span class="p">,</span>  <span class="n">at_time</span><span class="o">=</span><span class="n">cortix_time</span> <span class="p">)</span>
+
+  <span class="c1"># use data using the &#39;use-port-name&#39; of the module</span>
+  <span class="c1">#self.__use_data( use_port_name=&#39;use-port-name&#39;, at_time=cortix_time )</span>
+
+  <span class="k">return</span></div>
+<span class="c1">#---------------------- end def call_ports():---------------------------------------</span>
+
+<div class="viewcode-block" id="Droplet.execute"><a class="viewcode-back" href="../examples_rst/modulib_rst/droplet_rst/droplet.html#droplet.Droplet.execute">[docs]</a> <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">cortix_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">cortix_time_step</span><span class="o">=</span><span class="mf">0.0</span> <span class="p">):</span>
+  <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  Evolve system from cortix_time to cortix_time + cortix_time_step</span>
+<span class="sd">  &#39;&#39;&#39;</span>
+
+  <span class="n">cortix_time</span>      <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__time_unit_scale</span>  <span class="c1"># convert to Droplet time unit</span>
+  <span class="n">cortix_time_step</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__time_unit_scale</span>  <span class="c1"># convert to Droplet time unit</span>
+
+  <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;execute(&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">cortix_time</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span><span class="o">+</span><span class="s1">&#39;[min]): &#39;</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">__evolve</span><span class="p">(</span> <span class="n">cortix_time</span><span class="p">,</span> <span class="n">cortix_time_step</span> <span class="p">)</span>
+
+  <span class="k">return</span></div>
+<span class="c1">#---------------------- end def execute():----------------------------------------</span>
+
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Private helper functions (internal use: __)</span>
+
+ <span class="k">def</span> <span class="nf">__provide_data</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">provide_port_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">at_time</span><span class="o">=</span><span class="mf">0.0</span> <span class="p">):</span>
+
+<span class="c1"># Access the port file</span>
+  <span class="n">port_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_port_file</span><span class="p">(</span> <span class="n">provide_port_name</span> <span class="o">=</span> <span class="n">provide_port_name</span> <span class="p">)</span>
+
+<span class="c1"># Provide data to port files</span>
+  <span class="k">if</span> <span class="n">provide_port_name</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span> <span class="ow">and</span> <span class="n">port_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
+   <span class="bp">self</span><span class="o">.</span><span class="n">__provide_persistent_output</span><span class="p">(</span> <span class="n">port_file</span><span class="p">,</span> <span class="n">at_time</span> <span class="p">)</span>
+
+  <span class="k">if</span> <span class="n">provide_port_name</span> <span class="o">==</span> <span class="s1">&#39;state&#39;</span> <span class="ow">and</span> <span class="n">port_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span> 
+   <span class="bp">self</span><span class="o">.</span><span class="n">__provide_state</span><span class="p">(</span> <span class="n">port_file</span><span class="p">,</span> <span class="n">at_time</span> <span class="p">)</span>
+
+  <span class="k">return</span>
+<span class="c1">#---------------------- end def __provide_data():---------------------------------</span>
+
+ <span class="k">def</span> <span class="nf">__use_data</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">use_port_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">at_time</span><span class="o">=</span><span class="mf">0.0</span> <span class="p">):</span>
+
+<span class="c1"># Access the port file</span>
+  <span class="n">port_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_port_file</span><span class="p">(</span> <span class="n">use_port_name</span> <span class="o">=</span> <span class="n">use_port_name</span> <span class="p">)</span>
+ 
+<span class="c1"># Use data from port file</span>
+  <span class="c1">#if use_port_name == &#39;use-port-name&#39; and port_file is not None:  </span>
+  <span class="c1">#   self.__use_mymodule_method( port_file, at_time )</span>
+
+  <span class="k">return</span>
+<span class="c1">#---------------------- end def __use_data():-------------------------------------</span>
+
+ <span class="k">def</span> <span class="nf">__get_port_file</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">use_port_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">provide_port_name</span><span class="o">=</span><span class="kc">None</span> <span class="p">):</span>
+   <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">   This may return a None port_file</span>
+<span class="sd">   &#39;&#39;&#39;</span>
+
+   <span class="n">port_file</span> <span class="o">=</span> <span class="kc">None</span>
+
+   <span class="c1">#..........</span>
+   <span class="c1"># Use ports</span>
+   <span class="c1">#..........</span>
+   <span class="k">if</span> <span class="n">use_port_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+ 
+     <span class="k">assert</span> <span class="n">provide_port_name</span> <span class="ow">is</span> <span class="kc">None</span>
+ 
+     <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ports</span><span class="p">:</span>
+
+       <span class="p">(</span><span class="n">port_name</span><span class="p">,</span><span class="n">port_type</span><span class="p">,</span><span class="n">this_port_file</span><span class="p">)</span> <span class="o">=</span> <span class="n">port</span>
+
+       <span class="k">if</span> <span class="n">port_name</span> <span class="o">==</span> <span class="n">use_port_name</span> <span class="ow">and</span> <span class="n">port_type</span> <span class="o">==</span> <span class="s1">&#39;use&#39;</span><span class="p">:</span> 
+          <span class="n">port_file</span> <span class="o">=</span> <span class="n">this_port_file</span>
+
+     <span class="k">if</span> <span class="n">port_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+        <span class="k">return</span> <span class="kc">None</span>
+ 
+     <span class="n">max_n_trials</span> <span class="o">=</span> <span class="mi">50</span>
+     <span class="n">n_trials</span>     <span class="o">=</span> <span class="mi">0</span>
+     <span class="k">while</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">port_file</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">n_trials</span> <span class="o">&lt;=</span> <span class="n">max_n_trials</span><span class="p">:</span>
+       <span class="n">n_trials</span> <span class="o">+=</span> <span class="mi">1</span>
+       <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+ 
+     <span class="k">if</span> <span class="n">n_trials</span> <span class="o">&gt;</span> <span class="n">max_n_trials</span><span class="p">:</span>
+         <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__get_port_file(): waited &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">n_trials</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; trials for port: &#39;</span> <span class="o">+</span>\
+             <span class="n">port_file</span>
+         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+ 
+     <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">port_file</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">,</span> \
+            <span class="s1">&#39;port_file </span><span class="si">%r</span><span class="s1"> not available; stop.&#39;</span> <span class="o">%</span> <span class="n">port_file</span>
+
+   <span class="c1">#..............</span>
+   <span class="c1"># Provide ports</span>
+   <span class="c1">#..............</span>
+   <span class="k">if</span> <span class="n">provide_port_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+ 
+     <span class="k">assert</span> <span class="n">use_port_name</span> <span class="ow">is</span> <span class="kc">None</span>
+
+     <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ports</span><span class="p">:</span>
+       <span class="p">(</span><span class="n">port_name</span><span class="p">,</span><span class="n">port_type</span><span class="p">,</span><span class="n">this_port_file</span><span class="p">)</span> <span class="o">=</span> <span class="n">port</span>
+       <span class="k">if</span> <span class="n">port_name</span> <span class="o">==</span> <span class="n">provide_port_name</span> <span class="ow">and</span> <span class="n">port_type</span> <span class="o">==</span> <span class="s1">&#39;provide&#39;</span><span class="p">:</span> <span class="n">port_file</span> <span class="o">=</span> <span class="n">this_port_file</span>
+ 
+   <span class="k">return</span> <span class="n">port_file</span>
+<span class="c1">#---------------------- end def __get_port_file():--------------------------------</span>
+
+ <span class="k">def</span> <span class="nf">__provide_persistent_output</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">port_file</span><span class="p">,</span> <span class="n">at_time</span> <span class="p">):</span>
+   <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">   Provide data that will remain in disk after the simulation ends.</span>
+<span class="sd">   &#39;&#39;&#39;</span>
+   <span class="kn">import</span> <span class="nn">datetime</span>
+
+   <span class="c1"># if the first time step, write the header of a table data file</span>
+   <span class="k">if</span> <span class="n">at_time</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start_time</span><span class="p">:</span>
+
+     <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">port_file</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;port_file </span><span class="si">%r</span><span class="s1"> exists; stop.&#39;</span> <span class="o">%</span> <span class="n">port_file</span>
+     <span class="n">fout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">port_file</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
+
+     <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;# name:   &#39;</span><span class="o">+</span><span class="s1">&#39;droplet_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__slot_id</span><span class="p">));</span> <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+     <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;# author: &#39;</span><span class="o">+</span><span class="s1">&#39;cortix.examples.modulib.droplet&#39;</span><span class="p">);</span> <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+     <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;# version:&#39;</span><span class="o">+</span><span class="s1">&#39;0.1&#39;</span><span class="p">);</span> <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+     <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+     <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;# today:  &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">today</span><span class="p">));</span> <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+     <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
+<span class="c1"># write file header</span>
+     <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%17s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="s1">&#39;Time[sec]&#39;</span><span class="p">))</span>
+     <span class="c1"># mass density   </span>
+     <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">GetSpecies</span><span class="p">():</span>
+       <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%18s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">specie</span><span class="o">.</span><span class="n">formulaName</span><span class="o">+</span><span class="s1">&#39;[&#39;</span><span class="o">+</span><span class="n">specie</span><span class="o">.</span><span class="n">massCCUnit</span><span class="o">+</span><span class="s1">&#39;]&#39;</span><span class="p">))</span>
+     <span class="c1"># quantities     </span>
+     <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">GetQuantities</span><span class="p">():</span>
+         <span class="k">if</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;spatial-position&#39;</span> <span class="ow">or</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;velocity&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%18s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">quant</span><span class="o">.</span><span class="n">formalName</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;[&#39;</span><span class="o">+</span><span class="n">quant</span><span class="o">.</span><span class="n">unit</span><span class="o">+</span><span class="s1">&#39;]&#39;</span><span class="p">))</span>
+         <span class="k">else</span><span class="p">:</span>
+            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%18s</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">quant</span><span class="o">.</span><span class="n">formalName</span><span class="o">+</span><span class="s1">&#39;[&#39;</span><span class="o">+</span><span class="n">quant</span><span class="o">.</span><span class="n">unit</span><span class="o">+</span><span class="s1">&#39;]&#39;</span><span class="p">))</span>
+
+     <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+     <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+   <span class="c1"># write history data</span>
+
+   <span class="n">fout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">port_file</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">)</span>
+
+   <span class="c1"># Droplet time </span>
+   <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%18.6e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">at_time</span><span class="p">))</span>
+
+   <span class="c1"># mass density   </span>
+   <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">GetSpecies</span><span class="p">():</span>
+     <span class="n">rho</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="n">specie</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">at_time</span><span class="p">)</span>
+     <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%18.6e</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">rho</span><span class="p">))</span>
+     <span class="c1"># quantities     </span>
+   <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">GetQuantities</span><span class="p">():</span>
+     <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="n">quant</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">at_time</span><span class="p">)</span>
+     <span class="k">if</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;spatial-position&#39;</span> <span class="ow">or</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;velocity&#39;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+            <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%18.6e</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+     <span class="k">else</span><span class="p">:</span>
+        <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%18.6e</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+
+   <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+   <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+   <span class="k">return</span>
+<span class="c1">#---------------------- end def __provide_persistent_output():--------------------</span>
+ <span class="k">def</span> <span class="nf">__provide_state</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">port_file</span><span class="p">,</span> <span class="n">at_time</span> <span class="p">):</span>
+   <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">   Provide the internal state of the module. This is typically used by another</span>
+<span class="sd">   module such as &#39;.cortix.modulib.pyplot&#39;; this XML file type is now deprecated.</span>
+<span class="sd">   However to have a dynamic plotting option, create this history file in the</span>
+<span class="sd">   time unit of Cortix; that is, undo the time scaling.</span>
+<span class="sd">   &#39;&#39;&#39;</span>
+   <span class="kn">import</span> <span class="nn">datetime</span>
+   <span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ElementTree</span>
+   <span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Lock</span>
+
+   <span class="n">n_digits_precision</span> <span class="o">=</span> <span class="mi">8</span>
+
+   <span class="c1"># write header</span>
+   <span class="k">if</span> <span class="n">at_time</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start_time</span><span class="p">:</span>
+
+    <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">port_file</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;port_file </span><span class="si">%r</span><span class="s1"> exists; stop.&#39;</span> <span class="o">%</span> <span class="n">port_file</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s1">&#39;time-sequence&#39;</span><span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="s1">&#39;droplet_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__slot_id</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-state&#39;</span><span class="p">)</span>
+
+    <span class="n">b</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="s1">&#39;comment&#39;</span><span class="p">)</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;author&#39;</span><span class="p">,</span><span class="s1">&#39;cortix.examples.modulib.droplet&#39;</span><span class="p">)</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;version&#39;</span><span class="p">,</span><span class="s1">&#39;0.1&#39;</span><span class="p">)</span>
+
+    <span class="n">b</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="s1">&#39;comment&#39;</span><span class="p">)</span>
+    <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;today&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">today</span><span class="p">))</span>
+
+    <span class="n">b</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__cortix_time_unit</span><span class="p">)</span>
+
+    <span class="c1"># setup the headers</span>
+    <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="s1">&#39;var&#39;</span><span class="p">)</span>
+        <span class="n">formula_name</span> <span class="o">=</span> <span class="n">specie</span><span class="o">.</span><span class="n">formulaName</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="n">formula_name</span><span class="p">)</span>
+        <span class="n">unit</span> <span class="o">=</span> <span class="n">specie</span><span class="o">.</span><span class="n">massCCUnit</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span><span class="n">unit</span><span class="p">)</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;legend&#39;</span><span class="p">,</span><span class="s1">&#39;Droplet_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__slot_id</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-state&#39;</span><span class="p">)</span>
+        <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;scale&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__pyplot_scale</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">quantities</span><span class="p">:</span>
+        <span class="n">formal_name</span> <span class="o">=</span> <span class="n">quant</span><span class="o">.</span><span class="n">formalName</span> 
+        <span class="k">if</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;spatial-position&#39;</span> <span class="ow">or</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;velocity&#39;</span><span class="p">:</span>
+           <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+               <span class="n">b</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="s1">&#39;var&#39;</span><span class="p">)</span>
+               <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="n">formal_name</span><span class="o">+</span><span class="s1">&#39; &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+               <span class="n">unit</span> <span class="o">=</span> <span class="n">quant</span><span class="o">.</span><span class="n">unit</span>
+               <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span><span class="n">unit</span><span class="p">)</span>
+               <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;legend&#39;</span><span class="p">,</span><span class="s1">&#39;Droplet_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__slot_id</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-state&#39;</span><span class="p">)</span>
+               <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;scale&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__pyplot_scale</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="n">b</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="s1">&#39;var&#39;</span><span class="p">)</span>
+           <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="n">formal_name</span><span class="p">)</span>
+           <span class="n">unit</span> <span class="o">=</span> <span class="n">quant</span><span class="o">.</span><span class="n">unit</span>
+           <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">,</span><span class="n">unit</span><span class="p">)</span>
+           <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;legend&#39;</span><span class="p">,</span><span class="s1">&#39;Droplet_&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__slot_id</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;-state&#39;</span><span class="p">)</span>
+           <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;scale&#39;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__pyplot_scale</span><span class="p">)</span>
+
+    <span class="c1"># write values for all variables</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="s1">&#39;timeStamp&#39;</span><span class="p">)</span>
+    <span class="n">b</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">at_time</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">__time_unit_scale</span><span class="p">,</span><span class="n">n_digits_precision</span><span class="p">)))</span>
+
+    <span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span> <span class="n">specie</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">at_time</span> <span class="p">)</span>
+        <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">val</span> <span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">quantities</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">at_time</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;spatial-position&#39;</span> <span class="ow">or</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;velocity&#39;</span><span class="p">:</span>
+           <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+               <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="p">)</span> <span class="c1"># pyplot can&#39;t take negative values</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">val</span> <span class="p">)</span>
+
+    <span class="c1"># flush out data</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="n">n_digits_precision</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> 
+
+    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">b</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">text</span> 
+
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">ElementTree</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+    <span class="n">tree</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="n">port_file</span><span class="p">,</span> <span class="n">xml_declaration</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;unicode&quot;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;xml&quot;</span> <span class="p">)</span>
+
+  <span class="c1">#-------------------------------------------------------------------------------</span>
+  <span class="c1"># if not the first time step then parse the existing history file and append to it</span>
+   <span class="k">else</span><span class="p">:</span>
+
+    <span class="n">mutex</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
+    <span class="n">mutex</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span> <span class="n">port_file</span> <span class="p">)</span>
+    <span class="n">root_node</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s1">&#39;timeStamp&#39;</span><span class="p">)</span>
+    <span class="n">a</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">at_time</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">__time_unit_scale</span><span class="p">,</span><span class="n">n_digits_precision</span><span class="p">)))</span>
+
+    <span class="c1"># all variables values</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span> <span class="n">specie</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">at_time</span> <span class="p">)</span>
+        <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">val</span> <span class="p">)</span>
+    <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">quantities</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">at_time</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;spatial-position&#39;</span> <span class="ow">or</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;velocity&#39;</span><span class="p">:</span>
+           <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+               <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">math</span><span class="o">.</span><span class="n">fabs</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="p">)</span> <span class="c1"># pyplot can&#39;t take negative values</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">val</span> <span class="p">)</span>
+
+    <span class="c1"># flush out data</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="n">n_digits_precision</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;,&#39;</span> 
+
+    <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">a</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">text</span> 
+
+    <span class="n">root_node</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+    <span class="n">tree</span><span class="o">.</span><span class="n">write</span><span class="p">(</span> <span class="n">port_file</span><span class="p">,</span> <span class="n">xml_declaration</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;unicode&quot;</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;xml&quot;</span> <span class="p">)</span>
+
+    <span class="n">mutex</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+
+   <span class="k">return</span> 
+
+<span class="c1">#---------------------- end def __provide_state():--------------------------------</span>
+
+ <span class="k">def</span> <span class="nf">__evolve</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">cortix_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">cortix_time_step</span><span class="o">=</span><span class="mf">0.0</span> <span class="p">):</span>
+  <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">  .. math::</span>
+<span class="sd">  ODE IVP problem:</span>
+<span class="sd">  Given the initial data at $t=0$, $u_1(0) = x_0$, $u_2(0) = v_0 = \dot{u}_1(0)$</span>
+<span class="sd">  solve $\frac{\mathtext{d}u}{\mathtext{d}t} = f(u)$.</span>
+<span class="sd">  When $u_1(t)$ is negative, bounce the droplet to a random height between</span>
+<span class="sd">  0 and $1.2 x_0$ and no velocity, and continue the time integration until</span>
+<span class="sd">  $t \le t_f$.</span>
+<span class="sd">  &#39;&#39;&#39;</span> 
+  <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ode_integrator</span> <span class="o">==</span> <span class="s1">&#39;scikits.odes&#39;</span><span class="p">:</span>
+     <span class="kn">from</span> <span class="nn">scikits.odes</span> <span class="k">import</span> <span class="n">ode</span>        <span class="c1"># this requires the SUNDIALS ODE package </span>
+  <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ode_integrator</span> <span class="o">==</span> <span class="s1">&#39;scipy.integrate&#39;</span><span class="p">:</span>
+     <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="k">import</span> <span class="n">odeint</span>  <span class="c1"># this ships with scipy </span>
+  <span class="k">else</span><span class="p">:</span>
+     <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;Fatal: invalid ode integrator config. </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">__ode_integrator</span>
+
+  <span class="n">x_0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span> <span class="s1">&#39;spatial-position&#39;</span><span class="p">,</span> <span class="n">cortix_time</span> <span class="p">)</span>
+  <span class="n">v_0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span> <span class="s1">&#39;velocity&#39;</span><span class="p">,</span> <span class="n">cortix_time</span> <span class="p">)</span>
+
+  <span class="n">u_vec_0</span> <span class="o">=</span> <span class="n">x_0</span> <span class="o">+</span> <span class="n">v_0</span> <span class="c1"># concatenate tuples</span>
+
+  <span class="c1"># rhs function</span>
+  <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ode_integrator</span> <span class="o">==</span> <span class="s1">&#39;scikits.odes&#39;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">rhs_fn</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">u_vec</span><span class="p">,</span> <span class="n">dt_u_vec</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+      <span class="n">dt_u_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">u_vec</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>              <span class="c1">#  d_t u_1 = u_4</span>
+      <span class="n">dt_u_vec</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>                   <span class="c1">#  d_t u_4 = 0 </span>
+
+      <span class="n">dt_u_vec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">u_vec</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>              <span class="c1">#  d_t u_2 = u_5</span>
+      <span class="n">dt_u_vec</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>                   <span class="c1">#  d_t u_5 = 0 </span>
+
+      <span class="n">dt_u_vec</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">u_vec</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>              <span class="c1">#  d_t u_3 = u_6</span>
+      <span class="n">dt_u_vec</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span> <span class="n">params</span><span class="o">.</span><span class="n">gravity</span>      <span class="c1">#  d_t u_6 = -g</span>
+      <span class="k">return</span>
+  <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ode_integrator</span> <span class="o">==</span> <span class="s1">&#39;scipy.integrate&#39;</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">rhs_fn</span><span class="p">(</span><span class="n">u_vec</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">gravity</span><span class="p">):</span>
+      <span class="n">dt_u_0</span> <span class="o">=</span> <span class="n">u_vec</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>              <span class="c1">#  d_t u_1 = u_4</span>
+      <span class="n">dt_u_3</span> <span class="o">=</span> <span class="mf">0.0</span>                   <span class="c1">#  d_t u_4 = 0</span>
+
+      <span class="n">dt_u_1</span> <span class="o">=</span> <span class="n">u_vec</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>              <span class="c1">#  d_t u_2 = u_5</span>
+      <span class="n">dt_u_4</span> <span class="o">=</span> <span class="mf">0.0</span>                   <span class="c1">#  d_t u_5 = 0 </span>
+
+      <span class="n">dt_u_2</span> <span class="o">=</span> <span class="n">u_vec</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span>              <span class="c1">#  d_t u_3 = u_6</span>
+      <span class="n">dt_u_5</span> <span class="o">=</span> <span class="o">-</span> <span class="n">gravity</span>             <span class="c1">#  d_t u_6 = -g</span>
+      <span class="k">return</span> <span class="p">[</span><span class="n">dt_u_0</span><span class="p">,</span> <span class="n">dt_u_1</span><span class="p">,</span> <span class="n">dt_u_2</span><span class="p">,</span> <span class="n">dt_u_3</span><span class="p">,</span> <span class="n">dt_u_4</span><span class="p">,</span> <span class="n">dt_u_5</span><span class="p">]</span>
+  <span class="k">else</span><span class="p">:</span>
+     <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;Fatal: invalid ode integrator config. </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">__ode_integrator</span>
+
+  <span class="n">t_interval_sec</span> <span class="o">=</span> <span class="n">npy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">cortix_time_step</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+  <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ode_integrator</span> <span class="o">==</span> <span class="s1">&#39;scikits.odes&#39;</span><span class="p">:</span>
+     <span class="n">cvode</span> <span class="o">=</span> <span class="n">ode</span><span class="p">(</span><span class="s1">&#39;cvode&#39;</span><span class="p">,</span> <span class="n">rhs_fn</span><span class="p">,</span> <span class="n">user_data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__params</span><span class="p">,</span> <span class="n">old_api</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+     <span class="n">solution</span> <span class="o">=</span> <span class="n">cvode</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span> <span class="n">t_interval_sec</span><span class="p">,</span> <span class="n">u_vec_0</span> <span class="p">)</span>  <span class="c1"># solve for time interval </span>
+
+     <span class="n">results</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">values</span>
+     <span class="n">message</span> <span class="o">=</span> <span class="n">solution</span><span class="o">.</span><span class="n">message</span>
+
+     <span class="k">assert</span> <span class="n">solution</span><span class="o">.</span><span class="n">message</span> <span class="o">==</span> <span class="s1">&#39;Successful function return.&#39;</span>
+     <span class="k">assert</span> <span class="n">solution</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">t</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;errors.t = </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">solution</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">t</span>
+     <span class="k">assert</span> <span class="n">solution</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;errors.y = </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">solution</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">y</span>
+
+     <span class="n">u_vec</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span> <span class="c1"># solution vector at final time step</span>
+
+  <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ode_integrator</span> <span class="o">==</span> <span class="s1">&#39;scipy.integrate&#39;</span><span class="p">:</span>
+     <span class="p">(</span> <span class="n">u_vec_hist</span><span class="p">,</span> <span class="n">info_dict</span> <span class="p">)</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span> <span class="n">rhs_fn</span><span class="p">,</span>
+                                         <span class="n">u_vec_0</span><span class="p">,</span> <span class="n">t_interval_sec</span><span class="p">,</span>
+                                         <span class="n">args</span><span class="o">=</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__params</span><span class="o">.</span><span class="n">gravity</span><span class="p">,</span> <span class="p">),</span> <span class="n">full_output</span><span class="o">=</span><span class="kc">True</span>
+                                       <span class="p">)</span>
+
+     <span class="k">assert</span> <span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;Integration successful.&#39;</span><span class="p">,</span>\
+            <span class="s1">&#39;Fatal: scipy.integrate.odeint failed </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span>
+
+     <span class="n">u_vec</span> <span class="o">=</span> <span class="n">u_vec_hist</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span>  <span class="c1"># solution vector at final time step</span>
+  <span class="k">else</span><span class="p">:</span>
+     <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;Fatal: invalid ode integrator config. </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">__ode_integrator</span>
+
+
+  <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">GetRow</span><span class="p">(</span> <span class="n">cortix_time</span> <span class="p">)</span> <span class="c1"># values at previous time</span>
+
+  <span class="n">at_time</span> <span class="o">=</span> <span class="n">cortix_time</span> <span class="o">+</span> <span class="n">cortix_time_step</span>  
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">AddRow</span><span class="p">(</span> <span class="n">at_time</span><span class="p">,</span> <span class="n">values</span> <span class="p">)</span> <span class="c1"># repeat values for current time</span>
+
+  <span class="k">if</span> <span class="n">u_vec</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span> <span class="c1"># ground impact bounces the drop to a different height near original</span>
+   <span class="n">position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span> <span class="s1">&#39;spatial-position&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start_time</span> <span class="p">)</span>
+   <span class="n">bounced_position</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">position</span><span class="p">)</span>
+   <span class="n">bounced_position</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*=</span> <span class="n">npy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.2</span>
+   <span class="n">u_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">bounced_position</span><span class="p">[:]</span>
+   <span class="n">u_vec</span><span class="p">[</span><span class="mi">3</span><span class="p">:]</span>  <span class="o">=</span> <span class="mf">0.0</span>
+
+  <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span> <span class="s1">&#39;spatial-position&#39;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">u_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]),</span> <span class="n">at_time</span> <span class="p">)</span> <span class="c1"># update current values</span>
+  <span class="bp">self</span><span class="o">.</span><span class="n">__liquid_phase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span> <span class="s1">&#39;velocity&#39;</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">u_vec</span><span class="p">[</span><span class="mi">3</span><span class="p">:]),</span> <span class="n">at_time</span> <span class="p">)</span> <span class="c1"># update current values</span></div>
+
+<span class="c1">#---------------------- end def __evolve():---------------------------------------</span>
+
+
+<span class="c1">#======================= end class Droplet: ======================================</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../src_rst/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Valmor F. de Almeida.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+    </div>
+  </body>
+</html>

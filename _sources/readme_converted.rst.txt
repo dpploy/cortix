@@ -1,71 +1,86 @@
-|image1|
+| |Build Status|
+| |PyPI version|
+| |PyPI - Python Version|
+| |Binder|
+| |NBViewer|
+| ---
+| |image5|
 
 What is Cortix?
 ---------------
 
 -  Cortix is a Python library for system-level module coupling,
    execution, and
-   analysis.
+   analysis of dynamical system models that exchange time-dependent
+   data.
 -  Cortix takes as input a collection of computational modules and
    provides an
-   environment for the coupling of those modules into a single
+   environment for the coupling of these modules into a single
    simulation.
--  Cortix handles:
+-  Cortix supports:
 
-   -  Communication between the modules
-   -  Numerical integration
+   -  Communication between modules
+   -  Time synchronization
    -  Data visualization
 
 The basic concepts in Cortix are the creation of an ``Application`` and
 a ``Simulation`` involving ``Tasks``.
 
-Dependencies
-------------
+Pip install for users using PyPI
+--------------------------------
 
--  Core
+Cortix can be installed on any Unix-based machine or Mac OSX via pip.
+Run
 
-   -  python >= 3.6.5
-   -  mpi4py >= 3.0.0 (use openmpi >= 3.1.1)
-   -  networkx >= 1.11
-   -  numpy >= 1.10.4
-   -  matplotlib >= 2.2.2
-   -  sphinx >= 1.6.5
-   -  pandoc >= 1.19
-   -  pytest==3.7.2
+::
 
--  Support
+    pip install --user cortix
 
-   -  pandas >= 0.19
+to install the current version of cortix in PyPI. To install the
+dependencies run
 
--  Modulib
+::
 
-   -  pandas >= 0.19
-   -  scikits.odes==2.4.0.dev0
-   -  sundials >= 2.7
+    pin install --user requirements.txt
 
-Usage
------
+| where ``requirements.txt`` is the file in the Cortix repository.
+| After this first install, upgrade to newer versions
 
-Cortix is a library and it is best used when copied to its own
-directory, say inside a project directory of your choice, *e.g.*,
-``/somepath/myproject/cortix/``, or anywhere else in your system,
-*e.g.*, ``/somepath/cortix``. Then add either
-``/somepath/myproject to $PYTHONPATH`` or ``/somepath to $PYTHONPATH``,
-respectively.
+::
+
+    pip install --upgrade cortix.
+
+whenever the PyPI version has been upgraded (refer to the PyPI badge
+above).
+
+Repository install for latest version of Cortix
+-----------------------------------------------
+
+| Either on a linux OS or Mac OS X, clone the Cortix repository.
+| Cortix is a library and it is best used when copied to its own
+  directory, say inside a project directory of your choice, *e.g.*,
+  ``/somepath/myproject/cortix/``, or anywhere else in your system,
+  *e.g.*, ``/somepath/cortix``. Then add either
+  ``/somepath/myproject/cortix to $PYTHONPATH`` or
+  ``/somepath/cortix to $PYTHONPATH``, respectively. This is done in the
+  Linux shell through the startup file ``.bashrc``. For instance:
+  ``export PYTHONPATH=$PYTHONPATH:/somepath/myproject/cortix``. A common
+  case is:
+| ``export PYTHONPATH=$PYTHONPATH:$HOME/somepath/myproject/cortix``.
+  Then the ``.bashrc`` file needs to be sourced: ``source .bashrc``.
 
 Cortix has a directory (``examples/``) that contains examples for input
 files, and a driver file. At the moment these input files are past files
 used in the development of Cortix. A driver file is needed to run
-Cortix. There is an example (``examples/driver-cortix.py``) that can be
-copied to say:
-``/somepath/driver-test.py or /somepath/myproject/driver-test.py``. An
-input configuration (xml) file is also needed. An example is provided in
-the ``examples/input/`` directory (cortix-config.xml). Then to run
-Cortix, enter the directory of the driver and run the driver
-``./driver-test.py`` which will run an MPI process for Cortix and an
-additional MPI process for each launched module as a single MPI process
-or as a pool of processes. To capture the Cortix screen output of log
-messages (and other standard output messages), issue the bash command
+Cortix. There is an example directory (``examples/console_run/``) with
+some examples that can be copied to say:
+``/somepath/driver-test.py or /somepath/myproject/driver-test.py``.
+Alternatively, examples can be started from the ``console_run``
+directory, *i.e.* ``droplet_run.py``. An input configuration (xml) file
+is also needed. An example is provided in the ``examples/input/``
+directory (cortix-config.xml). Cortix will run each module in a separate
+thread. To capture the Cortix screen output of log messages (and other
+standard output messages), issue the bash command
 ``/driver-cortix.py >& screen.out`` under Linux (inspect the output file
 ``screen.out`` when the run is finished). Extensive logging of runtime
 information is stored in the ``<work_dir>`` directory specified in the
@@ -76,15 +91,6 @@ Testing
 
 Testing is facilitated through PyTest. To execute the tests, run the
 ``py.test`` command from the tests directory.
-
-Linux
------
-
-Most Linux distros will provide an evironment with the needed
-dependencies.
-
-Mac OS X
---------
 
 Developers
 ----------
@@ -99,5 +105,12 @@ Documentation
 
 .. |Build Status| image:: https://travis-ci.org/dpploy/cortix.svg?branch=master
    :target: https://travis-ci.org/dpploy/cortix
-.. |image1| image:: cortix-cover.png
+.. |PyPI version| image:: https://badge.fury.io/py/cortix.svg
+   :target: https://badge.fury.io/py/cortix
+.. |PyPI - Python Version| image:: https://img.shields.io/pypi/pyversions/Django.svg
+.. |Binder| image:: https://mybinder.org/badge.svg
+   :target: https://mybinder.org/v2/gh/dpploy/cortix-nb/master
+.. |NBViewer| image:: https://github.com/jupyter/design/blob/master/logos/Badges/nbviewer_badge.svg
+   :target: http://nbviewer.jupyter.org/github/dpploy/cortix-nb/
+.. |image5| image:: cortix-cover.png
 

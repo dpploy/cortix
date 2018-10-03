@@ -55,21 +55,21 @@
 <span class="c1">#</span>
 <span class="c1"># Licensed under the GNU General Public License v. 3, please see LICENSE file.</span>
 <span class="c1"># https://www.gnu.org/licenses/gpl-3.0.txt</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">Network class for the Cortix project. A network defines the connectivity between</span>
 <span class="sd">Cortix modules.</span>
 
 <span class="sd">Cortix: a program for system-level modules coupling, execution, and analysis.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&#39;&#39;&#39;</span>
 <span class="c1">#*********************************************************************************</span>
 <span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
 <span class="kn">from</span> <span class="nn">cortix.src.utils.configtree</span> <span class="k">import</span> <span class="n">ConfigTree</span>
 <span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="Network"><a class="viewcode-back" href="../src_rst/network.html#network.Network">[docs]</a><span class="k">class</span> <span class="nc">Network</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Cortix network class definition. Defines the manner in which Modules interact.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">net_config_node</span><span class="o">=</span><span class="n">ConfigTree</span><span class="p">()):</span>
 
@@ -124,46 +124,46 @@
 <span class="c1">#----------------------- end def __init__():--------------------------------------</span>
 
     <span class="k">def</span> <span class="nf">__get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        `str`:Network name</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
     <span class="n">name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 <span class="c1">#----------------------- end def get_name():--------------------------------------</span>
 
     <span class="k">def</span> <span class="nf">__get_connectivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        `list(dict)`:List of the network connectivity</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connectivity</span>
     <span class="n">connectivity</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_connectivity</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 <span class="c1">#----------------------- end def get_connectivity():------------------------------</span>
 
     <span class="k">def</span> <span class="nf">__get_slot_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        `list(str)`:List of network slot names</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__slot_names</span>
     <span class="n">slot_names</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_slot_names</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 <span class="c1">#----------------------- end def get_slot_names():--------------------------------</span>
 
 <div class="viewcode-block" id="Network.set_runtime_cortix_comm_file"><a class="viewcode-back" href="../src_rst/network.html#network.Network.set_runtime_cortix_comm_file">[docs]</a>    <span class="k">def</span> <span class="nf">set_runtime_cortix_comm_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot_name</span><span class="p">,</span> <span class="n">full_path_file_name</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the runtime cortix communications file to the one specified</span>
 <span class="sd">        by full_path_file_name</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__runtime_cortix_comm_file</span><span class="p">[</span><span class="n">slot_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">full_path_file_name</span></div>
 <span class="c1">#----------------------- end def set_runtime_cortix_comm_file():------------------</span>
 
 <div class="viewcode-block" id="Network.get_runtime_cortix_comm_file"><a class="viewcode-back" href="../src_rst/network.html#network.Network.get_runtime_cortix_comm_file">[docs]</a>    <span class="k">def</span> <span class="nf">get_runtime_cortix_comm_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slot_name</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the cortix comm file that corresponds to slot_name.</span>
 <span class="sd">        None if otherwise.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">if</span> <span class="n">slot_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__runtime_cortix_comm_file</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__runtime_cortix_comm_file</span><span class="p">[</span><span class="n">slot_name</span><span class="p">]</span>
@@ -171,28 +171,32 @@
 <span class="c1">#----------------------- end def get_runtime_cortix_comm_file():------------------</span>
 
     <span class="k">def</span> <span class="nf">__get_nx_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        `str`:NXGraph corresponding to network</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        `networkx.MultiDiGraph`:NXGraph corresponding to network</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__nx_graph</span>
     <span class="n">nx_graph</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_nx_graph</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 <span class="c1">#----------------------- end def get_nx_graph():----------------------------------</span>
 
 <div class="viewcode-block" id="Network.__str__"><a class="viewcode-back" href="../src_rst/network.html#network.Network.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Network to string conversion</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-
-        <span class="k">return</span> <span class="s1">&#39;Network data members: name=</span><span class="si">%5s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">)</span></div>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;Network data members:</span><span class="se">\n</span><span class="s1"> name=</span><span class="si">%s</span><span class="se">\n</span><span class="s1"> slot names=</span><span class="si">%s</span><span class="se">\n</span><span class="s1"> connectivity=</span><span class="si">%s</span><span class="se">\n</span><span class="s1"> runtime comm file= </span><span class="si">%s</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__slot_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connectivity</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__runtime_cortix_comm_file</span><span class="p">)</span>
 <span class="c1">#----------------------- end def __str__():---------------------------------------</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">__runtime_cortix_comm_file</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span></div>
 <div class="viewcode-block" id="Network.__repr__"><a class="viewcode-back" href="../src_rst/network.html#network.Network.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Network to string conversion</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="k">return</span> <span class="s1">&#39;Network data members: name=</span><span class="si">%5s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">)</span></div></div>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;Network data members:</span><span class="se">\n</span><span class="s1"> name=</span><span class="si">%s</span><span class="se">\n</span><span class="s1"> slot names=</span><span class="si">%s</span><span class="se">\n</span><span class="s1"> connectivity=</span><span class="si">%s</span><span class="se">\n</span><span class="s1"> runtime comm file= </span><span class="si">%s</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__slot_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connectivity</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__runtime_cortix_comm_file</span><span class="p">)</span></div></div>
 <span class="c1">#----------------------- end def __repr__():--------------------------------------</span>
 
 <span class="c1">#======================= end class Network: ======================================</span>

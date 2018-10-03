@@ -53,8 +53,27 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="cortix-driver">
-<h1>cortix_driver<a class="headerlink" href="#cortix-driver" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-cortix_driver">
+<span id="cortix-driver"></span><h1>cortix_driver<a class="headerlink" href="#module-cortix_driver" title="Permalink to this headline">¶</a></h1>
+<p>Cortix driver for the PyPlot module.</p>
+<dl class="class">
+<dt id="cortix_driver.CortixDriver">
+<em class="property">class </em><code class="descclassname">cortix_driver.</code><code class="descname">CortixDriver</code><span class="sig-paren">(</span><em>slot_id</em>, <em>input_full_path_file_name</em>, <em>exec_full_path_file_name</em>, <em>work_dir</em>, <em>ports=[]</em>, <em>cortix_start_time=0.0</em>, <em>cortix_final_time=0.0</em>, <em>cortix_time_step=0.0</em>, <em>cortix_time_unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cortix_driver.html#CortixDriver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_driver.CortixDriver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="cortix_driver.CortixDriver.call_ports">
+<code class="descname">call_ports</code><span class="sig-paren">(</span><em>cortix_time=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cortix_driver.html#CortixDriver.call_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_driver.CortixDriver.call_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call all ports at cortix_time</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cortix_driver.CortixDriver.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><em>cortix_time=0.0</em>, <em>time_step=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/cortix_driver.html#CortixDriver.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_driver.CortixDriver.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evolve system from cortix_time to cortix_time + time_step</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 

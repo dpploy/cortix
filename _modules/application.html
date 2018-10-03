@@ -66,7 +66,8 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">cortix.src.utils.configtree</span> <span class="k">import</span> <span class="n">ConfigTree</span>
 <span class="kn">from</span> <span class="nn">cortix.src.utils.set_logger_level</span> <span class="k">import</span> <span class="n">set_logger_level</span>
-<span class="kn">from</span> <span class="nn">cortix.src.module</span> <span class="k">import</span> <span class="n">Module</span>
+
+<span class="kn">from</span> <span class="nn">cortix.src.module</span>  <span class="k">import</span> <span class="n">Module</span>
 <span class="kn">from</span> <span class="nn">cortix.src.network</span> <span class="k">import</span> <span class="n">Network</span>
 <span class="c1">#*********************************************************************************</span>
 
@@ -211,17 +212,19 @@
 <span class="c1"># Private helper functions (internal use: __)</span>
 
     <span class="k">def</span> <span class="nf">__setup_networks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        A helper function used by the Application constructor to setup the networks</span>
 <span class="sd">        portion of the Application.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;start __setup_networks()&#39;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">net_node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__config_node</span><span class="o">.</span><span class="n">get_all_sub_nodes</span><span class="p">(</span><span class="s2">&quot;network&quot;</span><span class="p">):</span>
             <span class="n">net_config_node</span> <span class="o">=</span> <span class="n">ConfigTree</span><span class="p">(</span><span class="n">net_node</span><span class="p">)</span>
             <span class="k">assert</span> <span class="n">net_config_node</span><span class="o">.</span><span class="n">get_node_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">net_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">),</span> <span class="s1">&#39;check failed&#39;</span>
+
             <span class="n">network</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="n">net_config_node</span><span class="p">)</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">__networks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">network</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;appended network </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">net_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">))</span>
 
@@ -235,14 +238,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Start __setup_modules()&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">mode_node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__config_node</span><span class="o">.</span><span class="n">get_all_sub_nodes</span><span class="p">(</span><span class="s1">&#39;module&#39;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">mod_node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__config_node</span><span class="o">.</span><span class="n">get_all_sub_nodes</span><span class="p">(</span><span class="s1">&#39;module&#39;</span><span class="p">):</span>
 
-            <span class="n">mod_config_node</span> <span class="o">=</span> <span class="n">ConfigTree</span><span class="p">(</span><span class="n">mode_node</span><span class="p">)</span>
-            <span class="k">assert</span> <span class="n">mod_config_node</span><span class="o">.</span><span class="n">get_node_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">mode_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">),</span> \
+            <span class="n">mod_config_node</span> <span class="o">=</span> <span class="n">ConfigTree</span><span class="p">(</span><span class="n">mod_node</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">mod_config_node</span><span class="o">.</span><span class="n">get_node_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">mod_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">),</span> \
                 <span class="s1">&#39;check failed&#39;</span>
 
-            <span class="n">new_module</span> <span class="o">=</span> <span class="n">Module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__module_lib_name</span><span class="p">,</span>
-                                <span class="bp">self</span><span class="o">.</span><span class="n">__module_lib_full_parent_dir</span><span class="p">,</span> <span class="n">mod_config_node</span><span class="p">)</span>
+            <span class="n">new_module</span> <span class="o">=</span> <span class="n">Module</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__module_lib_name</span><span class="p">,</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">__module_lib_full_parent_dir</span><span class="p">,</span> <span class="n">mod_config_node</span><span class="p">)</span>
 
             <span class="c1"># check for a duplicate module before appending a new one</span>
             <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__modules</span><span class="p">:</span>
@@ -256,7 +259,7 @@
 
             <span class="c1"># add module to list</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_module</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;appended module </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">mode_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;appended module </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">mod_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;end __setup_modules()&quot;</span><span class="p">)</span></div>
 <span class="c1">#----------------------- end def __setup_modules():-------------------------------</span>

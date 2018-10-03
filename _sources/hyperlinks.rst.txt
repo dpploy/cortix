@@ -1,4 +1,5 @@
-Hyperlinks
-----------
+GitHub Repos
+~~~~~~~~~~~~
 
-* GitHub Repo: https://github.com/dpploy/cortix
+* Cortix: https://github.com/dpploy/cortix
+* Jupyter Notebooks: https://github.com/dpploy/cortix-nb  

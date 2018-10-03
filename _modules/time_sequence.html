@@ -80,19 +80,18 @@
 <div class="viewcode-block" id="TimeSequence"><a class="viewcode-back" href="../modulib_rst/pyplot_rst/time_sequence.html#time_sequence.TimeSequence">[docs]</a><span class="k">class</span> <span class="nc">TimeSequence</span><span class="p">():</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">fileName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>   <span class="c1"># full path file name</span>
-                 <span class="n">fileType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>   <span class="c1"># &quot;xml&quot;</span>
+                 <span class="n">fileName</span><span class="p">,</span>   <span class="c1"># full path file name</span>
+                 <span class="n">fileType</span><span class="p">,</span>   <span class="c1"># &quot;xml&quot;</span>
                  <span class="n">initialTime</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
                  <span class="n">finalTime</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">time_unit</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">logger</span><span class="o">=</span><span class="kc">None</span>
                  <span class="p">):</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;wrong type; stop.&#39;</span>
-        <span class="k">assert</span> <span class="n">fileName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;must give a fileName; stop.&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__fileName</span> <span class="o">=</span> <span class="n">fileName</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fileType</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;wrong type; stop.&#39;</span>
-        <span class="k">assert</span> <span class="n">fileType</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;must give a fileType; stop.&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__fileType</span> <span class="o">=</span> <span class="n">fileType</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">initialTime</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;wrong type; stop.&#39;</span>
@@ -100,6 +99,9 @@
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">finalTime</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;wrong type; stop.&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__finalTime</span> <span class="o">=</span> <span class="n">finalTime</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">time_unit</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;wrong type; stop.&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__time_unit</span> <span class="o">=</span> <span class="n">time_unit</span>
 
         <span class="k">assert</span> <span class="n">finalTime</span> <span class="o">&gt;=</span> <span class="n">initialTime</span><span class="p">,</span> <span class="s1">&#39;sanity check failed. stop.&#39;</span>
         <span class="k">assert</span> <span class="n">initialTime</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;sanity check failed. stop.&#39;</span>
@@ -189,6 +191,9 @@
 <span class="c1"># Private helper functions (internal use: __)</span>
 
     <span class="k">def</span> <span class="nf">__read_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Read the xml data file recursively until the desired time stamp is found.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;TimeSequence::__read_xml(): try reading: &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fileName</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
@@ -218,6 +223,9 @@
             <span class="n">node</span> <span class="o">=</span> <span class="n">rootNode</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">)</span>
             <span class="n">timeUnit</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
+            <span class="n">time_unit_scale</span> <span class="o">=</span> <span class="mf">1.0</span>
+<span class="c1">#            time_unit_scale = 60.0 # __get_time_unit_scale( timeUnit )</span>
+
             <span class="c1"># (cut-off) legacy stuff</span>
             <span class="n">timeCutOff</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cut-off&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">timeCutOff</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -231,7 +239,7 @@
 
                 <span class="n">timeStamp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
 
-                <span class="k">if</span> <span class="n">timeStamp</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__finalTime</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">timeStamp</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__finalTime</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1.0e-5</span><span class="p">:</span>
                     <span class="k">return</span>
 
         <span class="c1"># end of while found is False</span>

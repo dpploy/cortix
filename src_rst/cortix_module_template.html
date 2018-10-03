@@ -1,0 +1,145 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>cortix_module_template &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="launcher" href="launcher.html" />
+    <link rel="prev" title="cortix_main" href="cortix_main.html" /> 
+  </head>
+  <body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="launcher.html" title="launcher"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="cortix_main.html" title="cortix_main"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">src</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-cortix_module_template">
+<span id="cortix-module-template"></span><h1>cortix_module_template<a class="headerlink" href="#module-cortix_module_template" title="Permalink to this headline">¶</a></h1>
+<p>Simple MyModule module template for developers.</p>
+<dl class="class">
+<dt id="cortix_module_template.MyModule">
+<em class="property">class </em><code class="descclassname">cortix_module_template.</code><code class="descname">MyModule</code><span class="sig-paren">(</span><em>slot_id</em>, <em>input_full_path_file_name</em>, <em>work_dir</em>, <em>ports=[]</em>, <em>cortix_start_time=0.0</em>, <em>cortix_final_time=0.0</em>, <em>cortix_time_unit=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_module_template.html#MyModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_module_template.MyModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>MyModule template for Cortix.</p>
+<dl class="method">
+<dt id="cortix_module_template.MyModule.call_ports">
+<code class="descname">call_ports</code><span class="sig-paren">(</span><em>cortix_time=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_module_template.html#MyModule.call_ports"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_module_template.MyModule.call_ports" title="Permalink to this definition">¶</a></dt>
+<dd><p>Developer must implement this method.
+Transfer data at cortix_time</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="cortix_module_template.MyModule.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><em>cortix_time=0.0</em>, <em>cortix_time_step=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_module_template.html#MyModule.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_module_template.MyModule.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Developer must implement this method.
+Evolve system from cortix_time to cortix_time + cortix_time_step</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="application.html">application</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cortix_driver_template.html">cortix_driver_template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cortix_main.html">cortix_main</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">cortix_module_template</a></li>
+<li class="toctree-l2"><a class="reference internal" href="launcher.html">launcher</a></li>
+<li class="toctree-l2"><a class="reference internal" href="module.html">module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="network.html">network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulation.html">simulation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="task.html">task</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils_rst/modules.html">utils</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="launcher.html" title="launcher"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="cortix_main.html" title="cortix_main"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Valmor F. de Almeida.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
+    </div>
+  </body>
+</html>

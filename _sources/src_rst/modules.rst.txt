@@ -7,6 +7,7 @@ src
    application
    cortix_driver_template
    cortix_main
+   cortix_module_template
    launcher
    module
    network

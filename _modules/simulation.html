@@ -63,16 +63,17 @@
 <span class="c1">#*********************************************************************************</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">cortix.src.task</span> <span class="k">import</span> <span class="n">Task</span>
-<span class="kn">from</span> <span class="nn">cortix.src.application</span> <span class="k">import</span> <span class="n">Application</span>
-<span class="kn">from</span> <span class="nn">cortix.src.utils.configtree</span> <span class="k">import</span> <span class="n">ConfigTree</span>
+<span class="kn">from</span> <span class="nn">cortix.src.utils.configtree</span>       <span class="k">import</span> <span class="n">ConfigTree</span>
 <span class="kn">from</span> <span class="nn">cortix.src.utils.set_logger_level</span> <span class="k">import</span> <span class="n">set_logger_level</span>
+
+<span class="kn">from</span> <span class="nn">cortix.src.task</span>        <span class="k">import</span> <span class="n">Task</span>
+<span class="kn">from</span> <span class="nn">cortix.src.application</span> <span class="k">import</span> <span class="n">Application</span>
 <span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="Simulation"><a class="viewcode-back" href="../src_rst/simulation.html#simulation.Simulation">[docs]</a><span class="k">class</span> <span class="nc">Simulation</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+    <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Cortix Simulation element as defined in the Cortix config.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_work_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sim_config_node</span><span class="o">=</span><span class="n">ConfigTree</span><span class="p">()):</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parent_work_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;-&gt; parentWorkDir invalid.&#39;</span>
@@ -137,7 +138,10 @@
             <span class="n">app_config_node</span> <span class="o">=</span> <span class="n">ConfigTree</span><span class="p">(</span><span class="n">app_node</span><span class="p">)</span>
             <span class="k">assert</span> <span class="n">app_config_node</span><span class="o">.</span><span class="n">get_node_name</span><span class="p">()</span> <span class="o">==</span> <span class="n">app_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">),</span> \
                 <span class="s2">&quot;check failed&quot;</span>
+
+            <span class="c1"># Create the application for this simulation</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__application</span> <span class="o">=</span> <span class="n">Application</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span><span class="p">,</span> <span class="n">app_config_node</span><span class="p">)</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;created application: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">app_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">))</span>
 
         <span class="c1"># Stores the task(s) created by the execute method</span>
@@ -146,14 +150,15 @@
 <span class="c1">#----------------------- end def __init__():--------------------------------------</span>
 
 <div class="viewcode-block" id="Simulation.execute"><a class="viewcode-back" href="../src_rst/simulation.html#simulation.Simulation.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        This method allows for the execution of a simulation by executing each</span>
 <span class="sd">        task, if any. Execution proceeds one task at a time.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;prepare to execute(</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">task_name</span><span class="p">)</span>
-   
+
         <span class="k">if</span> <span class="n">task_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 
+            <span class="c1"># Create the task object for each task in this simulation</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__setup_task</span><span class="p">(</span><span class="n">task_name</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tasks</span><span class="p">:</span>
@@ -179,10 +184,10 @@
 <span class="c1"># Private helper functions (internal use: __)</span>
 
     <span class="k">def</span> <span class="nf">__setup_task</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+        <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        This is a helper function used by the execute() method.</span>
 <span class="sd">        It sets up the set of tasks defined in the Cortix config for a simulation.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;start __setup_task(</span><span class="si">%s</span><span class="s1">)&#39;</span><span class="p">,</span> <span class="n">task_name</span><span class="p">)</span>
         <span class="n">task</span> <span class="o">=</span> <span class="kc">None</span>
@@ -243,9 +248,17 @@
         <span class="c1"># Using the tasks and network create the runtime module directories and comm</span>
         <span class="c1"># files</span>
         <span class="k">for</span> <span class="n">net</span> <span class="ow">in</span> <span class="n">networks</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">net</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">task_name</span><span class="p">:</span>  <span class="c1"># Warning: net and task name must match</span>
+  
+            <span class="k">if</span> <span class="n">net</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">!=</span> <span class="n">task_name</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__setup_task():: net name: &#39;</span> <span class="o">+</span> \
+                    <span class="n">net</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; not equal to task name: &#39;</span> <span class="o">+</span> <span class="n">task_name</span> <span class="o">+</span> <span class="s1">&#39;; ignored.&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">net</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">task_name</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>  <span class="c1"># net and task names must match</span>
+
                 <span class="n">connect</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">connectivity</span>
                 <span class="n">to_module_to_port_visited</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
                 <span class="k">for</span> <span class="n">con</span> <span class="ow">in</span> <span class="n">connect</span><span class="p">:</span>
                     <span class="c1"># Start with the ports that will function as a provide port or</span>
                     <span class="c1"># input port</span>
@@ -255,7 +268,7 @@
                     <span class="k">if</span> <span class="n">to_module_slot</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">to_module_to_port_visited</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                         <span class="n">to_module_to_port_visited</span><span class="p">[</span><span class="n">to_module_slot</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
-                    <span class="n">to_module_name</span> <span class="o">=</span> <span class="n">to_module_slot</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">to_module_name</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">to_module_slot</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
                     <span class="n">to_module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__application</span><span class="o">.</span><span class="n">get_module</span><span class="p">(</span><span class="n">to_module_name</span><span class="p">)</span>
 
                     <span class="k">assert</span> <span class="n">to_module</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
@@ -263,11 +276,11 @@
 
                     <span class="k">assert</span> <span class="n">to_module</span><span class="o">.</span><span class="n">has_port_name</span><span class="p">(</span><span class="n">to_port</span><span class="p">),</span> \
                         <span class="s1">&#39;module </span><span class="si">%r</span><span class="s1"> has no port </span><span class="si">%r</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="p">(</span>
-                            <span class="n">to_module</span><span class="o">.</span><span class="n">get_name</span><span class="p">(),</span> <span class="n">to_port</span><span class="p">)</span>
+                            <span class="n">to_module</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">to_port</span><span class="p">)</span>
 
                     <span class="k">assert</span> <span class="n">to_module</span><span class="o">.</span><span class="n">get_port_type</span><span class="p">(</span><span class="n">to_port</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>\
                         <span class="s1">&#39;network name: </span><span class="si">%r</span><span class="s1">, module name: </span><span class="si">%r</span><span class="s1">, to_port: </span><span class="si">%r</span><span class="s1"> port type </span><span class="se">\</span>
-<span class="s1">                    invalid </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">get_name</span><span class="p">(),</span> <span class="n">to_module</span><span class="o">.</span><span class="n">get_name</span><span class="p">(),</span> <span class="n">to_port</span><span class="p">,</span>
+<span class="s1">                    invalid </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">to_module</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">to_port</span><span class="p">,</span>
                                    <span class="nb">type</span><span class="p">(</span><span class="n">to_module</span><span class="o">.</span><span class="n">get_port_type</span><span class="p">(</span><span class="n">to_port</span><span class="p">)))</span>
 
                     <span class="n">to_module_slot_work_dir</span> <span class="o">=</span> <span class="n">task_work_dir</span> <span class="o">+</span> <span class="n">to_module_slot</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
@@ -275,7 +288,7 @@
                     <span class="k">if</span> <span class="n">to_module</span><span class="o">.</span><span class="n">get_port_type</span><span class="p">(</span><span class="n">to_port</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;input&#39;</span><span class="p">:</span>
                         <span class="k">assert</span> <span class="n">to_module</span><span class="o">.</span><span class="n">get_port_type</span><span class="p">(</span><span class="n">to_port</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;provide&#39;</span><span class="p">,</span> \
                             <span class="s1">&#39;port type </span><span class="si">%r</span><span class="s1"> invalid. Module </span><span class="si">%r</span><span class="s1">, port </span><span class="si">%r</span><span class="s1">&#39;</span> \
-                            <span class="o">%</span> <span class="p">(</span><span class="n">to_module</span><span class="o">.</span><span class="n">get_port_type</span><span class="p">(</span><span class="n">to_port</span><span class="p">),</span> <span class="n">to_module</span><span class="o">.</span><span class="n">get_name</span><span class="p">(),</span>
+                            <span class="o">%</span> <span class="p">(</span><span class="n">to_module</span><span class="o">.</span><span class="n">get_port_type</span><span class="p">(</span><span class="n">to_port</span><span class="p">),</span> <span class="n">to_module</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                                <span class="n">to_port</span><span class="p">)</span>
 
                     <span class="c1"># &quot;to&quot; is who receives the &quot;call&quot;, hence the provider</span>
@@ -319,10 +332,11 @@
                     <span class="n">net</span><span class="o">.</span><span class="n">set_runtime_cortix_comm_file</span><span class="p">(</span><span class="n">to_module_slot</span><span class="p">,</span>
                                                      <span class="n">to_module_slot_comm_file</span><span class="p">)</span>
 
-                    <span class="c1"># Now do the ports that will function as use ports</span>
+                    <span class="c1"># Now do the ports that will function as use ports or</span>
+                    <span class="c1"># output ports</span>
                     <span class="n">from_module_slot</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;fromModuleSlot&#39;</span><span class="p">]</span>
                     <span class="n">from_port</span> <span class="o">=</span> <span class="n">con</span><span class="p">[</span><span class="s1">&#39;fromPort&#39;</span><span class="p">]</span>
-                    <span class="n">from_module_name</span> <span class="o">=</span> <span class="n">from_module_slot</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">from_module_name</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">from_module_slot</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
                     <span class="n">from_module</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__application</span><span class="o">.</span><span class="n">get_module</span><span class="p">(</span><span class="n">from_module_name</span><span class="p">)</span>
 
                     <span class="k">assert</span> <span class="n">from_module</span><span class="o">.</span><span class="n">has_port_name</span><span class="p">(</span><span class="n">from_port</span><span class="p">),</span> \
@@ -331,7 +345,7 @@
 
                     <span class="k">assert</span> <span class="n">from_module</span><span class="o">.</span><span class="n">get_port_type</span><span class="p">(</span><span class="n">from_port</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> \
                         <span class="s1">&#39;network name: </span><span class="si">%r</span><span class="s1">, module name: </span><span class="si">%r</span><span class="s1">, from_port: </span><span class="si">%r</span><span class="s1"> port type invalid </span><span class="si">%r</span><span class="s1">&#39;</span>\
-                        <span class="o">%</span> <span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">get_name</span><span class="p">(),</span> <span class="n">from_module</span><span class="o">.</span><span class="n">get_name</span><span class="p">(),</span> <span class="n">from_port</span><span class="p">,</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">from_module</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">from_port</span><span class="p">,</span>
                            <span class="nb">type</span><span class="p">(</span><span class="n">from_module</span><span class="o">.</span><span class="n">get_port_type</span><span class="p">(</span><span class="n">from_port</span><span class="p">)))</span>
 
                     <span class="n">from_module_slot_work_dir</span> <span class="o">=</span> <span class="n">task_work_dir</span> <span class="o">+</span> <span class="n">from_module_slot</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span>
@@ -340,7 +354,7 @@
                         <span class="k">assert</span> <span class="n">from_module</span><span class="o">.</span><span class="n">get_port_type</span><span class="p">(</span><span class="n">from_port</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;use&#39;</span><span class="p">,</span> \
                             <span class="s1">&#39;port type </span><span class="si">%r</span><span class="s1"> invalid. Module </span><span class="si">%r</span><span class="s1">, port </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> \
                             <span class="p">(</span><span class="n">from_module</span><span class="o">.</span><span class="n">get_port_type</span><span class="p">(</span><span class="n">from_port</span><span class="p">),</span>
-                             <span class="n">from_module</span><span class="o">.</span><span class="n">get_name</span><span class="p">(),</span> <span class="n">from_port</span><span class="p">)</span>
+                             <span class="n">from_module</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">from_port</span><span class="p">)</span>
 
                         <span class="c1"># &quot;from&quot; is who makes the &quot;call&quot;, hence the user</span>
                         <span class="n">from_module_slot_comm_file</span> <span class="o">=</span> <span class="n">from_module_slot_work_dir</span> <span class="o">+</span> \
@@ -385,15 +399,22 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">debug_str</span><span class="p">)</span>
 
                 <span class="c1"># register the cortix-comm file for the network</span>
-                <span class="n">net</span><span class="o">.</span><span class="n">set_runtime_cortix_comm_file</span><span class="p">(</span><span class="n">from_module_slot</span><span class="p">,</span>
-                                                 <span class="n">from_module_slot_comm_file</span><span class="p">)</span>
+                <span class="n">net</span><span class="o">.</span><span class="n">set_runtime_cortix_comm_file</span><span class="p">(</span> <span class="n">from_module_slot</span><span class="p">,</span>
+                                                  <span class="n">from_module_slot_comm_file</span> <span class="p">)</span>
 
         <span class="c1"># finish forming the XML documents for port types</span>
         <span class="k">for</span> <span class="n">net</span> <span class="ow">in</span> <span class="n">networks</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">slot_name</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">slot_names</span><span class="p">:</span>
                 <span class="n">comm_file</span> <span class="o">=</span> <span class="n">net</span><span class="o">.</span><span class="n">get_runtime_cortix_comm_file</span><span class="p">(</span><span class="n">slot_name</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">comm_file</span> <span class="o">==</span> <span class="s1">&#39;null-runtime_cortix_comm_file&#39;</span><span class="p">:</span>
-                    <span class="k">continue</span>
+                    <span class="k">if</span> <span class="n">net</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">task_name</span><span class="p">:</span>
+                       <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__setup_task():: comm file for &#39;</span> <span class="o">+</span> <span class="n">slot_name</span> <span class="o">+</span> \
+                           <span class="s1">&#39; in network &#39;</span> <span class="o">+</span> <span class="n">net</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; is &#39;</span> <span class="o">+</span> <span class="n">comm_file</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                       <span class="k">continue</span>
+                    <span class="k">else</span><span class="p">:</span> 
+                       <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;FATAL ERROR building the comm file for module </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span>\
+                                    <span class="n">slot_name</span>
                 <span class="n">fout</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">comm_file</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">)</span>
                 <span class="n">fout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/cortix_comm&gt;&#39;</span><span class="p">)</span>
                 <span class="n">fout</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
