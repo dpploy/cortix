@@ -2,4 +2,5 @@ pandas
 networkx
 matplotlib
 numpy
+scipy
 pytest
