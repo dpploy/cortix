@@ -25,7 +25,7 @@ from cortix.support.phase    import Phase
 class Droplet():
  r'''
   Droplet module used example in Cortix.
- '''
+  ''' 
 
  def __init__( self,
                slot_id,
@@ -453,13 +453,14 @@ class Droplet():
 
  def __evolve( self, cortix_time=0.0, cortix_time_step=0.0 ):
   r'''
-  .. math::
   ODE IVP problem:
-  Given the initial data at $t=0$, $u_1(0) = x_0$, $u_2(0) = v_0 = \dot{u}_1(0)$
-  solve $\frac{\mathtext{d}u}{\mathtext{d}t} = f(u)$.
-  When $u_1(t)$ is negative, bounce the droplet to a random height between
-  0 and $1.2 x_0$ and no velocity, and continue the time integration until
-  $t \le t_f$.
+  Given the initial data at :math:`t=0`, :math:`u_1(0) = x_0`, 
+  :math:`u_2(0) = v_0 = \dot{u}_1(0)`
+  solve :math:`\frac{\text{d}u}{\text{d}t} = f(u)` in the interval 
+  :math:`0\le t \le t_f`.
+  When :math:`u_1(t)` is negative, bounce the droplet to a random height between
+  0 and :math:`1.2\,x_0` with no velocity, and continue the time integration until
+  :math:`t \le t_f`.
   ''' 
   if self.__ode_integrator == 'scikits.odes':
      from scikits.odes import ode        # this requires the SUNDIALS ODE package 

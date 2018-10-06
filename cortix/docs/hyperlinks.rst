@@ -1,5 +1,5 @@
 GitHub Repos
 ~~~~~~~~~~~~
 
-* Cortix: https://github.com/dpploy/cortix
-* Jupyter Notebooks: https://github.com/dpploy/cortix-nb  
+* Cortix repository: https://github.com/dpploy/cortix
+* Cortix Jupyter Notebooks: https://github.com/dpploy/cortix-nb  

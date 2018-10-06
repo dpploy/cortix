@@ -53,6 +53,8 @@ extensions = ['sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages']
 #
+imgmath_image_format = 'svg'
+#
 todo_include_todos=True
 #
 napoleon_google_docstring = False
