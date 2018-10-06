@@ -1,15 +1,15 @@
 language: python
 python: 3.7-dev
-sudo: required
-before_install:
-    - "export DISPLAY=:99.0"
-    - "sh -e /etc/init.d/xvfb start"
-    - sleep 3 # give xvfb some time to start
-    - sudo apt-get update
-    - sudo apt-get install -y libopenblas-dev liblapack-dev gfortran cmake liblapack-dev libopenmpi-dev openmpi-bin libsuitesparse-dev
+#sudo: required
+#before_install:
+#    - "export DISPLAY=:99.0"
+#    - "sh -e /etc/init.d/xvfb start"
+#    - sleep 3 # give xvfb some time to start
+#    - sudo apt-get update
+#    - sudo apt-get install -y libopenblas-dev liblapack-dev gfortran cmake liblapack-dev libopenmpi-dev openmpi-bin libsuitesparse-dev
 install:
-    - sh scripts/install_sundials.sh
+    #  - sh scripts/install_sundials.sh
     - pip install -r requirements.txt
 script:
     - export PYTHONPATH=$PYTHONPATH:$(pwd)
-    - cd cortix/tests && py.test
+    - cd cortix/tests && py.test *.py
