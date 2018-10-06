@@ -3,9 +3,12 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
+with open("requirements.txt", "r") as fh:
+    req = fh.readlines()
+
 setuptools.setup(
     name="cortix",
-    version="0.0.7",
+    version="0.0.8",
     author="Valmor F. de Almeida",
     author_email="Valmor_deAlmeida@uml.edu",
     description=" Cortix is a Python library for system-level\
@@ -13,6 +16,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     include_package_data=True,
+    install_requires=req,
     url="https://github.com/dpploy/cortix",
     packages=['cortix', 'cortix.docs', 'cortix.examples',
               'cortix.examples.modulib', 'cortix.examples.console_run',
