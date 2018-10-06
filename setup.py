@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="cortix",
-    version="0.0.4",
+    version="0.0.7",
     author="Valmor F. de Almeida",
     author_email="Valmor_deAlmeida@uml.edu",
     description=" Cortix is a Python library for system-level\
@@ -15,11 +15,12 @@ setuptools.setup(
     include_package_data=True,
     url="https://github.com/dpploy/cortix",
     packages=['cortix', 'cortix.docs', 'cortix.examples',
-              'cortix.examples.modulib', 'cortix.examples.main',
+              'cortix.examples.modulib', 'cortix.examples.console_run',
+              'cortix.examples.notebook_run',
               'cortix.examples.input', 'cortix.examples.modulib.droplet',\
               'cortix.modulib.pyplot','cortix.src',\
               'cortix.src.utils', 'cortix.support', 'cortix.tests',
-              'cortix.tests.input'],
+              'cortix.tests.input', 'cortix.examples.modulib.wind'],
     keywords = ['simulation', 'math'],
     classifiers=[
         "Programming Language :: Python :: 3",
