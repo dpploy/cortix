@@ -18,6 +18,7 @@ import os
 import logging
 import time
 import datetime
+from mpi4py import MPI
 from threading import Thread
 import importlib
 import xml.etree.ElementTree as ElementTree
@@ -274,6 +275,10 @@ class Launcher(Thread):
 
         self.__set_runtime_status('finished')
         self.__log.info("__set_runtime_status(self, 'finished'")
+
+        # tell each process we're done
+        for i in range(1,MPI.COMM_WORLD.Get_size()):
+            MPI.COMM_WORLD.send("finished", dest=i, tag=i)
 #----------------------- end def run():-------------------------------------------
 
     def __del__(self):
