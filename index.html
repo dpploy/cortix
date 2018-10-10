@@ -52,18 +52,20 @@
 <div class="section" id="github-repos">
 <h2>GitHub Repos<a class="headerlink" href="#github-repos" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Cortix: <a class="reference external" href="https://github.com/dpploy/cortix">https://github.com/dpploy/cortix</a></li>
-<li>Jupyter Notebooks: <a class="reference external" href="https://github.com/dpploy/cortix-nb">https://github.com/dpploy/cortix-nb</a></li>
+<li>Cortix repository: <a class="reference external" href="https://github.com/dpploy/cortix">https://github.com/dpploy/cortix</a></li>
+<li>Cortix Jupyter Notebooks: <a class="reference external" href="https://github.com/dpploy/cortix-nb">https://github.com/dpploy/cortix-nb</a></li>
 </ul>
+<blockquote>
+<div>A Python library for system-level module coupling, execution, and
+analysis.</div></blockquote>
 <div class="line-block">
 <div class="line"><a class="reference external" href="https://travis-ci.org/dpploy/cortix"><img alt="Build Status" src="https://travis-ci.org/dpploy/cortix.svg?branch=master" /></a></div>
 <div class="line"><a class="reference external" href="https://badge.fury.io/py/cortix"><img alt="PyPI version" src="https://badge.fury.io/py/cortix.svg" /></a></div>
 <div class="line"><img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/Django.svg" /></div>
 <div class="line"><a class="reference external" href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master"><img alt="Binder" src="https://mybinder.org/badge.svg" /></a></div>
 <div class="line"><a class="reference external" href="http://nbviewer.jupyter.org/github/dpploy/cortix-nb/"><img alt="NBViewer" src="https://github.com/jupyter/design/blob/master/logos/Badges/nbviewer_badge.svg" /></a></div>
-<div class="line">—</div>
-<div class="line"><img alt="image5" src="_images/cortix-cover.png" /></div>
 </div>
+<p><img alt="image5" src="_images/cortix-cover.png" /></p>
 <div class="section" id="what-is-cortix">
 <h3>What is Cortix?<a class="headerlink" href="#what-is-cortix" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
@@ -85,65 +87,55 @@ simulation.</li>
 <p>The basic concepts in Cortix are the creation of an <code class="docutils literal"><span class="pre">Application</span></code> and
 a <code class="docutils literal"><span class="pre">Simulation</span></code> involving <code class="docutils literal"><span class="pre">Tasks</span></code>.</p>
 </div>
-<div class="section" id="pip-install-for-users-using-pypi">
-<h3>Pip install for users using PyPI<a class="headerlink" href="#pip-install-for-users-using-pypi" title="Permalink to this headline">¶</a></h3>
-<p>Cortix can be installed on any Unix-based machine or Mac OSX via pip.
-Run</p>
+<div class="section" id="installation-cortix-can-be-installed-on-any-unix-based-environment">
+<h3>Installation: Cortix can be installed on any Unix-based environment<a class="headerlink" href="#installation-cortix-can-be-installed-on-any-unix-based-environment" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="installing-via-pypi">
+<h3>Installing via PyPI<a class="headerlink" href="#installing-via-pypi" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="n">cortix</span>
 </pre></div>
 </div>
-<p>to install the current version of cortix in PyPI. To install the
-dependencies run</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pin</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+</div>
+<div class="section" id="installing-from-source">
+<h3>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline">¶</a></h3>
+<ol class="arabic">
+<li><p class="first">Clone this repository to install the current version of Cortix in
+PyPI.</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">dpploy</span><span class="o">/</span><span class="n">cortix</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
-<div class="line-block">
-<div class="line">where <code class="docutils literal"><span class="pre">requirements.txt</span></code> is the file in the Cortix repository.</div>
-<div class="line">After this first install, upgrade to newer versions</div>
-</div>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">cortix</span><span class="o">.</span>
+</li>
+<li><p class="first">Install the required dependencies listed in requirements.txt</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="o">-</span><span class="n">r</span> <span class="n">cortix</span><span class="o">/</span><span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
 </pre></div>
 </div>
-<p>whenever the PyPI version has been upgraded (refer to the PyPI badge
-above).</p>
+</li>
+<li><p class="first">Add <code class="docutils literal"><span class="pre">cortix</span></code>’s parent path to your <code class="docutils literal"><span class="pre">$PYTHONPATH</span></code> variable</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span>export PYTHONPATH=$PYTHONPATH:$(pwd)
+</pre></div>
 </div>
-<div class="section" id="repository-install-for-latest-version-of-cortix">
-<h3>Repository install for latest version of Cortix<a class="headerlink" href="#repository-install-for-latest-version-of-cortix" title="Permalink to this headline">¶</a></h3>
-<div class="line-block">
-<div class="line">Either on a linux OS or Mac OS X, clone the Cortix repository.</div>
-<div class="line">Cortix is a library and it is best used when copied to its own
-directory, say inside a project directory of your choice, <em>e.g.</em>,
-<code class="docutils literal"><span class="pre">/somepath/myproject/cortix/</span></code>, or anywhere else in your system,
-<em>e.g.</em>, <code class="docutils literal"><span class="pre">/somepath/cortix</span></code>. Then add either
-<code class="docutils literal"><span class="pre">/somepath/myproject/cortix</span> <span class="pre">to</span> <span class="pre">$PYTHONPATH</span></code> or
-<code class="docutils literal"><span class="pre">/somepath/cortix</span> <span class="pre">to</span> <span class="pre">$PYTHONPATH</span></code>, respectively. This is done in the
-Linux shell through the startup file <code class="docutils literal"><span class="pre">.bashrc</span></code>. For instance:
-<code class="docutils literal"><span class="pre">export</span> <span class="pre">PYTHONPATH=$PYTHONPATH:/somepath/myproject/cortix</span></code>. A common
-case is:</div>
-<div class="line"><code class="docutils literal"><span class="pre">export</span> <span class="pre">PYTHONPATH=$PYTHONPATH:$HOME/somepath/myproject/cortix</span></code>.
-Then the <code class="docutils literal"><span class="pre">.bashrc</span></code> file needs to be sourced: <code class="docutils literal"><span class="pre">source</span> <span class="pre">.bashrc</span></code>.</div>
-</div>
-<p>Cortix has a directory (<code class="docutils literal"><span class="pre">examples/</span></code>) that contains examples for input
-files, and a driver file. At the moment these input files are past files
-used in the development of Cortix. A driver file is needed to run
-Cortix. There is an example directory (<code class="docutils literal"><span class="pre">examples/console_run/</span></code>) with
-some examples that can be copied to say:
-<code class="docutils literal"><span class="pre">/somepath/driver-test.py</span> <span class="pre">or</span> <span class="pre">/somepath/myproject/driver-test.py</span></code>.
-Alternatively, examples can be started from the <code class="docutils literal"><span class="pre">console_run</span></code>
-directory, <em>i.e.</em> <code class="docutils literal"><span class="pre">droplet_run.py</span></code>. An input configuration (xml) file
-is also needed. An example is provided in the <code class="docutils literal"><span class="pre">examples/input/</span></code>
-directory (cortix-config.xml). Cortix will run each module in a separate
-thread. To capture the Cortix screen output of log messages (and other
-standard output messages), issue the bash command
-<code class="docutils literal"><span class="pre">/driver-cortix.py</span> <span class="pre">&gt;&amp;</span> <span class="pre">screen.out</span></code> under Linux (inspect the output file
-<code class="docutils literal"><span class="pre">screen.out</span></code> when the run is finished). Extensive logging of runtime
-information is stored in the <code class="docutils literal"><span class="pre">&lt;work_dir&gt;</span></code> directory specified in the
-<code class="docutils literal"><span class="pre">cortix-config.xml</span></code> input file.</p>
+<p>Note: you may want to add this line to your <code class="docutils literal"><span class="pre">.bashrc</span></code> in order for
+it to be persistent</p>
+</li>
+</ol>
 </div>
 <div class="section" id="testing">
 <h3>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h3>
-<p>Testing is facilitated through PyTest. To execute the tests, run the
-<code class="docutils literal"><span class="pre">py.test</span></code> command from the tests directory.</p>
+<p>Testing is facilitated through PyTest. To test your Cortix install, run
+the droplet example from the python shell</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="kn">from</span> <span class="nn">cortix.examples.console_run</span> <span class="k">import</span> <span class="n">droplet_run</span> <span class="k">as</span> <span class="n">droplet</span>
+<span class="o">&gt;&gt;</span> <span class="n">droplet</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-cortix">
+<h3>Using Cortix<a class="headerlink" href="#using-cortix" title="Permalink to this headline">¶</a></h3>
+<p>Cortix requires a set of input files, a driver, and a configuration
+file. See <code class="docutils literal"><span class="pre">examples/console_run</span></code> for working examples of Cortix
+simulations. Cortix will output logging information to <code class="docutils literal"><span class="pre">stdout</span></code> by
+default, extensive logging of runtime information is also stored in the
+<code class="docutils literal"><span class="pre">&lt;work_dir&gt;</span></code> directory specified in the <code class="docutils literal"><span class="pre">cortix-config.xml</span></code> input
+file.</p>
 </div>
 <div class="section" id="developers">
 <h3>Developers<a class="headerlink" href="#developers" title="Permalink to this headline">¶</a></h3>

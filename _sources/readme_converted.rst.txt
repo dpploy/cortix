@@ -1,10 +1,13 @@
+    A Python library for system-level module coupling, execution, and
+    analysis.
+
 | |Build Status|
 | |PyPI version|
 | |PyPI - Python Version|
 | |Binder|
 | |NBViewer|
-| ---
-| |image5|
+
+|image5|
 
 What is Cortix?
 ---------------
@@ -26,71 +29,61 @@ What is Cortix?
 The basic concepts in Cortix are the creation of an ``Application`` and
 a ``Simulation`` involving ``Tasks``.
 
-Pip install for users using PyPI
---------------------------------
+Installation: Cortix can be installed on any Unix-based environment
+-------------------------------------------------------------------
 
-Cortix can be installed on any Unix-based machine or Mac OSX via pip.
-Run
+Installing via PyPI
+-------------------
 
 ::
 
     pip install --user cortix
 
-to install the current version of cortix in PyPI. To install the
-dependencies run
+Installing from source
+----------------------
 
-::
+#. Clone this repository to install the current version of Cortix in
+   PyPI.
 
-    pin install --user requirements.txt
+   ::
 
-| where ``requirements.txt`` is the file in the Cortix repository.
-| After this first install, upgrade to newer versions
+       git clone https://github.com/dpploy/cortix.git
 
-::
+#. Install the required dependencies listed in requirements.txt
 
-    pip install --upgrade cortix.
+   ::
 
-whenever the PyPI version has been upgraded (refer to the PyPI badge
-above).
+       pip install --user -r cortix/requirements.txt
 
-Repository install for latest version of Cortix
------------------------------------------------
+#. Add ``cortix``'s parent path to your ``$PYTHONPATH`` variable
 
-| Either on a linux OS or Mac OS X, clone the Cortix repository.
-| Cortix is a library and it is best used when copied to its own
-  directory, say inside a project directory of your choice, *e.g.*,
-  ``/somepath/myproject/cortix/``, or anywhere else in your system,
-  *e.g.*, ``/somepath/cortix``. Then add either
-  ``/somepath/myproject/cortix to $PYTHONPATH`` or
-  ``/somepath/cortix to $PYTHONPATH``, respectively. This is done in the
-  Linux shell through the startup file ``.bashrc``. For instance:
-  ``export PYTHONPATH=$PYTHONPATH:/somepath/myproject/cortix``. A common
-  case is:
-| ``export PYTHONPATH=$PYTHONPATH:$HOME/somepath/myproject/cortix``.
-  Then the ``.bashrc`` file needs to be sourced: ``source .bashrc``.
+   ::
 
-Cortix has a directory (``examples/``) that contains examples for input
-files, and a driver file. At the moment these input files are past files
-used in the development of Cortix. A driver file is needed to run
-Cortix. There is an example directory (``examples/console_run/``) with
-some examples that can be copied to say:
-``/somepath/driver-test.py or /somepath/myproject/driver-test.py``.
-Alternatively, examples can be started from the ``console_run``
-directory, *i.e.* ``droplet_run.py``. An input configuration (xml) file
-is also needed. An example is provided in the ``examples/input/``
-directory (cortix-config.xml). Cortix will run each module in a separate
-thread. To capture the Cortix screen output of log messages (and other
-standard output messages), issue the bash command
-``/driver-cortix.py >& screen.out`` under Linux (inspect the output file
-``screen.out`` when the run is finished). Extensive logging of runtime
-information is stored in the ``<work_dir>`` directory specified in the
-``cortix-config.xml`` input file.
+       export PYTHONPATH=$PYTHONPATH:$(pwd)
+
+   Note: you may want to add this line to your ``.bashrc`` in order for
+   it to be persistent
 
 Testing
 -------
 
-Testing is facilitated through PyTest. To execute the tests, run the
-``py.test`` command from the tests directory.
+Testing is facilitated through PyTest. To test your Cortix install, run
+the droplet example from the python shell
+
+::
+
+       >> from cortix.examples.console_run import droplet_run as droplet 
+       >> droplet.run()
+
+Using Cortix
+------------
+
+Cortix requires a set of input files, a driver, and a configuration
+file. See ``examples/console_run`` for working examples of Cortix
+simulations. Cortix will output logging information to ``stdout`` by
+default, extensive logging of runtime information is also stored in the
+``<work_dir>`` directory specified in the ``cortix-config.xml`` input
+file.
 
 Developers
 ----------

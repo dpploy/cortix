@@ -65,21 +65,14 @@
 <dl class="method">
 <dt id="droplet.Droplet._Droplet__evolve">
 <code class="descname">_Droplet__evolve</code><span class="sig-paren">(</span><em>cortix_time=0.0</em>, <em>cortix_time_step=0.0</em><span class="sig-paren">)</span><a class="headerlink" href="#droplet.Droplet._Droplet__evolve" title="Permalink to this definition">¶</a></dt>
-<dd><div class="system-message">
-<p class="system-message-title">System Message: WARNING/2 (<tt class="docutils"></tt>)</p>
-dvipng exited with error
-[stderr]
-/tmp/tmpz0yaidmr/math.dvi: No such file or directory
-
-[stdout]
-This is dvipng 1.15 Copyright 2002-2015 Jan-Ake Larsson
-</div>
-<p>ODE IVP problem:
-Given the initial data at $t=0$, $u_1(0) = x_0$, $u_2(0) = v_0 = dot{u}_1(0)$
-solve $frac{mathtext{d}u}{mathtext{d}t} = f(u)$.
-When $u_1(t)$ is negative, bounce the droplet to a random height between
-0 and $1.2 x_0$ and no velocity, and continue the time integration until
-$t le t_f$.</p>
+<dd><p>ODE IVP problem:
+Given the initial data at <img class="math" src="../../../_images/math/c9c0db14206d811c979283bc2269384bec23557d.svg" alt="t=0"/>, <img class="math" src="../../../_images/math/fbce44bd48315f725a2edac608faf090a0390c9d.svg" alt="u_1(0) = x_0"/>,
+<img class="math" src="../../../_images/math/a994ca7a67b5173e643c3d76f2a897ae4083b60e.svg" alt="u_2(0) = v_0 = \dot{u}_1(0)"/>
+solve <img class="math" src="../../../_images/math/6dc56e03fc4925c43dc948b4652e5c28b3f5a089.svg" alt="\frac{\text{d}u}{\text{d}t} = f(u)"/> in the interval
+<img class="math" src="../../../_images/math/47dfc08576060d50f4579e3816a573bb79346540.svg" alt="0\le t \le t_f"/>.
+When <img class="math" src="../../../_images/math/51b94a9a1ef130f75b1df7531af548f6f4bc4669.svg" alt="u_1(t)"/> is negative, bounce the droplet to a random height between
+0 and <img class="math" src="../../../_images/math/aec8880b3cf3635587568946fa228f7cfa158639.svg" alt="1.2\,x_0"/> with no velocity, and continue the time integration until
+<img class="math" src="../../../_images/math/c27a7ef068e4928376e76893082574bf6cb712d0.svg" alt="t \le t_f"/>.</p>
 </dd></dl>
 
 <dl class="method">

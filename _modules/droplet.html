@@ -72,7 +72,7 @@
 <div class="viewcode-block" id="Droplet"><a class="viewcode-back" href="../examples_rst/modulib_rst/droplet_rst/droplet.html#droplet.Droplet">[docs]</a><span class="k">class</span> <span class="nc">Droplet</span><span class="p">():</span>
  <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">  Droplet module used example in Cortix.</span>
-<span class="sd"> &#39;&#39;&#39;</span>
+<span class="sd">  &#39;&#39;&#39;</span> 
 
  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span>
                <span class="n">slot_id</span><span class="p">,</span>
@@ -500,13 +500,14 @@
 
  <span class="k">def</span> <span class="nf">__evolve</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">cortix_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">cortix_time_step</span><span class="o">=</span><span class="mf">0.0</span> <span class="p">):</span>
   <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">  .. math::</span>
 <span class="sd">  ODE IVP problem:</span>
-<span class="sd">  Given the initial data at $t=0$, $u_1(0) = x_0$, $u_2(0) = v_0 = \dot{u}_1(0)$</span>
-<span class="sd">  solve $\frac{\mathtext{d}u}{\mathtext{d}t} = f(u)$.</span>
-<span class="sd">  When $u_1(t)$ is negative, bounce the droplet to a random height between</span>
-<span class="sd">  0 and $1.2 x_0$ and no velocity, and continue the time integration until</span>
-<span class="sd">  $t \le t_f$.</span>
+<span class="sd">  Given the initial data at :math:`t=0`, :math:`u_1(0) = x_0`, </span>
+<span class="sd">  :math:`u_2(0) = v_0 = \dot{u}_1(0)`</span>
+<span class="sd">  solve :math:`\frac{\text{d}u}{\text{d}t} = f(u)` in the interval </span>
+<span class="sd">  :math:`0\le t \le t_f`.</span>
+<span class="sd">  When :math:`u_1(t)` is negative, bounce the droplet to a random height between</span>
+<span class="sd">  0 and :math:`1.2\,x_0` with no velocity, and continue the time integration until</span>
+<span class="sd">  :math:`t \le t_f`.</span>
 <span class="sd">  &#39;&#39;&#39;</span> 
   <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ode_integrator</span> <span class="o">==</span> <span class="s1">&#39;scikits.odes&#39;</span><span class="p">:</span>
      <span class="kn">from</span> <span class="nn">scikits.odes</span> <span class="k">import</span> <span class="n">ode</span>        <span class="c1"># this requires the SUNDIALS ODE package </span>
