@@ -5,7 +5,6 @@
 
 Cortix documentation
 ====================
-.. include:: hyperlinks.rst
 .. include:: readme_converted.rst
 
 Table of Contents
