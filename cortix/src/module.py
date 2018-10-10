@@ -15,9 +15,11 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 """
 #**********************************************************************************
 import os
-from cortix.src.utils.configtree import ConfigTree
-
+import dill
+from mpi4py import MPI
+MPI.pickle.__init__(dill.dumps, dill.loads)
 from cortix.src.launcher import Launcher
+from cortix.src.utils.configtree import ConfigTree
 #**********************************************************************************
 
 class Module:
@@ -252,8 +254,8 @@ class Module:
 
         # run module on its own process (file IO communication will take place
         # between modules)
-        launch.start() # this start a thread and runs the run() method of launch
-
+        #launch.start() # this start a thread and runs the run() method of launch
+        MPI.COMM_WORLD.send(launch, dest=1)
         return runtime_module_status_file
 #----------------------- end def execute():---------------------------------------
 

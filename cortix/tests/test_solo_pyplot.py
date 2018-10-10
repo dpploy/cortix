@@ -25,7 +25,7 @@ def test_solo_pyplot():
     cortix1.run_simulations(task_name="solo-pyplot")
     for i in range(14):
         assert os.path.exists("pyplot_0-timeseq-dashboard-%02d.png" % i)
-    os.system("rm -f *.p*")
+    #os.system("rm -f *.pickle; rm -rf *.png")
 
 
 if __name__ == "__main__":

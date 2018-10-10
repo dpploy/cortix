@@ -15,8 +15,10 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 '''
 #*********************************************************************************
 import os
+import dill
 import logging
 from mpi4py import MPI
+MPI.pickle.__init__(dill.dumps, dill.loads)
 from cortix.src.simulation import Simulation
 from cortix.src.utils.configtree import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
@@ -136,12 +138,8 @@ class Cortix():
         processing data.
         '''
         if self.rank != 0:
-            with open("worker_log_{}.txt".format(self.rank), "w") as wl:
-                wl.write("Hello from rank %d\n" % (self.rank))
-            data = self.comm.recv(source=0, tag=self.rank)
-            with open("worker_log_{}.txt".format(self.rank), "a") as wl:
-                wl.write("Received message: %s\n" % (data))
-
+            launcher_obj = MPI.COMM_WORLD.recv(source=0)
+            launcher_obj.run()
 #----------------------- end def run_simulations():-------------------------------
 
 
