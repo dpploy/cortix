@@ -36,10 +36,8 @@ class Application:
         assert isinstance(app_work_dir, str), '-> app_work_dir is invalid'
 
         # Inherit a configuration tree
-        assert isinstance(
-            app_config_node, ConfigTree), "-> app_config_node invalid"
-        assert isinstance(app_config_node.get_node_tag(),
-                          str), "empty xml tree."
+        assert isinstance(app_config_node, ConfigTree), "-> app_config_node invalid"
+        assert isinstance(app_config_node.get_node_tag(), str), "empty xml tree."
         self.__config_node = app_config_node
 
         # Read the application name
@@ -189,17 +187,18 @@ class Application:
         A helper function used by the Application constructor to setup the modules
         portion of the Application.
         """
-
+        i = 0
         self.__log.debug("Start __setup_modules()")
         for mod_node in self.__config_node.get_all_sub_nodes('module'):
-
+            i += 1
             mod_config_node = ConfigTree(mod_node)
             assert mod_config_node.get_node_name() == mod_node.get('name'), \
                 'check failed'
 
             new_module = Module( self.__work_dir, self.__module_lib_name,
-                                 self.__module_lib_full_parent_dir, mod_config_node)
-
+                                 self.__module_lib_full_parent_dir,
+                                 mod_config_node, i)
+            self.__log.info("Launched module to rank %d %s" % (i, mod_node.get('name')))
             # check for a duplicate module before appending a new one
             for module in self.__modules:
                 mod_lib_dir_name = module.library_parent_dir

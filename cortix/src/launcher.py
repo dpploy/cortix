@@ -209,11 +209,11 @@ class Launcher():
                                                       self.__input_full_path_file_name,
                                                       self.__exec_full_path_file_name,
                                                       self.__work_dir,
-                                                      ports, 
-                                                      cortix_start_time, 
+                                                      ports,
+                                                      cortix_start_time,
                                                       cortix_final_time,
                                                       cortix_time_step,
-                                                      cortix_time_unit 
+                                                      cortix_time_unit
                                                     )
 
         s = 'guest_driver = CortixDriver( slot_id=' + str(self.__slot_id) + \

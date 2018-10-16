@@ -28,8 +28,12 @@ class Module:
     '''
 
     def __init__(self, parent_work_dir=None, library_name=None,
-                 library_parent_dir=None, mod_config_node=ConfigTree()):
+                 library_parent_dir=None, mod_config_node=ConfigTree(),
+                 module_id=0):
 
+
+        assert (module_id > 0), "Mod id must be > 0!"
+        self.mod_id = module_id
         assert isinstance(
             parent_work_dir, str), "-> parent_work_dir is invalid."
 
@@ -208,7 +212,7 @@ class Module:
         return False
 #----------------------- end def has_port_name():---------------------------------
 
-    def execute( self, slot_id, 
+    def execute( self, slot_id,
                  runtime_cortix_param_file,
                  runtime_cortix_comm_file    ):
         '''
@@ -252,10 +256,11 @@ class Module:
                            mod_work_dir,
                            param, comm, status )
 
-        # run module on its own process (file IO communication will take place
-        # between modules)
-        #launch.start() # this start a thread and runs the run() method of launch
-        MPI.COMM_WORLD.send(launch, dest=1)
+        # Send launcher to its respective mpi process
+        #TODO: Change print statments to log
+        print("Rank %d sending launcher to Rank %d" % (MPI.COMM_WORLD.Get_rank(), self.mod_id))
+        MPI.COMM_WORLD.send(launch, dest=self.mod_id)
+        print("Rank %d sent launcher to Rank %d" % (MPI.COMM_WORLD.Get_rank(), self.mod_id))
         return runtime_module_status_file
 #----------------------- end def execute():---------------------------------------
 

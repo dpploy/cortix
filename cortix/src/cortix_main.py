@@ -37,87 +37,85 @@ class Cortix():
         self.rank = self.comm.Get_rank()   # Ranks in communicator
         self.name = MPI.Get_processor_name()    # Node where this MPI process runs
 
-        # Rank nonzero, wait for a message
-        if(self.rank != 0):
-            self.worker()
+        assert name is not None, "must give Cortix object a name"
+        assert isinstance(config_file, str), "-> configFile not a str."
+        self.__config_file = config_file
 
-        else:
-            assert name is not None, "must give Cortix object a name"
-            assert isinstance(config_file, str), "-> configFile not a str."
-            self.__config_file = config_file
+        # Create a configuration tree
+        self.__config_tree = ConfigTree(config_file_name=self.__config_file)
 
-            # Create a configuration tree
-            self.__config_tree = ConfigTree(config_file_name=self.__config_file)
+        # Read this object's name
+        node = self.__config_tree.get_sub_node("name")
+        self.__name = node.text.strip()
 
-            # Read this object's name
-            node = self.__config_tree.get_sub_node("name")
-            self.__name = node.text.strip()
+        # check
+        assert self.__name == name,\
+               "Cortix object name %r conflicts with cortix-config.xml %r" % (self.__name, name)
 
-            # check
-            assert self.__name == name,\
-                "Cortix object name %r conflicts with cortix-config.xml %r" \
-                % (self.__name, name)
+        # Read the work directory name
+        node = self.__config_tree.get_sub_node("work_dir")
+        work_dir = node.text.strip()
+        if work_dir[-1] != '/': work_dir += '/'
 
-            # Read the work directory name
-            node = self.__config_tree.get_sub_node("work_dir")
-            work_dir = node.text.strip()
-            if work_dir[-1] != '/':
-                work_dir += '/'
+        self.__work_dir = work_dir + self.__name + "-wrk/"
 
-            self.__work_dir = work_dir + self.__name + "-wrk/"
-
-            # Create the work directory
+        # Create the work directory
+        if self.rank == 0:
             if os.path.isdir(self.__work_dir):
                 os.system('rm -rf ' + self.__work_dir)
 
             os.system('mkdir -p ' + self.__work_dir)
 
-            # Create the logging facility for each object
-            node = self.__config_tree.get_sub_node("logger")
-            logger_name = self.__name
-            self.__log = logging.getLogger(logger_name)
-            self.__log.setLevel(logging.NOTSET)
-            logger_level = node.get("level").strip()
-            self.__log = set_logger_level(self.__log, logger_name, logger_level)
+        # Create the logging facility for each object
+        node = self.__config_tree.get_sub_node("logger")
+        logger_name = self.__name
+        self.__log = logging.getLogger(logger_name)
+        self.__log.setLevel(logging.NOTSET)
+        logger_level = node.get("level").strip()
+        self.__log = set_logger_level(self.__log, logger_name, logger_level)
 
-            file_handler = logging.FileHandler(self.__work_dir + "cortix.log")
-            file_handler.setLevel(logging.NOTSET)
-            file_handler_level = None
+        file_handler = logging.FileHandler(self.__work_dir + "cortix_rank_{}.log".format(self.rank))
+        file_handler.setLevel(logging.NOTSET)
+        file_handler_level = None
 
-            console_handler = logging.StreamHandler()
-            console_handler.setLevel(logging.NOTSET)
-            console_handler_level = None
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.NOTSET)
+        console_handler_level = None
 
-            for child in node:
-                if child.tag == "file_handler":
-                    file_handler_level = child.get("level").strip()
-                    file_handler = set_logger_level(file_handler, logger_name,
+        for child in node:
+            if child.tag == "file_handler":
+                file_handler_level = child.get("level").strip()
+                file_handler = set_logger_level(file_handler, logger_name,
                                                 file_handler_level)
-                if child.tag == "console_handler":
-                    console_handler_level = child.get("level").strip()
-                    console_handler = set_logger_level(console_handler, logger_name,
+            if child.tag == "console_handler":
+                console_handler_level = child.get("level").strip()
+                console_handler = set_logger_level(console_handler, logger_name,
                                                    console_handler_level)
 
-            # Formatter added to handlers
-            formatter = logging.Formatter(
-                "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-            file_handler.setFormatter(formatter)
-            console_handler.setFormatter(formatter)
+        # Formatter added to handlers
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+        file_handler.setFormatter(formatter)
+        console_handler.setFormatter(formatter)
 
-            # add handlers to logger
-            self.__log.addHandler(file_handler)
-            self.__log.addHandler(console_handler)
-            self.__log.info("Created Cortix logger: %s", self.__name)
-            self.__log.debug("Logger level: %s", logger_level)
-            self.__log.debug("Logger file handler level: %s", file_handler_level)
-            self.__log.debug("Logger console handler level: %s", console_handler_level)
+        # add handlers to logger
+        self.__log.addHandler(file_handler)
+        self.__log.addHandler(console_handler)
+        self.__log.info("Created Cortix logger: %s", self.__name)
+        self.__log.debug("Logger level: %s", logger_level)
+        self.__log.debug("Logger file handler level: %s", file_handler_level)
+        self.__log.debug("Logger console handler level: %s", console_handler_level)
+
+        # Rank 0: Set up simulations
+        if self.rank == 0:
             self.__log.info("Created Cortix work directory: %s", self.__work_dir)
-
-            # Setup simulations (one or more as specified in the config file)
             self.__simulations = list()
             self.__setup_simulations()
-
             self.__log.info("Created Cortix object %s", self.__name)
+
+        # Rank nonzero: Wait for a launcher message
+        else:
+            self.__worker()
+
 #----------------------- end def __init__():--------------------------------------
 
     def run_simulations(self, task_name=None):
@@ -130,18 +128,6 @@ class Cortix():
             for sim in self.__simulations:
                 sim.execute(task_name)
 #----------------------- end def run_simulations():-------------------------------
-
-    def worker(self, task_name=None):
-        '''
-        This method is run by any process which is not rank 0.
-        These "worker" processes wait for a message to begin
-        processing data.
-        '''
-        if self.rank != 0:
-            launcher_obj = MPI.COMM_WORLD.recv(source=0)
-            launcher_obj.run()
-#----------------------- end def run_simulations():-------------------------------
-
 
 #*********************************************************************************
 # Private helper functions (internal use: __)
@@ -161,6 +147,22 @@ class Cortix():
                 simulation = Simulation(self.__work_dir, sim_config_tree)
                 self.__simulations.append(simulation)
 #----------------------- end def __setup_simulations():---------------------------
+
+    def __worker(self, task_name=None):
+        '''
+        This method is run by any process which is not rank 0.
+        These "worker" processes wait for a message to begin
+        processing data.
+        '''
+#        if self.rank == 1 or self.rank == 3:
+        if self.rank != 0:
+            self.__log.debug("Rank %d waiting for launcher" % self.rank)
+            launcher_obj = MPI.COMM_WORLD.recv(source=0)
+            self.__log.debug("Rank %d running launcher" % self.rank)
+            launcher_obj.run()
+            self.__log.debug("Rank %d finished running launcher" % self.rank)
+#----------------------- end def __worker():---------------------------------------
+
 
     def __del__(self):
         if self.rank == 0:

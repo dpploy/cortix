@@ -147,7 +147,6 @@ class Task:
 
             # Run module in the slot
             self.__log.info('call execute on module: %s:%s',module_name,slot_id)
-
             status_file = module.execute(slot_id, param_file, comm_file)
 
             assert status_file is not None, \
