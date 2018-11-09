@@ -46,10 +46,10 @@ Note: you may want to add this line to your ```.bashrc``` in order for it to be 
 
 ## Testing
 
-Testing is facilitated through <a href="http://pytest.org">PyTest</a>. To test your Cortix install, run the following from the python shell
+Testing is facilitated through <a href="http://pytest.org">PyTest</a>. To test your Cortix install, run the droplet example from the python shell
 ```
-   >> import cortix.tests.comprehensive_test tests
-   >> tests.run()
+   >> from cortix.examples.console_run import droplet_run as droplet 
+   >> droplet.run()
 ```
 
 ## Using Cortix

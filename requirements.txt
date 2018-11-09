@@ -2,6 +2,5 @@ pandas
 networkx
 matplotlib
 numpy
-mpi4py
+scipy
 pytest
-scikits.odes
