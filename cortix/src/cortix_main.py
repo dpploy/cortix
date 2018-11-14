@@ -114,7 +114,7 @@ class Cortix():
 
         # Rank nonzero: Wait for a launcher message
         else:
-            self.__worker()
+            self.__run_worker()
 
 #----------------------- end def __init__():--------------------------------------
 
@@ -138,30 +138,25 @@ class Cortix():
         whose purpose is to set up the simulations defined by the
         Cortix configuration.
         '''
-        if self.rank == 0:
-            for sim in self.__config_tree.get_all_sub_nodes('simulation'):
-                self.__log.debug(
-                    "__setup_simulations(): simulation name: %s",
-                    sim.get('name'))
-                sim_config_tree = ConfigTree(sim)
-                simulation = Simulation(self.__work_dir, sim_config_tree)
-                self.__simulations.append(simulation)
+        for sim in self.__config_tree.get_all_sub_nodes('simulation'):
+            self.__log.debug("__setup_simulations(): simulation name: %s",
+                sim.get('name'))
+            sim_config_tree = ConfigTree(sim)
+            simulation = Simulation(self.__work_dir, sim_config_tree)
+            self.__simulations.append(simulation)
 #----------------------- end def __setup_simulations():---------------------------
 
-    def __worker(self, task_name=None):
+    def __run_worker(self, master_rank=0):
         '''
-        This method is run by any process which is not rank 0.
-        These "worker" processes wait for a message to begin
-        processing data.
+        This method is run by worker processes in which they
+        wait for a message to begin processing data.
         '''
-#        if self.rank == 1 or self.rank == 3:
-        if self.rank != 0:
-            self.__log.debug("Rank %d waiting for launcher" % self.rank)
-            launcher_obj = MPI.COMM_WORLD.recv(source=0)
-            self.__log.debug("Rank %d running launcher" % self.rank)
-            launcher_obj.run()
-            self.__log.debug("Rank %d finished running launcher" % self.rank)
-#----------------------- end def __worker():---------------------------------------
+        self.__log.debug("Rank %d waiting for launcher" % self.rank)
+        launcher_obj = MPI.COMM_WORLD.recv(source=master_rank)
+        self.__log.debug("Rank %d running launcher" % self.rank)
+        launcher_obj.run()
+        self.__log.debug("Rank %d finished running launcher" % self.rank)
+#----------------------- end def __run_worker():---------------------------------------
 
 
     def __del__(self):
