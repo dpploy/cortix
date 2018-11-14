@@ -15,9 +15,6 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 """
 #**********************************************************************************
 import os
-import dill
-from mpi4py import MPI
-MPI.pickle.__init__(dill.dumps, dill.loads)
 from cortix.src.launcher import Launcher
 from cortix.src.utils.configtree import ConfigTree
 #**********************************************************************************
@@ -28,12 +25,8 @@ class Module:
     '''
 
     def __init__(self, parent_work_dir=None, library_name=None,
-                 library_parent_dir=None, mod_config_node=ConfigTree(),
-                 module_id=0):
+                 library_parent_dir=None, mod_config_node=ConfigTree()):
 
-
-        assert (module_id > 0), "Mod id must be > 0!"
-        self.mod_id = module_id
         assert isinstance(
             parent_work_dir, str), "-> parent_work_dir is invalid."
 
@@ -249,18 +242,13 @@ class Module:
 
         # the laucher "loads" the module dynamically and provides the method for
         # threading
-        launch = Launcher( library_name, mod_name,
+        launcher = Launcher( library_name, mod_name,
                            slot_id,
                            module_input,
                            mod_exec_name,
                            mod_work_dir,
                            param, comm, status )
-
-        # Send launcher to its respective mpi process
-        #TODO: Change print statments to log
-        print("Rank %d sending launcher to Rank %d" % (MPI.COMM_WORLD.Get_rank(), self.mod_id))
-        MPI.COMM_WORLD.send(launch, dest=self.mod_id)
-        print("Rank %d sent launcher to Rank %d" % (MPI.COMM_WORLD.Get_rank(), self.mod_id))
+        launcher.run()
         return runtime_module_status_file
 #----------------------- end def execute():---------------------------------------
 

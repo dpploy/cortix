@@ -151,11 +151,11 @@ class Cortix():
         This method is run by worker processes in which they
         wait for a message to begin processing data.
         '''
-        self.__log.debug("Rank %d waiting for launcher" % self.rank)
-        launcher_obj = MPI.COMM_WORLD.recv(source=master_rank)
-        self.__log.debug("Rank %d running launcher" % self.rank)
-        launcher_obj.run()
-        self.__log.debug("Rank %d finished running launcher" % self.rank)
+        self.__log.debug("Rank %d waiting for module..." % self.rank)
+        module = MPI.COMM_WORLD.recv(source=master_rank)
+        self.__log.debug("Rank %d received module! Running module.execute()..." % self.rank)
+        module.execute()
+        self.__log.debug("Rank %d finished executing module!" % self.rank)
 #----------------------- end def __run_worker():---------------------------------------
 
 

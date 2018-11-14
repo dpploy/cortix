@@ -17,9 +17,11 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 import os
 import sys
 import logging
+import dill
+from mpi4py import MPI
+MPI.pickle.__init__(dill.dumps, dill.loads)
 from cortix.src.utils.configtree import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
-
 from cortix.src.module  import Module
 from cortix.src.network import Network
 #*********************************************************************************
@@ -102,9 +104,7 @@ class Application:
         self.__log.info('Created Application logger: %s', self.__name)
         self.__log.debug('logger level: %s', logger_level)
         self.__log.debug('logger file handler level: %s', file_handler_level)
-        self.__log.debug(
-            'logger console handler level: %s',
-            console_handler_level)
+        self.__log.debug('logger console handler level: %s', console_handler_level)
 
         self.__modules = list()
         self.__setup_modules()
@@ -195,10 +195,10 @@ class Application:
             assert mod_config_node.get_node_name() == mod_node.get('name'), \
                 'check failed'
 
-            new_module = Module( self.__work_dir, self.__module_lib_name,
+            new_module = Module(self.__work_dir, self.__module_lib_name,
                                  self.__module_lib_full_parent_dir,
-                                 mod_config_node, i)
-            self.__log.info("Launched module to rank %d %s" % (i, mod_node.get('name')))
+                                 mod_config_node)
+
             # check for a duplicate module before appending a new one
             for module in self.__modules:
                 mod_lib_dir_name = module.library_parent_dir
@@ -212,7 +212,10 @@ class Application:
             # add module to list
             self.__modules.append(new_module)
             self.__log.debug("appended module %s", mod_node.get('name'))
-
+            # Send Module to its respective mpi process 
+            self.__log.info("Sending module to rank %d %s" % (i, mod_node.get('name')))
+            MPI.COMM_WORLD.send(new_module, dest=self.mod_id)
+            self.__log.info("Sent module to rank %d %s" % (i, mod_node.get('name')))
         self.__log.debug("end __setup_modules()")
 #----------------------- end def __setup_modules():-------------------------------
 
