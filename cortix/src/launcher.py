@@ -19,11 +19,7 @@ import logging
 import time
 import datetime
 import importlib
-import dill
-from mpi4py import MPI
-MPI.pickle.__init__(dill.dumps, dill.loads)
 import xml.etree.ElementTree as ElementTree
-import concurrent.futures
 #*********************************************************************************
 
 class Launcher():
