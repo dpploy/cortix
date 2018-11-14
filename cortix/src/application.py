@@ -214,7 +214,7 @@ class Application:
             self.__log.debug("appended module %s", mod_node.get('name'))
             # Send Module to its respective mpi process 
             self.__log.info("Sending module to rank %d %s" % (i, mod_node.get('name')))
-            MPI.COMM_WORLD.send(new_module, dest=self.mod_id)
+            MPI.COMM_WORLD.send(new_module, dest=i)
             self.__log.info("Sent module to rank %d %s" % (i, mod_node.get('name')))
         self.__log.debug("end __setup_modules()")
 #----------------------- end def __setup_modules():-------------------------------
