@@ -176,14 +176,13 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'Cortix.tex', 'Cortix Documentation',
+    ('contents', 'Cortix.tex', 'Cortix Documentation',
      'Valmor F. de Almeida', 'manual'),
 ]
 
 latex_engine = 'pdflatex'
 #latex_engine = 'xelatex'
-latex_elements = {
-    'preamble': r'''
+latex_elements = {'classoptions': ',openany,oneside', 'preamble': r'''
 \usepackage{amsmath}
 '''
 }
