@@ -10,9 +10,9 @@ Cortix documentation
 Table of Contents
 -----------------
 .. toctree::
-   examples_rst/modules
-   modulib_rst/modules
    src_rst/modules
+   modulib_rst/modules
+   examples_rst/modules
    support_rst/modules
    :maxdepth: 2
 
