@@ -3,14 +3,10 @@
 Cortix Documentation
 ====================
 
-Table of Contents
------------------
-
 .. toctree::
    :maxdepth: 2
 
-   getting-started
-   src
+   src_rst/modules
    modulib_rst/modules
    examples_rst/modules
    support_rst/modules
