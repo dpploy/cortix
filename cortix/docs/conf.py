@@ -83,8 +83,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Cortix'
-copyright = '2018, Valmor F. de Almeida'
-author = 'Valmor F. de Almeida'
+copyright = '2019, University of Massachusetts Lowell'
+author = 'Valmor F. de Almeida, Taha Azzaoui, Gilberto E. Alas'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -177,7 +177,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     ('contents', 'Cortix.tex', 'Cortix Documentation',
-     'Valmor F. de Almeida', 'manual'),
+     author, 'manual'),
 ]
 
 latex_engine = 'pdflatex'
