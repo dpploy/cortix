@@ -1,0 +1,443 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>phase &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for phase</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># This file is part of the Cortix toolkit evironment</span>
+<span class="c1"># https://github.com/dpploy/cortix</span>
+<span class="c1">#</span>
+<span class="c1"># All rights reserved, see COPYRIGHT for full restrictions.</span>
+<span class="c1"># https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the GNU General Public License v. 3, please see LICENSE file.</span>
+<span class="c1"># https://www.gnu.org/licenses/gpl-3.0.txt</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Phase *history* container. When you think of a phase value, think of that value at</span>
+<span class="sd">a specific point in time.</span>
+
+<span class="sd">ATTENTION:</span>
+<span class="sd">The species (list of Specie) AND quantities (list of Quantity) data members</span>
+<span class="sd">have ARBITRARY density values either at an arbitrary point in the history or at</span>
+<span class="sd">no point in the history. This needs to be removed in the future to avoid confusion.</span>
+
+<span class="sd">To obtain history values, associated to the phase, at a particular point in time,</span>
+<span class="sd">use the GetValue() method to access the history data frame (pandas) via columns and</span>
+<span class="sd">rows. The corresponding values in species and quantities are OVERRIDEN and NOT to</span>
+<span class="sd">be used through the phase interface.</span>
+
+<span class="sd">Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda</span>
+<span class="sd">Sat Sep  5 01:26:53 EDT 2015</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="c1">#*********************************************************************************</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">npy</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+
+<span class="kn">from</span> <span class="nn">cortix.support.specie</span>   <span class="k">import</span> <span class="n">Specie</span>
+<span class="kn">from</span> <span class="nn">cortix.support.quantity</span> <span class="k">import</span> <span class="n">Quantity</span>
+<span class="c1">#*********************************************************************************</span>
+
+<div class="viewcode-block" id="Phase"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase">[docs]</a><span class="k">class</span> <span class="nc">Phase</span><span class="p">():</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">time_stamp</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">species</span>    <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">quantities</span> <span class="o">=</span> <span class="kc">None</span>
+                 <span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">time_stamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">time_stamp</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">species</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">species</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="n">species</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">specie</span><span class="p">,</span> <span class="n">Specie</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">quantities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quantities</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="n">quantities</span><span class="p">:</span> 
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">quant</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">)</span>
+
+<span class="c1"># List of species and quantities objects; columns of data frame are named</span>
+<span class="c1"># by objects</span>
+        <span class="c1"># a new object held by a Phase() object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__species</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">species</span><span class="p">)</span>
+        <span class="c1"># a new object held by a Phase() object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__quantities</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">quantities</span><span class="p">)</span>
+
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">species</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__species</span><span class="p">:</span>
+                <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">specie</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">specie</span><span class="o">.</span><span class="n">massCC</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># clear these values</span>
+                                     <span class="c1"># todo: eliminate them from Specie in the future</span>
+
+        <span class="k">if</span> <span class="n">quantities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__quantities</span><span class="p">:</span>
+                <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">quant</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">quant</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">0.0</span>    <span class="c1"># clear these values </span>
+                                     <span class="c1"># todo: eliminate them from Quantity in the future</span>
+
+<span class="c1"># Table data phase without data type assigned; this is left to the user</span>
+<span class="c1"># Time stamps will always be float</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">)],</span> <span class="n">columns</span><span class="o">=</span><span class="n">names</span> <span class="p">)</span>
+<span class="c1">#        self.__phase.fillna( 0.0, inplace=True )  # dtype defaults to float</span>
+
+        <span class="k">return</span>
+
+<span class="c1"># *******************************************************************************</span>
+<span class="c1"># Setters and Getters methods</span>
+<span class="c1"># -------------------------------------------------------------------------------</span>
+<span class="c1"># These are passing arguments by value effectively. Because the python objects</span>
+<span class="c1"># passed into/out of the function are immutable.</span>
+
+<div class="viewcode-block" id="Phase.GetActors"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetActors">[docs]</a>    <span class="k">def</span> <span class="nf">GetActors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>  <span class="c1"># return all names in order</span></div>
+
+<div class="viewcode-block" id="Phase.GetTimeStamps"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetTimeStamps">[docs]</a>    <span class="k">def</span> <span class="nf">GetTimeStamps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>  <span class="c1"># return all time stamps</span></div>
+    <span class="n">timeStamps</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetTimeStamps</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Phase.GetSpecie"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetSpecie">[docs]</a>    <span class="k">def</span> <span class="nf">GetSpecie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__species</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">specie</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">time_stamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_time_stamp</span><span class="p">(</span> <span class="kc">None</span> <span class="p">)</span> <span class="c1"># get latest time stamp</span>
+                <span class="k">assert</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="s1">&#39;name </span><span class="si">%r</span><span class="s1"> not in </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span> \
+                   <span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+                <span class="n">specie</span><span class="o">.</span><span class="n">massCC</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_stamp</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">specie</span>  <span class="c1"># return specie syncronized with the phase</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Phase.GetSpecies"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">GetSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">species</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__species</span><span class="p">:</span>
+          <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetSpecie</span><span class="p">(</span><span class="n">species</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="c1"># handy way to synchronize the whole list</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__species</span></div>
+    <span class="n">species</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetSpecies</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Phase.GetQuantities"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetQuantities">[docs]</a>    <span class="k">def</span> <span class="nf">GetQuantities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__quantities</span><span class="p">:</span>
+          <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetQuantity</span><span class="p">(</span><span class="n">quant</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="c1"># handy way to synchronize the whole list</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__quantities</span></div>
+    <span class="n">quantities</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetQuantities</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Phase.SetSpecieId"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.SetSpecieId">[docs]</a>    <span class="k">def</span> <span class="nf">SetSpecieId</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__species</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">specie</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">specie</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="n">val</span>
+                <span class="k">return</span></div>
+
+<div class="viewcode-block" id="Phase.GetQuantity"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetQuantity">[docs]</a>    <span class="k">def</span> <span class="nf">GetQuantity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__quantities</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">time_stamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_time_stamp</span><span class="p">(</span> <span class="kc">None</span> <span class="p">)</span> <span class="c1"># get latest time stamp</span>
+                <span class="k">assert</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="s1">&#39;name </span><span class="si">%r</span><span class="s1"> not in </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span> \
+                   <span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+                <span class="n">quant</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_stamp</span><span class="p">,</span> <span class="n">name</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">quant</span>  <span class="c1"># return quantity syncronized with the phase</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Phase.AddSpecie"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.AddSpecie">[docs]</a>    <span class="k">def</span> <span class="nf">AddSpecie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_specie</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_specie</span><span class="p">,</span> <span class="n">Specie</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">new_specie</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> \
+               <span class="s1">&#39;new_specie: </span><span class="si">%r</span><span class="s1"> exists. Current names: </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> \
+               <span class="p">(</span><span class="n">new_specie</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="n">speciesFormulae</span> <span class="o">=</span> <span class="p">[</span><span class="n">specie</span><span class="o">.</span><span class="n">formulaName</span> <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__species</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">new_specie</span><span class="o">.</span><span class="n">formulaName</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">speciesFormulae</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__species</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_specie</span><span class="p">)</span>
+        <span class="n">newName</span> <span class="o">=</span> <span class="n">new_specie</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span> <span class="n">index</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">newName</span><span class="p">]</span> <span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>   <span class="c1"># for species have float as default</span></div>
+
+<div class="viewcode-block" id="Phase.AddQuantity"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.AddQuantity">[docs]</a>    <span class="k">def</span> <span class="nf">AddQuantity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newQuant</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">newQuant</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">newQuant</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> \
+               <span class="s1">&#39;quantity: </span><span class="si">%r</span><span class="s1"> exists. Current names: </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> \
+               <span class="p">(</span><span class="n">newQuant</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="n">quantFormalNames</span> <span class="o">=</span> <span class="p">[</span><span class="n">quant</span><span class="o">.</span><span class="n">formalName</span> <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__quantities</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">newQuant</span><span class="o">.</span><span class="n">formalName</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">quantFormalNames</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__quantities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newQuant</span><span class="p">)</span>
+        <span class="n">newName</span> <span class="o">=</span> <span class="n">newQuant</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="c1"># create a col with object data type; user must fill out column </span>
+        <span class="n">col</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span> <span class="n">index</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">newName</span><span class="p">],</span>
+                                <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span> <span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span>
+        <span class="n">df</span>  <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">&#39;outer&#39;</span><span class="p">)</span></div>
+<span class="c1">#        self.__phase = df.fillna(newQuant.value)</span>
+
+<div class="viewcode-block" id="Phase.AddRow"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.AddRow">[docs]</a>    <span class="k">def</span> <span class="nf">AddRow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="p">,</span> <span class="n">row_values</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">row_values</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+
+        <span class="n">time_stamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_time_stamp</span><span class="p">(</span> <span class="n">try_time_stamp</span> <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">time_stamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;already used time_stamp: </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">)</span>
+        <span class="n">time_stamp</span> <span class="o">=</span> <span class="n">try_time_stamp</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">row_values</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">size</span>
+
+        <span class="c1"># create a row with object data type; users row_values data define data type</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">time_stamp</span><span class="p">],</span> 
+                                <span class="n">columns</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span> <span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span> <span class="p">)</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">col</span><span class="p">,</span><span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">row_values</span><span class="p">):</span>
+            <span class="n">row</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_stamp</span><span class="p">,</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+        <span class="n">frames</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="p">,</span> <span class="n">row</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">frames</span><span class="p">)</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="Phase.GetRow"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetRow">[docs]</a>    <span class="k">def</span> <span class="nf">GetRow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">time_stamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_time_stamp</span><span class="p">(</span> <span class="n">try_time_stamp</span> <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">time_stamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;missing try_time_stamp: </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_stamp</span><span class="p">,</span> <span class="p">:])</span></div>
+
+<div class="viewcode-block" id="Phase.GetColumn"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetColumn">[docs]</a>    <span class="k">def</span> <span class="nf">GetColumn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="s1">&#39;actor </span><span class="si">%r</span><span class="s1"> not in </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span> \
+                   <span class="p">(</span><span class="n">actor</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">actor</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Phase.ScaleRow"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.ScaleRow">[docs]</a>    <span class="k">def</span> <span class="nf">ScaleRow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> 
+        <span class="n">time_stamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_time_stamp</span><span class="p">(</span> <span class="n">try_time_stamp</span> <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">time_stamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;missing try_time_stamp: </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_stamp</span><span class="p">,</span> <span class="p">:]</span> <span class="o">*=</span> <span class="n">value</span>
+        <span class="k">return</span></div>
+
+    <span class="c1"># set species and quantities of history to a given value (default to zero value)</span>
+    <span class="c1"># all time stamps are preserved</span>
+<div class="viewcode-block" id="Phase.ClearHistory"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.ClearHistory">[docs]</a>    <span class="k">def</span> <span class="nf">ClearHistory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> 
+        <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span></div>
+
+    <span class="c1"># set species and quantities of history to a given value (default to zero value)</span>
+    <span class="c1"># only one time stamp is preserved (default to last time stamp)</span>
+<div class="viewcode-block" id="Phase.ResetHistory"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.ResetHistory">[docs]</a>    <span class="k">def</span> <span class="nf">ResetHistory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">or</span> \
+                  <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">npy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">try_time_stamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> 
+
+        <span class="n">time_stamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_time_stamp</span><span class="p">(</span> <span class="n">try_time_stamp</span> <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">time_stamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;missing try_time_stamp: </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">)</span>
+
+        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GetRow</span><span class="p">(</span><span class="n">time_stamp</span><span class="p">)</span>  <span class="c1"># save values</span>
+
+        <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">),</span> <span class="s1">&#39;FATAL: oops internal error.&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="n">time_stamp</span><span class="p">],</span> <span class="n">columns</span><span class="o">=</span><span class="n">columns</span> <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_stamp</span><span class="p">,</span> <span class="n">columns</span><span class="p">[</span><span class="n">idx</span><span class="p">]]</span> <span class="o">=</span> <span class="n">v</span>  <span class="c1"># restore values</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_stamp</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">value</span>   <span class="c1"># set user-given value</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="Phase.GetValue"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetValue">[docs]</a>    <span class="k">def</span> <span class="nf">GetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="s1">&#39;actor </span><span class="si">%r</span><span class="s1"> not in </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span> \
+                   <span class="p">(</span><span class="n">actor</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">try_time_stamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> 
+
+        <span class="n">time_stamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_time_stamp</span><span class="p">(</span> <span class="n">try_time_stamp</span> <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">time_stamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;missing try_time_stamp: </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_stamp</span><span class="p">,</span> <span class="n">actor</span><span class="p">]</span></div>
+
+<span class="c1"># old def SetValue(self, time_stamp, actor, value):</span>
+<span class="c1"># new</span>
+<div class="viewcode-block" id="Phase.SetValue"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.SetValue">[docs]</a>    <span class="k">def</span> <span class="nf">SetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">columns</span>
+
+<span class="c1">#        assert isinstance(value, int) or isinstance(value, float) or \</span>
+<span class="c1">#               isinstance(value, npy.ndarray)</span>
+
+        <span class="k">if</span> <span class="n">try_time_stamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> 
+
+        <span class="n">time_stamp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_time_stamp</span><span class="p">(</span> <span class="n">try_time_stamp</span> <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">time_stamp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;missing try_time_stamp: </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">)</span>
+
+<span class="c1">#        print(&#39;*value =&#39;, value)</span>
+<span class="c1">#        print(&#39;*type(value) =&#39;, type(value))</span>
+<span class="c1">#        print(&#39;*time_stamp =&#39;, time_stamp)</span>
+<span class="c1">#        print(&#39;*actor =&#39;, actor)</span>
+<span class="c1">#        print(&#39;*column values =&#39;, self.__phase[actor])</span>
+<span class="c1">#        print(&#39;*df =&#39;, self.__phase)</span>
+<span class="c1">#        print(&#39;*df.dtypes =&#39;, self.__phase.dtypes)</span>
+<span class="c1">#        print(&#39;*df.shape =&#39;, self.__phase.shape)</span>
+<span class="c1">#        print(&#39;&#39;)</span>
+<span class="c1">#        if isinstance(value,npy.ndarray):</span>
+<span class="c1">#           self.__phase[actor] = self.__phase.astype({actor:type(value)})</span>
+<span class="c1">#        print(&#39;*df.dtypes =&#39;, self.__phase.dtypes)</span>
+<span class="c1">#        print(&#39;&#39;)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_stamp</span><span class="p">,</span> <span class="n">actor</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="Phase.WriteHTML"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.WriteHTML">[docs]</a>    <span class="k">def</span> <span class="nf">WriteHTML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="p">)</span>
+        <span class="n">columnNames</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">columns</span>
+        <span class="n">speciesNames</span> <span class="o">=</span> <span class="p">[</span><span class="n">specie</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__species</span><span class="p">]</span>
+        <span class="n">quantityNames</span> <span class="o">=</span> <span class="p">[</span><span class="n">quantity</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">quantity</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__quantities</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columnNames</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">speciesNames</span><span class="p">:</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">speciesNames</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+                <span class="n">specie</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__species</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+                <span class="n">tmp</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="n">col</span><span class="p">:</span> <span class="n">specie</span><span class="o">.</span><span class="n">formulaName</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">quantityNames</span><span class="p">:</span>
+                <span class="n">idx</span> <span class="o">=</span> <span class="n">quantityNames</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+                <span class="n">quant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__quantities</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+                <span class="n">tmp</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span> <span class="n">columns</span><span class="o">=</span><span class="p">{</span> <span class="n">col</span><span class="p">:</span> <span class="n">col</span> <span class="o">+</span> <span class="s1">&#39;[&#39;</span> <span class="o">+</span> <span class="n">quant</span><span class="o">.</span><span class="n">unit</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span><span class="p">},</span>
+                            <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;oops fatal.&#39;</span>
+        <span class="n">tmp</span><span class="o">.</span><span class="n">to_html</span><span class="p">(</span><span class="n">fileName</span><span class="p">)</span></div>
+
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Private helper functions (internal use: __)</span>
+
+    <span class="k">def</span> <span class="nf">__get_time_stamp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method for finding the closest time stamp in the phase history.  </span>
+<span class="sd">        The pandas Index container used for storing float data type time stamps</span>
+<span class="sd">        will return the nearest time stamp up to a tolerance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">try_time_stamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+           <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="n">tol</span> <span class="o">=</span> <span class="mf">1.0e-4</span>
+           <span class="k">try</span><span class="p">:</span>
+             <span class="n">loc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span> <span class="n">try_time_stamp</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;nearest&#39;</span><span class="p">,</span> 
+                                               <span class="n">tolerance</span><span class="o">=</span><span class="n">tol</span> <span class="p">)</span>
+           <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+             <span class="k">return</span> <span class="kc">None</span>
+           <span class="k">else</span><span class="p">:</span>
+             <span class="k">return</span>  <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">loc</span><span class="p">]</span>
+
+<span class="c1"># *******************************************************************************</span>
+<span class="c1"># Printing of data members</span>
+<span class="c1"># def __str__( self ):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> **Phase()**: </span><span class="se">\n\t</span><span class="s1"> *quantities*: </span><span class="si">%s</span><span class="se">\n\t</span><span class="s1"> *species*: </span><span class="si">%s</span><span class="se">\n\t</span><span class="s1"> *history* #time_stamp=</span><span class="si">%s</span><span class="se">\n\t</span><span class="s1"> *history end* @</span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__quantities</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__species</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">index</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">:])</span>
+<span class="c1">#</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> **Phase()**: </span><span class="se">\n\t</span><span class="s1"> *quantities*: </span><span class="si">%s</span><span class="se">\n\t</span><span class="s1"> *species*: </span><span class="si">%s</span><span class="se">\n\t</span><span class="s1"> *history* #time_stamp=</span><span class="si">%s</span><span class="se">\n\t</span><span class="s1"> *history end* @</span><span class="si">%s</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__quantities</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__species</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">index</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="p">:])</span></div>
+<span class="c1"># *******************************************************************************</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><img src="logo.jpg">
+<h3>About Cortix</h3>
+<p>
+Cortix is a Python library for system-level module coupling, execution, and analysis.
+</p>
+
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul>
+<li><a href="../index.html">Home</a></li>
+<li><a href="../install.html">Install</a></li>
+<li><a href="../contents.html">Documentation</a></li>
+
+</ul>
+<!---->
+
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="https://pypi.org/project/cortix/">Cortix @ PyPI</a></li>
+  <li><a href="https://github.com/dpploy/cortix">Cortix @ GitHub</a></li>
+  <li><a href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master">Cortix @ binder</a></li>
+  <li><a href="https://nbviewer.jupyter.org/github/dpploy/cortix-nb/tree/master/">Cortix @ nbviewer</a></li>
+  <li><a href="https://github.com/dpploy/cortix-nb">Cortix Jupyter Notebooks</a></li>
+  <li><a href="https://github.com/dpploy/cortix/issues">Issue Tracker</a></li>
+  <li><a href="https://dpploy.github.io/cortix/Cortix.pdf">PDF Documentation</a></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, University of Massachusetts Lowell.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
