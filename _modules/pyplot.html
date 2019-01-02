@@ -1,0 +1,981 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>pyplot &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for pyplot</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># This file is part of the Cortix toolkit evironment</span>
+<span class="c1"># https://github.com/dpploy/cortix</span>
+<span class="c1">#</span>
+<span class="c1"># All rights reserved, see COPYRIGHT for full restrictions.</span>
+<span class="c1"># https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the GNU General Public License v. 3, please see LICENSE file.</span>
+<span class="c1"># https://www.gnu.org/licenses/gpl-3.0.txt</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">PyPlot module.</span>
+
+<span class="sd">Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda</span>
+<span class="sd">Tue Jun 24 01:03:45 EDT 2014</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="c1">#*********************************************************************************</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ElementTree</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">npy</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">,</span> <span class="n">warn</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.gridspec</span> <span class="k">as</span> <span class="nn">gridspec</span>
+<span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="k">import</span> <span class="n">MultipleLocator</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+
+<span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="k">as</span> <span class="nn">ElementTree</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Lock</span>
+
+<span class="kn">from</span> <span class="nn">cortix.modulib.pyplot.time_sequence</span> <span class="k">import</span> <span class="n">TimeSequence</span>
+<span class="c1"># *********************************************************************************</span>
+
+<div class="viewcode-block" id="PyPlot"><a class="viewcode-back" href="../modulib_rst/pyplot_rst/pyplot.html#pyplot.PyPlot">[docs]</a><span class="k">class</span> <span class="nc">PyPlot</span><span class="p">():</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">slot_id</span><span class="p">,</span>
+                 <span class="n">input_full_path_file_name</span><span class="p">,</span>
+                 <span class="n">work_dir</span><span class="p">,</span>
+                 <span class="n">ports</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(),</span>
+                 <span class="n">cortix_start_time</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">cortix_final_time</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">cortix_time_step</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">cortix_time_unit</span>  <span class="o">=</span> <span class="kc">None</span>
+                 <span class="p">):</span>
+
+        <span class="c1"># Sanity test</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">slot_id</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span> <span class="s1">&#39;-&gt; slot_id type </span><span class="si">%r</span><span class="s1"> is invalid.&#39;</span> <span class="o">%</span> \
+                           <span class="nb">type</span><span class="p">(</span><span class="n">slot_id</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">ports</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="s1">&#39;-&gt; ports type </span><span class="si">%r</span><span class="s1"> is invalid.&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">ports</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">ports</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;fatal.&#39;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">cortix_start_time</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;-&gt; time type </span><span class="si">%r</span><span class="s1"> is invalid.&#39;</span> <span class="o">%</span> \
+                           <span class="nb">type</span><span class="p">(</span><span class="n">cortix_start_time</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">cortix_final_time</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;-&gt; time type </span><span class="si">%r</span><span class="s1"> is invalid.&#39;</span> <span class="o">%</span> \
+                           <span class="nb">type</span><span class="p">(</span><span class="n">cortix_final_time</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">cortix_time_step</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span> <span class="s1">&#39;-&gt; time step type </span><span class="si">%r</span><span class="s1"> is invalid.&#39;</span> <span class="o">%</span> \
+                           <span class="nb">type</span><span class="p">(</span><span class="n">cortix_time_step</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span> <span class="n">cortix_time_unit</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;-&gt; time unit type </span><span class="si">%r</span><span class="s1"> is invalid.&#39;</span> <span class="o">%</span> \
+                           <span class="nb">type</span><span class="p">(</span><span class="n">cortix_time_unit</span><span class="p">)</span>
+
+        <span class="c1"># Logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;launcher-modulib.pyplot_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">slot_id</span><span class="p">)</span> <span class="o">+</span>
+                                       <span class="s1">&#39;.cortix_driver.pyplot&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;initializing an object of PyPlot()&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Member data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__slot_id</span> <span class="o">=</span> <span class="n">slot_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ports</span>   <span class="o">=</span> <span class="n">ports</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_start_time</span> <span class="o">=</span> <span class="n">cortix_start_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_final_time</span> <span class="o">=</span> <span class="n">cortix_final_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_time_unit</span>  <span class="o">=</span> <span class="n">cortix_time_unit</span>
+
+        <span class="n">n_time_steps</span> <span class="o">=</span> <span class="p">(</span> <span class="n">cortix_final_time</span> <span class="o">-</span> <span class="n">cortix_start_time</span> <span class="p">)</span> <span class="o">/</span> <span class="n">cortix_time_step</span>
+        <span class="n">n_of_times_to_plot</span> <span class="o">=</span> <span class="mi">10</span> <span class="c1"># during the entire run</span>
+        <span class="c1"># how often to plot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__plot_interval</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span> <span class="n">n_time_steps</span> <span class="o">/</span> <span class="n">n_of_times_to_plot</span> <span class="p">)</span>
+        <span class="c1"># the width of the window to plot</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__plot_slide_window_interval</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__plot_interval</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;Plot interval = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__plot_interval</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; [&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_time_unit</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;Plot slide window interval = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__plot_slide_window_interval</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; [&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_time_unit</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+        <span class="c1"># This holds all time sequences, potentially, one per use port. One time sequence</span>
+        <span class="c1"># has all the data for one port connection.</span>
+        <span class="c1"># Time sequences are xml formatted data per Cortix convention.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__time_sequences_tmp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>  <span class="c1"># temporary storage</span>
+
+        <span class="c1"># Tables in xml format per Cortix convention</span>
+        <span class="c1"># [(time,timeUnit)] = [column,column,...]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__time_tables_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">())</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># Input ports (if any)</span>
+
+        <span class="n">fin</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_full_path_file_name</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">input_data_full_path_file_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fin</span><span class="p">:</span>
+            <span class="n">input_data_full_path_file_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="p">)</span>
+        <span class="n">fin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_data_full_path_file_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">portName</span><span class="p">,</span> <span class="n">portType</span><span class="p">,</span> <span class="n">port_file</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ports</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">portName</span> <span class="o">==</span> <span class="s1">&#39;time-sequence-input&#39;</span><span class="p">:</span>  <span class="c1"># this is the use port connected to the input port</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;cp -f &#39;</span> <span class="o">+</span> <span class="n">input_data_full_path_file_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">port_file</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">found</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;found time-sequence-input file.&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;did not find time-sequence-input file.&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+<span class="c1"># ---------------------- end def __init__():------------------------------</span>
+
+<div class="viewcode-block" id="PyPlot.call_ports"><a class="viewcode-back" href="../modulib_rst/pyplot_rst/pyplot.html#pyplot.PyPlot.call_ports">[docs]</a>    <span class="k">def</span> <span class="nf">call_ports</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cortix_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Transfer data at cortix_time</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">cortix_time</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__plot_interval</span> <span class="o">&lt;=</span> <span class="mf">1e-2</span> <span class="ow">and</span> \
+            <span class="n">cortix_time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_final_time</span><span class="p">)</span>        \
+           <span class="ow">or</span> <span class="n">cortix_time</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_final_time</span><span class="p">:</span>
+
+            <span class="c1"># use ports in PyPlot have infinite multiplicity (implement</span>
+            <span class="c1"># multiplicity later)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__time_sequences_tmp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+
+            <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ports</span><span class="p">:</span>
+                <span class="p">(</span><span class="n">portName</span><span class="p">,</span> <span class="n">portType</span><span class="p">,</span> <span class="n">thisPortFile</span><span class="p">)</span> <span class="o">=</span> <span class="n">port</span>
+
+                <span class="k">if</span> <span class="n">portType</span> <span class="o">==</span> <span class="s1">&#39;use&#39;</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="n">portName</span> <span class="o">==</span> <span class="s1">&#39;time-sequence&#39;</span> <span class="ow">or</span> <span class="n">portName</span> <span class="o">==</span> <span class="s1">&#39;time-tables&#39;</span> <span class="ow">or</span> \
+                        <span class="n">portName</span> <span class="o">==</span> <span class="s1">&#39;time-sequence-input&#39;</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__use_data</span><span class="p">(</span> <span class="n">usePortName</span> <span class="o">=</span> <span class="n">portName</span><span class="p">,</span>
+                                     <span class="n">usePortFile</span> <span class="o">=</span> <span class="n">thisPortFile</span><span class="p">,</span>
+                                     <span class="n">at_time</span> <span class="o">=</span> <span class="n">cortix_time</span> <span class="p">)</span></div>
+
+<span class="c1">#----------------------- end def call_ports():------------------------------------</span>
+
+<div class="viewcode-block" id="PyPlot.execute"><a class="viewcode-back" href="../modulib_rst/pyplot_rst/pyplot.html#pyplot.PyPlot.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cortix_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;execute(): cortix time [min] = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">cortix_time</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__plot_data</span><span class="p">(</span><span class="n">cortix_time</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span></div>
+
+<span class="c1">#----------------------- end def execute():---------------------------------------</span>
+
+<span class="c1"># *********************************************************************************</span>
+<span class="c1"># Private helper functions (internal use: __)</span>
+
+    <span class="k">def</span> <span class="nf">__use_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usePortName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">usePortFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">at_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This operates on a given use port;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># Access the port file</span>
+        <span class="n">port_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_port_file</span><span class="p">(</span> <span class="n">usePortName</span> <span class="o">=</span> <span class="n">usePortName</span><span class="p">,</span>
+                                          <span class="n">usePortFile</span> <span class="o">=</span> <span class="n">usePortFile</span>  <span class="p">)</span>
+
+<span class="c1"># Get data from port files</span>
+        <span class="k">if</span> <span class="n">usePortName</span> <span class="o">==</span> <span class="s1">&#39;time-sequence&#39;</span> <span class="ow">or</span> <span class="n">usePortName</span> <span class="o">==</span> <span class="s1">&#39;time-sequence-input&#39;</span> \
+           <span class="ow">and</span> <span class="n">port_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">__get_time_sequence</span><span class="p">(</span> <span class="n">port_file</span><span class="p">,</span> <span class="n">at_time</span> <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">usePortName</span> <span class="o">==</span> <span class="s1">&#39;time-tables&#39;</span> <span class="ow">and</span> <span class="n">port_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_GetTimeTables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_file</span><span class="p">,</span> <span class="n">at_time</span><span class="p">)</span>
+
+        <span class="k">return</span>
+<span class="c1">#----------------------- end def __use_data():------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">__provide_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">providePortName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">at_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Nothing planned to provide at this time; but could change</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span>
+<span class="c1">#----------------------- end def __provide_data():--------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">__get_port_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usePortName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">usePortFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">providePortName</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">port_file</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># ..........</span>
+        <span class="c1"># Use ports</span>
+        <span class="c1"># ..........</span>
+        <span class="k">if</span> <span class="n">usePortName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="k">assert</span> <span class="n">providePortName</span> <span class="ow">is</span> <span class="kc">None</span>
+
+            <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ports</span><span class="p">:</span>
+                <span class="p">(</span><span class="n">portName</span><span class="p">,</span> <span class="n">portType</span><span class="p">,</span> <span class="n">thisPortFile</span><span class="p">)</span> <span class="o">=</span> <span class="n">port</span>
+                <span class="k">if</span> <span class="n">portName</span> <span class="o">==</span> <span class="n">usePortName</span> <span class="ow">and</span> <span class="n">portType</span> <span class="o">==</span> <span class="s1">&#39;use&#39;</span> <span class="ow">and</span> <span class="n">thisPortFile</span> <span class="o">==</span> <span class="n">usePortFile</span><span class="p">:</span>
+                    <span class="n">port_file</span> <span class="o">=</span> <span class="n">thisPortFile</span>
+
+            <span class="k">if</span> <span class="n">port_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="n">max_n_trials</span> <span class="o">=</span> <span class="mi">50</span>
+            <span class="n">n_trials</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">while</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">port_file</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span> <span class="ow">and</span> <span class="n">n_trials</span> <span class="o">&lt;=</span> <span class="n">max_n_trials</span><span class="p">:</span>
+                <span class="n">n_trials</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">n_trials</span> <span class="o">&gt;</span> <span class="n">max_n_trials</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__get_port_file(): waited &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">n_trials</span><span class="p">)</span> <span class="o">+</span> \
+                    <span class="s1">&#39; trials for port: &#39;</span> <span class="o">+</span> <span class="n">port_file</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+            <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">port_file</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;port_file </span><span class="si">%r</span><span class="s1"> not available; stop.&#39;</span> <span class="o">%</span> <span class="n">port_file</span>
+
+        <span class="c1"># ..............</span>
+        <span class="c1"># Provide ports</span>
+        <span class="c1"># ..............</span>
+        <span class="k">if</span> <span class="n">providePortName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="k">assert</span> <span class="n">usePortName</span> <span class="ow">is</span> <span class="kc">None</span>
+
+            <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ports</span><span class="p">:</span>
+                <span class="p">(</span><span class="n">portName</span><span class="p">,</span> <span class="n">portType</span><span class="p">,</span> <span class="n">thisPortFile</span><span class="p">)</span> <span class="o">=</span> <span class="n">port</span>
+                <span class="k">if</span> <span class="n">portName</span> <span class="o">==</span> <span class="n">providePortName</span> <span class="ow">and</span> <span class="n">portType</span> <span class="o">==</span> <span class="s1">&#39;provide&#39;</span><span class="p">:</span>
+                    <span class="n">port_file</span> <span class="o">=</span> <span class="n">thisPortFile</span>
+
+        <span class="k">return</span> <span class="n">port_file</span>
+<span class="c1"># ---------------------- end def __get_port_file():-----------------------</span>
+
+    <span class="k">def</span> <span class="nf">__plot_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cortix_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">cortix_time</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">__plot_interval</span> <span class="o">&lt;=</span> <span class="mf">1e-2</span> <span class="ow">and</span> \
+           <span class="n">cortix_time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_final_time</span><span class="p">:</span>
+
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__plot_data(): cortix time [min] = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cortix_time</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+            <span class="n">from_time</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">cortix_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__plot_slide_window_interval</span><span class="p">)</span>
+            <span class="n">to_time</span> <span class="o">=</span> <span class="n">cortix_time</span>
+
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__plot_data(): from_time [min] = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">from_time</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__plot_data(): to_time [min] = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">to_time</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+            <span class="c1"># plot with slide window history</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__plot_time_seq_dashboard</span><span class="p">(</span> <span class="n">from_time</span><span class="p">,</span> <span class="n">to_time</span> <span class="p">)</span>
+
+            <span class="c1"># plot with slide window history</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__plot_time_tables</span><span class="p">(</span> <span class="n">from_time</span><span class="p">,</span> <span class="n">to_time</span> <span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">cortix_time</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_final_time</span><span class="p">:</span>
+
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__plot_data(): cortix time [min] = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cortix_time</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">__plot_time_seq_dashboard</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_start_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_final_time</span><span class="p">)</span>  <span class="c1"># plot all history</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">__plot_time_tables</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_start_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_final_time</span> <span class="p">)</span>  <span class="c1"># plot all history</span>
+
+<span class="c1">#----------------------- end def __plot_data():-----------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">__get_time_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_file</span><span class="p">,</span> <span class="n">at_time</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This uses a use port_file which is guaranteed to exist at this point</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__get_time_sequence(): will get data in port_file: &#39;</span> <span class="o">+</span> <span class="n">port_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">at_time</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_final_time</span><span class="p">:</span>
+            <span class="n">initialTime</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_start_time</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">initialTime</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__cortix_start_time</span><span class="p">,</span> <span class="n">at_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__plot_slide_window_interval</span><span class="p">)</span>
+
+        <span class="n">timeSequence</span> <span class="o">=</span> <span class="n">TimeSequence</span><span class="p">(</span> <span class="n">port_file</span><span class="p">,</span> <span class="s1">&#39;xml&#39;</span><span class="p">,</span> <span class="n">initialTime</span><span class="p">,</span> <span class="n">at_time</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_time_unit</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__log</span> <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__time_sequences_tmp</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">timeSequence</span><span class="p">)</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__get_time_sequence(): loaded &#39;</span> <span class="o">+</span> <span class="n">timeSequence</span><span class="o">.</span><span class="n">get_name</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+        <span class="k">return</span>
+<span class="c1">#----------------------- end def __get_time_sequence():---------------------------</span>
+
+    <span class="k">def</span> <span class="nf">__get_time_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_file</span><span class="p">,</span> <span class="n">at_time</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This uses a use port_file which is guaranteed at this point</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__get_time_tables(): will check file: &#39;</span> <span class="o">+</span> <span class="n">port_file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">while</span> <span class="n">found</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__get_time_tables(): checking for value at &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">at_time</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+<span class="c1">#    tree = ElementTree.parse(port_file)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">mutex</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
+                <span class="n">mutex</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+                <span class="n">tree</span> <span class="o">=</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">port_file</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">ElementTree</span><span class="o">.</span><span class="n">ParseError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="n">mutex</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__get_time_tables(): &#39;</span> <span class="o">+</span> <span class="n">port_file</span> <span class="o">+</span> <span class="s1">&#39; unavailable. Error code: &#39;</span> <span class="o">+</span> \
+                    <span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">code</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; File position: &#39;</span> <span class="o">+</span> \
+                    <span class="nb">str</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">position</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;. Retrying...&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">mutex</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+            <span class="n">rootNode</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="n">rootNode</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;time-tables&#39;</span><span class="p">,</span> <span class="s1">&#39;invalid format.&#39;</span>
+
+            <span class="n">timeNodes</span> <span class="o">=</span> <span class="n">rootNode</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;timeStamp&#39;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">timeNode</span> <span class="ow">in</span> <span class="n">timeNodes</span><span class="p">:</span>
+
+                <span class="n">timeStamp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">timeNode</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+                <span class="k">if</span> <span class="n">timeStamp</span> <span class="o">==</span> <span class="n">at_time</span><span class="p">:</span>
+
+                    <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+
+                    <span class="n">timeUnit</span> <span class="o">=</span> <span class="n">timeNode</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__time_tables_data</span><span class="p">[(</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">timeUnit</span><span class="p">)]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+                    <span class="n">columns</span> <span class="o">=</span> <span class="n">timeNode</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;column&#39;</span><span class="p">)</span>
+
+                    <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+                    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+                        <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__time_tables_data</span><span class="p">[(</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">timeUnit</span><span class="p">)]</span> <span class="o">=</span> <span class="n">data</span>
+
+                    <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__get_time_tables(): added &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39; columns of data&#39;</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+                <span class="c1"># end of if timeStamp == at_time:</span>
+
+            <span class="c1"># end of for timeNode in timeNodes:</span>
+
+            <span class="k">if</span> <span class="n">found</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+
+        <span class="c1"># while found is False:</span>
+
+        <span class="k">return</span>
+<span class="c1">#----------------------- end __get_time_tables():---------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">__plot_time_seq_dashboard</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">initialTime</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">finalTime</span><span class="o">=</span><span class="mf">0.0</span> <span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        All time sequences on hold will be plotted here and the temporary storage</span>
+<span class="sd">        of these time sequences will be cleared at the end.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">nRows</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">nCols</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">nSequences</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__time_sequences_tmp</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nSequences</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__plot_time_seq_dashboard(): from: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">initialTime</span><span class="p">)</span> <span class="o">+</span> \
+            <span class="s1">&#39; to &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">finalTime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__plot_time_seq_dashboard(): # of sequences: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">nSequences</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+        <span class="n">nVar</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__time_sequences_tmp</span><span class="p">:</span>
+            <span class="n">nVar</span> <span class="o">+=</span> <span class="n">seq</span><span class="o">.</span><span class="n">GetNVariables</span><span class="p">()</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__plot_time_seq_dashboard(): # of variables: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">nVar</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+    <span class="c1"># multiple sequences are stored coming from various sources</span>
+    <span class="c1"># collect all variables in a list for mapping on the dashboards</span>
+        <span class="n">variablesData</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__time_sequences_tmp</span><span class="p">:</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span> <span class="ow">in</span> <span class="n">seq</span><span class="o">.</span><span class="n">GetVariables</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">variablesData</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">spec</span><span class="p">,</span> <span class="n">values</span><span class="p">))</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">variablesData</span><span class="p">)</span> <span class="o">==</span> <span class="n">nVar</span><span class="p">,</span> <span class="s1">&#39;len(variablesData) = </span><span class="si">%r</span><span class="s1">; nVar = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">variablesData</span><span class="p">),</span> <span class="n">nVar</span><span class="p">)</span>
+
+        <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">%b%y %H:%M:%S&quot;</span><span class="p">)</span>
+
+        <span class="n">figNum</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># loop over variables and assign to the dashboards</span>
+        <span class="n">iDash</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">iVar</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nVar</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="n">iVar</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="n">nRows</span> <span class="o">*</span> <span class="n">nCols</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># if a multiple of nRows*nCols start a new dashboard</span>
+
+                <span class="k">if</span> <span class="n">iVar</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># flush any current figure</span>
+                    <span class="n">figName</span> <span class="o">=</span> <span class="s1">&#39;pyplot_&#39;</span> <span class="o">+</span> \
+                        <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__slot_id</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;-timeseq-dashboard-&#39;</span> <span class="o">+</span> \
+                        <span class="nb">str</span><span class="p">(</span><span class="n">iDash</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">figName</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">fomat</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">)</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">figNum</span><span class="p">)</span>
+
+                    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span> <span class="n">fig</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">figName</span><span class="o">+</span><span class="s1">&#39;.pickle&#39;</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="p">)</span>
+
+                    <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__plot_time_seq_dashboard(): created plot: &#39;</span> <span class="o">+</span> <span class="n">figName</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+                    <span class="n">iDash</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="c1"># end of: if iVar != 0: # flush any current figure</span>
+
+                <span class="n">figNum</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__slot_id</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">iDash</span><span class="p">)</span>
+                <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">num</span><span class="o">=</span><span class="n">figNum</span><span class="p">)</span>
+
+                <span class="n">gs</span> <span class="o">=</span> <span class="n">gridspec</span><span class="o">.</span><span class="n">GridSpec</span><span class="p">(</span><span class="n">nRows</span><span class="p">,</span> <span class="n">nCols</span><span class="p">)</span>
+<span class="c1">#                gs.update(left=0.08, right=0.98, wspace=0.4, hspace=0.4)</span>
+                <span class="n">gs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.09</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+                <span class="n">axlst</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+                <span class="n">nPlotsNeeded</span> <span class="o">=</span> <span class="n">nVar</span> <span class="o">-</span> <span class="n">iVar</span>
+                <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nRows</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nCols</span><span class="p">):</span>
+                        <span class="n">axlst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]))</span>
+                        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="n">nPlotsNeeded</span><span class="p">:</span>
+                            <span class="k">break</span>
+                    <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="n">nPlotsNeeded</span><span class="p">:</span>
+                        <span class="k">break</span>
+
+                <span class="n">axes</span> <span class="o">=</span> <span class="n">npy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">axlst</span><span class="p">)</span>
+
+                <span class="n">text</span> <span class="o">=</span> <span class="n">today</span> <span class="o">+</span> <span class="s1">&#39;: Cortix.PyPlot_&#39;</span> <span class="o">+</span> \
+                    <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__slot_id</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;: Time-Sequence Dashboard&#39;</span>
+                <span class="n">fig</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">95</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+
+                <span class="n">axs</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flat</span>
+
+                <span class="n">axId</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="c1"># end of: if iVar % nRows*nCols == 0: # if a multiple of nRows*nCols</span>
+            <span class="c1"># start a new dashboard</span>
+
+            <span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="o">=</span> <span class="n">variablesData</span><span class="p">[</span><span class="n">iVar</span><span class="p">]</span>
+
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">axs</span><span class="p">[</span><span class="n">axId</span><span class="p">]</span>
+            <span class="n">axId</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">varName</span> <span class="o">=</span> <span class="n">spec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">varUnit</span> <span class="o">=</span> <span class="n">spec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram&#39;</span><span class="p">:</span>
+                <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;g&#39;</span>
+            <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/min&#39;</span><span class="p">:</span>
+                <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;g/min&#39;</span>
+            <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/s&#39;</span><span class="p">:</span>
+                <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;g/s&#39;</span>
+            <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/m3&#39;</span><span class="p">:</span>
+                <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;g/m3&#39;</span>
+            <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/L&#39;</span><span class="p">:</span>
+                <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;g/L&#39;</span>
+            <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;sec&#39;</span><span class="p">:</span>
+                <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;s&#39;</span>
+
+            <span class="n">timeUnit</span> <span class="o">=</span> <span class="n">spec</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">varLegend</span> <span class="o">=</span> <span class="n">spec</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">varScale</span> <span class="o">=</span> <span class="n">spec</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="n">varScale</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span> <span class="ow">or</span> <span class="n">varScale</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span> <span class="ow">or</span> <span class="n">varScale</span> <span class="o">==</span> <span class="s1">&#39;log-linear&#39;</span> \
+                <span class="ow">or</span> <span class="n">varScale</span> <span class="o">==</span> <span class="s1">&#39;linear-log&#39;</span> <span class="ow">or</span> <span class="n">varScale</span> <span class="o">==</span> <span class="s1">&#39;linear-linear&#39;</span> <span class="ow">or</span> \
+                <span class="n">varScale</span> <span class="o">==</span> <span class="s1">&#39;log-log&#39;</span>
+
+            <span class="k">if</span> <span class="n">timeUnit</span> <span class="o">==</span> <span class="s1">&#39;minute&#39;</span><span class="p">:</span>
+                <span class="n">timeUnit</span> <span class="o">=</span> <span class="s1">&#39;min&#39;</span>
+
+            <span class="n">data</span> <span class="o">=</span> <span class="n">npy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>  <span class="c1"># convert to numpy ndarray</span>
+
+<span class="c1">#      assert len(data.shape) == 2, &#39;not a 2-column shape: %r in var %r of %r; stop.&#39; % (data.shape,varName,varLegend)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__plot_time_seq_dashboard(): bad data; variable: &#39;</span> <span class="o">+</span> <span class="n">varName</span> <span class="o">+</span> <span class="s1">&#39; unit: &#39;</span> <span class="o">+</span> \
+                    <span class="n">varUnit</span> <span class="o">+</span> <span class="s1">&#39; legend: &#39;</span> <span class="o">+</span> <span class="n">varLegend</span> <span class="o">+</span> \
+                    <span class="s1">&#39; shape: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; skipping...&#39;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                <span class="k">continue</span>  <span class="c1"># simply skip bad data and log</span>
+
+            <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">varScale</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span> <span class="ow">or</span> <span class="n">varScale</span> <span class="o">==</span> <span class="s1">&#39;linear-linear&#39;</span> <span class="ow">or</span> \
+                <span class="n">varScale</span> <span class="o">==</span> <span class="s1">&#39;linear-log&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mf">120.0</span><span class="p">:</span>
+                <span class="n">x</span> <span class="o">/=</span> <span class="mf">60.0</span>
+                <span class="k">if</span> <span class="n">timeUnit</span> <span class="o">==</span> <span class="s1">&#39;min&#39;</span><span class="p">:</span>
+                    <span class="n">timeUnit</span> <span class="o">=</span> <span class="s1">&#39;h&#39;</span>
+
+            <span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mf">1e3</span> <span class="ow">and</span> <span class="n">varScale</span> <span class="o">!=</span> <span class="s1">&#39;linear-log&#39;</span> <span class="ow">and</span> \
+                    <span class="n">varScale</span> <span class="o">!=</span> <span class="s1">&#39;log-log&#39;</span> <span class="ow">and</span> <span class="n">varScale</span> <span class="o">!=</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
+                <span class="n">y</span> <span class="o">/=</span> <span class="mf">1e3</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;kg&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;kL&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;cc&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;L&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;Ci&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;kCi&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;W&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;kW&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/min&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/min&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;kg/min&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/s&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/s&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;kg/s&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/m3&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/m3&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;kg/m3&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/L&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;kg/L&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;W/L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;kW/L&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;Ci/L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;kCi/L&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;x1e3&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;L/min&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;kL/min&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;Pa&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;kPa&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;ks&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;km&#39;</span>
+
+            <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">1e-6</span> <span class="ow">and</span> <span class="n">varScale</span> <span class="o">!=</span> <span class="s1">&#39;linear-log&#39;</span> <span class="ow">and</span> \
+                    <span class="n">varScale</span> <span class="o">!=</span> <span class="s1">&#39;log-log&#39;</span> <span class="ow">and</span> <span class="n">varScale</span> <span class="o">!=</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
+                <span class="n">y</span> <span class="o">*=</span> <span class="mf">1e9</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;ng&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;cc&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;n-cc&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;nL&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;W&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;nW&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;Ci&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;nCi&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/min&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/min&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;ng/min&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/s&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/s&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;ng/s&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/m3&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/m3&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;ng/m3&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/L&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;ng/L&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;W/L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;nW/L&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;Ci/L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;nCi/L&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;L/min&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;nL/min&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;Pa&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;nPa&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;ns&#39;</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mf">1e-6</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">1e-3</span><span class="p">)</span> <span class="ow">and</span> <span class="n">varScale</span> <span class="o">!=</span> <span class="s1">&#39;linear-log&#39;</span> <span class="ow">and</span> \
+                    <span class="n">varScale</span> <span class="o">!=</span> <span class="s1">&#39;log-log&#39;</span> <span class="ow">and</span> <span class="n">varScale</span> <span class="o">!=</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
+                <span class="n">y</span> <span class="o">*=</span> <span class="mf">1e6</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;ug&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;cc&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;u-cc&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;uL&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;W&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;uW&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;Ci&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;uCi&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/min&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/min&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;ug/min&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/s&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/s&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;ug/s&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/m3&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/m3&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;ug/m3&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/L&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;ug/L&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;W/L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;uW/L&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;Ci/L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;uCi/L&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;L/min&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;uL/min&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;Pa&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;uPa&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;us&#39;</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mf">1e-3</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mf">1e-1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">varScale</span> <span class="o">!=</span> <span class="s1">&#39;linear-log&#39;</span> <span class="ow">and</span> \
+                    <span class="n">varScale</span> <span class="o">!=</span> <span class="s1">&#39;log-log&#39;</span> <span class="ow">and</span> <span class="n">varScale</span> <span class="o">!=</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
+                <span class="n">y</span> <span class="o">*=</span> <span class="mf">1e3</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;mg&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;cc&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;m-cc&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;mL&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;W&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;mW&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;Ci&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;mCi&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/min&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/min&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;mg/min&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/s&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/s&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;mg/s&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/m3&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/m3&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;mg/m3&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;gram/L&#39;</span> <span class="ow">or</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;g/L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;mg/L&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;W/L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;mW/L&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;Ci/L&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;mCi/L&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;L/min&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;mL/min&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;Pa&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;mPa&#39;</span>
+                <span class="k">if</span> <span class="n">varUnit</span> <span class="o">==</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span>
+                    <span class="n">varUnit</span> <span class="o">=</span> <span class="s1">&#39;ms&#39;</span>
+
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Time [&#39;</span> <span class="o">+</span> <span class="n">timeUnit</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">varName</span> <span class="o">+</span> <span class="s1">&#39; [&#39;</span> <span class="o">+</span> <span class="n">varUnit</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+
+            <span class="n">ymax</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+            <span class="n">dy</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">*</span> <span class="o">.</span><span class="mi">1</span>
+            <span class="n">ymax</span> <span class="o">+=</span> <span class="n">dy</span>
+            <span class="n">ymin</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+            <span class="n">ymin</span> <span class="o">-=</span> <span class="n">dy</span>
+
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">ymin</span> <span class="o">-</span> <span class="n">ymax</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1.e-4</span><span class="p">:</span>
+                <span class="n">ymin</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+                <span class="n">ymax</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">nCols</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">():</span>
+                    <span class="n">l</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">():</span>
+                    <span class="n">l</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">():</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">timeUnit</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span> <span class="ow">and</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">-</span> <span class="n">x</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&lt;=</span> <span class="mf">5.0</span><span class="p">:</span>
+                <span class="n">majorLocator</span> <span class="o">=</span> <span class="n">MultipleLocator</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+                <span class="n">minorLocator</span> <span class="o">=</span> <span class="n">MultipleLocator</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+                <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_major_locator</span><span class="p">(</span><span class="n">majorLocator</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">set_minor_locator</span><span class="p">(</span><span class="n">minorLocator</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">varScale</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span> <span class="ow">or</span> <span class="n">varScale</span> <span class="o">==</span> <span class="s1">&#39;log-log&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+                <span class="n">positiveX</span> <span class="o">=</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">npy</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">positiveX</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">npy</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">positiveX</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+                <span class="n">positiveY</span> <span class="o">=</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">npy</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">positiveY</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">npy</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">positiveY</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">():</span>
+                        <span class="n">ymax</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+                        <span class="n">dy</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">*</span> <span class="o">.</span><span class="mi">1</span>
+                        <span class="n">ymax</span> <span class="o">+=</span> <span class="n">dy</span>
+                        <span class="n">ymin</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+                        <span class="n">ymin</span> <span class="o">-=</span> <span class="n">dy</span>
+                        <span class="k">if</span> <span class="n">ymin</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">ymin</span> <span class="o">&gt;</span> <span class="n">ymax</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">:</span>
+                            <span class="n">ymin</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">/</span> <span class="mf">1000.0</span>
+                        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">varScale</span> <span class="o">==</span> <span class="s1">&#39;log-linear&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+                <span class="n">positiveX</span> <span class="o">=</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">npy</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">positiveX</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">npy</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">positiveX</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">varScale</span> <span class="o">==</span> <span class="s1">&#39;linear-log&#39;</span><span class="p">:</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_yscale</span><span class="p">(</span><span class="s1">&#39;log&#39;</span><span class="p">)</span>
+                <span class="n">positiveY</span> <span class="o">=</span> <span class="n">y</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">npy</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">positiveY</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">npy</span><span class="o">.</span><span class="n">extract</span><span class="p">(</span><span class="n">positiveY</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="c1">#      assert x.size == y.size, &#39;size error; stop.&#39;</span>
+                <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.0</span> <span class="ow">and</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">():</span>
+                        <span class="n">ymax</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+                        <span class="n">dy</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">*</span> <span class="o">.</span><span class="mi">1</span>
+                        <span class="n">ymax</span> <span class="o">+=</span> <span class="n">dy</span>
+                        <span class="n">ymin</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+                        <span class="n">ymin</span> <span class="o">-=</span> <span class="n">dy</span>
+                        <span class="k">if</span> <span class="n">ymin</span> <span class="o">&lt;</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">ymin</span> <span class="o">&gt;</span> <span class="n">ymax</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">:</span>
+                            <span class="n">ymin</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">/</span> <span class="mf">1000.0</span>
+                        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">ymax</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
+
+        <span class="c1"># ...................</span>
+        <span class="c1"># make the plot here</span>
+
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;s-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">varLegend</span><span class="p">)</span>
+
+        <span class="c1"># ...................</span>
+
+            <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">,</span> <span class="n">prop</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">7</span><span class="p">})</span>
+
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__plot_time_seq_dashboard(): plotted &#39;</span> <span class="o">+</span> <span class="n">varName</span> <span class="o">+</span> <span class="s1">&#39; from &#39;</span> <span class="o">+</span> <span class="n">varLegend</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+    <span class="c1"># end of: for iVar in range(nVar):</span>
+
+        <span class="n">figName</span> <span class="o">=</span> <span class="s1">&#39;pyplot_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__slot_id</span><span class="p">)</span> <span class="o">+</span> \
+            <span class="s1">&#39;-timeseq-dashboard-&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">iDash</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">figName</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">fomat</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">figNum</span><span class="p">)</span>
+
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span> <span class="n">fig</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="n">figName</span><span class="o">+</span><span class="s1">&#39;.pickle&#39;</span><span class="p">,</span><span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="p">)</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__plot_time_seq_dashboard(): created plot: &#39;</span> <span class="o">+</span> <span class="n">figName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__plot_time_seq_dashboard(): done with plotting&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+    <span class="c1"># clear __time_sequences_tmp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__time_sequences_tmp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">return</span>
+<span class="c1">#----------------------- end __plot_time_seq_dashboard():-------------------------</span>
+
+    <span class="k">def</span> <span class="nf">__plot_time_tables</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">initialTime</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">finalTime</span><span class="o">=</span><span class="mf">0.0</span> <span class="p">):</span>
+
+        <span class="n">nTimeSteps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__time_tables_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="n">nTimeSteps</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;__plot_time_tables(): plotting tables&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+
+<span class="c1">#  s = &#39;__plot_time_tables(): keys = &#39;+str(self.__time_tables_data.items())</span>
+<span class="c1">#  self.log.debug(s)</span>
+
+
+<span class="c1">#  assert nVariables &lt;= 9, &#39;exceeded # of variables&#39;</span>
+
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="s1">&#39;time-tables&#39;</span><span class="p">)</span>
+
+        <span class="n">gs</span> <span class="o">=</span> <span class="n">gridspec</span><span class="o">.</span><span class="n">GridSpec</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">gs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span> <span class="n">wspace</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">hspace</span><span class="o">=</span><span class="mf">0.4</span><span class="p">)</span>
+
+        <span class="n">axlst</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">axlst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+        <span class="n">axlst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+        <span class="n">axlst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]))</span>
+        <span class="n">axlst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="n">gs</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">axlst</span><span class="p">)</span>
+
+        <span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Cortix.PyPlot: Time-Tables Dashboard&#39;</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="o">.</span><span class="mi">5</span><span class="p">,</span> <span class="o">.</span><span class="mi">95</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__time_tables_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="p">(</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">timeUnit</span><span class="p">)</span> <span class="o">=</span> <span class="n">key</span>
+            <span class="n">columns</span> <span class="o">=</span> <span class="n">val</span>
+
+            <span class="k">if</span> <span class="n">timeStamp</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">distance</span> <span class="o">=</span> <span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">xLabel</span> <span class="o">=</span> <span class="n">distance</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">xUnit</span> <span class="o">=</span> <span class="n">distance</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">distance</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+                <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+
+                <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+                <span class="n">y</span> <span class="o">=</span> <span class="n">columns</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">yLabel</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">yUnit</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;unit&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">yLegend</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;legend&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)):</span>
+                    <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">k</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">y</span> <span class="o">*=</span> <span class="mf">1000.0</span>
+                    <span class="n">yUnit</span> <span class="o">=</span> <span class="s1">&#39;m&#39;</span>
+
+
+<span class="c1">#    x = data[:,0]</span>
+<span class="c1">#    if x.max() &gt;= 120.0:</span>
+<span class="c1">#      x /= 60.0</span>
+<span class="c1">#      if timeUnit == &#39;m&#39;: timeUnit = &#39;h&#39;</span>
+
+<span class="c1">#    y = data[:,1]</span>
+<span class="c1">#    if y.max() &gt;= 1000.0:</span>
+<span class="c1">#      y /= 1000.0</span>
+<span class="c1">#      if varUnit == &#39;gram&#39; or varUnit == &#39;g&#39;:</span>
+<span class="c1">#        varUnit = &#39;kg&#39;</span>
+<span class="c1">#    if y.max() &lt;= .1:</span>
+<span class="c1">#      y *= 1000.0</span>
+<span class="c1">#      if varUnit == &#39;gram&#39; or varUnit == &#39;g&#39;:</span>
+<span class="c1">#        varUnit = &#39;mg&#39;</span>
+
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">xLabel</span> <span class="o">+</span> <span class="s1">&#39; [&#39;</span> <span class="o">+</span> <span class="n">xUnit</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">yLabel</span> <span class="o">+</span> <span class="s1">&#39; [&#39;</span> <span class="o">+</span> <span class="n">yUnit</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+
+<span class="c1">#    ymax  = y.max()</span>
+<span class="c1">#    dy    = ymax * .1</span>
+<span class="c1">#    ymax += dy</span>
+<span class="c1">#    ymin  = y.min()</span>
+<span class="c1">#    ymin -= dy</span>
+
+<span class="c1">#    ax.set_ylim(ymin,ymax)</span>
+
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">():</span>
+                    <span class="n">l</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">():</span>
+                    <span class="n">l</span><span class="o">.</span><span class="n">set_fontsize</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="c1">#  color  = parameters[&#39;plot-color&#39;]</span>
+<span class="c1">#  marker = parameters[&#39;plot-marker&#39;]+&#39;-&#39;</span>
+<span class="c1">#  axis.set_xlim(2e-3, 2)</span>
+<span class="c1">#  axis.set_aspect(1)</span>
+<span class="c1">#  axis.set_title(&quot;adjustable = box&quot;)</span>
+
+                <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;s-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                        <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">yLegend</span><span class="p">)</span>
+
+<span class="c1">#      if k == 2 or k == 3: ax.set_yscale(&quot;log&quot;)</span>
+
+
+<span class="c1">#      ax.legend( loc=&#39;best&#39;, prop={&#39;size&#39;:8} )</span>
+
+    <span class="c1"># end of for (varSpec,ax) in zip( self.timeSeriesData , axes.flat ):</span>
+
+        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;pyplot-timetables.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">fomat</span><span class="o">=</span><span class="s1">&#39;png&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;time-tables&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span></div>
+<span class="c1">#----------------------- end __plot_time_tables():--------------------------------</span>
+
+
+<span class="c1">#======================= end class PyPlot: =======================================</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><img src="logo.jpg">
+<h3>About Cortix</h3>
+<p>
+Cortix is a Python library for system-level module coupling, execution, and analysis.
+</p>
+
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul>
+<li><a href="../index.html">Home</a></li>
+<li><a href="../contents.html">Documentation</a></li>
+<!--<li><a href="../getting-started.html">Install</a></li>-->
+</ul>
+<!---->
+
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="https://pypi.org/project/cortix/">Cortix @ PyPI</a></li>
+  <li><a href="https://github.com/dpploy/cortix">Cortix @ GitHub</a></li>
+  <li><a href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master">Cortix @ binder</a></li>
+  <li><a href="https://nbviewer.jupyter.org/github/dpploy/cortix-nb/tree/master/">Cortix @ nbviewer</a></li>
+  <li><a href="https://github.com/dpploy/cortix-nb">Cortix Jupyter Notebooks</a></li>
+  <li><a href="https://github.com/dpploy/cortix/issues">Cortix Issue Tracker</a></li>
+  <li><a href="https://dpploy.github.io/cortix/Cortix.pdf">PDF Documentation</a></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, University of Massachusetts Lowell.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
