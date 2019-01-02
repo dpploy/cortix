@@ -16,7 +16,7 @@ Installation and Getting Started
    * `scipy <https://www.scipy.org/>`_
    * `pytest <https://www.pytest.org/>`_
 
-**Documentation as PDF**: `download latest <cortix.pdf>`_
+**Documentation as PDF**: `download latest <https://dpploy.github.io/cortix/Cortix.pdf>`_
 
 Install ``cortix``
 ----------------------------------------
