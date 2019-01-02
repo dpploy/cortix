@@ -5,7 +5,7 @@
    
 =========================================
 
-Cortix: Modeling and simulation made easy
+Cortix: modeling and simulation made easy
 =========================================
 
 What is Cortix?
