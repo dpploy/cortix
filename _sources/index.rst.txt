@@ -17,6 +17,8 @@ What is Cortix?
 * Cortix takes as input a collection of computational modules and provides an 
   environment for the coupling of these modules into a single simulation.
 
+.. image:: http://cortix.org/cortix-cover.png
+
 Features
 --------
 * Massively parallel execution with `mpi4py <https://mpi4py.readthedocs.io/en/stable/>`_
