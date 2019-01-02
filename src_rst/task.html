@@ -4,52 +4,32 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>task &#8212; Cortix 0.1.0 documentation</title>
-    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.1.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="utils" href="utils_rst/modules.html" />
-    <link rel="prev" title="simulation" href="simulation.html" /> 
-  </head>
-  <body>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             accesskey="I">index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="utils_rst/modules.html" title="utils"
-             accesskey="N">next</a> |</li>
-        <li class="right" >
-          <a href="simulation.html" title="simulation"
-             accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">src</a> &#187;</li> 
-      </ul>
-    </div>  
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+          
+
           <div class="body" role="main">
             
   <div class="section" id="module-task">
@@ -59,19 +39,35 @@
 <dl class="class">
 <dt id="task.Task">
 <em class="property">class </em><code class="descclassname">task.</code><code class="descname">Task</code><span class="sig-paren">(</span><em>parent_work_dir=None</em>, <em>task_config_node=&lt;cortix.src.utils.configtree.ConfigTree object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/task.html#Task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#task.Task" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>A Task is work done by a Simulation handled by Cortix.
 A Task will use a given Application.</p>
 <dl class="attribute">
 <dt id="task.Task.evolve_time">
 <code class="descname">evolve_time</code><a class="headerlink" href="#task.Task.evolve_time" title="Permalink to this definition">¶</a></dt>
-<dd><p><cite>float</cite> – Task final time</p>
+<dd><p>Task final time</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><cite>float</cite></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="task.Task.evolve_time_unit">
 <code class="descname">evolve_time_unit</code><a class="headerlink" href="#task.Task.evolve_time_unit" title="Permalink to this definition">¶</a></dt>
-<dd><p><cite>str</cite> – Task final time unit</p>
+<dd><p>Task final time unit</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><cite>str</cite></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -83,13 +79,29 @@ A Task will use a given Application.</p>
 <dl class="attribute">
 <dt id="task.Task.name">
 <code class="descname">name</code><a class="headerlink" href="#task.Task.name" title="Permalink to this definition">¶</a></dt>
-<dd><p><cite>str</cite> – Task name</p>
+<dd><p>Task name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><cite>str</cite></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="task.Task.runtime_cortix_param_file">
 <code class="descname">runtime_cortix_param_file</code><a class="headerlink" href="#task.Task.runtime_cortix_param_file" title="Permalink to this definition">¶</a></dt>
-<dd><p><cite>str</cite> – Task’s config file</p>
+<dd><p>Task’s config file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><cite>str</cite></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -101,31 +113,71 @@ A Task will use a given Application.</p>
 <dl class="attribute">
 <dt id="task.Task.start_time">
 <code class="descname">start_time</code><a class="headerlink" href="#task.Task.start_time" title="Permalink to this definition">¶</a></dt>
-<dd><p><cite>float</cite> – Task initial time</p>
+<dd><p>Task initial time</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><cite>float</cite></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="task.Task.start_time_unit">
 <code class="descname">start_time_unit</code><a class="headerlink" href="#task.Task.start_time_unit" title="Permalink to this definition">¶</a></dt>
-<dd><p><cite>str</cite> – Task initial time unit</p>
+<dd><p>Task initial time unit</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><cite>str</cite></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="task.Task.time_step">
 <code class="descname">time_step</code><a class="headerlink" href="#task.Task.time_step" title="Permalink to this definition">¶</a></dt>
-<dd><p><cite>float</cite> – Magnitude of incremental step in the task’s time</p>
+<dd><p>Magnitude of incremental step in the task’s time</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><cite>float</cite></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="task.Task.time_step_unit">
 <code class="descname">time_step_unit</code><a class="headerlink" href="#task.Task.time_step_unit" title="Permalink to this definition">¶</a></dt>
-<dd><p><cite>str</cite> – Time step unit</p>
+<dd><p>Time step unit</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><cite>str</cite></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="task.Task.work_dir">
 <code class="descname">work_dir</code><a class="headerlink" href="#task.Task.work_dir" title="Permalink to this definition">¶</a></dt>
-<dd><p><cite>str</cite> – Working directory of task</p>
+<dd><p>Working directory of task</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><cite>str</cite></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -134,72 +186,64 @@ A Task will use a given Application.</p>
 
 
           </div>
+          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><h3><a href="../index.html">Table Of Contents</a></h3>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="application.html">application</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cortix_driver_template.html">cortix_driver_template</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cortix_main.html">cortix_main</a></li>
-<li class="toctree-l2"><a class="reference internal" href="cortix_module_template.html">cortix_module_template</a></li>
-<li class="toctree-l2"><a class="reference internal" href="launcher.html">launcher</a></li>
-<li class="toctree-l2"><a class="reference internal" href="module.html">module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="network.html">network</a></li>
-<li class="toctree-l2"><a class="reference internal" href="simulation.html">simulation</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">task</a></li>
-<li class="toctree-l2"><a class="reference internal" href="utils_rst/modules.html">utils</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../modulib_rst/modules.html">modulib</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../examples_rst/modules.html">examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../support_rst/modules.html">support</a></li>
-</ul>
+        <div class="sphinxsidebarwrapper"><img src="logo.jpg">
+<h3>About Cortix</h3>
+<p>
+Cortix is a Python library for system-level module coupling, execution, and analysis.
+</p>
 
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul>
+<li><a href="../index.html">Home</a></li>
+<li><a href="../contents.html">Documentation</a></li>
+<!--<li><a href="../getting-started.html">Install</a></li>-->
+</ul>
+<!---->
 
 <h3>Useful Links</h3>
 <ul>
-  <li><a href="https://github.com/dpploy/cortix">Cortix Repo</a></li>
-  <li><a href="https://github.com/dpploy/cortix-nb">Cortix Notebooks</a></li>
+  <li><a href="https://pypi.org/project/cortix/">Cortix @ PyPI</a></li>
+  <li><a href="https://github.com/dpploy/cortix">Cortix @ GitHub</a></li>
+  <li><a href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master">Cortix @ binder</a></li>
+  <li><a href="https://nbviewer.jupyter.org/github/dpploy/cortix-nb/tree/master/">Cortix @ nbviewer</a></li>
+  <li><a href="https://github.com/dpploy/cortix-nb">Cortix Jupyter Notebooks</a></li>
+  <li><a href="https://github.com/dpploy/cortix/issues">Cortix Issue Tracker</a></li>
   <li><a href="https://dpploy.github.io/cortix/Cortix.pdf">PDF Documentation</a></li>
 </ul>
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
-    <div class="related" role="navigation" aria-label="related navigation">
-      <h3>Navigation</h3>
-      <ul>
-        <li class="right" style="margin-right: 10px">
-          <a href="../genindex.html" title="General Index"
-             >index</a></li>
-        <li class="right" >
-          <a href="../py-modindex.html" title="Python Module Index"
-             >modules</a> |</li>
-        <li class="right" >
-          <a href="utils_rst/modules.html" title="utils"
-             >next</a> |</li>
-        <li class="right" >
-          <a href="simulation.html" title="simulation"
-             >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">Cortix 0.1.0 documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="modules.html" >src</a> &#187;</li> 
-      </ul>
+    <div class="footer">
+      &copy;2019, University of Massachusetts Lowell.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/src_rst/task.rst.txt"
+          rel="nofollow">Page source</a>
     </div>
-    <div class="footer" role="contentinfo">
-        &#169; Copyright 2018, Valmor F. de Almeida.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.7.
-    </div>
+
+    
+
+    
   </body>
 </html>
