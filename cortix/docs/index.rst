@@ -19,11 +19,11 @@ What is Cortix?
 
 Features
 --------
-* Massively parallel execution with `mpi4py` 
+* Massively parallel execution with `mpi4py <https://mpi4py.readthedocs.io/en/stable/>`_
 * Efficient ODE and DAE solver
 * Built-in time synchronization
 * Data visualization
-* Extensive Logging
+* Extensive logging
 
 Documentation
 -------------
