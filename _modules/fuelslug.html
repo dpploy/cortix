@@ -1,0 +1,894 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>fuelslug &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for fuelslug</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># This file is part of the Cortix toolkit evironment</span>
+<span class="c1"># https://github.com/dpploy/cortix</span>
+<span class="c1">#</span>
+<span class="c1"># All rights reserved, see COPYRIGHT for full restrictions.</span>
+<span class="c1"># https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the GNU General Public License v. 3, please see LICENSE file.</span>
+<span class="c1"># https://www.gnu.org/licenses/gpl-3.0.txt</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Author: Valmor de Almeida dealmeidav@ornl.gov; vfda</span>
+
+<span class="sd">Fuel slug</span>
+
+<span class="sd">----------</span>
+<span class="sd">ATTENTION:</span>
+<span class="sd">----------</span>
+<span class="sd">This container requires two Phase() containers which are by definition histories.</span>
+<span class="sd">The history is not checked. Therefore any inconsistency will be propagated forward.</span>
+<span class="sd">A fuel slug has two solid phases: cladding and fuel. The user will decide how to</span>
+<span class="sd">best use the underlying history data in the Phase() container of each phase.</span>
+
+<span class="sd">VFdALib support classes</span>
+
+<span class="sd">Thu Dec 15 16:18:39 EST 2016</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1"># *******************************************************************************</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+
+<span class="kn">from</span> <span class="nn">cortix.support.periodictable</span> <span class="k">import</span> <span class="n">ELEMENTS</span>
+<span class="kn">from</span> <span class="nn">cortix.support.periodictable</span> <span class="k">import</span> <span class="n">SERIES</span>
+<span class="kn">from</span> <span class="nn">cortix.support.phase</span> <span class="k">import</span> <span class="n">Phase</span>
+<span class="c1"># *******************************************************************************</span>
+
+<span class="c1"># *******************************************************************************</span>
+
+
+<div class="viewcode-block" id="FuelSlug"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug">[docs]</a><span class="k">class</span> <span class="nc">FuelSlug</span><span class="p">():</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">specs</span><span class="o">=</span><span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(),</span>
+                 <span class="n">fuelPhase</span><span class="o">=</span><span class="n">Phase</span><span class="p">(),</span>
+                 <span class="n">claddingPhase</span><span class="o">=</span><span class="n">Phase</span><span class="p">()</span>
+                 <span class="p">):</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">specs</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">),</span> <span class="s1">&#39;fatal.&#39;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuelPhase</span><span class="p">,</span> <span class="n">Phase</span><span class="p">),</span> <span class="s1">&#39;fatal.&#39;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">claddingPhase</span><span class="p">,</span> <span class="n">Phase</span><span class="p">),</span> <span class="s1">&#39;fatal.&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">attributeNames</span> <span class="o">=</span> \
+            <span class="p">[</span><span class="s1">&#39;nSlugs&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;slugType&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;slugVolume&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;slugArea&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;fuelVolume&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;claddingVolume&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;fuelArea&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;claddingArea&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;equivalentCladdingVolume&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;equivalentCladdingArea&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;equivalentFuelVolume&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;equivalentFuelArea&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;fuelLength&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;slugLength&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;fuelMass&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;fuelMassDens&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;fuelMassCC&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;claddingMass&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;claddingMassDens&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;claddingMassCC&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;nuclides&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;isotopes&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;radioactivity&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;radioactivityDens&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;gamma&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;gammaDens&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;heat&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;heatDens&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;molarHeatPwr&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;molarGammaPwr&#39;</span><span class="p">]</span>
+
+        <span class="c1"># own internal copy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">specs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">fuelPhase</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">claddingPhase</span><span class="p">)</span>
+
+        <span class="c1"># setup the equivalent cladding hollow sphere</span>
+        <span class="n">pi</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+
+        <span class="n">area</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetAttribute</span><span class="p">(</span><span class="s1">&#39;claddingArea&#39;</span><span class="p">)</span>
+        <span class="n">volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetAttribute</span><span class="p">(</span><span class="s1">&#39;claddingVolume&#39;</span><span class="p">)</span>
+
+        <span class="n">ro</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">area</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">pi</span><span class="p">)</span>
+        <span class="n">ri</span> <span class="o">=</span> <span class="p">(</span><span class="n">ro</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">volume</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">pi</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRo</span> <span class="o">=</span> <span class="n">ro</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRi</span> <span class="o">=</span> <span class="n">ri</span>
+
+        <span class="n">area</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetAttribute</span><span class="p">(</span><span class="s1">&#39;fuelArea&#39;</span><span class="p">)</span>
+        <span class="n">volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetAttribute</span><span class="p">(</span><span class="s1">&#39;fuelVolume&#39;</span><span class="p">)</span>
+
+        <span class="n">ro</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">area</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">pi</span><span class="p">)</span>
+        <span class="n">ri</span> <span class="o">=</span> <span class="p">(</span><span class="n">ro</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">volume</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">/</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">pi</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fuelHollowSphereRo</span> <span class="o">=</span> <span class="n">ro</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fuelHollowSphereRi</span> <span class="o">=</span> <span class="n">ri</span>
+
+        <span class="k">return</span>
+
+
+<span class="c1"># *******************************************************************************</span>
+
+<span class="c1"># *******************************************************************************</span>
+
+<span class="c1"># *******************************************************************************</span>
+<span class="c1"># Setters and Getters methods</span>
+<span class="c1"># -------------------------------------------------------------------------------</span>
+<span class="c1"># These are passing arguments by value effectively. Because the python objects</span>
+<span class="c1"># passed into/out of the function are immutable.</span>
+
+<div class="viewcode-block" id="FuelSlug.GetSpecs"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.GetSpecs">[docs]</a>    <span class="k">def</span> <span class="nf">GetSpecs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span></div>
+    <span class="n">specs</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetSpecs</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FuelSlug.GetFuelPhase"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.GetFuelPhase">[docs]</a>    <span class="k">def</span> <span class="nf">GetFuelPhase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span></div>
+    <span class="n">fuelPhase</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetFuelPhase</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FuelSlug.GetCladdingPhase"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.GetCladdingPhase">[docs]</a>    <span class="k">def</span> <span class="nf">GetCladdingPhase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span></div>
+    <span class="n">claddingPhase</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetCladdingPhase</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FuelSlug.GetAttribute"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.GetAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">symbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">series</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetAttribute</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">series</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FuelSlug.ReduceCladdingVolume"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.ReduceCladdingVolume">[docs]</a>    <span class="k">def</span> <span class="nf">ReduceCladdingVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dissolvedVolume</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ReduceCladdingVolume</span><span class="p">(</span><span class="n">dissolvedVolume</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FuelSlug.ReduceFuelVolume"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.ReduceFuelVolume">[docs]</a>    <span class="k">def</span> <span class="nf">ReduceFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dissolvedVolume</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ReduceFuelVolume</span><span class="p">(</span><span class="n">dissolvedVolume</span><span class="p">)</span></div>
+
+
+<span class="c1"># Get stored fuel slug property either overall or on a nuclide basis</span>
+<span class="c1"># ---------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">__GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attributeName</span><span class="p">,</span> <span class="n">nuclide</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">series</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">assert</span> <span class="n">attributeName</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributeNames</span><span class="p">,</span> <span class="s1">&#39; attribute name: </span><span class="si">%r</span><span class="s1">; options: </span><span class="si">%r</span><span class="s1">; fail.&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">attributeName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributeNames</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">nuclide</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">nuclide</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span>  <span class="c1"># sanity check</span>
+
+        <span class="k">if</span> <span class="n">nuclide</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">series</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;fail.&#39;</span>
+        <span class="k">if</span> <span class="n">series</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">nuclide</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;fail.&#39;</span>
+
+        <span class="k">if</span> <span class="n">series</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39; not implemented.&#39;</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;isotopes&#39;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">nuclide</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;need a nuclide symbol.&#39;</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># # of slugs</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;nSlugs&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># slugId</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;slugType&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Slug type&#39;</span><span class="p">]</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># slug volume</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;slugVolume&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__GetSlugVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># fuel volume</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;fuelVolume&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__GetFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># equivalent fuel volume</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;equivalentFuelVolume&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__GetEquivalentFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># cladding volume</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;claddingVolume&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__GetCladdingVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># equivalent cladding volume</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;equivalentCladdingVolume&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__GetEquivalentCladdingVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># fuel area</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;fuelArea&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__GetFuelArea</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># equivalent fuel area</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;equivalentFuelArea&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__GetEquivalentFuelArea</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># cladding area</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;claddingArea&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__GetCladdingArea</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;slugArea&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__GetCladdingArea</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># equivalent cladding area</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;equivalentCladdingArea&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__GetEquivalentCladdingArea</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># fuel length</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;fuelLength&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">__GetFuelLength</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># fuel slug overall quantities</span>
+        <span class="k">if</span> <span class="n">nuclide</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">series</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="c1"># mass or mass concentration</span>
+            <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;fuelMassCC&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;fuelMassDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;fuelMass&#39;</span><span class="p">:</span>
+                <span class="n">mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;mass&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;fuelMass&#39;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">mass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">#          volume = __GetFuelVolume( self )</span>
+                    <span class="n">volume</span> <span class="o">=</span> <span class="n">__GetEquivalentFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">volume</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span>
+                            <span class="n">volume</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;volume&#39;</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">1e-8</span>
+                        <span class="k">return</span> <span class="n">mass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span>
+                            <span class="n">volume</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;volume&#39;</span><span class="p">))</span> <span class="o">/</span> <span class="n">volume</span> <span class="o">*</span> <span class="mf">100.0</span> <span class="o">&lt;</span> <span class="mf">0.1</span>
+                        <span class="k">return</span> <span class="n">mass</span> <span class="o">/</span> <span class="n">volume</span>
+<span class="c1"># mass or mass concentration</span>
+            <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;claddingMassCC&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;claddingMassDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;claddingMass&#39;</span><span class="p">:</span>
+                <span class="n">mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;mass&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;claddingMass&#39;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">mass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1">#          volume = __GetCladdingVolume( self )</span>
+                    <span class="n">volume</span> <span class="o">=</span> <span class="n">__GetEquivalentCladdingVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">volume</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span>
+                            <span class="n">volume</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;volume&#39;</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">1e-8</span>
+                        <span class="k">return</span> <span class="n">mass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span>
+                            <span class="n">volume</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;volume&#39;</span><span class="p">))</span> <span class="o">/</span> <span class="n">volume</span> <span class="o">*</span> <span class="mf">100.0</span> <span class="o">&lt;</span> <span class="mf">0.1</span>
+                        <span class="k">return</span> <span class="n">mass</span> <span class="o">/</span> <span class="n">volume</span>
+<span class="c1"># radioactivity</span>
+            <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;radioactivtyDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;radioactivity&#39;</span><span class="p">:</span>
+                <span class="n">radioactivity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;radioactivity&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;radioactivity&#39;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">radioactivity</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">volume</span> <span class="o">=</span> <span class="n">__GetFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">volume</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span>
+                            <span class="n">volume</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;volume&#39;</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mf">1e-8</span>
+                        <span class="k">return</span> <span class="n">radioactivity</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span>
+                            <span class="n">volume</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;volume&#39;</span><span class="p">))</span> <span class="o">/</span> <span class="n">volume</span> <span class="o">*</span> <span class="mf">100.0</span> <span class="o">&lt;</span> <span class="mf">0.1</span>
+                        <span class="k">return</span> <span class="n">radioactivity</span> <span class="o">/</span> <span class="n">volume</span>
+<span class="c1"># gamma</span>
+            <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;gammaDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;gamma&#39;</span><span class="p">:</span>
+                <span class="n">gammaDens</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="k">for</span> <span class="n">spc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
+                    <span class="n">gammaDens</span> <span class="o">+=</span> <span class="n">spc</span><span class="o">.</span><span class="n">molarGammaPwr</span> <span class="o">*</span> <span class="n">spc</span><span class="o">.</span><span class="n">molarCC</span>
+                <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;gammaDens&#39;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">gammaDens</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">volume</span> <span class="o">=</span> <span class="n">__GetFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">gammaDens</span> <span class="o">*</span> <span class="n">volume</span>
+<span class="c1"># heat</span>
+            <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;heatDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span>
+                <span class="n">heatDens</span> <span class="o">=</span> <span class="mf">0.0</span>
+                <span class="k">for</span> <span class="n">spc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
+                    <span class="n">heatDens</span> <span class="o">+=</span> <span class="n">spc</span><span class="o">.</span><span class="n">molarHeatPwr</span> <span class="o">*</span> <span class="n">spc</span><span class="o">.</span><span class="n">molarCC</span>
+                <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;heatDens&#39;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">heatDens</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">volume</span> <span class="o">=</span> <span class="n">__GetFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">heatDens</span> <span class="o">*</span> <span class="n">volume</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># radioactivity</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;radioactivityDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;radioactivity&#39;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="kc">False</span>
+            <span class="n">colName</span> <span class="o">=</span> <span class="s1">&#39;Radioactivity Dens. [Ci/cc]&#39;</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># thermal</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;thermalDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;thermal&#39;</span> <span class="ow">or</span>  \
+           <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;heatDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;heat&#39;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="kc">False</span>
+            <span class="n">colName</span> <span class="o">=</span> <span class="s1">&#39;Thermal Dens. [W/cc]&#39;</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># gamma</span>
+
+        <span class="k">if</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;gammaDens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span> <span class="o">==</span> <span class="s1">&#39;gamma&#39;</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="kc">False</span>
+            <span class="n">colName</span> <span class="o">=</span> <span class="s1">&#39;Gamma Dens. [W/cc]&#39;</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1">##########################################################################</span>
+<span class="c1"># .................................................................................</span>
+
+<span class="c1">#  if attributeName[-4:] == &#39;Dens&#39; or attributeName[-2:] == &#39;CC&#39;:</span>
+<span class="c1">#     attributeDens = True</span>
+<span class="c1">#  else:</span>
+<span class="c1">#     attributeDens = False</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># all nuclide content of the fuel added</span>
+
+<span class="c1">#  if nuclide is None and series is None:</span>
+<span class="c1">#</span>
+<span class="c1">#     density = 0.0</span>
+<span class="c1">#</span>
+<span class="c1">#     density = self.propertyDensities[ colName ].sum()</span>
+<span class="c1">#</span>
+<span class="c1">#     if attributeDens is False:</span>
+<span class="c1">#        volume = __GetFuelSlugVolume( self )</span>
+<span class="c1">#        prop = density * volume</span>
+<span class="c1">#        return prop</span>
+<span class="c1">#     else:</span>
+<span class="c1">#        return density</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># get chemical element series</span>
+
+<span class="c1">#  if series is not None:</span>
+<span class="c1">#</span>
+<span class="c1">#     density = 0.0</span>
+<span class="c1">#</span>
+<span class="c1">#     for isotope in isotopes:</span>
+<span class="c1">#       density += self.propertyDensities.loc[isotope,colName]</span>
+<span class="c1">#</span>
+<span class="c1">#     if attributeDens is False:</span>
+<span class="c1">#        volume = __GetFuelSlugVolume( self )</span>
+<span class="c1">#        prop = density * volume</span>
+<span class="c1">#        return prop</span>
+<span class="c1">#     else:</span>
+<span class="c1">#        return density</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># get specific nuclide (either the isotopes of the nuclide or the specific</span>
+<span class="c1"># isotope) property</span>
+
+        <span class="k">if</span> <span class="n">nuclide</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="c1"># a particular nuclide given (atomic number and atomic mass number)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nuclide</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+
+                <span class="n">nuclideMassNumber</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nuclide</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">))</span>
+                <span class="n">nuclideSymbol</span> <span class="o">=</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">nuclideMolarMass</span> <span class="o">=</span> <span class="n">ELEMENTS</span><span class="p">[</span><span class="n">nuclideSymbol</span><span class="p">]</span><span class="o">.</span><span class="n">isotopes</span><span class="p">[</span><span class="n">nuclideMassNumber</span><span class="p">]</span><span class="o">.</span><span class="n">mass</span>
+
+                <span class="n">massCC</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+                <span class="k">for</span> <span class="n">spc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
+
+                    <span class="n">formula</span> <span class="o">=</span> <span class="n">spc</span><span class="o">.</span><span class="n">atoms</span>
+
+                    <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+                    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">formula</span><span class="p">:</span>
+
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+                               <span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># no multiplier (implies 1.0)</span>
+
+                            <span class="n">formulaNuclideSymbol</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="n">formulaNuclideSymbol</span> <span class="o">==</span> <span class="n">nuclideSymbol</span><span class="p">:</span>
+                                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span>
+
+                            <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">nuclide</span><span class="p">:</span>
+                                <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">1.0</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+                        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># with multiplier</span>
+
+                            <span class="n">formulaNuclideSymbol</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                                <span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                            <span class="k">if</span> <span class="n">formulaNuclideSymbol</span> <span class="o">==</span> <span class="n">nuclideSymbol</span><span class="p">:</span>
+                                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span>
+
+                            <span class="k">if</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">nuclide</span><span class="p">:</span>
+                                <span class="n">moleFraction</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+                                    <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">assert</span> <span class="kc">False</span>
+
+                        <span class="n">massCC</span> <span class="o">+=</span> <span class="n">spc</span><span class="o">.</span><span class="n">molarCC</span> <span class="o">*</span> <span class="n">moleFraction</span> <span class="o">*</span> <span class="n">nuclideMolarMass</span>
+
+                <span class="k">return</span> <span class="n">massCC</span> <span class="o">*</span> <span class="n">__GetFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="c1"># chemical element given (only atomic number given)</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">nuclide</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+
+                <span class="n">massCC</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+                <span class="k">for</span> <span class="n">spc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
+
+                    <span class="n">formula</span> <span class="o">=</span> <span class="n">spc</span><span class="o">.</span><span class="n">atoms</span>
+
+                    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">formula</span><span class="p">:</span>
+
+                        <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+                               <span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>  <span class="c1"># no multiplier (implies 1.0)</span>
+
+                            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span>
+                            <span class="n">formulaNuclideSymbol</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                            <span class="n">formulaNuclideMassNumber</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                                <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">))</span>
+                            <span class="n">formulaNuclideMolarMass</span> <span class="o">=</span> <span class="n">ELEMENTS</span><span class="p">[</span><span class="n">formulaNuclideSymbol</span><span class="p">]</span><span class="o">.</span><span class="n">isotopes</span><span class="p">[</span><span class="n">formulaNuclideMassNumber</span><span class="p">]</span><span class="o">.</span><span class="n">mass</span>
+
+                            <span class="k">if</span> <span class="n">formulaNuclideSymbol</span> <span class="o">==</span> <span class="n">nuclide</span><span class="p">:</span>
+                                <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">1.0</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+                        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># with multiplier</span>
+
+                            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">2</span>
+                            <span class="n">formulaNuclideSymbol</span> <span class="o">=</span> <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span>
+                                <span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                            <span class="n">formulaNuclideMassNumber</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                                <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">))</span>
+                            <span class="n">formulaNuclideMolarMass</span> <span class="o">=</span> <span class="n">ELEMENTS</span><span class="p">[</span><span class="n">formulaNuclideSymbol</span><span class="p">]</span><span class="o">.</span><span class="n">isotopes</span><span class="p">[</span><span class="n">formulaNuclideMassNumber</span><span class="p">]</span><span class="o">.</span><span class="n">mass</span>
+
+                            <span class="k">if</span> <span class="n">formulaNuclideSymbol</span> <span class="o">==</span> <span class="n">nuclide</span><span class="p">:</span>
+                                <span class="n">moleFraction</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+                                    <span class="n">item</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">moleFraction</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">assert</span> <span class="kc">False</span>
+
+                        <span class="n">massCC</span> <span class="o">+=</span> <span class="n">spc</span><span class="o">.</span><span class="n">molarCC</span> <span class="o">*</span> <span class="n">moleFraction</span> <span class="o">*</span> <span class="n">formulaNuclideMolarMass</span>
+
+                <span class="k">return</span> <span class="n">massCC</span> <span class="o">*</span> <span class="n">__GetFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="k">assert</span> <span class="kc">False</span>
+
+<span class="c1"># ---------------------------------------------------------------------------------</span>
+    <span class="k">def</span> <span class="nf">__GetSlugLength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Slug length [cm]&#39;</span><span class="p">]</span>
+
+<span class="c1"># ---------------------------------------------------------------------------------</span>
+    <span class="k">def</span> <span class="nf">__GetFuelLength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">slugLength</span> <span class="o">=</span> <span class="n">__GetSlugLength</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">cladEndCapThickness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Cladding end cap thickness [cm]&#39;</span><span class="p">]</span>
+        <span class="n">fuelLength</span> <span class="o">=</span> <span class="n">slugLength</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">cladEndCapThickness</span>
+
+        <span class="k">return</span> <span class="n">fuelLength</span>
+
+<span class="c1"># ---------------------------------------------------------------------------------</span>
+    <span class="k">def</span> <span class="nf">__GetSlugVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">slugLength</span> <span class="o">=</span> <span class="n">__GetSlugLength</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">outerSlugOuterRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Outer slug OD [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">outerSlugInnerRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Outer slug ID [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">outerSlugVolume</span> <span class="o">=</span> <span class="n">slugLength</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> \
+            <span class="p">(</span><span class="n">outerSlugOuterRadius</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">outerSlugInnerRadius</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">innerSlugOuterRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Inner slug OD [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">innerSlugInnerRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Inner slug ID [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">innerSlugVolume</span> <span class="o">=</span> <span class="n">slugLength</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> \
+            <span class="p">(</span><span class="n">innerSlugOuterRadius</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">innerSlugInnerRadius</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">outerSlugVolume</span> <span class="o">+</span> <span class="n">innerSlugVolume</span>
+
+<span class="c1"># ---------------------------------------------------------------------------------</span>
+    <span class="k">def</span> <span class="nf">__GetFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">fuelLength</span> <span class="o">=</span> <span class="n">__GetFuelLength</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="n">cladWallThickness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Cladding wall thickness [cm]&#39;</span><span class="p">]</span>
+        <span class="n">outerFuelOuterRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Outer slug OD [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> \
+            <span class="mf">2.0</span> <span class="o">-</span> <span class="n">cladWallThickness</span>
+        <span class="n">outerFuelInnerRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Outer slug ID [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> \
+            <span class="mf">2.0</span> <span class="o">+</span> <span class="n">cladWallThickness</span>
+
+        <span class="n">outerFuelVolume</span> <span class="o">=</span> <span class="n">fuelLength</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> \
+            <span class="p">(</span><span class="n">outerFuelOuterRadius</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">outerFuelInnerRadius</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">innerFuelOuterRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Inner slug OD [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> \
+            <span class="mf">2.0</span> <span class="o">-</span> <span class="n">cladWallThickness</span>
+        <span class="n">innerFuelInnerRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Inner slug ID [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> \
+            <span class="mf">2.0</span> <span class="o">+</span> <span class="n">cladWallThickness</span>
+
+        <span class="n">innerFuelVolume</span> <span class="o">=</span> <span class="n">fuelLength</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> \
+            <span class="p">(</span><span class="n">innerFuelOuterRadius</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">innerFuelInnerRadius</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">volume</span> <span class="o">=</span> <span class="n">outerFuelVolume</span> <span class="o">+</span> <span class="n">innerFuelVolume</span>
+
+        <span class="k">return</span> <span class="n">volume</span>
+
+<span class="c1"># ---------------------------------------------------------------------------------</span>
+    <span class="k">def</span> <span class="nf">__GetCladdingVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">slugVolume</span> <span class="o">=</span> <span class="n">__GetSlugVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">fuelVolume</span> <span class="o">=</span> <span class="n">__GetFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">slugVolume</span> <span class="o">-</span> <span class="n">fuelVolume</span>
+
+<span class="c1"># ---------------------------------------------------------------------------------</span>
+    <span class="k">def</span> <span class="nf">__GetFuelArea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">pi</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+
+        <span class="n">cladWallThickness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Cladding wall thickness [cm]&#39;</span><span class="p">]</span>
+        <span class="n">slugLength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Slug length [cm]&#39;</span><span class="p">]</span>
+
+        <span class="n">outerSlugFuelArea</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="c1"># side walls</span>
+        <span class="n">outerSlugOuterRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Outer slug OD [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">outerSlugFuelArea</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> \
+            <span class="p">(</span><span class="n">outerSlugOuterRadius</span> <span class="o">-</span> <span class="n">cladWallThickness</span><span class="p">)</span> <span class="o">*</span> <span class="n">slugLength</span>
+        <span class="n">outerSlugInnerRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Outer slug ID [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">outerSlugFuelArea</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> \
+            <span class="p">(</span><span class="n">outerSlugInnerRadius</span> <span class="o">+</span> <span class="n">cladWallThickness</span><span class="p">)</span> <span class="o">*</span> <span class="n">slugLength</span>
+        <span class="c1"># add bottom and top areas</span>
+        <span class="n">outerSlugFuelArea</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> \
+            <span class="p">((</span><span class="n">outerSlugOuterRadius</span> <span class="o">-</span> <span class="n">cladWallThickness</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span>
+             <span class="p">(</span><span class="n">outerSlugInnerRadius</span> <span class="o">+</span> <span class="n">cladWallThickness</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">innerSlugFuelArea</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="c1"># side walls</span>
+        <span class="n">innerSlugOuterRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Inner slug OD [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">innerSlugFuelArea</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> \
+            <span class="p">(</span><span class="n">innerSlugOuterRadius</span> <span class="o">-</span> <span class="n">cladWallThickness</span><span class="p">)</span> <span class="o">*</span> <span class="n">slugLength</span>
+        <span class="n">innerSlugInnerRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Inner slug ID [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">innerSlugFuelArea</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> \
+            <span class="p">(</span><span class="n">innerSlugInnerRadius</span> <span class="o">+</span> <span class="n">cladWallThickness</span><span class="p">)</span> <span class="o">*</span> <span class="n">slugLength</span>
+        <span class="c1"># add bottom and top areas</span>
+        <span class="n">innerSlugFuelArea</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> \
+            <span class="p">((</span><span class="n">innerSlugOuterRadius</span> <span class="o">-</span> <span class="n">cladWallThickness</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span>
+             <span class="p">(</span><span class="n">innerSlugInnerRadius</span> <span class="o">+</span> <span class="n">cladWallThickness</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">outerSlugFuelArea</span> <span class="o">+</span> <span class="n">innerSlugFuelArea</span>
+
+<span class="c1"># ---------------------------------------------------------------------------------</span>
+    <span class="k">def</span> <span class="nf">__GetCladdingArea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">slugLength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Slug length [cm]&#39;</span><span class="p">]</span>
+
+        <span class="n">outerSlugArea</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="c1"># side walls</span>
+        <span class="n">outerSlugOuterRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Outer slug OD [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">outerSlugArea</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">outerSlugOuterRadius</span> <span class="o">*</span> <span class="n">slugLength</span>
+        <span class="n">outerSlugInnerRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Outer slug ID [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">outerSlugArea</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">outerSlugInnerRadius</span> <span class="o">*</span> <span class="n">slugLength</span>
+        <span class="c1"># add bottom and top areas</span>
+        <span class="n">outerSlugArea</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> \
+            <span class="p">(</span><span class="n">outerSlugOuterRadius</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">outerSlugInnerRadius</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">innerSlugArea</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="c1"># side walls</span>
+        <span class="n">innerSlugOuterRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Inner slug OD [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">innerSlugArea</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">innerSlugOuterRadius</span> <span class="o">*</span> <span class="n">slugLength</span>
+        <span class="n">innerSlugInnerRadius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Inner slug ID [cm]&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.0</span>
+        <span class="n">innerSlugArea</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">innerSlugInnerRadius</span> <span class="o">*</span> <span class="n">slugLength</span>
+        <span class="c1"># add bottom and top areas</span>
+        <span class="n">innerSlugArea</span> <span class="o">+=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> \
+            <span class="p">(</span><span class="n">innerSlugOuterRadius</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">innerSlugInnerRadius</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">outerSlugArea</span> <span class="o">+</span> <span class="n">innerSlugArea</span>
+
+<span class="c1"># ---------------------------------------------------------------------------------</span>
+    <span class="k">def</span> <span class="nf">__GetEquivalentCladdingArea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">ro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRo</span>
+
+        <span class="n">area</span> <span class="o">=</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">ro</span>
+
+        <span class="k">return</span> <span class="n">area</span>
+
+<span class="c1"># ---------------------------------------------------------------------------------</span>
+    <span class="k">def</span> <span class="nf">__GetEquivalentCladdingVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">ro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRo</span>
+        <span class="n">ri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRi</span>
+
+        <span class="n">volume</span> <span class="o">=</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">ro</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">ri</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">volume</span>
+
+<span class="c1"># ---------------------------------------------------------------------------------</span>
+    <span class="k">def</span> <span class="nf">__GetEquivalentFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">ro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelHollowSphereRo</span>
+        <span class="n">ri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelHollowSphereRi</span>
+
+        <span class="n">volume</span> <span class="o">=</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">ro</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">ri</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">volume</span>
+
+<span class="c1"># ---------------------------------------------------------------------------------</span>
+    <span class="k">def</span> <span class="nf">__GetEquivalentFuelArea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="n">ro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelHollowSphereRo</span>
+
+        <span class="n">area</span> <span class="o">=</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">ro</span>
+
+        <span class="k">return</span> <span class="n">area</span>
+
+
+<span class="c1"># *********************************************************************************</span>
+<span class="c1"># Shrink the volume based on the equivalent cladding hollow sphere</span>
+
+<span class="c1"># ---------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">__ReduceCladdingVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dissolvedVolume</span><span class="p">):</span>
+
+        <span class="k">assert</span> <span class="n">dissolvedVolume</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;dissolved volume= </span><span class="si">%r</span><span class="s1">; failed.&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">dissolvedVolume</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dissolvedVolume</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRo</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRi</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">dV</span> <span class="o">=</span> <span class="n">dissolvedVolume</span>
+        <span class="n">pi</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+
+        <span class="c1"># get this first</span>
+        <span class="n">massDens</span> <span class="o">=</span> <span class="n">_GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;claddingMassDens&#39;</span><span class="p">)</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># reduce the volume of the cladding hollow sphere</span>
+
+        <span class="n">ro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRo</span>
+        <span class="n">ri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRi</span>
+
+        <span class="n">volume</span> <span class="o">=</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">ro</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">ri</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dV</span> <span class="o">&lt;</span> <span class="n">volume</span><span class="p">:</span>
+
+            <span class="n">ro</span> <span class="o">=</span> <span class="p">(</span><span class="n">ri</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">volume</span> <span class="o">-</span> <span class="n">dV</span><span class="p">))</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRo</span> <span class="o">=</span> <span class="n">ro</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRo</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRi</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+            <span class="n">cladWallThickness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Cladding wall thickness [cm]&#39;</span><span class="p">]</span>
+            <span class="n">cladEndCapThickness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Cladding end cap thickness [cm]&#39;</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Inner slug ID [cm]&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">cladWallThickness</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Inner slug OD [cm]&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">cladWallThickness</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Outer slug ID [cm]&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="n">cladWallThickness</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Outer slug OD [cm]&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="n">cladWallThickness</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Slug length [cm]&#39;</span><span class="p">]</span> <span class="o">-=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">cladEndCapThickness</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Cladding wall thickness [cm]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Cladding end cap thickness [cm]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># Update the history of the cladding phase</span>
+
+        <span class="n">volume</span> <span class="o">=</span> <span class="n">_GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;equivalentCladdingVolume&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;volume&#39;</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;mass&#39;</span><span class="p">,</span> <span class="n">massDens</span> <span class="o">*</span> <span class="n">volume</span><span class="p">)</span>
+
+
+<span class="c1"># ---------------------------------------------------------------------------------</span>
+
+    <span class="k">def</span> <span class="nf">__ReduceFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dissolvedVolume</span><span class="p">):</span>
+
+        <span class="k">assert</span> <span class="n">dissolvedVolume</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;dissolved volume= </span><span class="si">%r</span><span class="s1">; failed.&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">dissolvedVolume</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dissolvedVolume</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelHollowSphereRo</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelHollowSphereRi</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRo</span> <span class="o">==</span> <span class="mf">0.0</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRi</span> <span class="o">==</span> <span class="mf">0.0</span>
+
+        <span class="n">dV</span> <span class="o">=</span> <span class="n">dissolvedVolume</span>
+        <span class="n">pi</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
+
+        <span class="c1"># get this first</span>
+        <span class="n">massDens</span> <span class="o">=</span> <span class="n">_GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;fuelMassDens&#39;</span><span class="p">)</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># reduce the volume of the fuel hollow sphere</span>
+
+        <span class="n">ro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelHollowSphereRo</span>
+        <span class="n">ri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelHollowSphereRi</span>
+
+        <span class="n">volume</span> <span class="o">=</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">ro</span><span class="o">**</span><span class="mi">3</span> <span class="o">-</span> <span class="n">ri</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">dV</span> <span class="o">&lt;</span> <span class="n">volume</span><span class="p">:</span>
+
+            <span class="n">ro</span> <span class="o">=</span> <span class="p">(</span><span class="n">ri</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">volume</span> <span class="o">-</span> <span class="n">dV</span><span class="p">))</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fuelHollowSphereRo</span> <span class="o">=</span> <span class="n">ro</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fuelHollowSphereRo</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fuelHollowSphereRi</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Inner slug ID [cm]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Inner slug OD [cm]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Outer slug ID [cm]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Outer slug OD [cm]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Slug length [cm]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Cladding wall thickness [cm]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Cladding end cap thickness [cm]&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+<span class="c1"># .................................................................................</span>
+<span class="c1"># Update the history of the fuel phase</span>
+
+        <span class="n">volume</span> <span class="o">=</span> <span class="n">_GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;equivalentFuelVolume&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;volume&#39;</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;mass&#39;</span><span class="p">,</span> <span class="n">massDens</span> <span class="o">*</span> <span class="n">volume</span><span class="p">)</span>
+
+
+<span class="c1"># *********************************************************************************</span>
+
+
+<span class="c1"># *******************************************************************************</span>
+<span class="c1"># Printing of data members</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;FuelSlug(): </span><span class="se">\n\t</span><span class="s1"> specs </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n\t</span><span class="s1"> fuelPhase </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n\t</span><span class="s1"> claddingPhase </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;FuelSlug(): </span><span class="se">\n\t</span><span class="s1"> specs </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n\t</span><span class="s1"> fuelPhase </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n\t</span><span class="s1"> claddingPhase </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span><span class="p">)</span></div>
+<span class="c1"># *******************************************************************************</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><img src="logo.jpg">
+<h3>About Cortix</h3>
+<p>
+Cortix is a Python library for system-level module coupling, execution, and analysis.
+</p>
+
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul>
+<li><a href="../index.html">Home</a></li>
+<li><a href="../install.html">Install</a></li>
+<li><a href="../contents.html">Documentation</a></li>
+
+</ul>
+<!---->
+
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="https://pypi.org/project/cortix/">Cortix @ PyPI</a></li>
+  <li><a href="https://github.com/dpploy/cortix">Cortix @ GitHub</a></li>
+  <li><a href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master">Cortix @ binder</a></li>
+  <li><a href="https://nbviewer.jupyter.org/github/dpploy/cortix-nb/tree/master/">Cortix @ nbviewer</a></li>
+  <li><a href="https://github.com/dpploy/cortix-nb">Cortix Jupyter Notebooks</a></li>
+  <li><a href="https://github.com/dpploy/cortix/issues">Issue Tracker</a></li>
+  <li><a href="https://dpploy.github.io/cortix/Cortix.pdf">PDF Documentation</a></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, University of Massachusetts Lowell.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
