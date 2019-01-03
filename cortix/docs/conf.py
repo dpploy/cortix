@@ -83,8 +83,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Cortix'
-copyright = '2018, Valmor F. de Almeida'
-author = 'Valmor F. de Almeida'
+copyright = '2019, University of Massachusetts Lowell'
+author = 'Valmor F. de Almeida, Taha Azzaoui, Gilberto E. Alas'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -118,15 +118,22 @@ todo_include_todos = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-#
-#vfda:orig html_theme = 'alabaster'
-html_theme = 'classic'
+
+html_theme = 'alabaster'
+#html_theme = 'classic'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
 #
-# html_theme_options = {}
+html_theme_options = {
+    'show_powered_by': False,
+    'github_user': 'dpploy',
+    'github_repo': 'cortix',
+    'github_banner': True,
+    'show_related': False,
+    'note_bg': '#FFF59C'
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -177,7 +184,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     ('contents', 'Cortix.tex', 'Cortix Documentation',
-     'Valmor F. de Almeida', 'manual'),
+     author, 'manual'),
 ]
 
 latex_engine = 'pdflatex'
