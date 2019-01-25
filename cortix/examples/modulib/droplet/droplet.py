@@ -455,12 +455,12 @@ class Droplet():
   r'''
   ODE IVP problem:
   Given the initial data at :math:`t=0`, :math:`u_1(0) = x_0`, 
-  :math:`u_2(0) = v_0 = \dot{u}_1(0)`
+  :math:`u_2(0) = v_0 = \dot{u}_1(0)`,
   solve :math:`\frac{\text{d}u}{\text{d}t} = f(u)` in the interval 
   :math:`0\le t \le t_f`.
   When :math:`u_1(t)` is negative, bounce the droplet to a random height between
   0 and :math:`1.2\,x_0` with no velocity, and continue the time integration until
-  :math:`t \le t_f`.
+  :math:`t = t_f`.
   ''' 
   if self.__ode_integrator == 'scikits.odes':
      from scikits.odes import ode        # this requires the SUNDIALS ODE package 

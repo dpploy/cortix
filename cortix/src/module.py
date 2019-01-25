@@ -25,8 +25,8 @@ class Module:
     The Module class encapsulates a computational module of some scientific domain.
     '''
 
-    def __init__(self, parent_work_dir=None, library_name=None,
-                 library_parent_dir=None, mod_config_node=ConfigTree()):
+    def __init__( self, parent_work_dir=None, library_name=None,
+                  library_parent_dir=None, mod_config_node=ConfigTree() ):
 
         assert isinstance(
             parent_work_dir, str), "-> parent_work_dir is invalid."
