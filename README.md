@@ -5,8 +5,6 @@
 [![PyPI version](https://badge.fury.io/py/cortix.svg)](https://badge.fury.io/py/cortix)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/Django.svg)
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/dpploy/cortix-nb/master)
-[![NBViewer](https://github.com/jupyter/design/blob/master/logos/Badges/nbviewer_badge.svg)](http://nbviewer.jupyter.org/github/dpploy/cortix-nb/)
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/dpploy/cortix.svg?columns=all)](https://waffle.io/dpploy/cortix) 
 
 ![](cortix/docs/cortix-cover.png)
 

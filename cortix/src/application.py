@@ -198,7 +198,8 @@ class Application:
                 'check failed'
 
             new_module = Module( self.__work_dir, self.__module_lib_name,
-                                 self.__module_lib_full_parent_dir, mod_config_node)
+                                 self.__module_lib_full_parent_dir, 
+                                 mod_config_node )
 
             # check for a duplicate module before appending a new one
             for module in self.__modules:
