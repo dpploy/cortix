@@ -13,7 +13,6 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
    
@@ -28,8 +27,6 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          
-
           <div class="body" role="main">
             
   <h1>Source code for application</h1><div class="highlight"><pre>
@@ -233,7 +230,8 @@
                 <span class="s1">&#39;check failed&#39;</span>
 
             <span class="n">new_module</span> <span class="o">=</span> <span class="n">Module</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__module_lib_name</span><span class="p">,</span>
-                                 <span class="bp">self</span><span class="o">.</span><span class="n">__module_lib_full_parent_dir</span><span class="p">,</span> <span class="n">mod_config_node</span><span class="p">)</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">__module_lib_full_parent_dir</span><span class="p">,</span> 
+                                 <span class="n">mod_config_node</span> <span class="p">)</span>
 
             <span class="c1"># check for a duplicate module before appending a new one</span>
             <span class="k">for</span> <span class="n">module</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__modules</span><span class="p">:</span>
@@ -256,7 +254,6 @@
 </pre></div>
 
           </div>
-          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -280,12 +277,10 @@ Cortix is a Python library for system-level module coupling, execution, and anal
 <ul>
   <li><a href="https://pypi.org/project/cortix/">Cortix @ PyPI</a></li>
   <li><a href="https://github.com/dpploy/cortix">Cortix @ GitHub</a></li>
-  <li><a href="https://waffle.io/dpploy/cortix">Cortix @ Waffle</a></li>
   <li><a href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master">Cortix @ binder</a></li>
   <li><a href="https://nbviewer.jupyter.org/github/dpploy/cortix-nb/tree/master/">Cortix @ nbviewer</a></li>
   <li><a href="https://github.com/dpploy/cortix-nb">Cortix Jupyter Notebooks</a></li>
   <li><a href="https://github.com/dpploy/cortix/issues">Issue Tracker</a></li>
-  <li><a href="https://groups.google.com/forum/#!forum/cortix">Cortix Google Group</a></li>
   <li><a href="https://dpploy.github.io/cortix/Cortix.pdf">PDF Documentation</a></li>
 </ul>
 <div id="searchbox" style="display: none" role="search">

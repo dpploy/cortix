@@ -5,7 +5,7 @@
    
 =========================================
 
-Cortix: modeling and simulation made easy
+Cortix: system dynamics simulation
 =========================================
 
 What is Cortix?

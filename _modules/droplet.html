@@ -13,7 +13,6 @@
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
-    <script type="text/javascript" src="../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
    
@@ -28,8 +27,6 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
-          
-
           <div class="body" role="main">
             
   <h1>Source code for droplet</h1><div class="highlight"><pre>
@@ -490,12 +487,12 @@
   <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">  ODE IVP problem:</span>
 <span class="sd">  Given the initial data at :math:`t=0`, :math:`u_1(0) = x_0`, </span>
-<span class="sd">  :math:`u_2(0) = v_0 = \dot{u}_1(0)`</span>
+<span class="sd">  :math:`u_2(0) = v_0 = \dot{u}_1(0)`,</span>
 <span class="sd">  solve :math:`\frac{\text{d}u}{\text{d}t} = f(u)` in the interval </span>
 <span class="sd">  :math:`0\le t \le t_f`.</span>
 <span class="sd">  When :math:`u_1(t)` is negative, bounce the droplet to a random height between</span>
 <span class="sd">  0 and :math:`1.2\,x_0` with no velocity, and continue the time integration until</span>
-<span class="sd">  :math:`t \le t_f`.</span>
+<span class="sd">  :math:`t = t_f`.</span>
 <span class="sd">  &#39;&#39;&#39;</span> 
   <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ode_integrator</span> <span class="o">==</span> <span class="s1">&#39;scikits.odes&#39;</span><span class="p">:</span>
      <span class="kn">from</span> <span class="nn">scikits.odes</span> <span class="k">import</span> <span class="n">ode</span>        <span class="c1"># this requires the SUNDIALS ODE package </span>
@@ -587,7 +584,6 @@
 </pre></div>
 
           </div>
-          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -611,12 +607,10 @@ Cortix is a Python library for system-level module coupling, execution, and anal
 <ul>
   <li><a href="https://pypi.org/project/cortix/">Cortix @ PyPI</a></li>
   <li><a href="https://github.com/dpploy/cortix">Cortix @ GitHub</a></li>
-  <li><a href="https://waffle.io/dpploy/cortix">Cortix @ Waffle</a></li>
   <li><a href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master">Cortix @ binder</a></li>
   <li><a href="https://nbviewer.jupyter.org/github/dpploy/cortix-nb/tree/master/">Cortix @ nbviewer</a></li>
   <li><a href="https://github.com/dpploy/cortix-nb">Cortix Jupyter Notebooks</a></li>
   <li><a href="https://github.com/dpploy/cortix/issues">Issue Tracker</a></li>
-  <li><a href="https://groups.google.com/forum/#!forum/cortix">Cortix Google Group</a></li>
   <li><a href="https://dpploy.github.io/cortix/Cortix.pdf">PDF Documentation</a></li>
 </ul>
 <div id="searchbox" style="display: none" role="search">
