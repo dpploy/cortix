@@ -117,6 +117,9 @@ class Application:
         self.__log.info('Created application: %s', self.__name)
 #----------------------- end def __init__():--------------------------------------
 
+#*********************************************************************************
+# Public functions 
+
     def __get_networks(self):
         """
         `list(str)`:List of names of network objects

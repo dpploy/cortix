@@ -76,32 +76,8 @@ class Network:
             name for name in self.__runtime_cortix_comm_file.keys()]
 #----------------------- end def __init__():--------------------------------------
 
-    def __get_name(self):
-        '''
-        `str`:Network name
-        '''
-
-        return self.__name
-    name = property(__get_name, None, None, None)
-#----------------------- end def get_name():--------------------------------------
-
-    def __get_connectivity(self):
-        '''
-        `list(dict)`:List of the network connectivity
-        '''
-
-        return self.__connectivity
-    connectivity = property(__get_connectivity, None, None, None)
-#----------------------- end def get_connectivity():------------------------------
-
-    def __get_slot_names(self):
-        '''
-        `list(str)`:List of network slot names
-        '''
-
-        return self.__slot_names
-    slot_names = property(__get_slot_names, None, None, None)
-#----------------------- end def get_slot_names():--------------------------------
+#*********************************************************************************
+# Public functions 
 
     def set_runtime_cortix_comm_file(self, slot_name, full_path_file_name):
         '''
@@ -123,6 +99,36 @@ class Network:
         return None
 #----------------------- end def get_runtime_cortix_comm_file():------------------
 
+#*********************************************************************************
+# Private helper functions (internal use: __)
+
+    def __get_name(self):
+        '''
+        `str`:Network name
+        '''
+
+        return self.__name
+    name = property(__get_name, None, None, None)
+#----------------------- end def __get_name():------------------------------------
+
+    def __get_connectivity(self):
+        '''
+        `list(dict)`:List of the network connectivity
+        '''
+
+        return self.__connectivity
+    connectivity = property(__get_connectivity, None, None, None)
+#----------------------- end def __get_connectivity():----------------------------
+
+    def __get_slot_names(self):
+        '''
+        `list(str)`:List of network slot names
+        '''
+
+        return self.__slot_names
+    slot_names = property(__get_slot_names, None, None, None)
+#----------------------- end def __get_slot_names():------------------------------
+
     def __get_nx_graph(self):
         '''
         `networkx.MultiDiGraph`:NXGraph corresponding to network
@@ -130,7 +136,7 @@ class Network:
 
         return self.__nx_graph
     nx_graph = property(__get_nx_graph, None, None, None)
-#----------------------- end def get_nx_graph():----------------------------------
+#----------------------- end def __get_nx_graph():--------------------------------
 
     def __str__(self):
         '''
