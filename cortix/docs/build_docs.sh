@@ -26,7 +26,7 @@ sphinx-apidoc -o src_rst/utils_rst ../src/utils
 sphinx-apidoc -o support_rst ../support
 
 # Build docs for modulib directory
-sphinx-apidoc -o modulib_rst
+sphinx-apidoc -o modulib_rst ../modulib
 
 # Build docs for pyplot subdirectory
 sphinx-apidoc -o modulib_rst/pyplot_rst ../modulib/pyplot
