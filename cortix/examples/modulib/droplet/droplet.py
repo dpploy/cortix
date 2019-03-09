@@ -24,19 +24,19 @@ from cortix.support.phase    import Phase
 #*********************************************************************************
 
 class Droplet():
-    r'''
-    Droplet module used example in Cortix.
-    ''' 
+ r'''
+ Droplet module used example in Cortix.
+ ''' 
 
-    def __init__( self,
-        slot_id,
-        input_full_path_file_name,
-        work_dir,
-        ports = list(),
-        cortix_start_time = 0.0,
-        cortix_final_time = 0.0,
-        cortix_time_step = 0.0,
-        cortix_time_unit=None
+ def __init__( self,
+     slot_id,
+     input_full_path_file_name,
+     work_dir,
+     ports = list(),
+     cortix_start_time = 0.0,
+     cortix_final_time = 0.0,
+     cortix_time_step = 0.0,
+     cortix_time_unit=None
                 ):
 
 #.................................................................................
