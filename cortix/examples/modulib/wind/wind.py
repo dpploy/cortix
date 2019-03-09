@@ -1,12 +1,13 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# This file is part of the Cortix toolkit evironment
-# https://github.com/dpploy/cortix
+# This file is part of the Cortix toolkit environment
+# https://cortix.org
 #
 # All rights reserved, see COPYRIGHT for full restrictions.
-# https://github.com/dpploy/COPYRIGHT....
+# https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
 #
-# Licensed under the GNU General Public License v. 3, please see LICENSE file.
-# https://www.gnu.org/licenses/gpl-3.0.txt
+# Licensed under the University of Massachusetts Lowell LICENSE:
+# https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 '''
 Wind module example in Cortix.
 '''
@@ -14,6 +15,7 @@ Wind module example in Cortix.
 import os, sys, io, time
 import logging
 from collections             import namedtuple
+import numpy as np
 
 from cortix.support.quantity import Quantity
 from cortix.support.specie   import Specie
@@ -111,6 +113,7 @@ class Wind():
   air = Specie( name='air', formulaName='Air', phase='gas' )
   air.massCCUnit = 'g/cc'
   air.molarCCUnit = 'mole/cc'
+  air.molarMass = 0.3*16*2 + 0.7*14*2
 
   species.append(air)
 
@@ -127,13 +130,15 @@ class Wind():
 
   # Initialize phase
   air_mass_cc = 0.1 # [g/cc]
-  self.__gas_phase.SetValue( 'water', water_mass_cc, self.__start_time )
+  self.__gas_phase.SetValue( 'air', air_mass_cc, self.__start_time )
 
   x_0 = 1000.0  # initial altitude [m] above ground at 0
   self.__gas_phase.SetValue( 'altitude', x_0, self.__start_time )
 
   v_0 = np.array([0.0,0.0,0.0])   # initial wind velocity [m/s]
   self.__gas_phase.SetValue( 'velocity', v_0, self.__start_time )
+
+  return
 
 #---------------------- end def __init__():---------------------------------------
 
@@ -275,6 +280,7 @@ class Wind():
      fout.write('#')
 # write file header
      fout.write('%17s'%('Time[sec]'))
+
      # mass density   
      for specie in self.__gas_phase.GetSpecies():
        fout.write('%18s'%(specie.formulaName+'['+specie.massCCUnit+']'))
@@ -299,7 +305,11 @@ class Wind():
      # quantities     
    for quant in self.__gas_phase.GetQuantities():
      val = self.__gas_phase.GetValue(quant.name, at_time)
-     fout.write('%18.6e'%(val))
+     if quant.name == 'velocity':
+         for v in val:
+             fout.write('%18.6e'%(v))
+     else:
+         fout.write('%18.6e'%(val))
 
    fout.write('\n')
    fout.close()
@@ -432,82 +442,21 @@ class Wind():
 
  def __evolve( self, cortix_time=0.0, cortix_time_step=0.0 ):
   r'''
-  .. math::
-  ODE IVP problem:
-  Given the initial data at $t=0$, $u_1(0) = x_0$, $u_2(0) = v_0 = \dot{u}_1(0)$
-  solve $\frac{\mathtext{d}u}{\mathtext{d}t} = f(u)%
   ''' 
-  import numpy as np
 
-  if self.__ode_integrator == 'scikits.odes':
-     from scikits.odes import ode        # this requires the SUNDIALS ODE package 
-  elif self.__ode_integrator == 'scipy.integrate':
-     from scipy.integrate import odeint  # this ships with scipy 
-  else:
-     assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
+  altitude = self.__gas_phase.GetValue('altitude',cortix_time)
+  velocity = self.__gas_phase.GetValue('velocity',cortix_time)
 
-  x_0 =   self.__gas_phase.GetValue( 'altitude', cortix_time )
-  v_0 = - self.__gas_phase.GetValue( 'speed', cortix_time )
-
-  u_vec_0 = [x_0, v_0]
-
-  # rhs function
-  if self.__ode_integrator == 'scikits.odes':
-    def rhs_fn(t, u_vec, dt_u_vec, params):
-      dt_u_vec[0] = u_vec[1]              #  d_t u_1 = u_2
-      dt_u_vec[1] = - params.gravity      #  d_t u_2 = -g
-      return
-  elif self.__ode_integrator == 'scipy.integrate':
-    def rhs_fn(u_vec, t, gravity):
-      dt_u_0 = u_vec[1]              #  d_t u_1 = u_2
-      dt_u_1 = - gravity             #  d_t u_2 = -g
-      return [dt_u_0, dt_u_1]
-  else:
-     assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
-
-  t_interval_sec = np.linspace(0.0, cortix_time_step, num=2)
-
-  if self.__ode_integrator == 'scikits.odes':
-     cvode = ode('cvode', rhs_fn, user_data=self.__params, old_api=False)
-     solution = cvode.solve( t_interval_sec, u_vec_0 )  # solve for time interval 
-
-     results = solution.values
-     message = solution.message
-
-     assert solution.message == 'Successful function return.'
-     assert solution.errors.t is None, 'errors.t = %r'%solution.errors.t
-     assert solution.errors.y is None, 'errors.y = %r'%solution.errors.y
-
-     u_vec = results.y[1,:] # solution vector at final time step
-
-  elif self.__ode_integrator == 'scipy.integrate':
-     u_vec_hist, info_dict = odeint( rhs_fn,
-                                     u_vec_0, t_interval_sec,
-                                     args=( self.__params.gravity, ), full_output=True
-                                   )
-
-     assert info_dict['message']=='Integration successful.',\
-            'Fatal: scipy.integrate.odeint failed %r'%info_dict['message']
-
-     u_vec = u_vec_hist[1,:]  # solution vector at final time step
-  else:
-     assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
+  new_altitude = altitude
+  new_velocity = velocity
 
   values = self.__gas_phase.GetRow( cortix_time ) # values at previous time
-
   at_time = cortix_time + cortix_time_step  
-
   self.__gas_phase.AddRow( at_time, values ) # repeat values for current time
 
-  if u_vec[0] <= 0.0: # ground impact sets result to zero
-   u_vec[0] = 0.0
-   u_vec[1] = 0.0
+  self.__gas_phase.SetValue( 'altitude', new_altitude, at_time )  # update current values
+  self.__gas_phase.SetValue( 'velocity', new_velocity, at_time ) # update current values
 
-  self.__gas_phase.SetValue( 'altitude', u_vec[0], at_time )      # update current values
-  self.__gas_phase.SetValue( 'speed',  abs(u_vec[1]), at_time ) # update current values
-
-#  print('u(t=',at_time*60,'[s]) = ',u_1)
-  
 #---------------------- end def __evolve():---------------------------------------
 
 

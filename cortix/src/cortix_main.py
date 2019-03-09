@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# This file is part of the Cortix toolkit evironment
-# https://github.com/dpploy/cortix
+# This file is part of the Cortix toolkit environment
+# https://cortix.org
 #
 # All rights reserved, see COPYRIGHT for full restrictions.
 # https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
 #
-# Licensed under the GNU General Public License v. 3, please see LICENSE file.
-# https://www.gnu.org/licenses/gpl-3.0.txt
+# Licensed under the University of Massachusetts Lowell LICENSE:
+# https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 '''
 The Cortix class definition.
 
@@ -110,6 +110,11 @@ class Cortix():
         self.__log.info("Created Cortix object %s", self.__name)
 #----------------------- end def __init__():--------------------------------------
 
+    def __del__(self):
+
+        self.__log.info("Destroyed Cortix object: %s", self.__name)
+#----------------------- end def __del__():---------------------------------------
+
     def run_simulations(self, task_name=None):
         '''
         This method runs every simulation
@@ -139,10 +144,5 @@ class Cortix():
             simulation = Simulation(self.__work_dir, sim_config_tree)
             self.__simulations.append(simulation)
 #----------------------- end def __setup_simulations():---------------------------
-
-    def __del__(self):
-
-        self.__log.info("Destroyed Cortix object: %s", self.__name)
-#----------------------- end def __del__():---------------------------------------
 
 #======================= end class Cortix: =======================================

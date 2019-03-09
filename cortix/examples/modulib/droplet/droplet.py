@@ -1,12 +1,13 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# This file is part of the Cortix toolkit evironment
-# https://github.com/dpploy/cortix
+# This file is part of the Cortix toolkit environment
+# https://cortix.org
 #
 # All rights reserved, see COPYRIGHT for full restrictions.
-# https://github.com/dpploy/COPYRIGHT....
+# https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
 #
-# Licensed under the GNU General Public License v. 3, please see LICENSE file.
-# https://www.gnu.org/licenses/gpl-3.0.txt
+# Licensed under the University of Massachusetts Lowell LICENSE:
+# https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 '''
 Droplet module example in Cortix.
 '''
@@ -23,20 +24,20 @@ from cortix.support.phase    import Phase
 #*********************************************************************************
 
 class Droplet():
- r'''
-  Droplet module used example in Cortix.
-  ''' 
+    r'''
+    Droplet module used example in Cortix.
+    ''' 
 
- def __init__( self,
-               slot_id,
-               input_full_path_file_name,
-               work_dir,
-               ports = list(),
-               cortix_start_time = 0.0,
-               cortix_final_time = 0.0,
-               cortix_time_step = 0.0,
-               cortix_time_unit=None
-             ):
+    def __init__( self,
+        slot_id,
+        input_full_path_file_name,
+        work_dir,
+        ports = list(),
+        cortix_start_time = 0.0,
+        cortix_final_time = 0.0,
+        cortix_time_step = 0.0,
+        cortix_time_unit=None
+                ):
 
 #.................................................................................
 # Sanity test
@@ -137,6 +138,8 @@ class Droplet():
 
   v_0 = (0.0,0.0,0.0)     # initial velocity [m/s]
   self.__liquid_phase.SetValue( 'velocity', v_0, self.__start_time )
+
+  return
 
 #---------------------- end def __init__():---------------------------------------
 

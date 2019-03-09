@@ -18,17 +18,15 @@ from cortix import Cortix
 
 def run():
     '''
-    Run the Cortix Droplet example. If Cortix and its dependencies are installed,
+    Run the Cortix Wind example. If Cortix and its dependencies are installed,
     this program should be executed at the command prompt inside the directory
     this program resides, namely, cortix/cortix/example/console_run/ directory.
     '''
 
     pwd = os.path.dirname(__file__)
-    full_path_config_file = os.path.join(pwd, '../input/cortix-config-droplet.xml')
-    cortix = Cortix('cortix-droplet', full_path_config_file)
-    cortix.run_simulations(task_name="droplet-fall")
-#    cortix.run_simulations(task_name="solo-droplet-fall")
-#    cortix.run_simulations(task_name="solo-pyplot") # this needs additional config
+    full_path_config_file = os.path.join(pwd, '../input/cortix-config-wind.xml')
+    cortix = Cortix('cortix-wind', full_path_config_file)
+    cortix.run_simulations(task_name="solo-wind")
 #---------------------- end def run():--------------------------------------------
 
 #*********************************************************************************

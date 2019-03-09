@@ -10,7 +10,7 @@ setuptools.setup(
     name="cortix",
     version="0.0.8",
     author="Valmor F. de Almeida",
-    author_email="Valmor_deAlmeida@uml.edu",
+    author_email="valmor_dealmeida@uml.edu",
     description=" Cortix is a Python library for system-level\
                   module coupling, execution, and analysis.",
     long_description=long_description,

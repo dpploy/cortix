@@ -1,12 +1,13 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# This file is part of the Cortix toolkit evironment
-# https://github.com/dpploy/cortix
+# This file is part of the Cortix toolkit environment
+# https://cortix.org
 #
 # All rights reserved, see COPYRIGHT for full restrictions.
-# https://github.com/dpploy/COPYRIGHT
+# https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
 #
-# Licensed under the GNU General Public License v. 3, please see LICENSE file.
-# https://www.gnu.org/licenses/gpl-3.0.txt
+# Licensed under the University of Massachusetts Lowell LICENSE:
+# https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 '''
 Wind module example in Cortix.
 '''
@@ -36,7 +37,7 @@ class CortixDriver():
                  cortix_start_time=0.0,
                  cortix_final_time=0.0,
                  cortix_time_step=0.0,
-                 time_unit=None
+                 cortix_time_unit=None
                  ):
 
         # Sanity test
@@ -49,8 +50,8 @@ class CortixDriver():
                type(cortix_final_time)
         assert isinstance(cortix_time_step, float), '-> time step type %r is invalid.' % \
                type(cortix_time_step)
-        assert isinstance(time_unit, str), '-> time unit type %r is invalid.' % \
-               type(time_unit)
+        assert isinstance(cortix_time_unit, str), '-> time unit type %r is invalid.' % \
+               type(cortix_time_unit)
 
         # Logging
         self.__log = logging.getLogger( 'launcher-wind' + str(slot_id) +
@@ -59,7 +60,8 @@ class CortixDriver():
 
         # Guest library module: Wind
         self.__wind = Wind( slot_id, input_full_path_file_name, work_dir, ports,
-                            cortix_start_time, cortix_final_time, time_unit )
+                            cortix_start_time, cortix_final_time, cortix_time_step,
+                            cortix_time_unit )
 
         self.__time_stamp = None  # temporary
 
