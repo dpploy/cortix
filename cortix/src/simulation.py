@@ -355,7 +355,11 @@ class Simulation:
                 net.set_runtime_cortix_comm_file( from_module_slot,
                                                   from_module_slot_comm_file )
 
-        # finish forming the XML documents for port types
+            #end if net.name.strip() == task_name.strip():  
+
+        # end for net in networks:
+
+        # Now finish forming the XML documents for port types
         for net in networks:
             for slot_name in net.slot_names:
                 comm_file = net.get_runtime_cortix_comm_file(slot_name)
@@ -373,6 +377,8 @@ class Simulation:
                 fout.close()
 
         self.__log.debug('end __setup_task(%s)', task_name)
+
+        return
 #----------------------- end def __setup_task():----------------------------------
 
 #======================= end class Simulation: ===================================

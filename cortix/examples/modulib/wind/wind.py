@@ -35,7 +35,7 @@ class Wind():
                cortix_start_time = 0.0,
                cortix_final_time = 0.0,
                cortix_time_step = 0.0,
-               cortix_time_unit=None
+               cortix_time_unit = None
              ):
 
 #.................................................................................
@@ -139,7 +139,6 @@ class Wind():
   self.__gas_phase.SetValue( 'velocity', v_0, self.__start_time )
 
   return
-
 #---------------------- end def __init__():---------------------------------------
 
  def call_ports( self, cortix_time=0.0 ):

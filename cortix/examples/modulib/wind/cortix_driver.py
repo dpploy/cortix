@@ -34,10 +34,10 @@ class CortixDriver():
                  exec_full_path_file_name,
                  work_dir,
                  ports=list(),
-                 cortix_start_time=0.0,
-                 cortix_final_time=0.0,
-                 cortix_time_step=0.0,
-                 cortix_time_unit=None
+                 cortix_start_time = 0.0,
+                 cortix_final_time = 0.0,
+                 cortix_time_step = 0.0,
+                 cortix_time_unit = None
                  ):
 
         # Sanity test
