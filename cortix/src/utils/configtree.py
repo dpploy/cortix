@@ -70,7 +70,17 @@ class ConfigTree:
 # ---------------------- end def __init__():------------------------------
 
     def get_root_node(self):
-        '''Returns the Element tree's root node'''
+        '''
+        Returns the Element tree's root node.
+
+        Parameters
+        ----------
+        empty:
+
+        Returns
+        -------
+        self.__config_tree_node: Element
+        '''
 
         return self.__config_tree_node
 # ---------------------- end def get_root_node:():------------------------
@@ -98,8 +108,9 @@ class ConfigTree:
     def get_node_name(self):
         '''
         Returns the value of the `name` attribute associated with the root node of
-        the element tree, *e.g.* <task name='solo-wind'></task>. This attribute 
-        must exist.
+        the element tree, *e.g.* <task name='solo-wind'></task>. Here `task` is the
+        element (or tag) name. The attribute pair name-value is name='solo-wind'.
+        The`name` attribute name must exist.
 
         Parameters
         ----------
@@ -145,16 +156,31 @@ class ConfigTree:
 
     def get_sub_node(self, tag):
         '''
-        Returns a subnode of the element tree specified by the parameter tag.
+        Returns a subnode (branch) of the element tree specified by the parameter tag.
+        If there is more than one, the first found is returned.
+
+        Parameters
+        ----------
+        tag: str
+            This is the XML element name (or tag name).
+        Returns
+        -------
+        node: Element
+            An XML branch tree starting from `node`.
         '''
+
         assert isinstance(tag, str), 'tag invalid'
 
-        return self.__config_tree_node.find(tag)
+        node = self.__config_tree_node.find(tag)
+
+        assert node is not None
+
+        return node
 # ---------------------- end def get_sub_node:():-------------------------
 
     def get_all_sub_nodes(self, tag):
         '''
-        Returns a list of all nodes in the element tree with tag name.
+        Returns a list of all direct children nodes in the element tree with tag name.
 
         Parameters
         ----------
@@ -168,7 +194,12 @@ class ConfigTree:
 
         assert isinstance(tag, str), 'tag invalid'
 
-        return self.__config_tree_node.findall(tag)
+        sub_nodes = self.__config_tree_node.findall(tag)
+
+        assert isinstance(sub_nodes,list)
+        assert len(sub_nodes) > 0
+
+        return sub_nodes
 # ---------------------- end def get_all_sub_nodes:():--------------------
 
     def get_node_children(self):

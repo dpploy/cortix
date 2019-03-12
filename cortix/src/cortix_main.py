@@ -64,9 +64,9 @@ class Cortix():
         # Create the logging facility for each object
         self.__create_logging_facility( config_tree )
 
+        #==================
         # Setup simulations (one or more as specified in the config file)
-        self.__simulations = list()
-
+        #==================
         self.__setup_simulations( config_tree )
 
         self.__log.info('Created Cortix object %s', self.__name)
@@ -149,11 +149,16 @@ class Cortix():
         Cortix configuration.
         '''
 
+        self.__simulations = list()
+
         for sim in config_tree.get_all_sub_nodes('simulation'):
+
+            sim_config_tree = ConfigTree( sim )
+
             self.__log.debug(
                 '__setup_simulations(): simulation name: %s',
-                sim.get('name'))
-            sim_config_tree = ConfigTree(sim)
+                sim_config_tree.get_node_name)
+
 
             simulation = Simulation( self.__work_dir, sim_config_tree )
 

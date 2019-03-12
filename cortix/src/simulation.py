@@ -29,16 +29,14 @@ class Simulation:
     Cortix Simulation element as defined in the Cortix config.
     '''
 
-    def __init__(self, parent_work_dir=None, sim_config_node=ConfigTree()):
+    def __init__(self, parent_work_dir, sim_config_node):
 
         assert isinstance(parent_work_dir, str), '-> parentWorkDir invalid.'
 
         # Inherit a configuration tree
         assert isinstance(sim_config_node, ConfigTree), '-> sim_config_node invalid.'
 
-        self.__config_node = sim_config_node
-
-        # Read the simulation name
+        # Read the simulation name, e.g. <simulation name='droplet'></simulation>
         self.__name = sim_config_node.get_node_name()
 
         # Create the cortix/simulation work directory
@@ -46,7 +44,77 @@ class Simulation:
 
         os.system('mkdir -p ' + self.__work_dir)
 
-        # Create the logging facility for each object
+        # Create the logging facility 
+        self.__create_logging( sim_config_node )
+
+        #======================
+        # Create application(s)
+        #======================
+        for app_node in sim_config_node.get_all_sub_nodes('application'):
+
+            app_config_node = ConfigTree(app_node)
+
+            assert app_config_node.get_node_tag() == 'application'
+
+            # Create the application for this simulation
+            self.__application = Application( self.__work_dir, app_config_node )
+
+            self.__log.debug("created application: %s", app_node.get('name'))
+
+        # Stores the task(s) created by the execute method
+        self.__tasks = list() # not needed now; in the future for task parallelism
+        # Save configuration information for setting up task in execute()
+        self.__config_xml = sim_config_node
+
+        self.__log.info("created simulation: %s", self.__name)
+
+        return
+#----------------------- end def __init__():--------------------------------------
+
+    def execute(self, task_name=None):
+        '''
+        This method allows for the execution of a simulation by executing each
+        task, if any. Execution proceeds one task at a time.
+        '''
+
+        self.__log.debug("prepare to execute(%s)", task_name)
+
+        if task_name is not None:
+
+            # Create the task object for each task in this simulation
+            self.__setup_task( task_name )
+
+            for task in self.__tasks:
+
+                if task.name == task_name:
+
+                    self.__log.debug("call execute(%s)", task_name)
+
+                    task.execute(self.__application)
+
+                    self.__log.debug(
+                        'called task.execute() on task %s', task_name)
+
+        self.__log.debug("end execute(%s)", task_name)
+
+        return
+#----------------------- end def execute():---------------------------------------
+
+    def __del__(self):
+
+        self.__log.info("destroyed simulation: %s", self.__name)
+
+        return
+#----------------------- end def __del__():---------------------------------------
+
+#*********************************************************************************
+# Private helper functions (internal use: __)
+
+    def __create_logging(self, sim_config_node ):
+        '''
+        A helper function to setup the logging facility used in self.__init__()
+        '''
+
         node = sim_config_node.get_sub_node("logger")
         logger_name = 'sim:' + self.__name
         self.__log = logging.getLogger(logger_name)
@@ -89,62 +157,8 @@ class Simulation:
             "logger console handler level: %s",
             console_handler_level)
 
-        for app_node in self.__config_node.get_all_sub_nodes("application"):
-            app_config_node = ConfigTree(app_node)
-            assert app_config_node.get_node_name() == app_node.get("name"), \
-                "check failed"
-
-            # Create the application for this simulation
-            self.__application = Application(self.__work_dir, app_config_node)
-
-            self.__log.debug("created application: %s", app_node.get('name'))
-
-        # Stores the task(s) created by the execute method
-        # vfda:  Why is this needed? 
-        self.__tasks = list()
-
-        self.__log.info("created simulation: %s", self.__name)
-
         return
-#----------------------- end def __init__():--------------------------------------
-
-    def execute(self, task_name=None):
-        '''
-        This method allows for the execution of a simulation by executing each
-        task, if any. Execution proceeds one task at a time.
-        '''
-        self.__log.debug("prepare to execute(%s)", task_name)
-
-        if task_name is not None:
-
-            # Create the task object for each task in this simulation
-            self.__setup_task(task_name)
-
-            for task in self.__tasks:
-
-                if task.name == task_name:
-
-                    self.__log.debug("call execute(%s)", task_name)
-
-                    task.execute(self.__application)
-
-                    self.__log.debug(
-                        'called task.execute() on task %s', task_name)
-
-        self.__log.debug("end execute(%s)", task_name)
-
-        return
-#----------------------- end def execute():---------------------------------------
-
-    def __del__(self):
-
-        self.__log.info("destroyed simulation: %s", self.__name)
-
-        return
-#----------------------- end def __del__():---------------------------------------
-
-#*********************************************************************************
-# Private helper functions (internal use: __)
+#----------------------- end def __create_logging():------------------------------
 
     def __setup_task(self, task_name):
         '''
@@ -170,13 +184,13 @@ class Simulation:
         task = None
 
         print('here')
-        print(type(self.__config_node.get_all_sub_nodes('task')))
-        print(self.__config_node.get_all_sub_nodes('task'))
+        print(type(self.__config_xml.get_all_sub_nodes('task')))
+        print(self.__config_xml.get_all_sub_nodes('task'))
         print('here')
 
         # loop over all elements with a <task></task> tag in this simulation 
-        # __config_node
-        for task_node in self.__config_node.get_all_sub_nodes('task'):
+        # __config_xml
+        for task_node in self.__config_xml.get_all_sub_nodes('task'):
 
             task_config_node = ConfigTree(task_node)
 

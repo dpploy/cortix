@@ -61,17 +61,21 @@ class Application:
         if self.__module_lib_full_parent_dir[-1] == '/':
             self.__module_lib_full_parent_dir.strip('/')
 
-        # add library full path to python module search
+        # Add library full path to python module search
         sys.path.insert(1, self.__module_lib_full_parent_dir)
 
-        # Create loggin facility
+        # Create logging facility
         self.__create_logging_facility( app_config_node )
 
+        #==============
         # Setup modules
+        #==============
         self.__modules = list()
         self.__setup_modules(app_config_node)
 
+        #===============
         # Setup networks 
+        #===============
         self.__networks = list()
         self.__setup_networks(app_config_node)
 
@@ -184,7 +188,44 @@ class Application:
         return
 #----------------------- end def __create_loggin_facility():----------------------
 
-    def __setup_networks(self,app_config_node):
+    def __setup_modules( self, app_config_node ):
+        '''
+        A helper function used by the Application constructor to setup the modules
+        portion of the Application.
+        '''
+
+        self.__log.debug('Start __setup_modules()')
+
+        for mod_node in app_config_node.get_all_sub_nodes('module'):
+
+            config_xml_tree = ConfigTree( mod_node )
+
+            assert config_xml_tree.get_node_tag() == 'module'
+
+            new_module = Module( self.__work_dir, self.__module_lib_name,
+                                 self.__module_lib_full_parent_dir,
+                                 config_xml_tree )
+
+            # check for a duplicate module before appending a new one
+            for module in self.__modules:
+                mod_lib_dir_name = module.library_parent_dir
+                mod_lib_name     = module.library_name
+
+                if new_module.name == module.name:
+                    if new_module.get_library_parent_dir() == mod_lib_dir_name:
+                        assert new_module.get_library_name != mod_lib_name, \
+                            'duplicate module; ABORT.'
+
+            # add module to list
+            self.__modules.append(new_module)
+            self.__log.debug('appended module %s', mod_node.get('name'))
+
+        self.__log.debug('end __setup_modules()')
+
+        return
+#----------------------- end def __setup_modules():-------------------------------
+
+    def __setup_networks( self, app_config_node ):
         '''
         A helper function used by the Application constructor to setup the networks
         portion of the Application.
@@ -192,54 +233,18 @@ class Application:
 
         self.__log.debug('start __setup_networks()')
 
-        for net_node in app_config_node.get_all_sub_nodes("network"):
+        for net_node in app_config_node.get_all_sub_nodes('network'):
             net_config_node = ConfigTree(net_node)
             assert net_config_node.get_node_name() == net_node.get('name'), 'check failed'
 
             network = Network(net_config_node)
 
             self.__networks.append(network)
-            self.__log.debug("appended network %s", net_node.get("name"))
+            self.__log.debug('appended network %s', net_node.get('name'))
 
-        self.__log.debug("end __setup_networks()")
+        self.__log.debug('end __setup_networks()')
 
         return
 #----------------------- end def __setup_networks():------------------------------
-
-    def __setup_modules(self,app_config_node):
-        """
-        A helper function used by the Application constructor to setup the modules
-        portion of the Application.
-        """
-
-        self.__log.debug("Start __setup_modules()")
-        for mod_node in app_config_node.get_all_sub_nodes('module'):
-
-            mod_config_node = ConfigTree(mod_node)
-            assert mod_config_node.get_node_name() == mod_node.get('name'), \
-                'check failed'
-
-            new_module = Module( self.__work_dir, self.__module_lib_name,
-                                 self.__module_lib_full_parent_dir, 
-                                 mod_config_node )
-
-            # check for a duplicate module before appending a new one
-            for module in self.__modules:
-                mod_lib_dir_name = module.library_parent_dir
-                mod_lib_name = module.library_name
-
-                if new_module.name == module.name:
-                    if new_module.get_library_parent_dir() == mod_lib_dir_name:
-                        assert new_module.get_library_name != mod_lib_name, \
-                            "duplicate module; ABORT."
-
-            # add module to list
-            self.__modules.append(new_module)
-            self.__log.debug("appended module %s", mod_node.get('name'))
-
-        self.__log.debug("end __setup_modules()")
-
-        return
-#----------------------- end def __setup_modules():-------------------------------
 
 #======================= end class Application: ==================================

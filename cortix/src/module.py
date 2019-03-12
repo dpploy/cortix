@@ -26,20 +26,18 @@ class Module:
     '''
 
     def __init__( self, parent_work_dir, library_name,
-                  library_parent_dir, mod_config_node ):
+                  library_parent_dir, config_xml_tree ):
 
         assert isinstance(parent_work_dir, str), '-> parent_work_dir is invalid.'
         assert isinstance(library_name, str), '-> library_name is invalid.'
         assert isinstance(library_parent_dir, str), '-> library_parent is invalid.'
 
-        assert isinstance(mod_config_node, ConfigTree), '-> mod_config_node is invalid.'
-
-        # Inherit a configuration tree
-        self.__config_node = mod_config_node
+        assert isinstance(config_xml_tree, ConfigTree), '-> config_xml_tree is invalid.'
+        assert config_xml_tree.get_node_tag() == 'module', 'invalid module xml tree.'
 
         # Read the module name and type
-        self.__mod_name = self.__config_node.get_node_name()
-        self.__mod_type = self.__config_node.get_node_type()
+        self.__mod_name = config_xml_tree.get_node_name()
+        self.__mod_type = config_xml_tree.get_node_type()
 
         # Specify module library with upstream information
         self.__library_parent_dir = library_parent_dir
@@ -53,7 +51,7 @@ class Module:
         self.__ports = list()  # list of (port_name, port_type, port_multiplicity)
 
         # Save config data
-        for child in self.__config_node.get_node_children():
+        for child in config_xml_tree.get_node_children():
             (elem, tag, attributes, text) = child
             text = text.strip()
 
