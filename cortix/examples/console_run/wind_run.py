@@ -20,13 +20,18 @@ def run():
     '''
     Run the Cortix Wind example. If Cortix and its dependencies are installed,
     this program should be executed at the command prompt inside the directory
-    this program resides, namely, cortix/cortix/example/console_run/ directory.
+    this program resides, namely, `$CORTIX/cortix/cortix/examples/console_run/`
+    directory.
     '''
 
     pwd = os.path.dirname(__file__)
     full_path_config_file = os.path.join(pwd, '../input/cortix-config-wind.xml')
+
     cortix = Cortix('cortix-wind', full_path_config_file)
+
     cortix.run_simulations(task_name="solo-wind")
+
+    return
 #---------------------- end def run():--------------------------------------------
 
 #*********************************************************************************

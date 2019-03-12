@@ -25,15 +25,16 @@ class Module:
     The Module class encapsulates a computational module of some scientific domain.
     '''
 
-    def __init__( self, parent_work_dir=None, library_name=None,
-                  library_parent_dir=None, mod_config_node=ConfigTree() ):
+    def __init__( self, parent_work_dir, library_name,
+                  library_parent_dir, mod_config_node ):
 
-        assert isinstance(
-            parent_work_dir, str), "-> parent_work_dir is invalid."
+        assert isinstance(parent_work_dir, str), '-> parent_work_dir is invalid.'
+        assert isinstance(library_name, str), '-> library_name is invalid.'
+        assert isinstance(library_parent_dir, str), '-> library_parent is invalid.'
+
+        assert isinstance(mod_config_node, ConfigTree), '-> mod_config_node is invalid.'
 
         # Inherit a configuration tree
-        assert isinstance(mod_config_node, ConfigTree), \
-               "-> mod_config_node is invalid."
         self.__config_node = mod_config_node
 
         # Read the module name and type
@@ -128,8 +129,9 @@ class Module:
         '''
 
         return self.__mod_name
-    name = property(__get_name, None, None, None)
 #----------------------- end def __get_name():------------------------------------
+
+    name = property(__get_name, None, None, None)
 
     def __get_library_name(self):
         '''
@@ -137,8 +139,9 @@ class Module:
         '''
 
         return self.__library_name
-    library_name = property(__get_library_name, None, None, None)
 #----------------------- end def get_library_name():------------------------------
+
+    library_name = property(__get_library_name, None, None, None)
 
     def __get_library_parent_dir(self):
         '''
@@ -146,8 +149,9 @@ class Module:
         '''
 
         return self.__library_parent_dir
-    library_parent_dir = property(__get_library_parent_dir, None, None, None)
 #----------------------- end def __get_library_parent_dir():----------------------
+
+    library_parent_dir = property(__get_library_parent_dir, None, None, None)
 
     def __get_ports(self):
         '''
@@ -155,8 +159,9 @@ class Module:
         '''
 
         return self.__ports
-    ports = property(__get_ports, None, None, None)
 #----------------------- end def get_ports():-------------------------------------
+
+    ports = property(__get_ports, None, None, None)
 
     def get_port_type(self, port_name):
         '''
@@ -191,8 +196,9 @@ class Module:
         for port in self.__ports:
             port_names.append(port[0])
         return port_names
-    port_names = property(__get_port_names, None, None, None)
 #----------------------- end def get_port_names():--------------------------------
+
+    port_names = property(__get_port_names, None, None, None)
 
     def has_port_name(self, port_name):
         '''

@@ -8,14 +8,15 @@
 #
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
-"""
+'''
 Simulation class of Cortix.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
-"""
+'''
 #*********************************************************************************
 import os
 import logging
+import datetime
 from cortix.src.utils.configtree       import ConfigTree
 from cortix.src.utils.set_logger_level import set_logger_level
 
@@ -29,11 +30,12 @@ class Simulation:
     '''
 
     def __init__(self, parent_work_dir=None, sim_config_node=ConfigTree()):
+
         assert isinstance(parent_work_dir, str), '-> parentWorkDir invalid.'
 
         # Inherit a configuration tree
-        assert isinstance(
-            sim_config_node, ConfigTree), '-> sim_config_node invalid.'
+        assert isinstance(sim_config_node, ConfigTree), '-> sim_config_node invalid.'
+
         self.__config_node = sim_config_node
 
         # Read the simulation name
@@ -46,7 +48,7 @@ class Simulation:
 
         # Create the logging facility for each object
         node = sim_config_node.get_sub_node("logger")
-        logger_name = 'sim:' + self.__name 
+        logger_name = 'sim:' + self.__name
         self.__log = logging.getLogger(logger_name)
         self.__log.setLevel(logging.NOTSET)
 
@@ -98,8 +100,12 @@ class Simulation:
             self.__log.debug("created application: %s", app_node.get('name'))
 
         # Stores the task(s) created by the execute method
+        # vfda:  Why is this needed? 
         self.__tasks = list()
+
         self.__log.info("created simulation: %s", self.__name)
+
+        return
 #----------------------- end def __init__():--------------------------------------
 
     def execute(self, task_name=None):
@@ -126,11 +132,15 @@ class Simulation:
                         'called task.execute() on task %s', task_name)
 
         self.__log.debug("end execute(%s)", task_name)
+
+        return
 #----------------------- end def execute():---------------------------------------
 
     def __del__(self):
 
         self.__log.info("destroyed simulation: %s", self.__name)
+
+        return
 #----------------------- end def __del__():---------------------------------------
 
 #*********************************************************************************
@@ -138,37 +148,57 @@ class Simulation:
 
     def __setup_task(self, task_name):
         '''
-        This is a helper function used by the execute() method.
-        It sets up the set of tasks defined in the Cortix config for a simulation.
+        This is a helper function used by the execute() method. It createas a
+        Task object and sets up the communication file for the task at hand.
+        There must be only one nework for this task and this network will be
+        used to generate the communication file for each module where the ports
+        will point to files. Each module will have in its runtime directory an
+        XML file which maps a port name and type to a file. If the port type is a
+        provide type, the file pointed to resides on the same directory as the
+        communication file. If the port type is a use type, the file pointed to
+        resides in the directory of the module whose corresponding provide port is
+        connected to. The communication XML file contains a root tag
+        <cortix_comm>, a series of XML port tags with three attributes and no
+        content as follows:
+
+                <port name=port_name type=port_type file=full_path_file_name />
+
         '''
 
         self.__log.debug('start __setup_task(%s)', task_name)
+
         task = None
 
+        print('here')
+        print(type(self.__config_node.get_all_sub_nodes('task')))
+        print(self.__config_node.get_all_sub_nodes('task'))
+        print('here')
+
+        # loop over all elements with a <task></task> tag in this simulation 
+        # __config_node
         for task_node in self.__config_node.get_all_sub_nodes('task'):
-            if task_node.get('name') != task_name:
-                continue
 
             task_config_node = ConfigTree(task_node)
 
+            if task_config_node.get_node_name() != task_name:
+                continue
+
             # create task
-            task = Task(self.__work_dir, task_config_node)
+            task = Task( self.__work_dir, task_config_node )
 
             self.__tasks.append(task)
 
-            self.__log.debug("appended task: %s", task_node.get("name"))
+            self.__log.debug('appended task: %s', task_config_node.get_node_name())
 
         if task is None:
             self.__log.debug('no task to exectute; done here.')
             self.__log.debug('end __setup_task(%s)', task_name)
             return
 
-        networks = self.__application.networks
-
         # create subdirectory with task name
         task_name = task.name
         task_work_dir = task.work_dir
-        assert os.path.isdir(task_work_dir), "directory %r invalid." % task_work_dir
+        assert os.path.isdir(task_work_dir), 'directory %r invalid.' % task_work_dir
 
         # set the parameters for the task in the cortix param file
         task_file = task_work_dir + 'cortix-param.xml'
@@ -176,6 +206,9 @@ class Simulation:
         fout = open(task_file, 'w')
         fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         fout.write('<!-- Written by Simulation::__setup_task() -->\n')
+        today = datetime.datetime.today()
+        fout.write('<!-- ' + str(today) + ' -->\n')
+
         fout.write('<cortix_param>\n')
 
         start_time = task.start_time
@@ -198,19 +231,23 @@ class Simulation:
 
         task.set_runtime_cortix_param_file(task_file)
 
-        # Using the tasks and network create the runtime module directories and comm
-        # files
+        # Using the task and network objects create the runtime module directories and 
+        # cortix comm files; one comm file per module inside the module runtime directory
+
+        networks = self.__application.networks
+
         for net in networks:
-  
-            if net.name.strip() != task_name.strip():
+
+            if net.name != task_name:
                 s = '__setup_task():: net name: ' + \
                     net.name + ' not equal to task name: ' + task_name + '; ignored.'
                 self.__log.warn(s)
+                continue
 
-            if net.name.strip() == task_name.strip():  # net and task names must match
+            elif net.name == task_name:  # net and task names must match
 
                 connect = net.connectivity
-                to_module_to_port_visited = dict()
+                to_module_to_port_visited = dict()  # providers
 
                 for con in connect:
                     # Start with the ports that will function as a provide port or
@@ -255,6 +292,8 @@ class Simulation:
                         fout = open(to_module_slot_comm_file,'w')
                         fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
                         fout.write('<!-- Written by Simulation::__setup_task() -->\n')
+                        today = datetime.datetime.today()
+                        fout.write('<!-- ' + str(today) + ' -->\n')
                         fout.write('<cortix_comm>\n')
 
                     if to_port not in to_module_to_port_visited[to_module_slot]:
@@ -263,12 +302,13 @@ class Simulation:
                         to_port_mode = to_module.get_port_mode(to_port)
                         if to_port_mode.split('.')[0] == 'file':
                             ext = to_port_mode.split('.')[1]
-                            log_str = '<port name="' + to_port + '" type="provide" file="'\
-                                      + to_module_slot_work_dir + to_port + '.' + ext + '"/>\n'
+                            log_str = '<port name="' + to_port + \
+                                    '" type="provide" file="' + to_module_slot_work_dir\
+                                    + to_port + '.' + ext + '"/>\n'
                         elif to_port_mode == 'directory':
-                            log_str = '<port name="' + to_port +\
-                                      '" type="provide" directory="' +\
-                                      to_module_slot_work_dir + to_port + '"/>\n'
+                            log_str = '<port name="' + to_port + \
+                                    '" type="provide" directory="' + \
+                                    to_module_slot_work_dir + to_port + '"/>\n'
                         else:
                             assert False, 'invalid port mode. fatal.'
 
@@ -282,11 +322,10 @@ class Simulation:
                     self.__log.debug(debug_str)
 
                     # register the cortix-comm file for the network
-                    net.set_runtime_cortix_comm_file(to_module_slot,
-                                                     to_module_slot_comm_file)
+                    net.set_runtime_cortix_comm_file_name( to_module_slot,
+                        to_module_slot_comm_file)
 
-                    # Now do the ports that will function as use ports or
-                    # output ports
+                    # Now do the ports that will function as use ports or output ports
                     from_module_slot = con['fromModuleSlot']
                     from_port = con['fromPort']
                     from_module_name = '_'.join( from_module_slot.split('_')[:-1] )
@@ -304,14 +343,10 @@ class Simulation:
                     from_module_slot_work_dir = task_work_dir + from_module_slot + '/'
 
                     if from_module.get_port_type(from_port) != 'output':
-                        assert from_module.get_port_type(from_port) == 'use', \
-                            'port type %r invalid. Module %r, port %r' % \
-                            (from_module.get_port_type(from_port),
-                             from_module.name, from_port)
+                        assert from_module.get_port_type(from_port) == 'use', 'port type %r invalid. Module %r, port %r' % (from_module.get_port_type(from_port), from_module.name, from_port)
 
                         # "from" is who makes the "call", hence the user
-                        from_module_slot_comm_file = from_module_slot_work_dir + \
-                            'cortix-comm.xml'
+                        from_module_slot_comm_file = from_module_slot_work_dir + 'cortix-comm.xml'
 
                         if not os.path.isdir(from_module_slot_work_dir):
                             os.system('mkdir -p ' + from_module_slot_work_dir)
@@ -320,6 +355,8 @@ class Simulation:
                             fout = open(from_module_slot_comm_file,'w')
                             fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
                             fout.write('<!-- Written by Simulation::__setup_task() -->\n')
+                            today = datetime.datetime.today()
+                            fout.write('<!-- ' + str(today) + ' -->\n')
                             fout.write('<cortix_comm>\n')
                             fout.close() # is this right?
 
@@ -346,30 +383,31 @@ class Simulation:
                         fout.write(log_str)
                         fout.close()
 
-                        debug_str = '__setup_task():: comm module: ' + \
-                                    from_module_slot + '; network: ' + task_name + \
-                                    ' ' + log_str
+                        debug_str = '__setup_task():: comm module: ' + from_module_slot\
+                                + '; network: ' + task_name + ' ' + log_str
                         self.__log.debug(debug_str)
 
                 # register the cortix-comm file for the network
-                net.set_runtime_cortix_comm_file( from_module_slot,
+                net.set_runtime_cortix_comm_file_name( from_module_slot,
                                                   from_module_slot_comm_file )
 
-            #end if net.name.strip() == task_name.strip():  
+            #end elif net.name.strip() == task_name.strip():  # net and task names must match
+            else:
+                assert False, 'this should not happen...'
 
         # end for net in networks:
 
-        # Now finish forming the XML documents for port types
+        # Now finish forming the XML comm file for each module in each network
         for net in networks:
-            for slot_name in net.slot_names:
-                comm_file = net.get_runtime_cortix_comm_file(slot_name)
-                if comm_file == 'null-runtime_cortix_comm_file':
+            for slot_name in net.module_slot_names:
+                comm_file = net.get_runtime_cortix_comm_file_name(slot_name)
+                if comm_file == 'null-runtime_cortix_comm_file_name':
                     if net.name != task_name:
                        s = '__setup_task():: comm file for ' + slot_name + \
                            ' in network ' + net.name + ' is ' + comm_file
                        self.__log.warn(s)
                        continue
-                    else: 
+                    else:
                        assert False, 'FATAL ERROR building the comm file for module %r'%\
                                     slot_name
                 fout = open(comm_file, 'a')

@@ -8,11 +8,11 @@
 #
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
-"""
+'''
 Application class for Cortix.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
-"""
+'''
 #*********************************************************************************
 import os
 import sys
@@ -31,19 +31,16 @@ class Application:
     combination is assigned to a Network object.
     """
 
-    def __init__(self, app_work_dir=None, app_config_node=ConfigTree()):
+    def __init__(self, app_work_dir, app_config_node):
 
         assert isinstance(app_work_dir, str), '-> app_work_dir is invalid'
+        assert isinstance(app_config_node, ConfigTree), '-> app_config_node invalid'
 
-        # Inherit a configuration tree
-        assert isinstance(
-            app_config_node, ConfigTree), "-> app_config_node invalid"
-        assert isinstance(app_config_node.get_node_tag(),
-                          str), "empty xml tree."
-        self.__config_node = app_config_node
+        # Inherit configuration XML tree
+        #self.__config_node = app_config_node
 
         # Read the application name
-        self.__name = self.__config_node.get_node_name()
+        self.__name = app_config_node.get_node_name()
 
         # Set the work directory (previously created)
         self.__work_dir = app_work_dir
@@ -51,9 +48,11 @@ class Application:
 
         # Set the module library for the whole application
         node = app_config_node.get_sub_node('module_library')
-        self.__module_lib_name = node.get('name').strip()
         sub_node = ConfigTree(node)
         assert sub_node.get_node_tag() == 'module_library', 'FATAL.'
+
+        self.__module_lib_name = sub_node.get_node_name()
+
         for child in sub_node.get_node_children():
             (elem, tag, attributes, text) = child
             if tag == 'parent_dir':
@@ -64,6 +63,80 @@ class Application:
 
         # add library full path to python module search
         sys.path.insert(1, self.__module_lib_full_parent_dir)
+
+        # Create loggin facility
+        self.__create_logging_facility( app_config_node )
+
+        # Setup modules
+        self.__modules = list()
+        self.__setup_modules(app_config_node)
+
+        # Setup networks 
+        self.__networks = list()
+        self.__setup_networks(app_config_node)
+
+        self.__log.info('Created application: %s', self.__name)
+
+        return
+#----------------------- end def __init__():--------------------------------------
+
+#*********************************************************************************
+# Public functions 
+
+    def __get_networks(self):
+        '''
+        `list(str)`:List of names of network objects
+        '''
+
+        return self.__networks
+#----------------------- end def __get_networks():--------------------------------
+
+    networks = property(__get_networks, None, None, None)
+
+    def get_network(self, name):
+        '''
+        Returns a network with a given name.  None if the name doesn't exist.
+        '''
+
+        for net in self.__networks:
+            if net.name == name:
+                return net
+
+        return None
+#----------------------- end def get_network():-----------------------------------
+
+    def __get_modules(self):
+        '''
+        `list(str)`:List of names of Cortix module objects
+        '''
+
+        return self.__modules
+#----------------------- end def __get_modules():---------------------------------
+
+    modules = property(__get_modules, None, None, None)
+
+    def get_module(self, name):
+        """
+        Returns a module with a given name.  None if the name doesn't exist.
+        """
+        for mod in self.__modules:
+            if mod.name == name:
+                return mod
+        return None
+#----------------------- end def get_module():------------------------------------
+
+    def __del__(self):
+
+        self.__log.info('destroyed application: %s', self.__name)
+#----------------------- end def __del__():---------------------------------------
+
+#*********************************************************************************
+# Private helper functions (internal use: __)
+
+    def __create_logging_facility(self, app_config_node):
+        '''
+        A helper function to setup the logging facility used in self.__init__().
+        '''
 
         # Create the logging facility for the singleton object
         node = app_config_node.get_sub_node("logger")
@@ -108,66 +181,10 @@ class Application:
             'logger console handler level: %s',
             console_handler_level)
 
-        self.__modules = list()
-        self.__setup_modules()
+        return
+#----------------------- end def __create_loggin_facility():----------------------
 
-        self.__networks = list()
-        self.__setup_networks()
-
-        self.__log.info('Created application: %s', self.__name)
-#----------------------- end def __init__():--------------------------------------
-
-#*********************************************************************************
-# Public functions 
-
-    def __get_networks(self):
-        """
-        `list(str)`:List of names of network objects
-        """
-
-        return self.__networks
-    networks = property(__get_networks, None, None, None)
-#----------------------- end def __get_networks():--------------------------------
-
-    def get_network(self, name):
-        """
-        Returns a network with a given name.  None if the name doesn't exist.
-        """
-
-        for net in self.__networks:
-            if net.name == name:
-                return net
-        return None
-#----------------------- end def get_network():-----------------------------------
-
-    def __get_modules(self):
-        """
-        `list(str)`:List of names of Cortix module objects
-        """
-
-        return self.__modules
-    modules = property(__get_modules, None, None, None)
-#----------------------- end def __get_modules():---------------------------------
-
-    def get_module(self, name):
-        """
-        Returns a module with a given name.  None if the name doesn't exist.
-        """
-        for mod in self.__modules:
-            if mod.name == name:
-                return mod
-        return None
-#----------------------- end def get_module():------------------------------------
-
-    def __del__(self):
-
-        self.__log.info('destroyed application: %s', self.__name)
-#----------------------- end def __del__():---------------------------------------
-
-#*********************************************************************************
-# Private helper functions (internal use: __)
-
-    def __setup_networks(self):
+    def __setup_networks(self,app_config_node):
         '''
         A helper function used by the Application constructor to setup the networks
         portion of the Application.
@@ -175,7 +192,7 @@ class Application:
 
         self.__log.debug('start __setup_networks()')
 
-        for net_node in self.__config_node.get_all_sub_nodes("network"):
+        for net_node in app_config_node.get_all_sub_nodes("network"):
             net_config_node = ConfigTree(net_node)
             assert net_config_node.get_node_name() == net_node.get('name'), 'check failed'
 
@@ -185,16 +202,18 @@ class Application:
             self.__log.debug("appended network %s", net_node.get("name"))
 
         self.__log.debug("end __setup_networks()")
+
+        return
 #----------------------- end def __setup_networks():------------------------------
 
-    def __setup_modules(self):
+    def __setup_modules(self,app_config_node):
         """
         A helper function used by the Application constructor to setup the modules
         portion of the Application.
         """
 
         self.__log.debug("Start __setup_modules()")
-        for mod_node in self.__config_node.get_all_sub_nodes('module'):
+        for mod_node in app_config_node.get_all_sub_nodes('module'):
 
             mod_config_node = ConfigTree(mod_node)
             assert mod_config_node.get_node_name() == mod_node.get('name'), \
@@ -219,6 +238,8 @@ class Application:
             self.__log.debug("appended module %s", mod_node.get('name'))
 
         self.__log.debug("end __setup_modules()")
+
+        return
 #----------------------- end def __setup_modules():-------------------------------
 
 #======================= end class Application: ==================================

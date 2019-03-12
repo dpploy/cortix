@@ -8,11 +8,11 @@
 #
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
-"""
-Valmor F. de Almeida dealmeidav@ornl.gov; vfda
+'''
+The Cortix Task class definition.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
-"""
+'''
 #*********************************************************************************
 import os
 import time
@@ -38,7 +38,7 @@ class Task:
         self.__config_node = task_config_node
 
         # Read the task name
-        self.__name = self.__config_node.get_node_name()
+        self.__name = self.__config_node.get_node_name().strip()
 
         # Set the work directory (previously created)
         assert os.path.isdir(parent_work_dir), 'work directory not available.'
@@ -127,6 +127,8 @@ class Task:
         self.__log.debug('evolve_time unit  = %s', str(self.__evolve_time_unit))
         self.__log.debug('end __init__()')
         self.__log.info('created task: %s', self.__name)
+
+        return
 #----------------------- end def __init__():--------------------------------------
 
     def execute(self, application):
@@ -136,14 +138,14 @@ class Task:
         network = application.get_network(self.__name)
         runtime_status_files = dict()
 
-        for slot_name in network.slot_names:
+        for slot_name in network.module_slot_names:
 
             module_name = '_'.join( slot_name.split('_')[:-1] )
             slot_id = int(slot_name.split('_')[-1])
 
             module     = application.get_module(module_name)
             param_file = self.__runtime_cortix_param_file
-            comm_file  = network.get_runtime_cortix_comm_file(slot_name)
+            comm_file  = network.get_runtime_cortix_comm_file_name(slot_name)
 
             # Run module in the slot
             self.__log.info('call execute on module: %s:%s',module_name,slot_id)
@@ -162,6 +164,8 @@ class Task:
             (status, slot_names) = self.__get_runtime_status(runtime_status_files)
             self.__log.info('runtime status: %s; module slots running: %s', status,
                           str(slot_names))
+
+        return
 #----------------------- end def execute():---------------------------------------
 
     def __get_name(self):
@@ -170,6 +174,7 @@ class Task:
         '''
 
         return self.__name
+
     name = property(__get_name, None, None, None)
 #----------------------- end def get_name():--------------------------------------
 
@@ -188,8 +193,9 @@ class Task:
         '''
 
         return self.__start_time
-    start_time = property(__get_start_time, None, None, None)
 #----------------------- end def get_start_time():--------------------------------
+
+    start_time = property(__get_start_time, None, None, None)
 
     def __get_start_time_unit(self):
         '''
@@ -197,8 +203,9 @@ class Task:
         '''
 
         return self.__start_time_unit
-    start_time_unit = property(__get_start_time_unit, None, None, None)
 #----------------------- end def get_start_time_unit():---------------------------
+
+    start_time_unit = property(__get_start_time_unit, None, None, None)
 
     def __get_evolve_time(self):
         '''
@@ -206,8 +213,9 @@ class Task:
         '''
 
         return self.__evolve_time
-    evolve_time = property(__get_evolve_time, None, None, None)
 #----------------------- end def get_evolve_time():-------------------------------
+
+    evolve_time = property(__get_evolve_time, None, None, None)
 
     def __get_evolve_time_unit(self):
         '''
@@ -215,8 +223,9 @@ class Task:
         '''
 
         return self.__evolve_time_unit
-    evolve_time_unit = property(__get_evolve_time_unit, None, None, None)
 #----------------------- end def get_evolve_time_unit():--------------------------
+
+    evolve_time_unit = property(__get_evolve_time_unit, None, None, None)
 
     def __get_time_step(self):
         '''
@@ -224,8 +233,9 @@ class Task:
         '''
 
         return self.__time_step
-    time_step = property(__get_time_step, None, None, None)
 #----------------------- end def get_time_step():---------------------------------
+
+    time_step = property(__get_time_step, None, None, None)
 
     def __get_time_step_unit(self):
         '''
@@ -233,8 +243,9 @@ class Task:
         '''
 
         return self.__time_step_unit
-    time_step_unit = property(__get_time_step_unit, None, None, None)
 #----------------------- end def get_time_step_unit():----------------------------
+
+    time_step_unit = property(__get_time_step_unit, None, None, None)
 
     def set_runtime_cortix_param_file(self, full_path):
         '''
@@ -250,11 +261,16 @@ class Task:
         '''
 
         return self.__runtime_cortix_param_file
-    runtime_cortix_param_file = property(__get_runtime_cortix_param_file, set_runtime_cortix_param_file, None, None)
 #----------------------- end def get_runtime_cortix_param_file():-----------------
 
+    runtime_cortix_param_file = property(__get_runtime_cortix_param_file,
+        set_runtime_cortix_param_file, None, None)
+
     def __del__(self):
+
         self.__log.info('destroyed task: %s', self.__name)
+
+        return
 #----------------------- end def __del__():---------------------------------------
 
 #*********************************************************************************
