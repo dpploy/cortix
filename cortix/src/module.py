@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# This file is part of the Cortix toolkit evironment
-# https://github.com/dpploy/cortix
+# This file is part of the Cortix toolkit environment
+# https://cortix.org
 #
 # All rights reserved, see COPYRIGHT for full restrictions.
 # https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
 #
-# Licensed under the GNU General Public License v. 3, please see LICENSE file.
-# https://www.gnu.org/licenses/gpl-3.0.txt
-"""
+# Licensed under the University of Massachusetts Lowell LICENSE:
+# https://github.com/dpploy/cortix/blob/master/LICENSE.txt
+'''
 Cortix Module class defintion.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
-"""
+'''
 #**********************************************************************************
 import os
-from cortix.src.utils.configtree import ConfigTree
+from cortix.src.utils.xmltree import XMLTree
 
 from cortix.src.launcher import Launcher
 #**********************************************************************************
@@ -25,20 +25,23 @@ class Module:
     The Module class encapsulates a computational module of some scientific domain.
     '''
 
-    def __init__( self, parent_work_dir=None, library_name=None,
-                  library_parent_dir=None, mod_config_node=ConfigTree() ):
+#*********************************************************************************
+# Construction 
+#*********************************************************************************
 
-        assert isinstance(
-            parent_work_dir, str), "-> parent_work_dir is invalid."
+    def __init__( self, parent_work_dir, library_name,
+                  library_parent_dir, config_xml_tree ):
 
-        # Inherit a configuration tree
-        assert isinstance(mod_config_node, ConfigTree), \
-               "-> mod_config_node is invalid."
-        self.__config_node = mod_config_node
+        assert isinstance(parent_work_dir, str), '-> parent_work_dir is invalid.'
+        assert isinstance(library_name, str), '-> library_name is invalid.'
+        assert isinstance(library_parent_dir, str), '-> library_parent is invalid.'
+
+        assert isinstance(config_xml_tree, XMLTree), '-> config_xml_tree is invalid.'
+        assert config_xml_tree.get_node_tag() == 'module', 'invalid module xml tree.'
 
         # Read the module name and type
-        self.__mod_name = self.__config_node.get_node_name()
-        self.__mod_type = self.__config_node.get_node_type()
+        self.__mod_name = config_xml_tree.get_node_name()
+        self.__mod_type = config_xml_tree.get_node_type()
 
         # Specify module library with upstream information
         self.__library_parent_dir = library_parent_dir
@@ -49,10 +52,11 @@ class Module:
         self.__input_file_name = 'null-input_file_name'
         self.__input_file_path = 'null-input_file_path'
 
-        self.__ports = list()  # list of (port_name, port_type, port_multiplicity)
+        self.__ports = list() # list of (port_name, port_type, port_multiplicity)
 
-        # Save config data
-        for child in self.__config_node.get_node_children():
+        # Get config data  
+        for child in config_xml_tree.get_node_children():
+
             (elem, tag, attributes, text) = child
             text = text.strip()
 
@@ -80,11 +84,11 @@ class Module:
                 val = attributes[0][1].strip()
                 self.__library_name = val
 
-                node = ConfigTree(elem)
+                node = XMLTree( elem ) # fixme: remove thi wrapper
                 sub_node = node.get_sub_node('parent_dir')
-                assert sub_node is not None, 'missing parent_dir.'
 
-                self.__library_parent_dir = sub_node.text.strip()
+                # fixme: no root node needed
+                self.__library_parent_dir = sub_node.get_root_node().text.strip()
 
                 if self.__library_parent_dir[-1] == '/':
                     self.__library_parent_dir.strip('/')
@@ -95,7 +99,7 @@ class Module:
                 tmp = dict()  # store port name and three attributes
 
                 for attribute in attributes:
-                    key = attribute[0]
+                    key = attribute[0].strip()
                     val = attribute[1].strip()
 
                     if key == 'type':
@@ -111,7 +115,7 @@ class Module:
                     elif key == 'multiplicity':
                         tmp['port_multiplicity'] = int(val)  # port_multiplicity
                     else:
-                        assert False, 'invalid port attribute. fatal.'
+                        assert False, 'invalid port attribute: %r=%r. fatal.'%(key,val)
 
                 assert len(tmp) == 4
                 store = (tmp['port_name'], tmp['port_type'], tmp['port_mode'],
@@ -120,7 +124,12 @@ class Module:
                 #  port_multiplicity)
                 tmp = None
                 store = None
-#----------------------- end def __init__():--------------------------------------
+
+        return
+
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
 
     def __get_name(self):
         '''
@@ -128,8 +137,8 @@ class Module:
         '''
 
         return self.__mod_name
+
     name = property(__get_name, None, None, None)
-#----------------------- end def __get_name():------------------------------------
 
     def __get_library_name(self):
         '''
@@ -137,8 +146,8 @@ class Module:
         '''
 
         return self.__library_name
+
     library_name = property(__get_library_name, None, None, None)
-#----------------------- end def get_library_name():------------------------------
 
     def __get_library_parent_dir(self):
         '''
@@ -146,8 +155,8 @@ class Module:
         '''
 
         return self.__library_parent_dir
+
     library_parent_dir = property(__get_library_parent_dir, None, None, None)
-#----------------------- end def __get_library_parent_dir():----------------------
 
     def __get_ports(self):
         '''
@@ -155,8 +164,8 @@ class Module:
         '''
 
         return self.__ports
+
     ports = property(__get_ports, None, None, None)
-#----------------------- end def get_ports():-------------------------------------
 
     def get_port_type(self, port_name):
         '''
@@ -167,8 +176,8 @@ class Module:
         for port in self.__ports:
             if port[0] == port_name:
                 port_type = port[1]
+
         return port_type
-#----------------------- end def get_port_type():---------------------------------
 
     def get_port_mode(self, port_name):
         '''
@@ -179,8 +188,8 @@ class Module:
         for port in self.__ports:
             if port[0] == port_name:
                 port_mode = port[2]
+
         return port_mode
-#----------------------- end def get_port_mode():---------------------------------
 
     def __get_port_names(self):
         '''
@@ -191,8 +200,8 @@ class Module:
         for port in self.__ports:
             port_names.append(port[0])
         return port_names
+
     port_names = property(__get_port_names, None, None, None)
-#----------------------- end def get_port_names():--------------------------------
 
     def has_port_name(self, port_name):
         '''
@@ -203,15 +212,16 @@ class Module:
         for port in self.__ports:
             if port[0] == port_name:
                 return True
-        return False
-#----------------------- end def has_port_name():---------------------------------
 
-    def execute( self, slot_id, 
+        return False
+
+    def execute( self, slot_id,
                  runtime_cortix_param_file,
                  runtime_cortix_comm_file    ):
         '''
         Spawns a worker process to execute the module.
         '''
+
         assert runtime_cortix_param_file[-1] is not '/'
         assert runtime_cortix_comm_file[-1] is not '/'
 
@@ -255,6 +265,9 @@ class Module:
         launch.start() # this start a thread and runs the run() method of launch
 
         return runtime_module_status_file
-#----------------------- end def execute():---------------------------------------
+
+#*********************************************************************************
+# Private helper functions (internal use: __)
+#*********************************************************************************
 
 #======================= end class Module: =======================================
