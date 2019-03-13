@@ -28,25 +28,30 @@ convention. It is also common to call the element name as the tag name. The star
 of an element may have any number of atributes:
  + **attributes**: name='value', *e.g.*, <net_x mod_slot='wind:0'> </net_x>
 these are name-value pairs; we will use the same name convention for element names
-when creating attribute names. There may be many attributes in a start tag. Finally 
+when creating attribute names. There may be many attributes in a start tag. Finally
 everything in between tags of an element, is considered as the element content:
  + **content**: <tag> content </tag>, *e.g.*, <net_x mod_slot='wind:0'>189.67 MeV</net_x>
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
 '''
 #*********************************************************************************
-from xml.etree.ElementTree import Element
-from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import ElementTree # the whole XML tree data structure
+from xml.etree.ElementTree import Element     # an XML element or tree node
 #*********************************************************************************
 
 class ConfigTree:
     '''
-    This class generates objects that hold an ElementTree node of an XML tree
-    structure. The level of the node depends on the argument passed when creating a
-    `ConfigTree` object. If a node is passed, that node and all of its subnodes are held
-    in a new tree. If a filename is passed, instead, an XML file is read and the root
-    node is held at the top of the tree. A node is the same thing as an XML element as
-    described in the Background above.
+    This class is a wrapper around the XML parser ElementTree and Element. See
+    import statement above. This XML parser is fast but the interface is not very
+    user friendly; hence the motivation for this wrapper.
+    The interface is designed to facilitate the use of XML data within Cortix and
+    its modules. This class generates objects that hold an XML tree: ElementTree.
+    Configuration of Cortix and some runtime files are the primary usage of XMLTree.
+    The construction of an XMLTree object either uses a file with an XML content or
+    an XML branch of an XML tree. This makes it useful throughout Cortix to inspect
+    branches of a configuration XML tree to retrieve data.
+    A node in a tree is the root of a branch. That is, the same thing as an XML
+    element and all its direct sub-elements; described in the Background above.
     '''
 
     def __init__(self, config_tree_node=None, config_file_name=None):
@@ -54,20 +59,24 @@ class ConfigTree:
         # hold a given XML tree node
         if config_tree_node is not None:
             assert isinstance(config_tree_node, Element), '-> config_tree_node invalid.'
+            tag_name = config_tree_node.tag
+            assert isinstance(tag_name,str)
+            assert len(tag_name) > 0
+
             self.__config_tree_node = config_tree_node
 
         # parse an XML tree and hold its root node
         if config_file_name is not None:
-            assert isinstance(
-                config_file_name, str), '-> configFileName not a str.'
+            assert isinstance(config_file_name, str), '-> configFileName not a str.'
             assert config_tree_node is None, 'node and file not allowed together.'
 
             tree = ElementTree()
-            tree.parse(config_file_name)
+            tree.parse( config_file_name )
+
             self.__config_tree_node = tree.getroot()
 
         return
-# ---------------------- end def __init__():------------------------------
+#----------------------- end def __init__() --------------------------------------
 
     def get_root_node(self):
         '''
@@ -83,7 +92,7 @@ class ConfigTree:
         '''
 
         return self.__config_tree_node
-# ---------------------- end def get_root_node:():------------------------
+#----------------------- end def get_root_node() ---------------------------------
 
     def get_node_tag(self):
         '''
@@ -103,7 +112,7 @@ class ConfigTree:
         assert isinstance(tag_name,str)
 
         return tag_name
-# ---------------------- end def get_node_tag:():-------------------------
+#----------------------- end def get_node_tag() ----------------------------------
 
     def get_node_name(self):
         '''
@@ -128,7 +137,7 @@ class ConfigTree:
         assert isinstance(attribute_value,str)
 
         return attribute_value.strip()
-# ---------------------- end def get_node_name:():------------------------
+#----------------------- end def get_node_name:() --------------------------------
 
     def get_node_type(self):
         '''
@@ -146,26 +155,72 @@ class ConfigTree:
         '''
 
         attribute_name = 'type'
-        attribute_value = self.__config_tree_node.get('type')
+        attribute_value = self.__config_tree_node.get(attribute_name)
 
         assert attribute_value is not None
         assert isinstance(attribute_value,str)
 
         return attribute_value.strip()
-# ---------------------- end def get_node_type:():------------------------
+#----------------------- end def get_node_type() ---------------------------------
+
+    def get_node_attribute(self, attribute_name):
+        '''
+        Returns the value of the attribute associated with the root node of
+        the element tree, *e.g.* <module type='native'></module>. Attribute
+        name is `type`, value is 'native'.
+
+        Parameters
+        ----------
+        attribute_name: str
+
+        Returns
+        -------
+        attribute_value: str
+        '''
+
+        assert isinstance(attribute_name,str)
+        attribute_value = self.__config_tree_node.get(attribute_name.strip())
+
+        assert attribute_value is not None
+        assert isinstance(attribute_value,str)
+
+        return attribute_value.strip()
+#----------------------- end def get_node_attribute() ----------------------------
+
+    def get_node_content(self):
+        '''
+        Returns the content or text of the XML element.This is what is in between
+        the start and end tags of the element.
+
+        Parameters
+        ----------
+        Empty
+
+        Returns
+        -------
+        content: str
+        '''
+
+        content = self.__config_tree_node.text
+
+        assert isinstance(content,str)
+
+        return content
+#----------------------- end def get_node_attribute() ----------------------------
 
     def get_sub_node(self, tag):
         '''
-        Returns a subnode (branch) of the element tree specified by the parameter tag.
-        If there is more than one, the first found is returned.
+        Returns the first subnode (branch) of the element tree specified by the
+        parameter tag.
 
         Parameters
         ----------
         tag: str
             This is the XML element name (or tag name).
+
         Returns
         -------
-        node: Element
+        node: XMLTree
             An XML branch tree starting from `node`.
         '''
 
@@ -175,8 +230,10 @@ class ConfigTree:
 
         assert node is not None
 
+        node = ConfigTree(node)  # wrap Element
+
         return node
-# ---------------------- end def get_sub_node:():-------------------------
+#----------------------- end def get_sub_node() ----------------------------------
 
     def get_all_sub_nodes(self, tag):
         '''
@@ -186,10 +243,11 @@ class ConfigTree:
         ----------
         tag: str
             XML element name or tag name, *e.g.* <task></task>
+
         Returns
         -------
-        sub_nodes: list(Element)
-            List of Element entries.
+        sub_nodes: list(XMLTree)
+            List of XMLTree items.
         '''
 
         assert isinstance(tag, str), 'tag invalid'
@@ -199,16 +257,18 @@ class ConfigTree:
         assert isinstance(sub_nodes,list)
         assert len(sub_nodes) > 0
 
-        return sub_nodes
-# ---------------------- end def get_all_sub_nodes:():--------------------
+        xml_tree_list = [ConfigTree(sub_node) for sub_node in sub_nodes]
+
+        return xml_tree_list
+#----------------------- end def get_all_sub_nodes() -----------------------------
 
     def get_node_children(self):
         '''
-        Returns a list of the sub-elements in the given element (node) containing
+        Returns a list of the direct sub-elements in the given element (node) containing:
         the subnode, the tag (element) name, the attributes a list of tuples,
         and the content (text) of the node. This is not recursive. Recursion
         can be done by calling this method on the children nodes (that is the first
-        element of the tuple below).
+        element of the tuple).
 
         Parameters
         ----------
@@ -228,6 +288,6 @@ class ConfigTree:
             children.append( (child, child.tag, child.items(), child.text) )
 
         return children
-# ---------------------- end def get_note_children:():--------------------
+#----------------------- end def get_note_children() -----------------------------
 
-# ====================== end class ConfigTree: =+++_======================
+#======================= end class ConfigTree ====================================

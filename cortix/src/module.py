@@ -48,10 +48,11 @@ class Module:
         self.__input_file_name = 'null-input_file_name'
         self.__input_file_path = 'null-input_file_path'
 
-        self.__ports = list()  # list of (port_name, port_type, port_multiplicity)
+        self.__ports = list() # list of (port_name, port_type, port_multiplicity)
 
-        # Save config data
+        # Get config data  
         for child in config_xml_tree.get_node_children():
+
             (elem, tag, attributes, text) = child
             text = text.strip()
 
@@ -79,11 +80,11 @@ class Module:
                 val = attributes[0][1].strip()
                 self.__library_name = val
 
-                node = ConfigTree(elem)
+                node = ConfigTree( elem ) # fixme: remove thi wrapper
                 sub_node = node.get_sub_node('parent_dir')
-                assert sub_node is not None, 'missing parent_dir.'
 
-                self.__library_parent_dir = sub_node.text.strip()
+                # fixme: no root node needed
+                self.__library_parent_dir = sub_node.get_root_node().text.strip()
 
                 if self.__library_parent_dir[-1] == '/':
                     self.__library_parent_dir.strip('/')
@@ -94,7 +95,7 @@ class Module:
                 tmp = dict()  # store port name and three attributes
 
                 for attribute in attributes:
-                    key = attribute[0]
+                    key = attribute[0].strip()
                     val = attribute[1].strip()
 
                     if key == 'type':
@@ -110,7 +111,7 @@ class Module:
                     elif key == 'multiplicity':
                         tmp['port_multiplicity'] = int(val)  # port_multiplicity
                     else:
-                        assert False, 'invalid port attribute. fatal.'
+                        assert False, 'invalid port attribute: %r=%r. fatal.'%(key,val)
 
                 assert len(tmp) == 4
                 store = (tmp['port_name'], tmp['port_type'], tmp['port_mode'],

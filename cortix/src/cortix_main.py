@@ -28,19 +28,22 @@ class Cortix():
     the user with an interface to the simulations.
     '''
 
-    def __init__(self, name, config_file='cortix-config.xml'):
+    def __init__(self, name, config_xml_file='cortix-config.xml'):
 
         assert isinstance(name,str), 'must give Cortix object a name'
 
-        assert isinstance(config_file, str), '-> configFile not a str.'
-        self.__config_file = config_file
+        assert isinstance(config_xml_file, str), '-> config_xml_file not a str.'
 
-        # Create a configuration XML tree
-        config_tree = ConfigTree(config_file_name=self.__config_file)
+        # Create the configuration XML tree
+        config_xml_tree = ConfigTree( config_file_name=config_xml_file )
+
+        assert config_xml_tree.get_node_tag() == 'cortix_config'
 
         # Read the cortix config element (tag) name <name></name>
-        node = config_tree.get_sub_node('name')  # get node (or XML element)
-        self.__name = node.text.strip()   # name is now, say, 'droplet-fall'
+        node = config_xml_tree.get_sub_node('name') # get node w/ tag: name (XML element)
+
+        # Set the Cortix configuration name
+        self.__name = node.get_node_content()  # name is now, say, 'droplet-fall'
 
         # Consistency check
         assert self.__name == name,\
@@ -48,8 +51,8 @@ class Cortix():
             % (self.__name, name)
 
         # Read the work directory name
-        node = config_tree.get_sub_node('work_dir')
-        work_dir = node.text.strip()
+        node = config_xml_tree.get_sub_node('work_dir')
+        work_dir = node.get_node_content()
         if work_dir[-1] != '/':
             work_dir += '/'
 
@@ -62,12 +65,14 @@ class Cortix():
         os.system('mkdir -p ' + self.__work_dir)
 
         # Create the logging facility for each object
-        self.__create_logging_facility( config_tree )
+        self.__create_logging( config_xml_tree )
+
+        self.__log.info('Created Cortix work directory: %s', self.__work_dir)
 
         #==================
         # Setup simulations (one or more as specified in the config file)
         #==================
-        self.__setup_simulations( config_tree )
+        self.__setup_simulations( config_xml_tree )
 
         self.__log.info('Created Cortix object %s', self.__name)
 #----------------------- end def __init__():--------------------------------------
@@ -92,16 +97,19 @@ class Cortix():
 #*********************************************************************************
 # Private helper functions (internal use: __)
 
-    def __create_logging_facility(self, config_tree):
+    def __create_logging(self, config_xml_tree):
         '''
-        A helper function to setup the logging facility used in  self.__init__()
+        A helper function to setup the logging facility used in self.__init__()
         '''
 
-        node = config_tree.get_sub_node('logger')
         logger_name = self.__name
+
         self.__log = logging.getLogger(logger_name)
         self.__log.setLevel(logging.NOTSET)
-        logger_level = node.get('level').strip()
+
+        node = config_xml_tree.get_sub_node('logger') # tag name is logger
+
+        logger_level = node.get_node_attribute('level')
         self.__log = set_logger_level(self.__log, logger_name, logger_level)
 
         file_handler = logging.FileHandler(self.__work_dir + 'cortix.log')
@@ -112,13 +120,15 @@ class Cortix():
         console_handler.setLevel(logging.NOTSET)
         console_handler_level = None
 
-        for child in node:
-            if child.tag == 'file_handler':
-                file_handler_level = child.get('level').strip()
+        for child in node.get_node_children():
+            (elem,tag,attributes,text) = child
+            elem = ConfigTree( elem ) # fixme: remove wrapping
+            if tag == 'file_handler':
+                file_handler_level = elem.get_node_attribute('level')
                 file_handler = set_logger_level(file_handler, logger_name,
                                                 file_handler_level)
-            if child.tag == 'console_handler':
-                console_handler_level = child.get('level').strip()
+            if tag == 'console_handler':
+                console_handler_level = elem.get_node_attribute('level')
                 console_handler = set_logger_level(console_handler, logger_name,
                                                    console_handler_level)
 
@@ -134,15 +144,12 @@ class Cortix():
         self.__log.info('Created Cortix logger: %s', self.__name)
         self.__log.debug('Logger level: %s', logger_level)
         self.__log.debug('Logger file handler level: %s', file_handler_level)
-        self.__log.debug(
-            'Logger console handler level: %s',
-            console_handler_level)
-        self.__log.info('Created Cortix work directory: %s', self.__work_dir)
+        self.__log.debug('Logger console handler level: %s', console_handler_level)
 
         return
-#----------------------- end def __create_logging_facility():---------------------
+#----------------------- end def __create_logging():------------------------------
 
-    def __setup_simulations(self, config_tree):
+    def __setup_simulations(self, config_xml_tree):
         '''
         This method is a helper function for the Cortix constructor
         whose purpose is to set up the simulations defined by the
@@ -151,16 +158,15 @@ class Cortix():
 
         self.__simulations = list()
 
-        for sim in config_tree.get_all_sub_nodes('simulation'):
+        for sim_config_xml_node in config_xml_tree.get_all_sub_nodes('simulation'):
 
-            sim_config_tree = ConfigTree( sim )
+            assert sim_config_xml_node.get_node_tag() == 'simulation'
 
             self.__log.debug(
                 '__setup_simulations(): simulation name: %s',
-                sim_config_tree.get_node_name)
+                sim_config_xml_node.get_node_attribute('name'))
 
-
-            simulation = Simulation( self.__work_dir, sim_config_tree )
+            simulation = Simulation( self.__work_dir, sim_config_xml_node )
 
             self.__simulations.append(simulation)
 

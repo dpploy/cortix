@@ -51,7 +51,7 @@ class Task:
         self.__log = logging.getLogger(logger_name)
         self.__log.setLevel(logging.NOTSET)
 
-        logger_level = node.get('level').strip()
+        logger_level = node.get_node_attribute('level')
         self.__log = set_logger_level(self.__log, logger_name, logger_level)
 
         file_handle = logging.FileHandler(self.__work_dir + 'task.log')
@@ -60,15 +60,15 @@ class Task:
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.NOTSET)
 
-        for child in node:
-            if child.tag == 'file_handler':
-                # file handler
-                file_handle_level = child.get('level').strip()
+        for child in node.get_node_children():
+            (elem,tag,attributes,text) = child
+            elem = ConfigTree( elem )
+            if tag == 'file_handler':
+                file_handle_level = elem.get_node_attribute('level')
                 file_handle = set_logger_level(file_handle, logger_name,
                                                file_handle_level)
-            if child.tag == 'console_handler':
-                # console handler
-                console_handle_level = child.get('level').strip()
+            if tag == 'console_handler':
+                console_handle_level = elem.get_node_attribute('level')
                 console_handler = set_logger_level(console_handler,
                                                    logger_name, console_handle_level)
 
@@ -85,9 +85,7 @@ class Task:
         self.__log.info('created logger: %s', self.__name)
         self.__log.debug('logger level: %s', logger_level)
         self.__log.debug('logger file handler level: %s', file_handle_level)
-        self.__log.debug(
-            'logger console handler level: %s',
-            console_handle_level)
+        self.__log.debug('logger console handler level: %s', console_handle_level)
 
         self.__start_time = self.__evolve_time = self.__time_step = 0.0
         self.__start_time_unit = 'null-start_time_unit'

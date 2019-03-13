@@ -31,29 +31,27 @@ class Application:
     combination is assigned to a Network object.
     """
 
-    def __init__(self, app_work_dir, app_config_node):
+    def __init__(self, app_work_dir, config_xml_tree):
 
         assert isinstance(app_work_dir, str), '-> app_work_dir is invalid'
-        assert isinstance(app_config_node, ConfigTree), '-> app_config_node invalid'
 
-        # Inherit configuration XML tree
-        #self.__config_node = app_config_node
+        assert isinstance(config_xml_tree, ConfigTree), '-> config_xml_tree invalid'
+        assert config_xml_tree.get_node_tag() == 'application'
 
         # Read the application name
-        self.__name = app_config_node.get_node_name()
+        self.__name = config_xml_tree.get_node_attribute('name')
 
         # Set the work directory (previously created)
         self.__work_dir = app_work_dir
         assert os.path.isdir(app_work_dir), "Work directory not available."
 
         # Set the module library for the whole application
-        node = app_config_node.get_sub_node('module_library')
-        sub_node = ConfigTree(node)
-        assert sub_node.get_node_tag() == 'module_library', 'FATAL.'
+        node = config_xml_tree.get_sub_node('module_library')
+        assert node.get_node_tag() == 'module_library', 'FATAL.'
 
-        self.__module_lib_name = sub_node.get_node_name()
+        self.__module_lib_name = node.get_node_attribute('name')
 
-        for child in sub_node.get_node_children():
+        for child in node.get_node_children():
             (elem, tag, attributes, text) = child
             if tag == 'parent_dir':
                 self.__module_lib_full_parent_dir = text.strip()
@@ -65,19 +63,19 @@ class Application:
         sys.path.insert(1, self.__module_lib_full_parent_dir)
 
         # Create logging facility
-        self.__create_logging_facility( app_config_node )
+        self.__create_logging_facility( config_xml_tree )
 
         #==============
         # Setup modules
         #==============
         self.__modules = list()
-        self.__setup_modules(app_config_node)
+        self.__setup_modules(config_xml_tree)
 
         #===============
         # Setup networks 
         #===============
         self.__networks = list()
-        self.__setup_networks(app_config_node)
+        self.__setup_networks(config_xml_tree)
 
         self.__log.info('Created application: %s', self.__name)
 
@@ -137,18 +135,19 @@ class Application:
 #*********************************************************************************
 # Private helper functions (internal use: __)
 
-    def __create_logging_facility(self, app_config_node):
+    def __create_logging_facility(self, config_xml_tree):
         '''
         A helper function to setup the logging facility used in self.__init__().
         '''
 
         # Create the logging facility for the singleton object
-        node = app_config_node.get_sub_node("logger")
+        node = config_xml_tree.get_sub_node("logger")
+
         logger_name = 'app:'+self.__name # prefix to avoid clash of loggers
         self.__log = logging.getLogger(logger_name)
         self.__log.setLevel(logging.NOTSET)
 
-        logger_level = node.get('level').strip()
+        logger_level = node.get_node_attribute('level')
         self.__log = set_logger_level(self.__log, logger_name, logger_level)
 
         file_handler = logging.FileHandler(self.__work_dir + 'app.log')
@@ -157,15 +156,15 @@ class Application:
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.NOTSET)
 
-        for child in node:
-            if child.tag == 'file_handler':
-                # file handler
-                file_handler_level = child.get('level').strip()
+        for child in node.get_node_children():
+            (elem,tag,attributes,text) = child
+            elem = ConfigTree( elem )
+            if tag == 'file_handler':
+                file_handler_level = elem.get_node_attribute('level')
                 file_handler = set_logger_level(file_handler, logger_name,
                                                 file_handler_level)
-            if child.tag == 'console_handler':
-                # console handler
-                console_handler_level = child.get('level').strip()
+            if tag == 'console_handler':
+                console_handler_level = elem.get_node_attribute('level')
                 console_handler = set_logger_level(console_handler, logger_name,
                                                    console_handler_level)
 
@@ -178,17 +177,15 @@ class Application:
         # add handlers to logger
         self.__log.addHandler(file_handler)
         self.__log.addHandler(console_handler)
-        self.__log.info('Created Application logger: %s', self.__name)
+        self.__log.info('created Application logger: %s', self.__name)
         self.__log.debug('logger level: %s', logger_level)
         self.__log.debug('logger file handler level: %s', file_handler_level)
-        self.__log.debug(
-            'logger console handler level: %s',
-            console_handler_level)
+        self.__log.debug('logger console handler level: %s', console_handler_level)
 
         return
 #----------------------- end def __create_loggin_facility():----------------------
 
-    def __setup_modules( self, app_config_node ):
+    def __setup_modules( self, config_xml_tree ):
         '''
         A helper function used by the Application constructor to setup the modules
         portion of the Application.
@@ -196,15 +193,13 @@ class Application:
 
         self.__log.debug('Start __setup_modules()')
 
-        for mod_node in app_config_node.get_all_sub_nodes('module'):
+        for mod_config_xml_node in config_xml_tree.get_all_sub_nodes('module'):
 
-            config_xml_tree = ConfigTree( mod_node )
-
-            assert config_xml_tree.get_node_tag() == 'module'
+            assert mod_config_xml_node.get_node_tag() == 'module'
 
             new_module = Module( self.__work_dir, self.__module_lib_name,
                                  self.__module_lib_full_parent_dir,
-                                 config_xml_tree )
+                                 mod_config_xml_node )
 
             # check for a duplicate module before appending a new one
             for module in self.__modules:
@@ -218,14 +213,14 @@ class Application:
 
             # add module to list
             self.__modules.append(new_module)
-            self.__log.debug('appended module %s', mod_node.get('name'))
+            self.__log.debug('appended module %s', mod_config_xml_node.get_node_attribute('name'))
 
         self.__log.debug('end __setup_modules()')
 
         return
 #----------------------- end def __setup_modules():-------------------------------
 
-    def __setup_networks( self, app_config_node ):
+    def __setup_networks( self, config_xml_tree ):
         '''
         A helper function used by the Application constructor to setup the networks
         portion of the Application.
@@ -233,14 +228,14 @@ class Application:
 
         self.__log.debug('start __setup_networks()')
 
-        for net_node in app_config_node.get_all_sub_nodes('network'):
-            net_config_node = ConfigTree(net_node)
-            assert net_config_node.get_node_name() == net_node.get('name'), 'check failed'
+        for net_config_xml_node in config_xml_tree.get_all_sub_nodes('network'):
 
-            network = Network(net_config_node)
+            assert net_config_xml_node.get_node_tag() == 'network'
+
+            network = Network( net_config_xml_node )
 
             self.__networks.append(network)
-            self.__log.debug('appended network %s', net_node.get('name'))
+            self.__log.debug('appended network %s', net_config_xml_node.get_node_attribute('name'))
 
         self.__log.debug('end __setup_networks()')
 

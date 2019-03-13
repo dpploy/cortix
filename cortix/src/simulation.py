@@ -29,15 +29,15 @@ class Simulation:
     Cortix Simulation element as defined in the Cortix config.
     '''
 
-    def __init__(self, parent_work_dir, sim_config_node):
+    def __init__(self, parent_work_dir, config_xml_tree):
 
         assert isinstance(parent_work_dir, str), '-> parentWorkDir invalid.'
 
-        # Inherit a configuration tree
-        assert isinstance(sim_config_node, ConfigTree), '-> sim_config_node invalid.'
+        assert isinstance(config_xml_tree, ConfigTree), '-> config_xml_tree invalid.'
+        assert config_xml_tree.get_node_tag() == 'simulation'
 
         # Read the simulation name, e.g. <simulation name='droplet'></simulation>
-        self.__name = sim_config_node.get_node_name()
+        self.__name = config_xml_tree.get_node_name()
 
         # Create the cortix/simulation work directory
         self.__work_dir = parent_work_dir + 'sim_' + self.__name + '/'
@@ -45,26 +45,25 @@ class Simulation:
         os.system('mkdir -p ' + self.__work_dir)
 
         # Create the logging facility 
-        self.__create_logging( sim_config_node )
+        self.__create_logging( config_xml_tree )
 
         #======================
         # Create application(s)
         #======================
-        for app_node in sim_config_node.get_all_sub_nodes('application'):
+        for app_config_xml_node in config_xml_tree.get_all_sub_nodes('application'):
 
-            app_config_node = ConfigTree(app_node)
-
-            assert app_config_node.get_node_tag() == 'application'
+            assert app_config_xml_node.get_node_tag() == 'application'
 
             # Create the application for this simulation
-            self.__application = Application( self.__work_dir, app_config_node )
+            self.__application = Application( self.__work_dir, app_config_xml_node )
 
-            self.__log.debug("created application: %s", app_node.get('name'))
+            self.__log.debug("created application: %s", app_config_xml_node.get_node_attribute('name'))
 
         # Stores the task(s) created by the execute method
         self.__tasks = list() # not needed now; in the future for task parallelism
+
         # Save configuration information for setting up task in execute()
-        self.__config_xml = sim_config_node
+        self.__config_xml = config_xml_tree
 
         self.__log.info("created simulation: %s", self.__name)
 
@@ -110,17 +109,19 @@ class Simulation:
 #*********************************************************************************
 # Private helper functions (internal use: __)
 
-    def __create_logging(self, sim_config_node ):
+    def __create_logging( self, config_xml_tree ):
         '''
         A helper function to setup the logging facility used in self.__init__()
         '''
 
-        node = sim_config_node.get_sub_node("logger")
         logger_name = 'sim:' + self.__name
+
         self.__log = logging.getLogger(logger_name)
         self.__log.setLevel(logging.NOTSET)
 
-        logger_level = node.get('level').strip()
+        node = config_xml_tree.get_sub_node("logger")
+
+        logger_level = node.get_node_attribute('level')
         self.__log = set_logger_level(self.__log, logger_name, logger_level)
 
         file_handler = logging.FileHandler(self.__work_dir + 'sim.log')
@@ -129,14 +130,16 @@ class Simulation:
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.NOTSET)
 
-        for child in node:
-            if child.tag == "file_handler":
-                file_handler_level = child.get("level").strip()
+        for child in node.get_node_children():
+            (elem,tag,attributes,text) = child
+            elem = ConfigTree( elem ) # fixme: remove wrapping
+            if tag == 'file_handler':
+                file_handler_level = elem.get_node_attribute('level')
                 file_handler = set_logger_level(file_handler, logger_name,
                                                 file_handler_level)
 
-            if child.tag == 'console_handler':
-                console_handler_level = child.get('level').strip()
+            if tag == 'console_handler':
+                console_handler_level = elem.get_node_attribute('level')
                 console_handler = set_logger_level(console_handler, logger_name,
                                                    console_handler_level)
 
@@ -150,12 +153,10 @@ class Simulation:
         self.__log.addHandler(file_handler)
         self.__log.addHandler(console_handler)
 
-        self.__log.info("created Simulation logger: %s", self.__name)
-        self.__log.debug("'logger level: %s", logger_level)
-        self.__log.debug("logger file handler level: %s", file_handler_level)
-        self.__log.debug(
-            "logger console handler level: %s",
-            console_handler_level)
+        self.__log.info('created Simulation logger: %s', self.__name)
+        self.__log.debug('logger level: %s', logger_level)
+        self.__log.debug('logger file handler level: %s', file_handler_level)
+        self.__log.debug('logger console handler level: %s', console_handler_level)
 
         return
 #----------------------- end def __create_logging():------------------------------
@@ -172,7 +173,7 @@ class Simulation:
         communication file. If the port type is a use type, the file pointed to
         resides in the directory of the module whose corresponding provide port is
         connected to. The communication XML file contains a root tag
-        <cortix_comm>, a series of XML port tags with three attributes and no
+        <cortix_comm>, and a series of XML port tags with three attributes and no
         content as follows:
 
                 <port name=port_name type=port_type file=full_path_file_name />
@@ -181,28 +182,21 @@ class Simulation:
 
         self.__log.debug('start __setup_task(%s)', task_name)
 
-        task = None
-
-        print('here')
-        print(type(self.__config_xml.get_all_sub_nodes('task')))
-        print(self.__config_xml.get_all_sub_nodes('task'))
-        print('here')
+        task = None  # flag
 
         # loop over all elements with a <task></task> tag in this simulation 
         # __config_xml
-        for task_node in self.__config_xml.get_all_sub_nodes('task'):
+        for task_config_xml_node in self.__config_xml.get_all_sub_nodes('task'):
 
-            task_config_node = ConfigTree(task_node)
-
-            if task_config_node.get_node_name() != task_name:
+            if task_config_xml_node.get_node_attribute('name') != task_name:
                 continue
 
             # create task
-            task = Task( self.__work_dir, task_config_node )
+            task = Task( self.__work_dir, task_config_xml_node )
 
             self.__tasks.append(task)
 
-            self.__log.debug('appended task: %s', task_config_node.get_node_name())
+            self.__log.debug('appended task: %s', task_config_xml_node.get_node_attribute('name'))
 
         if task is None:
             self.__log.debug('no task to exectute; done here.')
