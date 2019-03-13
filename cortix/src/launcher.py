@@ -30,6 +30,10 @@ class Launcher(Thread):
     simulation time, and monitoring its progress.
     """
 
+#*********************************************************************************
+# Construction 
+#*********************************************************************************
+
     def __init__(self, mod_lib_name, module_name, slot_id,
                  input_full_path_file_name,
                  exec_full_path_file_name,
@@ -65,7 +69,7 @@ class Launcher(Thread):
         log.setLevel(logging.DEBUG)
 
         # create file handler for logs
-        i = self.__cortix_comm_full_path_file_name.rfind('/') 
+        i = self.__cortix_comm_full_path_file_name.rfind('/')
         directory = self.__cortix_comm_full_path_file_name[:i]
         full_path_launcher_dir = directory + '/'
         file_handle = logging.FileHandler(full_path_launcher_dir + 'launcher.log')
@@ -104,7 +108,19 @@ class Launcher(Thread):
         log.info('imported pyModule: %s', str(self.__py_module))
 
         super(Launcher, self).__init__()
-#----------------------- end def __init__():--------------------------------------
+
+        return
+
+    def __del__(self):
+
+        self.__log.info('destroyed launcher-%s',
+                      self.__module_name + '_' + str(self.__slot_id))
+
+        return
+
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
 
     def run(self):
         '''
@@ -168,7 +184,7 @@ class Launcher(Thread):
         elif cortix_time_step_unit == 'day':
             cortix_time_step *= 24.0 * 60.0
         elif cortix_time_step_unit == 'second':
-            cortix_time_step /= 60.0 
+            cortix_time_step /= 60.0
         else:
             assert False, 'time unit invalid: %r' % (cortix_time_step_unit)
 
@@ -209,11 +225,11 @@ class Launcher(Thread):
                                                       self.__input_full_path_file_name,
                                                       self.__exec_full_path_file_name,
                                                       self.__work_dir,
-                                                      ports, 
-                                                      cortix_start_time, 
+                                                      ports,
+                                                      cortix_start_time,
                                                       cortix_final_time,
                                                       cortix_time_step,
-                                                      cortix_time_unit 
+                                                      cortix_time_unit
                                                     )
 
         s = 'guest_driver = CortixDriver( slot_id=' + str(self.__slot_id) + \
@@ -274,16 +290,12 @@ class Launcher(Thread):
 
         self.__set_runtime_status('finished')
         self.__log.info("__set_runtime_status(self, 'finished'")
-#----------------------- end def run():-------------------------------------------
 
-    def __del__(self):
-
-        self.__log.info('destroyed launcher-%s',
-                      self.__module_name + '_' + str(self.__slot_id))
-#----------------------- end def __del__():---------------------------------------
+        return
 
 #*********************************************************************************
 # Private helper functions (internal use: __)
+#*********************************************************************************
 
     def __set_runtime_status(self, status):
         """
@@ -305,6 +317,7 @@ class Launcher(Thread):
         fout.write('</runtime>\n')
 
         fout.close()
-#----------------------- end def __set_runtime_status():--------------------------
+
+        return
 
 #======================= end class Launcher: =====================================

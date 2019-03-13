@@ -18,7 +18,7 @@ import os
 import time
 import logging
 from xml.etree.cElementTree import ElementTree
-from cortix.src.utils.configtree import ConfigTree
+from cortix.src.utils.xmltree import XMLTree
 from cortix.src.utils.set_logger_level import set_logger_level
 #*********************************************************************************
 
@@ -28,13 +28,17 @@ class Task:
     A Task will use a given Application.
     '''
 
-    def __init__(self, parent_work_dir=None, task_config_node=ConfigTree()):
+#*********************************************************************************
+# Construction
+#*********************************************************************************
+
+    def __init__(self, parent_work_dir=None, task_config_node=XMLTree()):
 
         assert isinstance(parent_work_dir, str), '-> parent_work_dir invalid.'
 
         # Inherit a configuration tree
-        assert isinstance(task_config_node, ConfigTree), \
-            '-> task_config_node not a ConfigTree: %r.' % type(task_config_node)
+        assert isinstance(task_config_node, XMLTree), \
+            '-> task_config_node not a XMLTree: %r.' % type(task_config_node)
         self.__config_node = task_config_node
 
         # Read the task name
@@ -62,7 +66,7 @@ class Task:
 
         for child in node.get_node_children():
             (elem,tag,attributes,text) = child
-            elem = ConfigTree( elem )
+            elem = XMLTree( elem )
             if tag == 'file_handler':
                 file_handle_level = elem.get_node_attribute('level')
                 file_handle = set_logger_level(file_handle, logger_name,
@@ -127,13 +131,24 @@ class Task:
         self.__log.info('created task: %s', self.__name)
 
         return
-#----------------------- end def __init__():--------------------------------------
+
+    def __del__(self):
+
+        self.__log.info('destroyed task: %s', self.__name)
+
+        return
+
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
 
     def execute(self, application):
         '''
         This method is used to execute (accomplish) the given task.
         '''
+
         network = application.get_network(self.__name)
+
         runtime_status_files = dict()
 
         for slot_name in network.module_slot_names:
@@ -141,7 +156,8 @@ class Task:
             module_name = '_'.join( slot_name.split('_')[:-1] )
             slot_id = int(slot_name.split('_')[-1])
 
-            module     = application.get_module(module_name)
+            module = application.get_module(module_name)
+
             param_file = self.__runtime_cortix_param_file
             comm_file  = network.get_runtime_cortix_comm_file_name(slot_name)
 
@@ -164,7 +180,6 @@ class Task:
                           str(slot_names))
 
         return
-#----------------------- end def execute():---------------------------------------
 
     def __get_name(self):
         '''
@@ -174,7 +189,6 @@ class Task:
         return self.__name
 
     name = property(__get_name, None, None, None)
-#----------------------- end def get_name():--------------------------------------
 
     def __get_work_dir(self):
         '''
@@ -182,8 +196,8 @@ class Task:
         '''
 
         return self.__work_dir
+
     work_dir = property(__get_work_dir, None, None, None)
-#----------------------- end def get_work_dir():----------------------------------
 
     def __get_start_time(self):
         '''
@@ -191,7 +205,6 @@ class Task:
         '''
 
         return self.__start_time
-#----------------------- end def get_start_time():--------------------------------
 
     start_time = property(__get_start_time, None, None, None)
 
@@ -201,7 +214,6 @@ class Task:
         '''
 
         return self.__start_time_unit
-#----------------------- end def get_start_time_unit():---------------------------
 
     start_time_unit = property(__get_start_time_unit, None, None, None)
 
@@ -211,7 +223,6 @@ class Task:
         '''
 
         return self.__evolve_time
-#----------------------- end def get_evolve_time():-------------------------------
 
     evolve_time = property(__get_evolve_time, None, None, None)
 
@@ -221,7 +232,6 @@ class Task:
         '''
 
         return self.__evolve_time_unit
-#----------------------- end def get_evolve_time_unit():--------------------------
 
     evolve_time_unit = property(__get_evolve_time_unit, None, None, None)
 
@@ -231,7 +241,6 @@ class Task:
         '''
 
         return self.__time_step
-#----------------------- end def get_time_step():---------------------------------
 
     time_step = property(__get_time_step, None, None, None)
 
@@ -241,7 +250,6 @@ class Task:
         '''
 
         return self.__time_step_unit
-#----------------------- end def get_time_step_unit():----------------------------
 
     time_step_unit = property(__get_time_step_unit, None, None, None)
 
@@ -251,7 +259,8 @@ class Task:
         '''
 
         self.__runtime_cortix_param_file = full_path
-#----------------------- end def set_runtime_cortix_param_file():-----------------
+
+        return
 
     def __get_runtime_cortix_param_file(self):
         '''
@@ -259,26 +268,18 @@ class Task:
         '''
 
         return self.__runtime_cortix_param_file
-#----------------------- end def get_runtime_cortix_param_file():-----------------
 
     runtime_cortix_param_file = property(__get_runtime_cortix_param_file,
-        set_runtime_cortix_param_file, None, None)
-
-    def __del__(self):
-
-        self.__log.info('destroyed task: %s', self.__name)
-
-        return
-#----------------------- end def __del__():---------------------------------------
+            set_runtime_cortix_param_file, None, None)
 
 #*********************************************************************************
 # Private helper functions (internal use: __)
+#*********************************************************************************
 
     def __get_runtime_status(self, runtime_status_files):
         '''
-        Helper funcion for montioring the status of the task.
-        It reads the status files of all modules and reports which ones are still
-        running.
+        Helper funcion for montioring the status of the task. It reads the status
+        files of all modules and reports which ones are still running.
         '''
 
         task_status = 'finished'
@@ -303,7 +304,5 @@ class Task:
                 running_module_slots.append(slot_name)
 
         return (task_status, running_module_slots)
-#----------------------- end def __get_runtime_status():--------------------------
-
 
 #======================= end class Task: =========================================

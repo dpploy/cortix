@@ -8,14 +8,14 @@
 #
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
-"""
+'''
 Cortix Module class defintion.
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
-"""
+'''
 #**********************************************************************************
 import os
-from cortix.src.utils.configtree import ConfigTree
+from cortix.src.utils.xmltree import XMLTree
 
 from cortix.src.launcher import Launcher
 #**********************************************************************************
@@ -25,6 +25,10 @@ class Module:
     The Module class encapsulates a computational module of some scientific domain.
     '''
 
+#*********************************************************************************
+# Construction 
+#*********************************************************************************
+
     def __init__( self, parent_work_dir, library_name,
                   library_parent_dir, config_xml_tree ):
 
@@ -32,7 +36,7 @@ class Module:
         assert isinstance(library_name, str), '-> library_name is invalid.'
         assert isinstance(library_parent_dir, str), '-> library_parent is invalid.'
 
-        assert isinstance(config_xml_tree, ConfigTree), '-> config_xml_tree is invalid.'
+        assert isinstance(config_xml_tree, XMLTree), '-> config_xml_tree is invalid.'
         assert config_xml_tree.get_node_tag() == 'module', 'invalid module xml tree.'
 
         # Read the module name and type
@@ -80,7 +84,7 @@ class Module:
                 val = attributes[0][1].strip()
                 self.__library_name = val
 
-                node = ConfigTree( elem ) # fixme: remove thi wrapper
+                node = XMLTree( elem ) # fixme: remove thi wrapper
                 sub_node = node.get_sub_node('parent_dir')
 
                 # fixme: no root node needed
@@ -120,7 +124,12 @@ class Module:
                 #  port_multiplicity)
                 tmp = None
                 store = None
-#----------------------- end def __init__():--------------------------------------
+
+        return
+
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
 
     def __get_name(self):
         '''
@@ -128,7 +137,6 @@ class Module:
         '''
 
         return self.__mod_name
-#----------------------- end def __get_name():------------------------------------
 
     name = property(__get_name, None, None, None)
 
@@ -138,7 +146,6 @@ class Module:
         '''
 
         return self.__library_name
-#----------------------- end def get_library_name():------------------------------
 
     library_name = property(__get_library_name, None, None, None)
 
@@ -148,7 +155,6 @@ class Module:
         '''
 
         return self.__library_parent_dir
-#----------------------- end def __get_library_parent_dir():----------------------
 
     library_parent_dir = property(__get_library_parent_dir, None, None, None)
 
@@ -158,7 +164,6 @@ class Module:
         '''
 
         return self.__ports
-#----------------------- end def get_ports():-------------------------------------
 
     ports = property(__get_ports, None, None, None)
 
@@ -171,8 +176,8 @@ class Module:
         for port in self.__ports:
             if port[0] == port_name:
                 port_type = port[1]
+
         return port_type
-#----------------------- end def get_port_type():---------------------------------
 
     def get_port_mode(self, port_name):
         '''
@@ -183,8 +188,8 @@ class Module:
         for port in self.__ports:
             if port[0] == port_name:
                 port_mode = port[2]
+
         return port_mode
-#----------------------- end def get_port_mode():---------------------------------
 
     def __get_port_names(self):
         '''
@@ -195,7 +200,6 @@ class Module:
         for port in self.__ports:
             port_names.append(port[0])
         return port_names
-#----------------------- end def get_port_names():--------------------------------
 
     port_names = property(__get_port_names, None, None, None)
 
@@ -208,15 +212,16 @@ class Module:
         for port in self.__ports:
             if port[0] == port_name:
                 return True
-        return False
-#----------------------- end def has_port_name():---------------------------------
 
-    def execute( self, slot_id, 
+        return False
+
+    def execute( self, slot_id,
                  runtime_cortix_param_file,
                  runtime_cortix_comm_file    ):
         '''
         Spawns a worker process to execute the module.
         '''
+
         assert runtime_cortix_param_file[-1] is not '/'
         assert runtime_cortix_comm_file[-1] is not '/'
 
@@ -260,6 +265,9 @@ class Module:
         launch.start() # this start a thread and runs the run() method of launch
 
         return runtime_module_status_file
-#----------------------- end def execute():---------------------------------------
+
+#*********************************************************************************
+# Private helper functions (internal use: __)
+#*********************************************************************************
 
 #======================= end class Module: =======================================

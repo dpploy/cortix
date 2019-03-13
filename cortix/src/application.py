@@ -17,7 +17,7 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 import os
 import sys
 import logging
-from cortix.src.utils.configtree import ConfigTree
+from cortix.src.utils.xmltree import XMLTree
 from cortix.src.utils.set_logger_level import set_logger_level
 
 from cortix.src.module  import Module
@@ -31,11 +31,15 @@ class Application:
     combination is assigned to a Network object.
     """
 
+#*********************************************************************************
+# Construction 
+#*********************************************************************************
+
     def __init__(self, app_work_dir, config_xml_tree):
 
         assert isinstance(app_work_dir, str), '-> app_work_dir is invalid'
 
-        assert isinstance(config_xml_tree, ConfigTree), '-> config_xml_tree invalid'
+        assert isinstance(config_xml_tree, XMLTree), '-> config_xml_tree invalid'
         assert config_xml_tree.get_node_tag() == 'application'
 
         # Read the application name
@@ -80,10 +84,14 @@ class Application:
         self.__log.info('Created application: %s', self.__name)
 
         return
-#----------------------- end def __init__():--------------------------------------
+
+    def __del__(self):
+
+        self.__log.info('destroyed application: %s', self.__name)
 
 #*********************************************************************************
-# Public functions 
+# Public member functions
+#*********************************************************************************
 
     def __get_networks(self):
         '''
@@ -91,7 +99,6 @@ class Application:
         '''
 
         return self.__networks
-#----------------------- end def __get_networks():--------------------------------
 
     networks = property(__get_networks, None, None, None)
 
@@ -105,7 +112,6 @@ class Application:
                 return net
 
         return None
-#----------------------- end def get_network():-----------------------------------
 
     def __get_modules(self):
         '''
@@ -113,7 +119,6 @@ class Application:
         '''
 
         return self.__modules
-#----------------------- end def __get_modules():---------------------------------
 
     modules = property(__get_modules, None, None, None)
 
@@ -125,15 +130,10 @@ class Application:
             if mod.name == name:
                 return mod
         return None
-#----------------------- end def get_module():------------------------------------
-
-    def __del__(self):
-
-        self.__log.info('destroyed application: %s', self.__name)
-#----------------------- end def __del__():---------------------------------------
 
 #*********************************************************************************
 # Private helper functions (internal use: __)
+#*********************************************************************************
 
     def __create_logging_facility(self, config_xml_tree):
         '''
@@ -158,7 +158,7 @@ class Application:
 
         for child in node.get_node_children():
             (elem,tag,attributes,text) = child
-            elem = ConfigTree( elem )
+            elem = XMLTree( elem )
             if tag == 'file_handler':
                 file_handler_level = elem.get_node_attribute('level')
                 file_handler = set_logger_level(file_handler, logger_name,
@@ -183,7 +183,6 @@ class Application:
         self.__log.debug('logger console handler level: %s', console_handler_level)
 
         return
-#----------------------- end def __create_loggin_facility():----------------------
 
     def __setup_modules( self, config_xml_tree ):
         '''
@@ -213,12 +212,12 @@ class Application:
 
             # add module to list
             self.__modules.append(new_module)
-            self.__log.debug('appended module %s', mod_config_xml_node.get_node_attribute('name'))
+            self.__log.debug('appended module %s',
+                    mod_config_xml_node.get_node_attribute('name'))
 
         self.__log.debug('end __setup_modules()')
 
         return
-#----------------------- end def __setup_modules():-------------------------------
 
     def __setup_networks( self, config_xml_tree ):
         '''
@@ -235,11 +234,11 @@ class Application:
             network = Network( net_config_xml_node )
 
             self.__networks.append(network)
-            self.__log.debug('appended network %s', net_config_xml_node.get_node_attribute('name'))
+            self.__log.debug('appended network %s',
+                    net_config_xml_node.get_node_attribute('name'))
 
         self.__log.debug('end __setup_networks()')
 
         return
-#----------------------- end def __setup_networks():------------------------------
 
 #======================= end class Application: ==================================

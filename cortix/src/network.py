@@ -16,14 +16,14 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 '''
 #*********************************************************************************
 import networkx as nx
-from cortix.src.utils.configtree import ConfigTree
+from cortix.src.utils.xmltree import XMLTree
 #*********************************************************************************
 
 class Network:
     '''
     Cortix network class definition. Network class members:
 
-    __config_node: ConfigTree
+    __config_node: XMLTree
         Configuration data in the form of an XML tree.
 
     __name:str
@@ -46,9 +46,12 @@ class Network:
 
     '''
 
-    def __init__(self, net_config_node):
+#*********************************************************************************
+# Construction 
+#*********************************************************************************
 
-        assert isinstance(net_config_node, ConfigTree), '-> net_config_node is invalid.'
+    def __init__(self, net_config_node): 
+        assert isinstance(net_config_node, XMLTree), '-> net_config_node is invalid.'
 
         self.__config_node = net_config_node
 
@@ -106,10 +109,10 @@ class Network:
         self.__module_slot_names = [name for name in self.__runtime_cortix_comm_file_name.keys()]
 
         return
-#----------------------- end def __init__():--------------------------------------
 
 #*********************************************************************************
-# Public functions 
+# Public member functions 
+#*********************************************************************************
 
     def set_runtime_cortix_comm_file_name(self, module_slot_name, full_path_file_name):
         '''
@@ -120,7 +123,6 @@ class Network:
         self.__runtime_cortix_comm_file_name[module_slot_name] = full_path_file_name
 
         return
-#----------------------- end def set_runtime_cortix_comm_file_name():------------------
 
     def get_runtime_cortix_comm_file_name(self, module_slot_name):
         '''
@@ -131,7 +133,6 @@ class Network:
             return self.__runtime_cortix_comm_file_name[module_slot_name]
         else:
             return None
-#----------------------- end def get_runtime_cortix_comm_file_name():------------------
 
     def __get_name(self):
         '''
@@ -139,7 +140,6 @@ class Network:
         '''
 
         return self.__name
-#----------------------- end def __get_name():------------------------------------
 
     name = property(__get_name, None, None, None)
 
@@ -149,7 +149,6 @@ class Network:
         '''
 
         return self.__connectivity
-#----------------------- end def __get_connectivity():----------------------------
 
     connectivity = property(__get_connectivity, None, None, None)
 
@@ -159,7 +158,6 @@ class Network:
         '''
 
         return self.__module_slot_names
-#----------------------- end def __get_module_slot_names():------------------------------
 
     module_slot_names = property(__get_module_slot_names, None, None, None)
 
@@ -169,7 +167,6 @@ class Network:
         '''
 
         return self.__nx_graph
-#----------------------- end def __get_nx_graph():--------------------------------
 
     nx_graph = property(__get_nx_graph, None, None, None)
 
@@ -181,7 +178,6 @@ class Network:
         s = 'Network data members:\n name=%s\n module slot names=%s\n connectivity=%s\n runtime comm file= %s'
         return s % (self.__name, self.__module_slot_names, self.__connectivity,
                     self.__runtime_cortix_comm_file_name)
-#----------------------- end def __str__():---------------------------------------
 
     def __repr__(self):
         '''
@@ -191,10 +187,9 @@ class Network:
         s = 'Network data members:\n name=%s\n module slot names=%s\n connectivity=%s\n runtime comm file= %s'
         return s % (self.__name, self.__module_slot_names, self.__connectivity,
                     self.__runtime_cortix_comm_file_name)
-#----------------------- end def __repr__():--------------------------------------
 
 #*********************************************************************************
 # Private helper functions (internal use: __)
-
+#*********************************************************************************
 
 #======================= end class Network: ======================================

@@ -9,7 +9,7 @@
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 '''
-This file contains the class definition of `ConfigTree`,
+This file contains the class definition of `XMLTree`,
 which aids in parsing the XML configuration files used
 within the Cortix project.
 
@@ -39,7 +39,7 @@ from xml.etree.ElementTree import ElementTree # the whole XML tree data structur
 from xml.etree.ElementTree import Element     # an XML element or tree node
 #*********************************************************************************
 
-class ConfigTree:
+class XMLTree:
     '''
     This class is a wrapper around the XML parser ElementTree and Element. See
     import statement above. This XML parser is fast but the interface is not very
@@ -53,6 +53,10 @@ class ConfigTree:
     A node in a tree is the root of a branch. That is, the same thing as an XML
     element and all its direct sub-elements; described in the Background above.
     '''
+
+#*********************************************************************************
+# Construction
+#*********************************************************************************
 
     def __init__(self, config_tree_node=None, config_file_name=None):
 
@@ -76,7 +80,10 @@ class ConfigTree:
             self.__config_tree_node = tree.getroot()
 
         return
-#----------------------- end def __init__() --------------------------------------
+
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
 
     def get_root_node(self):
         '''
@@ -92,7 +99,6 @@ class ConfigTree:
         '''
 
         return self.__config_tree_node
-#----------------------- end def get_root_node() ---------------------------------
 
     def get_node_tag(self):
         '''
@@ -112,7 +118,6 @@ class ConfigTree:
         assert isinstance(tag_name,str)
 
         return tag_name
-#----------------------- end def get_node_tag() ----------------------------------
 
     def get_node_name(self):
         '''
@@ -137,7 +142,6 @@ class ConfigTree:
         assert isinstance(attribute_value,str)
 
         return attribute_value.strip()
-#----------------------- end def get_node_name:() --------------------------------
 
     def get_node_type(self):
         '''
@@ -161,7 +165,6 @@ class ConfigTree:
         assert isinstance(attribute_value,str)
 
         return attribute_value.strip()
-#----------------------- end def get_node_type() ---------------------------------
 
     def get_node_attribute(self, attribute_name):
         '''
@@ -185,7 +188,6 @@ class ConfigTree:
         assert isinstance(attribute_value,str)
 
         return attribute_value.strip()
-#----------------------- end def get_node_attribute() ----------------------------
 
     def get_node_content(self):
         '''
@@ -206,7 +208,6 @@ class ConfigTree:
         assert isinstance(content,str)
 
         return content
-#----------------------- end def get_node_attribute() ----------------------------
 
     def get_sub_node(self, tag):
         '''
@@ -230,10 +231,9 @@ class ConfigTree:
 
         assert node is not None
 
-        node = ConfigTree(node)  # wrap Element
+        node = XMLTree(node)  # wrap Element
 
         return node
-#----------------------- end def get_sub_node() ----------------------------------
 
     def get_all_sub_nodes(self, tag):
         '''
@@ -257,10 +257,9 @@ class ConfigTree:
         assert isinstance(sub_nodes,list)
         assert len(sub_nodes) > 0
 
-        xml_tree_list = [ConfigTree(sub_node) for sub_node in sub_nodes]
+        xml_tree_list = [XMLTree(sub_node) for sub_node in sub_nodes]
 
         return xml_tree_list
-#----------------------- end def get_all_sub_nodes() -----------------------------
 
     def get_node_children(self):
         '''
@@ -288,6 +287,9 @@ class ConfigTree:
             children.append( (child, child.tag, child.items(), child.text) )
 
         return children
-#----------------------- end def get_note_children() -----------------------------
 
-#======================= end class ConfigTree ====================================
+#*********************************************************************************
+# Private helper functions (internal use: __)
+#*********************************************************************************
+
+#======================= end class XMLTree =======================================

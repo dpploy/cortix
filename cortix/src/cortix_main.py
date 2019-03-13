@@ -17,7 +17,7 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 import os
 import logging
 from cortix.src.simulation import Simulation
-from cortix.src.utils.configtree import ConfigTree
+from cortix.src.utils.xmltree import XMLTree
 from cortix.src.utils.set_logger_level import set_logger_level
 #*********************************************************************************
 
@@ -28,6 +28,10 @@ class Cortix():
     the user with an interface to the simulations.
     '''
 
+#*********************************************************************************
+# Construction 
+#*********************************************************************************
+
     def __init__(self, name, config_xml_file='cortix-config.xml'):
 
         assert isinstance(name,str), 'must give Cortix object a name'
@@ -35,7 +39,7 @@ class Cortix():
         assert isinstance(config_xml_file, str), '-> config_xml_file not a str.'
 
         # Create the configuration XML tree
-        config_xml_tree = ConfigTree( config_file_name=config_xml_file )
+        config_xml_tree = XMLTree( config_file_name=config_xml_file )
 
         assert config_xml_tree.get_node_tag() == 'cortix_config'
 
@@ -75,12 +79,18 @@ class Cortix():
         self.__setup_simulations( config_xml_tree )
 
         self.__log.info('Created Cortix object %s', self.__name)
-#----------------------- end def __init__():--------------------------------------
+
+        return
 
     def __del__(self):
 
         self.__log.info("Destroyed Cortix object: %s", self.__name)
-#----------------------- end def __del__():---------------------------------------
+
+        return
+
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
 
     def run_simulations(self, task_name=None):
         '''
@@ -92,10 +102,12 @@ class Cortix():
         for sim in self.__simulations:
 
             sim.execute(task_name)
-#----------------------- end def run_simulations():-------------------------------
+
+        return
 
 #*********************************************************************************
 # Private helper functions (internal use: __)
+#*********************************************************************************
 
     def __create_logging(self, config_xml_tree):
         '''
@@ -122,7 +134,7 @@ class Cortix():
 
         for child in node.get_node_children():
             (elem,tag,attributes,text) = child
-            elem = ConfigTree( elem ) # fixme: remove wrapping
+            elem = XMLTree( elem ) # fixme: remove wrapping
             if tag == 'file_handler':
                 file_handler_level = elem.get_node_attribute('level')
                 file_handler = set_logger_level(file_handler, logger_name,
@@ -147,7 +159,6 @@ class Cortix():
         self.__log.debug('Logger console handler level: %s', console_handler_level)
 
         return
-#----------------------- end def __create_logging():------------------------------
 
     def __setup_simulations(self, config_xml_tree):
         '''
@@ -171,6 +182,5 @@ class Cortix():
             self.__simulations.append(simulation)
 
         return
-#----------------------- end def __setup_simulations():---------------------------
 
 #======================= end class Cortix: =======================================

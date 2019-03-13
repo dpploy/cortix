@@ -17,7 +17,7 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 import os
 import logging
 import datetime
-from cortix.src.utils.configtree       import ConfigTree
+from cortix.src.utils.xmltree       import XMLTree
 from cortix.src.utils.set_logger_level import set_logger_level
 
 from cortix.src.task        import Task
@@ -29,11 +29,15 @@ class Simulation:
     Cortix Simulation element as defined in the Cortix config.
     '''
 
+#*********************************************************************************
+# Construction 
+#*********************************************************************************
+
     def __init__(self, parent_work_dir, config_xml_tree):
 
         assert isinstance(parent_work_dir, str), '-> parentWorkDir invalid.'
 
-        assert isinstance(config_xml_tree, ConfigTree), '-> config_xml_tree invalid.'
+        assert isinstance(config_xml_tree, XMLTree), '-> config_xml_tree invalid.'
         assert config_xml_tree.get_node_tag() == 'simulation'
 
         # Read the simulation name, e.g. <simulation name='droplet'></simulation>
@@ -57,7 +61,8 @@ class Simulation:
             # Create the application for this simulation
             self.__application = Application( self.__work_dir, app_config_xml_node )
 
-            self.__log.debug("created application: %s", app_config_xml_node.get_node_attribute('name'))
+            self.__log.debug("created application: %s",
+                    app_config_xml_node.get_node_attribute('name'))
 
         # Stores the task(s) created by the execute method
         self.__tasks = list() # not needed now; in the future for task parallelism
@@ -68,7 +73,16 @@ class Simulation:
         self.__log.info("created simulation: %s", self.__name)
 
         return
-#----------------------- end def __init__():--------------------------------------
+
+    def __del__(self):
+
+        self.__log.info("destroyed simulation: %s", self.__name)
+
+        return
+
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
 
     def execute(self, task_name=None):
         '''
@@ -97,17 +111,10 @@ class Simulation:
         self.__log.debug("end execute(%s)", task_name)
 
         return
-#----------------------- end def execute():---------------------------------------
-
-    def __del__(self):
-
-        self.__log.info("destroyed simulation: %s", self.__name)
-
-        return
-#----------------------- end def __del__():---------------------------------------
 
 #*********************************************************************************
 # Private helper functions (internal use: __)
+#*********************************************************************************
 
     def __create_logging( self, config_xml_tree ):
         '''
@@ -132,7 +139,7 @@ class Simulation:
 
         for child in node.get_node_children():
             (elem,tag,attributes,text) = child
-            elem = ConfigTree( elem ) # fixme: remove wrapping
+            elem = XMLTree( elem ) # fixme: remove wrapping
             if tag == 'file_handler':
                 file_handler_level = elem.get_node_attribute('level')
                 file_handler = set_logger_level(file_handler, logger_name,
@@ -159,7 +166,6 @@ class Simulation:
         self.__log.debug('logger console handler level: %s', console_handler_level)
 
         return
-#----------------------- end def __create_logging():------------------------------
 
     def __setup_task(self, task_name):
         '''
@@ -340,8 +346,7 @@ class Simulation:
                     from_module = self.__application.get_module(from_module_name)
 
                     assert from_module.has_port_name(from_port), \
-                        'module %r has no port %r' % (
-                            from_module_name, from_port)
+                        'module %r has no port %r'%(from_module_name, from_port)
 
                     assert from_module.get_port_type(from_port) is not None, \
                         'network name: %r, module name: %r, from_port: %r port type invalid %r'\
@@ -354,7 +359,8 @@ class Simulation:
                         assert from_module.get_port_type(from_port) == 'use', 'port type %r invalid. Module %r, port %r' % (from_module.get_port_type(from_port), from_module.name, from_port)
 
                         # "from" is who makes the "call", hence the user
-                        from_module_slot_comm_file = from_module_slot_work_dir + 'cortix-comm.xml'
+                        from_module_slot_comm_file = from_module_slot_work_dir + \
+                                'cortix-comm.xml'
 
                         if not os.path.isdir(from_module_slot_work_dir):
                             os.system('mkdir -p ' + from_module_slot_work_dir)
@@ -425,6 +431,5 @@ class Simulation:
         self.__log.debug('end __setup_task(%s)', task_name)
 
         return
-#----------------------- end def __setup_task():----------------------------------
 
 #======================= end class Simulation: ===================================
