@@ -34,7 +34,8 @@ def run(task_name=None):
            'FATAL: task name %r invalid.'%task_name
 
     cortix.run_simulations(task_name=task_name)
-#---------------------- end def run():--------------------------------------------
+
+    return
 
 #*********************************************************************************
 if __name__ == "__main__":
