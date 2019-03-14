@@ -27,25 +27,29 @@ class Wind():
     Wind module used example in Cortix.
     '''
 
+#*********************************************************************************
+# Construction
+#*********************************************************************************
+
     def __init__( self, slot_id,
                   input_full_path_file_name,
-                  work_dir, ports = list(),
+                  work_dir, ports   = list(),
                   cortix_start_time = 0.0,
                   cortix_final_time = 0.0,
-                  cortix_time_step = 0.0,
-                  cortix_time_unit = None ):
+                  cortix_time_step  = 0.0,
+                  cortix_time_unit  = None ):
         #.........................................................................
         # Sanity test 
-        assert isinstance(slot_id, int), '-> slot_id type %r is invalid.' % type(slot_id)
-        assert isinstance(ports, list), '-> ports type %r is invalid.'  % type(ports)
+        assert isinstance(slot_id, int),'-> slot_id type %r is invalid.'%type(slot_id)
+        assert isinstance(ports, list),'-> ports type %r is invalid.'%type(ports)
         assert len(ports) > 0
-        assert isinstance(cortix_start_time,float), '-> time type %r is invalid.' % \
+        assert isinstance(cortix_start_time,float),'-> time type %r is invalid.'%\
                type(cortix_start_time)
-        assert isinstance(cortix_final_time, float), '-> time type %r is invalid.' % \
+        assert isinstance(cortix_final_time, float),'-> time type %r is invalid.'%\
                type(cortix_final_time)
-        assert isinstance(cortix_time_step, float), '-> time step type %r is invalid.' % \
+        assert isinstance(cortix_time_step, float),'-> time step type %r is invalid.'%\
                type(cortix_time_step)
-        assert isinstance(cortix_time_unit, str), '-> time unit type %r is invalid.' % \
+        assert isinstance(cortix_time_unit, str),'-> time unit type %r is invalid.'%\
                type(cortix_time_unit)
 
         # Logging
@@ -134,7 +138,10 @@ class Wind():
         self.__gas_phase.SetValue( 'velocity', v_0, self.__start_time )
 
         return
-#---------------------- end def __init__():---------------------------------------
+
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
 
     def call_ports( self, cortix_time=0.0 ):
         '''
@@ -143,15 +150,14 @@ class Wind():
 
         cortix_time *= self.__time_unit_scale  # convert to Wind time unit
 
-      # provide data to all provide ports 
+        # provide data to all provide ports 
         self.__provide_data( provide_port_name='output', at_time=cortix_time )
         self.__provide_data( provide_port_name='state',  at_time=cortix_time )
 
-      # use data using the 'use-port-name' of the module
+        # use data using the 'use-port-name' of the module
         self.__use_data( use_port_name='spatial-position', at_time=cortix_time )
 
         return
-#---------------------- end def call_ports():---------------------------------------
 
     def execute( self, cortix_time=0.0, cortix_time_step=0.0 ):
         '''
@@ -167,10 +173,10 @@ class Wind():
         self.__evolve( cortix_time, cortix_time_step )
 
         return
-#---------------------- end def execute():----------------------------------------
 
 #*********************************************************************************
 # Private helper functions (internal use: __)
+#*********************************************************************************
 
     def __provide_data( self, provide_port_name=None, at_time=0.0 ):
 
@@ -188,7 +194,6 @@ class Wind():
             self.__provide_wind_velocity( port_file, at_time )
 
         return
-#---------------------- end def __provide_data():---------------------------------
 
     def __use_data( self, use_port_name=None, at_time=0.0 ):
 
@@ -200,7 +205,6 @@ class Wind():
             self.__use_altitude( port_file, at_time )
 
         return
-#---------------------- end def __use_data():-------------------------------------
 
     def __get_port_file( self, use_port_name=None, provide_port_name=None ):
         '''
@@ -253,7 +257,6 @@ class Wind():
                     port_file = this_port_file
 
         return port_file
-#---------------------- end def __get_port_file():--------------------------------
 
     def __provide_persistent_output( self, port_file, at_time ):
         '''
@@ -310,7 +313,6 @@ class Wind():
         fout.close()
 
         return
-#---------------------- end def __provide_persistent_output():--------------------
 
     def __provide_state( self, port_file, at_time ):
         '''
@@ -435,8 +437,6 @@ class Wind():
 
         return
 
-#---------------------- end def __provide_state():--------------------------------
-
     def __evolve( self, cortix_time=0.0, cortix_time_step=0.0 ):
         r'''
          '''
@@ -455,7 +455,5 @@ class Wind():
         self.__gas_phase.SetValue( 'velocity', new_velocity, at_time ) # update current values
 
         return
-
-#---------------------- end def __evolve():---------------------------------------
 
 #======================= end class Wind: =========================================

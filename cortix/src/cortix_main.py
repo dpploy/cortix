@@ -173,9 +173,8 @@ class Cortix():
 
             assert sim_config_xml_node.get_node_tag() == 'simulation'
 
-            self.__log.debug(
-                '__setup_simulations(): simulation name: %s',
-                sim_config_xml_node.get_node_attribute('name'))
+            self.__log.debug('__setup_simulations(): simulation name: %s',
+                    sim_config_xml_node.get_node_attribute('name'))
 
             simulation = Simulation( self.__work_dir, sim_config_xml_node )
 

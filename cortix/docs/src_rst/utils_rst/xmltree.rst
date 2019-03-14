@@ -1,7 +1,7 @@
-configtree
-==========
+xmltree 
+=======
 
-.. automodule:: configtree
+.. automodule:: xmltree
     :members:
     :undoc-members:
     :show-inheritance:

@@ -241,8 +241,8 @@ class XMLTree:
 
         Parameters
         ----------
-        tag: str
-            XML element name or tag name, *e.g.* <task></task>
+        tag: `str`
+            XML element name or tag name, *e.g.*: `<task></task>`
 
         Returns
         -------
