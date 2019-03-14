@@ -12,7 +12,7 @@ readme_converted.rst
 *.gpg
 *.tar
 *.gz
-*.xml
+#*.xml
 *.ps
 *.shlv
 *.dat
