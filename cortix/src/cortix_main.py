@@ -39,12 +39,12 @@ class Cortix():
         assert isinstance(config_xml_file, str), '-> config_xml_file not a str.'
 
         # Create the configuration XML tree
-        config_xml_tree = XMLTree( config_file_name=config_xml_file )
+        config_xml_tree = XMLTree( xml_tree_file=config_xml_file )
 
         assert config_xml_tree.get_node_tag() == 'cortix_config'
 
         # Read the cortix config element (tag) name <name></name>
-        node = config_xml_tree.get_sub_node('name') # get node w/ tag: name (XML element)
+        node = config_xml_tree.get_sub_node('name') # get sub_node w/ tag: name (XML element)
 
         # Set the Cortix configuration name
         self.__name = node.get_node_content()  # name is now, say, 'droplet-fall'

@@ -58,26 +58,26 @@ class XMLTree:
 # Construction
 #*********************************************************************************
 
-    def __init__(self, config_tree_node=None, config_file_name=None):
+    def __init__(self, xml_tree_node=None, xml_tree_file=None):
 
         # hold a given XML tree node
-        if config_tree_node is not None:
-            assert isinstance(config_tree_node, Element), '-> config_tree_node invalid.'
-            tag_name = config_tree_node.tag
+        if xml_tree_node is not None:
+            assert isinstance(xml_tree_node, Element), '-> xml_tree_node invalid.'
+            tag_name = xml_tree_node.tag
             assert isinstance(tag_name,str)
             assert len(tag_name) > 0
 
-            self.__config_tree_node = config_tree_node
+            self.__xml_tree_node = xml_tree_node
 
         # parse an XML tree and hold its root node
-        if config_file_name is not None:
-            assert isinstance(config_file_name, str), '-> configFileName not a str.'
-            assert config_tree_node is None, 'node and file not allowed together.'
+        if xml_tree_file is not None:
+            assert isinstance(xml_tree_file, str), '-> configFileName not a str.'
+            assert xml_tree_node is None, 'node and file not allowed together.'
 
             tree = ElementTree()
-            tree.parse( config_file_name )
+            tree.parse( xml_tree_file )
 
-            self.__config_tree_node = tree.getroot()
+            self.__xml_tree_node = tree.getroot()
 
         return
 
@@ -95,10 +95,10 @@ class XMLTree:
 
         Returns
         -------
-        self.__config_tree_node: Element
+        self.__xml_tree_node: Element
         '''
 
-        return self.__config_tree_node
+        return self.__xml_tree_node
 
     def get_node_tag(self):
         '''
@@ -114,57 +114,10 @@ class XMLTree:
         tag_name: str
         '''
 
-        tag_name = self.__config_tree_node.tag
+        tag_name = self.__xml_tree_node.tag
         assert isinstance(tag_name,str)
 
         return tag_name
-
-    def get_node_name(self):
-        '''
-        Returns the value of the `name` attribute associated with the root node of
-        the element tree, *e.g.* <task name='solo-wind'></task>. Here `task` is the
-        element (or tag) name. The attribute pair name-value is name='solo-wind'.
-        The`name` attribute name must exist.
-
-        Parameters
-        ----------
-        empty:
-
-        Returns
-        -------
-        attribute_value: str
-        '''
-
-        attribute_name  = 'name'
-        attribute_value = self.__config_tree_node.get(attribute_name)
-
-        assert attribute_value is not None
-        assert isinstance(attribute_value,str)
-
-        return attribute_value.strip()
-
-    def get_node_type(self):
-        '''
-        Returns the value of the `type` attribute associated with the root node of
-        the element tree, *e.g.* <module type='native'></module>. This attribute
-        must exist.
-
-        Parameters
-        ----------
-        empty:
-
-        Returns
-        -------
-        attribute_value: str
-        '''
-
-        attribute_name = 'type'
-        attribute_value = self.__config_tree_node.get(attribute_name)
-
-        assert attribute_value is not None
-        assert isinstance(attribute_value,str)
-
-        return attribute_value.strip()
 
     def get_node_attribute(self, attribute_name):
         '''
@@ -182,7 +135,7 @@ class XMLTree:
         '''
 
         assert isinstance(attribute_name,str)
-        attribute_value = self.__config_tree_node.get(attribute_name.strip())
+        attribute_value = self.__xml_tree_node.get(attribute_name.strip())
 
         assert attribute_value is not None
         assert isinstance(attribute_value,str)
@@ -203,7 +156,7 @@ class XMLTree:
         content: str
         '''
 
-        content = self.__config_tree_node.text
+        content = self.__xml_tree_node.text
 
         assert isinstance(content,str)
 
@@ -227,7 +180,7 @@ class XMLTree:
 
         assert isinstance(tag, str), 'tag invalid'
 
-        node = self.__config_tree_node.find(tag)
+        node = self.__xml_tree_node.find(tag)
 
         assert node is not None
 
@@ -252,7 +205,7 @@ class XMLTree:
 
         assert isinstance(tag, str), 'tag invalid'
 
-        sub_nodes = self.__config_tree_node.findall(tag)
+        sub_nodes = self.__xml_tree_node.findall(tag)
 
         assert isinstance(sub_nodes,list)
         assert len(sub_nodes) > 0
@@ -282,7 +235,7 @@ class XMLTree:
 
         children = list()
 
-        for child in self.__config_tree_node:
+        for child in self.__xml_tree_node:
 
             children.append( (child, child.tag, child.items(), child.text) )
 

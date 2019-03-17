@@ -19,7 +19,7 @@ def test_solo_pyplot():
     pwd = os.path.dirname(__file__)
     full_path_config_file = os.path.join(
         pwd, 'input/cortix-config-pyplot.xml')
-    os.system('cp input/state.xml /tmp')
+#    os.system('cp input/state.xml /tmp')
     cortix1 = Cortix('cortix-dev1', full_path_config_file)
     cortix1.run_simulations(task_name='solo-pyplot')
     for i in range(14):

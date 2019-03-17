@@ -42,7 +42,7 @@ class Task:
         self.__config_node = task_config_node
 
         # Read the task name
-        self.__name = self.__config_node.get_node_name().strip()
+        self.__name = self.__config_node.get_node_attribute('name')
 
         # Set the work directory (previously created)
         assert os.path.isdir(parent_work_dir), 'work directory not available.'

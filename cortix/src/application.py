@@ -25,11 +25,11 @@ from cortix.src.network import Network
 #*********************************************************************************
 
 class Application:
-    r"""
+    r'''
     An Application is a singleton class composed of Module objects, and Network
     objects; the latter involve Module objects in various combinations. Each
     combination is assigned to a Network object.
-    """
+    '''
 
 #*********************************************************************************
 # Construction 
@@ -38,6 +38,7 @@ class Application:
     def __init__(self, app_work_dir, config_xml_tree):
 
         assert isinstance(app_work_dir, str), '-> app_work_dir is invalid'
+        assert os.path.isdir(app_work_dir), 'Work directory not available.'
 
         assert isinstance(config_xml_tree, XMLTree), '-> config_xml_tree invalid'
         assert config_xml_tree.get_node_tag() == 'application'
@@ -47,7 +48,6 @@ class Application:
 
         # Set the work directory (previously created)
         self.__work_dir = app_work_dir
-        assert os.path.isdir(app_work_dir), "Work directory not available."
 
         # Set the module library for the whole application
         node = config_xml_tree.get_sub_node('module_library')
@@ -140,8 +140,10 @@ class Application:
         A helper function to setup the logging facility used in self.__init__().
         '''
 
+        assert config_xml_tree.get_node_tag() == 'application'
+
         # Create the logging facility for the singleton object
-        node = config_xml_tree.get_sub_node("logger")
+        node = config_xml_tree.get_sub_node('logger')
 
         logger_name = 'app:'+self.__name # prefix to avoid clash of loggers
         self.__log = logging.getLogger(logger_name)
@@ -187,7 +189,9 @@ class Application:
     def __setup_modules( self, config_xml_tree ):
         '''
         A helper function used by the Application constructor to setup the modules
-        portion of the Application.
+        portion of the Application. What this does is to go into the Cortix config file
+        and read all modules that part of the module tag whether they are used in a
+        given task or not.
         '''
 
         self.__log.debug('Start __setup_modules()')
@@ -196,7 +200,9 @@ class Application:
 
             assert mod_config_xml_node.get_node_tag() == 'module'
 
-            new_module = Module( self.__work_dir, self.__module_lib_name,
+            # Modules log into the Application logger because they may or may not be 
+            # used in a task. Running tasks will effectively tell what modules are used.
+            new_module = Module( self.__log, self.__module_lib_name,
                                  self.__module_lib_full_parent_dir,
                                  mod_config_xml_node )
 
@@ -211,7 +217,8 @@ class Application:
                             'duplicate module; ABORT.'
 
             # add module to list
-            self.__modules.append(new_module)
+            self.__modules.append( new_module )
+
             self.__log.debug('appended module %s',
                     mod_config_xml_node.get_node_attribute('name'))
 
@@ -234,6 +241,7 @@ class Application:
             network = Network( net_config_xml_node )
 
             self.__networks.append(network)
+
             self.__log.debug('appended network %s',
                     net_config_xml_node.get_node_attribute('name'))
 

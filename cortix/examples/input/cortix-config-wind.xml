@@ -77,7 +77,7 @@
 
   <application name='wind'>
 
-   <module_library name='wind'>
+   <module_library name='cortix.examples.modulib'>
     <parent_dir>
         $CORTIX/cortix/examples/modulib
     </parent_dir>
@@ -89,16 +89,19 @@
    </logger>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <!--                  Modules objects starts here                                -->
-   <!-- Application: modules set -->
-
+   <!--                  Modules objects start here                                 -->
+   <!-- Elements allowed: 
+      + <executable_name>: optional
+      + <executable_path>: optional
+      + <input_file_name>: required
+      + <input_file_path>: required
+      + <library name='value'>: optional
+          <parent_dir>text</parent_dir>
+      + </library
+   -->
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
 
    <module name='wind' type='native'>
-
-    <library name='cortix.examples.modulib'>
-     <parent_dir>$CORTIX</parent_dir>
-    </library>
 
     <input_file_name>wind.input</input_file_name>
     <input_file_path>$CORTIX/cortix/examples/input</input_file_path>
@@ -107,20 +110,6 @@
      <file_handler level='DEBUG'> </file_handler>
      <console_handler level='INFO'> </console_handler>
     </logger>
-
-    <!-- Module port_manifest.xml has all module-related information -->
-    <port_manifest_file_name>port_manifest.xml</port_manifest_file_name>
-    <port_manifest_file_path>$CORTIX/cortix/examples/modulib/wind</port_manifest_file_path>
-
-    <!-- Ports have four types: * use, * provide, * input, * output -->
-    <!-- The *input*, and *output* types allow for module self-connection; see network section  -->
-    <port type='input'   mode='file.txt' multiplicity='1'>input-data</port>
-    <port type='use'     mode='file.txt' multiplicity='1'>input</port>
-    <port type='use'     mode='file.txt' multiplicity='1'>spatial-position</port>
-    <port type='provide' mode='file.xml' multiplicity='1'>state</port>
-    <port type='provide' mode='file.dat' multiplicity='1'>wind-velocity</port>
-    <port type='provide' mode='file.dat' multiplicity='1'>output</port>
-    <port type='output'  mode='file.any' multiplicity='1'>persistent-output</port>
 
    </module>
 
@@ -153,9 +142,9 @@
     <connect module_slot='wind:0' use_port='input' module_slot='wind:0' provide_port='input-data'/>
     <connect wind:0='input' wind:0='input-data'/>
 -->
-    <connect fromModuleSlot='wind:0' fromPort='input' toModuleSlot='wind:0' toPort='input-data'/>
+    <connect fromModuleSlot='wind:0' fromPort='input' toModuleSlot='wind:0' toPort='input-self'/>
 
-    <connect fromModuleSlot='wind:0' fromPort='persistent-output' toModuleSlot='wind:0' toPort='output'/>
+    <connect fromModuleSlot='wind:0' fromPort='output-self' toModuleSlot='wind:0' toPort='output'/>
 
    </network>
 

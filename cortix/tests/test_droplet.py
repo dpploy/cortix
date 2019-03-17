@@ -20,6 +20,8 @@ def test_droplet():
     full_path_config_file = os.path.join(pwd, 'input/cortix-config-droplet.xml')
     cortix1 = Cortix('cortix-droplet', full_path_config_file)
     cortix1.run_simulations(task_name="droplet-fall")
+    os.system('rm -f *.png')
+    os.system('rm -f *.pickle')
 
 if __name__ == "__main__":
     test_droplet()

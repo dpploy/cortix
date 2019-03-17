@@ -52,7 +52,7 @@ class Wind():
         assert isinstance(cortix_time_unit, str),'-> time unit type %r is invalid.'%\
                type(cortix_time_unit)
 
-        # Logging
+        # Logging: access Cortix Launcher logging facility
         self.__log = logging.getLogger('launcher-wind'+str(slot_id)+'.cortix_driver.wind')
         self.__log.info('initializing an object of Wind()')
 
@@ -89,8 +89,7 @@ class Wind():
         self.__setup_time = 60.0  # time unit; a delay time before starting to run
 
         #.........................................................................
-        # Input ports
-        # Read input information if any
+        # Read input file information if any
 
         #fin = open(input_full_path_file_name,'r')
 
@@ -151,8 +150,8 @@ class Wind():
         cortix_time *= self.__time_unit_scale  # convert to Wind time unit
 
         # provide data to all provide ports 
-        self.__provide_data( provide_port_name='output', at_time=cortix_time )
         self.__provide_data( provide_port_name='state',  at_time=cortix_time )
+        self.__provide_data( provide_port_name='output', at_time=cortix_time )
 
         # use data using the 'use-port-name' of the module
         self.__use_data( use_port_name='spatial-position', at_time=cortix_time )
@@ -185,7 +184,7 @@ class Wind():
 
         # Provide data to port files
         if provide_port_name == 'output' and port_file is not None:
-            self.__provide_persistent_output( port_file, at_time )
+            self.__provide_output( port_file, at_time )
 
         if provide_port_name == 'state' and port_file is not None:
             self.__provide_state( port_file, at_time )
@@ -258,7 +257,7 @@ class Wind():
 
         return port_file
 
-    def __provide_persistent_output( self, port_file, at_time ):
+    def __provide_output( self, port_file, at_time ):
         '''
         Provide data that will remain in disk after the simulation ends.
         '''

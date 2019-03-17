@@ -41,7 +41,7 @@ class Simulation:
         assert config_xml_tree.get_node_tag() == 'simulation'
 
         # Read the simulation name, e.g. <simulation name='droplet'></simulation>
-        self.__name = config_xml_tree.get_node_name()
+        self.__name = config_xml_tree.get_node_attribute('name')
 
         # Create the cortix/simulation work directory
         self.__work_dir = parent_work_dir + 'sim_' + self.__name + '/'
@@ -58,7 +58,7 @@ class Simulation:
 
             assert app_config_xml_node.get_node_tag() == 'application'
 
-            # Create the application for this simulation
+            # Create the application for this simulation (same work directory)
             self.__application = Application( self.__work_dir, app_config_xml_node )
 
             self.__log.debug("created application: %s",
@@ -205,8 +205,8 @@ class Simulation:
             self.__log.debug('appended task: %s', task_config_xml_node.get_node_attribute('name'))
 
         if task is None:
-            self.__log.debug('no task to exectute; done here.')
-            self.__log.debug('end __setup_task(%s)', task_name)
+            self.__log.info('no task to exectute; done here.')
+            self.__log.info('end __setup_task(%s)', task_name)
             return
 
         # create subdirectory with task name
