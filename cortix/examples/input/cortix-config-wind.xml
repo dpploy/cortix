@@ -1,5 +1,6 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version='1.0' encoding='UTF-8'?>
 <!-- 
+# -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 #
@@ -12,7 +13,7 @@
 
 <!-- Configuration of Cortix -->
 
-<cortix_config version="0.1">
+<cortix_config version='0.1'>
 
 <!-- ****************************************************************************** -->
 <!--                     CORTIX object starts here                                  -->
@@ -23,11 +24,11 @@
          If this rule is not followed, there will be collision with file in/outputs;
          including results files and logging files.-->
 
- <name>cortix-droplet</name>
+ <name>cortix-wind</name>
 
- <logger level="DEBUG">
-  <file_handler level="DEBUG"> </file_handler>
-  <console_handler level="INFO"> </console_handler>
+ <logger level='DEBUG'>
+  <file_handler level='DEBUG'> </file_handler>
+  <console_handler level='INFO'> </console_handler>
  </logger>
 
  <work_dir>/tmp/</work_dir>
@@ -38,11 +39,11 @@
  <!-- Simulation definition -->
  <!-- NB: each simulation has only one application -->
 
- <simulation name="droplet">
+ <simulation name='wind'>
 
-  <logger level="DEBUG">
-   <file_handler level="DEBUG"> </file_handler>
-   <console_handler level="INFO"> </console_handler>
+  <logger level='DEBUG'>
+   <file_handler level='DEBUG'> </file_handler>
+   <console_handler level='INFO'> </console_handler>
   </logger>
 
   <!-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
@@ -52,14 +53,17 @@
   <!--NB: each task combines parameters for one named application connectivity-->
   <!--NB: each task name must match a network name below-->
 
-  <task name="droplet-fall" >
-   <start_time unit="minute">0.0</start_time>
-   <evolve_time unit="minute">2.5</evolve_time>
-   <time_step unit="second">0.5</time_step>
-   <logger level="DEBUG">
-    <file_handler level="DEBUG"> </file_handler>
-    <console_handler level="INFO"> </console_handler>
+  <task name='solo-wind' >
+
+   <start_time unit='minute'>0.0</start_time>
+   <evolve_time unit='minute'>1.0</evolve_time>
+   <time_step unit='minute'>0.5</time_step>
+
+   <logger level='DEBUG'>
+    <file_handler level='DEBUG'> </file_handler>
+    <console_handler level='INFO'> </console_handler>
    </logger>
+
   </task>
 
   <!--                   Tasks objects end here                                     -->
@@ -71,7 +75,7 @@
   <!-- Simulation: application -->
   <!-- NB: each simulation has only one application -->
 
-  <application name="droplet">
+  <application name='wind'>
 
    <module_library name='cortix.examples.modulib'>
     <parent_dir>
@@ -79,38 +83,34 @@
     </parent_dir>
    </module_library>
 
-   <logger level="DEBUG">
-    <file_handler level="DEBUG"> </file_handler>
-    <console_handler level="INFO"> </console_handler>
+   <logger level='DEBUG'>
+    <file_handler level='DEBUG'> </file_handler>
+    <console_handler level='INFO'> </console_handler>
    </logger>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <!--                  Modules objects starts here                                -->
-   <!-- Application: modules set -->
-
+   <!--                  Modules objects start here                                 -->
+   <!-- Elements allowed: 
+      + <executable_name>: optional
+      + <executable_path>: optional
+      + <input_file_name>: required
+      + <input_file_path>: required
+      + <library name='value'>: optional
+          <parent_dir>text</parent_dir>
+      + </library
+   -->
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
 
-   <module name="droplet" type="native">
-    <input_file_name>droplet.input</input_file_name>
-    <input_file_path>$CORTIX/cortix/tests/input</input_file_path>
-    <logger level="DEBUG">
-     <file_handler level="DEBUG"> </file_handler>
-     <console_handler level="INFO"> </console_handler>
-    </logger>
-   </module>
+   <module name='wind' type='native'>
 
-   <module name="pyplot" type="native">
-    <library name='cortix.modulib'>
-     <parent_dir>
-         $CORTIX/cortix/modulib
-     </parent_dir>
-    </library>
-    <input_file_name>pyplot.input</input_file_name>
-    <input_file_path>$CORTIX/cortix/tests/input</input_file_path>
-    <logger level="DEBUG">
-     <file_handler level="DEBUG"> </file_handler>
-     <console_handler level="INFO"> </console_handler>
+    <input_file_name>wind.input</input_file_name>
+    <input_file_path>$CORTIX/cortix/examples/input</input_file_path>
+
+    <logger level='DEBUG'>
+     <file_handler level='DEBUG'> </file_handler>
+     <console_handler level='INFO'> </console_handler>
     </logger>
+
    </module>
 
    <!--                  Modules objects end here                                   -->
@@ -122,22 +122,30 @@
    <!-- Application: networks -->
    <!-- NB: each network has its own task definition above; with the same name -->
    <!-- NB: the connect tag is ordered: *from* is the receiver; *to* is the provider-->
-   <!-- NB: port labels are the "names" of the ports; "not" a file name necessarily-->
-   <!-- NB: module labels must be composed with a "slot" number, say "name:x"-->
+   <!-- NB: port labels are the 'names' of the ports; 'not' a file name necessarily-->
+   <!-- NB: module labels must be composed with a 'slot' number, say 'name:x'-->
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
 
-   <network name="droplet-fall">
-    <logger level="DEBUG">
-     <file_handler level="DEBUG"> </file_handler>
-     <console_handler level="INFO"> </console_handler>
+   <network name='solo-wind'>
+
+    <logger level='DEBUG'>
+     <file_handler level='DEBUG'></file_handler>
+     <console_handler level='INFO'></console_handler>
     </logger>
+
+    <!-- A connect element (or tag) must have no content; use <connect />-->
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
-    <connect fromModuleSlot="droplet:0" fromPort="input" toModuleSlot="droplet:0" toPort="input-self"/>
-    <connect fromModuleSlot="droplet:0" fromPort="output-self" toModuleSlot="droplet:0" toPort="output"/>
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="droplet:0" toPort="state"/>
+<!--
+    <connect module_slot='wind:0' use_port='input' module_slot='wind:0' provide_port='input-data'/>
+    <connect wind:0='input' wind:0='input-data'/>
+-->
+    <connect fromModuleSlot='wind:0' fromPort='input' toModuleSlot='wind:0' toPort='input-self'/>
+
+    <connect fromModuleSlot='wind:0' fromPort='output-self' toModuleSlot='wind:0' toPort='output'/>
+
    </network>
 
    <!--                  Network objects end here                                   -->

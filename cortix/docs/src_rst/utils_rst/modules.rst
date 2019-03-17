@@ -2,7 +2,7 @@ utils
 =====
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
-   configtree
    set_logger_level
+   xmltree

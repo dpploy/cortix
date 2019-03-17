@@ -25,35 +25,33 @@ import concurrent.futures
 #*********************************************************************************
 
 class Launcher(Thread):
-    """
+    '''
     The Launcher class handles the main funcitonality of stepping through the
     simulation time, and monitoring its progress.
-    """
+    '''
 
 #*********************************************************************************
 # Construction 
 #*********************************************************************************
 
-    def __init__(self, mod_lib_name, module_name, slot_id,
-                 input_full_path_file_name,
-                 exec_full_path_file_name,
-                 work_dir,
-                 cortix_param_full_path_file_name,
-                 cortix_comm_full_path_file_name,
-                 runtime_status_full_path):
+    def __init__(self, 
+            mod_lib_name, mod_lib_parent_dir, module_name, 
+            slot_id,
+            input_full_path_file_name,
+            exec_full_path_file_name,
+            work_dir,
+            cortix_param_full_path_file_name,
+            cortix_comm_full_path_file_name,
+            runtime_status_full_path):
 
         assert cortix_param_full_path_file_name[-1] is not '/', \
-               '%r'%cortix_param_full_path_file_name
+                '%r'%cortix_param_full_path_file_name
         assert cortix_comm_full_path_file_name[-1] is not '/' \
-               '%r'%cortix_comm_full_path_file_name
+                '%r'%cortix_comm_full_path_file_name
 
-        cortix_path = os.path.abspath(os.path.join(__file__, "../../.."))
+        cortix_path = os.path.abspath(os.path.join(__file__, '../../..'))
 
-
-        if "$CORTIX" in input_full_path_file_name:
-            self.__input_full_path_file_name = input_full_path_file_name.replace("$CORTIX", cortix_path)
-        else:
-            self.__input_full_path_file_name = input_full_path_file_name
+        self.__input_full_path_file_name = input_full_path_file_name
 
         self.__module_name = module_name
         self.__slot_id = slot_id
@@ -63,50 +61,22 @@ class Launcher(Thread):
         self.__exec_full_path_file_name = exec_full_path_file_name
         self.__work_dir = work_dir
 
-        # Create logger for this driver and its imported pymodule
-        log = logging.getLogger('launcher-' + self.__module_name + '_' +
-                                str(self.__slot_id))
-        log.setLevel(logging.DEBUG)
+        # Create logging facility
+        self.__create_logging_facility()
 
-        # create file handler for logs
-        i = self.__cortix_comm_full_path_file_name.rfind('/')
-        directory = self.__cortix_comm_full_path_file_name[:i]
-        full_path_launcher_dir = directory + '/'
-        file_handle = logging.FileHandler(full_path_launcher_dir + 'launcher.log')
-        file_handle.setLevel(logging.DEBUG)
-
-        # create console handler with a higher log level
-        console_handle = logging.StreamHandler()
-        console_handle.setLevel(logging.INFO)
-
-        # create formatter and add it to the handlers
-        formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        file_handle.setFormatter(formatter)
-        console_handle.setFormatter(formatter)
-
-        # add handles to the logger
-        log.addHandler(file_handle)
-        log.addHandler(console_handle)
-
-        self.__log = log
-
-        log.info('created logger')
-        log.debug('input file: %s', self.__input_full_path_file_name)
-        log.debug('param file: %s', self.__cortix_param_full_path_file_name)
-        log.debug('comm file: %s', self.__cortix_comm_full_path_file_name)
-
+        #lib_module_driver = mod_lib_name + '.' + module_name + '.cortix_driver'
         lib_module_driver = mod_lib_name + '.' + module_name + '.cortix_driver'
-        log.info('import module driver: %s', lib_module_driver)
+        self.__log.info('try importing module driver: %s', lib_module_driver)
 
         # import a guest Cortix module through its driver
         try:
-         self.__py_module = importlib.import_module( lib_module_driver )
+            self.__py_module = importlib.import_module( lib_module_driver )
         except Exception as error:
-         log.error('importlib error: ', error)
+            log.error('importlib error: ', error)
 
-        log.info('imported pyModule: %s', str(self.__py_module))
+        self.__log.info('imported pyModule: %s', str(self.__py_module))
 
+        # Launcher thread initialiation
         super(Launcher, self).__init__()
 
         return
@@ -197,7 +167,7 @@ class Launcher(Thread):
         tree = ElementTree.parse(self.__cortix_comm_full_path_file_name)
         cortix_comm_xml_root_node = tree.getroot()
 
-        # setup ports
+        # Setup ports
         nodes = cortix_comm_xml_root_node.findall('port')
         ports = list()
         if nodes is not None:
@@ -320,4 +290,45 @@ class Launcher(Thread):
 
         return
 
+    def __create_logging_facility(self):
+        '''
+        A helper function to setup the logging facility used in self.__init__()
+        '''
+
+        # Create logger for this launcher and its imported pymodule; Cortix modules
+        # should use this for logging
+        log = logging.getLogger('launcher-' + self.__module_name + '_' +
+                                str(self.__slot_id))
+        log.setLevel(logging.DEBUG)
+
+        # Create file handler for logs; same place as the Cortix comm file for module
+        i = self.__cortix_comm_full_path_file_name.rfind('/')
+        directory = self.__cortix_comm_full_path_file_name[:i]
+        full_path_launcher_dir = directory + '/'
+        file_handle = logging.FileHandler(full_path_launcher_dir + 'launcher.log')
+        file_handle.setLevel(logging.DEBUG)
+
+        # Create console handler with a higher log level
+        console_handle = logging.StreamHandler()
+        console_handle.setLevel(logging.INFO)
+
+        # Create formatter and add it to the handlers
+        formatter = logging.Formatter(
+                '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        file_handle.setFormatter(formatter)
+        console_handle.setFormatter(formatter)
+
+        # add handles to the logger
+        log.addHandler(file_handle)
+        log.addHandler(console_handle)
+
+        log.info('created logger')
+        log.debug('input file: %s', self.__input_full_path_file_name)
+        log.debug('param file: %s', self.__cortix_param_full_path_file_name)
+        log.debug('comm file: %s', self.__cortix_comm_full_path_file_name)
+
+        self.__log = log
+
+        return
+ 
 #======================= end class Launcher: =====================================

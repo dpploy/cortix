@@ -1,8 +1,5 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-
 <!-- 
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 #
@@ -37,38 +34,29 @@
    </logger>
   </task>
  <application name="dev1">
-   <module_library name='headend-lib'>
+   <module_library name='cortix.modulib'>
     <parent_dir>
-        ../../../
+        $CORTIX/cortix/modulib
     </parent_dir>
    </module_library>
    <logger level="DEBUG">
     <file_handler level="DEBUG"> </file_handler>
     <console_handler level="INFO"> </console_handler>
    </logger>
-   <module name="modulib.pyplot" type="native">
-    <library name='cortix'>
-     <parent_dir>
-         ../../../cortix/modulib
-     </parent_dir>
-    </library>
+   <module name="pyplot" type="native">
     <input_file_name>pyplot-test.input</input_file_name>
     <input_file_path>input/</input_file_path>
     <logger level="DEBUG">
      <file_handler level="DEBUG"> </file_handler>
      <console_handler level="INFO"> </console_handler>
     </logger>
-    <port type="input" mode="file.xml" multiplicity="1">pyplot-solo-input</port>
-    <port type="use"   mode="file.xml" multiplicity="1">time-sequence-input</port>
-    <port type="use"   mode="file.xml" multiplicity="1">time-sequence</port>
-    <port type="use"   mode="file.xml" multiplicity="1">time-tables</port>
    </module>
   <network name="solo-pyplot">
     <logger level="DEBUG">
      <file_handler level="DEBUG"> </file_handler>
      <console_handler level="INFO"> </console_handler>
     </logger>
-    <connect fromModuleSlot="modulib.pyplot:0" fromPort="time-sequence-input" toModuleSlot="modulib.pyplot:0" toPort="pyplot-solo-input"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="input" toModuleSlot="pyplot:0" toPort="input-self"/> 
    </network>
  </application>
  </simulation>

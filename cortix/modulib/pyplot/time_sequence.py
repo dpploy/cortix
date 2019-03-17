@@ -30,7 +30,6 @@ import xml.etree.ElementTree as ElementTree
 from threading import Lock
 # *********************************************************************************
 
-
 class TimeSequence():
 
     def __init__(self,

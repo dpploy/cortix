@@ -57,7 +57,7 @@ class Network:
 
         assert self.__config_node.get_node_tag() == 'network'
 
-        self.__name = self.__config_node.get_node_name()
+        self.__name = self.__config_node.get_node_attribute('name')
 
         self.__connectivity = list(dict())
         self.__module_slot_names = list()

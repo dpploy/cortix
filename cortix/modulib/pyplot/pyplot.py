@@ -38,6 +38,10 @@ from cortix.modulib.pyplot.time_sequence import TimeSequence
 
 class PyPlot():
 
+#*********************************************************************************
+# Construction
+#*********************************************************************************
+
     def __init__(self,
                  slot_id,
                  input_full_path_file_name,
@@ -112,20 +116,24 @@ class PyPlot():
 
         found = False
         for (portName, portType, port_file) in ports:
-            if portName == 'time-sequence-input':  # this is the use port connected to the input port
+            if portName == 'input':  # this is the use port connected to the input port
                 s = 'cp -f ' + input_data_full_path_file_names[0] + ' ' + port_file
                 os.system(s)
                 self.__log.debug(s)
                 found = True
 
         if found is True:
-            s = 'found time-sequence-input file.'
+            s = 'found input file.'
             self.__log.info(s)
         else:
-            s = 'did not find time-sequence-input file.'
+            s = 'did not find input file.'
             self.__log.warn(s)
 
-# ---------------------- end def __init__():------------------------------
+        return
+
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
 
     def call_ports(self, cortix_time=0.0):
         '''
@@ -145,13 +153,13 @@ class PyPlot():
 
                 if portType == 'use':
                     assert portName == 'time-sequence' or portName == 'time-tables' or \
-                        portName == 'time-sequence-input'
+                        portName == 'input'
 
                     self.__use_data( usePortName = portName,
                                      usePortFile = thisPortFile,
                                      at_time = cortix_time )
 
-#----------------------- end def call_ports():------------------------------------
+        return
 
     def execute(self, cortix_time=0.0, time_step=0.0):
 
@@ -160,10 +168,11 @@ class PyPlot():
 
         self.__plot_data(cortix_time, time_step)
 
-#----------------------- end def execute():---------------------------------------
+        return
 
-# *********************************************************************************
+#*********************************************************************************
 # Private helper functions (internal use: __)
+#*********************************************************************************
 
     def __use_data(self, usePortName=None, usePortFile=None, at_time=0.0):
         '''
@@ -175,7 +184,7 @@ class PyPlot():
                                           usePortFile = usePortFile  )
 
 # Get data from port files
-        if usePortName == 'time-sequence' or usePortName == 'time-sequence-input' \
+        if usePortName == 'time-sequence' or usePortName == 'input' \
            and port_file is not None:
 
             self.__get_time_sequence( port_file, at_time )
@@ -184,7 +193,6 @@ class PyPlot():
             _GetTimeTables(self, port_file, at_time)
 
         return
-#----------------------- end def __use_data():------------------------------------
 
     def __provide_data(self, providePortName=None, at_time=0.0):
         '''
@@ -192,7 +200,6 @@ class PyPlot():
         '''
 
         return
-#----------------------- end def __provide_data():--------------------------------
 
     def __get_port_file(self, usePortName=None,
                         usePortFile=None, providePortName=None):
@@ -240,7 +247,6 @@ class PyPlot():
                     port_file = thisPortFile
 
         return port_file
-# ---------------------- end def __get_port_file():-----------------------
 
     def __plot_data(self, cortix_time=0.0, time_step=0.0):
 
@@ -273,7 +279,7 @@ class PyPlot():
 
             self.__plot_time_tables( self.__cortix_start_time, self.__cortix_final_time )  # plot all history
 
-#----------------------- end def __plot_data():-----------------------------------
+        return
 
     def __get_time_sequence(self, port_file, at_time):
         '''
@@ -297,7 +303,6 @@ class PyPlot():
         self.__log.debug(s)
 
         return
-#----------------------- end def __get_time_sequence():---------------------------
 
     def __get_time_tables(self, port_file, at_time):
         '''
@@ -369,7 +374,6 @@ class PyPlot():
         # while found is False:
 
         return
-#----------------------- end __get_time_tables():---------------------------------
 
     def __plot_time_seq_dashboard( self, initialTime=0.0, finalTime=0.0 ):
         '''
@@ -764,7 +768,6 @@ class PyPlot():
         self.__time_sequences_tmp = list()
 
         return
-#----------------------- end __plot_time_seq_dashboard():-------------------------
 
     def __plot_time_tables( self, initialTime=0.0, finalTime=0.0 ):
 
@@ -880,7 +883,5 @@ class PyPlot():
         plt.close('time-tables')
 
         return
-#----------------------- end __plot_time_tables():--------------------------------
-
 
 #======================= end class PyPlot: =======================================
