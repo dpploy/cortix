@@ -77,6 +77,11 @@
 
   <application name='wind'>
 
+   <!-- The`importlib` name is system dependent. This name and the module's name are
+        combined to form the Python command argument:
+           importlib.import_module(`importlib_name+module_name+'.cortix_driver) 
+        that loads the `cortix_driver.py` wrapper at runtime.
+   -->
    <module_library importlib_name='cortix.examples.modulib'>
     <parent_dir>
         $CORTIX/cortix/examples/modulib
