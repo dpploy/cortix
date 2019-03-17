@@ -1,6 +1,7 @@
 # Cortix
 > A Python library for system-level module coupling, execution, and analysis.
 
+![Website](https://img.shields.io/website/https/github.com/dpploy/cortix.svg)
 [![Repo Size](https://img.shields.io/github/repo-size/dpploy/cortix.svg?style=flat)](https://cortix.org)
 [![Build Status](https://travis-ci.org/dpploy/cortix.svg?branch=master)](https://travis-ci.org/dpploy/cortix)
 [![PyPI version](https://badge.fury.io/py/cortix.svg)](https://badge.fury.io/py/cortix)
