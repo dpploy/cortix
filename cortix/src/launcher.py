@@ -35,7 +35,7 @@ class Launcher(Thread):
 #*********************************************************************************
 
     def __init__(self, 
-            mod_lib_name, mod_lib_parent_dir, module_name, 
+            importlib_name, mod_lib_parent_dir, module_name, 
             slot_id,
             input_full_path_file_name,
             exec_full_path_file_name,
@@ -64,8 +64,7 @@ class Launcher(Thread):
         # Create logging facility
         self.__create_logging_facility()
 
-        #lib_module_driver = mod_lib_name + '.' + module_name + '.cortix_driver'
-        lib_module_driver = mod_lib_name + '.' + module_name + '.cortix_driver'
+        lib_module_driver = importlib_name + '.' + module_name + '.cortix_driver'
         self.__log.info('try importing module driver: %s', lib_module_driver)
 
         # import a guest Cortix module through its driver

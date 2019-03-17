@@ -73,7 +73,7 @@
 
   <application name="droplet">
 
-   <module_library name='cortix.examples.modulib'>
+   <module_library importlib_name='cortix.examples.modulib'>
     <parent_dir>
         $CORTIX/cortix/examples/modulib
     </parent_dir>
@@ -100,7 +100,7 @@
    </module>
 
    <module name="pyplot" type="native">
-    <library name='cortix.modulib'>
+    <library importlib_name='cortix.modulib'>
      <parent_dir>
          $CORTIX/cortix/modulib
      </parent_dir>

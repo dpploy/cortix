@@ -32,11 +32,11 @@ class Module:
 
     def __init__( self, 
             logger,
-            library_name, library_parent_dir, 
+            importlib_name, library_parent_dir, 
             config_xml_tree ):
 
         assert isinstance(logger, logging.Logger),'ctx::mod: logger is invalid.'
-        assert isinstance(library_name, str), 'ctx::mod: library_name is invalid.'
+        assert isinstance(importlib_name, str), 'ctx::mod: importlib_name is invalid.'
         assert isinstance(library_parent_dir, str),'ctx:mod: library_parent is invalid.'
 
         assert isinstance(config_xml_tree, XMLTree),'ctx:mod: config_xml_tree is invalid.'
@@ -47,7 +47,7 @@ class Module:
 
         # Specify module library with upstream information
         self.__library_parent_dir = library_parent_dir
-        self.__library_name       = library_name
+        self.__importlib_name       = importlib_name
 
         # executable is deprecated; eliminate
         self.__executable_name = 'null-executable_name'
@@ -82,9 +82,9 @@ class Module:
             if tag == 'library':
                 assert len(attributes) == 1, 'only name of library allowed.'
                 key = attributes[0][0]
-                assert key == 'name', 'invalid attribute key.'
+                assert key == 'importlib_name', 'invalid attribute key.'
                 val = attributes[0][1].strip()
-                self.__library_name = val
+                self.__importlib_name = val
 
                 node = XMLTree( elem ) # fixme: remove this wrapper
                 sub_node = node.get_sub_node('parent_dir')
@@ -132,14 +132,14 @@ class Module:
 
     name = property(__get_name, None, None, None)
 
-    def __get_library_name(self):
+    def __get_importlib_name(self):
         '''
         `str`:Module library name
         '''
 
-        return self.__library_name
+        return self.__importlib_name
 
-    library_name = property(__get_library_name, None, None, None)
+    importlib_name = property(__get_importlib_name, None, None, None)
 
     def __get_library_parent_dir(self):
         '''
@@ -235,7 +235,7 @@ class Module:
 
         status = runtime_module_status_file
 
-        library_name = self.__library_name
+        importlib_name = self.__importlib_name
         library_parent_dir = self.__library_parent_dir
         mod_name     = self.__mod_name
 
@@ -255,7 +255,7 @@ class Module:
 
         # the laucher "loads" the module dynamically and provides the method for
         # threading
-        launch = Launcher( library_name, library_parent_dir, mod_name,
+        launch = Launcher( importlib_name, library_parent_dir, mod_name,
                            slot_id,
                            module_input,
                            mod_exec_name,

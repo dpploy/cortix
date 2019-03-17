@@ -34,7 +34,7 @@
    </logger>
   </task>
  <application name="dev1">
-   <module_library name='cortix.modulib'>
+   <module_library importlib_name='cortix.modulib'>
     <parent_dir>
         $CORTIX/cortix/modulib
     </parent_dir>

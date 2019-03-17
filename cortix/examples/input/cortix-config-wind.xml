@@ -77,7 +77,7 @@
 
   <application name='wind'>
 
-   <module_library name='cortix.examples.modulib'>
+   <module_library importlib_name='cortix.examples.modulib'>
     <parent_dir>
         $CORTIX/cortix/examples/modulib
     </parent_dir>
@@ -95,7 +95,7 @@
       + <executable_path>: optional
       + <input_file_name>: required
       + <input_file_path>: required
-      + <library name='value'>: optional
+      + <library importlib_name='value'>: optional
           <parent_dir>text</parent_dir>
       + </library
    -->
