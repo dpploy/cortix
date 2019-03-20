@@ -1,12 +1,13 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# This file is part of the Cortix toolkit evironment
-# https://github.com/dpploy/cortix
+# This file is part of the Cortix toolkit environment
+# https://cortix.org
 #
 # All rights reserved, see COPYRIGHT for full restrictions.
 # https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
 #
-# Licensed under the GNU General Public License v. 3, please see LICENSE file.
-# https://www.gnu.org/licenses/gpl-3.0.txt
+# Licensed under the University of Massachusetts Lowell LICENSE:
+# https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 """
 Fuel segment
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
@@ -28,7 +29,7 @@ from cortix.support.specie import Specie
 # *******************************************************************************
 
 class FuelSegment():
-
+    #a new fuel segment is initialized whenever a bundle is passed through the chopper. It retains the same properties as the bundle did when it was passed through the chopper, but now the elements are in different geometries than before. Uses phase data in the constructor instead of species data. 
     # Todo: Species should not be here. Need to replace by Phase instead.
     #      Chopper will be affected
 
@@ -36,6 +37,7 @@ class FuelSegment():
                  geometry = pandas.Series(),
                  species = list()
                  ):
+        
 
         assert isinstance(geometry, pandas.Series), 'fatal.'
         assert isinstance(species, list), 'fatal.'
@@ -67,14 +69,17 @@ class FuelSegment():
 # ---------------------- end def __init__():--------------------------------------
 
     def get_geometry(self):
+    #returns the new geometry of the fuel segment after chopping.
         return self.__geometry
     geometry = property(get_geometry, None, None, None)
 
     def get_species(self):
+        #returns the species that comprises this fuel segment.
         return self.__species
     species = property(get_species, None, None, None)
 
     def get_specie(self, name):
+        #takes the name of a specific specie as an argument; returns that name if that specie is present in the fuel segment, and returns none of that specie is not present in the fuel segment.
         for specie in self.__species:
             if specie.name == name:
                 return specie
@@ -83,7 +88,7 @@ class FuelSegment():
 
 # Get stored fuel segment property either overall or on a nuclide basis
     def get_attribute(self, name, nuclide=None, series=None):
-
+        #returns a specific attribute ('name'), which must be either an overall fuel segment property or a property of one of the nuclides present in the fuel segment (specified by passing a value for nuclide). Searchable values include: fuel-volume, segment-volume, fuel-diameter, fuel-length, mass-dens, radioactivityDens, heatDens, gammaDens
         attribute_name = name
 
         assert attribute_name in self.attribute_names, \

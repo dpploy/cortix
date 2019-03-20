@@ -1,12 +1,13 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# This file is part of the Cortix toolkit evironment
-# https://github.com/dpploy/cortix
+# This file is part of the Cortix toolkit environment
+# https://cortix.org
 #
 # All rights reserved, see COPYRIGHT for full restrictions.
 # https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
 #
-# Licensed under the GNU General Public License v. 3, please see LICENSE file.
-# https://www.gnu.org/licenses/gpl-3.0.txt
+# Licensed under the University of Massachusetts Lowell LICENSE:
+# https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 """
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
@@ -33,7 +34,7 @@ from cortix.support.fuel_segment import FuelSegment
 
 
 class FuelSegmentsGroups():
-
+#creates a dictionary of lists of fuel segment objects, with the keys typically being timestamps. Each fuel segment object has two data members, a pandas Series for geometry spec and a panda DataFrame for property density.
     def __init__(self,
                  key=None,
                  fuelSegments=None
@@ -67,24 +68,28 @@ class FuelSegmentsGroups():
 # passed into/out of the function are immutable.
 
     def HasGroup(self, key):
+        #checks if the specified key has a group of fuel segments associated with it.
 
         return key in self.groups.keys()
 
     def AddGroup(self, key, fuelSegments=None):
+        #appends the dictionary with a new key and associated list of fuelSegments. If the specified key is already present in the dictionary, then the specified list of fuel segments will be appended to the list of fuel segments already associated with the specified key.
 
         self.__AddGroup(key, fuelSegments)
 
     def GetAttribute(self, groupKey=None, attributeName=None,
                      nuclideSymbol=None, nuclideSeries=None):
-
+        #returns the average value of an attribute amongst all elements in a group (WARNING: keys with no values associated with them will lower this average!). If groupKey is not specified, the function will return the average attribute value of every fuel segment element in the entire dictionary. If attribute is not specified, the function call will fail. If the key value specified does not match any keys in the dictionary, the function will return a value of 0.
         return self.__GetGroupAttribute(
             groupKey, attributeName, nuclideSymbol, nuclideSeries)
 
     def GetFuelSegments(self, groupKey=None):
+        #returns a list of fuel segments associated with a specified groupkey. If no group key is specified, then all elements in the dictionary will be returned. If the specified group key does not exist, then the function will return an empty list.
 
         return self.__GetFuelSegments(groupKey)
 
     def RemoveFuelSegment(self, groupKey, fuelSegment):
+        #removes a fuel segment from a list associated with a specified group key. If the specified group key or fuel segment do not exist, the function will fail.
 
         return self.__RemoveFuelSegment(groupKey, fuelSegment)
 
