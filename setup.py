@@ -8,8 +8,8 @@ with open("requirements.txt", "r") as fh:
 
 setuptools.setup(
     name="cortix",
-    version="0.0.8",
-    author="Valmor F. de Almeida",
+    version="0.1.3",
+    author="Cortix Computing",
     author_email="valmor_dealmeida@uml.edu",
     description=" Cortix is a Python library for system-level\
                   module coupling, execution, and analysis.",
@@ -17,7 +17,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     include_package_data=True,
     install_requires=req,
-    url="https://github.com/dpploy/cortix",
+    url="https://cortix.org",
     packages=['cortix', 'cortix.docs', 'cortix.examples',
               'cortix.examples.modulib', 'cortix.examples.console_run',
               'cortix.examples.notebook_run',
