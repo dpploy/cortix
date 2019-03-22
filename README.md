@@ -64,3 +64,10 @@ Cortix requires a set of input files, a driver, and a configuration file. See `e
 ## Documentation
 
 - Gilberto E. Alas: gilberto\_alas@student.uml.edu
+
+## Physical Address
+
+Cortix Group <br>
+c/o [UMass Innovation Hub](https://www.uml.edu/Innovation-Hub/) <br>
+110 Canal St., 3rd Floor <br>
+Lowell, MA  01852
