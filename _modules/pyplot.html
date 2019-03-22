@@ -30,15 +30,16 @@
           <div class="body" role="main">
             
   <h1>Source code for pyplot</h1><div class="highlight"><pre>
-<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1"># This file is part of the Cortix toolkit evironment</span>
-<span class="c1"># https://github.com/dpploy/cortix</span>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># This file is part of the Cortix toolkit environment</span>
+<span class="c1"># https://cortix.org</span>
 <span class="c1">#</span>
 <span class="c1"># All rights reserved, see COPYRIGHT for full restrictions.</span>
 <span class="c1"># https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt</span>
 <span class="c1">#</span>
-<span class="c1"># Licensed under the GNU General Public License v. 3, please see LICENSE file.</span>
-<span class="c1"># https://www.gnu.org/licenses/gpl-3.0.txt</span>
+<span class="c1"># Licensed under the University of Massachusetts Lowell LICENSE:</span>
+<span class="c1"># https://github.com/dpploy/cortix/blob/master/LICENSE.txt</span>
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">PyPlot module.</span>
 
@@ -68,6 +69,10 @@
 <span class="c1"># *********************************************************************************</span>
 
 <div class="viewcode-block" id="PyPlot"><a class="viewcode-back" href="../modulib_rst/pyplot_rst/pyplot.html#pyplot.PyPlot">[docs]</a><span class="k">class</span> <span class="nc">PyPlot</span><span class="p">():</span>
+
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Construction</span>
+<span class="c1">#*********************************************************************************</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">slot_id</span><span class="p">,</span>
@@ -143,20 +148,24 @@
 
         <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">portName</span><span class="p">,</span> <span class="n">portType</span><span class="p">,</span> <span class="n">port_file</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ports</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">portName</span> <span class="o">==</span> <span class="s1">&#39;time-sequence-input&#39;</span><span class="p">:</span>  <span class="c1"># this is the use port connected to the input port</span>
+            <span class="k">if</span> <span class="n">portName</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span><span class="p">:</span>  <span class="c1"># this is the use port connected to the input port</span>
                 <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;cp -f &#39;</span> <span class="o">+</span> <span class="n">input_data_full_path_file_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span> <span class="o">+</span> <span class="n">port_file</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
                 <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">if</span> <span class="n">found</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;found time-sequence-input file.&#39;</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;found input file.&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;did not find time-sequence-input file.&#39;</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;did not find input file.&#39;</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
-<span class="c1"># ---------------------- end def __init__():------------------------------</span>
+        <span class="k">return</span>
+
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Public member functions</span>
+<span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="PyPlot.call_ports"><a class="viewcode-back" href="../modulib_rst/pyplot_rst/pyplot.html#pyplot.PyPlot.call_ports">[docs]</a>    <span class="k">def</span> <span class="nf">call_ports</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cortix_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -176,25 +185,26 @@
 
                 <span class="k">if</span> <span class="n">portType</span> <span class="o">==</span> <span class="s1">&#39;use&#39;</span><span class="p">:</span>
                     <span class="k">assert</span> <span class="n">portName</span> <span class="o">==</span> <span class="s1">&#39;time-sequence&#39;</span> <span class="ow">or</span> <span class="n">portName</span> <span class="o">==</span> <span class="s1">&#39;time-tables&#39;</span> <span class="ow">or</span> \
-                        <span class="n">portName</span> <span class="o">==</span> <span class="s1">&#39;time-sequence-input&#39;</span>
+                        <span class="n">portName</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span>
 
                     <span class="bp">self</span><span class="o">.</span><span class="n">__use_data</span><span class="p">(</span> <span class="n">usePortName</span> <span class="o">=</span> <span class="n">portName</span><span class="p">,</span>
                                      <span class="n">usePortFile</span> <span class="o">=</span> <span class="n">thisPortFile</span><span class="p">,</span>
-                                     <span class="n">at_time</span> <span class="o">=</span> <span class="n">cortix_time</span> <span class="p">)</span></div>
+                                     <span class="n">at_time</span> <span class="o">=</span> <span class="n">cortix_time</span> <span class="p">)</span>
 
-<span class="c1">#----------------------- end def call_ports():------------------------------------</span>
+        <span class="k">return</span></div>
 
 <div class="viewcode-block" id="PyPlot.execute"><a class="viewcode-back" href="../modulib_rst/pyplot_rst/pyplot.html#pyplot.PyPlot.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cortix_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
 
         <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;execute(): cortix time [min] = &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">cortix_time</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__plot_data</span><span class="p">(</span><span class="n">cortix_time</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__plot_data</span><span class="p">(</span><span class="n">cortix_time</span><span class="p">,</span> <span class="n">time_step</span><span class="p">)</span>
 
-<span class="c1">#----------------------- end def execute():---------------------------------------</span>
+        <span class="k">return</span></div>
 
-<span class="c1"># *********************************************************************************</span>
+<span class="c1">#*********************************************************************************</span>
 <span class="c1"># Private helper functions (internal use: __)</span>
+<span class="c1">#*********************************************************************************</span>
 
     <span class="k">def</span> <span class="nf">__use_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usePortName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">usePortFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">at_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -206,7 +216,7 @@
                                           <span class="n">usePortFile</span> <span class="o">=</span> <span class="n">usePortFile</span>  <span class="p">)</span>
 
 <span class="c1"># Get data from port files</span>
-        <span class="k">if</span> <span class="n">usePortName</span> <span class="o">==</span> <span class="s1">&#39;time-sequence&#39;</span> <span class="ow">or</span> <span class="n">usePortName</span> <span class="o">==</span> <span class="s1">&#39;time-sequence-input&#39;</span> \
+        <span class="k">if</span> <span class="n">usePortName</span> <span class="o">==</span> <span class="s1">&#39;time-sequence&#39;</span> <span class="ow">or</span> <span class="n">usePortName</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span> \
            <span class="ow">and</span> <span class="n">port_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">__get_time_sequence</span><span class="p">(</span> <span class="n">port_file</span><span class="p">,</span> <span class="n">at_time</span> <span class="p">)</span>
@@ -215,7 +225,6 @@
             <span class="n">_GetTimeTables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_file</span><span class="p">,</span> <span class="n">at_time</span><span class="p">)</span>
 
         <span class="k">return</span>
-<span class="c1">#----------------------- end def __use_data():------------------------------------</span>
 
     <span class="k">def</span> <span class="nf">__provide_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">providePortName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">at_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -223,7 +232,6 @@
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span>
-<span class="c1">#----------------------- end def __provide_data():--------------------------------</span>
 
     <span class="k">def</span> <span class="nf">__get_port_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">usePortName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">usePortFile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">providePortName</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -271,7 +279,6 @@
                     <span class="n">port_file</span> <span class="o">=</span> <span class="n">thisPortFile</span>
 
         <span class="k">return</span> <span class="n">port_file</span>
-<span class="c1"># ---------------------- end def __get_port_file():-----------------------</span>
 
     <span class="k">def</span> <span class="nf">__plot_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cortix_time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">time_step</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
 
@@ -304,7 +311,7 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">__plot_time_tables</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_start_time</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cortix_final_time</span> <span class="p">)</span>  <span class="c1"># plot all history</span>
 
-<span class="c1">#----------------------- end def __plot_data():-----------------------------------</span>
+        <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">__get_time_sequence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_file</span><span class="p">,</span> <span class="n">at_time</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -328,7 +335,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
 
         <span class="k">return</span>
-<span class="c1">#----------------------- end def __get_time_sequence():---------------------------</span>
 
     <span class="k">def</span> <span class="nf">__get_time_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_file</span><span class="p">,</span> <span class="n">at_time</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -400,7 +406,6 @@
         <span class="c1"># while found is False:</span>
 
         <span class="k">return</span>
-<span class="c1">#----------------------- end __get_time_tables():---------------------------------</span>
 
     <span class="k">def</span> <span class="nf">__plot_time_seq_dashboard</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">initialTime</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">finalTime</span><span class="o">=</span><span class="mf">0.0</span> <span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -795,7 +800,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__time_sequences_tmp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
         <span class="k">return</span>
-<span class="c1">#----------------------- end __plot_time_seq_dashboard():-------------------------</span>
 
     <span class="k">def</span> <span class="nf">__plot_time_tables</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">initialTime</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">finalTime</span><span class="o">=</span><span class="mf">0.0</span> <span class="p">):</span>
 
@@ -911,8 +915,6 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;time-tables&#39;</span><span class="p">)</span>
 
         <span class="k">return</span></div>
-<span class="c1">#----------------------- end __plot_time_tables():--------------------------------</span>
-
 
 <span class="c1">#======================= end class PyPlot: =======================================</span>
 </pre></div>
@@ -925,6 +927,14 @@
 <h3>About Cortix</h3>
 <p>
 Cortix is a Python library for system-level module coupling, execution, and analysis.
+</p>
+<p>
+Cortix Group <br>
+c/o <a href="https://www.uml.edu/innovation-hub">UMass Innovation Hub</a> <br>
+110 Canal St., 3rd Floor <br>
+Lower, MA 01852
+</p>
+
 </p>
 
 <h3><a href="../index.html">Table Of Contents</a></h3>

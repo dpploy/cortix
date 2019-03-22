@@ -32,25 +32,25 @@
   <h1>Source code for task</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1"># This file is part of the Cortix toolkit evironment</span>
-<span class="c1"># https://github.com/dpploy/cortix</span>
+<span class="c1"># This file is part of the Cortix toolkit environment</span>
+<span class="c1"># https://cortix.org</span>
 <span class="c1">#</span>
 <span class="c1"># All rights reserved, see COPYRIGHT for full restrictions.</span>
 <span class="c1"># https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt</span>
 <span class="c1">#</span>
-<span class="c1"># Licensed under the GNU General Public License v. 3, please see LICENSE file.</span>
-<span class="c1"># https://www.gnu.org/licenses/gpl-3.0.txt</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Valmor F. de Almeida dealmeidav@ornl.gov; vfda</span>
+<span class="c1"># Licensed under the University of Massachusetts Lowell LICENSE:</span>
+<span class="c1"># https://github.com/dpploy/cortix/blob/master/LICENSE.txt</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">The Cortix Task class definition.</span>
 
 <span class="sd">Cortix: a program for system-level modules coupling, execution, and analysis.</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&#39;&#39;&#39;</span>
 <span class="c1">#*********************************************************************************</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">xml.etree.cElementTree</span> <span class="k">import</span> <span class="n">ElementTree</span>
-<span class="kn">from</span> <span class="nn">cortix.src.utils.configtree</span> <span class="k">import</span> <span class="n">ConfigTree</span>
+<span class="kn">from</span> <span class="nn">cortix.src.utils.xmltree</span> <span class="k">import</span> <span class="n">XMLTree</span>
 <span class="kn">from</span> <span class="nn">cortix.src.utils.set_logger_level</span> <span class="k">import</span> <span class="n">set_logger_level</span>
 <span class="c1">#*********************************************************************************</span>
 
@@ -60,17 +60,21 @@
 <span class="sd">    A Task will use a given Application.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_work_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">task_config_node</span><span class="o">=</span><span class="n">ConfigTree</span><span class="p">()):</span>
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Construction</span>
+<span class="c1">#*********************************************************************************</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent_work_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">task_config_node</span><span class="o">=</span><span class="n">XMLTree</span><span class="p">()):</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parent_work_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;-&gt; parent_work_dir invalid.&#39;</span>
 
         <span class="c1"># Inherit a configuration tree</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task_config_node</span><span class="p">,</span> <span class="n">ConfigTree</span><span class="p">),</span> \
-            <span class="s1">&#39;-&gt; task_config_node not a ConfigTree: </span><span class="si">%r</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">task_config_node</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">task_config_node</span><span class="p">,</span> <span class="n">XMLTree</span><span class="p">),</span> \
+            <span class="s1">&#39;-&gt; task_config_node not a XMLTree: </span><span class="si">%r</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">task_config_node</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__config_node</span> <span class="o">=</span> <span class="n">task_config_node</span>
 
         <span class="c1"># Read the task name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__config_node</span><span class="o">.</span><span class="n">get_node_name</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__config_node</span><span class="o">.</span><span class="n">get_node_attribute</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
 
         <span class="c1"># Set the work directory (previously created)</span>
         <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">parent_work_dir</span><span class="p">),</span> <span class="s1">&#39;work directory not available.&#39;</span>
@@ -83,7 +87,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">logger_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">)</span>
 
-        <span class="n">logger_level</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">logger_level</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get_node_attribute</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span> <span class="o">=</span> <span class="n">set_logger_level</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="p">,</span> <span class="n">logger_name</span><span class="p">,</span> <span class="n">logger_level</span><span class="p">)</span>
 
         <span class="n">file_handle</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span> <span class="o">+</span> <span class="s1">&#39;task.log&#39;</span><span class="p">)</span>
@@ -92,15 +96,15 @@
         <span class="n">console_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
         <span class="n">console_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;file_handler&#39;</span><span class="p">:</span>
-                <span class="c1"># file handler</span>
-                <span class="n">file_handle_level</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">get_node_children</span><span class="p">():</span>
+            <span class="p">(</span><span class="n">elem</span><span class="p">,</span><span class="n">tag</span><span class="p">,</span><span class="n">attributes</span><span class="p">,</span><span class="n">text</span><span class="p">)</span> <span class="o">=</span> <span class="n">child</span>
+            <span class="n">elem</span> <span class="o">=</span> <span class="n">XMLTree</span><span class="p">(</span> <span class="n">elem</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;file_handler&#39;</span><span class="p">:</span>
+                <span class="n">file_handle_level</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get_node_attribute</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span>
                 <span class="n">file_handle</span> <span class="o">=</span> <span class="n">set_logger_level</span><span class="p">(</span><span class="n">file_handle</span><span class="p">,</span> <span class="n">logger_name</span><span class="p">,</span>
                                                <span class="n">file_handle_level</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;console_handler&#39;</span><span class="p">:</span>
-                <span class="c1"># console handler</span>
-                <span class="n">console_handle_level</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;console_handler&#39;</span><span class="p">:</span>
+                <span class="n">console_handle_level</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get_node_attribute</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span>
                 <span class="n">console_handler</span> <span class="o">=</span> <span class="n">set_logger_level</span><span class="p">(</span><span class="n">console_handler</span><span class="p">,</span>
                                                    <span class="n">logger_name</span><span class="p">,</span> <span class="n">console_handle_level</span><span class="p">)</span>
 
@@ -117,9 +121,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;created logger: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;logger level: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">logger_level</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;logger file handler level: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">file_handle_level</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-            <span class="s1">&#39;logger console handler level: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
-            <span class="n">console_handle_level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;logger console handler level: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">console_handle_level</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__start_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__evolve_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__time_step</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__start_time_unit</span> <span class="o">=</span> <span class="s1">&#39;null-start_time_unit&#39;</span>
@@ -159,23 +161,37 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;evolve_time unit  = </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__evolve_time_unit</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;end __init__()&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;created task: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">)</span>
-<span class="c1">#----------------------- end def __init__():--------------------------------------</span>
+
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;destroyed task: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">)</span>
+
+        <span class="k">return</span>
+
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Public member functions</span>
+<span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="Task.execute"><a class="viewcode-back" href="../src_rst/task.html#task.Task.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">application</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        This method is used to execute (accomplish) the given task.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="n">network</span> <span class="o">=</span> <span class="n">application</span><span class="o">.</span><span class="n">get_network</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">)</span>
+
         <span class="n">runtime_status_files</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-        <span class="k">for</span> <span class="n">slot_name</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">slot_names</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">slot_name</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">module_slot_names</span><span class="p">:</span>
 
             <span class="n">module_name</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span> <span class="n">slot_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="p">)</span>
             <span class="n">slot_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">slot_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 
-            <span class="n">module</span>     <span class="o">=</span> <span class="n">application</span><span class="o">.</span><span class="n">get_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+            <span class="n">module</span> <span class="o">=</span> <span class="n">application</span><span class="o">.</span><span class="n">get_module</span><span class="p">(</span><span class="n">module_name</span><span class="p">)</span>
+
             <span class="n">param_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__runtime_cortix_param_file</span>
-            <span class="n">comm_file</span>  <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_runtime_cortix_comm_file</span><span class="p">(</span><span class="n">slot_name</span><span class="p">)</span>
+            <span class="n">comm_file</span>  <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">get_runtime_cortix_comm_file_name</span><span class="p">(</span><span class="n">slot_name</span><span class="p">)</span>
 
             <span class="c1"># Run module in the slot</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;call execute on module: </span><span class="si">%s</span><span class="s1">:</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span><span class="n">module_name</span><span class="p">,</span><span class="n">slot_id</span><span class="p">)</span>
@@ -193,8 +209,9 @@
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># hard coded; fix me.</span>
             <span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="n">slot_names</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_runtime_status</span><span class="p">(</span><span class="n">runtime_status_files</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;runtime status: </span><span class="si">%s</span><span class="s1">; module slots running: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span>
-                          <span class="nb">str</span><span class="p">(</span><span class="n">slot_names</span><span class="p">))</span></div>
-<span class="c1">#----------------------- end def execute():---------------------------------------</span>
+                          <span class="nb">str</span><span class="p">(</span><span class="n">slot_names</span><span class="p">))</span>
+
+        <span class="k">return</span></div>
 
     <span class="k">def</span> <span class="nf">__get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -202,8 +219,8 @@
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
+
     <span class="n">name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="c1">#----------------------- end def get_name():--------------------------------------</span>
 
     <span class="k">def</span> <span class="nf">__get_work_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -211,8 +228,8 @@
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span>
+
     <span class="n">work_dir</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_work_dir</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="c1">#----------------------- end def get_work_dir():----------------------------------</span>
 
     <span class="k">def</span> <span class="nf">__get_start_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -220,8 +237,8 @@
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start_time</span>
+
     <span class="n">start_time</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_start_time</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="c1">#----------------------- end def get_start_time():--------------------------------</span>
 
     <span class="k">def</span> <span class="nf">__get_start_time_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -229,8 +246,8 @@
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__start_time_unit</span>
+
     <span class="n">start_time_unit</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_start_time_unit</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="c1">#----------------------- end def get_start_time_unit():---------------------------</span>
 
     <span class="k">def</span> <span class="nf">__get_evolve_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -238,8 +255,8 @@
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__evolve_time</span>
+
     <span class="n">evolve_time</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_evolve_time</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="c1">#----------------------- end def get_evolve_time():-------------------------------</span>
 
     <span class="k">def</span> <span class="nf">__get_evolve_time_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -247,8 +264,8 @@
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__evolve_time_unit</span>
+
     <span class="n">evolve_time_unit</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_evolve_time_unit</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="c1">#----------------------- end def get_evolve_time_unit():--------------------------</span>
 
     <span class="k">def</span> <span class="nf">__get_time_step</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -256,8 +273,8 @@
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__time_step</span>
+
     <span class="n">time_step</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_time_step</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="c1">#----------------------- end def get_time_step():---------------------------------</span>
 
     <span class="k">def</span> <span class="nf">__get_time_step_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -265,16 +282,17 @@
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__time_step_unit</span>
+
     <span class="n">time_step_unit</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_time_step_unit</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="c1">#----------------------- end def get_time_step_unit():----------------------------</span>
 
 <div class="viewcode-block" id="Task.set_runtime_cortix_param_file"><a class="viewcode-back" href="../src_rst/task.html#task.Task.set_runtime_cortix_param_file">[docs]</a>    <span class="k">def</span> <span class="nf">set_runtime_cortix_param_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">full_path</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the task config file to the specified file.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__runtime_cortix_param_file</span> <span class="o">=</span> <span class="n">full_path</span></div>
-<span class="c1">#----------------------- end def set_runtime_cortix_param_file():-----------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__runtime_cortix_param_file</span> <span class="o">=</span> <span class="n">full_path</span>
+
+        <span class="k">return</span></div>
 
     <span class="k">def</span> <span class="nf">__get_runtime_cortix_param_file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -282,21 +300,18 @@
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__runtime_cortix_param_file</span>
-    <span class="n">runtime_cortix_param_file</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_runtime_cortix_param_file</span><span class="p">,</span> <span class="n">set_runtime_cortix_param_file</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-<span class="c1">#----------------------- end def get_runtime_cortix_param_file():-----------------</span>
 
-    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;destroyed task: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">)</span>
-<span class="c1">#----------------------- end def __del__():---------------------------------------</span>
+    <span class="n">runtime_cortix_param_file</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_runtime_cortix_param_file</span><span class="p">,</span>
+            <span class="n">set_runtime_cortix_param_file</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <span class="c1">#*********************************************************************************</span>
 <span class="c1"># Private helper functions (internal use: __)</span>
+<span class="c1">#*********************************************************************************</span>
 
     <span class="k">def</span> <span class="nf">__get_runtime_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runtime_status_files</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Helper funcion for montioring the status of the task.</span>
-<span class="sd">        It reads the status files of all modules and reports which ones are still</span>
-<span class="sd">        running.</span>
+<span class="sd">        Helper funcion for montioring the status of the task. It reads the status</span>
+<span class="sd">        files of all modules and reports which ones are still running.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">task_status</span> <span class="o">=</span> <span class="s1">&#39;finished&#39;</span>
@@ -321,8 +336,6 @@
                 <span class="n">running_module_slots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">slot_name</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="n">task_status</span><span class="p">,</span> <span class="n">running_module_slots</span><span class="p">)</span></div>
-<span class="c1">#----------------------- end def __get_runtime_status():--------------------------</span>
-
 
 <span class="c1">#======================= end class Task: =========================================</span>
 </pre></div>
@@ -335,6 +348,14 @@
 <h3>About Cortix</h3>
 <p>
 Cortix is a Python library for system-level module coupling, execution, and analysis.
+</p>
+<p>
+Cortix Group <br>
+c/o <a href="https://www.uml.edu/innovation-hub">UMass Innovation Hub</a> <br>
+110 Canal St., 3rd Floor <br>
+Lower, MA 01852
+</p>
+
 </p>
 
 <h3><a href="../index.html">Table Of Contents</a></h3>

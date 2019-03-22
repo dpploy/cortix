@@ -32,14 +32,14 @@
   <h1>Source code for droplet_run</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
-<span class="c1"># This file is part of the Cortix toolkit evironment</span>
-<span class="c1"># https://github.com/dpploy/cortix</span>
+<span class="c1"># This file is part of the Cortix toolkit environment</span>
+<span class="c1"># https://cortix.org</span>
 <span class="c1">#</span>
 <span class="c1"># All rights reserved, see COPYRIGHT for full restrictions.</span>
 <span class="c1"># https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt</span>
 <span class="c1">#</span>
-<span class="c1"># Licensed under the GNU General Public License v. 3, please see LICENSE file.</span>
-<span class="c1"># https://www.gnu.org/licenses/gpl-3.0.txt</span>
+<span class="c1"># Licensed under the University of Massachusetts Lowell LICENSE:</span>
+<span class="c1"># https://github.com/dpploy/cortix/blob/master/LICENSE.txt</span>
 <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">Cortix: a program for system-level modules coupling, execution, and analysis.</span>
 <span class="sd">&#39;&#39;&#39;</span>
@@ -53,15 +53,28 @@
 <span class="sd">    Run the Cortix Droplet example. If Cortix and its dependencies are installed,</span>
 <span class="sd">    this program should be executed at the command prompt inside the directory</span>
 <span class="sd">    this program resides, namely, cortix/cortix/example/console_run/ directory.</span>
+<span class="sd">    At the end of execution a directory with all logging and outputs is left in the</span>
+<span class="sd">    work directory, as specified in the cortix-config-droplet.xml file. In this case,</span>
+<span class="sd">    /tmp/cortix-droplet-wrk/.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="n">pwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
     <span class="n">full_path_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pwd</span><span class="p">,</span> <span class="s1">&#39;../input/cortix-config-droplet.xml&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Create the cortix object and name it so it matches the &lt;name&gt;&lt;/name&gt; element</span>
+    <span class="c1"># in the XML config file.</span>
     <span class="n">cortix</span> <span class="o">=</span> <span class="n">Cortix</span><span class="p">(</span><span class="s1">&#39;cortix-droplet&#39;</span><span class="p">,</span> <span class="n">full_path_config_file</span><span class="p">)</span>
+
+    <span class="c1"># This is a test of the droplet module alone and it needs no input.</span>
+    <span class="n">cortix</span><span class="o">.</span><span class="n">run_simulations</span><span class="p">(</span><span class="n">task_name</span><span class="o">=</span><span class="s2">&quot;solo-droplet&quot;</span><span class="p">)</span>
+
+    <span class="c1"># This is a test of the pyplot module alone: it needs an input file: state.xml which</span>
+    <span class="c1"># is provided in ../input/. The input file ../input/pyplot.input points to this</span>
+    <span class="c1"># file at runtime. </span>
+    <span class="n">cortix</span><span class="o">.</span><span class="n">run_simulations</span><span class="p">(</span><span class="n">task_name</span><span class="o">=</span><span class="s2">&quot;solo-pyplot&quot;</span><span class="p">)</span>
+
+    <span class="c1"># This is a test of the droplet and pyplot connected.</span>
     <span class="n">cortix</span><span class="o">.</span><span class="n">run_simulations</span><span class="p">(</span><span class="n">task_name</span><span class="o">=</span><span class="s2">&quot;droplet-fall&quot;</span><span class="p">)</span></div>
-<span class="c1">#    cortix.run_simulations(task_name=&quot;solo-droplet-fall&quot;)</span>
-<span class="c1">#    cortix.run_simulations(task_name=&quot;solo-pyplot&quot;) # this needs additional config</span>
-<span class="c1">#---------------------- end def run():--------------------------------------------</span>
 
 <span class="c1">#*********************************************************************************</span>
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
@@ -76,6 +89,14 @@
 <h3>About Cortix</h3>
 <p>
 Cortix is a Python library for system-level module coupling, execution, and analysis.
+</p>
+<p>
+Cortix Group <br>
+c/o <a href="https://www.uml.edu/innovation-hub">UMass Innovation Hub</a> <br>
+110 Canal St., 3rd Floor <br>
+Lower, MA 01852
+</p>
+
 </p>
 
 <h3><a href="../index.html">Table Of Contents</a></h3>

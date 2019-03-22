@@ -1,10 +1,10 @@
     A Python library for system-level module coupling, execution, and
     analysis.
 
+| |Repo Size|
 | |Build Status|
 | |PyPI version|
 | |PyPI - Python Version|
-| |Binder|
 
 |image4|
 
@@ -95,12 +95,13 @@ Documentation
 
 -  Gilberto E. Alas: gilberto\_\ alas@student.uml.edu
 
+.. |Repo Size| image:: https://img.shields.io/github/repo-size/dpploy/cortix.svg?style=flat
+   :target: https://cortix.org
 .. |Build Status| image:: https://travis-ci.org/dpploy/cortix.svg?branch=master
    :target: https://travis-ci.org/dpploy/cortix
 .. |PyPI version| image:: https://badge.fury.io/py/cortix.svg
    :target: https://badge.fury.io/py/cortix
 .. |PyPI - Python Version| image:: https://img.shields.io/pypi/pyversions/Django.svg
-.. |Binder| image:: https://mybinder.org/badge.svg
-   :target: https://mybinder.org/v2/gh/dpploy/cortix-nb/master
+   :target: https://badge.fury.io/py/cortix
 .. |image4| image:: cortix-cover.png
 

@@ -35,9 +35,15 @@
 <p>Cortix: a program for system-level modules coupling, execution, and analysis.</p>
 <dl class="class">
 <dt id="module.Module">
-<em class="property">class </em><code class="descclassname">module.</code><code class="descname">Module</code><span class="sig-paren">(</span><em>parent_work_dir=None</em>, <em>library_name=None</em>, <em>library_parent_dir=None</em>, <em>mod_config_node=&lt;cortix.src.utils.configtree.ConfigTree object&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">module.</code><code class="descname">Module</code><span class="sig-paren">(</span><em>logger</em>, <em>importlib_name</em>, <em>library_parent_dir</em>, <em>config_xml_tree</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The Module class encapsulates a computational module of some scientific domain.</p>
+<dl class="attribute">
+<dt id="module.Module.diagram">
+<code class="descname">diagram</code><a class="headerlink" href="#module.Module.diagram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the diagram string from the module manifest or a null place holder.</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="module.Module.execute">
 <code class="descname">execute</code><span class="sig-paren">(</span><em>slot_id</em>, <em>runtime_cortix_param_file</em>, <em>runtime_cortix_comm_file</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.execute" title="Permalink to this definition">¶</a></dt>
@@ -64,8 +70,8 @@ port_name is available in the module.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="module.Module.library_name">
-<code class="descname">library_name</code><a class="headerlink" href="#module.Module.library_name" title="Permalink to this definition">¶</a></dt>
+<dt id="module.Module.importlib_name">
+<code class="descname">importlib_name</code><a class="headerlink" href="#module.Module.importlib_name" title="Permalink to this definition">¶</a></dt>
 <dd><p><cite>str</cite> – Module library name</p>
 </dd></dl>
 
@@ -106,6 +112,14 @@ port_name is available in the module.</p>
 <h3>About Cortix</h3>
 <p>
 Cortix is a Python library for system-level module coupling, execution, and analysis.
+</p>
+<p>
+Cortix Group <br>
+c/o <a href="https://www.uml.edu/innovation-hub">UMass Innovation Hub</a> <br>
+110 Canal St., 3rd Floor <br>
+Lower, MA 01852
+</p>
+
 </p>
 
 <h3><a href="../index.html">Table Of Contents</a></h3>
