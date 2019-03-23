@@ -94,14 +94,13 @@ class Cortix():
 
     def run_simulations(self, task_name=None):
         '''
-        This method runs every simulation
-        defined by the Cortix object.
-        At the moment this is done one simulation at a time.
+        This method runs every simulation defined by the Cortix object. At the 
+        moment this is done one simulation at a time.
         '''
 
         for sim in self.__simulations:
 
-            sim.execute(task_name)
+            sim.execute( task_name )
 
         return
 
@@ -162,9 +161,8 @@ class Cortix():
 
     def __setup_simulations(self, config_xml_tree):
         '''
-        This method is a helper function for the Cortix constructor
-        whose purpose is to set up the simulations defined by the
-        Cortix configuration.
+        This method is a helper function for the Cortix constructor whose purpose is 
+        to set up the simulations defined by the Cortix configuration.
         '''
 
         self.__simulations = list()

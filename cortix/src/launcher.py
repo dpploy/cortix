@@ -329,5 +329,5 @@ class Launcher(Thread):
         self.__log = log
 
         return
- 
+
 #======================= end class Launcher: =====================================

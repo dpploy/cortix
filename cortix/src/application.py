@@ -73,12 +73,14 @@ class Application:
         # Setup modules
         #==============
         self.__modules = list()
+
         self.__setup_modules(config_xml_tree)
 
         #===============
         # Setup networks 
         #===============
         self.__networks = list()
+
         self.__setup_networks(config_xml_tree)
 
         self.__log.info('Created application: %s', self.__name)

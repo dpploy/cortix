@@ -94,7 +94,7 @@ class Simulation:
 
         if task_name is not None:
 
-            # Create the task object for each task in this simulation
+            # Create the task object for each task
             self.__setup_task( task_name )
 
             for task in self.__tasks:
@@ -183,7 +183,6 @@ class Simulation:
         content as follows:
 
                 <port name=port_name type=port_type file=full_path_file_name />
-
         '''
 
         self.__log.debug('start __setup_task(%s)', task_name)

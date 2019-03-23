@@ -25,25 +25,35 @@
 
     <!-- provide ports -->
     <port type='input'   mode='file.txt' multiplicity='1'>input-self</port>
-    <port type="provide" mode="file.xml" multiplicity="1">droplet-position</port>
+    <port type='provide' mode='file.xml' multiplicity='1'>droplet-position</port>
     <port type='provide' mode='file.xml' multiplicity='1'>state</port>
     <port type='provide' mode='file.dat' multiplicity='1'>output</port>
 
     <diagram> 
    ..................................................................
-   .                  =========================                     .
-   .                  |     D R O P L E T     |                     .
-   .                  =========================                     .
+   .          _____ _____  _____  _____ __    _____ _____           .
+   .          ||  ) ||_// ((   )) ||_// ||    ||==   ||             .
+   .          ||_// || \\  \\_//  ||    ||__| ||___  ||             .
+   .          ===========================================           .
    . input port       |    USE    |  PROVIDE  |                     .
    .____________      |...........|...........|                     .
-   .|input-self| -->  | input     | drop.-pos.|                     .
+   .|input-self| ---  | input     | drop.-pos.|                     .
    .------------      |...........|...........|                     .
    . provide-like     |           | state     |       output port   .
    .                  |...........|...........|     _____________   .
-   .                  |           | output    | --> |output-self|   .
+   .                  |           | output    | --- |output-self|   .
    .                  =========================     -------------   .
    .                                                   use-like     .
    ..................................................................
     </diagram>
+
+    <ascii_art>
+    _________________________________________________
+    . ____   ____    ___   ____  __     ____ ______ .
+    . || \\  || \\  // \\  || \\ ||    ||    | || | .
+    . ||  )) ||_// ((   )) ||_// ||    ||==    ||   .
+    . ||_//  || \\  \\_//  ||    ||__| ||___   ||   .
+    _________________________________________________
+    </ascii_art>
 
 </module_manifest>
