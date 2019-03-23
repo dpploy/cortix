@@ -58,11 +58,13 @@ Cortix requires a set of input files, a driver, and a configuration file. See `e
 
 ## Developers 
 
-- Valmor F. de Almeida: Valmor\_deAlmeida@uml.edu
+- Valmor F. de Almeida: valmor\_dealmeida@uml.edu
 - Taha M. Azzaoui: tazzaoui@cs.uml.edu
+- Seamus D. Gallagher: seamus\_gallagher@student.uml.edu
 
 ## Documentation
 
+- Austin Rotker: austin_rotker@student.uml.edu
 - Gilberto E. Alas: gilberto\_alas@student.uml.edu
 
 ## Physical Address
