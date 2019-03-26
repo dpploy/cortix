@@ -28,12 +28,12 @@ from copy import deepcopy
 #*************************************************************************
 
 class FuelBucket():
-    #a class which represents a bucket of solid fule used in a nuclear reactor. 
+    '''a class which represents a bucket of solid fule used in a nuclear reactor. '''
 
     def __init__(self,
                  specs=pandas.DataFrame()
                 ):
-        #Class constructor. Requires a pandas dataframe as input with the initial specifications for the contents of the bucket.
+        '''Class constructor. Requires a pandas dataframe as input with the initial specifications for the contents of the bucket.'''
 
         assert isinstance(specs, pandas.DataFrame), 'oops not pandas table.'
 
@@ -51,7 +51,7 @@ class FuelBucket():
     # Start: Pre-irradiation information
 
     def get_name(self):
-        #returns the name of the fuel bucket.
+        '''returns the name of the fuel bucket.'''
         return self.__specs.loc['Name', 1]
     name = property(get_name, None, None, None)
 
@@ -60,32 +60,32 @@ class FuelBucket():
     slug_type = property(get_slug_type, None, None, None)
 
     def get_n_slugs(self):
-        #returns the number of slugs in the fuel bucket.
+        '''returns the number of slugs in the fuel bucket.'''
         return self.__get_n_slugs()
     n_slugs = property(get_n_slugs, None, None, None)
 
     def get_fuel_enrichment(self):
-        #returns the initial enrichment of the fuel slugs in the bucket, as U-235 atomic fraction.
+        '''returns the initial enrichment of the fuel slugs in the bucket, as U-235 atomic fraction.'''
         return self.__get_fuel_enrichment()
     fuel_enrichment = property(get_fuel_enrichment, None, None, None)
 
     def get_fresh_u_mass(self):
-        #returns the total mass of uranium in the bucket in grams.
+        '''returns the total mass of uranium in the bucket in grams.'''
         return self.__get_fresh_u_mass()
     fresh_u_mass = property(get_fresh_u_mass, None, None, None)
 
     def get_fresh_u238_mass(self):
-        #returns the total mass of U-238 in the bucket in grams.
+        '''returns the total mass of U-238 in the bucket in grams.'''
         return self.__get_fresh_u238_mass()
     fresh_u238_mass = property(get_fresh_u238_mass, None, None, None)
 
     def get_fresh_u235_mass(self):
-        #returns the total mass of Uranium-235 in the bucket in grams.
+        '''returns the total mass of Uranium-235 in the bucket in grams.'''
         return self.__GetFreshU235UMass()
     fresh_u235_mass = property(get_fresh_u235_mass, None, None, None)
 
     def get_cladding_mass(self):
-        #returns the total mass of cladding material in the bucket in grams.
+        '''returns the total mass of cladding material in the bucket in grams.'''
         return self.__get_cladding_mass()
     cladding_mass = property(get_cladding_mass, None, None, None)
 
@@ -93,107 +93,110 @@ class FuelBucket():
     #------
 
     def get_slug_length(self):
-        #returns length of a fuel slug in cm.
+        '''returns length of a fuel slug in cm.'''
         return self.__get_slug_length()
 
     def set_slug_length(self, x):
-        #sets the length of all slugs in the bucket to a new value, in cm. Used to up the slugs.
+        '''sets the length of all slugs in the bucket to a new value, in cm. Used to chop up the slugs.'''
         self.__set_slug_length(x)
     slug_length = property(get_slug_length, set_slug_length, None, None)
 
     def get_outer_slug_od(self):
-        #returns the outer diameter of the outer part of a slug in cm. Slugs are cylindrical, with layers going outward from the center arranged as follows: A layer of cladding, then a layer of fuel from inner slug inner diameter to outer slug outer diameter, then another layer of cladding, then another layer of fuel from outer slug inner diameter to outer slug outer diameter, and then a final layer of cladding. Additionally, there are end caps made of cladding on both ends of the cylinder.
+        '''returns the outer diameter of the outer part of a slug in cm. Slugs are cylindrical, with layers going outward from the center arranged as follows: A layer of cladding, then a layer of fuel from inner slug inner diameter to outer slug outer diameter, then another layer of cladding, then another layer of fuel from outer slug inner diameter to outer slug outer diameter, and then a final layer of cladding. Additionally, there are end caps made of cladding on both ends of the cylinder.'''
         return self.__get_outer_slug_od()
     outer_slug_od = property(get_outer_slug_od, None, None, None)
 
     def get_outer_slug_id(self):
-        #returns the inner diameter of the inner part of a slug in cm.Slugs are cylindrical, with layers going outward from the center arranged as follows: A layer of cladding, then a layer of fuel from inner slug inner diameter to outer slug outer diameter, then another layer of cladding, then another layer of fuel from outer slug inner diameter to outer slug outer diameter, and then a final layer of cladding. Additionally, there are end caps made of cladding on both ends of the cylinder.
+        '''returns the inner diameter of the inner part of a slug in cm.Slugs are cylindrical, with layers going outward from the center arranged as follows: A layer of cladding, then a layer of fuel from inner slug inner diameter to outer slug outer diameter, then another layer of cladding, then another layer of fuel from outer slug inner diameter to outer slug outer diameter, and then a final layer of cladding. Additionally, there are end caps made of cladding on both ends of the cylinder.'''
         return self.__get_outer_slug_id()
     outer_slug_id = property(get_outer_slug_id, None, None, None)
 
     def get_inner_slug_od(self):
-        #returns the outer diameter of the inner part of a slug in cm. Slugs are cylindrical, with layers going outward from the center arranged as follows: A layer of cladding, then a layer of fuel from inner slug inner diameter to outer slug outer diameter, then another layer of cladding, then another layer of fuel from outer slug inner diameter to outer slug outer diameter, and then a final layer of cladding. Additionally, there are end caps made of cladding on both ends of the cylinder.
+        '''returns the outer diameter of the inner part of a slug in cm. Slugs are cylindrical, with layers going outward from the center arranged as follows: A layer of cladding, then a layer of fuel from inner slug inner diameter to outer slug outer diameter, then another layer of cladding, then another layer of fuel from outer slug inner diameter to outer slug outer diameter, and then a final layer of cladding. Additionally, there are end caps made of cladding on both ends of the cylinder.'''
         return self.__get_inner_slug_od()
     inner_slug_od = property(get_inner_slug_od, None, None, None)
 
     def get_inner_slug_id(self):
-        #returns the inner diameter of the inner part of a slug in cm. Slugs are cylindrical, with layers going outward from the center arranged as follows: A layer of cladding, then a layer of fuel from inner slug inner diameter to outer slug outer diameter, then another layer of cladding, then another layer of fuel from outer slug inner diameter to outer slug outer diameter, and then a final layer of cladding. Additionally, there are end caps made of cladding on both ends of the cylinder.
+        '''returns the inner diameter of the inner part of a slug in cm. Slugs are cylindrical, with layers going outward from the center arranged as follows: A layer of cladding, then a layer of fuel from inner slug inner diameter to outer slug outer diameter, then another layer of cladding, then another layer of fuel from outer slug inner diameter to outer slug outer diameter, and then a final layer of cladding. Additionally, there are end caps made of cladding on both ends of the cylinder.'''
         return self.__get_inner_slug_id()
     inner_slug_id = property(get_inner_slug_id, None, None, None)
 
     def get_cladding_wall_thickness(self):
-        #Returns the radial thickness of each cladding layer in cm. Slugs are cylindrical, with layers going outward from the center arranged as follows: A layer of cladding, then a layer of fuel from inner slug inner diameter to outer slug outer diameter, then another layer of cladding, then another layer of fuel from outer slug inner diameter to outer slug outer diameter, and then a final layer of cladding. Additionally, there are end caps made of cladding on both ends of the cylinder.
+        '''Returns the radial thickness of each cladding layer in cm. Slugs are cylindrical, with layers going outward from the center arranged as follows: A layer of cladding, then a layer of fuel from inner slug inner diameter to outer slug outer diameter, then another layer of cladding, then another layer of fuel from outer slug inner diameter to outer slug outer diameter, and then a final layer of cladding. Additionally, there are end caps made of cladding on both ends of the cylinder.'''
         return self.__get_cladding_wall_thickness()
     cladding_wall_thickness = property(
         get_cladding_wall_thickness, None, None, None)
 
     def get_cladding_end_thickness(self):
-        #returns the thickness of the cladding material end caps in cm.
+        '''returns the thickness of the cladding material end caps in cm.'''
         return self.__get_cladding_end_thickness()
     cladding_end_thickness = property(get_cladding_end_thickness, None, None, None)
 
     def get_slug_fuel_volume(self):
-        #returns the total volume of fuel in a single fuel slug in centimeters cubed.
+        '''returns the total volume of fuel in a single fuel slug in centimeters cubed.'''
         return self.__get_slug_fuel_volume()
     slug_fuel_volume = property(get_slug_fuel_volume, None, None, None)
 
     def get_fuel_volume(self):
-        #returns the total volume of fuel in the entire bucket.
+        '''returns the total volume of fuel in the entire bucket.'''
         return self.__get_fuel_volume()
     fuel_volume = property(get_fuel_volume, None, None, None)
 
     def get_slug_cladding_volume(self):
-        #returns the total volume of cladding in a single fuel slug in centimeters cubed.
+        '''returns the total volume of cladding in a single fuel slug in centimeters cubed.'''
         return self.__get_slug_cladding_volume()
     slug_cladding_volume = property(get_slug_cladding_volume, None, None, None)
 
     def get_cladding_volume(self):
-        #returns the total volume of cladding in the fuel bucket in centimeters cubed.
+        '''returns the total volume of cladding in the fuel bucket in centimeters cubed.'''
         return self.__get_cladding_volume()
     cladding_volume = property(get_cladding_volume, None, None, None)
 
     def get_fuel_mass(self):
-        #returns the mass mass of fuel in the solid phase.
+        '''returns the mass mass of fuel in the solid phase.'''
         return self.__fuel_phase.GetValue('mass') 
     fuel_mass = property(get_fuel_mass, None, None, None)
 
     def get_fuel_mass_unit(self):
-        #returns the unit for mass density of fuel in the solid phase.
+        '''returns the unit for mass density of fuel in the solid phase.'''
         return self.__fuel_phase.GetQuantity('mass').unit # mass of the solid phase
     fuel_mass_unit = property(get_fuel_mass_unit, None, None, None)
 
     def get_radioactivity(self):   
-        #returns the radioactivity density of fuel elements in the bucket. Given in units of Ci/cc.
+        '''returns the radioactivity density of fuel elements in the bucket. Given in units of Ci/cc.'''
         return self.__fuel_phase.GetValue('radioactivity')
     radioactivity = property(get_radioactivity, None, None, None)
 
     def get_gamma_pwr(self):
-        #returns the gamma radiation production density of the fuel, given in units of W/cc.
+        '''returns the gamma radiation production density of the fuel, given in units of W/cc.'''
         return self.__fuel_phase.GetValue('gamma')   # gamma pwr of the fuel bucket
     gamma_pwr = property(get_gamma_pwr, None, None, None)
 
     def get_heat_pwr(self):
-        #returns the heat production density of the fuel, in units of W/cc.
+        '''returns the heat production density of the fuel, in units of W/cc.'''
         return self.__fuel_phase.GetValue('heat')   # heat pwr of the fuel bucket
     heat_pwr = property(get_heat_pwr, None, None, None)
 
     def get_fuel_radioactivity(self):
+        '''returns radioactivity of fuel in the solid phase.'''
         return self.__fuel_phase.GetValue('radioactivity')
     fuel_radioactivity = property(get_fuel_radioactivity, None, None, None)
 
     def get_fuel_phase(self):
+        '''returns the phase history of the fuel.'''
         return self.__fuel_phase
 
     def set_fuel_phase(self, phase):
-        
+        '''sets the current phase history of the fuel to specific values.'''
         self.__fuel_phase = deepcopy(phase)
     fuel_phase = property(get_fuel_phase, set_fuel_phase, None, None)
 
     def get_cladding_phase(self):
-        #returns the phase history of the cladding.
+        '''returns the phase history of the cladding.'''
         return self.__cladding_phase
 
     def set_cladding_phase(self, phase):
+        '''sets the current phase history of the fuel to specific values.'''
         self.__cladding_phase = deepcopy(phase)
     cladding_phase = property(get_cladding_phase, set_cladding_phase, None, None)
 

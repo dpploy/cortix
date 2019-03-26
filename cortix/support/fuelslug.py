@@ -1,12 +1,13 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# This file is part of the Cortix toolkit evironment
-# https://github.com/dpploy/cortix
+# This file is part of the Cortix toolkit environment
+# https://cortix.org
 #
 # All rights reserved, see COPYRIGHT for full restrictions.
 # https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
 #
-# Licensed under the GNU General Public License v. 3, please see LICENSE file.
-# https://www.gnu.org/licenses/gpl-3.0.txt
+# Licensed under the University of Massachusetts Lowell LICENSE:
+# https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 """
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
@@ -45,6 +46,7 @@ from cortix.support.phase import Phase
 
 
 class FuelSlug():
+    '''creates a slug of fuel consisting of two phases: a cladding phase and a fuel phase.''' 
 
     def __init__(self,
                  specs=pandas.Series(),
@@ -128,24 +130,30 @@ class FuelSlug():
 # passed into/out of the function are immutable.
 
     def GetSpecs(self):
+        '''returns all the specifications of the fuel slug.'''
         return self._specs
     specs = property(GetSpecs, None, None, None)
 
     def GetFuelPhase(self):
+        '''returns all the fuel phase data.'''
         return self._fuelPhase
     fuelPhase = property(GetFuelPhase, None, None, None)
 
     def GetCladdingPhase(self):
+        '''returns all the cladding phase data.'''
         return self._claddingPhase
     claddingPhase = property(GetCladdingPhase, None, None, None)
 
     def GetAttribute(self, name, phase=None, symbol=None, series=None):
+        '''returns a specified attribute ("name"), either of the fuel slug itself, the cladding phase, the fuel phase, or of the nuclides making up the fuel phase.'''
         return self.__GetAttribute(name, symbol, series)
 
     def ReduceCladdingVolume(self, dissolvedVolume):
+        '''removes the specified volume of cladding from the fluel slug. This will update attribute data (inner and outer diameters, cladding wall thickness, cladding cap thickness and fuel slug length), as well as cladding phase data (mass, volume and density).'''
         self.__ReduceCladdingVolume(dissolvedVolume)
 
     def ReduceFuelVolume(self, dissolvedVolume):
+        '''removes the specified volume of fuel from the fuel slug. This will update fuel phase data (mass, volume and density).'''
         self.__ReduceFuelVolume(dissolvedVolume)
 
 
