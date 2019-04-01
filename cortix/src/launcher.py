@@ -38,7 +38,7 @@ class Launcher(Thread):
             importlib_name, mod_lib_parent_dir, module_name, 
             slot_id,
             input_full_path_file_name,
-            exec_full_path_file_name,
+            manifest_full_path_file_name,
             work_dir,
             cortix_param_full_path_file_name,
             cortix_comm_full_path_file_name,
@@ -58,7 +58,7 @@ class Launcher(Thread):
         self.__cortix_param_full_path_file_name = cortix_param_full_path_file_name
         self.__cortix_comm_full_path_file_name = cortix_comm_full_path_file_name
         self.__runtime_status_full_path = runtime_status_full_path
-        self.__exec_full_path_file_name = exec_full_path_file_name
+        self.__manifest_full_path_file_name = manifest_full_path_file_name
         self.__work_dir = work_dir
 
         # Create logging facility
@@ -192,7 +192,7 @@ class Launcher(Thread):
         # Create the guest code driver
         guest_driver = self.__py_module.CortixDriver( self.__slot_id,
                                                       self.__input_full_path_file_name,
-                                                      self.__exec_full_path_file_name,
+                                                      self.__manifest_full_path_file_name,
                                                       self.__work_dir,
                                                       ports,
                                                       cortix_start_time,
@@ -203,7 +203,7 @@ class Launcher(Thread):
 
         s = 'guest_driver = CortixDriver( slot_id=' + str(self.__slot_id) + \
             ', input file=' + self.__input_full_path_file_name + \
-            ', exec file=' + self.__exec_full_path_file_name + \
+            ', exec file=' + self.__manifest_full_path_file_name + \
             ', work dir=' + self.__work_dir + \
             ', ports=' + str(ports) + \
             ', cortix_start_time=' + str(cortix_start_time) + \

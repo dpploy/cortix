@@ -18,6 +18,7 @@ from collections import namedtuple
 import math
 import numpy as npy
 
+from cortix.src.utils.xmltree import XMLTree
 from cortix.support.quantity import Quantity
 from cortix.support.specie   import Specie
 from cortix.support.phase    import Phase
@@ -29,12 +30,13 @@ class Droplet():
     '''
 
 #*********************************************************************************
-# Construntion
+# Construction
 #*********************************************************************************
 
     def __init__( self,
             slot_id,
             input_full_path_file_name,
+            manifest_full_path_file_name,
             work_dir,
             ports = list(),
             cortix_start_time = 0.0,
@@ -59,8 +61,12 @@ class Droplet():
                 type(cortix_time_unit)
 
         # Logging
-        self.__log = logging.getLogger('launcher-droplet'+str(slot_id)+'.cortix_driver.droplet')
+        self.__log = logging.getLogger('launcher-droplet_'+str(slot_id)+'.cortix_driver.droplet')
         self.__log.info('initializing an object of Droplet()')
+
+        # Read the manisfest 
+        self.__read_manifest( manifest_full_path_file_name )
+        self.__log.info(self.__port_diagram)
 
         #.............................................................................
         # Member data 
@@ -551,6 +557,78 @@ class Droplet():
 
         self.__liquid_phase.SetValue( 'spatial-position', tuple(u_vec[0:3]), at_time ) # update current values
         self.__liquid_phase.SetValue( 'velocity', tuple(u_vec[3:]), at_time ) # update current values
+
+        return
+
+    def __read_manifest( self, xml_tree_file ):
+        '''
+        Parse the manifest
+        '''
+
+        assert isinstance(xml_tree_file, str)
+
+        # Read the manifest 
+        xml_tree = XMLTree( xml_tree_file=xml_tree_file )
+
+        assert xml_tree.get_node_tag() == 'module_manifest'
+
+        assert xml_tree.get_node_attribute('name') == 'droplet'
+
+        # List of (port_name, port_type, port_mode, port_multiplicity)
+        __ports = list()
+
+        self.__port_diagram = 'null-module-port-diagram'
+
+        # Get manifest data  
+        for child in xml_tree.get_node_children():
+            (elem, tag, attributes, text) = child
+
+            if tag == 'port':
+
+                text = text.strip()
+
+                assert len(attributes) == 3, "only <= 3 attributes allowed."
+
+                tmp = dict()  # store port name and three attributes
+
+                for attribute in attributes:
+                    key = attribute[0].strip()
+                    val = attribute[1].strip()
+
+                    if key == 'type':
+                        assert val == 'use' or val == 'provide' or val == 'input' or \
+                            val == 'output', 'port attribute value invalid.'
+                        tmp['port_name'] = text  # port_name
+                        tmp['port_type'] = val   # port_type
+                    elif key == 'mode':
+                        file_value = val.split('.')[0]
+                        assert file_value == 'file' or file_value == 'directory',\
+                            'port attribute value invalid.'
+                        tmp['port_mode'] = val
+                    elif key == 'multiplicity':
+                        tmp['port_multiplicity'] = int(val)  # port_multiplicity
+                    else:
+                        assert False, 'invalid port attribute: %r=%r. fatal.'%\
+                                (key,val)
+
+                assert len(tmp) == 4
+                store = (tmp['port_name'], tmp['port_type'], tmp['port_mode'],
+                         tmp['port_multiplicity'])
+
+                # (port_name, port_type, port_mode, port_multiplicity)
+                __ports.append(store)
+
+                # clear
+                tmp   = None
+                store = None
+
+            if tag == 'diagram':
+
+                self.__port_diagram = text
+
+            if tag == 'ascii_art':
+
+                self.__ascii_art = text
 
         return
 

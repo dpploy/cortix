@@ -59,6 +59,9 @@ class XMLTree:
 #*********************************************************************************
 
     def __init__(self, xml_tree_node=None, xml_tree_file=None):
+        '''
+        Overall description of the constructor
+        '''
 
         # hold a given XML tree node
         if xml_tree_node is not None:

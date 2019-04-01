@@ -45,6 +45,7 @@ class PyPlot():
     def __init__(self,
                  slot_id,
                  input_full_path_file_name,
+                 manifest_full_path_file_name,
                  work_dir,
                  ports = list(),
                  cortix_start_time = 0.0,
@@ -69,7 +70,7 @@ class PyPlot():
                            type(cortix_time_unit)
 
         # Logger
-        self.__log = logging.getLogger('launcher-modulib.pyplot_' + str(slot_id) +
+        self.__log = logging.getLogger('launcher-pyplot_' + str(slot_id) +
                                        '.cortix_driver.pyplot')
         self.__log.info('initializing an object of PyPlot()')
 

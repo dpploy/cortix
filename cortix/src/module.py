@@ -16,8 +16,8 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 #**********************************************************************************
 import os
 import logging
-from cortix.src.utils.xmltree import XMLTree
 
+from cortix.src.utils.xmltree import XMLTree
 from cortix.src.launcher import Launcher
 #**********************************************************************************
 
@@ -101,19 +101,19 @@ class Module:
         # Take care of a few full path issue
         cortix_path = os.path.abspath(os.path.join(__file__, '../../..'))
 
-        manifest_full_path_file_name = self.__library_parent_dir + '/' + \
+        self.__manifest_full_path_file_name = self.__library_parent_dir + '/' + \
                 self.__mod_name + '/manifest.xml'
 
         if '$CORTIX' in self.__input_file_path:
             self.__input_file_path = \
                     self.__input_file_path.replace('$CORTIX', cortix_path)
 
-        if '$CORTIX' in manifest_full_path_file_name:
-            manifest_full_path_file_name = \
-                    manifest_full_path_file_name.replace('$CORTIX', cortix_path)
+        if '$CORTIX' in self.__manifest_full_path_file_name:
+            self.__manifest_full_path_file_name = \
+                    self.__manifest_full_path_file_name.replace('$CORTIX', cortix_path)
 
-        # Read the module's port information from the module manifest
-        self.__read_manifest_ports( manifest_full_path_file_name )
+        # Read the module's manifest
+        self.__read_manifest()
 
         logger.debug(self.__mod_name+': read manifest ports\n %s'%self.__diagram)
 
@@ -251,14 +251,16 @@ class Module:
                'module work directory %r not available.' % mod_work_dir
 
         # only for wrapped modules (deprecated; remove in the future)
-        mod_exec_name = self.__executable_path + self.__executable_name
+        #mod_exec_name = self.__executable_path + self.__executable_name
+
+        manifest_name = self.__manifest_full_path_file_name
 
         # the laucher "loads" the module dynamically and provides the method for
         # threading
         launch = Launcher( importlib_name, library_parent_dir, mod_name,
                            slot_id,
                            module_input,
-                           mod_exec_name,
+                           manifest_name,
                            mod_work_dir,
                            param, comm, status )
 
@@ -272,15 +274,15 @@ class Module:
 # Private helper functions (internal use: __)
 #*********************************************************************************
 
-    def __read_manifest_ports( self, xml_tree_file ):
+    def __read_manifest( self ):
         '''
         Get ports
         '''
 
-        assert isinstance(xml_tree_file, str)
+        assert isinstance(self.__manifest_full_path_file_name, str)
 
         # Read the manifest 
-        xml_tree = XMLTree( xml_tree_file=xml_tree_file )
+        xml_tree = XMLTree( xml_tree_file=self.__manifest_full_path_file_name )
 
         assert xml_tree.get_node_tag() == 'module_manifest'
 

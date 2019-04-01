@@ -44,6 +44,9 @@ def run():
     # This is a test of the droplet and pyplot connected.
     cortix.run_simulations(task_name="droplet-fall")
 
+    # WARNING: the tasks are interferring with each other and threads are left running.
+    # note how the droplet-fall runs two droplet instances...FIX ME.
+
 #*********************************************************************************
 if __name__ == "__main__":
     run()

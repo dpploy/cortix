@@ -202,6 +202,15 @@ class Task:
     def __get_start_time(self):
         '''
         `float`:Task initial time
+
+        Parameters
+        ---------
+        empty
+
+        Returns
+        -------
+        __start_time
+
         '''
 
         return self.__start_time

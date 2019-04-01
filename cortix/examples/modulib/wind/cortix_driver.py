@@ -31,7 +31,7 @@ class CortixDriver():
     def __init__(self,
                  slot_id,
                  input_full_path_file_name,
-                 exec_full_path_file_name,
+                 manifest_full_path_file_name,
                  work_dir,
                  ports=list(),
                  cortix_start_time = 0.0,
@@ -54,14 +54,15 @@ class CortixDriver():
                type(cortix_time_unit)
 
         # Logging
-        self.__log = logging.getLogger( 'launcher-wind' + str(slot_id) +
-                                        '.cortixdriver')
+        self.__log = logging.getLogger( 'launcher-wind_' + str(slot_id) +
+                                        '.cortix_driver')
         self.__log.info('initializing an object of CortixDriver()')
 
         # Guest library module: Wind
-        self.__wind = Wind( slot_id, input_full_path_file_name, work_dir, ports,
-                            cortix_start_time, cortix_final_time, cortix_time_step,
-                            cortix_time_unit )
+        self.__wind = Wind( slot_id, input_full_path_file_name,
+                manifest_full_path_file_name, work_dir,
+                ports,
+                cortix_start_time, cortix_final_time, cortix_time_step, cortix_time_unit )
 
         self.__time_stamp = None  # temporary
 

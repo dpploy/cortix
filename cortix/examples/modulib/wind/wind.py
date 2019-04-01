@@ -33,6 +33,7 @@ class Wind():
 
     def __init__( self, slot_id,
                   input_full_path_file_name,
+                  manifest_full_path_file_name,
                   work_dir, ports   = list(),
                   cortix_start_time = 0.0,
                   cortix_final_time = 0.0,
@@ -53,7 +54,7 @@ class Wind():
                type(cortix_time_unit)
 
         # Logging: access Cortix Launcher logging facility
-        self.__log = logging.getLogger('launcher-wind'+str(slot_id)+'.cortix_driver.wind')
+        self.__log = logging.getLogger('launcher-wind_'+str(slot_id)+'.cortix_driver.wind')
         self.__log.info('initializing an object of Wind()')
 
         #.........................................................................

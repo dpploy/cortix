@@ -106,7 +106,16 @@ class Application:
 
     def get_network(self, name):
         '''
-        Returns a network with a given name.  None if the name doesn't exist.
+        Returns a network with a given name. None if the name doesn't exist.
+
+        Parameters
+        ----------
+        name: str
+
+        Returns
+        -------
+        net: cortix.network or None
+           Default: None
         '''
 
         for net in self.__networks:
