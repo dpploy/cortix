@@ -46,7 +46,9 @@ from cortix.support.phase import Phase
 
 
 class FuelSlug():
-    '''creates a slug of fuel consisting of two phases: a cladding phase and a fuel phase.''' 
+    """
+    creates a slug of fuel consisting of two phases: a cladding phase and a fuel phase. 
+    """
 
     def __init__(self,
                  specs=pandas.Series(),
@@ -130,30 +132,87 @@ class FuelSlug():
 # passed into/out of the function are immutable.
 
     def GetSpecs(self):
-        '''returns all the specifications of the fuel slug.'''
+        """
+        returns all the specifications of the fuel slug.
+        Parameters
+        ----------
+        empty:
+        
+        Returns:
+        ----------
+        specs: list
+        """
         return self._specs
     specs = property(GetSpecs, None, None, None)
 
     def GetFuelPhase(self):
-        '''returns all the fuel phase data.'''
+        """
+        returns all the fuel phase data.
+        Parameters
+        ----------
+        empty:
+        
+        Returns:
+        ----------
+        fuelPhase: DataFrame
+        """
         return self._fuelPhase
     fuelPhase = property(GetFuelPhase, None, None, None)
 
     def GetCladdingPhase(self):
-        '''returns all the cladding phase data.'''
+        """
+        returns all the cladding phase data.
+        Parameters
+        ----------
+        empty:
+        
+        Returns:
+        ----------
+        claddingPhase: DataFrame
+        """
         return self._claddingPhase
     claddingPhase = property(GetCladdingPhase, None, None, None)
 
     def GetAttribute(self, name, phase=None, symbol=None, series=None):
-        '''returns a specified attribute ("name"), either of the fuel slug itself, the cladding phase, the fuel phase, or of the nuclides making up the fuel phase.'''
+        """
+        returns a specified attribute ("name"), either of the fuel slug itself, the cladding phase, the fuel phase, or of the nuclides making up the fuel phase.
+        Parameters
+        ----------
+        name: str
+        phase: DataFrame
+        symbol: str
+        series: str
+        
+        Returns:
+        ----------
+        attribute: float
+        """
         return self.__GetAttribute(name, symbol, series)
 
     def ReduceCladdingVolume(self, dissolvedVolume):
-        '''removes the specified volume of cladding from the fluel slug. This will update attribute data (inner and outer diameters, cladding wall thickness, cladding cap thickness and fuel slug length), as well as cladding phase data (mass, volume and density).'''
+        """
+        removes the specified volume of cladding from the fluel slug. This will update attribute data (inner and outer diameters, cladding wall thickness, cladding cap thickness and fuel slug length), as well as cladding phase data (mass, volume and density).
+        Parameters
+        ----------
+        dissolvedVolume: float
+        
+        Returns:
+        ----------
+        empty:
+        """
         self.__ReduceCladdingVolume(dissolvedVolume)
 
     def ReduceFuelVolume(self, dissolvedVolume):
-        '''removes the specified volume of fuel from the fuel slug. This will update fuel phase data (mass, volume and density).'''
+        """
+        removes the specified volume of fuel from the fuel slug. This will update fuel phase data (mass, volume and density).
+        Parameters
+        ----------
+        dissolvedVolume: float
+        
+        Returns:
+        ----------
+        empty:
+        """
         self.__ReduceFuelVolume(dissolvedVolume)
 
 

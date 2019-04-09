@@ -28,12 +28,16 @@ from copy import deepcopy
 #*************************************************************************
 
 class FuelBucket():
-    """a class which represents a bucket of solid fule used in a nuclear reactor. """
+    """
+    a class which represents a bucket of solid fule used in a nuclear reactor.
+    """
 
     def __init__(self,
                  specs=pandas.DataFrame()
                 ):
-        '''Class constructor. Requires a pandas dataframe as input with the initial specifications for the contents of the bucket.'''
+        """
+        Class constructor. Requires a pandas dataframe as input with the initial specifications for the contents of the bucket.
+        """
 
         assert isinstance(specs, pandas.DataFrame), 'oops not pandas table.'
 
