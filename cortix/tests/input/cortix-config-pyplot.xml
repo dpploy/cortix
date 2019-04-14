@@ -35,9 +35,9 @@
   </task>
  <application name="dev1">
    <module_library importlib_name='cortix.modulib'>
-    <parent_dir>
+    <home_dir>
         $CORTIX/cortix/modulib
-    </parent_dir>
+    </home_dir>
    </module_library>
    <logger level="DEBUG">
     <file_handler level="DEBUG"> </file_handler>
@@ -56,7 +56,7 @@
      <file_handler level="DEBUG"> </file_handler>
      <console_handler level="INFO"> </console_handler>
     </logger>
-    <connect fromModuleSlot="pyplot:0" fromPort="input" toModuleSlot="pyplot:0" toPort="input-self"/> 
+    <connect fromModuleSlot="pyplot:0" fromPort="input" toModuleSlot="pyplot:0" toPort="self-input"/> 
    </network>
  </application>
  </simulation>

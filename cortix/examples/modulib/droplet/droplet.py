@@ -60,7 +60,7 @@ class Droplet():
         assert isinstance(cortix_time_unit, str), '-> time unit type %r is invalid.' % \
                 type(cortix_time_unit)
 
-        # Logging
+        # Logging: access Cortix Launcher logging facility
         self.__log = logging.getLogger('launcher-droplet_'+str(slot_id)+'.cortix_driver.droplet')
         self.__log.info('initializing an object of Droplet()')
 

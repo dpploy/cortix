@@ -77,15 +77,17 @@
 
   <application name='wind'>
 
-   <!-- The`importlib` name is system dependent. This name and the module's name are
-        combined to form the Python command argument:
-           importlib.import_module(`importlib_name+module_name+'.cortix_driver) 
-        that loads the `cortix_driver.py` wrapper at runtime.
-   -->
    <module_library importlib_name='cortix.examples.modulib'>
-    <parent_dir>
+   <!-- The`importlib_name` attribute is system dependent. This name and the module's
+        name are combined to form the Python command argument:
+            importlib.import_module(`importlib_name+module_name+'.cortix_driver)
+        that loads the `cortix_driver.py` wrapper at runtime.
+        For this to work, the parent directory of `importlib_name` must be in the
+        system PYTHONPATH.
+   -->
+    <home_dir>
         $CORTIX/cortix/examples/modulib
-    </parent_dir>
+    </home_dir>
    </module_library>
 
    <logger level='DEBUG'>
@@ -101,7 +103,7 @@
       + <input_file_name>: required
       + <input_file_path>: required
       + <library importlib_name='value'>: optional
-          <parent_dir>text</parent_dir>
+          <home_dir>text</home_dir>
       + </library
    -->
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
@@ -147,9 +149,9 @@
     <connect module_slot='wind:0' use_port='input' module_slot='wind:0' provide_port='input-data'/>
     <connect wind:0='input' wind:0='input-data'/>
 -->
-    <connect fromModuleSlot='wind:0' fromPort='input' toModuleSlot='wind:0' toPort='input-self'/>
+    <connect fromModuleSlot='wind:0' fromPort='input' toModuleSlot='wind:0' toPort='self-input'/>
 
-    <connect fromModuleSlot='wind:0' fromPort='output-self' toModuleSlot='wind:0' toPort='output'/>
+    <connect fromModuleSlot='wind:0' fromPort='self-output' toModuleSlot='wind:0' toPort='output'/>
 
    </network>
 

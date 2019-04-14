@@ -93,15 +93,17 @@
 
   <application name='droplet'>
 
-   <!-- The`importlib` name is system dependent. This name and the module's name are
-        combined to form the Python command argument:
-           importlib.import_module(`importlib_name+module_name+'.cortix_driver) 
-        that loads the `cortix_driver.py` wrapper at runtime.
-   -->
    <module_library importlib_name='cortix.examples.modulib'>
-    <parent_dir>
+   <!-- The`importlib_name` attribute is system dependent. This name and the module's 
+        name are combined to form the Python command argument:
+            importlib.import_module(`importlib_name+module_name+'.cortix_driver) 
+        that loads the `cortix_driver.py` wrapper at runtime.
+        For this to work, the parent directory of `importlib_name` must be in the
+        system PYTHONPATH.
+   -->
+    <home_dir>
         $CORTIX/cortix/examples/modulib
-    </parent_dir>
+    </home_dir>
    </module_library>
 
    <logger level='DEBUG'>
@@ -117,10 +119,8 @@
       + <input_file_name>: required
       + <input_file_path>: required
       + <library importlib_name='value'>: optional
-          <parent_dir>text</parent_dir>
-      + </library
-      + <manifest_file_name>: required
-      + <manifest_file_path>: required
+          <home_dir>text</home_dir>
+      + </library>
    -->
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
 
@@ -139,7 +139,7 @@
    <module name='pyplot' type='native'>
 
     <library importlib_name='cortix.modulib'>
-        <parent_dir>$CORTIX/cortix/modulib</parent_dir>
+        <home_dir>$CORTIX/cortix/modulib</home_dir>
     </library>
 
     <input_file_name>pyplot.input</input_file_name>
@@ -186,8 +186,8 @@
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
-    <connect fromModuleSlot='droplet:0' fromPort='input' toModuleSlot='droplet:0' toPort='input-self'/>
-    <connect fromModuleSlot='droplet:0' fromPort='output-self' toModuleSlot='droplet:0' toPort='output'/>
+    <connect fromModuleSlot='droplet:0' fromPort='input' toModuleSlot='droplet:0' toPort='self-input'/>
+    <connect fromModuleSlot='droplet:0' fromPort='self-output' toModuleSlot='droplet:0' toPort='output'/>
    </network>
 
    <network name='solo-pyplot'>
@@ -198,7 +198,7 @@
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
-    <connect fromModuleSlot='pyplot:0' fromPort='input' toModuleSlot='pyplot:0' toPort='input-self'/>
+    <connect fromModuleSlot='pyplot:0' fromPort='input' toModuleSlot='pyplot:0' toPort='self-input'/>
    </network>
 
    <network name='droplet-fall'>
@@ -209,8 +209,8 @@
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
     <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
     <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
-    <connect fromModuleSlot='droplet:0' fromPort='input' toModuleSlot='droplet:0' toPort='input-self'/>
-    <connect fromModuleSlot='droplet:0' fromPort='output-self' toModuleSlot='droplet:0' toPort='output'/>
+    <connect fromModuleSlot='droplet:0' fromPort='input' toModuleSlot='droplet:0' toPort='self-input'/>
+    <connect fromModuleSlot='droplet:0' fromPort='self-output' toModuleSlot='droplet:0' toPort='output'/>
     <connect fromModuleSlot='pyplot:0' fromPort='time-sequence' toModuleSlot='droplet:0' toPort='state'/>
    </network>
 

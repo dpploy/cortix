@@ -35,7 +35,7 @@ class Simulation:
 
     def __init__(self, parent_work_dir, config_xml_tree):
 
-        assert isinstance(parent_work_dir, str), '-> parentWorkDir invalid.'
+        assert isinstance(parent_work_dir, str), '-> parent_work_dir invalid.'
 
         assert isinstance(config_xml_tree, XMLTree), '-> config_xml_tree invalid.'
         assert config_xml_tree.get_node_tag() == 'simulation'

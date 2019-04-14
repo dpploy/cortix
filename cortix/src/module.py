@@ -32,12 +32,12 @@ class Module:
 
     def __init__( self, 
             logger,
-            importlib_name, library_parent_dir, 
+            importlib_name, library_home_dir, 
             config_xml_tree ):
 
         assert isinstance(logger, logging.Logger),'ctx::mod: logger is invalid.'
         assert isinstance(importlib_name, str), 'ctx::mod: importlib_name is invalid.'
-        assert isinstance(library_parent_dir, str),'ctx:mod: library_parent is invalid.'
+        assert isinstance(library_home_dir, str),'ctx:mod: library_home is invalid.'
 
         assert isinstance(config_xml_tree, XMLTree),'ctx:mod: config_xml_tree is invalid.'
         assert config_xml_tree.get_node_tag() == 'module','ctx:mod:invalid module xml tree.'
@@ -46,7 +46,7 @@ class Module:
         self.__mod_type = config_xml_tree.get_node_attribute('type') # e.g. native
 
         # Specify module library with upstream information
-        self.__library_parent_dir = library_parent_dir
+        self.__library_home_dir = library_home_dir
         self.__importlib_name       = importlib_name
 
         # executable is deprecated; eliminate
@@ -87,21 +87,21 @@ class Module:
                 self.__importlib_name = val
 
                 node = XMLTree( elem ) # fixme: remove this wrapper
-                sub_node = node.get_sub_node('parent_dir')
+                sub_node = node.get_sub_node('home_dir')
 
-                # override parent_dir
+                # override home_dir
                 # fixme: no root node needed
-                self.__library_parent_dir = sub_node.get_root_node().text.strip()
+                self.__library_home_dir = sub_node.get_root_node().text.strip()
 
-                if self.__library_parent_dir[-1] == '/':
-                    self.__library_parent_dir.strip('/')
+                if self.__library_home_dir[-1] == '/':
+                    self.__library_home_dir.strip('/')
 
         logger.debug(self.__mod_name+': read module config info')
 
         # Take care of a few full path issue
         cortix_path = os.path.abspath(os.path.join(__file__, '../../..'))
 
-        self.__manifest_full_path_file_name = self.__library_parent_dir + '/' + \
+        self.__manifest_full_path_file_name = self.__library_home_dir + '/' + \
                 self.__mod_name + '/manifest.xml'
 
         if '$CORTIX' in self.__input_file_path:
@@ -141,14 +141,14 @@ class Module:
 
     importlib_name = property(__get_importlib_name, None, None, None)
 
-    def __get_library_parent_dir(self):
+    def __get_library_home_dir(self):
         '''
-        `str`:Library parent directory
+        `str`:Library home directory
         '''
 
-        return self.__library_parent_dir
+        return self.__library_home_dir
 
-    library_parent_dir = property(__get_library_parent_dir, None, None, None)
+    library_home_dir = property(__get_library_home_dir, None, None, None)
 
     def __get_ports(self):
         '''
@@ -236,7 +236,7 @@ class Module:
         status = runtime_module_status_file
 
         importlib_name = self.__importlib_name
-        library_parent_dir = self.__library_parent_dir
+        library_home_dir = self.__library_home_dir
         mod_name     = self.__mod_name
 
         # provide a wrk/ for each modules for additional work IO data
@@ -257,7 +257,7 @@ class Module:
 
         # the laucher "loads" the module dynamically and provides the method for
         # threading
-        launch = Launcher( importlib_name, library_parent_dir, mod_name,
+        launch = Launcher( importlib_name, library_home_dir, mod_name,
                            slot_id,
                            module_input,
                            manifest_name,

@@ -25,7 +25,7 @@
     <port type='use'     mode='file.xml' multiplicity='1'>time-tables</port>
 
     <!-- provide ports -->
-    <port type='input'   mode='file.xml' multiplicity='1'>input-self</port>
+    <port type='input'   mode='file.xml' multiplicity='1'>self-input</port>
 
     <diagram> 
    ..................................................................
@@ -35,7 +35,7 @@
    .             ====================================               .
    . input port       |    USE    |  PROVIDE  |                     .
    .____________      |...........|...........|                     .
-   .|input-self| -->  | input     |           |                     .
+   .|self-input| -->  | input     |           |                     .
    .------------      |...........|...........|                     .
    . provide-like     | time-seq. |           |                     .
    .                  |...........|...........|                     .
