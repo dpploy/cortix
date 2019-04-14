@@ -1,4 +1,5 @@
 *~
+*.xml
 .DS_Store
 __pycache__
 .pytest_cache
@@ -12,7 +13,6 @@ readme_converted.rst
 *.gpg
 *.tar
 *.gz
-*.xml
 *.ps
 *.shlv
 *.dat

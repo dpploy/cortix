@@ -57,14 +57,14 @@ class Application:
 
         for child in node.get_node_children():
             (elem, tag, attributes, text) = child
-            if tag == 'parent_dir':
-                self.__module_lib_full_parent_dir = text.strip()
+            if tag == 'home_dir':
+                self.__module_lib_full_home_dir = text.strip()
 
-        if self.__module_lib_full_parent_dir[-1] == '/':
-            self.__module_lib_full_parent_dir.strip('/')
+        if self.__module_lib_full_home_dir[-1] == '/':
+            self.__module_lib_full_home_dir.strip('/')
 
         # Add library full path to python module search
-        sys.path.insert(1, self.__module_lib_full_parent_dir)
+        sys.path.insert(1, self.__module_lib_full_home_dir)
 
         # Create logging facility
         self.__create_logging_facility( config_xml_tree )
@@ -106,7 +106,16 @@ class Application:
 
     def get_network(self, name):
         '''
-        Returns a network with a given name.  None if the name doesn't exist.
+        Returns a network with a given name. None if the name doesn't exist.
+
+        Parameters
+        ----------
+        name: str
+
+        Returns
+        -------
+        net: cortix.network or None
+           Default: None
         '''
 
         for net in self.__networks:
@@ -205,18 +214,19 @@ class Application:
             # Modules log into the Application logger because they may or may not be 
             # used in a task. Running tasks will effectively tell what modules are used.
             new_module = Module( self.__log, self.__importlib_name,
-                                 self.__module_lib_full_parent_dir,
+                                 self.__module_lib_full_home_dir,
                                  mod_config_xml_node )
 
             # check for a duplicate module before appending a new one
             for module in self.__modules:
-                mod_lib_dir_name   = module.library_parent_dir
+                mod_lib_dir_name   = module.library_home_dir
                 mod_importlib_name = module.importlib_name
 
                 if new_module.name == module.name:
-                    if new_module.get_library_parent_dir() == mod_lib_dir_name:
-                        assert new_module.get_library_name != mod_importlib_name, \
-                            'duplicate module; ABORT.'
+                    assert new_module.library_home_dir != mod_lib_dir_name,\
+                            ' duplicate module; ABORT.'
+                    assert new_module.importlib_name != mod_importlib_name,\
+                            ' duplicate module; ABORT.'
 
             # add module to list
             self.__modules.append( new_module )
