@@ -47,7 +47,7 @@ class Module:
 
         # Specify module library with upstream information
         self.__library_home_dir = library_home_dir
-        self.__importlib_name       = importlib_name
+        self.__importlib_name   = importlib_name
 
         # executable is deprecated; eliminate
         self.__executable_name = 'null-executable_name'
@@ -286,7 +286,9 @@ class Module:
 
         assert xml_tree.get_node_tag() == 'module_manifest'
 
-        assert xml_tree.get_node_attribute('name') == self.__mod_name
+        assert xml_tree.get_node_attribute('name') == self.__mod_name,\
+                "xml_tree.get_node_attribute('name') is %r and self.__mod_name is %r"%\
+                (xml_tree.get_node_attribute('name'),self.__mod_name)
 
         # List of (port_name, port_type, port_mode, port_multiplicity)
         self.__ports = list()
