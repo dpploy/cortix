@@ -20,7 +20,6 @@ Sat Aug 15 13:41:12 EDT 2015
 import os
 import sys
 #*******************************************************************************
-#hello world
 class Actor():
     """
     Creates a species with a molecular formula that must be specificed by the user of this class. Takes the name of the desired species as input. A dictionary of species names, their molecular formulae and the atoms present in that formula must be specified in the class constructor by the end user. 
