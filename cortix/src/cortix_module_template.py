@@ -24,11 +24,13 @@ class MyModule():
  def __init__( self,
                slot_id,
                input_full_path_file_name,
+               manifest_full_path_file_name,
                work_dir,
                ports = list(),
                cortix_start_time = 0.0,
                cortix_final_time = 0.0,
-               cortix_time_unit  = None 
+               cortix_time_step = 0.0,
+               cortix_time_unit = None 
              ):
 
 #.................................................................................
@@ -38,15 +40,24 @@ class MyModule():
   assert isinstance(ports, list), '-> ports type %r is invalid.'  % type(ports)
   assert len(ports) > 0
   assert isinstance(cortix_start_time,float), '-> time type %r is invalid.' % \
-         type(cortix_start_time)
+          type(cortix_start_time)
   assert isinstance(cortix_final_time, float), '-> time type %r is invalid.' % \
-         type(cortix_final_time)
-  assert isinstance(cortix_time_unit, str), '-> time type %r is invalid.' % \
-         type(cortix_time_unit)
+          type(cortix_final_time)
+  assert isinstance(cortix_time_step, float), '-> time step type %r is invalid.' % \
+          type(cortix_time_step)
+  assert isinstance(cortix_time_unit, str), '-> time unit type %r is invalid.' % \
+          type(cortix_time_unit)
+        # Read the manisfest 
+        self.__read_manifest( manifest_full_path_file_name )
+        self.__log.info(self.__port_diagram)
 
   # Logging
   self.__log = logging.getLogger('launcher-mymodule_'+str(slot_id)+'.cortix_driver.mymodule')
   self.__log.info('initializing an object of MyModule()')
+
+  # Read the manisfest 
+  self.__read_manifest( manifest_full_path_file_name )
+  self.__log.info(self.__port_diagram)
 
 #.................................................................................
 # Member data 
@@ -137,9 +148,9 @@ class MyModule():
 #---------------------- end def __use_data():-------------------------------------
 
  def __get_port_file( self, use_port_name=None, provide_port_name=None ):
-   """
+   '''
    This may return a None port_file
-   """
+   '''
 
    port_file = None
 
@@ -147,26 +158,26 @@ class MyModule():
    # Use ports
    #..........
    if use_port_name is not None:
- 
+
      assert provide_port_name is None
- 
+
      for port in self.__ports:
        (portName,portType,thisPortFile) = port
        if portName == use_port_name and portType == 'use': port_file = thisPortFile
 
      if port_file is None: return None
- 
+
      max_n_trials = 50
      n_trials     = 0
      while os.path.isfile(port_file) is False and n_trials <= max_n_trials:
        n_trials += 1
        time.sleep(0.1)
- 
+
      if n_trials > max_n_trials:
          s = '__get_port_file(): waited ' + str(n_trials) + ' trials for port: ' +\
              port_file
          self.__log.warn(s)
- 
+
      assert os.path.isfile(port_file) is True, \
             'port_file %r not available; stop.' % port_file
 
@@ -174,13 +185,13 @@ class MyModule():
    # Provide ports
    #..............
    if provide_port_name is not None:
- 
+
      assert use_port_name is None
 
      for port in self.__ports:
        (portName,portType,thisPortFile) = port
        if portName == provide_port_name and portType == 'provide': port_file = thisPortFile
- 
+
    return port_file
 #---------------------- end def __get_port_file():--------------------------------
 
