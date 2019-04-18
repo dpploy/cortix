@@ -32,26 +32,19 @@ class Module:
 
     def __init__( self, 
             logger,
-            importlib_name, library_home_dir, 
+            library_home_dir, 
             config_xml_tree ):
 
         assert isinstance(logger, logging.Logger),'ctx::mod: logger is invalid.'
-        assert isinstance(importlib_name, str), 'ctx::mod: importlib_name is invalid.'
         assert isinstance(library_home_dir, str),'ctx:mod: library_home is invalid.'
 
         assert isinstance(config_xml_tree, XMLTree),'ctx:mod: config_xml_tree is invalid.'
         assert config_xml_tree.get_node_tag() == 'module','ctx:mod:invalid module xml tree.'
         # Read the module name and type
         self.__mod_name = config_xml_tree.get_node_attribute('name') # e.g. wind
-        self.__mod_type = config_xml_tree.get_node_attribute('type') # e.g. native
 
         # Specify module library with upstream information
         self.__library_home_dir = library_home_dir
-        self.__importlib_name   = importlib_name
-
-        # executable is deprecated; eliminate
-        self.__executable_name = 'null-executable_name'
-        self.__executable_path = 'null-executable_path'
 
         self.__input_file_name = 'null-input_file_name'
         self.__input_file_path = 'null-input_file_path'
@@ -62,15 +55,6 @@ class Module:
             (elem, tag, attributes, text) = child
             text = text.strip()
 
-            if self.__mod_type != 'native':
-                if tag == 'executable_name':
-                    self.__executable_name = text
-
-            if tag == 'executable_path':
-                if text[-1] != '/':
-                    text += '/'
-                self.__executable_path = text
-
             if tag == 'input_file_name':
                 self.__input_file_name = text
 
@@ -80,11 +64,7 @@ class Module:
                 self.__input_file_path = text
 
             if tag == 'library':
-                assert len(attributes) == 1, 'only name of library allowed.'
-                key = attributes[0][0]
-                assert key == 'importlib_name', 'invalid attribute key.'
-                val = attributes[0][1].strip()
-                self.__importlib_name = val
+                assert len(attributes) == 0, 'no attributes allowed.'
 
                 node = XMLTree( elem ) # fixme: remove this wrapper
                 sub_node = node.get_sub_node('home_dir')
@@ -131,15 +111,6 @@ class Module:
         return self.__mod_name
 
     name = property(__get_name, None, None, None)
-
-    def __get_importlib_name(self):
-        '''
-        `str`:Module library name
-        '''
-
-        return self.__importlib_name
-
-    importlib_name = property(__get_importlib_name, None, None, None)
 
     def __get_library_home_dir(self):
         '''
@@ -235,7 +206,6 @@ class Module:
 
         status = runtime_module_status_file
 
-        importlib_name = self.__importlib_name
         library_home_dir = self.__library_home_dir
         mod_name     = self.__mod_name
 
@@ -250,14 +220,11 @@ class Module:
         assert os.path.isdir(mod_work_dir), \
                'module work directory %r not available.' % mod_work_dir
 
-        # only for wrapped modules (deprecated; remove in the future)
-        #mod_exec_name = self.__executable_path + self.__executable_name
-
         manifest_name = self.__manifest_full_path_file_name
 
         # the laucher "loads" the module dynamically and provides the method for
         # threading
-        launch = Launcher( importlib_name, library_home_dir, mod_name,
+        launch = Launcher( library_home_dir, mod_name,
                            slot_id,
                            module_input,
                            manifest_name,

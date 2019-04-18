@@ -14,7 +14,7 @@ Launcher functionality of the Cortix Class.
 Cortix: a program for system-level modules coupling, execution, and analysis.
 '''
 #*********************************************************************************
-import os
+import os, sys
 import logging
 import time
 import datetime
@@ -35,7 +35,7 @@ class Launcher(Thread):
 #*********************************************************************************
 
     def __init__(self, 
-            importlib_name, mod_lib_home_dir, module_name, 
+            mod_lib_home_dir, module_name, 
             slot_id,
             input_full_path_file_name,
             manifest_full_path_file_name,
@@ -44,12 +44,23 @@ class Launcher(Thread):
             cortix_comm_full_path_file_name,
             runtime_status_full_path):
 
+        assert mod_lib_home_dir[-1] is not '/', \
+                '%r'%mod_lib_home_dir
+        assert input_full_path_file_name[-1] is not '/', \
+                '%r'%input_full_path_file_name
+        assert manifest_full_path_file_name[-1] is not '/', \
+                '%r'%manifest_full_path_file_name
         assert cortix_param_full_path_file_name[-1] is not '/', \
                 '%r'%cortix_param_full_path_file_name
         assert cortix_comm_full_path_file_name[-1] is not '/' \
                 '%r'%cortix_comm_full_path_file_name
+        assert runtime_status_full_path[-1] is not '/' \
+                '%r'%runtime_status_full_path
 
         cortix_path = os.path.abspath(os.path.join(__file__, '../../..'))
+
+        if '$CORTIX' in mod_lib_home_dir:
+            mod_lib_home_dir = mod_lib_home_dir.replace('$CORTIX', cortix_path)
 
         self.__input_full_path_file_name = input_full_path_file_name
 
@@ -64,12 +75,14 @@ class Launcher(Thread):
         # Create logging facility
         self.__create_logging_facility()
 
-        lib_module_driver = importlib_name + '.' + module_name + '.cortix_driver'
-        self.__log.info('try importing module driver: %s', lib_module_driver)
+        module_cortix_driver = module_name + '.cortix_driver'
+        self.__log.info('try importing module driver: %s', module_cortix_driver )
+
+        sys.path.insert(0,os.path.abspath(mod_lib_home_dir))
 
         # import a guest Cortix module through its driver
         try:
-            self.__py_module = importlib.import_module( lib_module_driver )
+            self.__py_module = importlib.import_module( module_cortix_driver )
         except Exception as error:
             log.error('importlib error: ', error)
 

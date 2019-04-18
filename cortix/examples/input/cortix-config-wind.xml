@@ -77,15 +77,14 @@
 
   <application name='wind'>
 
-   <module_library importlib_name='cortix.examples.modulib'>
-   <!-- The`importlib_name` attribute is system dependent. This name and the module's
-        name are combined to form the Python command argument:
-            importlib.import_module(`importlib_name+module_name+'.cortix_driver)
-        that loads the `cortix_driver.py` wrapper at runtime.
-        For this to work, the parent directory of `importlib_name` must be in the
-        system PYTHONPATH.
-   -->
+   <module_library>
     <home_dir>
+   <!-- The home directory of a library is the parent directory of the module.
+        For example if this is where the module lives:
+            full_path_to_parent_directory/module_name
+        the parent directory is:
+            full_path_to_parent_directory
+   -->
         $CORTIX/cortix/examples/modulib
     </home_dir>
    </module_library>
@@ -98,17 +97,15 @@
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
    <!--                  Modules objects start here                                 -->
    <!-- Elements allowed: 
-      + <executable_name>: optional
-      + <executable_path>: optional
       + <input_file_name>: required
       + <input_file_path>: required
-      + <library importlib_name='value'>: optional
+      + <library>: optional
           <home_dir>text</home_dir>
       + </library
    -->
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
 
-   <module name='wind' type='native'>
+   <module name='wind'>
 
     <input_file_name>wind.input</input_file_name>
     <input_file_path>$CORTIX/cortix/examples/input</input_file_path>

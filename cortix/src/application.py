@@ -53,8 +53,6 @@ class Application:
         node = config_xml_tree.get_sub_node('module_library')
         assert node.get_node_tag() == 'module_library', 'FATAL.'
 
-        self.__importlib_name = node.get_node_attribute('importlib_name')
-
         for child in node.get_node_children():
             (elem, tag, attributes, text) = child
             if tag == 'home_dir':
@@ -213,19 +211,16 @@ class Application:
 
             # Modules log into the Application logger because they may or may not be 
             # used in a task. Running tasks will effectively tell what modules are used.
-            new_module = Module( self.__log, self.__importlib_name,
+            new_module = Module( self.__log,
                                  self.__module_lib_full_home_dir,
                                  mod_config_xml_node )
 
             # check for a duplicate module before appending a new one
             for module in self.__modules:
                 mod_lib_dir_name   = module.library_home_dir
-                mod_importlib_name = module.importlib_name
 
                 if new_module.name == module.name:
                     assert new_module.library_home_dir != mod_lib_dir_name,\
-                            ' duplicate module; ABORT.'
-                    assert new_module.importlib_name != mod_importlib_name,\
                             ' duplicate module; ABORT.'
 
             # add module to list
