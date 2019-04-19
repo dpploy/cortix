@@ -27,7 +27,7 @@ class CortixDriver():
     def __init__( self,
                   slot_id,
                   input_full_path_file_name,
-                  manifest_full_path_file_name,
+                  manifesto_full_path_file_name,
                   work_dir,
                   ports=list(),
                   cortix_start_time=0.0,
@@ -58,7 +58,7 @@ class CortixDriver():
 
         self.pyplot = PyPlot( slot_id,
                               input_full_path_file_name,
-                              manifest_full_path_file_name,
+                              manifesto_full_path_file_name,
                               work_dir,
                               ports,
                               cortix_start_time,

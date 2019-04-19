@@ -112,6 +112,23 @@ class Simulation:
 
         return
 
+    def __get_application(self):
+        '''
+        Returns the application singleton object.
+
+        Parameters
+        ----------
+        empty:
+
+        Returns
+        -------
+        self.__application: Application
+        '''
+
+        return self.__application
+
+    application = property(__get_application,None,None,None)
+
 #*********************************************************************************
 # Private helper functions (internal use: __)
 #*********************************************************************************
@@ -169,11 +186,11 @@ class Simulation:
 
     def __setup_task(self, task_name):
         '''
-        This is a helper function used by the execute() method. It createas a
+        This is a helper function used by the execute() method. It creates a
         Task object and sets up the communication file for the task at hand.
         There must be only one nework for this task and this network will be
         used to generate the communication file for each module where the ports
-        will point to files. Each module will have in its runtime directory an
+        will point to files. Each module will have in its runtime directory, an
         XML file which maps a port name and type to a file. If the port type is a
         provide type, the file pointed to resides on the same directory as the
         communication file. If the port type is a use type, the file pointed to

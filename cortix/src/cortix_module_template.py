@@ -24,7 +24,7 @@ class MyModule():
  def __init__( self,
                slot_id,
                input_full_path_file_name,
-               manifest_full_path_file_name,
+               manifesto_full_path_file_name,
                work_dir,
                ports = list(),
                cortix_start_time = 0.0,
@@ -48,7 +48,7 @@ class MyModule():
   assert isinstance(cortix_time_unit, str), '-> time unit type %r is invalid.' % \
           type(cortix_time_unit)
         # Read the manisfest 
-        self.__read_manifest( manifest_full_path_file_name )
+        self.__read_manifesto( manifesto_full_path_file_name )
         self.__log.info(self.__port_diagram)
 
   # Logging
@@ -56,7 +56,7 @@ class MyModule():
   self.__log.info('initializing an object of MyModule()')
 
   # Read the manisfest 
-  self.__read_manifest( manifest_full_path_file_name )
+  self.__read_manifesto( manifesto_full_path_file_name )
   self.__log.info(self.__port_diagram)
 
 #.................................................................................

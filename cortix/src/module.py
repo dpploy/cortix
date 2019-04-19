@@ -81,21 +81,21 @@ class Module:
         # Take care of a few full path issue
         cortix_path = os.path.abspath(os.path.join(__file__, '../../..'))
 
-        self.__manifest_full_path_file_name = self.__library_home_dir + '/' + \
-                self.__mod_name + '/manifest.xml'
+        self.__manifesto_full_path_file_name = self.__library_home_dir + '/' + \
+                self.__mod_name + '/manifesto.xml'
 
         if '$CORTIX' in self.__input_file_path:
             self.__input_file_path = \
                     self.__input_file_path.replace('$CORTIX', cortix_path)
 
-        if '$CORTIX' in self.__manifest_full_path_file_name:
-            self.__manifest_full_path_file_name = \
-                    self.__manifest_full_path_file_name.replace('$CORTIX', cortix_path)
+        if '$CORTIX' in self.__manifesto_full_path_file_name:
+            self.__manifesto_full_path_file_name = \
+                    self.__manifesto_full_path_file_name.replace('$CORTIX', cortix_path)
 
-        # Read the module's manifest
-        self.__read_manifest()
+        # Read the module's manifesto
+        self.__read_manifesto()
 
-        logger.debug(self.__mod_name+': read manifest ports\n %s'%self.__diagram)
+        logger.debug(self.__mod_name+': read manifesto ports\n %s'%self.__diagram)
 
         return
 
@@ -180,7 +180,7 @@ class Module:
 
     def __get_diagram(self):
         '''
-        Return the diagram string from the module manifest or a null place holder.
+        Return the diagram string from the module manifesto or a null place holder.
         '''
 
         return self.__diagram
@@ -220,14 +220,14 @@ class Module:
         assert os.path.isdir(mod_work_dir), \
                'module work directory %r not available.' % mod_work_dir
 
-        manifest_name = self.__manifest_full_path_file_name
+        manifesto_name = self.__manifesto_full_path_file_name
 
         # the laucher "loads" the module dynamically and provides the method for
         # threading
         launch = Launcher( library_home_dir, mod_name,
                            slot_id,
                            module_input,
-                           manifest_name,
+                           manifesto_name,
                            mod_work_dir,
                            param, comm, status )
 
@@ -241,17 +241,17 @@ class Module:
 # Private helper functions (internal use: __)
 #*********************************************************************************
 
-    def __read_manifest( self ):
+    def __read_manifesto( self ):
         '''
         Get ports
         '''
 
-        assert isinstance(self.__manifest_full_path_file_name, str)
+        assert isinstance(self.__manifesto_full_path_file_name, str)
 
-        # Read the manifest 
-        xml_tree = XMLTree( xml_tree_file=self.__manifest_full_path_file_name )
+        # Read the manifesto 
+        xml_tree = XMLTree( xml_tree_file=self.__manifesto_full_path_file_name )
 
-        assert xml_tree.get_node_tag() == 'module_manifest'
+        assert xml_tree.get_node_tag() == 'module_manifesto'
 
         assert xml_tree.get_node_attribute('name') == self.__mod_name,\
                 "xml_tree.get_node_attribute('name') is %r and self.__mod_name is %r"%\

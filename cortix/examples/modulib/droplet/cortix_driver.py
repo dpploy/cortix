@@ -31,7 +31,7 @@ class CortixDriver():
     def __init__(self,
                  slot_id,
                  input_full_path_file_name,
-                 manifest_full_path_file_name,
+                 manifesto_full_path_file_name,
                  work_dir,
                  ports=list(),
                  cortix_start_time=0.0,
@@ -61,7 +61,7 @@ class CortixDriver():
         # Guest library module: Droplet
         # uncomment
         self.__droplet = Droplet( slot_id,
-                input_full_path_file_name, manifest_full_path_file_name, work_dir,
+                input_full_path_file_name, manifesto_full_path_file_name, work_dir,
                 ports,
                 cortix_start_time, cortix_final_time, cortix_time_step, cortix_time_unit )
 
