@@ -1,0 +1,60 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<!-- 
+# -*- coding: utf-8 -*-
+# This file is part of the Cortix toolkit environment
+# https://cortix.org
+#
+# All rights reserved, see COPYRIGHT for full restrictions.
+# https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
+#
+# Licensed under the University of Massachusetts Lowell LICENSE:
+# https://github.com/dpploy/cortix/blob/master/LICENSE.txt
+-->
+<module_manifesto name='wind' version='0.0'>
+
+ <!-- Ports have four types: * use, * provide, * input, * output -->
+ <!-- The *input*, and *output* types allow for a module to self-connect. 
+      Eessentially, an *input port* is an *external provide port* and a
+      *output port* is an *external use port*. Hence to use an *input port*, a
+      use port is needed. To use an *output port* a provide port is needed. This
+      allows for the same module to self-connect.  -->
+
+    <!-- use ports -->
+    <port type='output'  mode='file.any' multiplicity='1'>self-output</port>
+    <port type='use'     mode='file.txt' multiplicity='1'>input</port>
+    <port type='use'     mode='file.txt' multiplicity='1'>spatial-position</port>
+
+    <!-- provide ports -->
+    <port type='input'   mode='file.txt' multiplicity='1'>self-input</port>
+    <port type='provide' mode='file.dat' multiplicity='1'>wind-velocity</port>
+    <port type='provide' mode='file.xml' multiplicity='1'>state</port>
+    <port type='provide' mode='file.dat' multiplicity='1'>output</port>
+
+    <diagram> 
+   ..................................................................
+   .                   __    ____ __  __ _____                      .
+   .                   \\ /\ //|| ||\\|| ||  )                      .
+   .                    \V/\V/ || || \|| ||_//                      .
+   .                  =========================                     .
+   . input port       |    USE    |  PROVIDE  |                     .
+   .____________      |...........|...........|                     .
+   .|self-input| -->  | input     | wind-velo |                     .
+   .------------      |...........|...........|                     .
+   . provide-like     | spat.-pos.| state     |       output port   .
+   .                  |...........|...........|     _____________   .
+   .                  |           | output    | --> |self-output|   .
+   .                  =========================     -------------   .
+   .                                                   use-like     .
+   ..................................................................
+    </diagram>
+
+    <ascii_art>
+    _____________________________
+    . __    __ __ __  __ ____   .
+    . ||    || || ||\ || || \\  .
+    . \\ /\ // || ||\\|| ||  )) .
+    .  \V/\V/  || || \|| ||_//  .
+    _____________________________
+    </ascii_art>
+
+</module_manifesto>
