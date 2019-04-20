@@ -265,7 +265,6 @@ class Launcher(Thread):
             guest_driver.execute( cortix_time, cortix_time_step )
 
             end_time = time.time()
-            print(end_time)
             s = 'CPU elapsed time (s): ' + str(round(end_time - start_time, 2))
             self.__log.debug(s)
 
