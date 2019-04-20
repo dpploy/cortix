@@ -1,0 +1,58 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<!-- 
+# -*- coding: utf-8 -*-
+# This file is part of the Cortix toolkit environment
+# https://cortix.org
+#
+# All rights reserved, see COPYRIGHT for full restrictions.
+# https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
+#
+# Licensed under the University of Massachusetts Lowell LICENSE:
+# https://github.com/dpploy/cortix/blob/master/LICENSE.txt
+-->
+<module_manifesto name='pyplot' version='0.0'>
+
+ <!-- Ports have four types: * use, * provide, * input, * output -->
+ <!-- The *input*, and *output* types allow for a module to self-connect. 
+      Eessentially, an *input port* is an *external provide port* and a
+      *output port* is an *external use port*. Hence to use an *input port*, a
+      use port is needed. To use an *output port* a provide port is needed. This
+      allows for the same module to self-connect.  -->
+
+    <!-- use ports -->
+    <port type='use'     mode='file.xml' multiplicity='1'>input</port>
+    <port type='use'     mode='file.xml' multiplicity='1'>time-sequence</port>
+    <port type='use'     mode='file.xml' multiplicity='1'>time-tables</port>
+
+    <!-- provide ports -->
+    <port type='input'   mode='file.xml' multiplicity='1'>self-input</port>
+
+    <diagram> 
+   ..................................................................
+   .             _____ _  _ _____ __     _____  _____               .
+   .             ||_// \\// ||_// ||    ((   ))  ||                 .
+   .             ||     //  ||    ||__|  \\_//   ||                 .
+   .             ====================================               .
+   . input port       |    USE    |  PROVIDE  |                     .
+   .____________      |...........|...........|                     .
+   .|self-input| -->  | input     |           |                     .
+   .------------      |...........|...........|                     .
+   . provide-like     | time-seq. |           |                     .
+   .                  |...........|...........|                     .
+   .                  | time-tabl.|           |                     .
+   .                  =========================                     .
+   .                                                                .
+   ..................................................................
+    </diagram>
+
+    <ascii_art>
+    _________________________________________
+    . ____  _  _ ____  __      ___   ______ .
+    . || \\ \\// || \\ ||     // \\  | || | .
+    . ||_//  )/  ||_// ||    ((   ))   ||   .
+    . ||    //   ||    ||__|  \\_//    ||   .
+    _________________________________________
+
+    </ascii_art>
+
+</module_manifesto>
