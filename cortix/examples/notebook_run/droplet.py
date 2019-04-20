@@ -36,7 +36,7 @@ def run(task_name=None):
 
     cortix.run_simulations(task_name=task_name)
 
-    return
+    return cortix.simulations
 
 #*********************************************************************************
 if __name__ == "__main__":

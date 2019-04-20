@@ -94,7 +94,7 @@ class Cortix():
 
     def run_simulations(self, task_name=None):
         '''
-        This method runs every simulation defined by the Cortix object. At the 
+        This method runs every simulation defined by the Cortix object. At the
         moment this is done one simulation at a time.
         '''
 
@@ -103,6 +103,23 @@ class Cortix():
             sim.execute( task_name )
 
         return
+
+    def __get_simulations(self):
+        '''
+        Get all simulations.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        self.__simulations: list(Simulation)
+        '''
+
+        return self.__simulations
+
+    simulations = property(__get_simulations,None,None,None)
 
 #*********************************************************************************
 # Private helper functions (internal use: __)
