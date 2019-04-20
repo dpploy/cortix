@@ -216,7 +216,7 @@ class Launcher(Thread):
 
         s = 'guest_driver = CortixDriver( slot_id=' + str(self.__slot_id) + \
             ', input file=' + self.__input_full_path_file_name + \
-            ', exec file=' + self.__manifesto_full_path_file_name + \
+            ', manifesto file=' + self.__manifesto_full_path_file_name + \
             ', work dir=' + self.__work_dir + \
             ', ports=' + str(ports) + \
             ', cortix_start_time=' + str(cortix_start_time) + \
@@ -251,9 +251,9 @@ class Launcher(Thread):
                 '**************'
             self.__log.debug(s)
 
-            s = 'run(' + str(round(cortix_time, 3)) + '[min]): ' # todo: change time unit
+            s = 'run(' + str(round(cortix_time, 2)) + '['+cortix_time_unit+']): '
             self.__log.debug(s)
-            s = 'run(' + str(round(cortix_time, 3)) + '[min]) ' # todo: change time unit
+            s = 'run(' + str(round(cortix_time, 2)) + '['+cortix_time_unit+']): '
             self.__log.info(s)
 
             start_time = time.time()
@@ -265,6 +265,7 @@ class Launcher(Thread):
             guest_driver.execute( cortix_time, cortix_time_step )
 
             end_time = time.time()
+            print(end_time)
             s = 'CPU elapsed time (s): ' + str(round(end_time - start_time, 2))
             self.__log.debug(s)
 
