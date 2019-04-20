@@ -339,6 +339,10 @@ class Simulation:
                             log_str = '<port name="' + to_port + \
                                     '" type="provide" directory="' + \
                                     to_module_slot_work_dir + to_port + '"/>\n'
+                        elif to_port_mode == 'hardware':
+                            log_str = '<port name="' + to_port + \
+                                    '" type="provide" hardware="' + \
+                                    to_module_slot_work_dir + to_port + '"/>\n'
                         else:
                             assert False, 'invalid port mode. fatal.'
 
@@ -404,6 +408,10 @@ class Simulation:
                                       to_module_slot_work_dir + to_port + '.' + ext + \
                                       '"/>\n'
                         elif to_port_mode == 'directory':
+                            log_str = '<port name="' + from_port + \
+                                      '" type="use" directory="' + \
+                                      to_module_slot_work_dir + to_port + '"/>\n'
+                        elif to_port_mode == 'hardware':
                             log_str = '<port name="' + from_port + \
                                       '" type="use" directory="' + \
                                       to_module_slot_work_dir + to_port + '"/>\n'

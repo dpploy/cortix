@@ -279,14 +279,14 @@ class Module:
                     val = attribute[1].strip()
 
                     if key == 'type':
-                        assert val == 'use' or val == 'provide' or val == 'input' or \
+                        assert val == 'use' or val == 'provide' or val == 'input' or\
                             val == 'output', 'port attribute value invalid.'
                         tmp['port_name'] = text  # port_name
                         tmp['port_type'] = val   # port_type
                     elif key == 'mode':
                         file_value = val.split('.')[0]
-                        assert file_value == 'file' or file_value == 'directory',\
-                            'port attribute value invalid.'
+                        assert file_value == 'file' or file_value == 'directory' or\
+                                file_value == 'hardware', 'port attribute value invalid.'
                         tmp['port_mode'] = val
                     elif key == 'multiplicity':
                         tmp['port_multiplicity'] = int(val)  # port_multiplicity

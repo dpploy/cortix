@@ -188,11 +188,14 @@ class Launcher(Thread):
                 port_type = node.get('type')
                 port_file = node.get('file')
                 port_directory = node.get('directory')
+                port_hardware = node.get('hardware')
 
                 if port_file is not None:
                     ports.append((port_name, port_type, port_file))
                 elif port_directory is not None:
                     ports.append((port_name, port_type, port_directory))
+                elif port_hardware is not None:
+                    ports.append((port_name, port_type, port_hardware))
                 else:
                     assert False, 'port mode incorrect. fatal.'
 
