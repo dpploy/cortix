@@ -76,7 +76,7 @@ class PyPlot():
                                        '.cortix_driver.pyplot')
         self.__log.info('initializing an object of PyPlot()')
 
-        # Read the manisfest
+        # Read the manisfesto
         self.__read_manifesto( manifesto_full_path_file_name )
         self.__log.info(self.__port_diagram)
 

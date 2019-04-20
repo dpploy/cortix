@@ -55,7 +55,7 @@ class MyModule():
   self.__log = logging.getLogger('launcher-mymodule_'+str(slot_id)+'.cortix_driver.mymodule')
   self.__log.info('initializing an object of MyModule()')
 
-  # Read the manisfest 
+  # Read the manisfesto
   self.__read_manifesto( manifesto_full_path_file_name )
   self.__log.info(self.__port_diagram)
 

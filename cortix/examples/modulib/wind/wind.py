@@ -58,7 +58,7 @@ class Wind():
         self.__log = logging.getLogger('launcher-wind_'+str(slot_id)+'.cortix_driver.wind')
         self.__log.info('initializing an object of Wind()')
 
-       # Read the manisfest
+       # Read the manisfesto
         self.__read_manifesto( manifesto_full_path_file_name )
         self.__log.info(self.__port_diagram)
 
