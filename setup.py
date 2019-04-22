@@ -8,7 +8,7 @@ with open("requirements.txt", "r") as fh:
 
 setuptools.setup(
     name="cortix",
-    version="0.1.3",
+    version="0.1.6",
     author="Cortix Computing",
     author_email="valmor_dealmeida@uml.edu",
     description=" Cortix is a Python library for system-level\
