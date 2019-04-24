@@ -95,38 +95,51 @@ class Task:
         self.__start_time_unit = 'null-start_time_unit'
         self.__evolve_time_unit = 'null-evolve_time_unit'
         self.__time_step_unit = 'null-time_step_unit'
+        self.__real_time = 'null-real_time'
         self.__runtime_cortix_param_file = 'null-runtime_cortix_param_file'
 
         self.__log.debug('start __init__()')
         for child in self.__config_node.get_node_children():
-            (elem, tag, items, text) = child
+
+            (elem, tag, attributes, text) = child
+
             if tag == 'start_time':
-                for (key, value) in items:
+                for (key, value) in attributes:
                     if key == 'unit':
                         self.__start_time_unit = value
                 self.__start_time = float(text.strip())
 
             if tag == 'evolve_time':
-                for (key, value) in items:
+                for (key, value) in attributes:
                     if key == 'unit':
                         self.__evolve_time_unit = value
                 self.__evolve_time = float(text.strip())
 
             if tag == 'time_step':
-                for (key, value) in items:
+                for (key, value) in attributes:
                     if key == 'unit':
                         self.__time_step_unit = value
                 self.__time_step = float(text.strip())
+
+            if tag == 'real_time':
+                self.__real_time = text.strip()
 
         if self.__start_time_unit == 'null-start_time_unit':
             self.__start_time_unit = self.__evolve_time_unit
         assert self.__evolve_time_unit != 'null-evolve_time_unit', \
             'invalid time unit = %r' % (self.__evolve_time_unit)
 
+        if self.__real_time == 'null-real_time':
+            self.__real_time = 'false'
+        else:
+            assert self.__real_time == 'true' or self.__real_time == 'false',\
+                    'invalid value %r use: false or true'%(self.__real_time)
+
         self.__log.debug('start_time value = %s', str(self.__start_time))
         self.__log.debug('start_time unit  = %s', str(self.__start_time_unit))
         self.__log.debug('evolve_time value = %s', str(self.__evolve_time))
         self.__log.debug('evolve_time unit  = %s', str(self.__evolve_time_unit))
+        self.__log.debug('real_time         = %s', str(self.__real_time))
         self.__log.debug('end __init__()')
         self.__log.info('created task: %s', self.__name)
 
@@ -261,6 +274,15 @@ class Task:
         return self.__time_step_unit
 
     time_step_unit = property(__get_time_step_unit, None, None, None)
+
+    def __get_real_time(self):
+        '''
+        `str`:Is timing real time?
+        '''
+
+        return self.__real_time
+
+    real_time = property(__get_real_time, None, None, None)
 
     def set_runtime_cortix_param_file(self, full_path):
         '''

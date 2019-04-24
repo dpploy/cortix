@@ -21,7 +21,7 @@ import datetime
 from threading import Thread
 import importlib
 import xml.etree.ElementTree as ElementTree
-import concurrent.futures
+from cortix.src.utils.xmltree import XMLTree
 #*********************************************************************************
 
 class Launcher(Thread):
@@ -127,11 +127,10 @@ class Launcher(Thread):
             'file %r not available;stop.' % self.__cortix_param_full_path_file_name
 
         # For now Cortix advances in unit of minutes; change this in the future
-        tree = ElementTree.parse(self.__cortix_param_full_path_file_name)
-        cortix_param_xml_root_node = tree.getroot()
-        node = cortix_param_xml_root_node.find('start_time')
-        cortix_start_time_unit = node.get('unit')
-        cortix_start_time = float(node.text.strip())
+        cortix_param_xml_tree = XMLTree( xml_tree_file = self.__cortix_param_full_path_file_name)
+        node = cortix_param_xml_tree.get_sub_node('start_time')
+        cortix_start_time_unit = node.get_node_attribute('unit')
+        cortix_start_time = float(node.get_node_content().strip())
 
         if cortix_start_time_unit == 'minute':
             cortix_start_time *= 1.0
@@ -142,9 +141,9 @@ class Launcher(Thread):
         else:
             assert False, 'time unit invalid: %r' % (cortix_start_time_unit)
 
-        node = cortix_param_xml_root_node.find('evolve_time')
-        evolve_time_unit = node.get('unit')
-        evolve_time = float(node.text.strip())
+        node = cortix_param_xml_tree.get_sub_node('evolve_time')
+        evolve_time_unit = node.get_node_attribute('unit')
+        evolve_time = float(node.get_node_content().strip())
 
         if evolve_time_unit == 'minute':
             evolve_time *= 1.0
@@ -155,9 +154,9 @@ class Launcher(Thread):
         else:
             assert False, 'time unit invalid: %r' % (evolve_time_unit)
 
-        node = cortix_param_xml_root_node.find('time_step')
-        cortix_time_step_unit = node.get('unit')
-        cortix_time_step = float(node.text.strip())
+        node = cortix_param_xml_tree.get_sub_node('time_step')
+        cortix_time_step_unit = node.get_node_attribute('unit')
+        cortix_time_step = float(node.get_node_content().strip())
 
         if cortix_time_step_unit == 'minute':
             cortix_time_step *= 1.0
@@ -170,25 +169,40 @@ class Launcher(Thread):
         else:
             assert False, 'time unit invalid: %r' % (cortix_time_step_unit)
 
+        node = cortix_param_xml_tree.get_sub_node('real_time')
+        real_time = node.get_node_content().strip()
+
+        sleep = 0.0
+
+        if real_time == 'false':
+            sleep = 0.0
+        else:
+            sleep = cortix_time_step * 60.0
+
         cortix_time_unit = 'minute'
 
         # collect information from the Cortix communication file for this guest module
         assert os.path.isfile(self.__cortix_comm_full_path_file_name),\
             'file %r not available;stop.' % self.__cortix_comm_full_path_file_name
 
-        tree = ElementTree.parse(self.__cortix_comm_full_path_file_name)
-        cortix_comm_xml_root_node = tree.getroot()
+        cortix_comm_xml_tree = XMLTree( xml_tree_file = self.__cortix_comm_full_path_file_name )
 
         # Setup ports
-        nodes = cortix_comm_xml_root_node.findall('port')
+        nodes = cortix_comm_xml_tree.get_all_sub_nodes('port')
         ports = list()
         if nodes is not None:
             for node in nodes:
-                port_name = node.get('name')
-                port_type = node.get('type')
-                port_file = node.get('file')
-                port_directory = node.get('directory')
-                port_hardware = node.get('hardware')
+                #port_name = node.get('name')
+                #port_type = node.get('type')
+                #port_file = node.get('file')
+                #port_directory = node.get('directory')
+                #port_hardware = node.get('hardware')
+
+                port_name = node.get_attribute('name')
+                port_type = node.get_attribute('type')
+                port_file = node.get_attribute('file')
+                port_directory = node.get_attribute('directory')
+                port_hardware = node.get_attribute('hardware')
 
                 if port_file is not None:
                     ports.append((port_name, port_type, port_file))
@@ -199,7 +213,7 @@ class Launcher(Thread):
                 else:
                     assert False, 'port mode incorrect. fatal.'
 
-        tree = None
+        #tree = None
         self.__log.debug('ports: %s', str(ports))
 
         # Add evolve time to start time  
@@ -238,6 +252,8 @@ class Launcher(Thread):
         before_final_time = True
 
         while cortix_time <= cortix_final_time or before_final_time:
+
+            time.sleep( sleep )
 
             if cortix_time >= cortix_final_time:  # make sure the final time is reached
                before_final_time = False          # or exceeded by a epsilon amount
