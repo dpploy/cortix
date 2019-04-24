@@ -74,7 +74,7 @@ class XMLTree:
 
         # parse an XML tree and hold its root node
         if xml_tree_file is not None:
-            assert isinstance(xml_tree_file, str), '-> configFileName not a str.'
+            assert isinstance(xml_tree_file, str), '-> xml_tree_file not a str.'
             assert xml_tree_node is None, 'node and file not allowed together.'
 
             tree = ElementTree()
@@ -144,6 +144,29 @@ class XMLTree:
         assert isinstance(attribute_value,str)
 
         return attribute_value.strip()
+
+    def get_attribute(self, attribute_name):
+        '''
+        Returns the value of the attribute associated with the root node of
+        the element tree, *e.g.* <module type='native'></module>. Attribute
+        name is `type`, value is 'native'.
+
+        Parameters
+        ----------
+        attribute_name: str
+
+        Returns
+        -------
+        attribute_value: str or None
+        '''
+
+        assert isinstance(attribute_name,str)
+        attribute_value = self.__xml_tree_node.get(attribute_name.strip())
+
+        if attribute_value is not None:
+            return attribute_value.strip()
+        else:
+            return attribute_value
 
     def get_node_content(self):
         '''
@@ -220,9 +243,9 @@ class XMLTree:
     def get_node_children(self):
         '''
         Returns a list of the direct sub-elements in the given element (node) containing:
-        the subnode, the tag (element) name, the attributes a list of tuples,
+        the subnode, the tag (element) name, the attributes as a list of tuples,
         and the content (text) of the node. This is not recursive. Recursion
-        can be done by calling this method on the children nodes (that is the first
+        can be done by calling this method on the children nodes (that is, the first
         element of the tuple).
 
         Parameters
@@ -232,7 +255,7 @@ class XMLTree:
         Returns
         -------
         children: list(tuple)
-                  Tuple: (node, tag, [(attribute name,attribute value),(.,.)...],
+                  Tuple: (node, tag name, [(attribute name,attribute value),(.,.)...],
                   content). Attribute name and value are string type.
         '''
 

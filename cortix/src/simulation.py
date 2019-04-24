@@ -143,7 +143,7 @@ class Simulation:
         self.__log = logging.getLogger(logger_name)
         self.__log.setLevel(logging.NOTSET)
 
-        node = config_xml_tree.get_sub_node("logger")
+        node = config_xml_tree.get_sub_node('logger')
 
         logger_level = node.get_node_attribute('level')
         self.__log = set_logger_level(self.__log, logger_name, logger_level)
@@ -218,7 +218,8 @@ class Simulation:
 
             self.__tasks.append(task)
 
-            self.__log.debug('appended task: %s', task_config_xml_node.get_node_attribute('name'))
+            self.__log.debug('appended task: %s', \
+                    task_config_xml_node.get_node_attribute('name'))
 
         if task is None:
             self.__log.info('no task to exectute; done here.')
@@ -255,6 +256,9 @@ class Simulation:
         time_step_unit = task.time_step_unit
         fout.write('<time_step unit="' + time_step_unit + '"' + '>' +
                            str(time_step) + '</time_step>\n')
+
+        real_time = task.real_time
+        fout.write('<real_time>' + real_time + '</real_time>\n')
 
         fout.write('</cortix_param>')
         fout.close()
