@@ -62,7 +62,7 @@ class Network:
         self.__connectivity = list(dict())
         self.__module_slot_names = list()
 
-        # cortix communication file for modules
+        # Cortix communication files for modules
         self.__runtime_cortix_comm_file_name = dict()
 
         # network graph
@@ -114,6 +114,38 @@ class Network:
 # Public member functions 
 #*********************************************************************************
 
+    def __get_name(self):
+        '''
+        `str`:Network name
+        '''
+
+        return self.__name
+    name = property(__get_name, None, None, None)
+
+    def __get_connectivity(self):
+        '''
+        `list(dict)`:List of the network connectivity
+        '''
+
+        return self.__connectivity
+    connectivity = property(__get_connectivity, None, None, None)
+
+    def __get_module_slot_names(self):
+        '''
+        `list(str)`:List of network slot names
+        '''
+
+        return self.__module_slot_names
+    module_slot_names = property(__get_module_slot_names, None, None, None)
+
+    def __get_nx_graph(self):
+        '''
+        `networkx.MultiDiGraph`:NXGraph corresponding to network
+        '''
+
+        return self.__nx_graph
+    nx_graph = property(__get_nx_graph, None, None, None)
+
     def set_runtime_cortix_comm_file_name(self, module_slot_name, full_path_file_name):
         '''
         Sets the runtime cortix communications file to the one specified
@@ -126,49 +158,54 @@ class Network:
 
     def get_runtime_cortix_comm_file_name(self, module_slot_name):
         '''
-        Returns the cortix comm file that corresponds to module_slot_name. None if otherwise.
+        Returns the cortix communication file name (full path) that corresponds to
+        module_slot_name. None if otherwise.
+
+        Parameters
+        ----------
+        module_slot_name: str
+
+        Returns
+        -------
+        full_path_file_name: str or None
         '''
 
         if module_slot_name in self.__runtime_cortix_comm_file_name:
-            return self.__runtime_cortix_comm_file_name[module_slot_name]
+            full_path_file_name = self.__runtime_cortix_comm_file_name[module_slot_name]
         else:
-            return None
+            full_path_file_name = None
 
-    def __get_name(self):
+        return full_path_file_name
+
+    def get_runtime_port_comm_file(self, module_slot_name, port_name):
         '''
-        `str`:Network name
-        '''
+        From the Cortix runtime communication file search for the module and port
+        given, and return the file associated to the specified arguments.
 
-        return self.__name
+        Parameters
+        ----------
+        module_slot_name: str
 
-    name = property(__get_name, None, None, None)
+        port_name: str
 
-    def __get_connectivity(self):
-        '''
-        `list(dict)`:List of the network connectivity
-        '''
-
-        return self.__connectivity
-
-    connectivity = property(__get_connectivity, None, None, None)
-
-    def __get_module_slot_names(self):
-        '''
-        `list(str)`:List of network slot names
+        Returns
+        -------
+        full_path_file_name: str or None
         '''
 
-        return self.__module_slot_names
+        assert module_slot_name in self.__runtime_cortix_comm_file_name
 
-    module_slot_names = property(__get_module_slot_names, None, None, None)
+        comm_file = self.__runtime_cortix_comm_file_name[module_slot_name]
+        comm_tree = XMLTree(xml_tree_file=comm_file)
+        for child in comm_tree.children:
+            (node,name,attributes,content) = child
+            (name,value) = attributes[0] # order: 0: (name,:) 1: (type,:) 2: (file,:)
+            if value == port_name:
+                data_file_name = attributes[-1][1] # (file,:)
+                break
 
-    def __get_nx_graph(self):
-        '''
-        `networkx.MultiDiGraph`:NXGraph corresponding to network
-        '''
+        return data_file_name # full path
 
-        return self.__nx_graph
-
-    nx_graph = property(__get_nx_graph, None, None, None)
 
     def __str__(self):
         '''

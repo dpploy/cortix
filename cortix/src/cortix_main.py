@@ -186,7 +186,7 @@ class Cortix():
 
         for sim_config_xml_node in config_xml_tree.get_all_sub_nodes('simulation'):
 
-            assert sim_config_xml_node.get_node_tag() == 'simulation'
+            assert sim_config_xml_node.tag == 'simulation'
 
             self.__log.debug('__setup_simulations(): simulation name: %s',
                     sim_config_xml_node.get_node_attribute('name'))

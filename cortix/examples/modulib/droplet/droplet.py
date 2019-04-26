@@ -131,7 +131,7 @@ class Droplet():
         quantities = list()
 
         # spatial position
-        spatial_position = Quantity( name='spatial-position', formalName='Spatial Pos.', unit='m' )
+        spatial_position = Quantity( name='spatial-position', formalName='Spatial_Pos.', unit='m' )
         quantities.append( spatial_position )
         # velocity
         velocity = Quantity( name='velocity', formalName='Veloc.', unit='m/s' )
@@ -284,7 +284,7 @@ class Droplet():
             fout.write('# version:'+'0.1'); fout.write('\n')
             today = datetime.datetime.today()
             fout.write('# today:  '+str(today)); fout.write('\n')
-            fout.write('#')
+            fout.write(' ')
             # write file header
             fout.write('%17s'%('Time[sec]'))
             # mass density   

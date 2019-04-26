@@ -40,7 +40,7 @@ def run(task_name=None):
 
     cortix.run_simulations(task_name=task_name)
 
-    return cortix.simulations
+    return cortix.simulations[0] # there must be only one simulation
 
 #*********************************************************************************
 if __name__ == "__main__":

@@ -37,6 +37,7 @@ Cortix: a program for system-level modules coupling, execution, and analysis.
 #*********************************************************************************
 from xml.etree.ElementTree import ElementTree # the whole XML tree data structure
 from xml.etree.ElementTree import Element     # an XML element or tree node
+from xml.etree.ElementTree import tostring    # convert all tree data into string 
 #*********************************************************************************
 
 class XMLTree:
@@ -65,7 +66,8 @@ class XMLTree:
 
         # hold a given XML tree node
         if xml_tree_node is not None:
-            assert isinstance(xml_tree_node, Element), '-> xml_tree_node invalid.'
+            assert isinstance(xml_tree_node, Element),\
+                    'ctx::xlt: xml_tree_node invalid.'
             tag_name = xml_tree_node.tag
             assert isinstance(tag_name,str)
             assert len(tag_name) > 0
@@ -74,7 +76,8 @@ class XMLTree:
 
         # parse an XML tree and hold its root node
         if xml_tree_file is not None:
-            assert isinstance(xml_tree_file, str), '-> xml_tree_file not a str.'
+            assert isinstance(xml_tree_file, str),\
+                    'ctx::xlt: xml_tree_file not a str.'
             assert xml_tree_node is None, 'node and file not allowed together.'
 
             tree = ElementTree()
@@ -276,7 +279,7 @@ class XMLTree:
             List of XMLTree items.
         '''
 
-        assert isinstance(tag, str), 'tag invalid'
+        assert isinstance(tag, str),'ctx::xlt: tag invalid'
 
         sub_nodes = self.__xml_tree_node.findall(tag)
 
@@ -344,6 +347,22 @@ class XMLTree:
         return children
 
     children = property(__get_root_node_children, None, None, None)
+
+    def __str__(self):
+        '''
+        XMLTree to string conversion used in a print statement.
+        '''
+
+        s = 'XMLTree content: %s'
+        return s % (tostring(self.__xml_tree_node,encoding='unicode'))
+
+    def __repr__(self):
+        '''
+        XMLTree to string conversion.
+        '''
+
+        s = 'XMLTree content: %s'
+        return s % (tostring(self.__xml_tree_node,encoding='unicode'))
 
 #*********************************************************************************
 # Private helper functions (internal use: __)

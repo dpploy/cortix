@@ -154,7 +154,7 @@ class Simulation:
         Simulation to string conversion used in a print statement.
         '''
 
-        s = 'Simulation data members:\n name=%s\n work dir=%s\n application=%s\n tasks=%s'
+        s = 'Simulation data members:\n \t name=%s\n \t work dir=%s\n \t application=%s\n \t tasks=%s'
         return s % (self.__name, self.__work_dir, self.__application,
                     self.__tasks)
 
@@ -163,7 +163,7 @@ class Simulation:
         Simulation to string conversion.
         '''
 
-        s = 'Simulation data members:\n name=%s\n work dir=%s\n application=%s\n tasks=%s'
+        s = 'Simulation data members:\n \t name=%s\n \t work dir=%s\n \t application=%s\n \t tasks=%s'
         return s % (self.__name, self.__work_dir, self.__application,
                     self.__tasks)
 
@@ -245,7 +245,6 @@ class Simulation:
         task = None  # flag
 
         # loop over all elements with a <task></task> tag in this simulation 
-        # __config_xml
         for task_config_xml_node in self.__config_xml.get_all_sub_nodes('task'):
 
             if task_config_xml_node.get_node_attribute('name') != task_name:

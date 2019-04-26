@@ -149,7 +149,7 @@ class Application:
         Application to string conversion used in a print statement.
         '''
 
-        s = 'Application data members:\n name=%s\n work dir=%s\n module lib home dir=%s\n modules=%s\n network=%s'
+        s = 'Application data members:\n \t name=%s\n \t work dir=%s\n \t module lib home dir=%s\n \t modules=%s\n \t network=%s'
         return s % (self.__name, self.__work_dir, self.__module_lib_full_home_dir,
                     self.__modules, self.__networks)
 
@@ -158,7 +158,7 @@ class Application:
         Application to string conversion.
         '''
 
-        s = 'Application data members:\n name=%s\n work dir=%s\n module lib home dir=%s\n modules=%s\n network=%s'
+        s = 'Application data members:\n \t name=%s\n \t work dir=%s\n \t module lib home dir=%s\n \t modules=%s\n \t network=%s'
         return s % (self.__name, self.__work_dir, self.__module_lib_full_home_dir,
                     self.__modules, self.__networks)
 
