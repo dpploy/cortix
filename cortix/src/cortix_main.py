@@ -44,7 +44,7 @@ class Cortix():
         assert config_xml_tree.get_node_tag() == 'cortix_config'
 
         # Read the cortix config element (tag) name <name></name>
-        node = config_xml_tree.get_sub_node('name') # get sub_node w/ tag: name (XML element)
+        node = config_xml_tree.get_sub_node('name') # get sub_node w/ tag: name 
 
         # Set the Cortix configuration name
         self.__name = node.get_node_content()  # name is now, say, 'droplet-fall'
@@ -92,18 +92,6 @@ class Cortix():
 # Public member functions
 #*********************************************************************************
 
-    def run_simulations(self, task_name=None):
-        '''
-        This method runs every simulation defined by the Cortix object. At the
-        moment this is done one simulation at a time.
-        '''
-
-        for sim in self.__simulations:
-
-            sim.execute( task_name )
-
-        return
-
     def __get_simulations(self):
         '''
         Get all simulations.
@@ -120,6 +108,18 @@ class Cortix():
         return self.__simulations
 
     simulations = property(__get_simulations,None,None,None)
+
+    def run_simulations(self, task_name=None):
+        '''
+        This method runs every simulation defined by the Cortix object. At the
+        moment this is done one simulation at a time.
+        '''
+
+        for sim in self.__simulations:
+
+            sim.execute( task_name )
+
+        return
 
 #*********************************************************************************
 # Private helper functions (internal use: __)

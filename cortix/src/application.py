@@ -37,23 +37,27 @@ class Application:
 
     def __init__(self, app_work_dir, config_xml_tree):
 
-        assert isinstance(app_work_dir, str), '-> app_work_dir is invalid'
-        assert os.path.isdir(app_work_dir), 'Work directory not available.'
-
-        assert isinstance(config_xml_tree, XMLTree), '-> config_xml_tree invalid'
-        assert config_xml_tree.get_node_tag() == 'application'
+        # Sanity tests
+        assert isinstance(app_work_dir, str),\
+                'ctx::app: app_work_dir is invalid'
+        assert os.path.isdir(app_work_dir),\
+                'ctx::app: work directory not available.'
+        assert isinstance(config_xml_tree, XMLTree),\
+                'ctx::app config_xml_tree invalid'
+        assert config_xml_tree.tag == 'application',\
+                'ctx::app: tag invalid.'
 
         # Read the application name
-        self.__name = config_xml_tree.get_node_attribute('name')
+        self.__name = config_xml_tree.get_attribute('name')
 
         # Set the work directory (previously created)
         self.__work_dir = app_work_dir
 
         # Set the module library for the whole application
         node = config_xml_tree.get_sub_node('module_library')
-        assert node.get_node_tag() == 'module_library', 'FATAL.'
+        assert node.tag == 'module_library','ctx::app: FATAL.'
 
-        for child in node.get_node_children():
+        for child in node.children:
             (elem, tag, attributes, text) = child
             if tag == 'home_dir':
                 self.__module_lib_full_home_dir = text.strip()
@@ -102,6 +106,15 @@ class Application:
 
     networks = property(__get_networks, None, None, None)
 
+    def __get_modules(self):
+        '''
+        `list(str)`:List of names of Cortix module objects
+        '''
+
+        return self.__modules
+
+    modules = property(__get_modules, None, None, None)
+
     def get_network(self, name):
         '''
         Returns a network with a given name. None if the name doesn't exist.
@@ -122,15 +135,6 @@ class Application:
 
         return None
 
-    def __get_modules(self):
-        '''
-        `list(str)`:List of names of Cortix module objects
-        '''
-
-        return self.__modules
-
-    modules = property(__get_modules, None, None, None)
-
     def get_module(self, name):
         """
         Returns a module with a given name.  None if the name doesn't exist.
@@ -139,6 +143,24 @@ class Application:
             if mod.name == name:
                 return mod
         return None
+
+    def __str__(self):
+        '''
+        Application to string conversion used in a print statement.
+        '''
+
+        s = 'Application data members:\n name=%s\n work dir=%s\n module lib home dir=%s\n modules=%s\n network=%s'
+        return s % (self.__name, self.__work_dir, self.__module_lib_full_home_dir,
+                    self.__modules, self.__networks)
+
+    def __repr__(self):
+        '''
+        Application to string conversion.
+        '''
+
+        s = 'Application data members:\n name=%s\n work dir=%s\n module lib home dir=%s\n modules=%s\n network=%s'
+        return s % (self.__name, self.__work_dir, self.__module_lib_full_home_dir,
+                    self.__modules, self.__networks)
 
 #*********************************************************************************
 # Private helper functions (internal use: __)
@@ -217,7 +239,7 @@ class Application:
 
             # check for a duplicate module before appending a new one
             for module in self.__modules:
-                mod_lib_dir_name   = module.library_home_dir
+                mod_lib_dir_name = module.library_home_dir
 
                 if new_module.name == module.name:
                     assert new_module.library_home_dir != mod_lib_dir_name,\

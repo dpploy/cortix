@@ -21,12 +21,12 @@ from cortix.src.utils.xmltree import XMLTree
 
 class Network:
     '''
-    Cortix network class definition. Network class members:
+    Cortix Network class definition. Network class members:
 
     __config_node: XMLTree
         Configuration data in the form of an XML tree.
 
-    __name:str
+    __name: str
         Name of the network.
 
     __connectivity: list(dict)
@@ -172,7 +172,7 @@ class Network:
 
     def __str__(self):
         '''
-        Network to string conversion
+        Network to string conversion used in a print statement.
         '''
 
         s = 'Network data members:\n name=%s\n module slot names=%s\n connectivity=%s\n runtime comm file= %s'

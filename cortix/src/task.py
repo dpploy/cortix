@@ -18,6 +18,7 @@ import os
 import time
 import logging
 from xml.etree.cElementTree import ElementTree
+
 from cortix.src.utils.xmltree import XMLTree
 from cortix.src.utils.set_logger_level import set_logger_level
 #*********************************************************************************
@@ -32,64 +33,28 @@ class Task:
 # Construction
 #*********************************************************************************
 
-    def __init__(self, parent_work_dir=None, task_config_node=XMLTree()):
+    def __init__(self, parent_work_dir, config_xml_tree):
 
-        assert isinstance(parent_work_dir, str), '-> parent_work_dir invalid.'
+        # Sanity checks
+        assert isinstance(parent_work_dir, str),\
+                'ctx::tsk: parent_work_dir invalid.'
+        assert os.path.isdir(parent_work_dir),\
+                'ctx::tsk: work directory not available.' # must be previously created
+        assert isinstance(config_xml_tree, XMLTree),\
+                'ctx::tsk: config_xml_tree not a XMLTree: %r.'%type(config_xml_tree)
+        assert config_xml_tree.tag == 'task',\
+                'ctx:tsk: invalid task xml node tag.'
 
-        # Inherit a configuration tree
-        assert isinstance(task_config_node, XMLTree), \
-            '-> task_config_node not a XMLTree: %r.' % type(task_config_node)
-        self.__config_node = task_config_node
+        # Read the task name, e.g. <task name='solo-dados'></task>
+        self.__name = config_xml_tree.get_attribute('name')
 
-        # Read the task name
-        self.__name = self.__config_node.get_node_attribute('name')
-
-        # Set the work directory (previously created)
-        assert os.path.isdir(parent_work_dir), 'work directory not available.'
+        # Set the work directory 
         self.__work_dir = parent_work_dir + 'task_' + self.__name + '/'
         os.system('mkdir -p ' + self.__work_dir)
 
         # Create the logging facility for the object
-        node = task_config_node.get_sub_node('logger')
-        logger_name = 'task:'+self.__name
-        self.__log = logging.getLogger(logger_name)
-        self.__log.setLevel(logging.NOTSET)
-
-        logger_level = node.get_node_attribute('level')
-        self.__log = set_logger_level(self.__log, logger_name, logger_level)
-
-        file_handle = logging.FileHandler(self.__work_dir + 'task.log')
-        file_handle.setLevel(logging.NOTSET)
-
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.NOTSET)
-
-        for child in node.get_node_children():
-            (elem,tag,attributes,text) = child
-            elem = XMLTree( elem )
-            if tag == 'file_handler':
-                file_handle_level = elem.get_node_attribute('level')
-                file_handle = set_logger_level(file_handle, logger_name,
-                                               file_handle_level)
-            if tag == 'console_handler':
-                console_handle_level = elem.get_node_attribute('level')
-                console_handler = set_logger_level(console_handler,
-                                                   logger_name, console_handle_level)
-
-        # formatter added to handlers
-        formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        file_handle.setFormatter(formatter)
-        console_handler.setFormatter(formatter)
-
-        # add handlers to logger
-        self.__log.addHandler(file_handle)
-        self.__log.addHandler(console_handler)
-
-        self.__log.info('created logger: %s', self.__name)
-        self.__log.debug('logger level: %s', logger_level)
-        self.__log.debug('logger file handler level: %s', file_handle_level)
-        self.__log.debug('logger console handler level: %s', console_handle_level)
+        self.__create_logging( config_xml_tree )
+        self.__log.debug('start __init__()')
 
         self.__start_time = self.__evolve_time = self.__time_step = 0.0
         self.__start_time_unit = 'null-start_time_unit'
@@ -98,8 +63,7 @@ class Task:
         self.__real_time = 'null-real_time'
         self.__runtime_cortix_param_file = 'null-runtime_cortix_param_file'
 
-        self.__log.debug('start __init__()')
-        for child in self.__config_node.get_node_children():
+        for child in config_xml_tree.children:
 
             (elem, tag, attributes, text) = child
 
@@ -284,15 +248,6 @@ class Task:
 
     real_time = property(__get_real_time, None, None, None)
 
-    def set_runtime_cortix_param_file(self, full_path):
-        '''
-        Sets the task config file to the specified file.
-        '''
-
-        self.__runtime_cortix_param_file = full_path
-
-        return
-
     def __get_runtime_cortix_param_file(self):
         '''
         `str`:Task's config file
@@ -300,8 +255,32 @@ class Task:
 
         return self.__runtime_cortix_param_file
 
+    def __set_runtime_cortix_param_file(self, full_path):
+        '''
+        Sets the task config file to the specified file.
+        '''
+
+        self.__runtime_cortix_param_file = full_path
+        return
+
     runtime_cortix_param_file = property(__get_runtime_cortix_param_file,
-            set_runtime_cortix_param_file, None, None)
+            __set_runtime_cortix_param_file, None, None)
+
+    def __str__(self):
+        '''
+        Task to string conversion used in a print statement.
+        '''
+
+        s = 'Task data members:\n name=%s\n work dir name=%s\n param file=%s'
+        return s % (self.__name, self.__work_dir, self.__runtime_cortix_param_file)
+
+    def __repr__(self):
+        '''
+        Task to string conversion.
+        '''
+
+        s = 'Task data members:\n name=%s\n work dir name=%s\n param file=%s'
+        return s % (self.__name, self.__work_dir, self.__runtime_cortix_param_file)
 
 #*********************************************************************************
 # Private helper functions (internal use: __)
@@ -335,5 +314,55 @@ class Task:
                 running_module_slots.append(slot_name)
 
         return (task_status, running_module_slots)
+
+    def __create_logging( self, config_xml_tree ):
+        '''
+        A helper function to setup the logging facility used in self.__init__()
+        '''
+
+        logger_name = 'task:' + self.__name
+
+        self.__log = logging.getLogger(logger_name)
+        self.__log.setLevel(logging.NOTSET)
+
+        node = config_xml_tree.get_sub_node('logger')
+
+        logger_level = node.get_attribute('level')
+        self.__log = set_logger_level(self.__log, logger_name, logger_level)
+
+        file_handle = logging.FileHandler(self.__work_dir + 'task.log')
+        file_handle.setLevel(logging.NOTSET)
+
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.NOTSET)
+
+        for child in node.get_node_children():
+            (elem,tag,attributes,text) = child
+            elem = XMLTree( elem )
+            if tag == 'file_handler':
+                file_handle_level = elem.get_node_attribute('level')
+                file_handle = set_logger_level(file_handle, logger_name,
+                                               file_handle_level)
+            if tag == 'console_handler':
+                console_handle_level = elem.get_node_attribute('level')
+                console_handler = set_logger_level(console_handler,
+                                                   logger_name, console_handle_level)
+
+        # formatter added to handlers
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        file_handle.setFormatter(formatter)
+        console_handler.setFormatter(formatter)
+
+        # add handlers to logger
+        self.__log.addHandler(file_handle)
+        self.__log.addHandler(console_handler)
+
+        self.__log.info('created logger: %s', self.__name)
+        self.__log.debug('logger level: %s', logger_level)
+        self.__log.debug('logger file handler level: %s', file_handle_level)
+        self.__log.debug('logger console handler level: %s', console_handle_level)
+
+        return
 
 #======================= end class Task: =========================================
