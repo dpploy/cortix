@@ -35,7 +35,7 @@ class Launcher(Thread):
 #*********************************************************************************
 
     def __init__(self, 
-            mod_lib_home_dir, module_name, 
+            mod_lib_home_dir, module_name,
             slot_id,
             input_full_path_file_name,
             manifesto_full_path_file_name,

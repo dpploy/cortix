@@ -30,10 +30,7 @@ class Module:
 # Construction 
 #*********************************************************************************
 
-    def __init__( self, 
-            logger,
-            library_home_dir, 
-            config_xml_tree ):
+    def __init__( self, logger, library_home_dir, config_xml_tree ):
 
         assert isinstance(logger, logging.Logger),'ctx::mod: logger is invalid.'
         assert isinstance(library_home_dir, str),'ctx:mod: library_home is invalid.'
@@ -130,6 +127,27 @@ class Module:
 
     ports = property(__get_ports, None, None, None)
 
+    def __get_port_names(self):
+        '''
+        `list(tuple)`:List of names of module's ports
+        '''
+
+        port_names = list()
+        for port in self.__ports:
+            port_names.append(port[0])
+        return port_names
+
+    port_names = property(__get_port_names, None, None, None)
+
+    def __get_diagram(self):
+        '''
+        Return the diagram string from the module manifesto or a null place holder.
+        '''
+
+        return self.__diagram
+
+    diagram = property(__get_diagram, None, None, None)
+
     def get_port_type(self, port_name):
         '''
         Returns the port type specified by port_name
@@ -154,18 +172,6 @@ class Module:
 
         return port_mode
 
-    def __get_port_names(self):
-        '''
-        `list(tuple)`:List of names of module's ports
-        '''
-
-        port_names = list()
-        for port in self.__ports:
-            port_names.append(port[0])
-        return port_names
-
-    port_names = property(__get_port_names, None, None, None)
-
     def has_port_name(self, port_name):
         '''
         Returns true if a port with the name
@@ -177,15 +183,6 @@ class Module:
                 return True
 
         return False
-
-    def __get_diagram(self):
-        '''
-        Return the diagram string from the module manifesto or a null place holder.
-        '''
-
-        return self.__diagram
-
-    diagram = property(__get_diagram, None, None, None)
 
     def execute( self, slot_id,
                  runtime_cortix_param_file,
@@ -236,6 +233,24 @@ class Module:
         launch.start() # this start a thread and runs the run() method of launch
 
         return runtime_module_status_file
+
+    def __str__(self):
+        '''
+        Module to string conversion used in a print statement.
+        '''
+
+        s = 'Module data members:\n name=%s\n lib home dir=%s\n input file name=%s\n input file path%s\n ports=%s'
+        return s % (self.__mod_name, self.__library_home_dir, self.__input_file_name,
+                    self.__input_file_path, self.__ports)
+
+    def __repr__(self):
+        '''
+        Module to string conversion.
+        '''
+
+        s = 'Module data members:\n name=%s\n lib home dir=%s\n input file name=%s\n input file path%s\n ports=%s'
+        return s % (self.__mod_name, self.__library_home_dir, self.__input_file_name,
+                    self.__input_file_path, self.__ports)
 
 #*********************************************************************************
 # Private helper functions (internal use: __)

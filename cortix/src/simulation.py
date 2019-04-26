@@ -35,21 +35,24 @@ class Simulation:
 
     def __init__(self, parent_work_dir, config_xml_tree):
 
-        assert isinstance(parent_work_dir, str), '-> parent_work_dir invalid.'
-
-        assert isinstance(config_xml_tree, XMLTree), '-> config_xml_tree invalid.'
-        assert config_xml_tree.get_node_tag() == 'simulation'
+        # Sanity checks
+        assert isinstance(parent_work_dir, str),\
+                'ctx::sim parent_work_dir invalid.'
+        assert isinstance(config_xml_tree, XMLTree),\
+                'ctx::sim config_xml_tree invalid.'
+        assert config_xml_tree.get_node_tag() == 'simulation',\
+                'ctx:sim: invalid simulation xml node tag.'
 
         # Read the simulation name, e.g. <simulation name='droplet'></simulation>
-        self.__name = config_xml_tree.get_node_attribute('name')
+        self.__name = config_xml_tree.get_attribute('name')
 
         # Create the cortix/simulation work directory
         self.__work_dir = parent_work_dir + 'sim_' + self.__name + '/'
-
         os.system('mkdir -p ' + self.__work_dir)
 
         # Create the logging facility 
         self.__create_logging( config_xml_tree )
+        self.__log.debug('start __init__()')
 
         #======================
         # Create application(s)
@@ -61,7 +64,7 @@ class Simulation:
             # Create the application for this simulation (same work directory)
             self.__application = Application( self.__work_dir, app_config_xml_node )
 
-            self.__log.debug("created application: %s",
+            self.__log.debug('created application: %s',
                     app_config_xml_node.get_node_attribute('name'))
 
         # Stores the task(s) created by the execute method
@@ -70,7 +73,7 @@ class Simulation:
         # Save configuration information for setting up task in execute()
         self.__config_xml = config_xml_tree
 
-        self.__log.info("created simulation: %s", self.__name)
+        self.__log.info('created simulation: %s', self.__name)
 
         return
 
@@ -83,6 +86,40 @@ class Simulation:
 #*********************************************************************************
 # Public member functions
 #*********************************************************************************
+
+    def __get_application(self):
+        '''
+        Returns the application singleton object.
+
+        Parameters
+        ----------
+        empty:
+
+        Returns
+        -------
+        self.__application: Application
+        '''
+
+        return self.__application
+
+    application = property(__get_application,None,None,None)
+
+    def __get_tasks(self):
+        '''
+        Returns the application tasks object.
+
+        Parameters
+        ----------
+        empty:
+
+        Returns
+        -------
+        self.__tasks: Task
+        '''
+
+        return self.__tasks
+
+    tasks = property(__get_tasks,None,None,None)
 
     def execute(self, task_name=None):
         '''
@@ -112,22 +149,23 @@ class Simulation:
 
         return
 
-    def __get_application(self):
+    def __str__(self):
         '''
-        Returns the application singleton object.
-
-        Parameters
-        ----------
-        empty:
-
-        Returns
-        -------
-        self.__application: Application
+        Simulation to string conversion used in a print statement.
         '''
 
-        return self.__application
+        s = 'Simulation data members:\n \t name=%s\n \t work dir=%s\n \t application=%s\n \t tasks=%s'
+        return s % (self.__name, self.__work_dir, self.__application,
+                    self.__tasks)
 
-    application = property(__get_application,None,None,None)
+    def __repr__(self):
+        '''
+        Simulation to string conversion.
+        '''
+
+        s = 'Simulation data members:\n \t name=%s\n \t work dir=%s\n \t application=%s\n \t tasks=%s'
+        return s % (self.__name, self.__work_dir, self.__application,
+                    self.__tasks)
 
 #*********************************************************************************
 # Private helper functions (internal use: __)
@@ -145,7 +183,7 @@ class Simulation:
 
         node = config_xml_tree.get_sub_node('logger')
 
-        logger_level = node.get_node_attribute('level')
+        logger_level = node.get_attribute('level')
         self.__log = set_logger_level(self.__log, logger_name, logger_level)
 
         file_handler = logging.FileHandler(self.__work_dir + 'sim.log')
@@ -199,7 +237,7 @@ class Simulation:
         <cortix_comm>, and a series of XML port tags with three attributes and no
         content as follows:
 
-                <port name=port_name type=port_type file=full_path_file_name />
+            <port name=port_name type=port_type file=full_path_file_name />
         '''
 
         self.__log.debug('start __setup_task(%s)', task_name)
@@ -207,7 +245,6 @@ class Simulation:
         task = None  # flag
 
         # loop over all elements with a <task></task> tag in this simulation 
-        # __config_xml
         for task_config_xml_node in self.__config_xml.get_all_sub_nodes('task'):
 
             if task_config_xml_node.get_node_attribute('name') != task_name:
@@ -263,7 +300,7 @@ class Simulation:
         fout.write('</cortix_param>')
         fout.close()
 
-        task.set_runtime_cortix_param_file(task_file)
+        task.runtime_cortix_param_file = task_file
 
         # Using the task and network objects create the runtime module directories and 
         # cortix comm files; one comm file per module inside the module runtime directory
