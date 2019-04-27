@@ -27,7 +27,7 @@
     <port type='input'   mode='file.txt' multiplicity='1'>self-input</port>
     <port type='provide' mode='file.xml' multiplicity='1'>droplet-position</port>
     <port type='provide' mode='file.xml' multiplicity='1'>state</port>
-    <port type='provide' mode='file.dat' multiplicity='1'>output</port>
+    <port type='provide' mode='file.pkl' multiplicity='1'>output</port>
 
     <diagram> 
    ..................................................................
