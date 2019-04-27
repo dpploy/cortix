@@ -72,7 +72,7 @@ class Wind():
         if cortix_time_unit == 'minute':
            self.__time_unit_scale = 60.0
         elif cortix_time_unit == 'second':
-           self.__time_unit_scale = 1.0
+           self.__time_unit_scale = 1.0   # Wind time unit
         elif cortix_time_unit == 'hour':
            self.__time_unit_scale = 60.0*60.0
         else:
@@ -130,7 +130,8 @@ class Wind():
         velocity = Quantity( name='velocity', formalName='Velocity', unit='m/s' )
         quantities.append( velocity )
 
-        self.__gas_phase = Phase( self.__start_time, species=species, quantities=quantities)
+        self.__gas_phase = Phase( 's', self.__start_time, species=species,
+                quantities=quantities)
 
         # Initialize phase
         air_mass_cc = 0.1 # [g/cc]

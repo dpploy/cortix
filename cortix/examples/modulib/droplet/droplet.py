@@ -78,7 +78,7 @@ class Droplet():
         if cortix_time_unit == 'minute':
             self.__time_unit_scale = 60.0
         elif cortix_time_unit == 'second':
-            self.__time_unit_scale = 1.0
+            self.__time_unit_scale = 1.0  # Droplet's time unit
         elif cortix_time_unit == 'hour':
             self.__time_unit_scale = 60.0*60.0
         else:
@@ -109,6 +109,8 @@ class Droplet():
         # Configuration member data   
 
         self.__pyplot_scale = 'linear'
+
+        # Choice of ODE solvers
         #  self.__ode_integrator = 'scikits.odes' # or 'scipy.integrate' 
         self.__ode_integrator = 'scipy.integrate'
 
@@ -130,14 +132,16 @@ class Droplet():
 
         quantities = list()
 
-        # spatial position
+        # Spatial position
         spatial_position = Quantity( name='spatial-position', formalName='Spatial_Pos.', unit='m' )
         quantities.append( spatial_position )
-        # velocity
+
+        # Velocity
         velocity = Quantity( name='velocity', formalName='Veloc.', unit='m/s' )
         quantities.append( velocity )
 
-        self.__liquid_phase = Phase( self.__start_time, species=species, quantities=quantities)
+        # Phase
+        self.__liquid_phase = Phase( 's', self.__start_time, species=species, quantities=quantities)
 
         # Initialize phase
         water_mass_cc = 0.99965 # [g/cc]
@@ -270,13 +274,35 @@ class Droplet():
     def __provide_output( self, port_file, at_time ):
         '''
         Provide data that will remain in disk after the simulation ends.
+        This only writes the data at the end of the simulation in a compact form using
+        pickle and a phase container.
+        '''
+
+        if at_time < self.__final_time:
+            return
+
+        import pickle
+
+        assert os.path.isfile(port_file) is False,'port_file %r exists; stop.'%port_file
+
+        pickle.dump( self.__liquid_phase, open(port_file,'wb') )
+
+        return
+
+    def __provide_output_example( self, port_file, at_time ):
+        '''
+        Provide data that will remain in disk after the simulation ends, persistent
+        data. This is an example of how to write a low level plain ASCII table of
+        data. This is not used.
         '''
         import datetime
 
-        # if the first time step, write the header of a table data file
+        # If the first time step, write the header of a table data file
         if at_time == self.__start_time:
 
-            assert os.path.isfile(port_file) is False, 'port_file %r exists; stop.' % port_file
+            assert os.path.isfile(port_file) is False,'port_file %r exists; stop.'%\
+                    port_file
+
             fout = open(port_file,'w')
 
             fout.write('# name:   '+'droplet_'+str(self.__slot_id)); fout.write('\n')
@@ -285,12 +311,12 @@ class Droplet():
             today = datetime.datetime.today()
             fout.write('# today:  '+str(today)); fout.write('\n')
             fout.write(' ')
-            # write file header
+            # Write file header
             fout.write('%17s'%('Time[sec]'))
-            # mass density   
+            # Mass density   
             for specie in self.__liquid_phase.GetSpecies():
               fout.write('%18s'%(specie.formulaName+'['+specie.massCCUnit+']'))
-            # quantities     
+            # Quantities     
             for quant in self.__liquid_phase.GetQuantities():
                 if quant.name == 'spatial-position' or quant.name == 'velocity':
                    for i in range(3):
@@ -301,18 +327,19 @@ class Droplet():
             fout.write('\n')
             fout.close()
 
-        # write history data
+        # Write history data
 
         fout = open(port_file,'a')
 
         # Droplet time 
         fout.write('%18.6e' % (at_time))
 
-        # mass density   
+        # Mass density   
         for specie in self.__liquid_phase.GetSpecies():
             rho = self.__liquid_phase.GetValue(specie.name, at_time)
             fout.write('%18.6e'%(rho))
-        # quantities     
+
+        # Quantities     
         for quant in self.__liquid_phase.GetQuantities():
             val = self.__liquid_phase.GetValue(quant.name, at_time)
             if quant.name == 'spatial-position' or quant.name == 'velocity':

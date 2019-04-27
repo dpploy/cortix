@@ -10,20 +10,25 @@
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 '''
 Phase *history* container. When you think of a phase value, think of that value at
-a specific point in time.
+a specific point in time. This container holds the historic data of a phase.
+Its species and quantities.
 
-ATTENTION:
+Background
+----------
+TODO: ATTENTION:
 The species (list of Specie) AND quantities (list of Quantity) data members
 have ARBITRARY density values either at an arbitrary point in the history or at
 no point in the history. This needs to be removed in the future to avoid confusion.
 
 To obtain history values, associated to the phase, at a particular point in time,
 use the GetValue() method to access the history data frame (pandas) via columns and
-rows. The corresponding values in species and quantities are OVERRIDEN and NOT to
+rows. ALERT: The corresponding values in species and quantities are OVERRIDEN and NOT to
 be used through the phase interface.
 
 Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 Sat Sep  5 01:26:53 EDT 2015
+
+Cortix: a program for system-level modules coupling, execution, and analysis.
 '''
 #*********************************************************************************
 import os
@@ -37,16 +42,34 @@ from cortix.support.quantity import Quantity
 #*********************************************************************************
 
 class Phase():
+    '''
+    Phase `history` container. A `Phase` consists of `Species` and `Quantities`
+    varying with time. This container is meant to reproduce the basic idea of a
+    material phase.
+    '''
+
+#*********************************************************************************
+# Construction
+#*********************************************************************************
 
     def __init__(self,
+                 time_unit  = None,
                  time_stamp = None,
                  species    = None,
                  quantities = None
                  ):
 
+        # Sanity tests
+        assert isinstance(time_unit, str)
+        assert isinstance(time_stamp, float)
+
+        self.__time_unit = time_unit
+
+        if time_unit is None:
+            self.__time_unit = 's'  # second
+
         if time_stamp is None:
             time_stamp = 0.0
-        assert isinstance(time_stamp, float)
 
         if species is not None:
             assert isinstance(species, list)
@@ -55,11 +78,11 @@ class Phase():
 
         if quantities is not None:
             assert isinstance(quantities, list)
-            for quant in quantities: 
+            for quant in quantities:
                 assert isinstance(quant, Quantity)
 
-# List of species and quantities objects; columns of data frame are named
-# by objects
+        # List of species and quantities objects; columns of data frame are named
+        # by objects
         # a new object held by a Phase() object
         self.__species = deepcopy(species)
         # a new object held by a Phase() object
@@ -79,35 +102,43 @@ class Phase():
                 quant.value = 0.0    # clear these values 
                                      # todo: eliminate them from Quantity in the future
 
-# Table data phase without data type assigned; this is left to the user
-# Time stamps will always be float
+        # Table data phase without data type assigned; this is left to the user
+        # Time stamps will always be float
         self.__phase = pandas.DataFrame( index=[float(time_stamp)], columns=names )
 #        self.__phase.fillna( 0.0, inplace=True )  # dtype defaults to float
 
         return
 
-# *******************************************************************************
-# Setters and Getters methods
-# -------------------------------------------------------------------------------
-# These are passing arguments by value effectively. Because the python objects
-# passed into/out of the function are immutable.
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
 
-    def GetActors(self):
-        return list(self.__phase.columns)  # return all names in order
+    def __get_time_unit(self):
+        '''
+        Returns the time unit of the `Phase.`
+
+        Paramers
+        --------
+        empty
+
+        Returns
+        -------
+        self.__time_unit: str
+        '''
+
+        return self.__time_unit
+    time_unit = property(__get_time_unit,None,None,None)
 
     def GetTimeStamps(self):
+        '''
+        TODO: deprecated/eliminate
+        '''
         return list(self.__phase.index)  # return all time stamps
     timeStamps = property(GetTimeStamps, None, None, None)
 
-    def GetSpecie(self, name):
-        for specie in self.__species:
-            if specie.name == name:
-                time_stamp = self.__get_time_stamp( None ) # get latest time stamp
-                assert name in self.__phase.columns, 'name %r not in %r'% \
-                   (name,self.__phase.columns)
-                specie.massCC = self.__phase.loc[time_stamp, name]
-                return specie  # return specie syncronized with the phase
-        return None
+    def __get_time_stamps(self):
+        return list(self.__phase.index)  # return all time stamps
+    time_stamps = property(__get_time_stamps, None, None, None)
 
     def GetSpecies(self):
         for species in self.__species:
@@ -120,6 +151,19 @@ class Phase():
           tmp = self.GetQuantity(quant.name) # handy way to synchronize the whole list
         return self.__quantities
     quantities = property(GetQuantities, None, None, None)
+
+    def GetActors(self):
+        return list(self.__phase.columns)  # return all names in order
+
+    def GetSpecie(self, name):
+        for specie in self.__species:
+            if specie.name == name:
+                time_stamp = self.__get_time_stamp( None ) # get latest time stamp
+                assert name in self.__phase.columns, 'name %r not in %r'% \
+                   (name,self.__phase.columns)
+                specie.massCC = self.__phase.loc[time_stamp, name]
+                return specie  # return specie syncronized with the phase
+        return None
 
     def SetSpecieId(self, name, val):
         for specie in self.__species:
@@ -166,7 +210,7 @@ class Phase():
                                 dtype=object )
         tmp = self.__phase
         df  = tmp.join(col, how='outer')
-#        self.__phase = df.fillna(newQuant.value)
+        #self.__phase = df.fillna(newQuant.value)
 
     def AddRow(self, try_time_stamp, row_values):
         assert isinstance(row_values, list)
@@ -178,7 +222,7 @@ class Phase():
         assert len(row_values) == self.__phase.columns.size
 
         # create a row with object data type; users row_values data define data type
-        row = pandas.DataFrame( index=[time_stamp], 
+        row = pandas.DataFrame( index=[time_stamp],
                                 columns=list( self.__phase.columns ), dtype=object )
 
         for (col,v) in zip(row.columns, row_values):
@@ -200,29 +244,36 @@ class Phase():
         return list(self.__phase.loc[:, actor])
 
     def ScaleRow(self, try_time_stamp, value):
-        assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
+        assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float)
         time_stamp = self.__get_time_stamp( try_time_stamp )
         assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
-        assert isinstance(value, int) or isinstance(value, float) 
+        assert isinstance(value, int) or isinstance(value, float)
         self.__phase.loc[time_stamp, :] *= value
         return
 
-    # set species and quantities of history to a given value (default to zero value)
-    # all time stamps are preserved
     def ClearHistory(self, value=0.0):
-        assert isinstance(value, int) or isinstance(value, float) 
+        '''
+        Set species and quantities of history to a given value (default to zero value),
+        all time stamps are preserved.
+        '''
+
+        assert isinstance(value, int) or isinstance(value, float)
         self.__phase.loc[:, :] = value
+
         return
 
-    # set species and quantities of history to a given value (default to zero value)
-    # only one time stamp is preserved (default to last time stamp)
     def ResetHistory(self, try_time_stamp=None, value=None):
+        '''
+        Set species and quantities of history to a given value (default to zero value)
+        only one time stamp is preserved (default to last time stamp).
+        '''
+
         if value is not None:
            assert isinstance(value, int) or isinstance(value, float) or \
                   isinstance(value, npy.ndarray)
 
         if try_time_stamp is not None:
-           assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
+           assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float)
 
         time_stamp = self.__get_time_stamp( try_time_stamp )
         assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
@@ -251,46 +302,53 @@ class Phase():
                    (actor,self.__phase.columns)
 
         if try_time_stamp is not None:
-           assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
+           assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float)
 
         time_stamp = self.__get_time_stamp( try_time_stamp )
         assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
 
         return self.__phase.loc[time_stamp, actor]
 
-# old def SetValue(self, time_stamp, actor, value):
-# new
     def SetValue(self, actor, value, try_time_stamp=None):
+        '''
+        For the record: old def SetValue(self, time_stamp, actor, value):
+        '''
 
         assert isinstance(actor, str)
         assert actor in self.__phase.columns
 
-#        assert isinstance(value, int) or isinstance(value, float) or \
-#               isinstance(value, npy.ndarray)
+        #assert isinstance(value, int) or isinstance(value, float) or \
+        #       isinstance(value, npy.ndarray)
 
         if try_time_stamp is not None:
-           assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float) 
+           assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float)
 
         time_stamp = self.__get_time_stamp( try_time_stamp )
         assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
 
-#        print('*value =', value)
-#        print('*type(value) =', type(value))
-#        print('*time_stamp =', time_stamp)
-#        print('*actor =', actor)
-#        print('*column values =', self.__phase[actor])
-#        print('*df =', self.__phase)
-#        print('*df.dtypes =', self.__phase.dtypes)
-#        print('*df.shape =', self.__phase.shape)
-#        print('')
-#        if isinstance(value,npy.ndarray):
-#           self.__phase[actor] = self.__phase.astype({actor:type(value)})
-#        print('*df.dtypes =', self.__phase.dtypes)
-#        print('')
+        #print('*value =', value)
+        #print('*type(value) =', type(value))
+        #print('*time_stamp =', time_stamp)
+        #print('*actor =', actor)
+        #print('*column values =', self.__phase[actor])
+        #print('*df =', self.__phase)
+        #print('*df.dtypes =', self.__phase.dtypes)
+        #print('*df.shape =', self.__phase.shape)
+        #print('')
+        #if isinstance(value,npy.ndarray):
+        #   self.__phase[actor] = self.__phase.astype({actor:type(value)})
+        #print('*df.dtypes =', self.__phase.dtypes)
+        #print('')
+
         self.__phase.loc[time_stamp, actor] = value
+
         return
 
     def WriteHTML(self, fileName):
+        '''
+        Convert the `Phase` container into an HTML file.
+        '''
+
         assert isinstance(fileName, str)
         tmp = pandas.DataFrame(self.__phase)
         columnNames = tmp.columns
@@ -308,14 +366,28 @@ class Phase():
                             inplace=True )
             else:
                 assert False, 'oops fatal.'
+
         tmp.to_html(fileName)
+
+        return
+
+    def __str__(self):
+        s = '\n\t **Phase()**: \n\t time unit: %s\n\t *quantities*: %s\n\t *species*: %s\n\t *history* #time_stamp=%s\n\t *history end* @%s\n%s'
+        return s % (self.__time_unit,self.__quantities, self.__species, len(self.__phase.index),
+                    self.__phase.index[-1], self.__phase.loc[self.__phase.index[-1], :])
+
+    def __repr__(self):
+        s = '\n\t **Phase()**: \n\t time unit: %s\n\t *quantities*: %s\n\t *species*: %s\n\t *history* #time_stamp=%s\n\t *history end* @%s\n%s'
+        return s % (self.__time_unit,self.__quantities, self.__species, len(self.__phase.index),
+                    self.__phase.index[-1], self.__phase.loc[self.__phase.index[-1], :])
 
 #*********************************************************************************
 # Private helper functions (internal use: __)
+#*********************************************************************************
 
     def __get_time_stamp(self, try_time_stamp):
         """
-        Helper method for finding the closest time stamp in the phase history.  
+        Helper method for finding the closest time stamp in the phase history.
         The pandas Index container used for storing float data type time stamps
         will return the nearest time stamp up to a tolerance.
         """
@@ -325,23 +397,11 @@ class Phase():
         else:
            tol = 1.0e-4
            try:
-             loc = self.__phase.index.get_loc( try_time_stamp, method='nearest', 
+             loc = self.__phase.index.get_loc( try_time_stamp, method='nearest',
                                                tolerance=tol )
            except KeyError:
              return None
            else:
              return  self.__phase.index[loc]
 
-# *******************************************************************************
-# Printing of data members
-# def __str__( self ):
-        s = '\n\t **Phase()**: \n\t *quantities*: %s\n\t *species*: %s\n\t *history* #time_stamp=%s\n\t *history end* @%s\n%s'
-        return s % (self.__quantities, self.__species, len(self.__phase.index),
-                    self.__phase.index[-1], self.__phase.loc[self.__phase.index[-1], :])
-#
-
-    def __repr__(self):
-        s = '\n\t **Phase()**: \n\t *quantities*: %s\n\t *species*: %s\n\t *history* #time_stamp=%s\n\t *history end* @%s\n%s'
-        return s % (self.__quantities, self.__species, len(self.__phase.index),
-                    self.__phase.index[-1], self.__phase.loc[self.__phase.index[-1], :])
-# *******************************************************************************
+#======================= end class Phase =========================================
