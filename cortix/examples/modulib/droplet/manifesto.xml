@@ -29,22 +29,34 @@
     <port type='provide' mode='file.xml' multiplicity='1'>state</port>
     <port type='provide' mode='file.pkl' multiplicity='1'>output</port>
 
+    <port_doc port_name='output'>
+        Output port doc goes here...
+    </port_doc>
+
     <diagram> 
-   ..................................................................
-   .          _____ _____  _____  _____ __    _____ _____           .
-   .          ||  ) ||_// ((   )) ||_// ||    ||==   ||             .
-   .          ||_// || \\  \\_//  ||    ||__| ||___  ||             .
-   .          ===========================================           .
-   . input port       |    USE    |  PROVIDE  |                     .
-   .____________      |...........|...........|                     .
-   .|self-input| ---  | input     | drop.-pos.|                     .
-   .------------      |...........|...........|                     .
-   . provide-like     |           | state     |       output port   .
-   .                  |...........|...........|     _____________   .
-   .                  |           | output    | --- |self-output|   .
-   .                  =========================     -------------   .
-   .                                                   use-like     .
-   ..................................................................
+   .................................................................................
+   .                    _____ _____  _____  _____ __    _____ _____                .
+   .                    ||  ) ||_// ((   )) ||_// ||    ||==   ||                  .
+   .                    ||_// || \\  \\_//  ||    ||__| ||___  ||                  .
+   .                    ===========================================                .
+   .           input port       |    USE    |  PROVIDE  |                          .
+   .          ____________      |...........|...........|                          .
+   .          |self-input| ---  | input     | drop.-pos.|                          .
+   .          ------------      |...........|...........|                          .
+   .           provide-like     |           | state     |       output port        .
+   .                            |...........|...........|     _____________        .
+   .                            |           | output    | --- |self-output|        .
+   .                            =========================     -------------        .
+   .                                                             use-like          .
+   .................................................................................
+   .   port type='output'  mode='file.any' multiplicity='1' self-output            .
+   .   port type='use'     mode='file.txt' multiplicity='1' input                  .
+   .                                                                               .
+   .   port type='input'   mode='file.txt' multiplicity='1' self-input             .
+   .   port type='provide' mode='file.xml' multiplicity='1' droplet-position       .
+   .   port type='provide' mode='file.xml' multiplicity='1' state                  .
+   .   port type='provide' mode='file.pkl' multiplicity='1' output                 .
+   .................................................................................
     </diagram>
 
     <ascii_art>

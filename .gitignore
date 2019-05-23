@@ -30,3 +30,6 @@ pylintrc
 cortix/docs/_build
 .cache/
 *.pyc
+
+# Jupyter Notebook
+.ipynb_checkpoints
