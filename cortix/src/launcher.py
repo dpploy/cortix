@@ -299,10 +299,10 @@ class Launcher(Thread):
 #*********************************************************************************
 
     def __set_runtime_status(self, status):
-        """
+        '''
         Helper function used by the launcher constructor to output status of the
         current run.
-        """
+        '''
 
         status = status.strip()
         assert status == 'running' or status == 'finished', 'status invalid.'

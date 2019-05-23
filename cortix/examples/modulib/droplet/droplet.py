@@ -608,6 +608,7 @@ class Droplet():
 
         # Get manifesto data  
         for child in xml_tree.get_node_children():
+
             (elem, tag, attributes, text) = child
 
             if tag == 'port':
