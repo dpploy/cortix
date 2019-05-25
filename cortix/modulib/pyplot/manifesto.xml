@@ -12,12 +12,7 @@
 -->
 <module_manifesto name='pyplot' version='0.0'>
 
- <!-- Ports have four types: * use, * provide, * input, * output -->
- <!-- The *input*, and *output* types allow for a module to self-connect. 
-      Eessentially, an *input port* is an *external provide port* and a
-      *output port* is an *external use port*. Hence to use an *input port*, a
-      use port is needed. To use an *output port* a provide port is needed. This
-      allows for the same module to self-connect.  -->
+ <!-- Ports have four types: use, and provide -->
 
     <!-- use ports -->
     <port type='use'     mode='file.xml' multiplicity='1'>input</port>
@@ -25,7 +20,10 @@
     <port type='use'     mode='file.xml' multiplicity='1'>time-tables</port>
 
     <!-- provide ports -->
-    <port type='input'   mode='file.xml' multiplicity='1'>self-input</port>
+
+    <port_doc port_name='output'>
+        Output port doc goes here...
+    </port_doc>
 
     <diagram> 
    ..................................................................
@@ -33,15 +31,19 @@
    .             ||_// \\// ||_// ||    ((   ))  ||                 .
    .             ||     //  ||    ||__|  \\_//   ||                 .
    .             ====================================               .
-   . input port       |    USE    |  PROVIDE  |                     .
-   .____________      |...........|...........|                     .
-   .|self-input| -->  | input     |           |                     .
-   .------------      |...........|...........|                     .
-   . provide-like     | time-seq. |           |                     .
+   .                  |    USE    |  PROVIDE  |                     .
+   .                  |===========|===========|                     .
+   .                  | input     |           |                     .
+   .                  |...........|...........|                     .
+   .                  | time-seq. |           |                     .
    .                  |...........|...........|                     .
    .                  | time-tabl.|           |                     .
    .                  =========================                     .
    .                                                                .
+   ..................................................................
+   . port type='use' mode='file.xml' multiplicity='1' input         .
+   . port type='use' mode='file.xml' multiplicity='1' time-sequence .
+   . port type='use' mode='file.xml' multiplicity='1' time-tables   .
    ..................................................................
     </diagram>
 

@@ -23,7 +23,7 @@ class Network:
     '''
     Cortix Network class definition. Network class members:
 
-    __config_node: XMLTree
+    __config_xml_node: XMLTree
         Configuration data in the form of an XML tree.
 
     __name: str
@@ -133,6 +133,8 @@ class Network:
 
         self.__module_slot_names = [name for name in
                                     self.__runtime_cortix_comm_file_name.keys()]
+
+        print(self)
 
         return
 

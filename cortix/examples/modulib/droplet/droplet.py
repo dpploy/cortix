@@ -597,9 +597,9 @@ class Droplet():
         # Read the manifesto
         xml_tree = XMLTree( xml_tree_file=xml_tree_file )
 
-        assert xml_tree.get_node_tag() == 'module_manifesto'
+        assert xml_tree.tag == 'module_manifesto'
 
-        assert xml_tree.get_node_attribute('name') == 'droplet'
+        assert xml_tree.get_attribute('name') == 'droplet'
 
         # List of (port_name, port_type, port_mode, port_multiplicity)
         __ports = list()
@@ -607,7 +607,7 @@ class Droplet():
         self.__port_diagram = 'null-module-port-diagram'
 
         # Get manifesto data  
-        for child in xml_tree.get_node_children():
+        for child in xml_tree.children:
 
             (elem, tag, attributes, text) = child
 

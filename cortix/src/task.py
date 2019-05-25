@@ -336,15 +336,15 @@ class Task:
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.NOTSET)
 
-        for child in node.get_node_children():
+        for child in node.children:
             (elem,tag,attributes,text) = child
             elem = XMLTree( elem )
             if tag == 'file_handler':
-                file_handle_level = elem.get_node_attribute('level')
+                file_handle_level = elem.get_attribute('level')
                 file_handle = set_logger_level(file_handle, logger_name,
                                                file_handle_level)
             if tag == 'console_handler':
-                console_handle_level = elem.get_node_attribute('level')
+                console_handle_level = elem.get_attribute('level')
                 console_handler = set_logger_level(console_handler,
                                                    logger_name, console_handle_level)
 

@@ -61,7 +61,10 @@ class XMLTree:
 
     def __init__(self, xml_tree_node=None, xml_tree_file=None):
         '''
-        Overall description of the constructor
+        An `XMLTree` object is constructed by either inheriting an XML tree node that
+        is an object of the `xml.etree.ElementTree` `Element` class or parsing an XML
+        formatted file. Either way, `XMLTree` holds a tree by either a root node or
+        a branch node, `__xml_tree_node` which is an instance of `Element`.
         '''
 
         # hold a given XML tree node
@@ -91,10 +94,10 @@ class XMLTree:
 # Public member functions
 #*********************************************************************************
 
-    def __get_root_node_tag_name(self):
+    def __get_node_tag_name(self):
         '''
-        Returns the tag name associated with the root node of the element tree. This is
-        the element name or tag name, *e.g.*, `<elem_name> </elem_name>`.
+        Returns the tag name associated with the root or branch node of the element
+        tree. This is the element name or tag name, *e.g.*, `<elem_name> </elem_name>`.
 
         Parameters
         ----------
@@ -109,11 +112,10 @@ class XMLTree:
         assert isinstance(tag_name,str)
 
         return tag_name
-    tag = property(__get_root_node_tag_name, None, None, None)
+    tag = property(__get_node_tag_name, None, None, None)
 
-    def __get_root_node_children(self):
+    def __get_node_children(self):
         '''
-        TODO: deprecated/eliminate
         Returns a list of the direct sub-elements in the given element (node) containing:
         the subnode, the tag (element) name, the attributes as a list of tuples,
         and the content (text) of the node. This is not recursive. Recursion
@@ -138,7 +140,7 @@ class XMLTree:
             children.append( (child, child.tag, child.items(), child.text) )
 
         return children
-    children = property(__get_root_node_children, None, None, None)
+    children = property(__get_node_children, None, None, None)
 
     def get_root_node(self):
         '''
@@ -154,27 +156,6 @@ class XMLTree:
         '''
 
         return self.__xml_tree_node
-
-    def get_node_tag(self):
-        '''
-        TODO: deprecated/eliminate
-
-        Returns the tag name associated with the root node of the element tree. This is
-        the element name or tag name, *e.g.*, `<elem_name> </elem_name>`.
-
-        Parameters
-        ----------
-        empty:
-
-        Returns
-        -------
-        tag_name: str
-        '''
-
-        tag_name = self.__xml_tree_node.tag
-        assert isinstance(tag_name,str)
-
-        return tag_name
 
     def get_attribute(self, attribute_name):
         '''
@@ -219,14 +200,14 @@ class XMLTree:
 
         return content
 
-    def get_sub_node(self, tag):
+    def get_sub_node(self, tag_name):
         '''
         Returns the first subnode (branch) of the element tree specified by the
-        parameter tag.
+        parameter tag name.
 
         Parameters
         ----------
-        tag: str
+        tag_name: str
             This is the XML element name (or tag name).
 
         Returns
@@ -235,9 +216,9 @@ class XMLTree:
             An XML branch tree starting from `node`.
         '''
 
-        assert isinstance(tag, str), 'tag invalid'
+        assert isinstance(tag_name, str), 'tag invalid'
 
-        node = self.__xml_tree_node.find(tag)
+        node = self.__xml_tree_node.find(tag_name)
 
         assert node is not None
 
@@ -270,34 +251,6 @@ class XMLTree:
         xml_tree_list = [XMLTree(sub_node) for sub_node in sub_nodes]
 
         return xml_tree_list
-
-    def get_node_children(self):
-        '''
-        TODO: deprecated/eliminate
-        Returns a list of the direct sub-elements in the given element (node) containing:
-        the subnode, the tag (element) name, the attributes as a list of tuples,
-        and the content (text) of the node. This is not recursive. Recursion
-        can be done by calling this method on the children nodes (that is, the first
-        element of the tuple).
-
-        Parameters
-        ----------
-        empty:
-
-        Returns
-        -------
-        children: list(tuple)
-                  Tuple: (node, tag name, [(attribute name,attribute value),(.,.)...],
-                  content). Attribute name and value are string type.
-        '''
-
-        children = list()
-
-        for child in self.__xml_tree_node:
-
-            children.append( (child, child.tag, child.items(), child.text) )
-
-        return children
 
     def __str__(self):
         '''

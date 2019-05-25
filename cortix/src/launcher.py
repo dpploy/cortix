@@ -129,7 +129,7 @@ class Launcher(Thread):
         # For now Cortix advances in unit of minutes; change this in the future
         cortix_param_xml_tree = XMLTree( xml_tree_file = self.__cortix_param_full_path_file_name)
         node = cortix_param_xml_tree.get_sub_node('start_time')
-        cortix_start_time_unit = node.get_node_attribute('unit')
+        cortix_start_time_unit = node.get_attribute('unit')
         cortix_start_time = float(node.get_node_content().strip())
 
         if cortix_start_time_unit == 'minute':
@@ -142,7 +142,7 @@ class Launcher(Thread):
             assert False, 'time unit invalid: %r' % (cortix_start_time_unit)
 
         node = cortix_param_xml_tree.get_sub_node('evolve_time')
-        evolve_time_unit = node.get_node_attribute('unit')
+        evolve_time_unit = node.get_attribute('unit')
         evolve_time = float(node.get_node_content().strip())
 
         if evolve_time_unit == 'minute':
@@ -155,7 +155,7 @@ class Launcher(Thread):
             assert False, 'time unit invalid: %r' % (evolve_time_unit)
 
         node = cortix_param_xml_tree.get_sub_node('time_step')
-        cortix_time_step_unit = node.get_node_attribute('unit')
+        cortix_time_step_unit = node.get_attribute('unit')
         cortix_time_step = float(node.get_node_content().strip())
 
         if cortix_time_step_unit == 'minute':
