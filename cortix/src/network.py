@@ -31,7 +31,7 @@ class Network:
 
     __connectivity: list(dict)
         List of dictionaries of connectivity. Dictionary:
-        {'fromModuleSlot': module_slot_name, 'fromPort': use_port_name, 'toModuleSlot': module_slot_name, 'toPort': provide_port_name}.
+        {'use_module_slot': module_slot_name, 'fromPort': use_port_name, 'provide_module_slot': module_slot_name, 'toPort': provide_port_name}.
 
     __module_slot_names: list(str)
         List of names of module slots.
@@ -50,16 +50,18 @@ class Network:
 # Construction 
 #*********************************************************************************
 
-    def __init__(self, net_config_node): 
-        assert isinstance(net_config_node, XMLTree), '-> net_config_node is invalid.'
+    def __init__(self, net_config_xml_node): 
 
-        self.__config_node = net_config_node
+        assert isinstance(net_config_xml_node, XMLTree), '-> net_config_xml_node is invalid.'
 
-        assert self.__config_node.get_node_tag() == 'network'
+        self.__config_xml_node = net_config_xml_node
 
-        self.__name = self.__config_node.get_node_attribute('name')
+        assert self.__config_xml_node.tag == 'network'
 
-        self.__connectivity = list(dict())
+        self.__name = self.__config_xml_node.get_attribute('name')
+
+        self.__connectivity = list( dict() )
+
         self.__module_slot_names = list()
 
         # Cortix communication files for modules
@@ -68,7 +70,8 @@ class Network:
         # network graph
         self.__nx_graph = nx.MultiDiGraph(name=self.__name)
 
-        for child in self.__config_node.get_node_children():
+        # loop over the connect xml tags
+        for child in self.__config_xml_node.children:
 
             (element, tag, attributes, text) = child
 
@@ -77,36 +80,59 @@ class Network:
                 assert text is None, 'non empty text, %r, in %r network: ' \
                     % (text, self.__name)
 
-            tmp = dict()
-
-            if tag == 'connect':
+                tmp = dict()
 
                 for (key, value) in attributes:
+
                     assert key not in tmp.keys(), \
                         'repeated key in attribute of %r network' % self.__name
+
                     value = value.strip()
-                    if key == 'fromModuleSlot':
-                        value = value.replace(':', '_')
-                    if key == 'toModuleSlot':
-                        value = value.replace(':', '_')
-                    tmp[key] = value
 
-                self.__connectivity.append(tmp)
+                    if key == 'use_port':
+                        data = value.split('@')
+                        assert len(data) == 2
+                        use_port = data[0].strip()
+                        use_module_slot = data[1].strip().replace(':','_')
+                        assert use_port not in tmp.keys(), \
+                            'repeated use_port in attribute of %r network' %\
+                            self.__name
+                        tmp['use_port'] = use_port
+                        assert use_module_slot not in tmp.keys(), \
+                            'repeated use_module_slot in attribute of %r network' %\
+                            self.__name
+                        tmp['use_module_slot'] = use_module_slot
 
+                    if key == 'provide_port':
+                        data = value.split('@')
+                        assert len(data) == 2
+                        provide_port = data[0].strip()
+                        provide_module_slot = data[1].strip().replace(':','_')
+                        assert use_port not in tmp.keys(), \
+                            'repeated provide_port in attribute of %r network' %\
+                            self.__name
+                        tmp['provide_port'] = provide_port
+                        assert provide_module_slot not in tmp.keys(), \
+                            'repeated provide_module_slot in attribute of %r network' %\
+                            self.__name
+                        tmp['provide_module_slot'] = provide_module_slot
+
+                self.__connectivity.append( tmp )
+
+                # initialize the runtime comm file for each module_slot
                 for (key, val) in tmp.items():
-                    if key == 'fromModuleSlot':
+                    if key == 'use_module_slot' or key == 'provide_module_slot':
                         self.__runtime_cortix_comm_file_name[val] = \
                             'null-runtime_cortix_comm_file_name'
-                    if key == 'toModuleSlot':
-                        self.__runtime_cortix_comm_file_name[val] = \
-                            'null-runtime_cortix_comm_file_name'
-                vtx1 = tmp['fromModuleSlot']
-                vtx2 = tmp['toModuleSlot']
 
-                self.__nx_graph.add_edge(vtx1, vtx2,
-                    fromPort=tmp['fromPort'], toPort=tmp['toPort'])
+                vtx1 = tmp['use_module_slot']
+                vtx2 = tmp['provide_module_slot']
 
-        self.__module_slot_names = [name for name in self.__runtime_cortix_comm_file_name.keys()]
+                self.__nx_graph.add_edge(vtx1, vtx2, use_port=tmp['use_port'],
+                        provide_port=tmp['provide_port'])
+
+        self.__module_slot_names = [name for name in
+                                    self.__runtime_cortix_comm_file_name.keys()]
 
         return
 
@@ -196,8 +222,9 @@ class Network:
         assert module_slot_name in self.__runtime_cortix_comm_file_name
 
         comm_file = self.__runtime_cortix_comm_file_name[module_slot_name]
-        comm_tree = XMLTree(xml_tree_file=comm_file)
-        for child in comm_tree.children:
+        comm_xml_tree = XMLTree(xml_tree_file=comm_file)
+
+        for child in comm_xml_tree.children:
             (node,name,attributes,content) = child
             (name,value) = attributes[0] # order: 0: (name,:) 1: (type,:) 2: (file,:)
             if value == port_name:
@@ -205,7 +232,6 @@ class Network:
                 break
 
         return data_file_name # full path
-
 
     def __str__(self):
         '''

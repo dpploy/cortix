@@ -43,13 +43,13 @@ from xml.etree.ElementTree import tostring    # convert all tree data into strin
 class XMLTree:
     '''
     This class is a wrapper around the XML parser ElementTree and Element. See
-    import statement above. This XML parser is fast but the interface is not very
-    user friendly; hence the motivation for this wrapper.
+    import statement above. The ElementTree XML parser is fast but the interface
+    is not very user friendly; hence the motivation for this wrapper.
     The interface is designed to facilitate the use of XML data within Cortix and
     its modules. This class generates objects that hold an XML tree: ElementTree.
     Configuration of Cortix and some runtime files are the primary usage of XMLTree.
     The construction of an XMLTree object either uses a file with an XML content or
-    an XML branch of an XML tree. This makes it useful throughout Cortix to inspect
+    a branch of an XML tree. This makes it useful throughout Cortix to inspect
     branches of a configuration XML tree to retrieve data.
     A node in a tree is the root of a branch. That is, the same thing as an XML
     element and all its direct sub-elements; described in the Background above.
@@ -175,53 +175,6 @@ class XMLTree:
         assert isinstance(tag_name,str)
 
         return tag_name
-
-    def get_node_attribute(self, attribute_name):
-        '''
-        TODO: deprecated/eliminate
-        Returns the value of the attribute associated with the root node of
-        the element tree, *e.g.* <module type='native'></module>. Attribute
-        name is `type`, value is 'native'.
-
-        Parameters
-        ----------
-        attribute_name: str
-
-        Returns
-        -------
-        attribute_value: str
-        '''
-
-        assert isinstance(attribute_name,str)
-        attribute_value = self.__xml_tree_node.get(attribute_name.strip())
-
-        assert attribute_value is not None
-        assert isinstance(attribute_value,str)
-
-        return attribute_value.strip()
-
-    def get_attribute(self, attribute_name):
-        '''
-        Returns the value of the attribute associated with the root node of
-        the element tree, *e.g.* <module type='native'></module>. Attribute
-        name is `type`, value is 'native'.
-
-        Parameters
-        ----------
-        attribute_name: str
-
-        Returns
-        -------
-        attribute_value: str
-        '''
-
-        assert isinstance(attribute_name,str)
-        attribute_value = self.__xml_tree_node.get(attribute_name.strip())
-
-        assert attribute_value is not None
-        assert isinstance(attribute_value,str)
-
-        return attribute_value.strip()
 
     def get_attribute(self, attribute_name):
         '''
