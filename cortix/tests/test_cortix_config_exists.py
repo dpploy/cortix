@@ -18,7 +18,6 @@ def test_cortix_config_exists():
     in the input directory.
     '''
 
-    assert os.path.isfile("input/cortix-config-pyplot.xml")
     assert os.path.isfile("input/cortix-config-droplet.xml")
 
 if __name__ == "__main__":

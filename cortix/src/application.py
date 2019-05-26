@@ -171,7 +171,7 @@ class Application:
         A helper function to setup the logging facility used in self.__init__().
         '''
 
-        assert config_xml_tree.get_node_tag() == 'application'
+        assert config_xml_tree.tag == 'application'
 
         # Create the logging facility for the singleton object
         node = config_xml_tree.get_sub_node('logger')
@@ -180,7 +180,7 @@ class Application:
         self.__log = logging.getLogger(logger_name)
         self.__log.setLevel(logging.NOTSET)
 
-        logger_level = node.get_node_attribute('level')
+        logger_level = node.get_attribute('level')
         self.__log = set_logger_level(self.__log, logger_name, logger_level)
 
         file_handler = logging.FileHandler(self.__work_dir + 'app.log')
@@ -189,15 +189,15 @@ class Application:
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.NOTSET)
 
-        for child in node.get_node_children():
+        for child in node.children:
             (elem,tag,attributes,text) = child
             elem = XMLTree( elem )
             if tag == 'file_handler':
-                file_handler_level = elem.get_node_attribute('level')
+                file_handler_level = elem.get_attribute('level')
                 file_handler = set_logger_level(file_handler, logger_name,
                                                 file_handler_level)
             if tag == 'console_handler':
-                console_handler_level = elem.get_node_attribute('level')
+                console_handler_level = elem.get_attribute('level')
                 console_handler = set_logger_level(console_handler, logger_name,
                                                    console_handler_level)
 
@@ -229,7 +229,7 @@ class Application:
 
         for mod_config_xml_node in config_xml_tree.get_all_sub_nodes('module'):
 
-            assert mod_config_xml_node.get_node_tag() == 'module'
+            assert mod_config_xml_node.tag == 'module'
 
             # Modules log into the Application logger because they may or may not be 
             # used in a task. Running tasks will effectively tell what modules are used.
@@ -249,7 +249,7 @@ class Application:
             self.__modules.append( new_module )
 
             self.__log.debug('appended module %s',
-                    mod_config_xml_node.get_node_attribute('name'))
+                    mod_config_xml_node.get_attribute('name'))
 
         self.__log.debug('end __setup_modules()')
 
@@ -265,14 +265,14 @@ class Application:
 
         for net_config_xml_node in config_xml_tree.get_all_sub_nodes('network'):
 
-            assert net_config_xml_node.get_node_tag() == 'network'
+            assert net_config_xml_node.tag == 'network'
 
             network = Network( net_config_xml_node )
 
             self.__networks.append(network)
 
             self.__log.debug('appended network %s',
-                    net_config_xml_node.get_node_attribute('name'))
+                    net_config_xml_node.get_attribute('name'))
 
         self.__log.debug('end __setup_networks()')
 

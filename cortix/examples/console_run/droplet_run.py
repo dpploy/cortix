@@ -33,14 +33,6 @@ def run():
     # in the XML config file.
     cortix = Cortix('cortix-droplet', full_path_config_file)
 
-    # This is a test of the droplet module alone and it needs no input.
-    cortix.run_simulations(task_name="solo-droplet")
-
-    # This is a test of the pyplot module alone: it needs an input file: state.xml which
-    # is provided in ../input/. The input file ../input/pyplot.input points to this
-    # file at runtime. 
-    cortix.run_simulations(task_name="solo-pyplot")
-
     # This is a test of the droplet and pyplot connected.
     cortix.run_simulations(task_name="droplet-fall")
 

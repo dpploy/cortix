@@ -26,7 +26,15 @@ from cortix.src.application import Application
 
 class Simulation:
     '''
-    Cortix Simulation element as defined in the Cortix config.
+    Cortix Simulation element as defined in the Cortix configuration.
+    Simulation class members:
+
+    __name: str
+        Name of the simulation.
+
+    __work_dir: str
+       Work directory for files pertaining to the simulation.
+
     '''
 
 #*********************************************************************************
@@ -40,7 +48,7 @@ class Simulation:
                 'ctx::sim parent_work_dir invalid.'
         assert isinstance(config_xml_tree, XMLTree),\
                 'ctx::sim config_xml_tree invalid.'
-        assert config_xml_tree.get_node_tag() == 'simulation',\
+        assert config_xml_tree.tag == 'simulation',\
                 'ctx:sim: invalid simulation xml node tag.'
 
         # Read the simulation name, e.g. <simulation name='droplet'></simulation>
@@ -59,13 +67,13 @@ class Simulation:
         #======================
         for app_config_xml_node in config_xml_tree.get_all_sub_nodes('application'):
 
-            assert app_config_xml_node.get_node_tag() == 'application'
+            assert app_config_xml_node.tag == 'application'
 
             # Create the application for this simulation (same work directory)
             self.__application = Application( self.__work_dir, app_config_xml_node )
 
             self.__log.debug('created application: %s',
-                    app_config_xml_node.get_node_attribute('name'))
+                    app_config_xml_node.get_attribute('name'))
 
         # Stores the task(s) created by the execute method
         self.__tasks = list() # not needed now; in the future for task parallelism
@@ -107,6 +115,7 @@ class Simulation:
     def __get_tasks(self):
         '''
         Returns the application tasks object.
+        Many tasks can be scheduled for a given application.
 
         Parameters
         ----------
@@ -192,16 +201,16 @@ class Simulation:
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.NOTSET)
 
-        for child in node.get_node_children():
+        for child in node.children:
             (elem,tag,attributes,text) = child
             elem = XMLTree( elem ) # fixme: remove wrapping
             if tag == 'file_handler':
-                file_handler_level = elem.get_node_attribute('level')
+                file_handler_level = elem.get_attribute('level')
                 file_handler = set_logger_level(file_handler, logger_name,
                                                 file_handler_level)
 
             if tag == 'console_handler':
-                console_handler_level = elem.get_node_attribute('level')
+                console_handler_level = elem.get_attribute('level')
                 console_handler = set_logger_level(console_handler, logger_name,
                                                    console_handler_level)
 
@@ -238,16 +247,17 @@ class Simulation:
         content as follows:
 
             <port name=port_name type=port_type file=full_path_file_name />
+
         '''
 
         self.__log.debug('start __setup_task(%s)', task_name)
 
-        task = None  # flag
+        task = None  # initialize the task object
 
         # loop over all elements with a <task></task> tag in this simulation 
         for task_config_xml_node in self.__config_xml.get_all_sub_nodes('task'):
 
-            if task_config_xml_node.get_node_attribute('name') != task_name:
+            if task_config_xml_node.get_attribute('name') != task_name:
                 continue
 
             # create task
@@ -256,7 +266,7 @@ class Simulation:
             self.__tasks.append(task)
 
             self.__log.debug('appended task: %s', \
-                    task_config_xml_node.get_node_attribute('name'))
+                    task_config_xml_node.get_attribute('name'))
 
         if task is None:
             self.__log.info('no task to exectute; done here.')
@@ -318,165 +328,173 @@ class Simulation:
             elif net.name == task_name:  # net and task names must match
 
                 connect = net.connectivity
-                to_module_to_port_visited = dict()  # providers
+                to_module_to_port_visited = dict() # providers
 
                 for con in connect:
-                    # Start with the ports that will function as a provide port or
-                    # input port
-                    to_module_slot = con['toModuleSlot']
-                    to_port = con['toPort']
 
-                    if to_module_slot not in to_module_to_port_visited.keys():
-                        to_module_to_port_visited[to_module_slot] = list()
+                    #==========================================================
+                    # start with the ports that will function as a provide port 
+                    #==========================================================
+                    provide_module_slot = con['provide_module_slot']
+                    provide_port = con['provide_port']
 
-                    to_module_name = '_'.join( to_module_slot.split('_')[:-1] )
-                    to_module = self.__application.get_module(to_module_name)
+                    if provide_module_slot not in to_module_to_port_visited.keys():
+                        to_module_to_port_visited[provide_module_slot] = list()
 
-                    assert to_module is not None, \
-                        'module %r does not exist in application' % to_module_name
+                    provide_module_name = provide_module_slot.rsplit('_',1)[0]
+                    provide_module = self.__application.get_module(provide_module_name)
 
-                    assert to_module.has_port_name(to_port), \
-                        'module %r has no port %r.' % (
-                            to_module.name, to_port)
+                    assert provide_module is not None, \
+                        'module %r does not exist in application'%provide_module_name
 
-                    assert to_module.get_port_type(to_port) is not None,\
-                        'network name: %r, module name: %r, to_port: %r port type \
-                    invalid %r' % (net.name, to_module.name, to_port,
-                                   type(to_module.get_port_type(to_port)))
+                    assert provide_module.has_port_name(provide_port),\
+                            'network %r, module %r has no port %r.'%\
+                            (net.name, provide_module.name, provide_port)
 
-                    to_module_slot_work_dir = task_work_dir + to_module_slot + '/'
+                    assert provide_module.get_port_type(provide_port) is not None,\
+                        'network name: %r, module name: %r, provide port: %r port type \
+                    invalid %r' % (net.name, provide_module.name, provide_port,
+                                   type(provide_module.get_port_type(provide_port)))
 
-                    if to_module.get_port_type(to_port) != 'input':
-                        assert to_module.get_port_type(to_port) == 'provide', \
-                            'port type %r invalid. Module %r, port %r' \
-                            % (to_module.get_port_type(to_port), to_module.name,
-                               to_port)
+                    provide_module_slot_work_dir = task_work_dir+provide_module_slot+'/'
 
-                    # "to" is who receives the "call", hence the provider
-                    to_module_slot_comm_file = to_module_slot_work_dir + \
+                    assert provide_module.get_port_type(provide_port) == 'provide',\
+                            'port type %r invalid. Module %r, port %r'%\
+                            (provide_module.get_port_type(provide_port),
+                                    provide_module.name, provide_port)
+
+                    provide_module_slot_comm_file = provide_module_slot_work_dir + \
                         'cortix-comm.xml'
 
-                    if not os.path.isdir(to_module_slot_work_dir):
-                        os.system('mkdir -p ' + to_module_slot_work_dir)
+                    if not os.path.isdir(provide_module_slot_work_dir):
+                        os.system('mkdir -p ' + provide_module_slot_work_dir)
 
-                    if not os.path.isfile(to_module_slot_comm_file):
-                        fout = open(to_module_slot_comm_file,'w')
+                    if not os.path.isfile(provide_module_slot_comm_file):
+                        fout = open(provide_module_slot_comm_file,'w')
                         fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
                         fout.write('<!-- Written by Simulation::__setup_task() -->\n')
                         today = datetime.datetime.today()
                         fout.write('<!-- ' + str(today) + ' -->\n')
                         fout.write('<cortix_comm>\n')
 
-                    if to_port not in to_module_to_port_visited[to_module_slot]:
-                        fout = open(to_module_slot_comm_file,'a')
+                    # a provide module/port only writes once no matter how many times it
+                    # is used
+                    if provide_port not in to_module_to_port_visited[provide_module_slot]:
+                        fout = open(provide_module_slot_comm_file,'a')
                         # this is the cortix info for modules providing data
-                        to_port_mode = to_module.get_port_mode(to_port)
-                        if to_port_mode.split('.')[0] == 'file':
-                            ext = to_port_mode.split('.')[1]
-                            log_str = '<port name="' + to_port + \
-                                    '" type="provide" file="' + to_module_slot_work_dir\
-                                    + to_port + '.' + ext + '"/>\n'
-                        elif to_port_mode == 'directory':
-                            log_str = '<port name="' + to_port + \
+                        provide_port_mode = provide_module.get_port_mode(provide_port)
+                        if provide_port_mode.split('.')[0] == 'file':
+                            ext = provide_port_mode.split('.')[1]
+                            log_str = '<port name="' + provide_port + \
+                                    '" type="provide" file="' + \
+                                    provide_module_slot_work_dir\
+                                    + provide_port + '.' + ext + '"/>\n'
+                        elif provide_port_mode == 'directory':
+                            log_str = '<port name="' + provide_port + \
                                     '" type="provide" directory="' + \
-                                    to_module_slot_work_dir + to_port + '"/>\n'
-                        elif to_port_mode == 'hardware':
-                            log_str = '<port name="' + to_port + \
+                                    provide_module_slot_work_dir + provide_port + '"/>\n'
+                        elif provide_port_mode == 'hardware':
+                            log_str = '<port name="' + provide_port + \
                                     '" type="provide" hardware="' + \
-                                    to_module_slot_work_dir + to_port + '"/>\n'
+                                    provide_module_slot_work_dir + provide_port + '"/>\n'
                         else:
                             assert False, 'invalid port mode. fatal.'
 
                         fout.write(log_str)
                         fout.close()
-                        to_module_to_port_visited[to_module_slot].append(
-                            to_port)
 
-                    debug_str = '__setup_task():: comm module: ' + to_module_slot + \
+                        to_module_to_port_visited[provide_module_slot].append(
+                            provide_port)
+
+                    debug_str = '__setup_task():: comm module: ' + provide_module_slot + \
                                 '; network: ' + task_name + ' ' + log_str
                     self.__log.debug(debug_str)
 
                     # register the cortix-comm file for the network
-                    net.set_runtime_cortix_comm_file_name( to_module_slot,
-                        to_module_slot_comm_file)
+                    net.set_runtime_cortix_comm_file_name( provide_module_slot,
+                        provide_module_slot_comm_file )
 
-                    # Now do the ports that will function as use ports or output ports
-                    from_module_slot = con['fromModuleSlot']
-                    from_port = con['fromPort']
-                    from_module_name = '_'.join( from_module_slot.split('_')[:-1] )
-                    from_module = self.__application.get_module(from_module_name)
+                    #=================================================
+                    # now do the ports that will function as use ports 
+                    #=================================================
+                    use_module_slot = con['use_module_slot']
+                    use_port = con['use_port']
+                    use_module_name = '_'.join( use_module_slot.split('_')[:-1] )
+                    use_module = self.__application.get_module(use_module_name)
 
-                    assert from_module.has_port_name(from_port), \
-                        'module %r has no port %r'%(from_module_name, from_port)
+                    assert use_module.has_port_name(use_port),\
+                            'module %r has no port %r'%(use_module_name, use_port)
 
-                    assert from_module.get_port_type(from_port) is not None, \
-                        'network name: %r, module name: %r, from_port: %r port type invalid %r'\
-                        % (net.name, from_module.name, from_port,
-                           type(from_module.get_port_type(from_port)))
+                    assert use_module.get_port_type(use_port) is not None,\
+                            'network name: %r, module name: %r, use_port: %r port type\
+                            invalid %r'%\
+                            (net.name, use_module.name, use_port,
+                                    type(use_module.get_port_type(use_port)))
 
-                    from_module_slot_work_dir = task_work_dir + from_module_slot + '/'
+                    use_module_slot_work_dir = task_work_dir + use_module_slot + '/'
 
-                    if from_module.get_port_type(from_port) != 'output':
-                        assert from_module.get_port_type(from_port) == 'use', 'port type %r invalid. Module %r, port %r' % (from_module.get_port_type(from_port), from_module.name, from_port)
+                    assert use_module.get_port_type(use_port) == 'use',\
+                            'port type %r invalid. Module %r, port %r'%\
+                            (use_module.get_port_type(use_port), use_module.name,
+                                    use_port)
 
-                        # "from" is who makes the "call", hence the user
-                        from_module_slot_comm_file = from_module_slot_work_dir + \
-                                'cortix-comm.xml'
+                    use_module_slot_comm_file = use_module_slot_work_dir+'cortix-comm.xml'
 
-                        if not os.path.isdir(from_module_slot_work_dir):
-                            os.system('mkdir -p ' + from_module_slot_work_dir)
+                    if not os.path.isdir(use_module_slot_work_dir):
+                        os.system('mkdir -p ' + use_module_slot_work_dir)
 
-                        if not os.path.isfile(from_module_slot_comm_file):
-                            fout = open(from_module_slot_comm_file,'w')
-                            fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-                            fout.write('<!-- Written by Simulation::__setup_task() -->\n')
-                            today = datetime.datetime.today()
-                            fout.write('<!-- ' + str(today) + ' -->\n')
-                            fout.write('<cortix_comm>\n')
-                            fout.close() # is this right?
+                    if not os.path.isfile(use_module_slot_comm_file):
+                        fout = open(use_module_slot_comm_file,'w')
+                        fout.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+                        fout.write('<!-- Written by Simulation::__setup_task() -->\n')
+                        today = datetime.datetime.today()
+                        fout.write('<!-- ' + str(today) + ' -->\n')
+                        fout.write('<cortix_comm>\n')
+                        fout.close() # is this right?
 
-                        fout = open(from_module_slot_comm_file,'a')
+                    fout = open(use_module_slot_comm_file,'a')
 
-                        # this is the cortix info for modules using data
-                        assert from_module.get_port_type(from_port) == 'use', \
-                            'from_port must be use type.'
+                    # this is the cortix info for modules using data
+                    assert use_module.get_port_type(use_port) == 'use',\
+                            'use_port must be use type.'
 
-                        to_port_mode = to_module.get_port_mode(to_port)
-                        if to_port_mode.split('.')[0] == 'file':
-                            ext = to_port_mode.split('.')[1]
-                            log_str = '<port name="' + from_port + \
+                    provide_port_mode = provide_module.get_port_mode(provide_port)
+                    if provide_port_mode.split('.')[0] == 'file':
+                            ext = provide_port_mode.split('.')[1]
+                            log_str = '<port name="' + use_port + \
                                       '" type="use" file="' + \
-                                      to_module_slot_work_dir + to_port + '.' + ext + \
-                                      '"/>\n'
-                        elif to_port_mode == 'directory':
-                            log_str = '<port name="' + from_port + \
-                                      '" type="use" directory="' + \
-                                      to_module_slot_work_dir + to_port + '"/>\n'
-                        elif to_port_mode == 'hardware':
-                            log_str = '<port name="' + from_port + \
-                                      '" type="use" directory="' + \
-                                      to_module_slot_work_dir + to_port + '"/>\n'
-                        else:
+                                      provide_module_slot_work_dir + provide_port + \
+                                      '.' + ext + '"/>\n'
+                    elif provide_port_mode == 'directory':
+                            log_str = '<port name="' + use_port +\
+                                    '" type="use" directory="' +\
+                                    provide_module_slot_work_dir + provide_port + '"/>\n'
+                    elif provide_port_mode == 'hardware':
+                            log_str = '<port name="' + use_port +\
+                                    '" type="use" directory="' +\
+                                    provide_module_slot_work_dir +\
+                                    provide_port + '"/>\n'
+                    else:
                             assert False, 'invalid port mode. fatal.'
 
-                        fout.write(log_str)
-                        fout.close()
+                    fout.write(log_str)
+                    fout.close()
 
-                        debug_str = '__setup_task():: comm module: ' + from_module_slot\
-                                + '; network: ' + task_name + ' ' + log_str
-                        self.__log.debug(debug_str)
+                    debug_str = '__setup_task():: comm module: ' + use_module_slot\
+                            + '; network: ' + task_name + ' ' + log_str
+                    self.__log.debug(debug_str)
 
                 # register the cortix-comm file for the network
-                net.set_runtime_cortix_comm_file_name( from_module_slot,
-                                                  from_module_slot_comm_file )
+                net.set_runtime_cortix_comm_file_name( use_module_slot,
+                        use_module_slot_comm_file )
 
             #end elif net.name.strip() == task_name.strip():  # net and task names must match
             else:
                 assert False, 'this should not happen...'
 
-        # end for net in networks:
+        #end for net in networks:
 
-        # Now finish forming the XML comm file for each module in each network
+        # now finish forming the XML comm file for each module in each network
         for net in networks:
             for slot_name in net.module_slot_names:
                 comm_file = net.get_runtime_cortix_comm_file_name(slot_name)
@@ -489,9 +507,10 @@ class Simulation:
                     else:
                        assert False, 'FATAL ERROR building the comm file for module %r'%\
                                     slot_name
-                fout = open(comm_file, 'a')
-                fout.write('</cortix_comm>')
-                fout.close()
+                else:
+                    fout = open(comm_file, 'a')
+                    fout.write('</cortix_comm>')
+                    fout.close()
 
         self.__log.debug('end __setup_task(%s)', task_name)
 

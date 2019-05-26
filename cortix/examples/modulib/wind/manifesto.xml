@@ -20,32 +20,38 @@
       allows for the same module to self-connect.  -->
 
     <!-- use ports -->
-    <port type='output'  mode='file.any' multiplicity='1'>self-output</port>
-    <port type='use'     mode='file.txt' multiplicity='1'>input</port>
-    <port type='use'     mode='file.txt' multiplicity='1'>spatial-position</port>
+    <port type='use'     mode='file.txt' multiplicity='1'>position</port>
 
     <!-- provide ports -->
-    <port type='input'   mode='file.txt' multiplicity='1'>self-input</port>
-    <port type='provide' mode='file.dat' multiplicity='1'>wind-velocity</port>
+    <port type='provide' mode='file.dat' multiplicity='1'>velocity</port>
     <port type='provide' mode='file.xml' multiplicity='1'>state</port>
     <port type='provide' mode='file.dat' multiplicity='1'>output</port>
 
+    <port_doc port_name='output'>
+        Spatial position and velocity are three-dimensional Cartesian.
+    </port_doc>
+
     <diagram> 
-   ..................................................................
-   .                   __    ____ __  __ _____                      .
-   .                   \\ /\ //|| ||\\|| ||  )                      .
-   .                    \V/\V/ || || \|| ||_//                      .
-   .                  =========================                     .
-   . input port       |    USE    |  PROVIDE  |                     .
-   .____________      |...........|...........|                     .
-   .|self-input| -->  | input     | wind-velo |                     .
-   .------------      |...........|...........|                     .
-   . provide-like     | spat.-pos.| state     |       output port   .
-   .                  |...........|...........|     _____________   .
-   .                  |           | output    | --> |self-output|   .
-   .                  =========================     -------------   .
-   .                                                   use-like     .
-   ..................................................................
+   ............................................................................
+   .                        __    ____ __  __ _____                           .
+   .                        \\ /\ //|| ||\\|| ||  )                           .
+   .                         \V/\V/ || || \|| ||_//                           .
+   .                      ===========================                         .
+   .                      |    USE     |  PROVIDE   |                         .
+   .                      |============|============|                         .
+   .                      | position   | velocity   |                         .
+   .                      |............|............|                         .
+   .                      |            | state      |                         .
+   .                      |............|............|                         .
+   .                      |            | output     |                         .
+   .                      ===========================                         .
+   ............................................................................
+   . port type='use'     mode='file.shlv' multiplicity='1' position           .
+   .                                                                          .
+   . port type='provide' mode='file.xml' multiplicity='1' velocity            .
+   . port type='provide' mode='file.xml' multiplicity='1' state               .
+   . port type='provide' mode='file.pkl' multiplicity='1' output              .
+   ............................................................................
     </diagram>
 
     <ascii_art>

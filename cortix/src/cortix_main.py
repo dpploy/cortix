@@ -41,7 +41,7 @@ class Cortix():
         # Create the configuration XML tree
         config_xml_tree = XMLTree( xml_tree_file=config_xml_file )
 
-        assert config_xml_tree.get_node_tag() == 'cortix_config'
+        assert config_xml_tree.tag == 'cortix_config'
 
         # Read the cortix config element (tag) name <name></name>
         node = config_xml_tree.get_sub_node('name') # get sub_node w/ tag: name 
@@ -137,7 +137,7 @@ class Cortix():
 
         node = config_xml_tree.get_sub_node('logger') # tag name is logger
 
-        logger_level = node.get_node_attribute('level')
+        logger_level = node.get_attribute('level')
         self.__log = set_logger_level(self.__log, logger_name, logger_level)
 
         file_handler = logging.FileHandler(self.__work_dir + 'cortix.log')
@@ -148,15 +148,15 @@ class Cortix():
         console_handler.setLevel(logging.NOTSET)
         console_handler_level = None
 
-        for child in node.get_node_children():
+        for child in node.children:
             (elem,tag,attributes,text) = child
             elem = XMLTree( elem ) # fixme: remove wrapping
             if tag == 'file_handler':
-                file_handler_level = elem.get_node_attribute('level')
+                file_handler_level = elem.get_attribute('level')
                 file_handler = set_logger_level(file_handler, logger_name,
                                                 file_handler_level)
             if tag == 'console_handler':
-                console_handler_level = elem.get_node_attribute('level')
+                console_handler_level = elem.get_attribute('level')
                 console_handler = set_logger_level(console_handler, logger_name,
                                                    console_handler_level)
 
@@ -189,7 +189,7 @@ class Cortix():
             assert sim_config_xml_node.tag == 'simulation'
 
             self.__log.debug('__setup_simulations(): simulation name: %s',
-                    sim_config_xml_node.get_node_attribute('name'))
+                    sim_config_xml_node.get_attribute('name'))
 
             simulation = Simulation( self.__work_dir, sim_config_xml_node )
 

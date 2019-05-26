@@ -36,9 +36,9 @@ class Module:
         assert isinstance(library_home_dir, str),'ctx:mod: library_home is invalid.'
 
         assert isinstance(config_xml_tree, XMLTree),'ctx:mod: config_xml_tree is invalid.'
-        assert config_xml_tree.get_node_tag() == 'module','ctx:mod:invalid module xml tree.'
+        assert config_xml_tree.tag == 'module','ctx:mod:invalid module xml tree.'
         # Read the module name and type
-        self.__mod_name = config_xml_tree.get_node_attribute('name') # e.g. wind
+        self.__mod_name = config_xml_tree.get_attribute('name') # e.g. wind
 
         # Specify module library with upstream information
         self.__library_home_dir = library_home_dir
@@ -47,7 +47,7 @@ class Module:
         self.__input_file_path = 'null-input_file_path'
 
         # Get config data  
-        for child in config_xml_tree.get_node_children():
+        for child in config_xml_tree.children:
 
             (elem, tag, attributes, text) = child
             text = text.strip()
@@ -150,10 +150,21 @@ class Module:
 
     def get_port_type(self, port_name):
         '''
-        Returns the port type specified by port_name
+        Returns the port type specified by `port_name`.
+
+        Parameters
+        ----------
+        port_name: str
+
+        Returns
+        -------
+        port_type: str or None
+            Types are: 'use' or 'provide'. None if port name does not exist.
+
         '''
 
         port_type = None
+
         for port in self.__ports:
             if port[0] == port_name:
                 port_type = port[1]
@@ -175,7 +186,7 @@ class Module:
     def has_port_name(self, port_name):
         '''
         Returns true if a port with the name
-        port_name is available in the module.
+        `port_name` is available in the module.
         '''
 
         for port in self.__ports:
@@ -266,11 +277,11 @@ class Module:
         # Read the manifesto 
         xml_tree = XMLTree( xml_tree_file=self.__manifesto_full_path_file_name )
 
-        assert xml_tree.get_node_tag() == 'module_manifesto'
+        assert xml_tree.tag == 'module_manifesto'
 
-        assert xml_tree.get_node_attribute('name') == self.__mod_name,\
-                "xml_tree.get_node_attribute('name') is %r and self.__mod_name is %r"%\
-                (xml_tree.get_node_attribute('name'),self.__mod_name)
+        assert xml_tree.get_attribute('name') == self.__mod_name,\
+                "xml_tree.get_attribute('name') is %r and self.__mod_name is %r"%\
+                (xml_tree.get_attribute('name'),self.__mod_name)
 
         # List of (port_name, port_type, port_mode, port_multiplicity)
         self.__ports = list()
@@ -278,7 +289,7 @@ class Module:
         self.__diagram = 'null-module-diagram'
 
         # Get config data  
-        for child in xml_tree.get_node_children():
+        for child in xml_tree.children:
             (elem, tag, attributes, text) = child
 
             if tag == 'port':
@@ -294,8 +305,9 @@ class Module:
                     val = attribute[1].strip()
 
                     if key == 'type':
-                        assert val == 'use' or val == 'provide' or val == 'input' or\
-                            val == 'output', 'port attribute value invalid.'
+                        assert val == 'use' or val == 'provide',\
+                                'port attribute value %r invalid in module %r manifesto'%\
+                                (val,self.__mod_name)
                         tmp['port_name'] = text  # port_name
                         tmp['port_type'] = val   # port_type
                     elif key == 'mode':

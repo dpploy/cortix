@@ -15,6 +15,7 @@ Wind module example in Cortix.
 import os, sys, io, time
 import logging
 from collections             import namedtuple
+import math
 import numpy as np
 
 from cortix.src.utils.xmltree import XMLTree
@@ -32,16 +33,21 @@ class Wind():
 # Construction
 #*********************************************************************************
 
-    def __init__( self, slot_id,
-                  input_full_path_file_name,
-                  manifesto_full_path_file_name,
-                  work_dir, ports   = list(),
-                  cortix_start_time = 0.0,
-                  cortix_final_time = 0.0,
-                  cortix_time_step  = 0.0,
-                  cortix_time_unit  = None ):
+    def __init__( self, 
+            slot_id,
+            input_full_path_file_name,
+            manifesto_full_path_file_name,
+            work_dir, 
+            ports = list(),
+            cortix_start_time = 0.0,
+            cortix_final_time = 0.0,
+            cortix_time_step  = 0.0,
+            cortix_time_unit  = None 
+                ):
+
         #.........................................................................
         # Sanity test 
+
         assert isinstance(slot_id, int),'-> slot_id type %r is invalid.'%type(slot_id)
         assert isinstance(ports, list),'-> ports type %r is invalid.'%type(ports)
         assert len(ports) > 0
@@ -90,7 +96,8 @@ class Wind():
         self.__goSignal = True     # start operation immediately
         for port in self.__ports:  # if there is a signal port, start operation accordingly
             (port_name, port_type, this_port_file) = port
-            if port_name == 'go-signal' and port_type == 'use': self.__go_signal = False
+            if port_name == 'go-signal' and port_type == 'use':
+                self.__go_signal = False
 
         self.__setup_time = 60.0  # time unit; a delay time before starting to run
 
@@ -105,13 +112,13 @@ class Wind():
         #self.__ode_integrator = 'scikits.odes' # or 'scipy.integrate' 
         self.__ode_integrator = 'scipy.integrate'
 
-        # Domain specific member data 
+        # domain specific member data 
 
         shear_coeff = 0.4  # dimensionless
         Params = namedtuple('Params',['shear_coeff'])
         self.__params = Params( shear_coeff )
 
-        # Setup the material phase as a gas
+        # setup species in the gas phase 
         species = list()
 
         air = Specie( name='air', formulaName='Air', phase='gas' )
@@ -121,13 +128,15 @@ class Wind():
 
         species.append(air)
 
+        # quantities in the gas phase
         quantities = list()
 
-        # altitude
-        altitude = Quantity( name='altitude', formalName='Altitude', unit='m' )
-        quantities.append( altitude )
+        # spatial position
+        position = Quantity( name='position', formalName='Pos.', unit='m' )
+        quantities.append( position )
+
         # velocity
-        velocity = Quantity( name='velocity', formalName='Velocity', unit='m/s' )
+        velocity = Quantity( name='velocity', formalName='Veloc.', unit='m/s' )
         quantities.append( velocity )
 
         self.__gas_phase = Phase( 's', self.__start_time, species=species,
@@ -137,8 +146,8 @@ class Wind():
         air_mass_cc = 0.1 # [g/cc]
         self.__gas_phase.SetValue( 'air', air_mass_cc, self.__start_time )
 
-        x_0 = 1000.0  # initial altitude [m] above ground at 0
-        self.__gas_phase.SetValue( 'altitude', x_0, self.__start_time )
+        x_0 = (0.0,0.0,1000.0)  # initial height [m] above ground at 0
+        self.__gas_phase.SetValue( 'position', x_0, self.__start_time )
 
         v_0 = np.array([0.0,0.0,0.0])   # initial wind velocity [m/s]
         self.__gas_phase.SetValue( 'velocity', v_0, self.__start_time )
@@ -161,7 +170,7 @@ class Wind():
         self.__provide_data( provide_port_name='output', at_time=cortix_time )
 
         # use data using the 'use-port-name' of the module
-        self.__use_data( use_port_name='spatial-position', at_time=cortix_time )
+        self.__use_data( use_port_name='position', at_time=cortix_time )
 
         return
 
@@ -196,8 +205,8 @@ class Wind():
         if provide_port_name == 'state' and port_file is not None:
             self.__provide_state( port_file, at_time )
 
-        if provide_port_name == 'wind_velocity' and port_file is not None:
-            self.__provide_wind_velocity( port_file, at_time )
+        if provide_port_name == 'velocity' and port_file is not None:
+            self.__provide_velocity( port_file, at_time )
 
         return
 
@@ -207,8 +216,8 @@ class Wind():
         port_file = self.__get_port_file( use_port_name = use_port_name )
 
         # Use data from port file
-        if use_port_name == 'altitude' and port_file is not None:
-            self.__use_altitude( port_file, at_time )
+        if use_port_name == 'position' and port_file is not None:
+            self.__use_position( port_file, at_time )
 
         return
 
@@ -337,10 +346,8 @@ class Wind():
         # write header
         if at_time == self.__start_time:
 
-            assert os.path.isfile(port_file) is False, 'port_file %r exists; stop.'%port_file
-
-            tree = ElementTree.ElementTree()
-            root_node = tree.getroot()
+            assert os.path.isfile(port_file) is False, 'port_file %r exists; stop.'%\
+                    port_file
 
             a = ElementTree.Element('time-sequence')
             a.set('name','wind_'+str(self.__slot_id)+'-state')
@@ -368,13 +375,22 @@ class Wind():
                 b.set('scale',self.__pyplot_scale)
 
             for quant in self.__gas_phase.quantities:
-                b = ElementTree.SubElement(a,'var')
                 formal_name = quant.formalName
-                b.set('name',formal_name)
-                unit = quant.unit
-                b.set('unit',unit)
-                b.set('legend','Wind_'+str(self.__slot_id)+'-state')
-                b.set('scale',self.__pyplot_scale)
+                if quant.name == 'position' or quant.name == 'velocity':
+                    for i in range(3):
+                        b = ElementTree.SubElement(a,'var')
+                        b.set('name',formal_name+' '+str(i+1))
+                        unit = quant.unit
+                        b.set('unit',unit)
+                        b.set('legend','Wind_'+str(self.__slot_id)+'-state')
+                        b.set('scale',self.__pyplot_scale)
+                else:
+                    b = ElementTree.SubElement(a,'var')
+                    b.set('name',formal_name)
+                    unit = quant.unit
+                    b.set('unit',unit)
+                    b.set('legend','Wind_'+str(self.__slot_id)+'-state')
+                    b.set('scale',self.__pyplot_scale)
 
             # write values for all variables
             b = ElementTree.SubElement(a,'timeStamp')
@@ -388,7 +404,11 @@ class Wind():
 
             for quant in self.__gas_phase.quantities:
                 val = self.__gas_phase.GetValue( quant.name, at_time )
-                values.append( val )
+                if quant.name == 'position' or quant.name == 'velocity':
+                    for v in val:
+                        values.append( math.fabs(v) ) # pyplot can't take negative values
+                else:
+                    values.append( val )
 
             # flush out data
             text = str()
@@ -401,7 +421,8 @@ class Wind():
 
             tree = ElementTree.ElementTree(a)
 
-            tree.write( port_file, xml_declaration=True, encoding="unicode", method="xml" )
+            tree.write( port_file, xml_declaration=True, encoding="unicode",
+                    method="xml" )
 
         #-------------------------------------------------------------------------
         # if not the first time step then parse the existing history file and append
@@ -424,7 +445,11 @@ class Wind():
                 values.append( val )
             for quant in self.__gas_phase.quantities:
                 val = self.__gas_phase.GetValue( quant.name, at_time )
-                values.append( val )
+                if quant.name == 'position' or quant.name == 'velocity':
+                    for v in val:
+                        values.append( math.fabs(v) ) # pyplot can't take negative values
+                else:
+                    values.append( val )
 
             # flush out data
             text = str()
@@ -447,17 +472,17 @@ class Wind():
         r'''
          '''
 
-        altitude = self.__gas_phase.GetValue('altitude',cortix_time)
+        position = self.__gas_phase.GetValue('position',cortix_time)
         velocity = self.__gas_phase.GetValue('velocity',cortix_time)
 
-        new_altitude = altitude
+        new_position = position
         new_velocity = velocity
 
         values = self.__gas_phase.GetRow( cortix_time ) # values at previous time
         at_time = cortix_time + cortix_time_step
         self.__gas_phase.AddRow( at_time, values ) # repeat values for current time
 
-        self.__gas_phase.SetValue( 'altitude', new_altitude, at_time )  # update current values
+        self.__gas_phase.SetValue( 'position', new_position, at_time )  # update current values
         self.__gas_phase.SetValue( 'velocity', new_velocity, at_time ) # update current values
 
         return
@@ -472,9 +497,9 @@ class Wind():
         # Read the manifesto
         xml_tree = XMLTree( xml_tree_file=xml_tree_file )
 
-        assert xml_tree.get_node_tag() == 'module_manifesto'
+        assert xml_tree.tag == 'module_manifesto'
 
-        assert xml_tree.get_node_attribute('name') == 'wind'
+        assert xml_tree.get_attribute('name') == 'wind'
 
         # List of (port_name, port_type, port_mode, port_multiplicity)
         __ports = list()
@@ -482,7 +507,7 @@ class Wind():
         self.__port_diagram = 'null-module-port-diagram'
 
         # Get manifesto data  
-        for child in xml_tree.get_node_children():
+        for child in xml_tree.children:
             (elem, tag, attributes, text) = child
 
             if tag == 'port':

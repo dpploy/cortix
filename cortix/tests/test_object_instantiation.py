@@ -18,8 +18,8 @@ def test_object_instantiation():
     '''
     pwd = os.path.dirname(__file__)
     full_path_config_file = os.path.join(
-        pwd, 'input/cortix-config-pyplot.xml')
-    cortix1 = Cortix('cortix-dev1', full_path_config_file)
+        pwd, 'input/cortix-config-droplet.xml')
+    cortix1 = Cortix('cortix-droplet', full_path_config_file)
     assert cortix1 is not None
 
 if __name__ == "__main__":
