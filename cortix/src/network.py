@@ -137,8 +137,6 @@ class Network:
         self.__module_slot_names = [name for name in
                                     self.__runtime_cortix_comm_file_name.keys()]
 
-        print(self)
-
         return
 
 #*********************************************************************************
