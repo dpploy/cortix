@@ -160,6 +160,7 @@
      <file_handler level='DEBUG'> </file_handler>
      <console_handler level='INFO'> </console_handler>
     </logger>
+
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
 
     <connect use_port='time-sequence @ pyplot:0' provide_port='state @ droplet:0' />

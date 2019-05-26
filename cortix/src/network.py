@@ -77,15 +77,18 @@ class Network:
 
             # a connect element must have no content; format: <connect />
             if tag == 'connect':
-                assert text is None, 'non empty text, %r, in %r network: ' \
-                    % (text, self.__name)
+                assert text is None, 'non empty text, %r, in %r network: '%\
+                        (text, self.__name)
 
                 tmp = dict()
 
                 for (key, value) in attributes:
 
+                    assert key == 'use_port' or key == 'provide_port',\
+                            'illegal port type %r'%key
+
                     assert key not in tmp.keys(), \
-                        'repeated key in attribute of %r network' % self.__name
+                        'repeated key in attribute of %r network'%self.__name
 
                     value = value.strip()
 

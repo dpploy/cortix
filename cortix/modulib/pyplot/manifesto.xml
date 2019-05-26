@@ -22,7 +22,8 @@
     <!-- provide ports -->
 
     <port_doc port_name='output'>
-        Output port doc goes here...
+        The use port named `input` is a legacy port used to read a past
+        simulation `state` file and re-make plots.
     </port_doc>
 
     <diagram> 

@@ -132,12 +132,11 @@
      <file_handler level="DEBUG"> </file_handler>
      <console_handler level="INFO"> </console_handler>
     </logger>
+    
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
-    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
-    <connect fromModuleSlot="droplet:0" fromPort="input" toModuleSlot="droplet:0" toPort="self-input"/>
-    <connect fromModuleSlot="droplet:0" fromPort="self-output" toModuleSlot="droplet:0" toPort="output"/>
-    <connect fromModuleSlot="pyplot:0" fromPort="time-sequence" toModuleSlot="droplet:0" toPort="state"/>
+
+    <connect use_port='time-sequence @ pyplot:0' provide_port='state @ droplet:0' />
+
    </network>
 
    <!--                  Network objects end here                                   -->
