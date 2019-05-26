@@ -56,10 +56,12 @@
    <start_time unit='minute'>0.0</start_time>
    <evolve_time unit='minute'>2.5</evolve_time>
    <time_step unit='second'>0.5</time_step>
+
    <logger level='DEBUG'>
     <file_handler level='DEBUG'> </file_handler>
     <console_handler level='INFO'> </console_handler>
    </logger>
+
   </task>
 
   <!--                   Tasks objects end here                                     -->
@@ -101,7 +103,7 @@
    -->
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
 
-   <module name='droplet' type='native'>
+   <module name='droplet'>
 
     <input_file_name>droplet.input</input_file_name>
     <input_file_path>$CORTIX/cortix/examples/input</input_file_path>
@@ -113,7 +115,7 @@
 
    </module>
 
-   <module name='pyplot' type='native'>
+   <module name='pyplot'>
 
     <library>
         <home_dir>$CORTIX/cortix/modulib</home_dir>
@@ -156,11 +158,13 @@
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
 
    <network name='droplet-fall'>
+       
     <logger level='DEBUG'>
      <file_handler level='DEBUG'> </file_handler>
      <console_handler level='INFO'> </console_handler>
     </logger>
 
+    <!-- A connect element (or tag) must have no content; use <connect />-->
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
 
     <connect use_port='time-sequence @ pyplot:0' provide_port='state @ droplet:0' />

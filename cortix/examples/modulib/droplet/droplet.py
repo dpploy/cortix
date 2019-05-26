@@ -96,7 +96,8 @@ class Droplet():
         self.__goSignal = True     # start operation immediately
         for port in self.__ports:  # if there is a signal port, start operation accordingly
             (port_name, port_type, this_port_file) = port
-            if port_name == 'go-signal' and port_type == 'use': self.__go_signal = False
+            if port_name == 'go-signal' and port_type == 'use':
+                self.__go_signal = False
 
         self.__setup_time = 60.0  # time unit; a delay time before starting to run
 
@@ -121,7 +122,7 @@ class Droplet():
         Params = namedtuple('Params',['gravity'])
         self.__params = Params( gravity )
 
-        # Setup the material phase as a liquid 
+        # setup species in the liquid phase 
         species = list()
 
         water = Specie( name='water', formulaName='H2O(l)', phase='liquid', atoms=['2*H','O'] )
@@ -130,25 +131,27 @@ class Droplet():
 
         species.append(water)
 
+        # quantities in the liquid phase
         quantities = list()
 
-        # Spatial position
-        spatial_position = Quantity( name='spatial-position', formalName='Spatial_Pos.', unit='m' )
-        quantities.append( spatial_position )
+        # spatial position
+        position = Quantity( name='position', formalName='Pos.', unit='m' )
+        quantities.append( position )
 
-        # Velocity
+        # velocity
         velocity = Quantity( name='velocity', formalName='Veloc.', unit='m/s' )
         quantities.append( velocity )
 
-        # Phase
-        self.__liquid_phase = Phase( 's', self.__start_time, species=species, quantities=quantities)
+        # phase
+        self.__liquid_phase = Phase( 's', self.__start_time, species=species,
+                quantities=quantities )
 
-        # Initialize phase
+        # initialize phase
         water_mass_cc = 0.99965 # [g/cc]
         self.__liquid_phase.SetValue( 'water', water_mass_cc, self.__start_time )
 
         x_0 = (0.0,0.0,1000.0)  # initial height [m] above ground at 0
-        self.__liquid_phase.SetValue( 'spatial-position', x_0, self.__start_time )
+        self.__liquid_phase.SetValue( 'position', x_0, self.__start_time )
 
         v_0 = (0.0,0.0,0.0)     # initial velocity [m/s]
         self.__liquid_phase.SetValue( 'velocity', v_0, self.__start_time )
@@ -167,8 +170,8 @@ class Droplet():
         cortix_time *= self.__time_unit_scale  # convert to Droplet time unit
 
         # provide data to all provide ports 
-        self.__provide_data( provide_port_name='output', at_time=cortix_time )
         self.__provide_data( provide_port_name='state',  at_time=cortix_time )
+        self.__provide_data( provide_port_name='output', at_time=cortix_time )
 
         # use data using the 'use-port-name' of the module
         #self.__use_data( use_port_name='use-port-name', at_time=cortix_time )
@@ -318,7 +321,7 @@ class Droplet():
               fout.write('%18s'%(specie.formulaName+'['+specie.massCCUnit+']'))
             # Quantities     
             for quant in self.__liquid_phase.GetQuantities():
-                if quant.name == 'spatial-position' or quant.name == 'velocity':
+                if quant.name == 'position' or quant.name == 'velocity':
                    for i in range(3):
                        fout.write('%18s'%(quant.formalName+str(i+1)+'['+quant.unit+']'))
                 else:
@@ -342,7 +345,7 @@ class Droplet():
         # Quantities     
         for quant in self.__liquid_phase.GetQuantities():
             val = self.__liquid_phase.GetValue(quant.name, at_time)
-            if quant.name == 'spatial-position' or quant.name == 'velocity':
+            if quant.name == 'position' or quant.name == 'velocity':
                 for v in val:
                     fout.write('%18.6e'%(v))
             else:
@@ -369,81 +372,82 @@ class Droplet():
         # Write header
         if at_time == self.__start_time:
 
-         assert os.path.isfile(port_file) is False, 'port_file %r exists; stop.'\
-                 % port_file
+            assert os.path.isfile(port_file) is False, 'port_file %r exists; stop.'%\
+                 port_file
 
-         a = ElementTree.Element('time-sequence')
-         a.set('name','droplet_'+str(self.__slot_id)+'-state')
+            a = ElementTree.Element('time-sequence')
+            a.set('name','droplet_'+str(self.__slot_id)+'-state')
 
-         b = ElementTree.SubElement(a,'comment')
-         b.set('author','cortix.examples.modulib.droplet')
-         b.set('version','0.1')
+            b = ElementTree.SubElement(a,'comment')
+            b.set('author','cortix.examples.modulib.droplet')
+            b.set('version','0.1')
 
-         b = ElementTree.SubElement(a,'comment')
-         today = datetime.datetime.today()
-         b.set('today',str(today))
+            b = ElementTree.SubElement(a,'comment')
+            today = datetime.datetime.today()
+            b.set('today',str(today))
 
-         b = ElementTree.SubElement(a,'time')
-         b.set('unit',self.__cortix_time_unit)
+            b = ElementTree.SubElement(a,'time')
+            b.set('unit',self.__cortix_time_unit)
 
-         # setup the headers
-         for specie in self.__liquid_phase.species:
-             b = ElementTree.SubElement(a,'var')
-             formula_name = specie.formulaName
-             b.set('name',formula_name)
-             unit = specie.massCCUnit
-             b.set('unit',unit)
-             b.set('legend','Droplet_'+str(self.__slot_id)+'-state')
-             b.set('scale',self.__pyplot_scale)
+            # setup the headers
+            for specie in self.__liquid_phase.species:
+                b = ElementTree.SubElement(a,'var')
+                formula_name = specie.formulaName
+                b.set('name',formula_name)
+                unit = specie.massCCUnit
+                b.set('unit',unit)
+                b.set('legend','Droplet_'+str(self.__slot_id)+'-state')
+                b.set('scale',self.__pyplot_scale)
 
-         for quant in self.__liquid_phase.quantities:
-             formal_name = quant.formalName
-             if quant.name == 'spatial-position' or quant.name == 'velocity':
-                 for i in range(3):
-                     b = ElementTree.SubElement(a,'var')
-                     b.set('name',formal_name+' '+str(i+1))
-                     unit = quant.unit
-                     b.set('unit',unit)
-                     b.set('legend','Droplet_'+str(self.__slot_id)+'-state')
-                     b.set('scale',self.__pyplot_scale)
-             else:
-                 b = ElementTree.SubElement(a,'var')
-                 b.set('name',formal_name)
-                 unit = quant.unit
-                 b.set('unit',unit)
-                 b.set('legend','Droplet_'+str(self.__slot_id)+'-state')
-                 b.set('scale',self.__pyplot_scale)
+            for quant in self.__liquid_phase.quantities:
+                formal_name = quant.formalName
+                if quant.name == 'position' or quant.name == 'velocity':
+                    for i in range(3):
+                        b = ElementTree.SubElement(a,'var')
+                        b.set('name',formal_name+' '+str(i+1))
+                        unit = quant.unit
+                        b.set('unit',unit)
+                        b.set('legend','Droplet_'+str(self.__slot_id)+'-state')
+                        b.set('scale',self.__pyplot_scale)
+                else:
+                    b = ElementTree.SubElement(a,'var')
+                    b.set('name',formal_name)
+                    unit = quant.unit
+                    b.set('unit',unit)
+                    b.set('legend','Droplet_'+str(self.__slot_id)+'-state')
+                    b.set('scale',self.__pyplot_scale)
 
-         # Write values for all variables
-         b = ElementTree.SubElement(a,'timeStamp')
-         b.set('value',str(round(at_time/self.__time_unit_scale,n_digits_precision)))
+            # write values for all variables
+            b = ElementTree.SubElement(a,'timeStamp')
+            b.set('value',str(round(at_time/self.__time_unit_scale,n_digits_precision)))
 
-         values = list()
+            values = list()
 
-         for specie in self.__liquid_phase.species:
-             val = self.__liquid_phase.GetValue( specie.name, at_time )
-             values.append( val )
-
-         for quant in self.__liquid_phase.quantities:
-             val = self.__liquid_phase.GetValue( quant.name, at_time )
-             if quant.name == 'spatial-position' or quant.name == 'velocity':
-                for v in val:
-                    values.append( math.fabs(v) ) # pyplot can't take negative values
-             else:
+            for specie in self.__liquid_phase.species:
+                val = self.__liquid_phase.GetValue( specie.name, at_time )
                 values.append( val )
 
-         # Flush out data
-         text = str()
-         for value in values:
-             text += str(round(value,n_digits_precision)) + ','
+            for quant in self.__liquid_phase.quantities:
+                val = self.__liquid_phase.GetValue( quant.name, at_time )
+                if quant.name == 'position' or quant.name == 'velocity':
+                   for v in val:
+                       values.append( math.fabs(v) ) # pyplot can't take negative values
+                else:
+                   values.append( val )
 
-         text = text[:-1]
+            # Flush out data
+            text = str()
+            for value in values:
+                text += str(round(value,n_digits_precision)) + ','
 
-         b.text = text
+            text = text[:-1]
 
-         tree = ElementTree.ElementTree(a)
+            b.text = text
 
-         tree.write( port_file, xml_declaration=True, encoding="unicode", method="xml" )
+            tree = ElementTree.ElementTree(a)
+
+            tree.write( port_file, xml_declaration=True, encoding="unicode",
+                    method="xml" )
 
         #-------------------------------------------------------------------------
         # if not the first time step then parse the existing history file and append 
@@ -467,7 +471,7 @@ class Droplet():
                 values.append( val )
             for quant in self.__liquid_phase.quantities:
                 val = self.__liquid_phase.GetValue( quant.name, at_time )
-                if quant.name == 'spatial-position' or quant.name == 'velocity':
+                if quant.name == 'position' or quant.name == 'velocity':
                     for v in val:
                         values.append( math.fabs(v) ) # pyplot can't take negative values
                 else:
@@ -508,7 +512,7 @@ class Droplet():
         else:
             assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
 
-        x_0 = self.__liquid_phase.GetValue( 'spatial-position', cortix_time )
+        x_0 = self.__liquid_phase.GetValue( 'position', cortix_time )
         v_0 = self.__liquid_phase.GetValue( 'velocity', cortix_time )
 
         u_vec_0 = x_0 + v_0 # concatenate tuples
@@ -576,13 +580,13 @@ class Droplet():
         self.__liquid_phase.AddRow( at_time, values ) # repeat values for current time
 
         if u_vec[2] <= 0.0: # ground impact bounces the drop to a different height near original
-            position = self.__liquid_phase.GetValue( 'spatial-position', self.__start_time )
+            position = self.__liquid_phase.GetValue( 'position', self.__start_time )
             bounced_position = list(position)
             bounced_position[2] *= npy.random.random(1) * 1.2
             u_vec[0:3] = bounced_position[:]
             u_vec[3:]  = 0.0
 
-        self.__liquid_phase.SetValue( 'spatial-position', tuple(u_vec[0:3]), at_time ) # update current values
+        self.__liquid_phase.SetValue( 'position', tuple(u_vec[0:3]), at_time ) # update current values
         self.__liquid_phase.SetValue( 'velocity', tuple(u_vec[3:]), at_time ) # update current values
 
         return

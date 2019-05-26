@@ -494,7 +494,7 @@ class Simulation:
 
         #end for net in networks:
 
-        # Now finish forming the XML comm file for each module in each network
+        # now finish forming the XML comm file for each module in each network
         for net in networks:
             for slot_name in net.module_slot_names:
                 comm_file = net.get_runtime_cortix_comm_file_name(slot_name)

@@ -53,11 +53,11 @@
   <!--NB: each task combines parameters for one named application connectivity-->
   <!--NB: each task name must match a network name below-->
 
-  <task name='solo-wind' >
+  <task name='wind-pyplot' >
 
    <start_time unit='minute'>0.0</start_time>
-   <evolve_time unit='minute'>1.0</evolve_time>
-   <time_step unit='minute'>0.5</time_step>
+   <evolve_time unit='minute'>2.5</evolve_time>
+   <time_step unit='second'>0.5</time_step>
 
    <logger level='DEBUG'>
     <file_handler level='DEBUG'> </file_handler>
@@ -117,6 +117,22 @@
 
    </module>
 
+   <module name='pyplot'>
+
+    <library>
+        <home_dir>$CORTIX/cortix/modulib</home_dir>
+    </library>
+
+    <input_file_name>pyplot.input</input_file_name>
+    <input_file_path>$CORTIX/cortix/examples/input</input_file_path>
+
+    <logger level='DEBUG'>
+     <file_handler level='DEBUG'> </file_handler>
+     <console_handler level='INFO'> </console_handler>
+    </logger>
+
+   </module>
+
    <!--                  Modules objects end here                                   -->
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
 
@@ -131,7 +147,7 @@
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
 
-   <network name='solo-wind'>
+   <network name='wind-pyplot'>
 
     <logger level='DEBUG'>
      <file_handler level='DEBUG'></file_handler>
@@ -140,15 +156,8 @@
 
     <!-- A connect element (or tag) must have no content; use <connect />-->
     <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
-    <!-- For self-connection of a module: fromPort is use type; toPort is input type-->
-    <!-- For self-connection of a module: fromPort is output type; toPort is provide type-->
-<!--
-    <connect module_slot='wind:0' use_port='input' module_slot='wind:0' provide_port='input-data'/>
-    <connect wind:0='input' wind:0='input-data'/>
--->
-    <connect fromModuleSlot='wind:0' fromPort='input' toModuleSlot='wind:0' toPort='self-input'/>
 
-    <connect fromModuleSlot='wind:0' fromPort='self-output' toModuleSlot='wind:0' toPort='output'/>
+    <connect use_port='time-sequence @ pyplot:0' provide_port='state @ wind:0'/>
 
    </network>
 
