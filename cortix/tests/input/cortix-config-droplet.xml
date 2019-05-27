@@ -90,7 +90,7 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
 
-   <module name="droplet" type="native">
+   <module name="droplet">
     <input_file_name>droplet.input</input_file_name>
     <input_file_path>$CORTIX/cortix/tests/input</input_file_path>
     <logger level="DEBUG">
@@ -99,7 +99,7 @@
     </logger>
    </module>
 
-   <module name="pyplot" type="native">
+   <module name="pyplot">
     <library>
      <home_dir>
          $CORTIX/cortix/modulib
@@ -121,20 +121,24 @@
 
    <!-- Application: networks -->
    <!-- NB: each network has its own task definition above; with the same name -->
-   <!-- NB: the connect tag is ordered: *from* is the receiver; *to* is the provider-->
-   <!-- NB: port labels are the "names" of the ports; "not" a file name necessarily-->
-   <!-- NB: module labels must be composed with a "slot" number, say "name:x"-->
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
 
    <network name="droplet-fall">
+
     <logger level="DEBUG">
      <file_handler level="DEBUG"> </file_handler>
      <console_handler level="INFO"> </console_handler>
     </logger>
     
     <!-- A connect element (or tag) must have no content; use <connect />-->
-    <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
+    <!-- Modules need to be given a slot number; use a colon after the module name 
+         followed by an integer-->
+    <!-- Example of a connect XML element:
+
+           <connect use_port='port_name @ module_name:slot_number_int'
+                    provide_port='port_name @ module_name:slot_number_int' />
+    -->
 
     <connect use_port='time-sequence @ pyplot:0' provide_port='state @ droplet:0' />
 
