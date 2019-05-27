@@ -277,7 +277,7 @@ class Wind():
     def __provide_velocity( self, port_file, at_time ):
         '''
         Provide data while other programs may be trying to read the data. This requires
-        a lock. The port file may be compleltely rewritten or appended to.
+        a lock. The port file may be completely rewritten or appended to.
         '''
 
         import pickle
