@@ -18,7 +18,7 @@
     <port type='use'     mode='file.pkl' multiplicity='1'>wind-velocity</port>
 
     <!-- provide ports -->
-    <port type='provide' mode='file.xml' multiplicity='1'>droplet-position</port>
+    <port type='provide' mode='file.pkl' multiplicity='1'>droplet-position</port>
     <port type='provide' mode='file.xml' multiplicity='1'>state</port>
     <port type='provide' mode='file.pkl' multiplicity='1'>output</port>
 
@@ -44,7 +44,7 @@
    .................................................................................
    .   port type='use'     mode='file.pkl' multiplicity='1' wind-velocity          .
    .                                                                               .
-   .   port type='provide' mode='file.xml' multiplicity='1' droplet-position       .
+   .   port type='provide' mode='file.pkl' multiplicity='1' droplet-position       .
    .   port type='provide' mode='file.xml' multiplicity='1' state                  .
    .   port type='provide' mode='file.pkl' multiplicity='1' output                 .
    .................................................................................

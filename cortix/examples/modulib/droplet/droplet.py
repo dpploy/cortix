@@ -123,10 +123,11 @@ class Droplet():
 
         self.__ode_params['gravity'] = gravity
 
+        # These must be npy.ndarray (see ODE solvers).
         self.__ode_params['drag-coeff']    = npy.array([1e-3,3e-4,6e-3])
         self.__ode_params['wind-velocity'] = npy.array([0.0,0.0,0.0])
 
-        # setup species in the liquid phase 
+        # Setup species in the liquid phase.
         species = list()
 
         water = Specie( name='water', formulaName='H2O(l)', phase='liquid', atoms=['2*H','O'] )
@@ -174,6 +175,7 @@ class Droplet():
         cortix_time *= self.__time_unit_scale  # convert to Droplet time unit
 
         # provide data to all provide ports 
+        self.__provide_data( provide_port_name='droplet-position',  at_time=cortix_time )
         self.__provide_data( provide_port_name='state',  at_time=cortix_time )
         self.__provide_data( provide_port_name='output', at_time=cortix_time )
 
@@ -207,6 +209,9 @@ class Droplet():
         port_file = self.__get_port_file( provide_port_name = provide_port_name )
 
         # Provide data to port files
+        if provide_port_name == 'droplet-position' and port_file is not None:
+            self.__provide_droplet_position( port_file, at_time )
+
         if provide_port_name == 'output' and port_file is not None:
             self.__provide_output( port_file, at_time )
 
@@ -277,6 +282,27 @@ class Droplet():
                         port_file = this_port_file
 
         return port_file
+
+    def __provide_droplet_position( self, port_file, at_time ):
+        '''
+        Provide data while other programs may be trying to read the data. This requires
+        a lock. The port file may be completely rewritten or appended to.
+        '''
+
+        import pickle
+        from threading import Lock
+
+        lock = Lock()
+
+        with lock:
+            pickle.dump( self.__liquid_phase.get_quantity_history('position'),
+                    open(port_file,'wb') )
+
+        s = '__provide_droplet_position('+str(round(at_time,2))+'[s]): '
+        m = 'pickle.dumped droplet position.'
+        self.__log.debug(s+m)
+
+        return
 
     def __provide_output( self, port_file, at_time ):
         '''
