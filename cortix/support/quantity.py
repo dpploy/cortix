@@ -8,7 +8,7 @@
 #
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
-"""
+'''
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
 This Quantity class is to be used with other classes in plant-level process modules.
@@ -17,69 +17,65 @@ For unit testing do at the linux command prompt:
     python quantity.py
 
 Sat Sep  5 12:51:34 EDT 2015
-"""
-# *******************************************************************************
+'''
+#*********************************************************************************
 import os
 import sys
 import numpy as npy
-# *******************************************************************************
+#*********************************************************************************
 
 class Quantity():
+    '''
+    todo: this probably should not have a "value" for the same reason as Specie.
+          this needs some thinking.
+    '''
 
-    # todo: this probably should not have a "value" for the same reason as Specie.
-    #      this needs some thinking.
+#*********************************************************************************
+# Construction
+#*********************************************************************************
 
     def __init__(self,
-                 name='null-quantity',
-                 formalName='null-quantity',
-                 value=float(0.0),  # float, int, or npy.ndarray (float or int)
-                 unit='null-unit'
-                 ):
+                 name       = 'null-quantity',
+                 formalName = 'null-quantity',
+                 value      = float(0.0),  # this can be type
+                 unit       = 'null-unit'
+                ):
 
+        # Sanity tests here
         assert isinstance(name, str), 'oops not string.'
         self._name = name
 
         assert isinstance(formalName, str), 'oops not string.'
         self._formalName = formalName
 
-        assert isinstance(value, float) or isinstance(value, int) or  \
-               isinstance(value, npy.ndarray),'illegal value.'
-
-        if isinstance(value, npy.ndarray):
-           assert value.dtype[:4] == 'float' or value.dtype[:2] == 'int'
-
-        self._value = value
+        self.__value = value
 
         assert isinstance(name, str), 'oops not string.'
-        self._unit = unit
+        self.__unit = unit
 
-        self._name = name
+        self.__name = name
         self._formalName = formalName
-        self._value = value
-        self._unit = unit
+        self.__value = value
+        self.__unit = unit
 
         return
 
-# *******************************************************************************
-
-# *******************************************************************************
-# Setters and Getters methods
-# -------------------------------------------------------------------------------
-# These are passing arguments by value effectively. Because the python objects
-# passed into/out of the function are immutable.
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
 
     def SetName(self, n):
-        self._name = n
+        self.__name = n
 
     def get_name(self):
-        return self._name
+        return self.__name
     name = property(get_name, SetName, None, None)
 
     def SetValue(self, v):
-        self._value = v
+        self.__value = v
 
     def GetValue(self):
-        return self._value
+        return self.__value
     value = property(GetValue, SetValue, None, None)
 
     def SetFormalName(self, fn):
@@ -90,27 +86,22 @@ class Quantity():
     formalName = property(GetFormalName, SetFormalName, None, None)
 
     def SetUnit(self, f):
-        self._unit = f
+        self.__unit = f
 
     def GetUnit(self):
-        return self._unit
+        return self.__unit
     unit = property(GetUnit, SetUnit, None, None)
 
-# *******************************************************************************
-# Internal helpers
-
-# *******************************************************************************
-# Printing of data members
     def __str__(self):
-        s = '\n\t Quantity(): \n\t name=%s; formalName=%s; value=%s[%s]'
+        s = '\n\t Quantity(): \n\t name=%s; formal name=%s; value=%s[%s]'
         return s % (self.name, self.formalName, self.value, self.unit)
 
     def __repr__(self):
-        s = '\n\t Quantity(): \n\t name=%s; formalName=%s; value=%s[%s]'
+        s = '\n\t Quantity(): \n\t name=%s; formal name=%s; value=%s[%s]'
         return s % (self.name, self.formalName, self.value, self.unit)
 
+#*********************************************************************************
+# Private helper functions (internal use: __)
+#*********************************************************************************
 
-# *******************************************************************************
-# Usage: -> python interface.py
-if __name__ == "__main__":
-    print('Unit testing for Quantity')
+#======================= end class Quantity ======================================

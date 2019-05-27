@@ -139,7 +139,7 @@ class Wind():
         velocity = Quantity( name='velocity', formalName='Veloc.', unit='m/s' )
         quantities.append( velocity )
 
-        self.__gas_phase = Phase( 's', self.__start_time, species=species,
+        self.__gas_phase = Phase( self.__start_time, time_unit='s', species=species,
                 quantities=quantities)
 
         # Initialize phase
@@ -149,7 +149,7 @@ class Wind():
         x_0 = (0.0,0.0,1000.0)  # initial height [m] above ground at 0
         self.__gas_phase.SetValue( 'position', x_0, self.__start_time )
 
-        v_0 = np.array([0.0,0.0,0.0])   # initial wind velocity [m/s]
+        v_0 = np.array([1.8,-4.3,2.5])   # initial wind velocity [m/s]
         self.__gas_phase.SetValue( 'velocity', v_0, self.__start_time )
 
         return
@@ -168,6 +168,7 @@ class Wind():
         # provide data to all provide ports 
         self.__provide_data( provide_port_name='state',  at_time=cortix_time )
         self.__provide_data( provide_port_name='output', at_time=cortix_time )
+        self.__provide_data( provide_port_name='velocity', at_time=cortix_time )
 
         # use data using the 'use-port-name' of the module
         self.__use_data( use_port_name='position', at_time=cortix_time )
@@ -273,20 +274,43 @@ class Wind():
 
         return port_file
 
-    def __provide_output( self, port_file, at_time ):
+    def __provide_velocity( self, port_file, at_time ):
         '''
-        Provide data that will remain in disk after the simulation ends.
+        Provide data while other programs may be trying to read the data. This requires
+        a lock. The port file may be compleltely rewritten or appended to.
+        '''
+
+        import pickle
+        from threading import Lock
+
+        lock = Lock()
+
+        with lock:
+            pickle.dump( self.__gas_phase.get_quantity_history('velocity'),
+                    open(port_file,'wb') )
+
+        s = '__provide_velocity('+str(round(at_time,2))+'[s]): '
+        m = 'pickle.dumped velocity.'
+        self.__log.debug(s+m)
+
+        return
+
+    def __provide_output_example( self, port_file, at_time ):
+        '''
+        Provide data that will remain in disk after the simulation ends, persistent
+        data. This is an example of how to write a low level plain ASCII table of
+        data. This is not used.
         '''
         import datetime
 
-        # if the first time step, write the header of a table data file
+        # If the first time step, write the header of a table data file.
         if at_time == self.__start_time:
 
             assert os.path.isfile(port_file) is False, \
                 'port_file %r exists; stop.' % port_file
             fout = open(port_file,'w')
 
-            # write file header
+            # Write file header.
             fout.write('# name:   '+'wind_'+str(self.__slot_id)); fout.write('\n')
             fout.write('# author: '+'cortix.examples.modulib.wind'); fout.write('\n')
             fout.write('# version:'+'0.1'); fout.write('\n')
@@ -295,30 +319,35 @@ class Wind():
             fout.write('#')
             fout.write('%17s'%('Time[sec]'))
 
-            # mass concentration
+            # Mass concentration.
             for specie in self.__gas_phase.GetSpecies():
                 fout.write('%18s'%(specie.formulaName+'['+specie.massCCUnit+']'))
-            # quantities     
+            # Quantities.
             for quant in self.__gas_phase.GetQuantities():
-                fout.write('%18s'%(quant.formalName+'['+quant.unit+']'))
+                if quant.name == 'position' or quant.name == 'velocity':
+                   for i in range(3):
+                       fout.write('%18s'%(quant.formalName+str(i+1)+'['+quant.unit+']'))
+                else:
+                   fout.write('%18s'%(quant.formalName+'['+quant.unit+']'))
 
             fout.write('\n')
             fout.close()
 
-        # write history data
+        # Write history data.
         fout = open(port_file,'a')
 
-        # Wind time 
+        # Wind time.
         fout.write('%18.6e' % (at_time))
 
-        # mass density   
+        # Mass density.
         for specie in self.__gas_phase.GetSpecies():
             rho = self.__gas_phase.GetValue(specie.name, at_time)
             fout.write('%18.6e'%(rho))
-        # quantities     
+
+        # Quantities.
         for quant in self.__gas_phase.GetQuantities():
             val = self.__gas_phase.GetValue(quant.name, at_time)
-            if quant.name == 'velocity':
+            if quant.name == 'position' or quant.name == 'velocity':
                 for v in val:
                     fout.write('%18.6e'%(v))
             else:
@@ -343,8 +372,13 @@ class Wind():
 
         n_digits_precision = 8
 
+        mutex = Lock()
+
         # write header
         if at_time == self.__start_time:
+
+            # some thread may be trying to read this output
+            mutex.acquire()
 
             assert os.path.isfile(port_file) is False, 'port_file %r exists; stop.'%\
                     port_file
@@ -424,11 +458,13 @@ class Wind():
             tree.write( port_file, xml_declaration=True, encoding="unicode",
                     method="xml" )
 
+            mutex.release()
+
         #-------------------------------------------------------------------------
         # if not the first time step then parse the existing history file and append
         else:
 
-            mutex = Lock()
+            # some thread may be trying to read this output
             mutex.acquire()
 
             tree = ElementTree.parse( port_file )
@@ -468,22 +504,24 @@ class Wind():
 
         return
 
+    def __use_position( self, port_file, at_time ):
+        '''
+        This file usage requires a locking mechanism before the reading operatkion
+        so the program writing the file does not delete it or modify it in the
+        middle of the reading process.
+        '''
+
+        return
+
     def __evolve( self, cortix_time=0.0, cortix_time_step=0.0 ):
         r'''
          '''
 
-        position = self.__gas_phase.GetValue('position',cortix_time)
-        velocity = self.__gas_phase.GetValue('velocity',cortix_time)
-
-        new_position = position
-        new_velocity = velocity
-
         values = self.__gas_phase.GetRow( cortix_time ) # values at previous time
-        at_time = cortix_time + cortix_time_step
-        self.__gas_phase.AddRow( at_time, values ) # repeat values for current time
 
-        self.__gas_phase.SetValue( 'position', new_position, at_time )  # update current values
-        self.__gas_phase.SetValue( 'velocity', new_velocity, at_time ) # update current values
+        at_time = cortix_time + cortix_time_step
+
+        self.__gas_phase.AddRow( at_time, values ) # repeat values for current time
 
         return
 

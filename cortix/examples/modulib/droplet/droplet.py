@@ -117,10 +117,14 @@ class Droplet():
 
         # Domain specific member data 
 
+        self.__ode_params = dict()
+
         gravity = 9.81 # [m/s^2] acceleration of gravity
 
-        Params = namedtuple('Params',['gravity'])
-        self.__params = Params( gravity )
+        self.__ode_params['gravity'] = gravity
+
+        self.__ode_params['drag-coeff']    = npy.array([1e-3,3e-4,6e-3])
+        self.__ode_params['wind-velocity'] = npy.array([0.0,0.0,0.0])
 
         # setup species in the liquid phase 
         species = list()
@@ -143,7 +147,7 @@ class Droplet():
         quantities.append( velocity )
 
         # phase
-        self.__liquid_phase = Phase( 's', self.__start_time, species=species,
+        self.__liquid_phase = Phase( self.__start_time, time_unit='s', species=species,
                 quantities=quantities )
 
         # initialize phase
@@ -173,8 +177,8 @@ class Droplet():
         self.__provide_data( provide_port_name='state',  at_time=cortix_time )
         self.__provide_data( provide_port_name='output', at_time=cortix_time )
 
-        # use data using the 'use-port-name' of the module
-        #self.__use_data( use_port_name='use-port-name', at_time=cortix_time )
+        # use data for wind velocity
+        self.__use_data( use_port_name='wind-velocity', at_time=cortix_time )
 
         return
 
@@ -217,8 +221,8 @@ class Droplet():
         port_file = self.__get_port_file( use_port_name = use_port_name )
 
         # Use data from port file
-        #if use_port_name == 'use-port-name' and port_file is not None:  
-        #   self.__use_mymodule_method( port_file, at_time )
+        if use_port_name == 'wind-velocity' and port_file is not None:
+           self.__use_wind_velocity( port_file, at_time )
 
         return
 
@@ -300,7 +304,7 @@ class Droplet():
         '''
         import datetime
 
-        # If the first time step, write the header of a table data file
+        # If the first time step, write the header of a table data file.
         if at_time == self.__start_time:
 
             assert os.path.isfile(port_file) is False,'port_file %r exists; stop.'%\
@@ -314,12 +318,12 @@ class Droplet():
             today = datetime.datetime.today()
             fout.write('# today:  '+str(today)); fout.write('\n')
             fout.write(' ')
-            # Write file header
+            # Write file header.
             fout.write('%17s'%('Time[sec]'))
-            # Mass density   
+            # Mass density.
             for specie in self.__liquid_phase.GetSpecies():
               fout.write('%18s'%(specie.formulaName+'['+specie.massCCUnit+']'))
-            # Quantities     
+            # Quantities.
             for quant in self.__liquid_phase.GetQuantities():
                 if quant.name == 'position' or quant.name == 'velocity':
                    for i in range(3):
@@ -330,19 +334,18 @@ class Droplet():
             fout.write('\n')
             fout.close()
 
-        # Write history data
-
+        # Write history data.
         fout = open(port_file,'a')
 
-        # Droplet time 
+        # Droplet time.
         fout.write('%18.6e' % (at_time))
 
-        # Mass density   
+        # Mass density.  
         for specie in self.__liquid_phase.GetSpecies():
             rho = self.__liquid_phase.GetValue(specie.name, at_time)
             fout.write('%18.6e'%(rho))
 
-        # Quantities     
+        # Quantities.
         for quant in self.__liquid_phase.GetQuantities():
             val = self.__liquid_phase.GetValue(quant.name, at_time)
             if quant.name == 'position' or quant.name == 'velocity':
@@ -494,7 +497,66 @@ class Droplet():
 
         return
 
-    def __evolve( self, cortix_time=0.0, cortix_time_step=0.0 ):
+    def __use_wind_velocity( self, port_file, at_time ):
+        '''
+        Get wind velocity.
+        '''
+
+        import pickle
+        from threading import Lock
+
+        lock = Lock()
+
+        found = False
+        while found is False:
+
+            try:
+              lock.acquire()
+              (velocity,time_unit) = pickle.load( open(port_file,'rb') )
+
+            except:
+              lock.release()
+              s = '__use_wind_velocity('+str(round(at_time,2))+'[s]):'
+              m = ' pickle.load velocity in '+port_file+' failed. Retrying...'
+              self.__log.debug(s+m)
+              continue
+
+            else:
+              try:
+                assert time_unit == 's'
+                assert isinstance(velocity,Quantity)
+                loc = velocity.value.index.get_loc(at_time,method='nearest',
+                        tolerance=1e-2)
+                time_stamp = velocity.value.index[loc]
+
+                #print('at_time    = ',at_time)
+                #print('time_stamp = ',time_stamp)
+                #print('loc        = ',loc)
+                #print('dt         = ',abs(time_stamp-at_time))
+                #print(velocity.value)
+                assert abs(time_stamp - at_time) <= 1e-2
+                found = True
+                lock.release()
+
+              except:
+                lock.release()
+                s = '__use_wind_velocity('+str(round(at_time,2))+'[s]): '
+                m = port_file+' does not have data yet. Retrying ...'
+                self.__log.debug(s+m)
+                self.__log.debug(s)
+
+        s = '__use_wind_velocity('+str(round(at_time,2))+'[s]): pickle.loaded velocity.'
+        self.__log.debug(s)
+
+        wind_velocity = velocity.value.loc[time_stamp]
+        self.__wind_velocity = wind_velocity
+
+        #print('wind velocity = ',wind_velocity)
+        self.__ode_params['wind-velocity'] = wind_velocity
+
+        return
+
+    def __evolve( self, at_time=0.0, at_time_step=0.0 ):
         r'''
         ODE IVP problem:
         Given the initial data at :math:`t=0`, :math:`u_1(0) = x_0`,
@@ -504,7 +566,20 @@ class Droplet():
         When :math:`u_1(t)` is negative, bounce the droplet to a random height between
         0 and :math:`1.2\,x_0` with no velocity, and continue the time integration until
         :math:`t = t_f`.
+
+        Parameters
+        ----------
+        at_time: float
+            Time in the droplet unit of time (seconds).
+
+        at_time_step: float
+            Time step in the droplet unit of time (seconds).
+
+        Returns
+        -------
+        None
         '''
+
         if self.__ode_integrator == 'scikits.odes':
             from scikits.odes import ode        # this requires the SUNDIALS ODE package 
         elif self.__ode_integrator == 'scipy.integrate':
@@ -512,13 +587,14 @@ class Droplet():
         else:
             assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
 
-        x_0 = self.__liquid_phase.GetValue( 'position', cortix_time )
-        v_0 = self.__liquid_phase.GetValue( 'velocity', cortix_time )
+        x_0 = self.__liquid_phase.GetValue( 'position', at_time )
+        v_0 = self.__liquid_phase.GetValue( 'velocity', at_time )
 
         u_vec_0 = x_0 + v_0 # concatenate tuples
 
         # rhs function
         if self.__ode_integrator == 'scikits.odes':
+
             def rhs_fn(t, u_vec, dt_u_vec, params):
                 dt_u_vec[0] = u_vec[3]              #  d_t u_1 = u_4
                 dt_u_vec[3] = 0.0                   #  d_t u_4 = 0 
@@ -527,26 +603,32 @@ class Droplet():
                 dt_u_vec[4] = 0.0                   #  d_t u_5 = 0 
 
                 dt_u_vec[2] = u_vec[5]              #  d_t u_3 = u_6
-                dt_u_vec[5] = - params.gravity      #  d_t u_6 = -g
+                dt_u_vec[5] = - params['gravity']   #  d_t u_6 = -g
                 return
         elif self.__ode_integrator == 'scipy.integrate':
-            def rhs_fn(u_vec, t, gravity):
-                dt_u_0 = u_vec[3]              #  d_t u_1 = u_4
-                dt_u_3 = 0.0                   #  d_t u_4 = 0
 
-                dt_u_1 = u_vec[4]              #  d_t u_2 = u_5
-                dt_u_4 = 0.0                   #  d_t u_5 = 0 
+            def rhs_fn(u_vec, t, params):
+                alpha     = params['drag-coeff']
+                wind_velo = params['wind-velocity']
+                drag      = -alpha*wind_velo
+                gravity   = -params['gravity']
 
-                dt_u_2 = u_vec[5]              #  d_t u_3 = u_6
-                dt_u_5 = - gravity             #  d_t u_6 = -g
+                dt_u_0 = u_vec[3]                         #  d_t u_1 = u_4
+                dt_u_3 = drag[0]                          #  d_t u_4 = f_1
+
+                dt_u_1 = u_vec[4]                         #  d_t u_2 = u_5
+                dt_u_4 = drag[1]                          #  d_t u_5 = f_2
+
+                dt_u_2 = u_vec[5]                         #  d_t u_3 = u_6
+                dt_u_5 = drag[2] + gravity                #  d_t u_6 = f_3 - g
                 return [dt_u_0, dt_u_1, dt_u_2, dt_u_3, dt_u_4, dt_u_5]
         else:
             assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
 
-        t_interval_sec = npy.linspace(0.0, cortix_time_step, num=2)
+        t_interval_sec = npy.linspace(0.0, at_time_step, num=2)
 
         if self.__ode_integrator == 'scikits.odes':
-            cvode = ode('cvode', rhs_fn, user_data=self.__params, old_api=False)
+            cvode = ode('cvode', rhs_fn, user_data=self.__ode_params, old_api=False)
             solution = cvode.solve( t_interval_sec, u_vec_0 )  # solve for time interval 
 
             results = solution.values
@@ -561,7 +643,7 @@ class Droplet():
         elif self.__ode_integrator == 'scipy.integrate':
             ( u_vec_hist, info_dict ) = odeint( rhs_fn,
                                                 u_vec_0, t_interval_sec,
-                                                args=( self.__params.gravity, ),
+                                                args=( self.__ode_params, ),
                                                 full_output=True
                                               )
 
@@ -573,9 +655,9 @@ class Droplet():
             assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
 
 
-        values = self.__liquid_phase.GetRow( cortix_time ) # values at previous time
+        values = self.__liquid_phase.GetRow( at_time ) # values at previous time
 
-        at_time = cortix_time + cortix_time_step
+        at_time = at_time + at_time_step
 
         self.__liquid_phase.AddRow( at_time, values ) # repeat values for current time
 

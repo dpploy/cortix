@@ -10,8 +10,12 @@
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 '''
 Phase *history* container. When you think of a phase value, think of that value at
-a specific point in time. This container holds the historic data of a phase.
-Its species and quantities.
+a specific point in time. This container holds the historic data of a phase;
+its species and quantities. This implementation treats access of time stamps within
+a tolerance. All searches for time stamped values are subjected to an approximation
+of the time stamp to avoid values too close to each other in time, and/or to return
+the closest value in time searched or no value if none can be found according to the
+tolerance.
 
 Background
 ----------
@@ -53,15 +57,15 @@ class Phase():
 #*********************************************************************************
 
     def __init__(self,
-                 time_unit  = None,
                  time_stamp = None,
+                 time_unit  = None,
                  species    = None,
                  quantities = None
-                 ):
+                ):
 
         # Sanity tests
-        assert isinstance(time_unit, str)
         assert isinstance(time_stamp, float)
+        assert isinstance(time_unit, str)
 
         self.__time_unit = time_unit
 
@@ -105,7 +109,7 @@ class Phase():
         # Table data phase without data type assigned; this is left to the user
         # Time stamps will always be float
         self.__phase = pandas.DataFrame( index=[float(time_stamp)], columns=names )
-#        self.__phase.fillna( 0.0, inplace=True )  # dtype defaults to float
+        #self.__phase.fillna( 0.0, inplace=True )  # dtype defaults to float
 
         return
 
@@ -137,6 +141,9 @@ class Phase():
     timeStamps = property(GetTimeStamps, None, None, None)
 
     def __get_time_stamps(self):
+        '''
+        Get all time stamps in the index of the data frame.
+        '''
         return list(self.__phase.index)  # return all time stamps
     time_stamps = property(__get_time_stamps, None, None, None)
 
@@ -172,14 +179,77 @@ class Phase():
                 return
 
     def GetQuantity(self, name):
+        '''
+        OLD version.
+        Returns the quantity evaluated at the last time step of the phase history.
+        This also updates the value of the quantity object. If the quantity name does not
+        exist the return is None.
+        '''
+
         for quant in self.__quantities:
             if quant.name == name:
                 time_stamp = self.__get_time_stamp( None ) # get latest time stamp
-                assert name in self.__phase.columns, 'name %r not in %r'% \
+                assert name in self.__phase.columns, 'name %r not in %r'%\
                    (name,self.__phase.columns)
                 quant.value = self.__phase.loc[time_stamp, name]
                 return quant  # return quantity syncronized with the phase
+
         return None
+
+    def get_quantity(self, name):
+        '''
+        New version.
+        Get the quantity `name` at a point in time closest to `try_time_stamp` up to a
+        tolerance. If no time stamp is passed, the whole history is returned.
+
+        Parameters
+        ----------
+        name: str
+
+        try_time_stamp: float, int or None
+            Time stamp of desired quantity value. Default: None returns the whole
+            quantity history.
+
+        Returns
+        -------
+        quant.value: float or int or other
+        '''
+
+        assert name in self.__phase.columns, 'name %r not in %r'%\
+                (name,self.__phase.columns)
+
+        time_stamp = self.__get_time_stamp( None )
+
+        for quant in self.__quantities:
+            if quant.name == name:
+                quant.value = self.__phase.loc[time_stamp, name] # labels' access mode
+                return quant  # return quantity syncronized with the phase
+
+    def get_quantity_history(self, name):
+        '''
+        Create a quantity `name` history. This will create a fully qualified quantity
+        and return to the caller. The function is typically needed for data output to
+        a file through `pickle`. Since the value attribute of a quantity can be any
+        data structure, a time-series is built and stored in the value attribute. In
+        addition the time unit is added to the final return value as a tuple.
+
+        Parameters
+        ----------
+        name: str
+
+        Returns
+        -------
+        quant_history: tuple(Quantity,float)
+        '''
+
+        assert name in self.__phase.columns, 'name %r not in %r'%\
+                (name,self.__phase.columns)
+
+        for quant in self.__quantities:
+            if quant.name == name:
+                quant_history = deepcopy(quant)
+                quant_history.value = self.__phase[name] # whole data frame index series
+                return (quant_history,self.__time_unit) # return tuple
 
     def AddSpecie(self, new_specie):
         assert isinstance(new_specie, Specie)
@@ -213,6 +283,9 @@ class Phase():
         #self.__phase = df.fillna(newQuant.value)
 
     def AddRow(self, try_time_stamp, row_values):
+
+        assert try_time_stamp not in self.__phase.index, 'already used time_stamp: %r'%\
+                (try_time_stamp)
         assert isinstance(row_values, list)
 
         time_stamp = self.__get_time_stamp( try_time_stamp )
@@ -385,23 +458,41 @@ class Phase():
 # Private helper functions (internal use: __)
 #*********************************************************************************
 
-    def __get_time_stamp(self, try_time_stamp):
-        """
-        Helper method for finding the closest time stamp in the phase history.
-        The pandas Index container used for storing float data type time stamps
-        will return the nearest time stamp up to a tolerance.
-        """
+    def __get_time_stamp(self, try_time_stamp=None):
+        '''
+        Helper method for finding the closest time stamp to `try_time_stamp` in the
+        phase history. The pandas index container used for storing float data type
+        time stamps will return the nearest time stamp up to a tolerance.
+        Whether the time index has one value, this function will inspect for the
+        proximity to that value.
+
+        Parameters
+        ----------
+        try_time_stamp: float, int or None
+            Default: None will return the last time stamp.
+
+        Returns
+        -------
+        self.__phase.index[loc]: float or None
+            Will return None if no time stamp within tolerance is found.
+
+        '''
+        import numpy as np
+
+        tol = 1.0e-3
 
         if try_time_stamp is None:
-           return self.__phase.index[-1]
+            return self.__phase.index[-1]
         else:
-           tol = 1.0e-4
-           try:
-             loc = self.__phase.index.get_loc( try_time_stamp, method='nearest',
-                                               tolerance=tol )
-           except KeyError:
-             return None
-           else:
-             return  self.__phase.index[loc]
+            time_stamps = np.array(self.__phase.index)
+            if time_stamps.size >= 2:
+               tol = 1.0e-3 * np.diff(time_stamps).mean() # 1e-3 * the mean delta t
+            try: # abs(index_value - try_time_stamp) <= tolerance
+                loc = self.__phase.index.get_loc( try_time_stamp, method='nearest',
+                        tolerance=tol )
+            except KeyError: # no value found withing tol
+                return None
+            else:
+                return  self.__phase.index[loc]
 
 #======================= end class Phase =========================================

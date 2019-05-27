@@ -34,7 +34,8 @@ def run():
     cortix = Cortix('cortix-droplet', full_path_config_file)
 
     # This is a test of the droplet and pyplot connected.
-    cortix.run_simulations(task_name="droplet-fall")
+    #cortix.run_simulations(task_name="droplet-fall")
+    cortix.run_simulations(task_name="droplet-wind")
 
     # WARNING: the tasks are interferring with each other and threads are left running.
     # note how the droplet-fall runs two droplet instances...FIX ME.
