@@ -286,7 +286,7 @@
    <!-- Application: modules set -->
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="fueldepot" type="native">
+   <module name="fueldepot">
     <library name='headend-lib'>
      <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing 
@@ -310,7 +310,7 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="chopper" type="native">
+   <module name="chopper">
     <library name='headend-lib'>
      <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing 
@@ -333,7 +333,7 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="oldchopper" type="native">
+   <module name="oldchopper">
     <library name='vfda-lib'>
      <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing 
@@ -359,7 +359,7 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="storage" type="native">
+   <module name="storage">
     <input_file_name>storage.input</input_file_name>
     <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
@@ -379,7 +379,7 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="dissolverA" type="native">
+   <module name="dissolverA">
     <library name='vfda-lib'>
      <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing 
@@ -405,7 +405,7 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
 <!--      /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing  -->
-   <module name="dissolver" type="native">
+   <module name="dissolver">
     <library name='headend-lib'>
      <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing  
@@ -434,7 +434,7 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="tank" type="native">
+   <module name="tank">
     <library name='ornl-lib'>
      <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing 
@@ -461,7 +461,7 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="feedprep" type="native">
+   <module name="feedprep">
     <input_file_name>feedprep.input</input_file_name>
     <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
@@ -483,7 +483,7 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="solventxtract" type="native">
+   <module name="solventxtract">
     <input_file_name>solventxtract.input</input_file_name>
     <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
@@ -505,7 +505,7 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="condenser" type="native">
+   <module name="condenser">
     <library name='headend-lib'>
      <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing 
@@ -529,7 +529,7 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="scrubber" type="native">
+   <module name="scrubber">
     <input_file_name>scrubber.input</input_file_name>
     <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
@@ -543,7 +543,7 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="filter" type="native">
+   <module name="filter">
     <input_file_name>filter.input</input_file_name>
     <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
@@ -557,7 +557,7 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="offgas" type="native">
+   <module name="offgas">
     <input_file_name>offgas.input</input_file_name>
     <input_file_path>/home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev/input/</input_file_path>
     <logger level="DEBUG">
@@ -571,7 +571,7 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="dissolverFpot" type="native">
+   <module name="dissolverFpot">
     <library name='srnl-lib'>
      <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing  
@@ -648,7 +648,7 @@
    </module>
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
-   <module name="modulib.pyplot" type="native">
+   <module name="modulib.pyplot">
     <library name='cortix'>
      <parent_dir>
       /home/dealmeida/mac-dealmeida/gentoo-home/work/codes/reprocessing/cortix-dev

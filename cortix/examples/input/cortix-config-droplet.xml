@@ -53,6 +53,20 @@
   <!--NB: each task name must match a network name below-->
 
   <task name='droplet-fall' >
+
+   <start_time unit='minute'>0.0</start_time>
+   <evolve_time unit='minute'>2.5</evolve_time>
+   <time_step unit='second'>0.5</time_step>
+
+   <logger level='DEBUG'>
+    <file_handler level='DEBUG'> </file_handler>
+    <console_handler level='INFO'> </console_handler>
+   </logger>
+
+  </task>
+
+  <task name='droplet-wind' >
+
    <start_time unit='minute'>0.0</start_time>
    <evolve_time unit='minute'>2.5</evolve_time>
    <time_step unit='second'>0.5</time_step>
@@ -131,7 +145,7 @@
 
    </module>
 
-   <module name='wind' type='native'>
+   <module name='wind'>
 
     <input_file_name>wind.input</input_file_name>
     <input_file_path>$CORTIX/cortix/examples/input/</input_file_path>
@@ -151,9 +165,6 @@
 
    <!-- Application: networks -->
    <!-- NB: each network has its own task definition above; with the same name -->
-   <!-- NB: the connect tag is ordered: *from* is the receiver; *to* is the provider-->
-   <!-- NB: port labels are the 'names' of the ports; 'not' a file name necessarily-->
-   <!-- NB: module labels must be composed with a 'slot' number, say 'name:x'-->
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
 
@@ -165,9 +176,37 @@
     </logger>
 
     <!-- A connect element (or tag) must have no content; use <connect />-->
-    <!-- Modules need to be given a slot number; use a colon after the name followed by an integer-->
+    <!-- Modules need to be given a slot number; use a colon after the module name 
+         followed by an integer-->
+    <!-- Example of a connect XML element:
+
+           <connect use_port='port_name @ module_name:slot_number_int'
+                    provide_port='port_name @ module_name:slot_number_int' />
+    -->
 
     <connect use_port='time-sequence @ pyplot:0' provide_port='state @ droplet:0' />
+
+   </network>
+
+   <network name='droplet-wind'>
+       
+    <logger level='DEBUG'>
+     <file_handler level='DEBUG'> </file_handler>
+     <console_handler level='INFO'> </console_handler>
+    </logger>
+
+    <!-- A connect element (or tag) must have no content; use <connect />-->
+    <!-- Modules need to be given a slot number; use a colon after the module name 
+         followed by an integer-->
+    <!-- Example of a connect XML element:
+
+           <connect use_port='port_name @ module_name:slot_number_int'
+                    provide_port='port_name @ module_name:slot_number_int' />
+    -->
+
+    <connect use_port='time-sequence @ pyplot:0' provide_port='state @ droplet:0' />
+    <connect use_port='wind-velocity @ droplet:0' provide_port='velocity @ wind:0' />
+    <connect use_port='time-sequence @ pyplot:0' provide_port='state @ wind:0' />
 
    </network>
 

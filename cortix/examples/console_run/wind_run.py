@@ -29,7 +29,7 @@ def run():
 
     cortix = Cortix('cortix-wind', full_path_config_file)
 
-    cortix.run_simulations(task_name="wind-pyplot")
+    cortix.run_simulations(task_name="wind-dry")
 
     return
 

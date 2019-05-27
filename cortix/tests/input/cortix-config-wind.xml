@@ -23,7 +23,7 @@
          If this rule is not followed, there will be collision with file in/outputs;
          including results files and logging files.-->
 
- <name>cortix-droplet</name>
+ <name>cortix-wind</name>
 
  <logger level="DEBUG">
   <file_handler level="DEBUG"> </file_handler>
@@ -38,7 +38,7 @@
  <!-- Simulation definition -->
  <!-- NB: each simulation has only one application -->
 
- <simulation name="droplet">
+ <simulation name="wind">
 
   <logger level="DEBUG">
    <file_handler level="DEBUG"> </file_handler>
@@ -52,7 +52,7 @@
   <!--NB: each task combines parameters for one named application connectivity-->
   <!--NB: each task name must match a network name below-->
 
-  <task name="droplet-fall" >
+  <task name="wind-dry" >
    <start_time unit="minute">0.0</start_time>
    <evolve_time unit="minute">2.5</evolve_time>
    <time_step unit="second">0.5</time_step>
@@ -71,7 +71,7 @@
   <!-- Simulation: application -->
   <!-- NB: each simulation has only one application -->
 
-  <application name="droplet">
+  <application name="wind">
 
    <module_library>
     <home_dir>
@@ -90,8 +90,8 @@
 
    <!-- ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::: -->
 
-   <module name="droplet">
-    <input_file_name>droplet.input</input_file_name>
+   <module name="wind">
+    <input_file_name>wind.input</input_file_name>
     <input_file_path>$CORTIX/cortix/tests/input</input_file_path>
     <logger level="DEBUG">
      <file_handler level="DEBUG"> </file_handler>
@@ -124,7 +124,7 @@
 
    <!-- o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o-o -->
 
-   <network name="droplet-fall">
+   <network name="wind-dry">
 
     <logger level="DEBUG">
      <file_handler level="DEBUG"> </file_handler>
@@ -140,7 +140,7 @@
                     provide_port='port_name @ module_name:slot_number_int' />
     -->
 
-    <connect use_port='time-sequence @ pyplot:0' provide_port='state @ droplet:0' />
+    <connect use_port='time-sequence @ pyplot:0' provide_port='state @ wind:0' />
 
    </network>
 
