@@ -204,10 +204,11 @@
                     provide_port='port_name @ module_name:slot_number_int' />
     -->
 
+    <connect use_port='position @ wind:0' provide_port='droplet-position @ droplet:0' />
+    <connect use_port='wind-velocity @ droplet:0' provide_port='velocity @ wind:0' />
+
     <connect use_port='time-sequence @ pyplot:0'  provide_port='state @ wind:0' />
     <connect use_port='time-sequence @ pyplot:0'  provide_port='state @ droplet:0' />
-    <connect use_port='position      @ wind:0'    provide_port='droplet-position @ droplet:0' />
-    <connect use_port='wind-velocity @ droplet:0' provide_port='velocity @ wind:0' />
 
    </network>
 

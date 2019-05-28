@@ -175,9 +175,9 @@ class Droplet():
         cortix_time *= self.__time_unit_scale  # convert to Droplet time unit
 
         # provide data to all provide ports 
-        self.__provide_data( provide_port_name='droplet-position',  at_time=cortix_time )
-        self.__provide_data( provide_port_name='state',  at_time=cortix_time )
-        self.__provide_data( provide_port_name='output', at_time=cortix_time )
+        self.__provide_data( provide_port_name='droplet-position', at_time=cortix_time )
+        self.__provide_data( provide_port_name='state',            at_time=cortix_time )
+        self.__provide_data( provide_port_name='output',           at_time=cortix_time )
 
         # use data for wind velocity
         self.__use_data( use_port_name='wind-velocity', at_time=cortix_time )
@@ -555,11 +555,6 @@ class Droplet():
                         tolerance=1e-2)
                 time_stamp = velocity.value.index[loc]
 
-                #print('at_time    = ',at_time)
-                #print('time_stamp = ',time_stamp)
-                #print('loc        = ',loc)
-                #print('dt         = ',abs(time_stamp-at_time))
-                #print(velocity.value)
                 assert abs(time_stamp - at_time) <= 1e-2
                 found = True
                 lock.release()
