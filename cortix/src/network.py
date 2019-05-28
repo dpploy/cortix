@@ -31,7 +31,7 @@ class Network:
 
     __connectivity: list(dict)
         List of dictionaries of connectivity. Dictionary:
-        {'use_module_slot': module_slot_name, 'fromPort': use_port_name, 'provide_module_slot': module_slot_name, 'toPort': provide_port_name}.
+        {'use_module_slot': module_slot_name, 'use_port': use_port_name, 'provide_module_slot': module_slot_name, 'provide_port': provide_port_name}.
 
     __module_slot_names: list(str)
         List of names of module slots.
