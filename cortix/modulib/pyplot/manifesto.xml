@@ -16,14 +16,15 @@
 
     <!-- use ports -->
     <port type='use'     mode='file.xml' multiplicity='1'>input</port>
-    <port type='use'     mode='file.xml' multiplicity='1'>time-sequence</port>
-    <port type='use'     mode='file.xml' multiplicity='1'>time-tables</port>
+    <port type='use'     mode='file.xml' multiplicity='999'>time-sequence</port>
+    <port type='use'     mode='file.xml' multiplicity='999'>time-tables</port>
 
     <!-- provide ports -->
 
     <port_doc port_name='output'>
         The use port named `input` is a legacy port used to read a past
-        simulation `state` file and re-make plots.
+        simulation `state` file and re-make plots. This does not work
+        now because no module can run solo.
     </port_doc>
 
     <diagram> 
@@ -43,8 +44,8 @@
    .                                                                .
    ..................................................................
    . port type='use' mode='file.xml' multiplicity='1' input         .
-   . port type='use' mode='file.xml' multiplicity='1' time-sequence .
-   . port type='use' mode='file.xml' multiplicity='1' time-tables   .
+   . port type='use' mode='file.xml' multiplicity='999' time-sequence .
+   . port type='use' mode='file.xml' multiplicity='999' time-tables   .
    ..................................................................
     </diagram>
 
