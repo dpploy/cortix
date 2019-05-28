@@ -532,8 +532,6 @@ class Simulation:
 
         # Now finish forming the XML comm file for each module in each network
         for net in networks:
-            print('')
-            print(net)
             for mod_slot_name in net.module_slot_names:
                 comm_file = net.get_runtime_cortix_comm_file_name(mod_slot_name)
                 if comm_file == 'null-runtime_cortix_comm_file_name':
