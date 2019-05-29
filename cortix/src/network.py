@@ -52,7 +52,8 @@ class Network:
 
     def __init__(self, net_config_xml_node): 
 
-        assert isinstance(net_config_xml_node, XMLTree), '-> net_config_xml_node is invalid.'
+        assert isinstance(net_config_xml_node, XMLTree), \
+                '-> net_config_xml_node is invalid.'
 
         self.__config_xml_node = net_config_xml_node
 
@@ -64,23 +65,23 @@ class Network:
 
         self.__module_slot_names = list()
 
-        # Cortix communication files for modules
+        # Cortix communication files for modules.
         self.__runtime_cortix_comm_file_name = dict()
 
-        # network graph
+        # Network graph.
         self.__nx_graph = nx.MultiDiGraph(name=self.__name)
 
-        # loop over the connect xml tags
+        # Loop over the connect xml tags.
         for child in self.__config_xml_node.children:
 
             (element, tag, attributes, text) = child
 
-            # a connect element must have no content; format: <connect />
+            # A connect element must have no content; format: <connect />
             if tag == 'connect':
                 assert text is None, 'non empty text, %r, in %r network: '%\
                         (text, self.__name)
 
-                tmp = dict()
+                tmp = dict() # of connect attributes
 
                 for (key, value) in attributes:
 
@@ -227,12 +228,17 @@ class Network:
         comm_file = self.__runtime_cortix_comm_file_name[module_slot_name]
         comm_xml_tree = XMLTree(xml_tree_file=comm_file)
 
+        data_file_name = None
+
         for child in comm_xml_tree.children:
             (node,name,attributes,content) = child
             (name,value) = attributes[0] # order: 0: (name,:) 1: (type,:) 2: (file,:)
             if value == port_name:
                 data_file_name = attributes[-1][1] # (file,:)
                 break
+
+        # If the data file name is not found, it is not in the comm file.
+        assert data_file_name is not None,'port name: %r not in runtime cortix comm file %r'%(port_name, comm_file)
 
         return data_file_name # full path
 

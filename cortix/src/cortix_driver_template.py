@@ -16,7 +16,7 @@ Developers should use this class to wrap their module (MyModule) implemented in 
 file named my_module.py. This file will be placed inside the developer's module
 directory which is pointed to in the Cortix config.xml file.
 '''
-#*************************************************************************
+#*********************************************************************************
 import os
 import sys
 import io
@@ -26,12 +26,16 @@ import logging
 
 # uncomment
 #from .my_module import MyModule
-#*************************************************************************
+#*********************************************************************************
 
 class CortixDriverTemplate():
     '''
      Cortix driver for guest modules.
     '''
+
+#*********************************************************************************
+# Construction 
+#*********************************************************************************
 
     def __init__(self,
                  slot_id,
@@ -73,7 +77,10 @@ class CortixDriverTemplate():
         self.__time_stamp = None  # temporary
 
         return
-#---------------------- end def __init__():-------------------------------
+
+#*********************************************************************************
+# Public member functions 
+#*********************************************************************************
 
     def call_ports(self, cortix_time=0.0):
         '''
@@ -88,7 +95,6 @@ class CortixDriverTemplate():
         self.__log_debug(cortix_time, 'call_ports')
 
         return
-#---------------------- end def call_ports():-----------------------------
 
     def execute(self, cortix_time=0.0, timeStep=0.0):
         '''
@@ -103,10 +109,10 @@ class CortixDriverTemplate():
         self.__log_debug(cortix_time, 'execute')
 
         return
-#---------------------- end def execute():--------------------------------
 
-#*************************************************************************
+#*********************************************************************************
 # Private helper functions (internal use: __)
+#*********************************************************************************
 
     def __log_debug(self, cortix_time=0.0, caller='null-function-name'):
 
@@ -140,6 +146,5 @@ class CortixDriverTemplate():
                 self.__log.debug(s)
 
         return
-#---------------------- end def __log_debug():----------------------------
 
-#====================== end class CortixDriver: ==========================
+#====================== end class CortixDriver: ==================================
