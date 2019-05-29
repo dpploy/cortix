@@ -26,17 +26,16 @@ def run(task_name=None):
     where `task_name` is one of the options below.
     Run the Cortix Droplet example in a Jupyter Notebook for the following tasks:
 
-     1. solo-droplet
-     2. solo-pyplot
-     3. droplet-fall
+     1. droplet-fall
+     2. droplet-wind
 
     '''
     pwd = os.path.dirname(__file__)
     full_path_config_file = os.path.join(pwd, '../input/cortix-config-droplet.xml')
     cortix = Cortix('cortix-droplet', full_path_config_file)
 
-    assert task_name == 'droplet-fall' or task_name == 'solo-droplet' or\
-            task_name == 'solo-pyplot','FATAL: task name %r invalid.'%task_name
+    assert task_name == 'droplet-fall' or task_name == 'droplet-wind',\
+            'FATAL: task name %r invalid.'%task_name
 
     cortix.run_simulations(task_name=task_name)
 
