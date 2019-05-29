@@ -26,7 +26,7 @@ def run(task_name=None):
     where `task_name` is one of the options below.
     Run the Cortix Droplet example in a Jupyter Notebook for the following tasks:
 
-     1. droplet-fall
+     1. droplet-fall (droplet falling without wind)
      2. droplet-wind
 
     '''
