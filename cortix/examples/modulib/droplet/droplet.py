@@ -14,7 +14,6 @@ Droplet module example in Cortix.
 #*********************************************************************************
 import os, sys, io, time
 import logging
-from collections import namedtuple
 import math
 import numpy as npy
 
@@ -42,7 +41,7 @@ class Droplet():
             cortix_start_time = 0.0,
             cortix_final_time = 0.0,
             cortix_time_step = 0.0,
-            cortix_time_unit=None
+            cortix_time_unit = None
                 ):
 
         #.............................................................................
@@ -61,7 +60,8 @@ class Droplet():
                 type(cortix_time_unit)
 
         # Logging: access Cortix Launcher logging facility
-        self.__log = logging.getLogger('launcher-droplet_'+str(slot_id)+'.cortix_driver.droplet')
+        self.__log = logging.getLogger('launcher-droplet_'+str(slot_id)+\
+                '.cortix_driver.droplet')
         self.__log.info('initializing an object of Droplet()')
 
         # Read the manisfesto
@@ -69,12 +69,12 @@ class Droplet():
         self.__log.info(self.__port_diagram)
 
         #.............................................................................
-        # Member data 
+        # Member data.
 
         self.__slot_id = slot_id
         self.__ports   = ports
 
-        # Convert Cortix's time unit to Droplet's internal time unit
+        # Convert Cortix's time unit to Droplet's internal time unit.
         if cortix_time_unit == 'minute':
             self.__time_unit_scale = 60.0
         elif cortix_time_unit == 'second':
@@ -92,7 +92,7 @@ class Droplet():
         if work_dir[-1] != '/': work_dir = work_dir + '/'
         self.__wrkDir = work_dir
 
-        # Signal to start operation
+        # Signal to start operation.
         self.__goSignal = True     # start operation immediately
         for port in self.__ports:  # if there is a signal port, start operation accordingly
             (port_name, port_type, this_port_file) = port
@@ -102,12 +102,12 @@ class Droplet():
         self.__setup_time = 60.0  # time unit; a delay time before starting to run
 
         #.............................................................................
-        # Input ports
-        # Read input information if any
+        # Input ports.
+        # Read input information if any.
 
         #fin = open(input_full_path_file_name,'r')
 
-        # Configuration member data   
+        # Configuration member data.
 
         self.__pyplot_scale = 'linear'
 
@@ -115,7 +115,7 @@ class Droplet():
         #  self.__ode_integrator = 'scikits.odes' # or 'scipy.integrate' 
         self.__ode_integrator = 'scipy.integrate'
 
-        # Domain specific member data 
+        # Domain specific member data.
 
         self.__ode_params = dict()
 
@@ -136,22 +136,22 @@ class Droplet():
 
         species.append(water)
 
-        # quantities in the liquid phase
+        # Quantities in the liquid phase.
         quantities = list()
 
-        # spatial position
+        # Spatial position.
         position = Quantity( name='position', formalName='Pos.', unit='m' )
         quantities.append( position )
 
-        # velocity
+        # Velocity.
         velocity = Quantity( name='velocity', formalName='Veloc.', unit='m/s' )
         quantities.append( velocity )
 
-        # phase
+        # Phase.
         self.__liquid_phase = Phase( self.__start_time, time_unit='s', species=species,
                 quantities=quantities )
 
-        # initialize phase
+        # Initialize phase.
         water_mass_cc = 0.99965 # [g/cc]
         self.__liquid_phase.SetValue( 'water', water_mass_cc, self.__start_time )
 
@@ -174,12 +174,12 @@ class Droplet():
 
         cortix_time *= self.__time_unit_scale  # convert to Droplet time unit
 
-        # provide data to all provide ports 
+        # Provide data to all provide ports.
         self.__provide_data( provide_port_name='droplet-position', at_time=cortix_time )
         self.__provide_data( provide_port_name='state',            at_time=cortix_time )
         self.__provide_data( provide_port_name='output',           at_time=cortix_time )
 
-        # use data for wind velocity
+        # Use data for wind velocity.
         self.__use_data( use_port_name='wind-velocity', at_time=cortix_time )
 
         return
@@ -205,10 +205,10 @@ class Droplet():
 
     def __provide_data( self, provide_port_name=None, at_time=0.0 ):
 
-        # Access the port file
+        # Access the port file.
         port_file = self.__get_port_file( provide_port_name = provide_port_name )
 
-        # Provide data to port files
+        # Provide data to port files.
         if provide_port_name == 'droplet-position' and port_file is not None:
             self.__provide_droplet_position( port_file, at_time )
 
@@ -216,18 +216,18 @@ class Droplet():
             self.__provide_output( port_file, at_time )
 
         if provide_port_name == 'state' and port_file is not None:
-             self.__provide_state( port_file, at_time )
+            self.__provide_state( port_file, at_time )
 
         return
 
     def __use_data( self, use_port_name=None, at_time=0.0 ):
 
-        # Access the port file
+        # Access the port file.
         port_file = self.__get_port_file( use_port_name = use_port_name )
 
-        # Use data from port file
+        # Use data from port files.
         if use_port_name == 'wind-velocity' and port_file is not None:
-           self.__use_wind_velocity( port_file, at_time )
+            self.__use_wind_velocity( port_file, at_time )
 
         return
 
@@ -257,6 +257,7 @@ class Droplet():
 
             max_n_trials = 50
             n_trials     = 0
+
             while os.path.isfile(port_file) is False and n_trials <= max_n_trials:
                 n_trials += 1
                 time.sleep(0.1)
@@ -277,9 +278,11 @@ class Droplet():
             assert use_port_name is None
 
             for port in self.__ports:
+
                 (port_name,port_type,this_port_file) = port
-                if port_name == provide_port_name and port_type == 'provide': \
-                        port_file = this_port_file
+
+                if port_name == provide_port_name and port_type == 'provide':
+                    port_file = this_port_file
 
         return port_file
 
@@ -398,7 +401,7 @@ class Droplet():
 
         n_digits_precision = 8
 
-        # Write header
+        # Write header.
         if at_time == self.__start_time:
 
             assert os.path.isfile(port_file) is False, 'port_file %r exists; stop.'%\
@@ -418,7 +421,7 @@ class Droplet():
             b = ElementTree.SubElement(a,'time')
             b.set('unit',self.__cortix_time_unit)
 
-            # setup the headers
+            # Setup the headers.
             for specie in self.__liquid_phase.species:
                 b = ElementTree.SubElement(a,'var')
                 formula_name = specie.formulaName
@@ -446,7 +449,7 @@ class Droplet():
                     b.set('legend','Droplet_'+str(self.__slot_id)+'-state')
                     b.set('scale',self.__pyplot_scale)
 
-            # write values for all variables
+            # Write values for all variables.
             b = ElementTree.SubElement(a,'timeStamp')
             b.set('value',str(round(at_time/self.__time_unit_scale,n_digits_precision)))
 
@@ -464,7 +467,7 @@ class Droplet():
                 else:
                    values.append( val )
 
-            # Flush out data
+            # Flush out data.
             text = str()
             for value in values:
                 text += str(round(value,n_digits_precision)) + ','
@@ -479,8 +482,8 @@ class Droplet():
                     method="xml" )
 
         #-------------------------------------------------------------------------
-        # if not the first time step then parse the existing history file and append 
-        # to it
+        # If not the first time step then parse the existing history file and append 
+        # to it.
         else:
 
             mutex = Lock()
@@ -492,7 +495,7 @@ class Droplet():
             a = ElementTree.Element('timeStamp')
             a.set('value',str(round(at_time/self.__time_unit_scale,n_digits_precision)))
 
-            # All variables values
+            # All variables values.
             values = list()
 
             for specie in self.__liquid_phase.species:
@@ -506,7 +509,7 @@ class Droplet():
                 else:
                     values.append( val )
 
-            # Flush out data
+            # Flush out data.
             text = str()
             for value in values:
                 text += str(round(value,n_digits_precision)) + ','
