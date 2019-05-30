@@ -30,7 +30,7 @@ import logging
 
 class CortixDriverTemplate():
     '''
-     Cortix driver for guest modules.
+     Cortix driver for guest module: MyModule
     '''
 
 #*********************************************************************************
@@ -38,18 +38,18 @@ class CortixDriverTemplate():
 #*********************************************************************************
 
     def __init__(self,
-                 slot_id,
-                 input_full_path_file_name,
-                 manifesto_full_path_file_name,
-                 work_dir,
-                 ports=list(),
-                 cortix_start_time=0.0,
-                 cortix_final_time=0.0,
-                 cortix_time_step=0.0,
-                 cortix_time_unit=None
-                 ):
+            slot_id,
+            input_full_path_file_name,
+            manifesto_full_path_file_name,
+            work_dir,
+            ports=list(),
+            cortix_start_time=0.0,
+            cortix_final_time=0.0,
+            cortix_time_step=0.0,
+            cortix_time_unit=None
+            ):
 
-        # Sanity test
+        # Sanity tests.
         assert isinstance(slot_id, int), '-> slot_id type %r is invalid.' % type(slot_id)
         assert isinstance( ports, list), '-> ports type %r is invalid.' % type(ports)
         assert len(ports) > 0
@@ -62,10 +62,12 @@ class CortixDriverTemplate():
         assert isinstance(cortix_time_unit, str), '-> time unit type %r is invalid.' % \
                type(cortix_time_unit)
 
-        # Logging
+        # Logging.
         self.__log = logging.getLogger( 'launcher-mymodule' + str(slot_id) +
                                         '.cortixdriver')
         self.__log.info('initializing an object of CortixDriver()')
+
+        self.__wall_clock_time_stamp = None  # initialize
 
         # Guest library module: MyModule
         # uncomment
@@ -74,7 +76,6 @@ class CortixDriverTemplate():
         #        ports,
         #        cortix_start_time, cortix_final_time, cortix_time_step, cortix_time_unit )
 
-        self.__time_stamp = None  # temporary
 
         return
 
@@ -84,7 +85,7 @@ class CortixDriverTemplate():
 
     def call_ports(self, cortix_time=0.0):
         '''
-        Call all ports at cortix_time
+        Call all ports at cortix_time.
         '''
 
         self.__log_debug(cortix_time, 'call_ports')
@@ -96,15 +97,15 @@ class CortixDriverTemplate():
 
         return
 
-    def execute(self, cortix_time=0.0, timeStep=0.0):
+    def execute(self, cortix_time=0.0, time_step=0.0):
         '''
-        Evolve system from cortix_time to cortix_time + timeStep
+        Evolve system from cortix_time to cortix_time + time_step
         '''
 
         self.__log_debug(cortix_time, 'execute')
 
         # uncomment
-        # self.my_module.execute( cortix_time, timeStep )
+        # self.my_module.execute( cortix_time, time_step )
 
         self.__log_debug(cortix_time, 'execute')
 
@@ -116,7 +117,7 @@ class CortixDriverTemplate():
 
     def __log_debug(self, cortix_time=0.0, caller='null-function-name'):
 
-        if self.__time_stamp is None:
+        if self.__wall_clock_time_stamp is None:
             s = ''
             self.__log.debug(s)
             s = '=========================================================='
@@ -129,7 +130,7 @@ class CortixDriverTemplate():
             s = caller + '(' + str(round(cortix_time, 2)) + '[min]):'
             self.__log.debug(s)
 
-            self.__time_stamp = time.time()
+            self.__wall_clock_time_stamp = time.time()
 
         else:
 
@@ -137,10 +138,10 @@ class CortixDriverTemplate():
 
             s = caller + '(' + str(round(cortix_time, 2)) + '[min]): '
             m = 'CPU elapsed time (s): ' + \
-                str(round(end_time - self.__time_stamp, 2))
+                str(round(end_time - self.__wall_clock_time_stamp, 2))
             self.__log.debug(s + m)
 
-            self.__time_stamp = None
+            self.__wall_clock_time_stamp = None
             if caller == 'execute':
                 s = ''
                 self.__log.debug(s)

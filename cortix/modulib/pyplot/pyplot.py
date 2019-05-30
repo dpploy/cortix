@@ -9,10 +9,8 @@
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 '''
-PyPlot module.
-
-Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
-Tue Jun 24 01:03:45 EDT 2014
+PyPlot module. A module for generating runtime plots of data provided by
+connected Cortix modules.
 '''
 #*********************************************************************************
 import os
@@ -36,7 +34,7 @@ from threading import Lock
 from cortix.src.utils.xmltree import XMLTree
 
 from cortix.modulib.pyplot.time_sequence import TimeSequence
-# *********************************************************************************
+#*********************************************************************************
 
 class PyPlot():
 
@@ -54,9 +52,11 @@ class PyPlot():
                  cortix_final_time = 0.0,
                  cortix_time_step = 0.0,
                  cortix_time_unit  = None
-                 ):
+                ):
 
-        # Sanity test
+        #.........................................................................
+        # Sanity tests.
+
         assert isinstance( slot_id, int), '-> slot_id type %r is invalid.' % \
                            type(slot_id)
         assert isinstance( ports, list), '-> ports type %r is invalid.' % type(ports)
@@ -71,16 +71,22 @@ class PyPlot():
         assert isinstance( cortix_time_unit, str), '-> time unit type %r is invalid.' % \
                            type(cortix_time_unit)
 
-        # Logger
+        #.........................................................................
+        # Logger.
+
         self.__log = logging.getLogger('launcher-pyplot_' + str(slot_id) +
                                        '.cortix_driver.pyplot')
         self.__log.info('initializing an object of PyPlot()')
 
-        # Read the manisfesto
+        #.........................................................................
+        # Read the manisfesto.
+
         self.__read_manifesto( manifesto_full_path_file_name )
         self.__log.info(self.__port_diagram)
 
-        # Member data
+        #.........................................................................
+        # Member data.
+
         self.__slot_id = slot_id
         self.__ports   = ports
 
@@ -95,22 +101,24 @@ class PyPlot():
         # the width of the window to plot
         self.__plot_slide_window_interval = 3 * self.__plot_interval
 
-        s = 'Plot interval = ' + str(self.__plot_interval) + ' [' + self.__cortix_time_unit + ']'
+        s = 'Plot interval = ' + str(self.__plot_interval) + ' [' + \
+                self.__cortix_time_unit + ']'
         self.__log.info(s)
-        s = 'Plot slide window interval = ' + str(self.__plot_slide_window_interval) + ' [' + self.__cortix_time_unit + ']'
+        s = 'Plot slide window interval = ' + str(self.__plot_slide_window_interval) + \
+                ' [' + self.__cortix_time_unit + ']'
         self.__log.info(s)
 
         # This holds all time sequences, potentially, one per use port. One time sequence
         # has all the data for one port connection.
-        # Time sequences are xml formatted data per Cortix convention.
+        # Time sequences are XML formatted data per Cortix convention.
         self.__time_sequences_tmp = list()  # temporary storage
 
         # Tables in xml format per Cortix convention
-        # [(time,timeUnit)] = [column,column,...]
+        # [(time,time_unit)] = [column,column,...]
         self.__time_tables_data = dict(list())
 
-# .................................................................................
-# Input ports (if any)
+        # ........................................................................
+        # Input ports (if any)
 
         fin = open(input_full_path_file_name, 'r')
         input_data_full_path_file_names = list()
@@ -122,8 +130,8 @@ class PyPlot():
             return
 
         found = False
-        for (portName, portType, port_file) in ports:
-            if portName == 'input':  # this is the use port connected to the input port
+        for (port_name, port_type, port_file) in ports:
+            if port_name == 'input':  # this is the use port connected to the input port
                 s = 'cp -f ' + input_data_full_path_file_names[0] + ' ' + port_file
                 os.system(s)
                 self.__log.debug(s)
@@ -144,33 +152,35 @@ class PyPlot():
 
     def call_ports(self, cortix_time=0.0):
         '''
-        Transfer data at cortix_time
+        Transfer data at cortix_time.
         '''
 
         if (cortix_time % self.__plot_interval <= 1e-2 and \
             cortix_time < self.__cortix_final_time)        \
            or cortix_time >= self.__cortix_final_time:
 
-            # use ports in PyPlot have infinite multiplicity (implement
-            # multiplicity later)
+            # There are no provide ports.
+
+            # Use ports in PyPlot have infinite multiplicity (implement
+            # multiplicity later).
             assert len(self.__time_sequences_tmp) == 0
 
             for port in self.__ports:
-                (portName, portType, thisPortFile) = port
+                (port_name, port_type, this_port_file) = port
 
-                if portType == 'use':
-                    assert portName == 'time-sequence' or portName == 'time-tables' or \
-                        portName == 'input'
+                if port_type == 'use':
+                    assert port_name == 'time-sequence' or \
+                            port_name == 'time-tables' or port_name == 'input'
 
-                    self.__use_data( usePortName = portName,
-                                     usePortFile = thisPortFile,
+                    self.__use_data( use_port_name = port_name,
+                                     use_port_file = this_port_file,
                                      at_time = cortix_time )
 
         return
 
     def execute(self, cortix_time=0.0, time_step=0.0):
 
-        s = 'execute(): cortix time [min] = ' + str(round(cortix_time, 3))
+        s = 'execute('+str(round(cortix_time,2))+'[min]): '
         self.__log.debug(s)
 
         self.__plot_data(cortix_time, time_step)
@@ -181,49 +191,56 @@ class PyPlot():
 # Private helper functions (internal use: __)
 #*********************************************************************************
 
-    def __use_data(self, usePortName=None, usePortFile=None, at_time=0.0):
+    def __use_data(self, use_port_name=None, use_port_file=None, at_time=0.0):
         '''
-        This operates on a given use port;
+        This operates on a given use port.
         '''
 
         # Access the port file
-        port_file = self.__get_port_file( usePortName = usePortName,
-                                          usePortFile = usePortFile  )
+        port_file = self.__get_port_file( use_port_name = use_port_name,
+                                          use_port_file = use_port_file  )
 
-# Get data from port files
-        if usePortName == 'time-sequence' or usePortName == 'input' \
+        # Use data from port files
+        if use_port_name == 'time-sequence' or use_port_name == 'input' \
            and port_file is not None:
 
             self.__get_time_sequence( port_file, at_time )
 
-        if usePortName == 'time-tables' and port_file is not None:
+        if use_port_name == 'time-tables' and port_file is not None:
             _GetTimeTables(self, port_file, at_time)
 
         return
 
-    def __provide_data(self, providePortName=None, at_time=0.0):
+    def __provide_data(self, provide_port_name=None, at_time=0.0):
         '''
-        Nothing planned to provide at this time; but could change
+        Nothing planned to provide at this time; but could change.
         '''
 
         return
 
-    def __get_port_file(self, usePortName=None,
-                        usePortFile=None, providePortName=None):
+    def __get_port_file(self, use_port_name=None,
+                        use_port_file=None, provide_port_name=None):
+        '''
+        This may return a None port_file.
+        This implementation works for multiple connectivity per port.
+        '''
 
         port_file = None
 
-        # ..........
+        # .........
         # Use ports
-        # ..........
-        if usePortName is not None:
+        # .........
+        if use_port_name is not None:
 
-            assert providePortName is None
+            assert provide_port_name is None
 
             for port in self.__ports:
-                (portName, portType, thisPortFile) = port
-                if portName == usePortName and portType == 'use' and thisPortFile == usePortFile:
-                    port_file = thisPortFile
+
+                (portName, port_type, this_port_file) = port
+
+                if portName == use_port_name and port_type == 'use' and \
+                        this_port_file == use_port_file:
+                    port_file = this_port_file
 
             if port_file is None:
                 return None
@@ -239,19 +256,20 @@ class PyPlot():
                     ' trials for port: ' + port_file
                 self.__log.warn(s)
 
-            assert os.path.isfile(port_file) is True, 'port_file %r not available; stop.' % port_file
+            assert os.path.isfile(port_file) is True,\
+                    'port_file %r not available; stop.' % port_file
 
-        # ..............
+        # .............
         # Provide ports
-        # ..............
-        if providePortName is not None:
+        # .............
+        if provide_port_name is not None:
 
-            assert usePortName is None
+            assert use_port_name is None
 
             for port in self.__ports:
-                (portName, portType, thisPortFile) = port
-                if portName == providePortName and portType == 'provide':
-                    port_file = thisPortFile
+                (portName, port_type, this_port_file) = port
+                if portName == provide_port_name and port_type == 'provide':
+                    port_file = this_port_file
 
         return port_file
 
@@ -290,7 +308,7 @@ class PyPlot():
 
     def __get_time_sequence(self, port_file, at_time):
         '''
-        This uses a use port_file which is guaranteed to exist at this point
+        This uses a use port_file which is guaranteed to exist at this point.
         '''
 
         s = '__get_time_sequence(): will get data in port_file: ' + port_file
@@ -898,19 +916,19 @@ class PyPlot():
 
         assert isinstance(xml_tree_file, str)
 
-        # Read the manifesto
+        # Read the manifesto.
         xml_tree = XMLTree( xml_tree_file=xml_tree_file )
 
         assert xml_tree.tag == 'module_manifesto'
 
         assert xml_tree.get_attribute('name') == 'pyplot'
 
-        # List of (port_name, port_type, port_mode, port_multiplicity)
+        # List of (port_name, port_type, port_mode, port_multiplicity).
         __ports = list()
 
         self.__port_diagram = 'null-module-port-diagram'
 
-        # Get manifesto data  
+        # Get manifesto data.
         for child in xml_tree.children:
             (elem, tag, attributes, text) = child
 
