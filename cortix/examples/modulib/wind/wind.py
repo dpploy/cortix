@@ -16,7 +16,7 @@ import os, sys, io, time
 import logging
 from collections             import namedtuple
 import math
-import numpy as np
+import numpy as npy
 
 from cortix.src.utils.xmltree import XMLTree
 from cortix.support.quantity import Quantity
@@ -93,8 +93,8 @@ class Wind():
         self.__wrkDir = work_dir
 
         # Signal to start operation
-        self.__goSignal = True     # start operation immediately
-        for port in self.__ports:  # if there is a signal port, start operation accordingly
+        self.__goSignal = True    # start operation immediately
+        for port in self.__ports: # if there is a signal port, start operation accordingly
             (port_name, port_type, this_port_file) = port
             if port_name == 'go-signal' and port_type == 'use':
                 self.__go_signal = False
@@ -106,19 +106,19 @@ class Wind():
 
         #fin = open(input_full_path_file_name,'r')
 
-        # Configuration member data   
+        # Configuration member data.
 
         self.__pyplot_scale = 'linear'
         #self.__ode_integrator = 'scikits.odes' # or 'scipy.integrate' 
         self.__ode_integrator = 'scipy.integrate'
 
-        # domain specific member data 
+        # Domain specific member data.
 
         shear_coeff = 0.4  # dimensionless
         Params = namedtuple('Params',['shear_coeff'])
         self.__params = Params( shear_coeff )
 
-        # setup species in the gas phase 
+        # Setup species in the gas phase.
         species = list()
 
         air = Specie( name='air', formulaName='Air', phase='gas' )
@@ -128,28 +128,30 @@ class Wind():
 
         species.append(air)
 
-        # quantities in the gas phase
+        # Quantities in the gas phase.
         quantities = list()
 
-        # spatial position
+        # Spatial position.
         position = Quantity( name='position', formalName='Pos.', unit='m' )
         quantities.append( position )
 
-        # velocity
+        # Velocity.
         velocity = Quantity( name='velocity', formalName='Veloc.', unit='m/s' )
         quantities.append( velocity )
 
         self.__gas_phase = Phase( self.__start_time, time_unit='s', species=species,
                 quantities=quantities)
 
-        # Initialize phase
+        # Initialize phase.
         air_mass_cc = 0.1 # [g/cc]
         self.__gas_phase.SetValue( 'air', air_mass_cc, self.__start_time )
 
-        x_0 = (0.0,0.0,1000.0)  # initial height [m] above ground at 0
+        x_0 = npy.array([0.0,0.0,1000.0])  # initial height [m] above ground at 0
         self.__gas_phase.SetValue( 'position', x_0, self.__start_time )
 
-        v_0 = np.array([1.8,-4.3,2.5])   # initial wind velocity [m/s]
+        # Note: if the z component is positive, wind is blowing upwards.
+        #       Gravit points in -z direction.
+        v_0 = npy.array([1.8,-4.3,-0.05])   # initial wind velocity [m/s]
         self.__gas_phase.SetValue( 'velocity', v_0, self.__start_time )
 
         return

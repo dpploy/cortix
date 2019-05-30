@@ -59,7 +59,7 @@ class Droplet():
         assert isinstance(cortix_time_unit, str), '-> time unit type %r is invalid.' % \
                 type(cortix_time_unit)
 
-        # Logging: access Cortix Launcher logging facility
+        # Logging: access Cortix Launcher logging facility.
         self.__log = logging.getLogger('launcher-droplet_'+str(slot_id)+\
                 '.cortix_driver.droplet')
         self.__log.info('initializing an object of Droplet()')
@@ -111,7 +111,7 @@ class Droplet():
 
         self.__pyplot_scale = 'linear'
 
-        # Choice of ODE solvers
+        # Choice of ODE solvers.
         #  self.__ode_integrator = 'scikits.odes' # or 'scipy.integrate' 
         self.__ode_integrator = 'scipy.integrate'
 
@@ -124,7 +124,7 @@ class Droplet():
         self.__ode_params['gravity'] = gravity
 
         # These must be npy.ndarray (see ODE solvers).
-        self.__ode_params['drag-coeff']    = npy.array([1e-3,3e-4,6e-3])
+        self.__ode_params['drag-coeff']    = npy.random.random(3)*5e-1
         self.__ode_params['wind-velocity'] = npy.array([0.0,0.0,0.0])
 
         # Setup species in the liquid phase.
@@ -155,10 +155,16 @@ class Droplet():
         water_mass_cc = 0.99965 # [g/cc]
         self.__liquid_phase.SetValue( 'water', water_mass_cc, self.__start_time )
 
-        x_0 = (0.0,0.0,1000.0)  # initial height [m] above ground at 0
+        # Random initial position in a 1000x1000x1000 m^3 box.
+        # Origin of cartesian coord. system at the bottom of the box. Z coord pointing
+        # upwards.
+        x_0 = ( 2*npy.random.random(3) - npy.ones(3) ) * 1000.0
+        # Make z=1000.
+        x_0[2] = 1000.0
         self.__liquid_phase.SetValue( 'position', x_0, self.__start_time )
 
-        v_0 = (0.0,0.0,0.0)     # initial velocity [m/s]
+        # Zero initial velocity
+        v_0 = npy.zeros(3)
         self.__liquid_phase.SetValue( 'velocity', v_0, self.__start_time )
 
         return
@@ -533,6 +539,7 @@ class Droplet():
 
         import pickle
         from threading import Lock
+        import numpy as npy
 
         lock = Lock()
 
@@ -540,18 +547,8 @@ class Droplet():
         while found is False:
 
             try:
-              lock.acquire()
-              (velocity,time_unit) = pickle.load( open(port_file,'rb') )
-
-            except:
-              lock.release()
-              s = '__use_wind_velocity('+str(round(at_time,2))+'[s]):'
-              m = ' pickle.load velocity in '+port_file+' failed. Retrying...'
-              self.__log.debug(s+m)
-              continue
-
-            else:
-              try:
+                lock.acquire()
+                (velocity,time_unit) = pickle.load( open(port_file,'rb') )
                 assert time_unit == 's'
                 assert isinstance(velocity,Quantity)
                 loc = velocity.value.index.get_loc(at_time,method='nearest',
@@ -562,7 +559,7 @@ class Droplet():
                 found = True
                 lock.release()
 
-              except:
+            except:
                 lock.release()
                 s = '__use_wind_velocity('+str(round(at_time,2))+'[s]): '
                 m = port_file+' does not have data yet. Retrying ...'
@@ -573,6 +570,7 @@ class Droplet():
         self.__log.debug(s)
 
         wind_velocity = velocity.value.loc[time_stamp]
+        assert isinstance(wind_velocity,npy.ndarray)
         self.__wind_velocity = wind_velocity
 
         #print('wind velocity = ',wind_velocity)
@@ -583,12 +581,14 @@ class Droplet():
     def __evolve( self, at_time=0.0, at_time_step=0.0 ):
         r'''
         ODE IVP problem:
-        Given the initial data at :math:`t=0`, :math:`u_1(0) = x_0`,
-        :math:`u_2(0) = v_0 = \dot{u}_1(0)`,
+        Given the initial data at :math:`t=0`,
+        :math:`(u_1(0),u_2(0),u_3(0)) = (x_0,x_1,x_2)`,
+        :math:`(u_4(0),u_5(0),u_6(0)) = (v_0,v_1,v_2) =
+        (\dot{u}_1(0),\dot{u}_2(0),\dot{u}_3(0))`,
         solve :math:`\frac{\text{d}u}{\text{d}t} = f(u)` in the interval
         :math:`0\le t \le t_f`.
-        When :math:`u_1(t)` is negative, bounce the droplet to a random height between
-        0 and :math:`1.2\,x_0` with no velocity, and continue the time integration until
+        When :math:`u_3(t)` is negative, bounce the droplet to a random height between
+        0 and :math:`1.0\,x_0` with no velocity, and continue the time integration until
         :math:`t = t_f`.
 
         Parameters
@@ -614,12 +614,13 @@ class Droplet():
         x_0 = self.__liquid_phase.GetValue( 'position', at_time )
         v_0 = self.__liquid_phase.GetValue( 'velocity', at_time )
 
-        u_vec_0 = x_0 + v_0 # concatenate tuples
+        u_vec_0 = npy.concatenate((x_0,v_0)) # concatenate vectors
 
         # rhs function
         if self.__ode_integrator == 'scikits.odes':
 
             def rhs_fn(t, u_vec, dt_u_vec, params):
+
                 dt_u_vec[0] = u_vec[3]              #  d_t u_1 = u_4
                 dt_u_vec[3] = 0.0                   #  d_t u_4 = 0 
 
@@ -628,28 +629,33 @@ class Droplet():
 
                 dt_u_vec[2] = u_vec[5]              #  d_t u_3 = u_6
                 dt_u_vec[5] = - params['gravity']   #  d_t u_6 = -g
+
                 return
+
         elif self.__ode_integrator == 'scipy.integrate':
 
             def rhs_fn(u_vec, t, params):
+
                 alpha     = params['drag-coeff']
                 wind_velo = params['wind-velocity']
-                drag      = -alpha*wind_velo
-                gravity   = -params['gravity']
+                drop_velo = u_vec[3:]
+                drag      = - alpha * (drop_velo - wind_velo)
+                gravity   = params['gravity']
 
-                dt_u_0 = u_vec[3]                         #  d_t u_1 = u_4
-                dt_u_3 = drag[0]                          #  d_t u_4 = f_1
+                dt_u_0 = u_vec[3]                                 #  d_t u_1 = u_4
+                dt_u_3 = drag[0]                                  #  d_t u_4 = f_1
 
-                dt_u_1 = u_vec[4]                         #  d_t u_2 = u_5
-                dt_u_4 = drag[1]                          #  d_t u_5 = f_2
+                dt_u_1 = u_vec[4]                                 #  d_t u_2 = u_5
+                dt_u_4 = drag[1]                                  #  d_t u_5 = f_2
 
-                dt_u_2 = u_vec[5]                         #  d_t u_3 = u_6
-                dt_u_5 = drag[2] + gravity                #  d_t u_6 = f_3 - g
+                dt_u_2 = u_vec[5]                                 #  d_t u_3 = u_6
+                dt_u_5 = drag[2] - gravity                        #  d_t u_6 = f_3 - g
+
                 return [dt_u_0, dt_u_1, dt_u_2, dt_u_3, dt_u_4, dt_u_5]
         else:
             assert False, 'Fatal: invalid ode integrator config. %r'%self.__ode_integrator
 
-        t_interval_sec = npy.linspace(0.0, at_time_step, num=2)
+        t_interval_sec = npy.linspace(0.0, at_time_step, num=2) # two time stamps output
 
         if self.__ode_integrator == 'scikits.odes':
             cvode = ode('cvode', rhs_fn, user_data=self.__ode_params, old_api=False)
@@ -687,13 +693,12 @@ class Droplet():
 
         if u_vec[2] <= 0.0: # ground impact bounces the drop to a different height near original
             position = self.__liquid_phase.GetValue( 'position', self.__start_time )
-            bounced_position = list(position)
-            bounced_position[2] *= npy.random.random(1) * 1.2
-            u_vec[0:3] = bounced_position[:]
+            bounced_position = position[2] * npy.random.random(1)
+            u_vec[2] = bounced_position
             u_vec[3:]  = 0.0
 
-        self.__liquid_phase.SetValue( 'position', tuple(u_vec[0:3]), at_time ) # update current values
-        self.__liquid_phase.SetValue( 'velocity', tuple(u_vec[3:]), at_time ) # update current values
+        self.__liquid_phase.SetValue( 'position', u_vec[0:3], at_time ) # update current values
+        self.__liquid_phase.SetValue( 'velocity', u_vec[3:], at_time ) # update current values
 
         return
 

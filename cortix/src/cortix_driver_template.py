@@ -30,7 +30,7 @@ import logging
 
 class CortixDriverTemplate():
     '''
-     Cortix driver for guest modules.
+     Cortix driver for guest module: MyModule
     '''
 
 #*********************************************************************************
@@ -97,15 +97,15 @@ class CortixDriverTemplate():
 
         return
 
-    def execute(self, cortix_time=0.0, timeStep=0.0):
+    def execute(self, cortix_time=0.0, time_step=0.0):
         '''
-        Evolve system from cortix_time to cortix_time + timeStep
+        Evolve system from cortix_time to cortix_time + time_step
         '''
 
         self.__log_debug(cortix_time, 'execute')
 
         # uncomment
-        # self.my_module.execute( cortix_time, timeStep )
+        # self.my_module.execute( cortix_time, time_step )
 
         self.__log_debug(cortix_time, 'execute')
 

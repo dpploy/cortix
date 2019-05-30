@@ -25,22 +25,26 @@ from cortix.examples.modulib.wind.wind import Wind
 
 class CortixDriver():
     '''
-     Cortix driver for guest modules.
+     Cortix driver for guest module: Wind
     '''
 
-    def __init__(self,
-                 slot_id,
-                 input_full_path_file_name,
-                 manifesto_full_path_file_name,
-                 work_dir,
-                 ports=list(),
-                 cortix_start_time = 0.0,
-                 cortix_final_time = 0.0,
-                 cortix_time_step = 0.0,
-                 cortix_time_unit = None
-                 ):
+#*********************************************************************************
+# Construction 
+#*********************************************************************************
 
-        # Sanity test
+    def __init__(self,
+            slot_id,
+            input_full_path_file_name,
+            manifesto_full_path_file_name,
+            work_dir,
+            ports=list(),
+            cortix_start_time = 0.0,
+            cortix_final_time = 0.0,
+            cortix_time_step = 0.0,
+            cortix_time_unit = None
+            ):
+
+        # Sanity tests.
         assert isinstance(slot_id, int), '-> slot_id type %r is invalid.' % type(slot_id)
         assert isinstance( ports, list), '-> ports type %r is invalid.' % type(ports)
         assert len(ports) > 0
@@ -58,15 +62,19 @@ class CortixDriver():
                                         '.cortix_driver')
         self.__log.info('initializing an object of CortixDriver()')
 
+        self.__wall_clock_time_stamp = None  # initialize
+
         # Guest library module: Wind.
         self.__wind = Wind( slot_id, input_full_path_file_name,
                 manifesto_full_path_file_name, work_dir,
                 ports,
                 cortix_start_time, cortix_final_time, cortix_time_step, cortix_time_unit )
 
-        self.__wall_clock_time_stamp = None  # initialize
-
         return
+
+#*********************************************************************************
+# Public member functions 
+#*********************************************************************************
 
     def call_ports(self, cortix_time=0.0):
         '''
@@ -81,14 +89,14 @@ class CortixDriver():
 
         return
 
-    def execute(self, cortix_time=0.0, timeStep=0.0):
+    def execute(self, cortix_time=0.0, time_step=0.0):
         '''
-        Evolve system from cortix_time to cortix_time + timeStep
+        Evolve system from cortix_time to cortix_time + time_step
         '''
 
         self.__log_debug(cortix_time, 'execute')
 
-        self.__wind.execute( cortix_time, timeStep )
+        self.__wind.execute( cortix_time, time_step )
 
         self.__log_debug(cortix_time, 'execute')
 

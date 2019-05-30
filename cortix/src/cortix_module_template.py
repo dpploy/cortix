@@ -54,11 +54,13 @@ class MyModule():
         assert isinstance(cortix_time_unit, str), '-> time unit type %r is invalid.'%\
                 type(cortix_time_unit)
 
+        #.........................................................................
         # Logging: access Cortix Laucher logging facility.
         self.__log = logging.getLogger('launcher-mymodule_'+str(slot_id)+\
                 '.cortix_driver.mymodule')
         self.__log.info('initializing an object of MyModule()')
 
+        #.........................................................................
         # Read the manisfesto.
         self.__read_manifesto( manifesto_full_path_file_name )
         self.__log.info(self.__port_diagram)
@@ -69,12 +71,14 @@ class MyModule():
         self.__slot_id = slot_id
         self.__ports   = ports
 
+        #.........................................................................
         # Convert Cortix's time unit to MyModule's internal time unit.
         # Add here...
 
         if work_dir[-1] != '/': work_dir = work_dir + '/'
         self.__wrkDir = work_dir
 
+        #.........................................................................
         # Signal to start operation.
         self.__goSignal = True    # start operation immediately
         for port in self.__ports: # if there is a signal port, start operation accordingly
@@ -130,7 +134,7 @@ class MyModule():
 
     def __provide_data( self, provide_port_name=None, at_time=0.0 ):
         '''
-        Example of how this internal method would look like
+        Example of how this internal method would look like.
         '''
 
         # Access the port file.
@@ -159,6 +163,7 @@ class MyModule():
     def __get_port_file( self, use_port_name=None, provide_port_name=None ):
          '''
          This may return a None port_file.
+         This implementation only works for a single connectivty per port.
          '''
 
         port_file = None
@@ -172,10 +177,10 @@ class MyModule():
 
             for port in self.__ports:
 
-                (portName,portType,thisPortFile) = port
+                (port_name, port_type, this_port_file) = port
 
-                if portName == use_port_name and portType == 'use':
-                    port_file = thisPortFile
+                if port_name == use_port_name and port_type == 'use':
+                    port_file = this_port_file
 
             if port_file is None:
                 return None
@@ -188,8 +193,8 @@ class MyModule():
                 time.sleep(0.1)
 
             if n_trials > max_n_trials:
-                s = '__get_port_file(): waited ' + str(n_trials) + ' trials for port: ' +\
-                    port_file
+                s = '__get_port_file(): waited ' + str(n_trials) + ' trials for port: '\
+                        + port_file
                 self.__log.warn(s)
 
             assert os.path.isfile(port_file) is True,\
@@ -204,10 +209,10 @@ class MyModule():
 
             for port in self.__ports:
 
-              (portName,portType,thisPortFile) = port
+              (port_name, port_type, this_port_file) = port
 
-              if portName == provide_port_name and portType == 'provide':
-                  port_file = thisPortFile
+              if port_name == provide_port_name and port_type == 'provide':
+                  port_file = this_port_file
 
         return port_file
 
