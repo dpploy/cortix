@@ -508,7 +508,7 @@ class Wind():
 
     def __use_position( self, port_file, at_time ):
         '''
-        This file usage requires a locking mechanism before the reading operatkion
+        This file usage requires a locking mechanism before the reading operation
         so the program writing the file does not delete it or modify it in the
         middle of the reading process.
         '''
