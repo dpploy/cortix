@@ -154,6 +154,8 @@ class Wind():
         v_0 = npy.array([1.8,-4.3,-0.05])   # initial wind velocity [m/s]
         self.__gas_phase.SetValue( 'velocity', v_0, self.__start_time )
 
+        self.__external_position = npy.array([0.0,0.0,0.0]) # external value of position
+
         return
 
 #*********************************************************************************
@@ -167,12 +169,12 @@ class Wind():
 
         cortix_time *= self.__time_unit_scale  # convert to Wind time unit
 
-        # provide data to all provide ports 
+        # Provide data to all provide ports.
+        self.__provide_data( provide_port_name='velocity', at_time=cortix_time )
         self.__provide_data( provide_port_name='state',  at_time=cortix_time )
         self.__provide_data( provide_port_name='output', at_time=cortix_time )
-        self.__provide_data( provide_port_name='velocity', at_time=cortix_time )
 
-        # use data using the 'use-port-name' of the module
+        # Use data from all use ports.
         self.__use_data( use_port_name='position', at_time=cortix_time )
 
         return
@@ -508,10 +510,46 @@ class Wind():
 
     def __use_position( self, port_file, at_time ):
         '''
-        This file usage requires a locking mechanism before the reading operatkion
+        This file usage requires a locking mechanism before the reading operation
         so the program writing the file does not delete it or modify it in the
         middle of the reading process.
         '''
+
+        import pickle
+        from threading import Lock
+        import numpy as npy
+
+        lock = Lock()
+
+        found = False
+        while found is False:
+
+            try:
+                lock.acquire()
+                (position,time_unit) = pickle.load( open(port_file,'rb') )
+                assert time_unit == 's'
+                assert isinstance(position,Quantity)
+                loc = position.value.index.get_loc(at_time,method='nearest',
+                        tolerance=1e-2)
+                time_stamp = position.value.index[loc]
+
+                assert abs(time_stamp - at_time) <= 1e-2
+                found = True
+                lock.release()
+
+            except:
+                lock.release()
+                s = '__use_position('+str(round(at_time,2))+'[s]): '
+                m = port_file+' does not have data yet. Retrying ...'
+                self.__log.debug(s+m)
+                self.__log.debug(s)
+
+        s = '__use_position('+str(round(at_time,2))+'[s]): pickle.loaded position.'
+        self.__log.debug(s)
+
+        position = position.value.loc[time_stamp]
+        assert isinstance(position,npy.ndarray)
+        self.__external_position = position
 
         return
 
@@ -524,6 +562,11 @@ class Wind():
         at_time = cortix_time + cortix_time_step
 
         self.__gas_phase.AddRow( at_time, values ) # repeat values for current time
+
+        # Compute the wind velocity at the given external position
+        # Conical spiral
+
+        self.__gas_phase.SetValue( 'position', self.__external_position, at_time )
 
         return
 

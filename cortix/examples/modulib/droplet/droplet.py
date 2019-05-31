@@ -112,7 +112,7 @@ class Droplet():
         self.__pyplot_scale = 'linear'
 
         # Choice of ODE solvers.
-        #  self.__ode_integrator = 'scikits.odes' # or 'scipy.integrate' 
+        #self.__ode_integrator = 'scikits.odes' # or 'scipy.integrate' 
         self.__ode_integrator = 'scipy.integrate'
 
         # Domain specific member data.
@@ -185,7 +185,7 @@ class Droplet():
         self.__provide_data( provide_port_name='state',            at_time=cortix_time )
         self.__provide_data( provide_port_name='output',           at_time=cortix_time )
 
-        # Use data for wind velocity.
+        # Use data from all use ports.
         self.__use_data( use_port_name='wind-velocity', at_time=cortix_time )
 
         return
@@ -296,6 +296,16 @@ class Droplet():
         '''
         Provide data while other programs may be trying to read the data. This requires
         a lock. The port file may be completely rewritten or appended to.
+
+        Parameters
+        ----------
+        port_file: str
+
+        at_time: float
+
+        Returns
+        -------
+        None
         '''
 
         import pickle
@@ -621,14 +631,20 @@ class Droplet():
 
             def rhs_fn(t, u_vec, dt_u_vec, params):
 
-                dt_u_vec[0] = u_vec[3]              #  d_t u_1 = u_4
-                dt_u_vec[3] = 0.0                   #  d_t u_4 = 0 
+                alpha     = params['drag-coeff']
+                wind_velo = params['wind-velocity']
+                drop_velo = u_vec[3:]
+                drag      = - alpha * (drop_velo - wind_velo)
+                gravity   = params['gravity']
 
-                dt_u_vec[1] = u_vec[4]              #  d_t u_2 = u_5
-                dt_u_vec[4] = 0.0                   #  d_t u_5 = 0 
+                dt_u_vec[0] = u_vec[3]                            #  d_t u_1 = u_4
+                dt_u_vec[3] = drag[0]                             #  d_t u_4 = 0 
 
-                dt_u_vec[2] = u_vec[5]              #  d_t u_3 = u_6
-                dt_u_vec[5] = - params['gravity']   #  d_t u_6 = -g
+                dt_u_vec[1] = u_vec[4]                            #  d_t u_2 = u_5
+                dt_u_vec[4] = drag[1]                             #  d_t u_5 = 0 
+
+                dt_u_vec[2] = u_vec[5]                            #  d_t u_3 = u_6
+                dt_u_vec[5] = drag[2] - gravity                   #  d_t u_6 = -g
 
                 return
 

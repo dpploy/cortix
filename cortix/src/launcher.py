@@ -116,8 +116,7 @@ class Launcher(Thread):
                       '_' + str(self.__slot_id) )
 
         # Verify the module input file name with full path.
-        # This input file may be empty or used by this driver and/or the
-        # native/wrapped module.
+        # This input file may be empty.
         assert os.path.isfile(self.__input_full_path_file_name), \
             'file %r not available;stop.' % self.__input_full_path_file_name
 
@@ -126,8 +125,10 @@ class Launcher(Thread):
         assert os.path.isfile(self.__cortix_param_full_path_file_name), \
             'file %r not available;stop.' % self.__cortix_param_full_path_file_name
 
-        # For now Cortix advances in unit of minutes; change this in the future
-        cortix_param_xml_tree = XMLTree( xml_tree_file = self.__cortix_param_full_path_file_name)
+        # For now Cortix advances in unit of minutes; TODO: change this in the future.
+        cortix_param_xml_tree = XMLTree( xml_tree_file =
+                self.__cortix_param_full_path_file_name)
+
         node = cortix_param_xml_tree.get_sub_node('start_time')
         cortix_start_time_unit = node.get_attribute('unit')
         cortix_start_time = float(node.get_node_content().strip())
@@ -181,11 +182,12 @@ class Launcher(Thread):
 
         cortix_time_unit = 'minute'
 
-        # collect information from the Cortix communication file for this guest module
+        # Collect information from the Cortix communication file for this guest module.
         assert os.path.isfile(self.__cortix_comm_full_path_file_name),\
             'file %r not available;stop.' % self.__cortix_comm_full_path_file_name
 
-        cortix_comm_xml_tree = XMLTree( xml_tree_file = self.__cortix_comm_full_path_file_name )
+        cortix_comm_xml_tree = XMLTree( xml_tree_file = \
+                self.__cortix_comm_full_path_file_name )
 
         # Setup ports
         nodes = cortix_comm_xml_tree.get_all_sub_nodes('port')
@@ -243,7 +245,7 @@ class Launcher(Thread):
             ', cortix_time_step_unit=', cortix_time_step_unit
         self.__log.info(s)
 
-        # Evolve the module
+        # Evolve the module.
         self.__set_runtime_status('running')
         self.__log.info("__set_runtime_status(self, 'running')")
 
@@ -277,7 +279,7 @@ class Launcher(Thread):
 
             start_time = time.time()
 
-            # Data exchange at cortix_time (call ports first)
+            # Data exchange at cortix_time (call ports first).
             guest_driver.call_ports( cortix_time )
 
             # Advance to cortix_time + cortix_time_step (call execute second)
