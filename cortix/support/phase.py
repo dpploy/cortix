@@ -13,9 +13,9 @@ Phase *history* container. When you think of a phase value, think of that value 
 a specific point in time. This container holds the historic data of a phase;
 its species and quantities. This implementation treats access of time stamps within
 a tolerance. All searches for time stamped values are subjected to an approximation
-of the time stamp to avoid values too close to each other in time, and/or to return
-the closest value in time searched or no value if none can be found according to the
-tolerance.
+of the time stamp to avoid storing values too close to each other in time, and/or to
+return the closest value in time searched or no value if none can be found according
+to the tolerance.
 
 Background
 ----------
@@ -70,10 +70,10 @@ class Phase():
         self.__time_unit = time_unit
 
         if time_unit is None:
-            self.__time_unit = 's'  # second
+            self.__time_unit = 's' # second
 
         if time_stamp is None:
-            time_stamp = 0.0
+            time_stamp = 0.0 # default type is float
 
         if species is not None:
             assert isinstance(species, list)
@@ -86,10 +86,10 @@ class Phase():
                 assert isinstance(quant, Quantity)
 
         # List of species and quantities objects; columns of data frame are named
-        # by objects
-        # a new object held by a Phase() object
+        # by objects.
+        # A new object held by a Phase() object
         self.__species = deepcopy(species)
-        # a new object held by a Phase() object
+        # A new object held by a Phase() object
         self.__quantities = deepcopy(quantities)
 
         names = list()
@@ -107,8 +107,14 @@ class Phase():
                                      # todo: eliminate them from Quantity in the future
 
         # Table data phase without data type assigned; this is left to the user
-        # Time stamps will always be float
+        # Time stamps will always be float or int
         self.__phase = pandas.DataFrame( index=[float(time_stamp)], columns=names )
+
+        for specie in species:
+            self.__phase.loc[time_stamp, specie.name] = specie.molarCC
+
+        for quant in quantities:
+            self.__phase.loc[time_stamp, quant.name] = quant.value
         #self.__phase.fillna( 0.0, inplace=True )  # dtype defaults to float
 
         return
@@ -116,6 +122,14 @@ class Phase():
 #*********************************************************************************
 # Public member functions
 #*********************************************************************************
+    def has_time_stamp(self, try_time_stamp):
+
+        time_stamp = self.__get_time_stamp( try_time_stamp )
+
+        if time_stamp is not None:
+            return True
+        else:
+            return False
 
     def __get_time_unit(self):
         '''
@@ -154,6 +168,10 @@ class Phase():
     species = property(GetSpecies, None, None, None)
 
     def GetQuantities(self):
+        '''
+        Returns the list of `Quantities`. The values in each `Quantity` are synchronized
+        with the `Phase` data frame.
+        '''
         for quant in self.__quantities:
           tmp = self.GetQuantity(quant.name) # handy way to synchronize the whole list
         return self.__quantities
@@ -180,7 +198,6 @@ class Phase():
 
     def GetQuantity(self, name):
         '''
-        OLD version.
         Returns the quantity evaluated at the last time step of the phase history.
         This also updates the value of the quantity object. If the quantity name does not
         exist the return is None.
