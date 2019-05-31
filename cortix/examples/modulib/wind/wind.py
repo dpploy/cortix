@@ -154,6 +154,8 @@ class Wind():
         v_0 = npy.array([1.8,-4.3,-0.05])   # initial wind velocity [m/s]
         self.__gas_phase.SetValue( 'velocity', v_0, self.__start_time )
 
+        self.__external_position = npy.array([0.0,0.0,0.0]) # external value of position
+
         return
 
 #*********************************************************************************
