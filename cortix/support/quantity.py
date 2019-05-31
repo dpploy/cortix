@@ -37,7 +37,7 @@ class Quantity():
     def __init__(self,
                  name       = 'null-quantity',
                  formalName = 'null-quantity',
-                 value      = float(0.0),  # this can be type
+                 value      = float(0.0),  # this can be any type
                  unit       = 'null-unit'
                 ):
 

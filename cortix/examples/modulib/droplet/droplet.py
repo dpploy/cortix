@@ -558,14 +558,24 @@ class Droplet():
 
             try:
                 lock.acquire()
-                (velocity,time_unit) = pickle.load( open(port_file,'rb') )
-                assert time_unit == 's'
-                assert isinstance(velocity,Quantity)
-                loc = velocity.value.index.get_loc(at_time,method='nearest',
-                        tolerance=1e-2)
-                time_stamp = velocity.value.index[loc]
+                wind_phase = pickle.load( open(port_file,'rb') )
+                assert wind_phase.time_unit == 's'
 
-                assert abs(time_stamp - at_time) <= 1e-2
+                # Wind specific quantity name
+                for port in self.__ports:
+                    (port_name, port_type, this_port_file) = port
+                    if port_name == 'droplet-position':
+                       assert port_type == 'provide'
+                       velocity_name = 'velocity_@_'+this_port_file
+
+                velocity = wind_phase.GetValue(velocity_name,at_time)
+
+                #loc = velocity.value.index.get_loc(at_time,method='nearest',
+                #        tolerance=1e-2)
+                #time_stamp = velocity.value.index[loc]
+
+                #assert abs(time_stamp - at_time) <= 1e-2
+
                 found = True
                 lock.release()
 
@@ -579,7 +589,8 @@ class Droplet():
         s = '__use_wind_velocity('+str(round(at_time,2))+'[s]): pickle.loaded velocity.'
         self.__log.debug(s)
 
-        wind_velocity = velocity.value.loc[time_stamp]
+        #wind_velocity = velocity.value.loc[time_stamp]
+        wind_velocity = velocity
         assert isinstance(wind_velocity,npy.ndarray)
         self.__wind_velocity = wind_velocity
 

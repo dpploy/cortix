@@ -8,7 +8,7 @@
 #
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
-"""
+'''
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
 This Specie class is to be used with other classes in plant-level process modules.
@@ -51,23 +51,26 @@ NB: The Specie() class encapsulates either the molecular or empirical chemical
     can also reset the value of the molar mass with a setter method.
 
 Sat May  9 21:40:48 EDT 2015 created; vfda
-"""
-
-# *******************************************************************************
+'''
+#*********************************************************************************
 import os
 import sys
 
 from cortix.support.periodictable import ELEMENTS
-# *******************************************************************************
+#*********************************************************************************
 
-# *******************************************************************************
-
+#*********************************************************************************
 
 class Specie():
+    '''
+    todo: phase should not be here; concentrations should not be here
+          only molar quantities should be here
+          see the Phase container
+    '''
 
-    # todo: phase should not be here; concentrations should not be here
-    #      only molar quantities should be here
-    #      see the Phase container
+#*********************************************************************************
+# Construction
+#*********************************************************************************
 
     def __init__(self,
                  name='null',

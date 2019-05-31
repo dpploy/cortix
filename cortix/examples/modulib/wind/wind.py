@@ -95,7 +95,7 @@ class Wind():
         # Signal to start operation
         self.__goSignal = True    # start operation immediately
         for port in self.__ports: # if there is a signal port, start operation accordingly
-            (port_name, port_type, this_port_file) = port
+            (port_name, port_type, port_file) = port
             if port_name == 'go-signal' and port_type == 'use':
                 self.__go_signal = False
 
@@ -131,13 +131,32 @@ class Wind():
         # Quantities in the gas phase.
         quantities = list()
 
-        # Spatial position.
-        position = Quantity( name='position', formalName='Pos.', unit='m' )
-        quantities.append( position )
+        # Initial position of the wind points.
+        x_0 = npy.array([0.0,0.0,1000.0])  # initial height [m] above ground at 0
 
-        # Velocity.
-        velocity = Quantity( name='velocity', formalName='Veloc.', unit='m/s' )
-        quantities.append( velocity )
+        # Initial value for wind at all points.
+        # Note: if the z component is positive, wind is blowing upwards.
+        #       Gravity points in -z direction.
+        v_0 = npy.array([1.8,-4.3,-0.05])   # initial wind velocity [m/s]
+
+        # Spatial position of wind points.
+        # One position and velocity quantity per use port to allow for multiple
+        # connections to the use port.
+        for port in self.__ports:
+            (port_name, port_type, port_file) = port
+            if port_name == 'position':
+
+                assert port_type == 'use'
+
+                # Create one position for each use port using the use port_file name
+                position = Quantity( name=port_file, formalName='Pos.',
+                        unit='m', value=x_0 )
+                quantities.append( position )
+
+                # Create a corresponding velocity quantity
+                velocity = Quantity( name='velocity_@_'+port_file, formalName='Veloc.',
+                        unit='m/s', value=v_0 )
+                quantities.append( velocity )
 
         self.__gas_phase = Phase( self.__start_time, time_unit='s', species=species,
                 quantities=quantities)
@@ -145,16 +164,6 @@ class Wind():
         # Initialize phase.
         air_mass_cc = 0.1 # [g/cc]
         self.__gas_phase.SetValue( 'air', air_mass_cc, self.__start_time )
-
-        x_0 = npy.array([0.0,0.0,1000.0])  # initial height [m] above ground at 0
-        self.__gas_phase.SetValue( 'position', x_0, self.__start_time )
-
-        # Note: if the z component is positive, wind is blowing upwards.
-        #       Gravit points in -z direction.
-        v_0 = npy.array([1.8,-4.3,-0.05])   # initial wind velocity [m/s]
-        self.__gas_phase.SetValue( 'velocity', v_0, self.__start_time )
-
-        self.__external_position = npy.array([0.0,0.0,0.0]) # external value of position
 
         return
 
@@ -175,7 +184,7 @@ class Wind():
         self.__provide_data( provide_port_name='output', at_time=cortix_time )
 
         # Use data from all use ports.
-        self.__use_data( use_port_name='position', at_time=cortix_time )
+        self.__use_data( use_port_name='position-1', at_time=cortix_time )
 
         return
 
@@ -282,6 +291,16 @@ class Wind():
         '''
         Provide data while other programs may be trying to read the data. This requires
         a lock. The port file may be completely rewritten or appended to.
+
+        Parameters
+        ----------
+        port_file: str
+
+        at_time: float
+
+        Returns
+        -------
+        None
         '''
 
         import pickle
@@ -290,8 +309,8 @@ class Wind():
         lock = Lock()
 
         with lock:
-            pickle.dump( self.__gas_phase.get_quantity_history('velocity'),
-                    open(port_file,'wb') )
+            # Note that the whole phase is sent out
+            pickle.dump( self.__gas_phase, open(port_file,'wb') )
 
         s = '__provide_velocity('+str(round(at_time,2))+'[s]): '
         m = 'pickle.dumped velocity.'
@@ -549,7 +568,11 @@ class Wind():
 
         position = position.value.loc[time_stamp]
         assert isinstance(position,npy.ndarray)
-        self.__external_position = position
+
+        assert self.phase.has_time_stamp(at_time)
+
+        self.__phase.SetValue( actor=port_file, value=position,
+                try_time_stamp=time_stamp )
 
         return
 
@@ -566,7 +589,7 @@ class Wind():
         # Compute the wind velocity at the given external position
         # Conical spiral
 
-        self.__gas_phase.SetValue( 'position', self.__external_position, at_time )
+        #self.__gas_phase.SetValue( 'position-1', self.__external_position, at_time )
 
         return
 
