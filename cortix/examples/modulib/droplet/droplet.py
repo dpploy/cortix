@@ -185,7 +185,7 @@ class Droplet():
         self.__provide_data( provide_port_name='state',            at_time=cortix_time )
         self.__provide_data( provide_port_name='output',           at_time=cortix_time )
 
-        # Use data for wind velocity.
+        # Use data from all use ports.
         self.__use_data( use_port_name='wind-velocity', at_time=cortix_time )
 
         return
@@ -296,6 +296,16 @@ class Droplet():
         '''
         Provide data while other programs may be trying to read the data. This requires
         a lock. The port file may be completely rewritten or appended to.
+
+        Parameters
+        ----------
+        port_file: str
+
+        at_time: float
+
+        Returns
+        -------
+        None
         '''
 
         import pickle

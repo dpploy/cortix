@@ -227,11 +227,12 @@ class Phase():
 
     def get_quantity_history(self, name):
         '''
-        Create a quantity `name` history. This will create a fully qualified quantity
-        and return to the caller. The function is typically needed for data output to
-        a file through `pickle`. Since the value attribute of a quantity can be any
-        data structure, a time-series is built and stored in the value attribute. In
-        addition the time unit is added to the final return value as a tuple.
+        Create a Quantity `name` history. This will create a fully qualified Quantity
+        object and return to the caller. The function is typically needed for data
+        output to a file through `pickle`. Since the value attribute of a quantity can
+        be any data structure, a time-series is built on the fly and stored in the
+        value attribute. In addition the time unit is added to the final return value
+        as a tuple.
 
         Parameters
         ----------
