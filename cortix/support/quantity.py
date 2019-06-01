@@ -84,6 +84,7 @@ class Quantity():
     def GetFormalName(self):
         return self._formalName
     formalName = property(GetFormalName, SetFormalName, None, None)
+    formal_name = property(GetFormalName, SetFormalName, None, None)
 
     def SetUnit(self, f):
         self.__unit = f
