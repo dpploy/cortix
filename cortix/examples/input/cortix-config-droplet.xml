@@ -213,9 +213,13 @@
     <connect use_port='position @ wind:0' provide_port='droplet-position @ droplet:2' />
     <connect use_port='wind-velocity @ droplet:2' provide_port='velocity @ wind:0' />
 
+    <connect use_port='position @ wind:0' provide_port='droplet-position @ droplet:3' />
+    <connect use_port='wind-velocity @ droplet:3' provide_port='velocity @ wind:0' />
+
     <connect use_port='time-sequence @ pyplot:0'  provide_port='state @ droplet:0' />
-    <connect use_port='time-sequence @ pyplot:0'  provide_port='state @ droplet:1' />
-    <connect use_port='time-sequence @ pyplot:0'  provide_port='state @ droplet:2' />
+    <connect use_port='time-sequence @ pyplot:1'  provide_port='state @ droplet:1' />
+    <connect use_port='time-sequence @ pyplot:2'  provide_port='state @ droplet:2' />
+    <connect use_port='time-sequence @ pyplot:3'  provide_port='state @ droplet:3' />
 
    </network>
 
