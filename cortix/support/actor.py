@@ -12,7 +12,6 @@
 This is a simple way to hide the name of species of interest in a simulation.
 The user would modify and copy this class into the Cortix module of interest
 and keep it private.
-
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 Sat Aug 15 13:41:12 EDT 2015
 '''
@@ -25,6 +24,10 @@ class Actor():
     '''
     See atoms list in Specie.
     '''
+#*********************************************************************************
+# Construction
+#*********************************************************************************
+
 
     def __init__( self, name ):
 
@@ -42,17 +45,41 @@ class Actor():
 
         assert name in self.__name_atoms_formula.keys(), 'name %r not valid.' % name
 
+
         self.__atoms = self.__name_atoms_formula[name][0]
 
         formula = self.__name_atoms_formula[name][1]
         assert isinstance(formula, str), 'formula %r not valid.' % formula
         self.__formula = formula
-
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
     def __get_atoms(self):
+        '''
+        Returns the specific nuclides found in the specified chemical.
+
+        Parameters
+        ----------
+        empty:
+
+        Returns
+        ----------
+        atoms: str
+        '''
         return self.__atoms
     atoms = property(__get_atoms, None, None, None)
-
     def __get_formula(self):
+        '''
+        Returns the formula of the chemical in question. 
+
+        Parameters
+        ----------
+        empty:
+
+        Returns:
+        ----------
+        formula: str
+        '''
         return self.__formula
     formula = property(__get_formula, None, None, None)
 
