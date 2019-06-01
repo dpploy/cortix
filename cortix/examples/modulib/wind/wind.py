@@ -604,7 +604,9 @@ class Wind():
                 y = position[1]
                 z = position[2]
                 velo_name = 'velocity@'+name
+
                 velocity = self.__gas_phase.GetValue(velo_name,cortix_time)
+
                 self.__gas_phase.SetValue(velo_name,velocity,at_time)
 
         #self.__gas_phase.SetValue( 'position-1', self.__external_position, at_time )
