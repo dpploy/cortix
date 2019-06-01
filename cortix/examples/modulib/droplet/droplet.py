@@ -128,19 +128,20 @@ class Droplet():
 
         self.__ode_params['gravity'] = gravity
 
-        # These must be npy.ndarray (see ODE solvers).
+        # Drag must be npy.ndarray (see ODE solvers).
         drag_variation = (npy.random.random(1)*(1.0 - 0.8) + 0.8)[0]
         self.__ode_params['drag-coeff']    = npy.ones(3)*drag_variation * 1e-4
-
-        self.__ode_params['wind-velocity'] = npy.array([1.8,-4.3,-0.1])
 
         # Setup species in the liquid phase.
         species = list()
 
-        water = Specie( name='water', formulaName='H2O(l)', phase='liquid', atoms=['2*H','O'] )
+        water = Specie( name='water', formulaName='H2O(l)', phase='liquid',
+                atoms=['2*H','O'] )
+
+        water_mass_cc = 0.99965 # [g/cc]
         water.massCCUnit  = 'g/cc'
         water.molarCCUnit = 'mole/cc'
-        water.massCC = 1.0
+        water.massCC      = water_mass_cc
 
         self.__droplet_mass = 4/3*math.pi*(self.__droplet_diameter/2)**3 * \
                 water.massCC * const.gram / const.centi**3  # [kg]
@@ -152,12 +153,12 @@ class Droplet():
         # Quantities in the liquid phase.
         quantities = list()
 
-        # Spatial position.
+        # Spatial position must be npy.ndarray (see ODE solvers).
         x_0 = npy.zeros(3)
         position = Quantity( name='position', formalName='Pos.', unit='m', value=x_0 )
         quantities.append( position )
 
-        # Velocity.
+        # Velocity must be npy.ndarray (see ODE solvers).
         v_0 = npy.zeros(3)
         velocity = Quantity( name='velocity', formalName='Veloc.', unit='m/s', value=v_0 )
         quantities.append( velocity )
@@ -167,20 +168,40 @@ class Droplet():
                 quantities=quantities )
 
         # Initialize phase.
-        water_mass_cc = 0.99965 # [g/cc]
         self.__liquid_phase.SetValue( 'water', water_mass_cc, self.__start_time )
 
         # Random initial position in a LxLxH m^3 box.
         # Origin of cartesian coordinate system at the bottom of the box. 
         # z coordinate pointing upwards. -L <= x <= L, -L <= y <= L, 
-        length = 250.0
-        x_0 = ( 2*npy.random.random(3) - npy.ones(3) ) * length
-        height = 100.0
-        x_0[2] = height
+        box_half_length = 250.0 # [m]
+        x_0 = ( 2*npy.random.random(3) - npy.ones(3) ) * box_half_length
+        box_height = 100.0 # [m]
+        x_0[2] = box_height
         self.__liquid_phase.SetValue( 'position', x_0, self.__start_time )
 
-        # Zero initial velocity
-        v_0 = npy.zeros(3)
+        # Vortex model for initial velocity
+        # Wind velocity must be npy.ndarray (see ODE solvers).
+        outer_cylindrical_radius = math.hypot(box_half_length,box_half_length)
+        outer_v_theta = 5 # m/s # angular speed
+        circulation = 2*math.pi * outer_cylindrical_radius * outer_v_theta # m/s
+
+        x = x_0[0]
+        y = x_0[1]
+        z = x_0[2]
+        cylindrical_radius = math.hypot(x,y)
+        core_radius = box_half_length * 0.1
+        v_theta = (1 - math.exp(-cylindrical_radius**2/core_radius**2) ) * \
+                circulation/2/math.pi/max(cylindrical_radius,10.0)
+
+        azimuth = math.atan2(y,x)
+
+        v_x = - v_theta * math.sin(azimuth)
+        v_y =   v_theta * math.cos(azimuth)
+        v_z = 0.25 # [m/s]
+
+        self.__ode_params['wind-velocity'] = npy.array([v_x,v_y,-v_z])
+        #print(self.__ode_params['wind-velocity'])
+
         self.__liquid_phase.SetValue( 'velocity', v_0, self.__start_time )
 
         return
