@@ -34,7 +34,12 @@ from cortix.support.fuel_segment import FuelSegment
 
 
 class FuelSegmentsGroups():
-
+    '''
+    creates a dictionary of lists of fuel segment objects, with the keys typically being timestamps. Each fuel segment object has two data members, a pandas Series for geometry spec and a panda DataFrame for property density.
+    '''
+#*********************************************************************************
+# Construction
+#*********************************************************************************
     def __init__(self,
                  key=None,
                  fuelSegments=None
@@ -61,52 +66,106 @@ class FuelSegmentsGroups():
 
         return
 
-# *******************************************************************************
-# Setters and Getters methods
-# -------------------------------------------------------------------------------
-# These are passing arguments by value effectively. Because the python objects
-# passed into/out of the function are immutable.
+#*********************************************************************************
+# Public Member Functions
+#*********************************************************************************
 
     def HasGroup(self, key):
+        '''
+        checks if the specified key has a group of fuel segments associated with it.
+        Parameters
+        ----------
+        key: str
+        Returns:
+        ----------
+        key: str
+        '''
 
         return key in self.groups.keys()
 
     def AddGroup(self, key, fuelSegments=None):
+        '''
+        appends the dictionary with a new key and associated list of fuelSegments. If the specified key is already present in the dictionary, then the specified list of fuel segments will be appended to the list of fuel segments already associated with the specified key.
+        Parameters
+        ----------
+        key: str
+        fuelSegments: list
+        Returns:
+        ----------
+        empty:
+        '''
 
         self.__AddGroup(key, fuelSegments)
 
     def GetAttribute(self, groupKey=None, attributeName=None,
                      nuclideSymbol=None, nuclideSeries=None):
-
+        '''
+        returns the average value of an attribute amongst all elements in a group (WARNING: keys with no values associated with them will lower this average!). If groupKey is not specified, the function will return the average attribute value of every fuel segment element in the entire dictionary. If attribute is not specified, the function call will fail. If the key value specified does not match any keys in the dictionary, the function will return a value of 0.
+        Parameters
+        ----------
+        groupKey: str
+        attributeName: str
+        nuclideSymbol: str
+        nuclideSeries: str
+        Returns:
+        ----------
+        groupAttribute: float
+        '''
         return self.__GetGroupAttribute(
             groupKey, attributeName, nuclideSymbol, nuclideSeries)
 
     def GetFuelSegments(self, groupKey=None):
+        '''
+        returns a list of fuel segments associated with a specified groupkey. If no group key is specified, then all elements in the dictionary will be returned. If the specified group key does not exist, then the function will return an empty list.
+        Parameters
+        ----------
+        groupKey: str
+        Returns:
+        ----------
+        fuelSegments: list
+        '''
 
         return self.__GetFuelSegments(groupKey)
 
     def RemoveFuelSegment(self, groupKey, fuelSegment):
 
+        '''
+        removes a fuel segment from a list associated with a specified group key. If the specified group key or fuel segment do not exist, the function will fail.
+        Parameters
+        ----------
+        groupKey: str
+        fuelSegment: str
+        Returns:
+        ----------
+        empty:
+        '''
         return self.__RemoveFuelSegment(groupKey, fuelSegment)
-
-
-# *********************************************************************************
-
 
 # If an attibute is not found, Return 0 even if a groupKey is not found
 # Don't change this behavior; it will break user's code.
-# ---------------------------------------------------------------------------------
 
+#*********************************************************************************
+# Private Helper Functions
+#*********************************************************************************
     def __GetGroupAttribute(self, groupKey=None,
                             attributeName=None, symbol=None, series=None):
 
+        '''
+        Returns the cumulative or average densities of all fuel segments in all groups. Use this function with discretion, as groups with no segments will reduce the average density value.
+        Parameters
+        ----------
+        groupKey: str
+        attributeName: str
+        symbol: str
+        series: list
+        Returns:
+        ----------
+        attribute: float
+        '''
         assert attributeName is not None, 'fatal.'
 
         attribute = None
 
-# Either cumulative or average density property for all fuel segments for *all* groups
-# BE VERY CAREFUL HERE: groups with no segments will reduce the average
-# density value
         if groupKey is None:
 
             attribute = 0
@@ -154,17 +213,18 @@ class FuelSegmentsGroups():
 
         return attribute
 
-# *********************************************************************************
-
-# Return the fuel segments of a given group (if the groupKey is given), otherwise
-# returns an ordered list of pairs of all segments in all groups and their keys.
-# That is, [ (timeStamp,fuelSegment), (timeStamp,fuelSegment), ... ]
-
-# *ALWAYS* return the list of segments held by the group when a groupKey is given.
-
-# If the groupKey does not exist return an empty list()
-# ---------------------------------------------------------------------------------
     def __GetFuelSegments(self, groupKey=None):
+
+        '''
+        Returns a list of fuel segments associated with a given group (if groupKey is specified), or an ordered list of pairs of all segments in all groups and their keys. [ (timeStamp, fuelSegment), (timeStamp, fuelSegment), ..]. If the specified groupKey does not exist, this function will return an empty list.
+        Parameters
+        ----------
+        groupKey: str
+        Returns:
+        ----------
+        sortedData: list
+        ----------
+        '''
 
         if groupKey is None:  # return an ordered list of all fuelSegments
 
@@ -192,16 +252,18 @@ class FuelSegmentsGroups():
 
             return self.groups[groupKey]
 
-# *********************************************************************************
-
-# Make fuelSegments *ALWAYS* a list (could be empty)
-# If group key exists, add to group otherwise create a group
-# If fuelSegments are not given, add an empty list to a group if it exists
-# A group will *ALWAYS* have a fuelSegments list.
-
-# ---------------------------------------------------------------------------------
     def __AddGroup(self, groupKey, fuelSegments=None):
 
+        '''
+        If a list of fuel segments and a group key is specified, the fuelSegment list is appended to the specified groupKey. If the groupKey specified does not already exist, a new one is created and the fuelSegments list is appended to it. fuelSegments is ALWAYS a list, and may be empty. A group will ALWAYS have a  fuelSegments list.
+        Parameters
+        ----------
+        groupKey: str
+        fuelSegments: list
+        Returns:
+        ----------
+        empty:
+        '''
         if fuelSegments is None:
             fuelSegments = list()
         else:
@@ -212,11 +274,18 @@ class FuelSegmentsGroups():
         else:
             self.groups[groupKey] = fuelSegments
 
-# *********************************************************************************
-
-# ---------------------------------------------------------------------------------
     def __RemoveFuelSegment(self, groupKey, fuelSegment_remove):
 
+        '''
+        removes a fuel segment from a list associated with a specified group key. If the specified group key or fuel segment do not exist, the function will fail.
+        Parameters
+        ----------
+        groupKey: str
+        fuelSegment: str
+        Returns:
+        ----------
+        empty:
+        '''
         assert groupKey in self.groups.keys(), 'fail.'
 
         fuelSegments = self.groups[groupKey]
@@ -241,3 +310,6 @@ class FuelSegmentsGroups():
 #     s = ' %5s %5s %5s '+' molar mass: %6s '+' molar cc: %6s '+' mass cc: %6s '+' flag: %s '+'# atoms: %s'+' atoms: %s\n'
 #     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)
 # *******************************************************************************
+#*********************************************************************************
+ 
+#========================= end class FuelSegmentsGroups: =========================
