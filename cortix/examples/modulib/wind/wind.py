@@ -593,7 +593,7 @@ class Wind():
         self.__gas_phase.AddRow( at_time, values ) # repeat values for current time
 
         # Compute the wind velocity at the given external position
-        # Conical spiral
+        # Using a vortex flow model.
 
         for quant in self.__gas_phase.quantities:
             name = quant.name
