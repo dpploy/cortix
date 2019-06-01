@@ -12,12 +12,7 @@
 -->
 <module_manifesto name='wind' version='0.0'>
 
- <!-- Ports have four types: * use, * provide, * input, * output -->
- <!-- The *input*, and *output* types allow for a module to self-connect. 
-      Eessentially, an *input port* is an *external provide port* and a
-      *output port* is an *external use port*. Hence to use an *input port*, a
-      use port is needed. To use an *output port* a provide port is needed. This
-      allows for the same module to self-connect.  -->
+ <!-- Ports have four types: use and provide -->
 
     <!-- use ports -->
     <port type='use'     mode='file.pkl' multiplicity='1'>position</port>
@@ -29,6 +24,13 @@
 
     <port_doc port_name='output'>
         Spatial position and velocity are three-dimensional Cartesian.
+        The position port can be connected to many provide ports from other
+        modules. The velocity port can be connected to many use ports of other
+        modules. However, the velocity port being a provide port, is associated
+        to one file.pkl file. Therefore the content of this file has all the
+        data pertaining to all possible connections to the position port.
+        Users of the velocity port will have to search through the phase data
+        provided and find the corresponding data. This needs documentation. TODO
     </port_doc>
 
     <diagram> 

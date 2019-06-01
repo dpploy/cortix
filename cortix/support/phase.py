@@ -62,6 +62,15 @@ class Phase():
                  species    = None,
                  quantities = None
                 ):
+        #TODO
+        '''
+        Note on usage: when passing quantities, do set the value argument explicitly
+        to help define the type and avoid SetValue() errors with Pandas. This is
+        to be investigated later. Also, the usage of a DataFrame needs to be re-evaluated.
+        Maybe better to use a Quantity object and a Specie object with a Pandas Series
+        history as a value to avoid the existance of a value in Quantity and a value
+        in Phase that are not in sync.
+        '''
 
         # Sanity tests
         assert isinstance(time_stamp, float)

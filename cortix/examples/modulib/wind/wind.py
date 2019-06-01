@@ -137,7 +137,7 @@ class Wind():
         # Initial value for wind at all points.
         # Note: if the z component is positive, wind is blowing upwards.
         #       Gravity points in -z direction.
-        v_0 = npy.array([1.8,-4.3,-0.05])   # initial wind velocity [m/s]
+        v_0 = npy.array([1.8,-4.3,-0.1])   # initial wind velocity [m/s]
 
         # Spatial position of wind points.
         # One position and velocity quantity per use port to allow for multiple
@@ -154,7 +154,7 @@ class Wind():
                 quantities.append( position )
 
                 # Create a corresponding velocity quantity
-                velocity = Quantity( name='velocity_@_'+port_file, formalName='Veloc.',
+                velocity = Quantity( name='velocity@'+port_file, formalName='Veloc.',
                         unit='m/s', value=v_0 )
                 quantities.append( velocity )
 
@@ -545,9 +545,15 @@ class Wind():
 
             try:
                 lock.acquire()
+                # Data specs: tuple(Quantity,float)
+                # The Quantity object must have a Pandas.Series as value for the history
+                # values.
+
                 (position,time_unit) = pickle.load( open(port_file,'rb') )
+
                 assert time_unit == 's'
                 assert isinstance(position,Quantity)
+
                 loc = position.value.index.get_loc(at_time,method='nearest',
                         tolerance=1e-2)
                 time_stamp = position.value.index[loc]
@@ -588,6 +594,18 @@ class Wind():
 
         # Compute the wind velocity at the given external position
         # Conical spiral
+
+        for quant in self.__gas_phase.quantities:
+            name = quant.name
+            formal_name = quant.formal_name
+            if formal_name == 'Pos.':
+                position = self.__gas_phase.GetValue(name,cortix_time)
+                x = position[0]
+                y = position[1]
+                z = position[2]
+                velo_name = 'velocity@'+name
+                velocity = self.__gas_phase.GetValue(velo_name,cortix_time)
+                self.__gas_phase.SetValue(velo_name,velocity,at_time)
 
         #self.__gas_phase.SetValue( 'position-1', self.__external_position, at_time )
 

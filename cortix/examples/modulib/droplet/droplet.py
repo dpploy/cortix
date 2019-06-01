@@ -117,22 +117,35 @@ class Droplet():
 
         # Domain specific member data.
 
-        self.__ode_params = dict()
+        self.__ode_params = dict() # hold parameters for the ODE solver
 
-        gravity = 9.81 # [m/s^2] acceleration of gravity
+        import scipy.constants as const
+        # Create a drop with random diameter up within 5 and 8 mm
+        diam = (npy.random.random(1)*(8 - 5) + 5)[0]
+        self.__droplet_diameter = diam * const.milli # [m]
+
+        gravity = const.g # acceleration of gravity SI
 
         self.__ode_params['gravity'] = gravity
 
         # These must be npy.ndarray (see ODE solvers).
-        self.__ode_params['drag-coeff']    = npy.random.random(3)*5e-1
-        self.__ode_params['wind-velocity'] = npy.array([0.0,0.0,0.0])
+        drag_variation = (npy.random.random(1)*(1.0 - 0.8) + 0.8)[0]
+        self.__ode_params['drag-coeff']    = npy.ones(3)*drag_variation * 1e-4
+
+        self.__ode_params['wind-velocity'] = npy.array([1.8,-4.3,-0.1])
 
         # Setup species in the liquid phase.
         species = list()
 
         water = Specie( name='water', formulaName='H2O(l)', phase='liquid', atoms=['2*H','O'] )
-        water.massCCUnit = 'g/cc'
+        water.massCCUnit  = 'g/cc'
         water.molarCCUnit = 'mole/cc'
+        water.massCC = 1.0
+
+        self.__droplet_mass = 4/3*math.pi*(self.__droplet_diameter/2)**3 * \
+                water.massCC * const.gram / const.centi**3  # [kg]
+
+        self.__ode_params['droplet_mass'] = self.__droplet_mass
 
         species.append(water)
 
@@ -157,12 +170,13 @@ class Droplet():
         water_mass_cc = 0.99965 # [g/cc]
         self.__liquid_phase.SetValue( 'water', water_mass_cc, self.__start_time )
 
-        # Random initial position in a 1000x1000x1000 m^3 box.
+        # Random initial position in a LxLxH m^3 box.
         # Origin of cartesian coordinate system at the bottom of the box. 
-        # z coordinate pointing upwards. -500 <= x <= 500, -500 <= y <= 500, 
-        x_0 = ( 2*npy.random.random(3) - npy.ones(3) ) * 500.0
-        # Make z=1000.
-        x_0[2] = 1000.0
+        # z coordinate pointing upwards. -L <= x <= L, -L <= y <= L, 
+        length = 250.0
+        x_0 = ( 2*npy.random.random(3) - npy.ones(3) ) * length
+        height = 100.0
+        x_0[2] = height
         self.__liquid_phase.SetValue( 'position', x_0, self.__start_time )
 
         # Zero initial velocity
@@ -568,7 +582,7 @@ class Droplet():
                     (port_name, port_type, this_port_file) = port
                     if port_name == 'droplet-position':
                        assert port_type == 'provide'
-                       velocity_name = 'velocity_@_'+this_port_file
+                       velocity_name = 'velocity@'+this_port_file
 
                 velocity = wind_phase.GetValue(velocity_name,at_time)
 
@@ -649,15 +663,16 @@ class Droplet():
                 drop_velo = u_vec[3:]
                 drag      = - alpha * (drop_velo - wind_velo)
                 gravity   = params['gravity']
+                mass      = params['droplet_mass']
 
                 dt_u_vec[0] = u_vec[3]                            #  d_t u_1 = u_4
-                dt_u_vec[3] = drag[0]                             #  d_t u_4 = 0 
+                dt_u_vec[3] = drag[0]/mass                        #  d_t u_4 = 0 
 
                 dt_u_vec[1] = u_vec[4]                            #  d_t u_2 = u_5
-                dt_u_vec[4] = drag[1]                             #  d_t u_5 = 0 
+                dt_u_vec[4] = drag[1]/mass                        #  d_t u_5 = 0 
 
                 dt_u_vec[2] = u_vec[5]                            #  d_t u_3 = u_6
-                dt_u_vec[5] = drag[2] - gravity                   #  d_t u_6 = -g
+                dt_u_vec[5] = drag[2]/mass - gravity                  #  d_t u_6 = -g
 
                 return
 
@@ -670,15 +685,16 @@ class Droplet():
                 drop_velo = u_vec[3:]
                 drag      = - alpha * (drop_velo - wind_velo)
                 gravity   = params['gravity']
+                mass      = params['droplet_mass']
 
                 dt_u_0 = u_vec[3]                                 #  d_t u_1 = u_4
-                dt_u_3 = drag[0]                                  #  d_t u_4 = f_1
+                dt_u_3 = drag[0]/mass                             #  d_t u_4 = f_1
 
                 dt_u_1 = u_vec[4]                                 #  d_t u_2 = u_5
-                dt_u_4 = drag[1]                                  #  d_t u_5 = f_2
+                dt_u_4 = drag[1]/mass                             #  d_t u_5 = f_2
 
                 dt_u_2 = u_vec[5]                                 #  d_t u_3 = u_6
-                dt_u_5 = drag[2] - gravity                        #  d_t u_6 = f_3 - g
+                dt_u_5 = drag[2]/mass - gravity                   #  d_t u_6 = f_3 - g
 
                 return [dt_u_0, dt_u_1, dt_u_2, dt_u_3, dt_u_4, dt_u_5]
         else:
@@ -703,6 +719,7 @@ class Droplet():
             ( u_vec_hist, info_dict ) = odeint( rhs_fn,
                                                 u_vec_0, t_interval_sec,
                                                 args=( self.__ode_params, ),
+                                                rtol=1e-4, atol=1e-8, mxstep=200,
                                                 full_output=True
                                               )
 
