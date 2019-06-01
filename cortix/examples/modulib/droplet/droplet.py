@@ -140,11 +140,13 @@ class Droplet():
         quantities = list()
 
         # Spatial position.
-        position = Quantity( name='position', formalName='Pos.', unit='m' )
+        x_0 = npy.zeros(3)
+        position = Quantity( name='position', formalName='Pos.', unit='m', value=x_0 )
         quantities.append( position )
 
         # Velocity.
-        velocity = Quantity( name='velocity', formalName='Veloc.', unit='m/s' )
+        v_0 = npy.zeros(3)
+        velocity = Quantity( name='velocity', formalName='Veloc.', unit='m/s', value=v_0 )
         quantities.append( velocity )
 
         # Phase.
@@ -156,9 +158,9 @@ class Droplet():
         self.__liquid_phase.SetValue( 'water', water_mass_cc, self.__start_time )
 
         # Random initial position in a 1000x1000x1000 m^3 box.
-        # Origin of cartesian coord. system at the bottom of the box. Z coord pointing
-        # upwards.
-        x_0 = ( 2*npy.random.random(3) - npy.ones(3) ) * 1000.0
+        # Origin of cartesian coordinate system at the bottom of the box. 
+        # z coordinate pointing upwards. -500 <= x <= 500, -500 <= y <= 500, 
+        x_0 = ( 2*npy.random.random(3) - npy.ones(3) ) * 500.0
         # Make z=1000.
         x_0[2] = 1000.0
         self.__liquid_phase.SetValue( 'position', x_0, self.__start_time )

@@ -431,6 +431,8 @@ class Phase():
         #print('*df.dtypes =', self.__phase.dtypes)
         #print('')
 
+        # Note: user value could have a different type than other column values.
+        # If there is a type change, this will not be checked; user has been advised.
         self.__phase.loc[time_stamp, actor] = value
 
         return
