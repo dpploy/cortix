@@ -15,10 +15,10 @@
  <!-- Ports have four types: use and provide -->
 
     <!-- use ports -->
-    <port type='use'     mode='file.pkl' multiplicity='1'>position</port>
+    <port type='use'     mode='file.pkl' multiplicity='999'>position</port>
 
     <!-- provide ports -->
-    <port type='provide' mode='file.pkl' multiplicity='1'>velocity</port>
+    <port type='provide' mode='file.pkl' multiplicity='999'>velocity</port>
     <port type='provide' mode='file.xml' multiplicity='1'>state</port>
     <port type='provide' mode='file.pkl' multiplicity='1'>output</port>
 
@@ -48,9 +48,9 @@
    .                      |            | output     |                         .
    .                      ===========================                         .
    ............................................................................
-   . port type='use'     mode='file.pkl' multiplicity='1' position            .
+   . port type='use'     mode='file.pkl' multiplicity='999' position          .
    .                                                                          .
-   . port type='provide' mode='file.xml' multiplicity='1' velocity            .
+   . port type='provide' mode='file.xml' multiplicity='999' velocity          .
    . port type='provide' mode='file.xml' multiplicity='1' state               .
    . port type='provide' mode='file.pkl' multiplicity='1' output              .
    ............................................................................

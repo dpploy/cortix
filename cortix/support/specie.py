@@ -327,8 +327,9 @@ class Specie():
 
     def __UpdateMolarMass(self):
 
-        if len(self._atoms) == 0:
-            return
+        #if len(self._atoms) == 0:
+        #    self._nAtoms = 0
+        #    return
 
         for entry in self._atoms:
             assert isinstance(entry, str), 'oops'

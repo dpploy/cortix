@@ -132,14 +132,22 @@ class Wind():
         quantities = list()
 
         # Initial position of the wind points.
-        x_0 = npy.array([0.0,0.0,1000.0])  # initial height [m] above ground at 0
+        box_height = 100.0 # [m]
+        x_0 = npy.array([0.0,0.0,box_height])  # initial height [m] above ground at 0
 
-        # Initial value for wind at all points.
+        # Initial value for wind velocity at all points.
         # Note: if the z component is positive, wind is blowing upwards.
         #       Gravity points in -z direction.
-        v_0 = npy.array([1.8,-4.3,-0.1])   # initial wind velocity [m/s]
 
-        # Spatial position of wind points.
+        self.__box_half_length = 250.0 # wind box [m] 
+        self.__min_core_radius = 5.0 # [m]
+        self.__outer_v_theta = 1 # m/s # angular speed
+        self.__v_z = 0.50 # [m/s]
+
+        v_0 = self.__vortex_velocity( x_0 )
+        #v_0 = npy.array([1.8,-4.3,-0.1])   # initial wind velocity [m/s]
+
+        # Spatial position of wind points and velocity.
         # One position and velocity quantity per use port to allow for multiple
         # connections to the use port.
         for port in self.__ports:
@@ -158,6 +166,7 @@ class Wind():
                         unit='m/s', value=v_0 )
                 quantities.append( velocity )
 
+        # Create phase.
         self.__gas_phase = Phase( self.__start_time, time_unit='s', species=species,
                 quantities=quantities)
 
@@ -184,7 +193,7 @@ class Wind():
         self.__provide_data( provide_port_name='output', at_time=cortix_time )
 
         # Use data from all use ports.
-        self.__use_data( use_port_name='position-1', at_time=cortix_time )
+        self.__use_data( use_port_name='position', at_time=cortix_time )
 
         return
 
@@ -309,8 +318,13 @@ class Wind():
         lock = Lock()
 
         with lock:
-            # Note that the whole phase is sent out
+            # Note that the whole phase is sent out.
             pickle.dump( self.__gas_phase, open(port_file,'wb') )
+
+        print('')
+        print('WIND: ALL PHASE PROVIDED')
+        print(self.__gas_phase)
+        print('')
 
         s = '__provide_velocity('+str(round(at_time,2))+'[s]): '
         m = 'pickle.dumped velocity.'
@@ -549,18 +563,24 @@ class Wind():
                 # The Quantity object must have a Pandas.Series as value for the history
                 # values.
 
-                (position,time_unit) = pickle.load( open(port_file,'rb') )
+                (position_history,time_unit) = pickle.load( open(port_file,'rb') )
 
                 assert time_unit == 's'
-                assert isinstance(position,Quantity)
+                assert isinstance(position_history,Quantity)
 
-                loc = position.value.index.get_loc(at_time,method='nearest',
+                loc = position_history.value.index.get_loc(at_time,method='nearest',
                         tolerance=1e-2)
-                time_stamp = position.value.index[loc]
+                time_stamp = position_history.value.index[loc]
+
 
                 assert abs(time_stamp - at_time) <= 1e-2
                 found = True
                 lock.release()
+
+                print('')
+                print('WIND: DROPLET POSITION RECEIVED')
+                print(position_history)
+                print('')
 
             except:
                 lock.release()
@@ -572,12 +592,18 @@ class Wind():
         s = '__use_position('+str(round(at_time,2))+'[s]): pickle.loaded position.'
         self.__log.debug(s)
 
-        position = position.value.loc[time_stamp]
+        position = position_history.value.loc[time_stamp]
         assert isinstance(position,npy.ndarray)
 
-        assert self.phase.has_time_stamp(at_time)
+        assert self.__gas_phase.has_time_stamp(at_time)
 
-        self.__phase.SetValue( actor=port_file, value=position,
+        self.__gas_phase.SetValue( actor=port_file, value=position,
+                try_time_stamp=time_stamp )
+
+        # Update the wind velocity at the position
+        velocity = self.__vortex_velocity( position )
+
+        self.__gas_phase.SetValue( actor=port_file, value=velocity,
                 try_time_stamp=time_stamp )
 
         return
@@ -600,18 +626,61 @@ class Wind():
             formal_name = quant.formal_name
             if formal_name == 'Pos.':
                 position = self.__gas_phase.GetValue(name,cortix_time)
-                x = position[0]
-                y = position[1]
-                z = position[2]
+
+                wind_velocity = self.__vortex_velocity( position )
+
                 velo_name = 'velocity@'+name
+                #print(velo_name)
+                #print(position)
+                #print(wind_velocity)
 
-                velocity = self.__gas_phase.GetValue(velo_name,cortix_time)
+                #wind_velocity = self.__gas_phase.GetValue(velo_name,cortix_time)
 
-                self.__gas_phase.SetValue(velo_name,velocity,at_time)
-
-        #self.__gas_phase.SetValue( 'position-1', self.__external_position, at_time )
+                self.__gas_phase.SetValue(velo_name,wind_velocity,at_time)
 
         return
+
+    def __vortex_velocity( self, position ):
+        '''
+        Computes the velocity of the wind at a given position.
+
+        Parameters
+        ----------
+        position: numpy.ndarray(3)
+
+        Returns
+        -------
+        wind_velocity: numpy.ndarray(3)
+        '''
+
+        # Compute the wind velocity at the given external position
+        # Using a vortex flow model.
+        box_half_length = self.__box_half_length
+        min_core_radius = self.__min_core_radius
+        outer_v_theta   = self.__outer_v_theta
+        v_z             = self.__v_z
+
+        outer_cylindrical_radius = math.hypot(box_half_length,box_half_length)
+        circulation = 2*math.pi * outer_cylindrical_radius * outer_v_theta # m^2/s
+
+        core_radius = min_core_radius
+
+        x = position[0]
+        y = position[1]
+        z = position[2]
+
+        cylindrical_radius = math.hypot(x,y)
+        azimuth = math.atan2(y,x)
+
+        v_theta = (1 - math.exp(-cylindrical_radius**2/core_radius**2) ) * \
+                   circulation/2/math.pi/max(cylindrical_radius,min_core_radius)
+
+        v_x = - v_theta * math.sin(azimuth)
+        v_y =   v_theta * math.cos(azimuth)
+
+        wind_velocity = npy.array([v_x,v_y,v_z])
+
+        return wind_velocity
 
     def __read_manifesto( self, xml_tree_file ):
         '''

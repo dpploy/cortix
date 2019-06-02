@@ -122,14 +122,16 @@ class Droplet():
         import scipy.constants as const
         # Create a drop with random diameter up within 5 and 8 mm
         diam = (npy.random.random(1)*(8 - 5) + 5)[0]
+        diam = 8 # hardcoded remove this later
         self.__droplet_diameter = diam * const.milli # [m]
 
         gravity = const.g # acceleration of gravity SI
 
         self.__ode_params['gravity'] = gravity
 
-        # Drag must be npy.ndarray (see ODE solvers).
+        # Drag coefficient must be npy.ndarray (see ODE solvers).
         drag_variation = (npy.random.random(1)*(1.0 - 0.8) + 0.8)[0]
+        drag_variation = 0.85 # hardcoded remove this later
         self.__ode_params['drag-coeff']    = npy.ones(3)*drag_variation * 1e-4
 
         # Setup species in the liquid phase.
@@ -163,46 +165,55 @@ class Droplet():
         velocity = Quantity( name='velocity', formalName='Veloc.', unit='m/s', value=v_0 )
         quantities.append( velocity )
 
-        # Phase.
+        # Create Phase.
         self.__liquid_phase = Phase( self.__start_time, time_unit='s', species=species,
                 quantities=quantities )
 
         # Initialize phase.
         self.__liquid_phase.SetValue( 'water', water_mass_cc, self.__start_time )
 
-        # Random initial position in a LxLxH m^3 box.
+        # Random initial position in a LxLxH m^3 box with given H.
         # Origin of cartesian coordinate system at the bottom of the box. 
         # z coordinate pointing upwards. -L <= x <= L, -L <= y <= L, 
-        box_half_length = 250.0 # [m]
-        x_0 = ( 2*npy.random.random(3) - npy.ones(3) ) * box_half_length
+        self.__box_half_length = 250.0 # [m]
+        x_0 = ( 2*npy.random.random(3) - npy.ones(3) ) * self.__box_half_length
         box_height = 100.0 # [m]
         x_0[2] = box_height
         self.__liquid_phase.SetValue( 'position', x_0, self.__start_time )
 
-        # Vortex model for initial velocity
+        # Vortex model for initial velocity (this is for the sake of testing droplet
+        # motion with wind drag)
         # Wind velocity must be npy.ndarray (see ODE solvers).
-        outer_cylindrical_radius = math.hypot(box_half_length,box_half_length)
-        outer_v_theta = 5 # m/s # angular speed
-        circulation = 2*math.pi * outer_cylindrical_radius * outer_v_theta # m/s
+        self.__min_core_radius = 5.0 # [m]
+        self.__outer_v_theta = 1.0 # m/s # angular speed
+        self.__v_z = 0.50 # [m/s]
 
-        x = x_0[0]
-        y = x_0[1]
-        z = x_0[2]
-        cylindrical_radius = math.hypot(x,y)
-        core_radius = box_half_length * 0.1
-        v_theta = (1 - math.exp(-cylindrical_radius**2/core_radius**2) ) * \
-                circulation/2/math.pi/max(cylindrical_radius,10.0)
+        wind_velocity = self.__vortex_velocity( x_0 )
 
-        azimuth = math.atan2(y,x)
-
-        v_x = - v_theta * math.sin(azimuth)
-        v_y =   v_theta * math.cos(azimuth)
-        v_z = 0.25 # [m/s]
-
-        self.__ode_params['wind-velocity'] = npy.array([v_x,v_y,-v_z])
+        self.__ode_params['wind-velocity'] = wind_velocity
         #print(self.__ode_params['wind-velocity'])
 
-        self.__liquid_phase.SetValue( 'velocity', v_0, self.__start_time )
+        self.__liquid_phase.SetValue( 'velocity', wind_velocity, self.__start_time )
+
+        # For insight on the vortex flow field:
+        xaxis = list()
+        yaxis = list()
+        for dx in npy.linspace(0,1,500):
+            x = dx * self.__box_half_length
+            xaxis.append(x)
+            y = 0.0
+            z = box_height
+            wind_velocity = self.__vortex_velocity( npy.array([x,y,z]) )
+            yaxis.append(wind_velocity[1])
+            #print(wind_velocity)
+        import matplotlib.pyplot as plt
+        fig=plt.figure(1)
+        plt.plot(xaxis,yaxis)
+        plt.xlabel('Radial distance [m]')
+        plt.ylabel('Tangential speed [m/s]')
+        plt.title('Vortex Wind')
+        plt.grid()
+        fig.savefig('vortex-wind.png',dpi=200,format='png')
 
         return
 
@@ -351,8 +362,16 @@ class Droplet():
         lock = Lock()
 
         with lock:
-            pickle.dump( self.__liquid_phase.get_quantity_history('position'),
-                    open(port_file,'wb') )
+
+            (position_history, time_unit) = self.__liquid_phase.get_quantity_history(
+                    'position')
+
+            pickle.dump( (position_history, time_unit), open(port_file,'wb') )
+
+        print('')
+        print('DROPLET: DROPLET POSITION SENT')
+        print(position_history)
+        print('')
 
         s = '__provide_droplet_position('+str(round(at_time,2))+'[s]): '
         m = 'pickle.dumped droplet position.'
@@ -598,14 +617,20 @@ class Droplet():
                 wind_phase = pickle.load( open(port_file,'rb') )
                 assert wind_phase.time_unit == 's'
 
-                # Wind specific quantity name
+                # Find in the Wind Phase the specific quantity name
                 for port in self.__ports:
                     (port_name, port_type, this_port_file) = port
                     if port_name == 'droplet-position':
                        assert port_type == 'provide'
                        velocity_name = 'velocity@'+this_port_file
 
+                # Get this Droplet's velocity
                 velocity = wind_phase.GetValue(velocity_name,at_time)
+
+                print('')
+                print('DROPLET: DROPLET VELOCITY RECEIVED')
+                print(velocity)
+                print('')
 
                 #loc = velocity.value.index.get_loc(at_time,method='nearest',
                 #        tolerance=1e-2)
@@ -769,6 +794,48 @@ class Droplet():
 
         return
 
+    def __vortex_velocity( self, position ):
+        '''
+        Computes the velocity of the wind at a given position.
+
+        Parameters
+        ----------
+        position: numpy.ndarray(3)
+
+        Returns
+        -------
+        wind_velocity: numpy.ndarray(3)
+        '''
+
+        # Compute the wind velocity at the given external position
+        # Using a vortex flow model.
+        box_half_length = self.__box_half_length
+        min_core_radius = self.__min_core_radius
+        outer_v_theta   = self.__outer_v_theta
+        v_z             = self.__v_z
+
+        outer_cylindrical_radius = math.hypot(box_half_length,box_half_length)
+        circulation = 2*math.pi * outer_cylindrical_radius * outer_v_theta # m^2/s
+
+        core_radius = min_core_radius
+
+        x = position[0]
+        y = position[1]
+        z = position[2]
+
+        cylindrical_radius = math.hypot(x,y)
+        azimuth = math.atan2(y,x)
+
+        v_theta = (1 - math.exp(-cylindrical_radius**2/core_radius**2) ) * \
+                   circulation/2/math.pi/max(cylindrical_radius,min_core_radius)
+
+        v_x = - v_theta * math.sin(azimuth)
+        v_y =   v_theta * math.cos(azimuth)
+
+        wind_velocity = npy.array([v_x,v_y,v_z])
+
+        return wind_velocity
+
     def __read_manifesto( self, xml_tree_file ):
         '''
         Parse the manifesto
@@ -842,4 +909,4 @@ class Droplet():
 
         return
 
-#======================= end class Droplet: ======================================
+#======================= end class Droplet =======================================

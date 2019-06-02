@@ -96,9 +96,10 @@ class PyPlot():
 
         n_time_steps = ( cortix_final_time - cortix_start_time ) / cortix_time_step
         n_of_times_to_plot = 10 # during the entire run
-        # how often to plot
-        self.__plot_interval = round( n_time_steps / n_of_times_to_plot )
-        # the width of the window to plot
+        # How often to plot.
+        self.__plot_interval = round( n_time_steps / n_of_times_to_plot ) + 1
+
+        # The width of the window to plot.
         self.__plot_slide_window_interval = 3 * self.__plot_interval
 
         s = 'Plot interval = ' + str(self.__plot_interval) + ' [' + \
@@ -154,7 +155,6 @@ class PyPlot():
         '''
         Transfer data at cortix_time.
         '''
-
         if (cortix_time % self.__plot_interval <= 1e-2 and \
             cortix_time < self.__cortix_final_time)        \
            or cortix_time >= self.__cortix_final_time:
@@ -406,7 +406,7 @@ class PyPlot():
         of these time sequences will be cleared at the end.
         '''
 
-        nRows = 3
+        nRows = 4
         nCols = 1
 
         nSequences = len(self.__time_sequences_tmp)
