@@ -143,10 +143,10 @@ class Droplet():
         water.molarCCUnit = 'mole/cc'
         water.massCC      = water_mass_cc
 
-        self.__droplet_mass = 4/3*math.pi*(self.__droplet_diameter/2)**3 * \
+        droplet_mass = 4/3*math.pi*(self.__droplet_diameter/2)**3 * \
                 water.massCC * const.gram / const.centi**3  # [kg]
 
-        self.__ode_params['droplet_mass'] = self.__droplet_mass
+        self.__ode_params['droplet_mass'] = droplet_mass
 
         species.append(water)
 
@@ -170,29 +170,39 @@ class Droplet():
         # Initialize phase.
         self.__liquid_phase.SetValue( 'water', water_mass_cc, self.__start_time )
 
-        # Random initial position in a LxLxH m^3 box with given H.
+        # Vortex box dimiensions: LxLxH m^3 box with given H.
         # Origin of cartesian coordinate system at the bottom of the box. 
         # z coordinate pointing upwards. -L <= x <= L, -L <= y <= L, 
-        self.__box_half_length = 250.0 # [m]
-        x_0 = ( 2*npy.random.random(3) - npy.ones(3) ) * self.__box_half_length
-        self.__box_height = 100.0 # H [m]
-        x_0[2] = self.__box_height
-        self.__liquid_phase.SetValue( 'position', x_0, self.__start_time )
-
-        # Vortex model for initial velocity (this is for the sake of testing droplet
-        # motion with wind drag).
-        # Wind velocity must be npy.ndarray (see ODE solvers).
+        self.__box_half_length = 250.0 # L [m]
+        self.__box_height      = 100.0 # H [m]
+        # Vortex model for initial velocity (this is for the sake of testing the droplet
+        # motion with wind drag). 
         self.__min_core_radius = 5.0 # [m]
         self.__outer_v_theta = 1.0 # m/s # angular speed
         self.__v_z_0 = 0.50 # [m/s]
-
+        # Wind velocity must be npy.ndarray (see ODE solvers).
         wind_velocity = self.__vortex_velocity( x_0 )
-
-        # Save the function reference for future dispatch
+        # Save the function reference for future dispatch in the ODE solver
         self.__ode_params['wind-velocity-function'] = self.__vortex_velocity
 
-        # Set the initial velocity of the droplet to the wind velocity
-        self.__liquid_phase.SetValue( 'velocity', wind_velocity, self.__start_time )
+        # Random positioning of the droplet. Constraint positioning to a box sub-region.
+        x_0 = ( 2*npy.random.random(3) - npy.ones(3) ) * self.__box_half_length/2.0
+        x_0[2] = self.__box_height
+        self.__liquid_phase.SetValue( 'position', x_0, self.__start_time )
+
+        # Set the initial velocity of the droplet to zero as the droplet has been
+        # placed still in the wind.
+        self.__liquid_phase.SetValue( 'velocity', npy.array([0.0,0.0,0.0]),
+                self.__start_time )
+
+        # This is a default value for the medium surrounding the droplet
+        # Air mass density: 0.1 g/cc
+        medium_mass_density = 0.1 * const.gram / const.centi**3 # [kg/m^3]
+
+        medium_displaced_mass = 4/3*math.pi*(self.__droplet_diameter/2)**3 * \
+                medium_mass_density # [kg]
+
+        self.__ode_params['medium_displaced_mass'] = medium_displaced_mass
 
         # Plot for insight on the vortex flow field.
         import matplotlib.pyplot as plt
@@ -383,9 +393,9 @@ class Droplet():
 
             pickle.dump( (position_history, time_unit), open(port_file,'wb') )
 
-        print('')
-        print('DROPLET: DROPLET POSITION SENT')
-        print(position_history)
+        #print('')
+        #print('DROPLET: DROPLET POSITION SENT')
+        #print(position_history)
         print('')
 
         s = '__provide_droplet_position('+str(round(at_time,2))+'[s]): '
@@ -730,16 +740,18 @@ class Droplet():
                 drop_velo = u_vec[3:]
                 drag      = - alpha * (drop_velo - wind_velo)
                 gravity   = params['gravity']
-                mass      = params['droplet_mass']
+                droplet_mass = params['droplet_mass']
+                medium_displaced_mass = params['medium_displaced_mass']
+                buoyant_force = (droplet_mass - medium_displaced_mass) * gravity
 
-                dt_u_vec[0] = u_vec[3]                            #  d_t u_1 = u_4
-                dt_u_vec[3] = drag[0]/mass                        #  d_t u_4 = f_1
+                dt_u_vec[0] = u_vec[3]                                #  d_t u_1 = u_4
+                dt_u_vec[3] = drag[0]/droplet_mass                    #  d_t u_4 = f_1
 
-                dt_u_vec[1] = u_vec[4]                            #  d_t u_2 = u_5
-                dt_u_vec[4] = drag[1]/mass                        #  d_t u_5 = f_2
+                dt_u_vec[1] = u_vec[4]                                #  d_t u_2 = u_5
+                dt_u_vec[4] = drag[1]/droplet_mass                    #  d_t u_5 = f_2
 
-                dt_u_vec[2] = u_vec[5]                            #  d_t u_3 = u_6
-                dt_u_vec[5] = drag[2]/mass - gravity              #  d_t u_6 = f_3 -g
+                dt_u_vec[2] = u_vec[5]                                #  d_t u_3 = u_6
+                dt_u_vec[5] = (drag[2] - buoyant_force)/droplet_mass  #  d_t u_6 = f_3
 
                 return
 
@@ -758,16 +770,18 @@ class Droplet():
                 drop_velo = u_vec[3:]
                 drag      = - alpha * (drop_velo - wind_velo)
                 gravity   = params['gravity']
-                mass      = params['droplet_mass']
+                droplet_mass = params['droplet_mass']
+                medium_displaced_mass = params['medium_displaced_mass']
+                buoyant_force = (droplet_mass - medium_displaced_mass) * gravity
 
-                dt_u_0 = u_vec[3]                                 #  d_t u_1 = u_4
-                dt_u_3 = drag[0]/mass                             #  d_t u_4 = f_1
+                dt_u_0 = u_vec[3]                               #  d_t u_1 = u_4
+                dt_u_3 = drag[0]/droplet_mass                   #  d_t u_4 = f_1/m
 
-                dt_u_1 = u_vec[4]                                 #  d_t u_2 = u_5
-                dt_u_4 = drag[1]/mass                             #  d_t u_5 = f_2
+                dt_u_1 = u_vec[4]                               #  d_t u_2 = u_5
+                dt_u_4 = drag[1]/droplet_mass                   #  d_t u_5 = f_2/m
 
-                dt_u_2 = u_vec[5]                                 #  d_t u_3 = u_6
-                dt_u_5 = drag[2]/mass - gravity                   #  d_t u_6 = f_3 - g
+                dt_u_2 = u_vec[5]                               #  d_t u_3 = u_6
+                dt_u_5 = (drag[2] - buoyant_force)/droplet_mass #  d_t u_6 = f_3/m
 
                 return [dt_u_0, dt_u_1, dt_u_2, dt_u_3, dt_u_4, dt_u_5]
         else:

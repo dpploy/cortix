@@ -131,21 +131,21 @@ class Wind():
         # Quantities in the gas phase.
         quantities = list()
 
-        # Initial position of the wind points.
-        box_height = 100.0 # [m]
-        x_0 = npy.array([0.0,0.0,box_height])  # initial height [m] above ground at 0
+        # Initial position of the wind points; make this zero because data is needed from
+        # the use port.
+        x_0 = npy.array([0.0,0.0,0.0]) # initial height [m] above ground at 0
 
-        # Initial value for wind velocity at all points.
+        # Initial value for wind velocity at all points. Make this zero too. Use data
+        # will change this later.
         # Note: if the z component is positive, wind is blowing upwards.
         #       Gravity points in -z direction.
-
+        self.__box_height = 100.0 # [m]
         self.__box_half_length = 250.0 # wind box [m] 
         self.__min_core_radius = 5.0 # [m]
-        self.__outer_v_theta = 1 # m/s # angular speed
-        self.__v_z = 0.50 # [m/s]
+        self.__outer_v_theta = 1.0 # m/s # angular speed
+        self.__v_z_0 = 0.50 # [m/s]
 
-        v_0 = self.__vortex_velocity( x_0 )
-        #v_0 = npy.array([1.8,-4.3,-0.1])   # initial wind velocity [m/s]
+        wind_velocity = npy.array([0.0,0.0,0.0])
 
         # Spatial position of wind points and velocity.
         # One position and velocity quantity per use port to allow for multiple
@@ -163,7 +163,7 @@ class Wind():
 
                 # Create a corresponding velocity quantity
                 velocity = Quantity( name='velocity@'+port_file, formalName='Veloc.',
-                        unit='m/s', value=v_0 )
+                        unit='m/s', value=wind_velocity )
                 quantities.append( velocity )
 
         # Create phase.
@@ -658,7 +658,6 @@ class Wind():
         box_half_length = self.__box_half_length
         min_core_radius = self.__min_core_radius
         outer_v_theta   = self.__outer_v_theta
-        v_z             = self.__v_z
 
         outer_cylindrical_radius = math.hypot(box_half_length,box_half_length)
         circulation = 2*math.pi * outer_cylindrical_radius * outer_v_theta # m^2/s
@@ -669,11 +668,16 @@ class Wind():
         y = position[1]
         z = position[2]
 
+        relax_length = self.__box_height/5.0
+        z_relax_factor = math.exp(-(self.__box_height-z)/relax_length)
+        v_z = self.__v_z_0 * z_relax_factor
+
         cylindrical_radius = math.hypot(x,y)
         azimuth = math.atan2(y,x)
 
-        v_theta = (1 - math.exp(-cylindrical_radius**2/core_radius**2) ) * \
-                   circulation/2/math.pi/max(cylindrical_radius,min_core_radius)
+        v_theta = (1 - math.exp(-cylindrical_radius**2/core_radius**2) ) *\
+                   circulation/2/math.pi/max(cylindrical_radius,min_core_radius) *\
+                   z_relax_factor
 
         v_x = - v_theta * math.sin(azimuth)
         v_y =   v_theta * math.cos(azimuth)

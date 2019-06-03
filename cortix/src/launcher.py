@@ -280,6 +280,7 @@ class Launcher(Thread):
             start_time = time.time()
 
             # Data exchange at cortix_time (call ports first).
+            # This must come first before execution next.
             guest_driver.call_ports( cortix_time )
 
             # Advance to cortix_time + cortix_time_step (call execute second)
