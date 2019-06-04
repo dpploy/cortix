@@ -122,15 +122,13 @@ class Droplet():
         import scipy.constants as const
         # Create a drop with random diameter up within 5 and 8 mm.
         diam = (npy.random.random(1)*(8 - 5) + 5)[0]
-        self.__droplet_diameter = diam * const.milli # [m]
+        droplet_diameter = diam * const.milli # [m]
+        self.__ode_params['droplet-diameter'] = droplet_diameter
+        self.__ode_params['droplet-xsec-area'] = math.pi*(droplet_diameter/2.0)**2
 
         gravity = const.g # acceleration of gravity SI
 
         self.__ode_params['gravity'] = gravity
-
-        # Drag coefficient must be npy.ndarray (see ODE solvers).
-        drag_variation = (npy.random.random(1)*(1.0 - 0.8) + 0.8)[0]
-        self.__ode_params['drag-coeff'] = npy.ones(3)*drag_variation * 5.0e-4
 
         # Setup species in the liquid phase.
         species = list()
@@ -138,15 +136,15 @@ class Droplet():
         water = Specie( name='water', formulaName='H2O(l)', phase='liquid',
                 atoms=['2*H','O'] )
 
-        water_mass_cc = 0.99965 # [g/cc]
+        water_mass_cc     = 0.99965 # [g/cc]
         water.massCCUnit  = 'g/cc'
         water.molarCCUnit = 'mole/cc'
         water.massCC      = water_mass_cc
 
-        droplet_mass = 4/3*math.pi*(self.__droplet_diameter/2)**3 * \
+        droplet_mass = 4/3*math.pi*(droplet_diameter/2)**3 * \
                 water.massCC * const.gram / const.centi**3  # [kg]
 
-        self.__ode_params['droplet_mass'] = droplet_mass
+        self.__ode_params['droplet-mass'] = droplet_mass
 
         species.append(water)
 
@@ -177,7 +175,7 @@ class Droplet():
         self.__box_height      = 100.0 # H [m]
         # Vortex model for initial velocity (this is for the sake of testing the droplet
         # motion with wind drag). 
-        self.__min_core_radius = 5.0 # [m]
+        self.__min_core_radius = 2.5 # [m]
         self.__outer_v_theta = 1.0 # m/s # angular speed
         self.__v_z_0 = 0.50 # [m/s]
         # Wind velocity must be npy.ndarray (see ODE solvers).
@@ -198,13 +196,17 @@ class Droplet():
         # This is a default value for the medium surrounding the droplet
         # Air mass density: 0.1 g/cc
         medium_mass_density = 0.1 * const.gram / const.centi**3 # [kg/m^3]
+        self.__ode_params['medium-mass-density'] = medium_mass_density
 
-        medium_displaced_mass = 4/3*math.pi*(self.__droplet_diameter/2)**3 * \
+        medium_displaced_mass = 4/3*math.pi*(droplet_diameter/2)**3 * \
                 medium_mass_density # [kg]
 
-        self.__ode_params['medium_displaced_mass'] = medium_displaced_mass
+        self.__ode_params['medium-displaced-mass'] = medium_displaced_mass
 
-        # Plot for insight on the vortex flow field.
+        medium_dyn_viscosity = 1.81e-5 # kg/(m s)
+        self.__ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
+
+        # Plots for insight on the vortex flow field.
         import matplotlib.pyplot as plt
         fig = plt.figure(1)
         plt.subplots_adjust(hspace=0.5)
@@ -234,8 +236,8 @@ class Droplet():
             xval.append(wind_velocity[2])
         plt.subplot(2,1,2)
         plt.plot(xval,yval)
-        plt.xlabel('Vertical speed [m]')
-        plt.ylabel('Height [m/s]')
+        plt.xlabel('Vertical speed [m/s]')
+        plt.ylabel('Height [m]')
         plt.grid()
 
         fig.savefig('vortex-wind.png',dpi=200,format='png')
@@ -730,18 +732,30 @@ class Droplet():
             def rhs_fn(t, u_vec, dt_u_vec, params):
 
                 drop_pos = u_vec[:3]
-                alpha    = params['drag-coeff']
+
                 try:
                     wind_velo = params['wind-velocity'] # try port connected data
                 except:
                     wind_velo_func = params['wind-velocity-function'] # use function
                     wind_velo      = wind_velo_func(drop_pos)
 
-                drop_velo = u_vec[3:]
-                drag      = - alpha * (drop_velo - wind_velo)
+                drop_velo     = u_vec[3:]
+                relative_velo = drop_velo - wind_velo
+                relative_velo_mag = npy.linalg.norm(relative_velo)
+                area = params['droplet-xsec-area']
+                diameter = params['droplet-diameter']
+                dyn_visco = params['medium-dyn-viscosity']
+
+                rho_wind = params['medium-mass-density']
+                reynolds_num = rho_wind * relative_velo_mag * diameter / dyn_visco
+
+                fric_factor = 0.44
+
+                drag = - fric_factor * area * rho_wind * relative_velo_mag * relative_velo/2.0
+
                 gravity   = params['gravity']
-                droplet_mass = params['droplet_mass']
-                medium_displaced_mass = params['medium_displaced_mass']
+                droplet_mass = params['droplet-mass']
+                medium_displaced_mass = params['medium-displaced-mass']
                 buoyant_force = (droplet_mass - medium_displaced_mass) * gravity
 
                 dt_u_vec[0] = u_vec[3]                                #  d_t u_1 = u_4
@@ -760,18 +774,35 @@ class Droplet():
             def rhs_fn(u_vec, t, params):
 
                 drop_pos = u_vec[:3]
-                alpha    = params['drag-coeff']
+
                 try:
                     wind_velo = params['wind-velocity'] # try port connected data
                 except:
                     wind_velo_func = params['wind-velocity-function'] # use function
                     wind_velo      = wind_velo_func(drop_pos)
 
-                drop_velo = u_vec[3:]
-                drag      = - alpha * (drop_velo - wind_velo)
+                drop_velo     = u_vec[3:]
+                relative_velo = drop_velo - wind_velo
+                relative_velo_mag = npy.linalg.norm(relative_velo)
+                area = params['droplet-xsec-area']
+                diameter = params['droplet-diameter']
+                dyn_visco = params['medium-dyn-viscosity']
+
+                rho_wind = params['medium-mass-density']
+                reynolds_num = rho_wind * relative_velo_mag * diameter / dyn_visco
+
+                if reynolds_num < 0.1:
+                    fric_factor = 24/reynolds_num
+                elif reynolds_num >= 0.1 and reynolds_num < 6000.0:
+                    fric_factor = ( math.sqrt(24/reynolds_num) + 0.5407 )**2
+                elif reynolds_num >= 6000:
+                    fric_factor = 0.44
+
+                drag = - fric_factor * area * rho_wind * relative_velo_mag * relative_velo/2.0
+
                 gravity   = params['gravity']
-                droplet_mass = params['droplet_mass']
-                medium_displaced_mass = params['medium_displaced_mass']
+                droplet_mass = params['droplet-mass']
+                medium_displaced_mass = params['medium-displaced-mass']
                 buoyant_force = (droplet_mass - medium_displaced_mass) * gravity
 
                 dt_u_0 = u_vec[3]                               #  d_t u_1 = u_4
@@ -863,14 +894,14 @@ class Droplet():
         y = position[1]
         z = position[2]
 
-        relax_length = self.__box_height/5.0
+        relax_length = self.__box_height/2.0
         z_relax_factor = math.exp(-(self.__box_height-z)/relax_length)
         v_z = self.__v_z_0 * z_relax_factor
 
         cylindrical_radius = math.hypot(x,y)
         azimuth = math.atan2(y,x)
 
-        v_theta = (1 - math.exp(-cylindrical_radius**2/core_radius**2) ) *\
+        v_theta = ( 1 - math.exp(-cylindrical_radius**2/8/core_radius**2) ) *\
                    circulation/2/math.pi/max(cylindrical_radius,min_core_radius) *\
                    z_relax_factor
 
