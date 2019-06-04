@@ -50,10 +50,10 @@ class Network:
 # Construction 
 #*********************************************************************************
 
-    def __init__(self, net_config_xml_node): 
+    def __init__(self, net_config_xml_node):
 
-        assert isinstance(net_config_xml_node, XMLTree), \
-                '-> net_config_xml_node is invalid.'
+        assert isinstance(net_config_xml_node, XMLTree),
+               '-> net_config_xml_node is invalid.'
 
         self.__config_xml_node = net_config_xml_node
 
