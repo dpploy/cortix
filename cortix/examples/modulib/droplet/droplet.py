@@ -660,10 +660,10 @@ class Droplet():
                 # Get this Droplet's velocity
                 velocity = wind_phase.GetValue(velocity_name,at_time)
 
-                #print('')
-                #print('DROPLET: DROPLET VELOCITY RECEIVED')
-                #print(velocity)
-                #print('')
+                print('')
+                print('DROPLET: DROPLET VELOCITY RECEIVED')
+                print(velocity)
+                print('')
 
                 #loc = velocity.value.index.get_loc(at_time,method='nearest',
                 #        tolerance=1e-2)

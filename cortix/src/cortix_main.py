@@ -71,7 +71,11 @@ class Cortix():
         # Create the logging facility for each object
         self.__create_logging( config_xml_tree )
 
+        # Show splash
+        self.__show_splash()
+
         self.__log.info('Created Cortix work directory: %s', self.__work_dir)
+
 
         #==================
         # Setup simulations (one or more as specified in the config file)
@@ -197,4 +201,27 @@ class Cortix():
 
         return
 
+    def __show_splash(self):
+
+        self.__splash = '\n'+\
+        '=============================================================================\n'+\
+        '      ...                                        s       .\n'+\
+        '   xH88"`~ .x8X                                 :8      @88>\n'+\
+        ' :8888   .f"8888Hf        u.      .u    .      .88      %8P      uL   ..\n'+\
+        ':8888>  X8L  ^""`   ...ue888b   .d88B :@8c    :888ooo    .     .@88b  @88R\n'+\
+        'X8888  X888h        888R Y888r ="8888f8888r -*8888888  .@88u  ""Y888k/"*P\n'+\
+        '88888  !88888.      888R I888>   4888>"88"    8888    ''888E`    Y888L\n'+\
+        '88888   %88888      888R I888>   4888> "      8888      888E      8888\n'+\
+        '88888 `> `8888>     888R I888>   4888>        8888      888E      `888N\n'+\
+        '`8888L %  ?888   ! u8888cJ888   .d888L .+    .8888Lu=   888E   .u./"888&\n'+\
+        ' `8888  `-*""   /   "*888*P"    ^"8888*"     ^%888*     888&  d888" Y888*"\n'+\
+        '   "888.      :"      "Y"          "Y"         "Y"      R888" ` "Y   Y"\n'+\
+        '     `""***~"`                                           ""\n'+\
+        '=============================================================================\n'
+
+        self.__log.info(self.__splash)
+
+        return
+
 #======================= end class Cortix: =======================================
+

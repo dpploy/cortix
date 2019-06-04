@@ -139,17 +139,17 @@ class Wind():
         # will change this later.
         # Note: if the z component is positive, wind is blowing upwards.
         #       Gravity points in -z direction.
-        self.__box_height = 100.0 # [m]
         self.__box_half_length = 250.0 # wind box [m] 
-        self.__min_core_radius = 5.0 # [m]
-        self.__outer_v_theta = 1.0 # m/s # angular speed
+        self.__box_height      = 100.0 # [m]
+        self.__min_core_radius = 2.5 # [m]
+        self.__outer_v_theta   = 1.0 # m/s # angular speed
         self.__v_z_0 = 0.50 # [m/s]
-
+        # Wind velocity must be npy.ndarray (see ODE solvers).
         wind_velocity = npy.array([0.0,0.0,0.0])
 
         # Spatial position of wind points and velocity.
         # One position and velocity quantity per use port to allow for multiple
-        # connections to the use port.
+        # connections to the position use port.
         for port in self.__ports:
             (port_name, port_type, port_file) = port
             if port_name == 'position':
@@ -668,14 +668,14 @@ class Wind():
         y = position[1]
         z = position[2]
 
-        relax_length = self.__box_height/5.0
+        relax_length = self.__box_height/2.0
         z_relax_factor = math.exp(-(self.__box_height-z)/relax_length)
         v_z = self.__v_z_0 * z_relax_factor
 
         cylindrical_radius = math.hypot(x,y)
         azimuth = math.atan2(y,x)
 
-        v_theta = (1 - math.exp(-cylindrical_radius**2/core_radius**2) ) *\
+        v_theta = (1 - math.exp(-cylindrical_radius**2/8/core_radius**2) ) *\
                    circulation/2/math.pi/max(cylindrical_radius,min_core_radius) *\
                    z_relax_factor
 
