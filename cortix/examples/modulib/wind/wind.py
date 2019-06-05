@@ -174,6 +174,42 @@ class Wind():
         air_mass_cc = 0.1 # [g/cc]
         self.__gas_phase.SetValue( 'air', air_mass_cc, self.__start_time )
 
+        # Plot wind-velocity function values.
+        import matplotlib.pyplot as plt
+        fig = plt.figure(1)
+        plt.subplots_adjust(hspace=0.5)
+
+        for z in npy.linspace(0,self.__box_height,3):
+            xval = list()
+            yval = list()
+            for x in npy.linspace(0,self.__box_half_length,500):
+                xval.append(x)
+                y = 0.0
+                wind_velocity = self.__vortex_velocity( npy.array([x,y,z]) )
+                yval.append(wind_velocity[1])
+                #print(wind_velocity)
+            plt.subplot(2,1,1)
+            plt.plot(xval,yval)
+
+        plt.xlabel('Radial distance [m]')
+        plt.ylabel('Tangential speed [m/s]')
+        plt.title('Vortex Wind')
+        plt.grid()
+
+        xval = list()
+        yval = list()
+        for z in npy.linspace(0,self.__box_height,50):
+            yval.append(z)
+            wind_velocity = self.__vortex_velocity( npy.array([0.0,0.0,z]) )
+            xval.append(wind_velocity[2])
+        plt.subplot(2,1,2)
+        plt.plot(xval,yval)
+        plt.xlabel('Vertical speed [m/s]')
+        plt.ylabel('Height [m]')
+        plt.grid()
+
+        fig.savefig('vortex-wind.png',dpi=200,format='png')
+
         return
 
 #*********************************************************************************
@@ -578,7 +614,7 @@ class Wind():
                 lock.release()
 
                 print('')
-                print('WIND: DROPLET POSITION RECEIVED')
+                print('WIND: POSITION RECEIVED')
                 print(position_history)
                 print('')
 

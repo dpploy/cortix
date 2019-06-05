@@ -71,9 +71,6 @@ class Cortix():
         # Create the logging facility for each object
         self.__create_logging( config_xml_tree )
 
-        # Show splash
-        self.__show_splash()
-
         self.__log.info('Created Cortix work directory: %s', self.__work_dir)
 
 
@@ -82,13 +79,15 @@ class Cortix():
         #==================
         self.__setup_simulations( config_xml_tree )
 
-        self.__log.info('Created Cortix object %s', self.__name)
+        self.__log.info('Created Cortix object %s %s', \
+                self.__name, self.__get_splash(begin=True))
 
         return
 
     def __del__(self):
 
-        self.__log.info("Destroyed Cortix object: %s", self.__name)
+        self.__log.info("Destroyed Cortix object: %s %s", self.__name,
+                self.__get_splash(begin=False))
 
         return
 
@@ -201,10 +200,10 @@ class Cortix():
 
         return
 
-    def __show_splash(self):
+    def __get_splash(self, begin=True):
 
-        self.__splash = '\n'+\
-        '=============================================================================\n'+\
+        splash = \
+        '_____________________________________________________________________________\n'+\
         '      ...                                        s       .\n'+\
         '   xH88"`~ .x8X                                 :8      @88>\n'+\
         ' :8888   .f"8888Hf        u.      .u    .      .88      %8P      uL   ..\n'+\
@@ -217,9 +216,20 @@ class Cortix():
         ' `8888  `-*""   /   "*888*P"    ^"8888*"     ^%888*     888&  d888" Y888*"\n'+\
         '   "888.      :"      "Y"          "Y"         "Y"      R888" ` "Y   Y"\n'+\
         '     `""***~"`                                           ""\n'+\
-        '=============================================================================\n'
+        '                             https://cortix.org                              \n'+\
+        '_____________________________________________________________________________'
 
-        self.__log.info(self.__splash)
+        if begin == True:
+            message = \
+            '\n_____________________________________________________________________________\n'+\
+            '                             L A U N C H I N G                               \n'
+
+        else:
+            message = \
+            '\n_____________________________________________________________________________\n'+\
+            '                           T E R M I N A T I N G                             \n'
+
+        return message+splash
 
         return
 
