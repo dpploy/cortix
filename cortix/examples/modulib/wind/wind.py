@@ -176,8 +176,8 @@ class Wind():
 
         # Plot wind-velocity function values.
         import matplotlib.pyplot as plt
-        fig = plt.figure(1)
-        plt.subplots_adjust(hspace=0.5)
+        (fig,axs) = plt.subplots(2,1)
+        fig.subplots_adjust(hspace=0.5)
 
         for z in npy.linspace(0,self.__box_height,3):
             xval = list()
@@ -187,14 +187,13 @@ class Wind():
                 y = 0.0
                 wind_velocity = self.__vortex_velocity( npy.array([x,y,z]) )
                 yval.append(wind_velocity[1])
-                #print(wind_velocity)
-            plt.subplot(2,1,1)
-            plt.plot(xval,yval)
 
-        plt.xlabel('Radial distance [m]')
-        plt.ylabel('Tangential speed [m/s]')
-        plt.title('Vortex Wind')
-        plt.grid()
+            axs[0].plot(xval,yval)
+
+        axs[0].set_xlabel('Radial distance [m]')
+        axs[0].set_ylabel('Tangential speed [m/s]')
+        fig.suptitle('Vortex Flow')
+        axs[0].grid(True)
 
         xval = list()
         yval = list()
@@ -202,13 +201,14 @@ class Wind():
             yval.append(z)
             wind_velocity = self.__vortex_velocity( npy.array([0.0,0.0,z]) )
             xval.append(wind_velocity[2])
-        plt.subplot(2,1,2)
-        plt.plot(xval,yval)
-        plt.xlabel('Vertical speed [m/s]')
-        plt.ylabel('Height [m]')
-        plt.grid()
 
-        fig.savefig('vortex-wind.png',dpi=200,format='png')
+        axs[1].plot(xval,yval)
+
+        axs[1].set_xlabel('Vertical speed [m/s]')
+        axs[1].set_ylabel('Height [m]')
+        axs[1].grid(True)
+
+        fig.savefig('vortex_'+str(self.__slot_id)+'.png',dpi=200,format='png')
 
         return
 
@@ -228,8 +228,14 @@ class Wind():
         self.__provide_data( provide_port_name='state',  at_time=cortix_time )
         self.__provide_data( provide_port_name='output', at_time=cortix_time )
 
-        # Use data from all use ports.
-        self.__use_data( use_port_name='position', at_time=cortix_time )
+        # Use data from all multiply-connected use ports.
+        for port in self.__ports:
+            (port_name, port_type, port_file) = port
+
+            if port_name == 'position':
+                assert port_type == 'use'
+
+                self.__use_data( use_port_name = 'position', at_time = cortix_time )
 
         return
 
@@ -357,10 +363,10 @@ class Wind():
             # Note that the whole phase is sent out.
             pickle.dump( self.__gas_phase, open(port_file,'wb') )
 
-        print('')
-        print('WIND: ALL PHASE PROVIDED')
-        print(self.__gas_phase)
-        print('')
+        #print('********************************************************************')
+        #print('WIND: ALL PHASE SENT')
+        #print('at_time=',at_time,'phase=',self.__gas_phase)
+        #print('********************************************************************')
 
         s = '__provide_velocity('+str(round(at_time,2))+'[s]): '
         m = 'pickle.dumped velocity.'
@@ -608,15 +614,14 @@ class Wind():
                         tolerance=1e-2)
                 time_stamp = position_history.value.index[loc]
 
-
                 assert abs(time_stamp - at_time) <= 1e-2
                 found = True
                 lock.release()
 
-                print('')
-                print('WIND: POSITION RECEIVED')
-                print(position_history)
-                print('')
+                #print('*****************************************************************')
+                #print('WIND: POSITION RECEIVED')
+                #print('at_time=',at_time,'pos_hist=',position_history)
+                #print('*****************************************************************')
 
             except:
                 lock.release()
@@ -629,18 +634,36 @@ class Wind():
         self.__log.debug(s)
 
         position = position_history.value.loc[time_stamp]
+        #print('======================================================================')
+        #print('WIND: POSITION RECEIVED')
+        #print('time_stamp=',time_stamp)
+        #print('position select=',position)
         assert isinstance(position,npy.ndarray)
 
         assert self.__gas_phase.has_time_stamp(at_time)
 
+        #print('**********************************************************************')
+        #print('before set_gas_phase =',self.__gas_phase)
+        #print('**********************************************************************')
+
         self.__gas_phase.SetValue( actor=port_file, value=position,
                 try_time_stamp=time_stamp )
+
+        #print('**********************************************************************')
+        #print('after set_gas_phase position =',self.__gas_phase)
+        #print('**********************************************************************')
 
         # Update the wind velocity at the position
         velocity = self.__vortex_velocity( position )
 
-        self.__gas_phase.SetValue( actor=port_file, value=velocity,
+        #print('velocity=',velocity)
+
+        self.__gas_phase.SetValue( actor='velocity@'+port_file, value=velocity,
                 try_time_stamp=time_stamp )
+
+        #print('gas_phase=',self.__gas_phase)
+
+        #print('======================================================================')
 
         return
 
@@ -650,7 +673,13 @@ class Wind():
 
         values = self.__gas_phase.GetRow( cortix_time ) # values at previous time
 
+        #print('**********************************************************************')
+        #print('WIND EVOLVE')
+        #print('cortix_time=',cortix_time)
+
         at_time = cortix_time + cortix_time_step
+        #print('at_time=',at_time)
+        #print('values=',values)
 
         self.__gas_phase.AddRow( at_time, values ) # repeat values for current time
 
@@ -661,9 +690,12 @@ class Wind():
             name = quant.name
             formal_name = quant.formal_name
             if formal_name == 'Pos.':
+                #print('name=',name)
                 position = self.__gas_phase.GetValue(name,cortix_time)
+                #print('position=',position)
 
                 wind_velocity = self.__vortex_velocity( position )
+                #print('wind_velocity=',wind_velocity)
 
                 velo_name = 'velocity@'+name
                 #print(velo_name)
@@ -673,7 +705,9 @@ class Wind():
                 #wind_velocity = self.__gas_phase.GetValue(velo_name,cortix_time)
 
                 self.__gas_phase.SetValue(velo_name,wind_velocity,at_time)
+                #print('gas_phase=',self.__gas_phase)
 
+        #print('**********************************************************************')
         return
 
     def __vortex_velocity( self, position ):

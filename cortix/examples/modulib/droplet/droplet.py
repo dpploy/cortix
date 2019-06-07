@@ -121,7 +121,8 @@ class Droplet():
 
         import scipy.constants as const
         # Create a drop with random diameter up within 5 and 8 mm.
-        diam = (npy.random.random(1)*(8 - 5) + 5)[0]
+        #diam = (npy.random.random(1)*(8 - 5) + 5)[0]
+        diam = 8
         droplet_diameter = diam * const.milli # [m]
         self.__ode_params['droplet-diameter'] = droplet_diameter
         self.__ode_params['droplet-xsec-area'] = math.pi*(droplet_diameter/2.0)**2
@@ -161,6 +162,15 @@ class Droplet():
         velocity = Quantity( name='velocity', formalName='Veloc.', unit='m/s', value=v_0 )
         quantities.append( velocity )
 
+        # Speed is a by-product
+        speed = Quantity( name='speed', formalName='Speed', unit='m/s', value=0.0 )
+        quantities.append( speed )
+
+        # Radial position
+        radial_pos = Quantity( name='radial-position', formalName='Radius', unit='m',
+                value=npy.linalg.norm(x_0[0:2]))
+        quantities.append( radial_pos )
+
         # Create Phase.
         self.__liquid_phase = Phase( self.__start_time, time_unit='s', species=species,
                 quantities=quantities )
@@ -172,7 +182,7 @@ class Droplet():
         # Origin of cartesian coordinate system at the bottom of the box. 
         # z coordinate pointing upwards. -L <= x <= L, -L <= y <= L, 
         self.__box_half_length = 250.0 # L [m]
-        self.__box_height      = 100.0 # H [m]
+        self.__box_height      = 5000.0 # H [m]
         # Vortex model for initial velocity (this is for the sake of testing the droplet
         # motion with wind drag). 
         self.__min_core_radius = 2.5 # [m]
@@ -184,7 +194,8 @@ class Droplet():
         self.__ode_params['wind-velocity-function'] = self.__vortex_velocity
 
         # Random positioning of the droplet. Constraint positioning to a box sub-region.
-        x_0 = ( 2*npy.random.random(3) - npy.ones(3) ) * self.__box_half_length/2.0
+        #x_0 = ( 2*npy.random.random(3) - npy.ones(3) ) * self.__box_half_length/2.0
+        x_0 = npy.array([40,40,0])
         x_0[2] = self.__box_height
         self.__liquid_phase.SetValue( 'position', x_0, self.__start_time )
 
@@ -218,11 +229,12 @@ class Droplet():
         # If there is no wind-velocity port connection, use the internal wind to test
         # Droplet.
         if wind_velocity_port_attached == False:
-            import matplotlib.pyplot as plt
-            fig = plt.figure(1)
-            plt.subplots_adjust(hspace=0.5)
 
-            for z in npy.linspace(0,self.__box_height,3):
+            import matplotlib.pyplot as plt
+            (fig,axs) = plt.subplots(2,1)
+            fig.subplots_adjust(hspace=0.5)
+
+            for z in npy.flip( npy.linspace(0,self.__box_height,3), 0 ):
                 xval = list()
                 yval = list()
                 for x in npy.linspace(0,self.__box_half_length,500):
@@ -230,14 +242,14 @@ class Droplet():
                     y = 0.0
                     wind_velocity = self.__vortex_velocity( npy.array([x,y,z]) )
                     yval.append(wind_velocity[1])
-                    #print(wind_velocity)
-                plt.subplot(2,1,1)
-                plt.plot(xval,yval)
 
-            plt.xlabel('Radial distance [m]')
-            plt.ylabel('Tangential speed [m/s]')
-            plt.title('Vortex Wind')
-            plt.grid()
+                axs[0].plot( xval, yval, label='z ='+str(round(z,2))+' [m]' )
+
+            axs[0].set_xlabel('Radial distance [m]')
+            axs[0].set_ylabel('Tangential speed [m/s]')
+            axs[0].legend(loc='best')
+            fig.suptitle('Vortex Flow')
+            axs[0].grid(True)
 
             xval = list()
             yval = list()
@@ -245,13 +257,14 @@ class Droplet():
                 yval.append(z)
                 wind_velocity = self.__vortex_velocity( npy.array([0.0,0.0,z]) )
                 xval.append(wind_velocity[2])
-            plt.subplot(2,1,2)
-            plt.plot(xval,yval)
-            plt.xlabel('Vertical speed [m/s]')
-            plt.ylabel('Height [m]')
-            plt.grid()
 
-            fig.savefig('vortex-wind.png',dpi=200,format='png')
+            axs[1].plot(xval,yval)
+
+            axs[1].set_xlabel('Vertical speed [m/s]')
+            axs[1].set_ylabel('Height [m]')
+            axs[1].grid(True)
+
+            fig.savefig('vortex_droplet_'+str(self.__slot_id)+'.png',dpi=200,format='png')
 
         return
 
@@ -406,10 +419,10 @@ class Droplet():
 
             pickle.dump( (position_history, time_unit), open(port_file,'wb') )
 
-        print('')
-        print('DROPLET: POSITION SENT')
-        print(position_history)
-        print('')
+        #print('*****************************************************************')
+        #print('DROPLET: POSITION SENT')
+        #print('at_time=',at_time, 'pos_hist=',position_history)
+        #print('*****************************************************************')
 
         s = '__provide_droplet_position('+str(round(at_time,2))+'[s]): '
         m = 'pickle.dumped droplet position.'
@@ -573,7 +586,8 @@ class Droplet():
                 val = self.__liquid_phase.GetValue( quant.name, at_time )
                 if quant.name == 'position' or quant.name == 'velocity':
                    for v in val:
-                       values.append( math.fabs(v) ) # pyplot can't take negative values
+                       #values.append( math.fabs(v) ) # pyplot can't take negative values
+                       values.append( v ) # pyplot can't take negative values
                 else:
                    values.append( val )
 
@@ -615,7 +629,8 @@ class Droplet():
                 val = self.__liquid_phase.GetValue( quant.name, at_time )
                 if quant.name == 'position' or quant.name == 'velocity':
                     for v in val:
-                        values.append( math.fabs(v) ) # pyplot can't take negative values
+                        #values.append( math.fabs(v) ) # pyplot can't take negative values
+                        values.append( v ) # pyplot can't take negative values
                 else:
                     values.append( val )
 
@@ -665,10 +680,10 @@ class Droplet():
                 # Get this Droplet's velocity
                 velocity = wind_phase.GetValue(velocity_name,at_time)
 
-                print('')
-                print('DROPLET: VELOCITY RECEIVED')
-                print(velocity)
-                print('')
+                #print('***********************************************************')
+                #print('DROPLET: VELOCITY RECEIVED')
+                #print('at_time=',at_time,'velocity=',velocity)
+                #print('***********************************************************')
 
                 #loc = velocity.value.index.get_loc(at_time,method='nearest',
                 #        tolerance=1e-2)
@@ -879,14 +894,18 @@ class Droplet():
 
         self.__liquid_phase.AddRow( at_time, values ) # repeat values for current time
 
-        if u_vec[2] <= 0.0: # ground impact bounces the drop to a different height near original
+        if u_vec[2] <= 0.0: # ground impact bounces the drop to a different height near 
+                            # original
             position = self.__liquid_phase.GetValue( 'position', self.__start_time )
-            bounced_position = position[2] * npy.random.random(1)
-            u_vec[2] = bounced_position
-            u_vec[3:]  = 0.0  # zero velocity
+            #bounced_position = position[2] * npy.random.random(1)
+            bounced_position = position[2]
+            u_vec[2]  = bounced_position
+            u_vec[3:] = 0.0  # zero velocity
 
         self.__liquid_phase.SetValue( 'position', u_vec[0:3], at_time ) # update current values
         self.__liquid_phase.SetValue( 'velocity', u_vec[3:], at_time ) # update current values
+        self.__liquid_phase.SetValue( 'speed', npy.linalg.norm(u_vec[3:]), at_time ) # update current values
+        self.__liquid_phase.SetValue( 'radial-position', npy.linalg.norm(u_vec[0:2]), at_time ) # update current values
 
         return
 
@@ -910,7 +929,7 @@ class Droplet():
         outer_v_theta   = self.__outer_v_theta
 
         outer_cylindrical_radius = math.hypot(box_half_length,box_half_length)
-        circulation = 2*math.pi * outer_cylindrical_radius * outer_v_theta # m^2/s
+        circulation = 2*math.pi * outer_cylindrical_radius * outer_v_theta   # m^2/s
 
         core_radius = min_core_radius
 

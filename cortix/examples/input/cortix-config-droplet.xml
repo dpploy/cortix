@@ -55,8 +55,8 @@
   <task name='droplet-fall' >
 
    <start_time unit='minute'>0.0</start_time>
-   <evolve_time unit='minute'>2.5</evolve_time>
-   <time_step unit='second'>0.5</time_step>
+   <evolve_time unit='minute'>70.0</evolve_time>
+   <time_step unit='second'>1.0</time_step>
 
    <logger level='DEBUG'>
     <file_handler level='DEBUG'> </file_handler>
@@ -68,7 +68,7 @@
   <task name='droplet-wind' >
 
    <start_time unit='minute'>0.0</start_time>
-   <evolve_time unit='minute'>0.02</evolve_time>
+   <evolve_time unit='minute'>30.0</evolve_time>
    <time_step unit='second'>1.0</time_step>
 
    <logger level='DEBUG'>
