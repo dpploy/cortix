@@ -67,7 +67,7 @@ class Actor():
         empty:
 
         Returns
-        ----------
+        -------
         atoms: str
         '''
 
@@ -82,8 +82,8 @@ class Actor():
         ----------
         empty:
 
-        Returns:
-        ----------
+        Returns
+        -------
         formula: str
         '''
 
