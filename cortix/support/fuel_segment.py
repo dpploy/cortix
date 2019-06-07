@@ -491,6 +491,7 @@ def get_attribute(self, name, nuclide=None, series=None):
         -------
         s: str
         '''
+        
         s = 'FuelSegment(): %s\n %s\n'
         return s % (self.__geometry, self.__species)
 
@@ -508,6 +509,7 @@ def get_attribute(self, name, nuclide=None, series=None):
         -------
         s: str
         '''
+
         s = 'FuelSegment(): %s\n %s\n'
         return s % (self.__geometry, self.__species)
-#************************** # END CLASS fuel_segment() ****************************
+#============================ # end class fuel_segment ============================

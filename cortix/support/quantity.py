@@ -65,44 +65,180 @@ class Quantity():
 #*********************************************************************************
 
     def SetName(self, n):
+       
+        '''
+        Sets the name of the quantity in question to n.
+
+        Parameters
+        ----------
+        n: str
+
+        Returns
+        -------
+        empty
+        '''
         self.__name = n
 
     def get_name(self):
+       
+        '''
+        Returns the name of the quantity.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        name: str
+        '''
+
         return self.__name
     name = property(get_name, SetName, None, None)
 
     def SetValue(self, v):
+       
+        '''
+        Sets the numerical value of the quantity to v.
+
+        Parameters
+        ----------
+        v: float
+
+        Returns
+        -------
+        empty
+
+        '''
         self.__value = v
 
     def GetValue(self):
+       
+        '''
+        Gets the numerical value of the quantity.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        value: float
+        '''
+
         return self.__value
     value = property(GetValue, SetValue, None, None)
 
     def SetFormalName(self, fn):
+       
+        '''
+        Sets the formal name of the property to fn.
+
+        Parameters
+        ----------
+        fn: str
+
+        Returns
+        -------
+        empty
+        '''
+
         self._formalName = fn
 
     def GetFormalName(self):
+       
+        '''
+        Returns the formal name of the quantity.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        formalName: str
+        '''
+
         return self._formalName
     formalName = property(GetFormalName, SetFormalName, None, None)
     formal_name = property(GetFormalName, SetFormalName, None, None)
 
     def SetUnit(self, f):
+       
+        '''
+        Sets the units of the quantity to f (for example, density would be in
+        units of g/cc.
+
+        Parameters
+        ----------
+        f: str
+
+        Returns
+        -------
+        empty
+        '''
+
         self.__unit = f
 
     def GetUnit(self):
+       
+        '''
+        Returns the units of the quantity.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        unit: str
+        '''
+
         return self.__unit
     unit = property(GetUnit, SetUnit, None, None)
 
-    def __str__(self):
-        s = '\n\t Quantity(): \n\t name=%s; formal name=%s; value=%s[%s]'
-        return s % (self.name, self.formalName, self.value, self.unit)
-
-    def __repr__(self):
-        s = '\n\t Quantity(): \n\t name=%s; formal name=%s; value=%s[%s]'
-        return s % (self.name, self.formalName, self.value, self.unit)
 
 #*********************************************************************************
 # Private helper functions (internal use: __)
 #*********************************************************************************
+
+
+    def __str__(self):
+       
+        '''
+        
+        Used to print the data stored by the quantity class. Will print out
+        name, formal name, the value of the quantity and its unit.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        s: str
+        '''
+
+        s = '\n\t Quantity(): \n\t name=%s; formal name=%s; value=%s[%s]'
+        return s % (self.name, self.formalName, self.value, self.unit)
+
+    def __repr__(self):
+       
+        '''
+        
+        Used to print the data stored by the quantity class. Will print out
+        name, formal name, the value of the quantity and its unit.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        s: str
+        '''
+
+        s = '\n\t Quantity(): \n\t name=%s; formal name=%s; value=%s[%s]'
+        return s % (self.name, self.formalName, self.value, self.unit)
 
 #======================= end class Quantity ======================================
