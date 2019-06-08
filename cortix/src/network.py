@@ -114,9 +114,8 @@ class Network:
                         provide_module_slot = data[1].strip().replace(':','_')
 
                         assert provide_port not in tmp.keys(), \
-                            'repeated provide_port in attribute of %r network' %\
+                            'repeated provide_port in attribute of %r network' % self.__name
                         
-                            self.__name
                         tmp['provide_port'] = provide_port
                         assert provide_module_slot not in tmp.keys(), \
                             'repeated provide_module_slot in attribute of %r network' %\
