@@ -112,8 +112,10 @@ class Network:
                         assert len(data) == 2
                         provide_port = data[0].strip()
                         provide_module_slot = data[1].strip().replace(':','_')
-                        assert provide_port not in tmp.keys(),\
-                                'repeated provide_port in attribute of %r network' %\
+
+                        assert provide_port not in tmp.keys(), \
+                            'repeated provide_port in attribute of %r network' %\
+                        
                             self.__name
                         tmp['provide_port'] = provide_port
                         assert provide_module_slot not in tmp.keys(), \
