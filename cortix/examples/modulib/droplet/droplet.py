@@ -113,7 +113,7 @@ class Droplet():
 
         # Choice of ODE solvers. This is a temporary fix for running multiple
         # droplets solver. SciPy ode solver is not thread safe. SUNDIALS is thread safe.
-        self.__slot_id = 0:
+        if self.__slot_id == 0:
             self.__ode_integrator = 'scipy.integrate'
         else:
             self.__ode_integrator = 'scikits.odes' # or 'scipy.integrate' 
