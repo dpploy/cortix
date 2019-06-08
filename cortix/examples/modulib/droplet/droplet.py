@@ -112,8 +112,8 @@ class Droplet():
         self.__pyplot_scale = 'linear'
 
         # Choice of ODE solvers.
-        #self.__ode_integrator = 'scikits.odes' # or 'scipy.integrate' 
-        self.__ode_integrator = 'scipy.integrate'
+        self.__ode_integrator = 'scikits.odes' # or 'scipy.integrate' 
+        #self.__ode_integrator = 'scipy.integrate'
 
         # Domain specific member data.
 
@@ -121,8 +121,8 @@ class Droplet():
 
         import scipy.constants as const
         # Create a drop with random diameter up within 5 and 8 mm.
-        #diam = (npy.random.random(1)*(8 - 5) + 5)[0]
-        diam = 8
+        diam = (npy.random.random(1)*(8 - 5) + 5)[0]
+        #diam = 8
         droplet_diameter = diam * const.milli # [m]
         self.__ode_params['droplet-diameter'] = droplet_diameter
         self.__ode_params['droplet-xsec-area'] = math.pi*(droplet_diameter/2.0)**2
@@ -178,29 +178,20 @@ class Droplet():
         # Initialize phase.
         self.__liquid_phase.SetValue( 'water', water_mass_cc, self.__start_time )
 
-        # Vortex box dimiensions: LxLxH m^3 box with given H.
+        # Domain box dimensions: LxLxH m^3 box with given H.
         # Origin of cartesian coordinate system at the bottom of the box. 
         # z coordinate pointing upwards. -L <= x <= L, -L <= y <= L, 
         self.__box_half_length = 250.0 # L [m]
-        self.__box_height      = 5000.0 # H [m]
-        # Vortex model for initial velocity (this is for the sake of testing the droplet
-        # motion with wind drag). 
-        self.__min_core_radius = 2.5 # [m]
-        self.__outer_v_theta = 1.0 # m/s # angular speed
-        self.__v_z_0 = 0.50 # [m/s]
-        # Wind velocity must be npy.ndarray (see ODE solvers).
-        wind_velocity = self.__vortex_velocity( x_0 )
-        # Save the function reference for future dispatch in the ODE solver
-        self.__ode_params['wind-velocity-function'] = self.__vortex_velocity
+        self.__box_height      = 250.0 # H [m]
 
         # Random positioning of the droplet. Constraint positioning to a box sub-region.
-        #x_0 = ( 2*npy.random.random(3) - npy.ones(3) ) * self.__box_half_length/2.0
-        x_0 = npy.array([40,40,0])
+        x_0 = ( 2*npy.random.random(3) - npy.ones(3) ) * self.__box_half_length/2.0
+        #x_0 = npy.array([40,40,0])
         x_0[2] = self.__box_height
         self.__liquid_phase.SetValue( 'position', x_0, self.__start_time )
 
         # Set the initial velocity of the droplet to zero as the droplet has been
-        # placed still in the wind.
+        # placed still in the wind. Wind velocity must be npy.ndarray (see ODE solvers).
         self.__liquid_phase.SetValue( 'velocity', npy.array([0.0,0.0,0.0]),
                 self.__start_time )
 
@@ -217,6 +208,15 @@ class Droplet():
         medium_dyn_viscosity = 1.81e-5 # kg/(m s)
         self.__ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
 
+        # Vortex model for initial velocity (this is for the sake of testing the droplet
+        # motion with wind drag) when there is no wind connection through the velocity
+        # port.
+        self.__min_core_radius = 2.5 # [m]
+        self.__outer_v_theta = 1.0 # m/s # angular speed
+        self.__v_z_0 = 0.50 # [m/s]
+        # Save the function reference for future dispatch in the ODE solver
+        self.__ode_params['wind-velocity-function'] = self.__vortex_velocity
+
         # Plots for insight on the vortex flow field if there is no external
         # wind data through port connection.
         wind_velocity_port_attached = False
@@ -226,45 +226,8 @@ class Droplet():
                 wind_velocity_port_attached = True
                 break
 
-        # If there is no wind-velocity port connection, use the internal wind to test
-        # Droplet.
         if wind_velocity_port_attached == False:
-
-            import matplotlib.pyplot as plt
-            (fig,axs) = plt.subplots(2,1)
-            fig.subplots_adjust(hspace=0.5)
-
-            for z in npy.flip( npy.linspace(0,self.__box_height,3), 0 ):
-                xval = list()
-                yval = list()
-                for x in npy.linspace(0,self.__box_half_length,500):
-                    xval.append(x)
-                    y = 0.0
-                    wind_velocity = self.__vortex_velocity( npy.array([x,y,z]) )
-                    yval.append(wind_velocity[1])
-
-                axs[0].plot( xval, yval, label='z ='+str(round(z,2))+' [m]' )
-
-            axs[0].set_xlabel('Radial distance [m]')
-            axs[0].set_ylabel('Tangential speed [m/s]')
-            axs[0].legend(loc='best')
-            fig.suptitle('Vortex Flow')
-            axs[0].grid(True)
-
-            xval = list()
-            yval = list()
-            for z in npy.linspace(0,self.__box_height,50):
-                yval.append(z)
-                wind_velocity = self.__vortex_velocity( npy.array([0.0,0.0,z]) )
-                xval.append(wind_velocity[2])
-
-            axs[1].plot(xval,yval)
-
-            axs[1].set_xlabel('Vertical speed [m/s]')
-            axs[1].set_ylabel('Height [m]')
-            axs[1].grid(True)
-
-            fig.savefig('vortex_droplet_'+str(self.__slot_id)+'.png',dpi=200,format='png')
+            self.__plot_vortex_velocity()
 
         return
 
@@ -897,8 +860,8 @@ class Droplet():
         if u_vec[2] <= 0.0: # ground impact bounces the drop to a different height near 
                             # original
             position = self.__liquid_phase.GetValue( 'position', self.__start_time )
-            #bounced_position = position[2] * npy.random.random(1)
-            bounced_position = position[2]
+            bounced_position = position[2] * npy.random.random(1)
+            #bounced_position = position[2]
             u_vec[2]  = bounced_position
             u_vec[3:] = 0.0  # zero velocity
 
@@ -954,6 +917,57 @@ class Droplet():
         wind_velocity = npy.array([v_x,v_y,v_z])
 
         return wind_velocity
+
+    def __plot_vortex_velocity( self ):
+        '''
+        Plot the vortex velocity function.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        '''
+
+        import matplotlib.pyplot as plt
+        (fig,axs) = plt.subplots(2,1)
+        fig.subplots_adjust(hspace=0.5)
+
+        for z in npy.flip( npy.linspace(0,self.__box_height,3), 0 ):
+            xval = list()
+            yval = list()
+            for x in npy.linspace(0,self.__box_half_length,500):
+                xval.append(x)
+                y = 0.0
+                wind_velocity = self.__vortex_velocity( npy.array([x,y,z]) )
+                yval.append(wind_velocity[1])
+
+            axs[0].plot( xval, yval, label='z ='+str(round(z,2))+' [m]' )
+
+        axs[0].set_xlabel('Radial distance [m]')
+        axs[0].set_ylabel('Tangential speed [m/s]')
+        axs[0].legend(loc='best')
+        fig.suptitle('Vortex Flow')
+        axs[0].grid(True)
+
+        xval = list()
+        yval = list()
+        for z in npy.linspace(0,self.__box_height,50):
+            yval.append(z)
+            wind_velocity = self.__vortex_velocity( npy.array([0.0,0.0,z]) )
+            xval.append(wind_velocity[2])
+
+        axs[1].plot(xval,yval)
+
+        axs[1].set_xlabel('Vertical speed [m/s]')
+        axs[1].set_ylabel('Height [m]')
+        axs[1].grid(True)
+
+        fig.savefig('vortex_droplet_'+str(self.__slot_id)+'.png',dpi=200,format='png')
+
+        return
 
     def __read_manifesto( self, xml_tree_file ):
         '''

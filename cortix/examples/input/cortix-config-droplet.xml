@@ -55,8 +55,8 @@
   <task name='droplet-fall' >
 
    <start_time unit='minute'>0.0</start_time>
-   <evolve_time unit='minute'>70.0</evolve_time>
-   <time_step unit='second'>1.0</time_step>
+   <evolve_time unit='minute'>10.0</evolve_time>
+   <time_step unit='second'>0.5</time_step>
 
    <logger level='DEBUG'>
     <file_handler level='DEBUG'> </file_handler>
@@ -68,7 +68,7 @@
   <task name='droplet-wind' >
 
    <start_time unit='minute'>0.0</start_time>
-   <evolve_time unit='minute'>30.0</evolve_time>
+   <evolve_time unit='minute'>10.0</evolve_time>
    <time_step unit='second'>1.0</time_step>
 
    <logger level='DEBUG'>
@@ -207,7 +207,15 @@
     <connect use_port='position @ wind:0' provide_port='droplet-position @ droplet:0' />
     <connect use_port='wind-velocity @ droplet:0' provide_port='velocity @ wind:0' />
 
+    <connect use_port='position @ wind:0' provide_port='droplet-position @ droplet:1' />
+    <connect use_port='wind-velocity @ droplet:1' provide_port='velocity @ wind:0' />
+
+    <connect use_port='position @ wind:0' provide_port='droplet-position @ droplet:2' />
+    <connect use_port='wind-velocity @ droplet:2' provide_port='velocity @ wind:0' />
+
     <connect use_port='time-sequence @ pyplot:0'  provide_port='state @ droplet:0' />
+    <connect use_port='time-sequence @ pyplot:1'  provide_port='state @ droplet:1' />
+    <connect use_port='time-sequence @ pyplot:2'  provide_port='state @ droplet:2' />
 
    </network>
 

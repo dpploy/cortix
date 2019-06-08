@@ -114,10 +114,6 @@ class Wind():
 
         # Domain specific member data.
 
-        shear_coeff = 0.4  # dimensionless
-        Params = namedtuple('Params',['shear_coeff'])
-        self.__params = Params( shear_coeff )
-
         # Setup species in the gas phase.
         species = list()
 
@@ -135,16 +131,18 @@ class Wind():
         # the use port.
         x_0 = npy.array([0.0,0.0,0.0]) # initial height [m] above ground at 0
 
-        # Initial value for wind velocity at all points. Make this zero too. Use data
-        # will change this later.
+        # Domain box dimensions: LxLxH m^3 box with given H.
+        # Origin of cartesian coordinate system at the bottom of the box. 
+        # z coordinate pointing upwards. -L <= x <= L, -L <= y <= L, 
         # Note: if the z component is positive, wind is blowing upwards.
         #       Gravity points in -z direction.
         self.__box_half_length = 250.0 # wind box [m] 
-        self.__box_height      = 100.0 # [m]
+        self.__box_height      = 250.0 # [m]
+        # Vortex parameters.
         self.__min_core_radius = 2.5 # [m]
         self.__outer_v_theta   = 1.0 # m/s # angular speed
         self.__v_z_0 = 0.50 # [m/s]
-        # Wind velocity must be npy.ndarray (see ODE solvers).
+        # Vortex velocity must be npy.ndarray (see ODE solvers).
         wind_velocity = npy.array([0.0,0.0,0.0])
 
         # Spatial position of wind points and velocity.
@@ -175,40 +173,7 @@ class Wind():
         self.__gas_phase.SetValue( 'air', air_mass_cc, self.__start_time )
 
         # Plot wind-velocity function values.
-        import matplotlib.pyplot as plt
-        (fig,axs) = plt.subplots(2,1)
-        fig.subplots_adjust(hspace=0.5)
-
-        for z in npy.linspace(0,self.__box_height,3):
-            xval = list()
-            yval = list()
-            for x in npy.linspace(0,self.__box_half_length,500):
-                xval.append(x)
-                y = 0.0
-                wind_velocity = self.__vortex_velocity( npy.array([x,y,z]) )
-                yval.append(wind_velocity[1])
-
-            axs[0].plot(xval,yval)
-
-        axs[0].set_xlabel('Radial distance [m]')
-        axs[0].set_ylabel('Tangential speed [m/s]')
-        fig.suptitle('Vortex Flow')
-        axs[0].grid(True)
-
-        xval = list()
-        yval = list()
-        for z in npy.linspace(0,self.__box_height,50):
-            yval.append(z)
-            wind_velocity = self.__vortex_velocity( npy.array([0.0,0.0,z]) )
-            xval.append(wind_velocity[2])
-
-        axs[1].plot(xval,yval)
-
-        axs[1].set_xlabel('Vertical speed [m/s]')
-        axs[1].set_ylabel('Height [m]')
-        axs[1].grid(True)
-
-        fig.savefig('vortex_'+str(self.__slot_id)+'.png',dpi=200,format='png')
+        self.__plot_vortex_velocity()
 
         return
 
@@ -235,7 +200,8 @@ class Wind():
             if port_name == 'position':
                 assert port_type == 'use'
 
-                self.__use_data( use_port_name = 'position', at_time = cortix_time )
+                self.__use_data( use_port_name = 'position', use_port_file = port_file,
+                        at_time = cortix_time )
 
         return
 
@@ -275,10 +241,11 @@ class Wind():
 
         return
 
-    def __use_data( self, use_port_name=None, at_time=0.0 ):
+    def __use_data( self, use_port_name=None, use_port_file=None, at_time=0.0 ):
 
         # Access the port file
-        port_file = self.__get_port_file( use_port_name = use_port_name )
+        port_file = self.__get_port_file( use_port_name = use_port_name,
+                use_port_file = use_port_file  )
 
         # Use data from port file
         if use_port_name == 'position' and port_file is not None:
@@ -286,9 +253,11 @@ class Wind():
 
         return
 
-    def __get_port_file( self, use_port_name=None, provide_port_name=None ):
+    def __get_port_file( self, use_port_name=None, provide_port_name=None, 
+            use_port_file=None ):
         '''
-        This may return a None port_file
+        This may return a None port_file. This implementation takes into account
+        multiple (different) use_port_files connected to the same use port name.
         '''
 
         port_file = None
@@ -304,7 +273,8 @@ class Wind():
 
                 (port_name,port_type,this_port_file) = port
 
-                if port_name == use_port_name and port_type == 'use':
+                if port_name == use_port_name and port_type == 'use' and\
+                        this_port_file == use_port_file:
                     port_file = this_port_file
 
             if port_file is None:
@@ -619,7 +589,8 @@ class Wind():
                 lock.release()
 
                 #print('*****************************************************************')
-                #print('WIND: POSITION RECEIVED')
+                #print('WIND: TRY POSITION')
+                #print('port file = ',port_file)
                 #print('at_time=',at_time,'pos_hist=',position_history)
                 #print('*****************************************************************')
 
@@ -636,6 +607,7 @@ class Wind():
         position = position_history.value.loc[time_stamp]
         #print('======================================================================')
         #print('WIND: POSITION RECEIVED')
+        #print('port file=',port_file)
         #print('time_stamp=',time_stamp)
         #print('position select=',position)
         assert isinstance(position,npy.ndarray)
@@ -755,6 +727,57 @@ class Wind():
         wind_velocity = npy.array([v_x,v_y,v_z])
 
         return wind_velocity
+
+    def __plot_vortex_velocity( self ):
+        '''
+        Plot the vortex velocity function.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        '''
+
+        import matplotlib.pyplot as plt
+        (fig,axs) = plt.subplots(2,1)
+        fig.subplots_adjust(hspace=0.5)
+
+        for z in npy.flip( npy.linspace(0,self.__box_height,3), 0 ):
+            xval = list()
+            yval = list()
+            for x in npy.linspace(0,self.__box_half_length,500):
+                xval.append(x)
+                y = 0.0
+                wind_velocity = self.__vortex_velocity( npy.array([x,y,z]) )
+                yval.append(wind_velocity[1])
+
+            axs[0].plot( xval, yval, label='z ='+str(round(z,2))+' [m]' )
+
+        axs[0].set_xlabel('Radial distance [m]')
+        axs[0].set_ylabel('Tangential speed [m/s]')
+        axs[0].legend(loc='best')
+        fig.suptitle('Vortex Flow')
+        axs[0].grid(True)
+
+        xval = list()
+        yval = list()
+        for z in npy.linspace(0,self.__box_height,50):
+            yval.append(z)
+            wind_velocity = self.__vortex_velocity( npy.array([0.0,0.0,z]) )
+            xval.append(wind_velocity[2])
+
+        axs[1].plot(xval,yval)
+
+        axs[1].set_xlabel('Vertical speed [m/s]')
+        axs[1].set_ylabel('Height [m]')
+        axs[1].grid(True)
+
+        fig.savefig('vortex_'+str(self.__slot_id)+'.png',dpi=200,format='png')
+
+        return
 
     def __read_manifesto( self, xml_tree_file ):
         '''
