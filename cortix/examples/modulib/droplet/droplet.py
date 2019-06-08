@@ -191,7 +191,7 @@ class Droplet():
         self.__liquid_phase.SetValue( 'position', x_0, self.__start_time )
 
         # Set the initial velocity of the droplet to zero as the droplet has been
-        # placed still in the wind. Wind velocity must be npy.ndarray (see ODE solvers).
+        # placed still in the flow. Flow velocity must be npy.ndarray (see ODE solvers).
         self.__liquid_phase.SetValue( 'velocity', npy.array([0.0,0.0,0.0]),
                 self.__start_time )
 
@@ -209,24 +209,24 @@ class Droplet():
         self.__ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
 
         # Vortex model for initial velocity (this is for the sake of testing the droplet
-        # motion with wind drag) when there is no wind connection through the velocity
+        # motion with flow drag) when there is no flow connection through the velocity
         # port.
         self.__min_core_radius = 2.5 # [m]
         self.__outer_v_theta = 1.0 # m/s # angular speed
         self.__v_z_0 = 0.50 # [m/s]
         # Save the function reference for future dispatch in the ODE solver
-        self.__ode_params['wind-velocity-function'] = self.__vortex_velocity
+        self.__ode_params['flow-velocity-function'] = self.__vortex_velocity
 
         # Plots for insight on the vortex flow field if there is no external
-        # wind data through port connection.
-        wind_velocity_port_attached = False
+        # flow data through port connection.
+        flow_velocity_port_attached = False
         for port in self.__ports:
             (port_name, port_type, this_port_file) = port
-            if port_name == 'wind-velocity' and port_type == 'use':
-                wind_velocity_port_attached = True
+            if port_name == 'flow-velocity' and port_type == 'use':
+                flow_velocity_port_attached = True
                 break
 
-        if wind_velocity_port_attached == False:
+        if flow_velocity_port_attached == False:
             self.__plot_vortex_velocity()
 
         return
@@ -248,7 +248,7 @@ class Droplet():
         self.__provide_data( provide_port_name='output',           at_time=cortix_time )
 
         # Use data from all use ports.
-        self.__use_data( use_port_name='wind-velocity', at_time=cortix_time )
+        self.__use_data( use_port_name='flow-velocity', at_time=cortix_time )
 
         return
 
@@ -294,8 +294,8 @@ class Droplet():
         port_file = self.__get_port_file( use_port_name = use_port_name )
 
         # Use data from port files.
-        if use_port_name == 'wind-velocity' and port_file is not None:
-            self.__use_wind_velocity( port_file, at_time )
+        if use_port_name == 'flow-velocity' and port_file is not None:
+            self.__use_flow_velocity( port_file, at_time )
 
         return
 
@@ -614,9 +614,9 @@ class Droplet():
 
         return
 
-    def __use_wind_velocity( self, port_file, at_time ):
+    def __use_flow_velocity( self, port_file, at_time ):
         '''
-        Get wind velocity.
+        Get flow velocity.
         '''
 
         import pickle
@@ -630,10 +630,10 @@ class Droplet():
 
             try:
                 lock.acquire()
-                wind_phase = pickle.load( open(port_file,'rb') )
-                assert wind_phase.time_unit == 's'
+                flow_phase = pickle.load( open(port_file,'rb') )
+                assert flow_phase.time_unit == 's'
 
-                # Find in the Wind Phase the specific quantity name
+                # Find in the Flow Phase the specific quantity name
                 for port in self.__ports:
                     (port_name, port_type, this_port_file) = port
                     if port_name == 'droplet-position':
@@ -641,7 +641,7 @@ class Droplet():
                        velocity_name = 'velocity@'+this_port_file
 
                 # Get this Droplet's velocity
-                velocity = wind_phase.GetValue(velocity_name,at_time)
+                velocity = flow_phase.GetValue(velocity_name,at_time)
 
                 #print('***********************************************************')
                 #print('DROPLET: VELOCITY RECEIVED')
@@ -659,21 +659,21 @@ class Droplet():
 
             except:
                 lock.release()
-                s = '__use_wind_velocity('+str(round(at_time,2))+'[s]): '
+                s = '__use_flow_velocity('+str(round(at_time,2))+'[s]): '
                 m = port_file+' does not have data yet. Retrying ...'
                 self.__log.debug(s+m)
                 self.__log.debug(s)
 
-        s = '__use_wind_velocity('+str(round(at_time,2))+'[s]): pickle.loaded velocity.'
+        s = '__use_flow_velocity('+str(round(at_time,2))+'[s]): pickle.loaded velocity.'
         self.__log.debug(s)
 
-        #wind_velocity = velocity.value.loc[time_stamp]
-        wind_velocity = velocity
-        assert isinstance(wind_velocity,npy.ndarray)
-        self.__wind_velocity = wind_velocity
+        #flow_velocity = velocity.value.loc[time_stamp]
+        flow_velocity = velocity
+        assert isinstance(flow_velocity,npy.ndarray)
+        self.__flow_velocity = flow_velocity
 
-        #print('wind velocity = ',wind_velocity)
-        self.__ode_params['wind-velocity'] = wind_velocity
+        #print('flow velocity = ',flow_velocity)
+        self.__ode_params['flow-velocity'] = flow_velocity
 
         return
 
@@ -723,20 +723,20 @@ class Droplet():
                 drop_pos = u_vec[:3]
 
                 try:
-                    wind_velo = params['wind-velocity'] # try port connected data
+                    flow_velo = params['flow-velocity'] # try port connected data
                 except:
-                    wind_velo_func = params['wind-velocity-function'] # use function
-                    wind_velo      = wind_velo_func(drop_pos)
+                    flow_velo_func = params['flow-velocity-function'] # use function
+                    flow_velo      = flow_velo_func(drop_pos)
 
                 drop_velo     = u_vec[3:]
-                relative_velo = drop_velo - wind_velo
+                relative_velo = drop_velo - flow_velo
                 relative_velo_mag = npy.linalg.norm(relative_velo)
                 area = params['droplet-xsec-area']
                 diameter = params['droplet-diameter']
                 dyn_visco = params['medium-dyn-viscosity']
 
-                rho_wind = params['medium-mass-density']
-                reynolds_num = rho_wind * relative_velo_mag * diameter / dyn_visco
+                rho_flow = params['medium-mass-density']
+                reynolds_num = rho_flow * relative_velo_mag * diameter / dyn_visco
 
                 if reynolds_num > 0.0 and reynolds_num < 0.1:
                     fric_factor = 24/reynolds_num
@@ -749,7 +749,7 @@ class Droplet():
                     fric_factor = 0.0
 
                 drag = - fric_factor * area * \
-                        rho_wind * relative_velo_mag * relative_velo/2.0
+                        rho_flow * relative_velo_mag * relative_velo/2.0
 
                 gravity   = params['gravity']
                 droplet_mass = params['droplet-mass']
@@ -774,20 +774,20 @@ class Droplet():
                 drop_pos = u_vec[:3]
 
                 try:
-                    wind_velo = params['wind-velocity'] # try port connected data
+                    flow_velo = params['flow-velocity'] # try port connected data
                 except:
-                    wind_velo_func = params['wind-velocity-function'] # use function
-                    wind_velo      = wind_velo_func(drop_pos)
+                    flow_velo_func = params['flow-velocity-function'] # use function
+                    flow_velo      = flow_velo_func(drop_pos)
 
                 drop_velo     = u_vec[3:]
-                relative_velo = drop_velo - wind_velo
+                relative_velo = drop_velo - flow_velo
                 relative_velo_mag = npy.linalg.norm(relative_velo)
                 area = params['droplet-xsec-area']
                 diameter = params['droplet-diameter']
                 dyn_visco = params['medium-dyn-viscosity']
 
-                rho_wind = params['medium-mass-density']
-                reynolds_num = rho_wind * relative_velo_mag * diameter / dyn_visco
+                rho_flow = params['medium-mass-density']
+                reynolds_num = rho_flow * relative_velo_mag * diameter / dyn_visco
 
                 if reynolds_num > 0.0 and reynolds_num < 0.1:
                     fric_factor = 24/reynolds_num
@@ -800,7 +800,7 @@ class Droplet():
                     fric_factor = 0.0
 
                 drag = - fric_factor * area * \
-                        rho_wind * relative_velo_mag * relative_velo/2.0
+                        rho_flow * relative_velo_mag * relative_velo/2.0
 
                 gravity   = params['gravity']
                 droplet_mass = params['droplet-mass']
@@ -874,7 +874,7 @@ class Droplet():
 
     def __vortex_velocity( self, position ):
         '''
-        Computes the velocity of the wind at a given position.
+        Computes the velocity of the flow at a given position.
 
         Parameters
         ----------
@@ -882,10 +882,10 @@ class Droplet():
 
         Returns
         -------
-        wind_velocity: numpy.ndarray(3)
+        flow_velocity: numpy.ndarray(3)
         '''
 
-        # Compute the wind velocity at the given external position
+        # Compute the flow velocity at the given external position
         # Using a vortex flow model.
         box_half_length = self.__box_half_length
         min_core_radius = self.__min_core_radius
@@ -914,9 +914,9 @@ class Droplet():
         v_x = - v_theta * math.sin(azimuth)
         v_y =   v_theta * math.cos(azimuth)
 
-        wind_velocity = npy.array([v_x,v_y,v_z])
+        flow_velocity = npy.array([v_x,v_y,v_z])
 
-        return wind_velocity
+        return flow_velocity
 
     def __plot_vortex_velocity( self ):
         '''
@@ -941,8 +941,8 @@ class Droplet():
             for x in npy.linspace(0,self.__box_half_length,500):
                 xval.append(x)
                 y = 0.0
-                wind_velocity = self.__vortex_velocity( npy.array([x,y,z]) )
-                yval.append(wind_velocity[1])
+                flow_velocity = self.__vortex_velocity( npy.array([x,y,z]) )
+                yval.append(flow_velocity[1])
 
             axs[0].plot( xval, yval, label='z ='+str(round(z,2))+' [m]' )
 
@@ -956,8 +956,8 @@ class Droplet():
         yval = list()
         for z in npy.linspace(0,self.__box_height,50):
             yval.append(z)
-            wind_velocity = self.__vortex_velocity( npy.array([0.0,0.0,z]) )
-            xval.append(wind_velocity[2])
+            flow_velocity = self.__vortex_velocity( npy.array([0.0,0.0,z]) )
+            xval.append(flow_velocity[2])
 
         axs[1].plot(xval,yval)
 

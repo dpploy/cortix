@@ -37,10 +37,10 @@ def run():
     # (un)comment next
     #cortix.run_simulations(task_name="droplet-fall")
 
-    # This is a test of many Droplets, one Wind, and many PyPlot connected.
+    # This is a test of many Droplets, one Vortex, and many PyPlot connected.
     # The config file can be adjusted to use PyPlot for all Droplets (less threads)
     # (un)comment next
-    cortix.run_simulations(task_name="droplet-wind")
+    cortix.run_simulations(task_name="droplet-vortex")
 
     # WARNING: the tasks are interferring with each other and threads are left running.
     # note how the droplet-fall runs two droplet instances...FIX ME. TODO
