@@ -15,7 +15,7 @@
  <!-- Ports have two types: use and provide -->
 
     <!-- use ports -->
-    <port type='use'     mode='file.pkl' multiplicity='1'>wind-velocity</port>
+    <port type='use'     mode='file.pkl' multiplicity='1'>flow-velocity</port>
 
     <!-- provide ports -->
     <port type='provide' mode='file.pkl' multiplicity='1'>droplet-position</port>
@@ -23,7 +23,7 @@
     <port type='provide' mode='file.pkl' multiplicity='1'>output</port>
 
     <port_doc port_name='output'>
-        Wind velocity and droplet position are three-dimensional Cartesian.
+        Flow velocity and droplet position are three-dimensional Cartesian.
     </port_doc>
 
     <diagram> 
@@ -34,7 +34,7 @@
    .                   =========================================                   .
    .                           |    USE    |  PROVIDE   |                          .
    .                           |===========|============|                          .
-   .                           | wind-velo.| drop.-pos. |                          .
+   .                           | flow-velo.| drop.-pos. |                          .
    .                           |...........|............|                          .
    .                           |           | state      |                          .
    .                           |...........|............|                          .
@@ -42,7 +42,7 @@
    .                           ==========================                          .
    .                                                                               .
    .................................................................................
-   .   port type='use'     mode='file.pkl' multiplicity='1' wind-velocity          .
+   .   port type='use'     mode='file.pkl' multiplicity='1' flow-velocity          .
    .                                                                               .
    .   port type='provide' mode='file.pkl' multiplicity='1' droplet-position       .
    .   port type='provide' mode='file.xml' multiplicity='1' state                  .

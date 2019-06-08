@@ -26,7 +26,7 @@ matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MultipleLocator
-import pickle
+#import pickle
 
 import xml.etree.ElementTree as ElementTree
 from threading import Lock
@@ -96,9 +96,10 @@ class PyPlot():
 
         n_time_steps = ( cortix_final_time - cortix_start_time ) / cortix_time_step
         n_of_times_to_plot = 10 # during the entire run
-        # how often to plot
-        self.__plot_interval = round( n_time_steps / n_of_times_to_plot )
-        # the width of the window to plot
+        # How often to plot.
+        self.__plot_interval = round( n_time_steps / n_of_times_to_plot ) + 1
+
+        # The width of the window to plot.
         self.__plot_slide_window_interval = 3 * self.__plot_interval
 
         s = 'Plot interval = ' + str(self.__plot_interval) + ' [' + \
@@ -154,7 +155,6 @@ class PyPlot():
         '''
         Transfer data at cortix_time.
         '''
-
         if (cortix_time % self.__plot_interval <= 1e-2 and \
             cortix_time < self.__cortix_final_time)        \
            or cortix_time >= self.__cortix_final_time:
@@ -317,7 +317,8 @@ class PyPlot():
         if at_time >= self.__cortix_final_time:
             initialTime = self.__cortix_start_time
         else:
-            initialTime = max(self.__cortix_start_time, at_time - self.__plot_slide_window_interval)
+            initialTime = max(self.__cortix_start_time, at_time - \
+                    self.__plot_slide_window_interval)
 
         timeSequence = TimeSequence( port_file, 'xml', initialTime, at_time,
                                      self.__cortix_time_unit, self.__log )
@@ -406,7 +407,7 @@ class PyPlot():
         of these time sequences will be cleared at the end.
         '''
 
-        nRows = 3
+        nRows = 2
         nCols = 1
 
         nSequences = len(self.__time_sequences_tmp)
@@ -445,8 +446,7 @@ class PyPlot():
         iDash = 0
         for iVar in range(nVar):
 
-            if iVar % (
-                    nRows * nCols) == 0:  # if a multiple of nRows*nCols start a new dashboard
+            if iVar % (nRows*nCols) == 0: # if multiple of nRows*nCols start new dashboard
 
                 if iVar != 0:  # flush any current figure
                     figName = 'pyplot_' + \
@@ -455,7 +455,7 @@ class PyPlot():
                     fig.savefig(figName+'.png', dpi=200, fomat='png')
                     plt.close(figNum)
 
-                    pickle.dump( fig, open(figName+'.pickle','wb') )
+                    #pickle.dump( fig, open(figName+'.pickle','wb') )
 
                     s = '__plot_time_seq_dashboard(): created plot: ' + figName
                     self.__log.debug(s)
@@ -468,7 +468,7 @@ class PyPlot():
 
                 gs = gridspec.GridSpec(nRows, nCols)
 #                gs.update(left=0.08, right=0.98, wspace=0.4, hspace=0.4)
-                gs.update(left=0.09, right=0.98, wspace=0.4, hspace=0.5)
+                gs.update(left=0.11, right=0.98, wspace=0.4, hspace=0.5)
 
                 axlst = list()
 
@@ -517,9 +517,9 @@ class PyPlot():
             if varUnit == 'sec':
                 varUnit = 's'
 
-            timeUnit = spec[2]
+            timeUnit  = spec[2]
             varLegend = spec[3]
-            varScale = spec[4]
+            varScale  = spec[4]
             assert varScale == 'log' or varScale == 'linear' or varScale == 'log-linear' \
                 or varScale == 'linear-log' or varScale == 'linear-linear' or \
                 varScale == 'log-log'
@@ -529,13 +529,13 @@ class PyPlot():
 
             data = npy.array(val)  # convert to numpy ndarray
 
-#      assert len(data.shape) == 2, 'not a 2-column shape: %r in var %r of %r; stop.' % (data.shape,varName,varLegend)
             if len(data.shape) != 2:
-                s = '__plot_time_seq_dashboard(): bad data; variable: ' + varName + ' unit: ' + \
+                s = '__plot_time_seq_dashboard(): bad data; variable: ' + \
+                        varName + ' unit: ' + \
                     varUnit + ' legend: ' + varLegend + \
                     ' shape: ' + str(data.shape) + ' skipping...'
                 self.__log.warn(s)
-                continue  # simply skip bad data and log
+                continue  # simply skip bad data and log warning
 
             x = data[:, 0]
 
@@ -547,7 +547,7 @@ class PyPlot():
 
             y = data[:, 1]
 
-            if y.max() >= 1e3 and varScale != 'linear-log' and \
+            if (y.max() >= 1e3 or y.min() <= -1e3) and varScale != 'linear-log' and \
                     varScale != 'log-log' and varScale != 'log':
                 y /= 1e3
                 if varUnit == 'gram' or varUnit == 'g':
@@ -582,8 +582,10 @@ class PyPlot():
                     varUnit = 'ks'
                 if varUnit == 'm':
                     varUnit = 'km'
+                if varUnit == 'm/s':
+                    varUnit = 'km/s'
 
-            if y.max() < 1e-6 and varScale != 'linear-log' and \
+            if (y.max() < 1e-6 and y.min() > -1e-6) and varScale != 'linear-log' and \
                     varScale != 'log-log' and varScale != 'log':
                 y *= 1e9
                 if varUnit == 'gram' or varUnit == 'g':
@@ -614,8 +616,11 @@ class PyPlot():
                     varUnit = 'nPa'
                 if varUnit == 's':
                     varUnit = 'ns'
+                if varUnit == 'm/s':
+                    varUnit = 'nm/s'
 
-            if (y.max() >= 1e-6 and y.max() < 1e-3) and varScale != 'linear-log' and \
+            if (y.max() >= 1e-6 and y.max()  <  1e-3) or \
+               (y.min() > -1e-3 and y.min() <= -1e-6) and varScale != 'linear-log' and \
                     varScale != 'log-log' and varScale != 'log':
                 y *= 1e6
                 if varUnit == 'gram' or varUnit == 'g':
@@ -646,8 +651,11 @@ class PyPlot():
                     varUnit = 'uPa'
                 if varUnit == 's':
                     varUnit = 'us'
+                if varUnit == 'm/s':
+                    varUnit = 'um/s'
 
-            if (y.max() >= 1e-3 and y.max() < 1e-1) and varScale != 'linear-log' and \
+            if (y.max() >= 1e-3 and y.max()  < 1e-1) or \
+               (y.min() <= -1e-3 and y.min() > -1e-1) and varScale != 'linear-log' and \
                     varScale != 'log-log' and varScale != 'log':
                 y *= 1e3
                 if varUnit == 'gram' or varUnit == 'g':
@@ -678,6 +686,8 @@ class PyPlot():
                     varUnit = 'mPa'
                 if varUnit == 's':
                     varUnit = 'ms'
+                if varUnit == 'm/s':
+                    varUnit = 'mm/s'
 
             ax.set_xlabel('Time [' + timeUnit + ']', fontsize=9)
             ax.set_ylabel(varName + ' [' + varUnit + ']', fontsize=9)
@@ -736,13 +746,13 @@ class PyPlot():
 
             if varScale == 'log-linear':
                 ax.set_xscale('log')
-                positiveX = x > 0.0
+                positiveX = x > 0.0 # True if > 0.0
                 x = npy.extract(positiveX, x)
                 y = npy.extract(positiveX, y)
 
             if varScale == 'linear-log':
                 ax.set_yscale('log')
-                positiveY = y > 0.0
+                positiveY = y > 0.0 # True if > 0.0
                 x = npy.extract(positiveY, x)
                 y = npy.extract(positiveY, y)
 #      assert x.size == y.size, 'size error; stop.'
@@ -781,7 +791,7 @@ class PyPlot():
         fig.savefig(figName+'.png', dpi=200, fomat='png')
         plt.close(figNum)
 
-        pickle.dump( fig, open(figName+'.pickle','wb') )
+        #pickle.dump( fig, open(figName+'.pickle','wb') )
 
         s = '__plot_time_seq_dashboard(): created plot: ' + figName
         self.__log.debug(s)
