@@ -9,7 +9,7 @@
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 '''
-Wind module example in Cortix.
+Vortex module example in Cortix.
 '''
 #*************************************************************************
 import os
@@ -20,12 +20,12 @@ import datetime
 import logging
 
 # uncomment
-from cortix.examples.modulib.wind.wind import Wind
+from cortix.examples.modulib.vortex.vortex import Vortex
 #*************************************************************************
 
 class CortixDriver():
     '''
-     Cortix driver for guest module: Wind
+     Cortix driver for guest module: Vortex
     '''
 
 #*********************************************************************************
@@ -58,14 +58,14 @@ class CortixDriver():
                type(cortix_time_unit)
 
         # Logging.
-        self.__log = logging.getLogger( 'launcher-wind_' + str(slot_id) +
+        self.__log = logging.getLogger( 'launcher-vortex_' + str(slot_id) +
                                         '.cortix_driver')
         self.__log.info('initializing an object of CortixDriver()')
 
         self.__wall_clock_time_stamp = None  # initialize
 
-        # Guest library module: Wind.
-        self.__wind = Wind( slot_id, input_full_path_file_name,
+        # Guest library module: Vortex.
+        self.__vortex = Vortex( slot_id, input_full_path_file_name,
                 manifesto_full_path_file_name, work_dir,
                 ports,
                 cortix_start_time, cortix_final_time, cortix_time_step, cortix_time_unit )
@@ -83,7 +83,7 @@ class CortixDriver():
 
         self.__log_debug(cortix_time, 'call_ports')
 
-        self.__wind.call_ports( cortix_time )
+        self.__vortex.call_ports( cortix_time )
 
         self.__log_debug(cortix_time, 'call_ports')
 
@@ -96,7 +96,7 @@ class CortixDriver():
 
         self.__log_debug(cortix_time, 'execute')
 
-        self.__wind.execute( cortix_time, time_step )
+        self.__vortex.execute( cortix_time, time_step )
 
         self.__log_debug(cortix_time, 'execute')
 

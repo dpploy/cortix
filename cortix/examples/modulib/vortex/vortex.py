@@ -9,7 +9,7 @@
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 '''
-Wind module example in Cortix.
+Vortex module example in Cortix.
 '''
 #*********************************************************************************
 import os, sys, io, time
@@ -24,9 +24,9 @@ from cortix.support.specie   import Specie
 from cortix.support.phase    import Phase
 #*********************************************************************************
 
-class Wind():
+class Vortex():
     r'''
-    Wind module used example in Cortix.
+    Vortex module used example in Cortix.
     '''
 
 #*********************************************************************************
@@ -61,8 +61,8 @@ class Wind():
                type(cortix_time_unit)
 
         # Logging: access Cortix Launcher logging facility
-        self.__log = logging.getLogger('launcher-wind_'+str(slot_id)+'.cortix_driver.wind')
-        self.__log.info('initializing an object of Wind()')
+        self.__log = logging.getLogger('launcher-vortex_'+str(slot_id)+'.cortix_driver.vortex')
+        self.__log.info('initializing an object of Vortex()')
 
        # Read the manisfesto
         self.__read_manifesto( manifesto_full_path_file_name )
@@ -74,11 +74,11 @@ class Wind():
         self.__slot_id = slot_id
         self.__ports   = ports
 
-        # Convert Cortix's time unit to Wind's internal time unit
+        # Convert Cortix's time unit to Vortex's internal time unit
         if cortix_time_unit == 'minute':
            self.__time_unit_scale = 60.0
         elif cortix_time_unit == 'second':
-           self.__time_unit_scale = 1.0   # Wind time unit
+           self.__time_unit_scale = 1.0   # Vortex time unit
         elif cortix_time_unit == 'hour':
            self.__time_unit_scale = 60.0*60.0
         else:
@@ -86,8 +86,8 @@ class Wind():
 
         self.__cortix_time_unit = cortix_time_unit
 
-        self.__start_time = cortix_start_time * self.__time_unit_scale # Wind time unit
-        self.__final_time = cortix_final_time * self.__time_unit_scale # Wind time unit
+        self.__start_time = cortix_start_time * self.__time_unit_scale # Vortex time unit
+        self.__final_time = cortix_final_time * self.__time_unit_scale # Vortex time unit
 
         if work_dir[-1] != '/': work_dir = work_dir + '/'
         self.__wrkDir = work_dir
@@ -127,25 +127,25 @@ class Wind():
         # Quantities in the gas phase.
         quantities = list()
 
-        # Initial position of the wind points; make this zero because data is needed from
+        # Initial position of the vortex points; make this zero because data is needed from
         # the use port.
         x_0 = npy.array([0.0,0.0,0.0]) # initial height [m] above ground at 0
 
         # Domain box dimensions: LxLxH m^3 box with given H.
         # Origin of cartesian coordinate system at the bottom of the box. 
         # z coordinate pointing upwards. -L <= x <= L, -L <= y <= L, 
-        # Note: if the z component is positive, wind is blowing upwards.
+        # Note: if the z component is positive, vortex is blowing upwards.
         #       Gravity points in -z direction.
-        self.__box_half_length = 250.0 # wind box [m] 
+        self.__box_half_length = 250.0 # vortex box [m] 
         self.__box_height      = 250.0 # [m]
         # Vortex parameters.
         self.__min_core_radius = 2.5 # [m]
         self.__outer_v_theta   = 1.0 # m/s # angular speed
         self.__v_z_0 = 0.50 # [m/s]
         # Vortex velocity must be npy.ndarray (see ODE solvers).
-        wind_velocity = npy.array([0.0,0.0,0.0])
+        vortex_velocity = npy.array([0.0,0.0,0.0])
 
-        # Spatial position of wind points and velocity.
+        # Spatial position of vortex points and velocity.
         # One position and velocity quantity per use port to allow for multiple
         # connections to the position use port.
         for port in self.__ports:
@@ -161,7 +161,7 @@ class Wind():
 
                 # Create a corresponding velocity quantity
                 velocity = Quantity( name='velocity@'+port_file, formalName='Veloc.',
-                        unit='m/s', value=wind_velocity )
+                        unit='m/s', value=vortex_velocity )
                 quantities.append( velocity )
 
         # Create phase.
@@ -172,7 +172,7 @@ class Wind():
         air_mass_cc = 0.1 # [g/cc]
         self.__gas_phase.SetValue( 'air', air_mass_cc, self.__start_time )
 
-        # Plot wind-velocity function values.
+        # Plot vortex-velocity function values.
         self.__plot_vortex_velocity()
 
         return
@@ -186,7 +186,7 @@ class Wind():
         Transfer data at cortix_time
         '''
 
-        cortix_time *= self.__time_unit_scale  # convert to Wind time unit
+        cortix_time *= self.__time_unit_scale  # convert to Vortex time unit
 
         # Provide data to all provide ports.
         self.__provide_data( provide_port_name='velocity', at_time=cortix_time )
@@ -210,8 +210,8 @@ class Wind():
         Evolve system from cortix_time to cortix_time + cortix_time_step
         '''
 
-        cortix_time      *= self.__time_unit_scale  # convert to Wind time unit
-        cortix_time_step *= self.__time_unit_scale  # convert to Wind time unit
+        cortix_time      *= self.__time_unit_scale  # convert to Vortex time unit
+        cortix_time_step *= self.__time_unit_scale  # convert to Vortex time unit
 
         s = 'execute('+str(round(cortix_time,2))+'[min]): '
         self.__log.debug(s)
@@ -334,7 +334,7 @@ class Wind():
             pickle.dump( self.__gas_phase, open(port_file,'wb') )
 
         #print('********************************************************************')
-        #print('WIND: ALL PHASE SENT')
+        #print('VORTEX: ALL PHASE SENT')
         #print('at_time=',at_time,'phase=',self.__gas_phase)
         #print('********************************************************************')
 
@@ -360,8 +360,8 @@ class Wind():
             fout = open(port_file,'w')
 
             # Write file header.
-            fout.write('# name:   '+'wind_'+str(self.__slot_id)); fout.write('\n')
-            fout.write('# author: '+'cortix.examples.modulib.wind'); fout.write('\n')
+            fout.write('# name:   '+'vortex_'+str(self.__slot_id)); fout.write('\n')
+            fout.write('# author: '+'cortix.examples.modulib.vortex'); fout.write('\n')
             fout.write('# version:'+'0.1'); fout.write('\n')
             today = datetime.datetime.today()
             fout.write('# today:  '+str(today)); fout.write('\n')
@@ -385,7 +385,7 @@ class Wind():
         # Write history data.
         fout = open(port_file,'a')
 
-        # Wind time.
+        # Vortex time.
         fout.write('%18.6e' % (at_time))
 
         # Mass density.
@@ -433,11 +433,11 @@ class Wind():
                     port_file
 
             a = ElementTree.Element('time-sequence')
-            a.set('name','wind_'+str(self.__slot_id)+'-state')
+            a.set('name','vortex_'+str(self.__slot_id)+'-state')
 
             b = ElementTree.SubElement(a,'comment')
             today = datetime.datetime.today()
-            b.set('author','cortix.examples.modulib.wind')
+            b.set('author','cortix.examples.modulib.vortex')
             b.set('version','0.1')
 
             b = ElementTree.SubElement(a,'comment')
@@ -454,7 +454,7 @@ class Wind():
                 b.set('name',formula_name)
                 unit = specie.massCCUnit
                 b.set('unit',unit)
-                b.set('legend','Wind_'+str(self.__slot_id)+'-state')
+                b.set('legend','Vortex_'+str(self.__slot_id)+'-state')
                 b.set('scale',self.__pyplot_scale)
 
             for quant in self.__gas_phase.quantities:
@@ -465,14 +465,14 @@ class Wind():
                         b.set('name',formal_name+' '+str(i+1))
                         unit = quant.unit
                         b.set('unit',unit)
-                        b.set('legend','Wind_'+str(self.__slot_id)+'-state')
+                        b.set('legend','Vortex_'+str(self.__slot_id)+'-state')
                         b.set('scale',self.__pyplot_scale)
                 else:
                     b = ElementTree.SubElement(a,'var')
                     b.set('name',formal_name)
                     unit = quant.unit
                     b.set('unit',unit)
-                    b.set('legend','Wind_'+str(self.__slot_id)+'-state')
+                    b.set('legend','Vortex_'+str(self.__slot_id)+'-state')
                     b.set('scale',self.__pyplot_scale)
 
             # write values for all variables
@@ -589,7 +589,7 @@ class Wind():
                 lock.release()
 
                 #print('*****************************************************************')
-                #print('WIND: TRY POSITION')
+                #print('VORTEX: TRY POSITION')
                 #print('port file = ',port_file)
                 #print('at_time=',at_time,'pos_hist=',position_history)
                 #print('*****************************************************************')
@@ -606,7 +606,7 @@ class Wind():
 
         position = position_history.value.loc[time_stamp]
         #print('======================================================================')
-        #print('WIND: POSITION RECEIVED')
+        #print('VORTEX: POSITION RECEIVED')
         #print('port file=',port_file)
         #print('time_stamp=',time_stamp)
         #print('position select=',position)
@@ -625,7 +625,7 @@ class Wind():
         #print('after set_gas_phase position =',self.__gas_phase)
         #print('**********************************************************************')
 
-        # Update the wind velocity at the position
+        # Update the vortex velocity at the position
         velocity = self.__vortex_velocity( position )
 
         #print('velocity=',velocity)
@@ -646,7 +646,7 @@ class Wind():
         values = self.__gas_phase.GetRow( cortix_time ) # values at previous time
 
         #print('**********************************************************************')
-        #print('WIND EVOLVE')
+        #print('VORTEX EVOLVE')
         #print('cortix_time=',cortix_time)
 
         at_time = cortix_time + cortix_time_step
@@ -655,7 +655,7 @@ class Wind():
 
         self.__gas_phase.AddRow( at_time, values ) # repeat values for current time
 
-        # Compute the wind velocity at the given external position
+        # Compute the vortex velocity at the given external position
         # Using a vortex flow model.
 
         for quant in self.__gas_phase.quantities:
@@ -666,17 +666,17 @@ class Wind():
                 position = self.__gas_phase.GetValue(name,cortix_time)
                 #print('position=',position)
 
-                wind_velocity = self.__vortex_velocity( position )
-                #print('wind_velocity=',wind_velocity)
+                vortex_velocity = self.__vortex_velocity( position )
+                #print('vortex_velocity=',vortex_velocity)
 
                 velo_name = 'velocity@'+name
                 #print(velo_name)
                 #print(position)
-                #print(wind_velocity)
+                #print(vortex_velocity)
 
-                #wind_velocity = self.__gas_phase.GetValue(velo_name,cortix_time)
+                #vortex_velocity = self.__gas_phase.GetValue(velo_name,cortix_time)
 
-                self.__gas_phase.SetValue(velo_name,wind_velocity,at_time)
+                self.__gas_phase.SetValue(velo_name,vortex_velocity,at_time)
                 #print('gas_phase=',self.__gas_phase)
 
         #print('**********************************************************************')
@@ -684,7 +684,7 @@ class Wind():
 
     def __vortex_velocity( self, position ):
         '''
-        Computes the velocity of the wind at a given position.
+        Computes the velocity of the vortex at a given position.
 
         Parameters
         ----------
@@ -692,10 +692,10 @@ class Wind():
 
         Returns
         -------
-        wind_velocity: numpy.ndarray(3)
+        vortex_velocity: numpy.ndarray(3)
         '''
 
-        # Compute the wind velocity at the given external position
+        # Compute the vortex velocity at the given external position
         # Using a vortex flow model.
         box_half_length = self.__box_half_length
         min_core_radius = self.__min_core_radius
@@ -724,9 +724,9 @@ class Wind():
         v_x = - v_theta * math.sin(azimuth)
         v_y =   v_theta * math.cos(azimuth)
 
-        wind_velocity = npy.array([v_x,v_y,v_z])
+        vortex_velocity = npy.array([v_x,v_y,v_z])
 
-        return wind_velocity
+        return vortex_velocity
 
     def __plot_vortex_velocity( self ):
         '''
@@ -751,8 +751,8 @@ class Wind():
             for x in npy.linspace(0,self.__box_half_length,500):
                 xval.append(x)
                 y = 0.0
-                wind_velocity = self.__vortex_velocity( npy.array([x,y,z]) )
-                yval.append(wind_velocity[1])
+                vortex_velocity = self.__vortex_velocity( npy.array([x,y,z]) )
+                yval.append(vortex_velocity[1])
 
             axs[0].plot( xval, yval, label='z ='+str(round(z,2))+' [m]' )
 
@@ -766,8 +766,8 @@ class Wind():
         yval = list()
         for z in npy.linspace(0,self.__box_height,50):
             yval.append(z)
-            wind_velocity = self.__vortex_velocity( npy.array([0.0,0.0,z]) )
-            xval.append(wind_velocity[2])
+            vortex_velocity = self.__vortex_velocity( npy.array([0.0,0.0,z]) )
+            xval.append(vortex_velocity[2])
 
         axs[1].plot(xval,yval)
 
@@ -791,7 +791,7 @@ class Wind():
 
         assert xml_tree.tag == 'module_manifesto'
 
-        assert xml_tree.get_attribute('name') == 'wind'
+        assert xml_tree.get_attribute('name') == 'vortex'
 
         # List of (port_name, port_type, port_mode, port_multiplicity)
         __ports = list()
@@ -851,4 +851,4 @@ class Wind():
 
         return
 
-#======================= end class Wind: =========================================
+#======================= end class Vortex: =======================================
