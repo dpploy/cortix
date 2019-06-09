@@ -129,53 +129,214 @@ class Specie():
 
         return
 
-# *******************************************************************************
-
-# *******************************************************************************
+#*********************************************************************************
+# Public Member Functions
+#*********************************************************************************
+>>>>>>> specie.py
 # Setters and Getters methods
 # -------------------------------------------------------------------------------
 # These are passing arguments by value effectively. Because the python objects
 # passed into/out of the function are immutable.
 
     def GetName(self):
+        
+        '''
+        Returns the empirical name of the species. For example, "water".
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        name: str
+
+        '''
+        
         return self._name
 
     def SetName(self, n):
+        
+        '''
+        Sets the empirical  name of the species to n.
+
+        Parameters
+        ----------
+        n: str
+
+        Returns
+        -------
+        empty
+        '''
+        
         self._name = n
     name = property(GetName, SetName, None, None)
 
     def GetFormulaName(self):
-        return self._formula_name
+        
+        '''
+        Returns the formulaic name of the compound. For example, "Dihydrogen
+        monoxide".
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        formulaName: str
+
+        '''
+        
+        return self._formulaName
 
     def SetFormulaName(self, f):
-        self._formula_name = f
-    formula_name = property(GetFormulaName, SetFormulaName, None, None)
+        
+        '''
+        Sets the formulaic name to f.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        formulaName: str
+        '''
+        
+        self._formulaName = f
+    formulaName = property(GetFormulaName, SetFormulaName, None, None)
 
     def GetPhase(self):
+        
+        '''
+        Returns the phase history of the species.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        phase: dataFrame
+        '''
+        
         return self._phase
 
     def SetPhase(self, p):
+        
+        '''
+        Sets the phase history to p.
+
+        Parameters
+        ----------
+        p: dataFrame
+
+        Returns
+        -------
+        empty
+        '''
+        
         self._mass = p
     phase = property(GetPhase, SetPhase, None, None)
 
     def GetMolarMass(self):
+        
+        '''
+        Returns the numerical value for the molar mass of the species. Units
+        are given by molarMassUnit.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        molarMass: float
+        '''
+        
         return self._molarMass
 
     def SetMolarMass(self, v):
+        
+        '''
+        Sets the molar mass of the species equal to v.
+
+        Parameters
+        ----------
+        v: float
+
+        Returns
+        -------
+        empty
+        '''
+        
         self._molarMass = v
     molarMass = property(GetMolarMass, SetMolarMass, None, None)
 
     def GetMolarMassUnit(self):
+        
+        '''
+        Returns the unit used to measure the molar mass of the species.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        molarMassUnit: str
+        '''
+        
         return self._molarMassUnit
 
     def SetMolarMassUnit(self, v):
+        
+        '''
+        Sets the unit used to measure the molar mass of the species to v.
+
+        Parameters
+        ----------
+        v: str
+
+        Returns
+        -------
+        empty
+        '''
+        
         self._molarMassUnit = v
     molarMassUnit = property(GetMolarMassUnit, SetMolarMassUnit, None, None)
 
     def GetMolarRadioactivity(self):
+        
+        '''
+        Returns the numerical value for molar radioactivity of the species.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        molarRadioactivity: float
+        '''
+        
         return self._molarRadioactivity
 
     def SetMolarRadioactivity(self, v):
+        
+        '''
+        Sets the molar radioactivity of the species equal to v.
+
+        Parameters
+        ----------
+        v: float
+
+        Returns
+        -------
+        empty
+        '''
+        
         self._molarRadioactivity = v
     molarRadioactivity = property(
         GetMolarRadioactivity,
@@ -184,9 +345,45 @@ class Specie():
         None)
 
     def GetMolarRadioactivityFractions(self):
+        
+        '''
+        Returns a list of numbers that speciefies the % of molar reactivity
+        that comes from each type of atom in the species. For example, a
+        molarRadioactivityFraction of [0.65, 0.35] for water means that 65%
+        of the molar radioactivity comes from the hydrogen atoms and 35% comes
+        from the oxygen atom.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        molarRadioactivityFractions: list
+        '''
+        
         return self._molarRadioactivityFractions
 
     def SetMolarRadioactivityFractions(self, fracs):
+        
+        '''
+        Sets molarRadioactivityFractions equal to fracs. Fracs must be a list
+        of floatswith the same length as there are different atoms in the
+        species, or the function call will fail. (e.g. self._atoms and fracs
+        must be of the same length). Take care to ensure that the elements of
+        fracs match with the elements of self._atoms! (65% is in the same
+        position in fracs as hydrogen is in self._atoms, following the above
+        example).
+
+        Parameters
+        ----------
+        fracs: list
+
+        Returns
+        -------
+        empty
+        '''
+        
         assert isinstance(fracs, list), 'oops not list.'
         if len(fracs) > 0:
             assert len(fracs) == len(self._atoms), 'oops not right length,'
@@ -200,9 +397,35 @@ class Specie():
         None)
 
     def GetMolarRadioactivityUnit(self):
+        
+        '''
+        Returns the unit used to measure molar radioactivity.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        molarRadioactivityUnit: str
+        '''
+        
         return self._molarRadioactivityUnit
 
     def SetMolarRadioactivityUnit(self, v):
+        
+        '''
+        Sets the unit used to measure molar radioactivity to v.
+
+        Parameters
+        ----------
+        v: str
+
+        Returns
+        -------
+        empty
+        '''
+        
         self._molarRadioactivityUnit = v
     molarRadioactivityUnit = property(
         GetMolarRadioactivityUnit,
@@ -211,16 +434,70 @@ class Specie():
         None)
 
     def GetMolarHeatPwr(self):
+        
+        '''
+        Returns the amount of heat generated per mole of this species.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        molarHeatPwr: float
+        '''
+        
         return self._molarHeatPwr
 
     def SetMolarHeatPwr(self, v):
+        
+        '''
+        Sets the amount of heat generated per mole of this species to v.
+
+        Parameters
+        ----------
+        v: float
+        
+        Returns
+        -------
+        empty
+        '''
+        
         self._molarHeatPwr = v
     molarHeatPwr = property(GetMolarHeatPwr, SetMolarHeatPwr, None, None)
 
     def GetMolarHeatPwrUnit(self):
+        
+        '''
+        Returns the unit used to measure the amount of heat generated per mole
+        of this species.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        molarHeatPwrUnit: str
+        '''
+        
         return self._molarHeatPwrUnit
 
     def SetMolarHeatPwrUnit(self, v):
+        
+        '''
+        Sets the unit used to measure the amount of heat generated per mole of
+        this species to v.
+
+        Parameters
+        ----------
+        v: str
+
+        Returns
+        -------
+        empty
+        '''
+        
         self._molarHeatPwrUnit = v
     molarHeatPwrUnit = property(
         GetMolarHeatPwrUnit,
@@ -229,16 +506,72 @@ class Specie():
         None)
 
     def GetMolarGammaPwr(self):
+        
+        '''
+        Returns the amount of gamma radiation produced per mole of this species
+        (measured in units of power).
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        molarGammaPwr: float
+        '''
+        
         return self._molarGammaPwr
 
     def SetMolarGammaPwr(self, v):
+        
+        '''
+        Sets the amount of gamma radiation produced per mole of this species to
+        v.
+
+        Parameters
+        ----------
+        v: float
+
+        Returns
+        -------
+        empty
+        '''
+        
         self._molarGammaPwr = v
     molarGammaPwr = property(GetMolarGammaPwr, SetMolarGammaPwr, None, None)
 
     def GetMolarGammaPwrUnit(self):
+        
+        '''
+        Returns the unit used to measure the amount of gamma radiation produced
+        per mole of this species.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        molarGammaPwrUnit: str
+        '''
+        
         return self._molarGammaPwrUnit
 
     def SetMolarGammaPwrUnit(self, v):
+        
+        '''
+        Sets the unit used to measure the amount of gamma radiation produced
+        per mole of this species to v.
+
+        Parameters
+        ----------
+        v: str
+
+        Returns
+        -------
+        empty
+        '''
+        
         self._molarGammaPwrUnit = v
     molarGammaPwrUnit = property(
         GetMolarGammaPwrUnit,
@@ -251,6 +584,7 @@ class Specie():
         return self._atoms
 
     def SetAtoms(self, atoms):
+        
         assert isinstance(atoms, list), 'oops not list.'
         if len(atoms) != 0:
             assert isinstance(atoms[-1], str), 'oops not string.'
@@ -260,9 +594,37 @@ class Specie():
 
     # New interface
     def GetFormula(self):
+        
+        '''
+        Returns the molecular or empirical formula of the species. It is
+        usually a list, for example, of the form ['2*H', 'O'].
+
+        Parameters
+        ----------
+        
+        Returns
+        -------
+        formula: list
+        '''
+        
         return self._atoms
 
     def SetFormula(self, atoms):
+        
+        '''
+        Sets the species' formula equal to atoms. Will automatically update
+        the molar mass of the species, and will also fail if atoms is not a
+        list of strings.
+
+        Parameters
+        ----------
+        atoms: list
+
+        Returns
+        -------
+        empty
+        '''
+        
         assert isinstance(atoms, list), 'oops not list.'
         if len(atoms) != 0:
             assert isinstance(atoms[-1], str), 'oops not string.'
@@ -271,40 +633,175 @@ class Specie():
     formula = property(GetFormula, SetFormula, None, None)
 
     def GetNAtoms(self):  # number of ficticious atoms in the species (see NB above)
+        
+        '''
+        Returns the total number of atoms comprising the species. For example,
+        water is comprised of three atoms.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        nAtoms: int
+        '''
+        
         return self._nAtoms
     nAtoms = property(GetNAtoms, None, None, None)
 
     # number of nuclide types involved in the species definition
     def GetNNuclideTypes(self):
+        
+        '''
+        Returns the number of different types of atoms comprising the species.
+        For example, water is composed of two different types of atoms,
+        hydrogen and oxygen.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        nNuclideTypes: int
+        '''
+        
         return self._nNuclideTypes
     nNuclideTypes = property(GetNNuclideTypes, None, None, None)
 
     def SetFlag(self, f):
+        
+        '''
+        Sets the flag associated with the species to f.
+
+        Parameters
+        ----------
+        f: str
+
+        Returns
+        -------
+        empty
+        '''
+        
         self._flag = f
 
     def GetFlag(self):
+        
+        '''
+        Returns the flag associated with the species.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        flag: str
+        '''
+        
         return self._flag
     flag = property(GetFlag, SetFlag, None, None)
 
     def GetMolarCC(self):
+        
+        '''
+        Returns the numerical value for the number (molar) density of the
+        species (moles/volume).
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        molarCC: float
+        '''
+        
         return self._molarCC
 
     def SetMolarCC(self, v):
+        
+        '''
+        Sets the numerical value for the molar density of the species to v.
+
+        Parameters
+        ----------
+        v: float
+
+        Returns
+        -------
+        empty
+        '''
+        
         self._molarCC = v
         self._massCC = v * self._molarMass
     molarCC = property(GetMolarCC, SetMolarCC, None, None)
 
     def GetMolarCCUnit(self):
+        
+        '''
+        Returns the unit used to measure molar density of the species.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        molarCCUnit: str
+        '''
+        
         return self._molarCCUnit
 
     def SetMolarCCUnit(self, v):
+        
+        '''
+        Sets the unit used to measure the molar density of the species to v.
+
+        Parameters
+        ----------
+        v: str
+        
+        Returns
+        -------
+        empty
+        '''
+        
         self._molarCCUnit = v
     molarCCUnit = property(GetMolarCCUnit, SetMolarCCUnit, None, None)
 
     def GetMassCC(self):
+        
+        '''
+        Returns the numerical value of the mass density of the species
+        (mass/volume).
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        massCC: float
+        '''
+        
         return self._massCC
 
     def SetMassCC(self, v):
+        
+        '''
+        Sets the numerical value of the mass density equal to v.
+
+        Parameters
+        ----------
+        v: float
+
+        Returns
+        -------
+        empty
+        '''
+        
         self._massCC = v
         if self._molarMass == 0.0 and v == 0.0:
             self._molarCC = 0.0
@@ -313,16 +810,55 @@ class Specie():
     massCC = property(GetMassCC, SetMassCC, None, None)
 
     def GetMassCCUnit(self):
+        
+        '''
+        Returns the unit used to measure the mass density of the species.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        massCCUnit: str
+        '''
+        
         return self._massCCUnit
 
     def SetMassCCUnit(self, v):
+        
+        '''
+        Sets the units used to measure mass density to v.
+
+        Parameters
+        ----------
+        v: str
+
+        Returns
+        -------
+        empty
+        '''
+        
         self._massCCUnit = v
     massCCUnit = property(GetMassCCUnit, SetMassCCUnit, None, None)
 
-# *******************************************************************************
-# Internal helpers
+#*********************************************************************************
+# Private Helper Functions (Internal use: __)
+#*********************************************************************************
 
     def __UpdateMolarMass(self):
+        '''
+        Updates the molar mass of the species after the molecular formula has
+        been changed.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        empty
+        '''
 
         #if len(self._atoms) == 0:
         #    self._nAtoms = 0
@@ -385,7 +921,19 @@ class Specie():
         return
 
     def __ReorderFormula(self):
+        '''
+        Takes a list of atoms for a molecular or empirical formula and places
+        it in order of decreasing magnitude of stoichiometric coefficient. For
+        example, [O, 2*H] will be returned as [2*H, O].
 
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        atoms2: list
+        '''
         atoms1 = self._atoms[:]  # shallow copy
         atoms2 = list()
 
@@ -443,10 +991,6 @@ class Specie():
 
         return atoms2
 
-
-# *******************************************************************************
-# Printing of data members
-
     def __str__(self):
         s = '\n\t Specie(): name=%s;' + ' formula_name=%s;' + ' phase=%s;' + '\n\t formula=%s;' + '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + ' molar cc=%9.3e[%s];' + ' mass cc=%9.3e[%s];' + '\n\t flag=%s;' + '\n\t molar radioactivity=%9.3e[%s];' + \
             '\n\t radioactivity  dens.=%9.3e[%s];' + '\n\t molar heat pwr=%9.3e[%s];' + '\n\t heat pwr dens.=%9.3e[%s];' + \
@@ -462,4 +1006,4 @@ class Specie():
             '\n\t atoms=%s;' + '\n\t molar radioactivity fractions=%s'
         return s % (self.name, self.formula_name, self.phase, self.__ReorderFormula(), self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarRadioactivity *
                     self.molarCC, '[Ci/cc]', self.molarHeatPwr, self.molarHeatPwrUnit, self.molarHeatPwr * self.molarCC, '[W/cc]', self.molarGammaPwr, self.molarGammaPwrUnit, self.molarGammaPwr * self.molarCC, '[W/cc]', [i.split('*')[-1] for i in self.formula], ['%9.3e' % i for i in self.molarRadioactivityFractions])
-# *******************************************************************************
+#=============================# End Class specie:=================================
