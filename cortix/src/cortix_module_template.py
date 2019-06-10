@@ -10,6 +10,7 @@
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 '''
 Simple MyModule module template for developers.
+Rename this file name from cortix_module_template.py to my_module.py.
 '''
 #*********************************************************************************
 import os, sys, io, time
@@ -33,8 +34,8 @@ class MyModule():
             ports = list(),
             cortix_start_time = 0.0,
             cortix_final_time = 0.0,
-            cortix_time_step = 0.0,
-            cortix_time_unit = None 
+            cortix_time_step  = 0.0,
+            cortix_time_unit  = None 
                 ):
 
         #.........................................................................
@@ -164,10 +165,10 @@ class MyModule():
         return
 
     def __get_port_file( self, use_port_name=None, provide_port_name=None ):
-         '''
-         This may return a None port_file.
-         This implementation only works for a single connection per port.
-         '''
+        '''
+        This may return a None port_file.
+        This implementation only works for a single connection per port.
+        '''
 
         port_file = None
 

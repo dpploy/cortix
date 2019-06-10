@@ -59,6 +59,7 @@ class Droplet():
         assert isinstance(cortix_time_unit, str), '-> time unit type %r is invalid.' % \
                 type(cortix_time_unit)
 
+        #.............................................................................
         # Logging: access Cortix Launcher logging facility.
         self.__log = logging.getLogger('launcher-droplet_'+str(slot_id)+\
                 '.cortix_driver.droplet')
@@ -74,6 +75,7 @@ class Droplet():
         self.__slot_id = slot_id
         self.__ports   = ports
 
+        #.............................................................................
         # Convert Cortix's time unit to Droplet's internal time unit.
         if cortix_time_unit == 'minute':
             self.__time_unit_scale = 60.0
@@ -92,6 +94,7 @@ class Droplet():
         if work_dir[-1] != '/': work_dir = work_dir + '/'
         self.__wrkDir = work_dir
 
+        #.............................................................................
         # Signal to start operation.
         self.__goSignal = True     # start operation immediately
         for port in self.__ports:  # if there is a signal port, start operation
@@ -1009,8 +1012,8 @@ class Droplet():
                     val = attribute[1].strip()
 
                     if key == 'type':
-                        assert val == 'use' or val == 'provide' or val == 'input' or \
-                            val == 'output', 'port attribute value invalid.'
+                        assert val == 'use' or val == 'provide', \
+                                'port attribute value invalid.'
                         tmp['port_name'] = text  # port_name
                         tmp['port_type'] = val   # port_type
                     elif key == 'mode':

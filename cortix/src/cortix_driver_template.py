@@ -28,6 +28,9 @@ import logging
 #from .my_module import MyModule
 #*********************************************************************************
 
+# Rename the class name: CortixDriverTemplate() (next line) to CortixDriver(). 
+# Rename this file name from cortix_driver_template.py to cortix_driver.py
+# Remove these three comment lines.
 class CortixDriverTemplate():
     '''
      Cortix driver for guest module: MyModule
@@ -43,10 +46,10 @@ class CortixDriverTemplate():
             manifesto_full_path_file_name,
             work_dir,
             ports=list(),
-            cortix_start_time=0.0,
-            cortix_final_time=0.0,
-            cortix_time_step=0.0,
-            cortix_time_unit=None
+            cortix_start_time = 0.0,
+            cortix_final_time = 0.0,
+            cortix_time_step  = 0.0,
+            cortix_time_unit  = None
             ):
 
         # Sanity tests.
@@ -64,7 +67,7 @@ class CortixDriverTemplate():
 
         # Logging.
         self.__log = logging.getLogger( 'launcher-mymodule' + str(slot_id) +
-                                        '.cortixdriver')
+                                        '.cortix_driver')
         self.__log.info('initializing an object of CortixDriver()')
 
         self.__wall_clock_time_stamp = None  # initialize
