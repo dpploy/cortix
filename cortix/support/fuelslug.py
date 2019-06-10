@@ -8,7 +8,7 @@
 #
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
-"""
+'''
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
 Fuel slug
@@ -24,7 +24,7 @@ best use the underlying history data in the Phase() container of each phase.
 VFdALib support classes
 
 Thu Dec 15 16:18:39 EST 2016
-"""
+'''
 
 # *******************************************************************************
 import os
@@ -46,6 +46,10 @@ from cortix.support.phase import Phase
 
 
 class FuelSlug():
+
+#*********************************************************************************
+# Construction
+#*********************************************************************************
 
     def __init__(self,
                  specs=pandas.Series(),
@@ -128,30 +132,103 @@ class FuelSlug():
 # These are passing arguments by value effectively. Because the python objects
 # passed into/out of the function are immutable.
 
+#*********************************************************************************
+# Public Member Functions
+#*********************************************************************************
+
     def GetSpecs(self):
+        
+        '''
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
+        '''
+        
         return self._specs
     specs = property(GetSpecs, None, None, None)
 
     def GetFuelPhase(self):
+        
+        '''
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
+        '''
+        
         return self._fuelPhase
     fuelPhase = property(GetFuelPhase, None, None, None)
 
     def GetCladdingPhase(self):
+        
+        '''
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
+        '''
+        
         return self._claddingPhase
     claddingPhase = property(GetCladdingPhase, None, None, None)
 
     def GetAttribute(self, name, phase=None, symbol=None, series=None):
+        
+        '''
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
+        '''
+        
         return self.__GetAttribute(name, symbol, series)
 
     def ReduceCladdingVolume(self, dissolvedVolume):
+        
+        '''
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
+        '''
+        
         self.__ReduceCladdingVolume(dissolvedVolume)
 
     def ReduceFuelVolume(self, dissolvedVolume):
+        
+        '''
+
+        Parameters
+        ----------
+
+        Returns
+        -------
+
+        '''
+        
         self.__ReduceFuelVolume(dissolvedVolume)
 
 
 # Get stored fuel slug property either overall or on a nuclide basis
 # ---------------------------------------------------------------------------------
+#*********************************************************************************
+# Private Member Functions (Internal use: __)
+#*********************************************************************************
 
     def __GetAttribute(self, attributeName, nuclide=None, series=None):
 
@@ -489,7 +566,6 @@ class FuelSlug():
             else:
 
                 assert False
-
 # ---------------------------------------------------------------------------------
     def __GetSlugLength(self):
 
@@ -795,4 +871,4 @@ class FuelSlug():
     def __repr__(self):
         s = 'FuelSlug(): \n\t specs \n\t %s \n\t fuelPhase \n\t %s \n\t claddingPhase \n\t %s'
         return s % (self._specs, self._fuelPhase, self._claddingPhase)
-# *******************************************************************************
+#=============================end class fuelSlug:=================================
