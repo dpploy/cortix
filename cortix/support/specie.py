@@ -59,8 +59,6 @@ import sys
 from cortix.support.periodictable import ELEMENTS
 #*********************************************************************************
 
-#*********************************************************************************
-
 class Specie():
     '''
     todo: phase should not be here; concentrations should not be here
