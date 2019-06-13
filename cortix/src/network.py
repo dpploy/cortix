@@ -50,10 +50,10 @@ class Network:
 # Construction 
 #*********************************************************************************
 
-    def __init__(self, net_config_xml_node): 
+    def __init__(self, net_config_xml_node):
 
-        assert isinstance(net_config_xml_node, XMLTree), \
-                '-> net_config_xml_node is invalid.'
+        assert isinstance(net_config_xml_node, XMLTree),\
+               '-> net_config_xml_node is invalid.'
 
         self.__config_xml_node = net_config_xml_node
 
@@ -112,7 +112,7 @@ class Network:
                         assert len(data) == 2
                         provide_port = data[0].strip()
                         provide_module_slot = data[1].strip().replace(':','_')
-                        assert use_port not in tmp.keys(), \
+                        assert provide_port not in tmp.keys(), \
                             'repeated provide_port in attribute of %r network' %\
                             self.__name
                         tmp['provide_port'] = provide_port

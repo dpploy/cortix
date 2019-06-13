@@ -59,8 +59,6 @@ import sys
 from cortix.support.periodictable import ELEMENTS
 #*********************************************************************************
 
-#*********************************************************************************
-
 class Specie():
     '''
     todo: phase should not be here; concentrations should not be here
@@ -74,7 +72,7 @@ class Specie():
 
     def __init__(self,
                  name='null',
-                 formulaName='null',
+                 formula_name='null',
                  phase='null',
                  atoms=list(),
                  molarCC=0.0,      # default unit: M (mole/L)
@@ -84,8 +82,8 @@ class Specie():
         assert isinstance(name, str), 'oops not string.'
         self._name = name
 
-        assert isinstance(formulaName, str), 'oops not string.'
-        self._formulaName = formulaName
+        assert isinstance(formula_name, str), 'oops not string.'
+        self._formula_name = formula_name
 
         assert isinstance(phase, str), 'oops not string.'
         self._phase = phase
@@ -131,7 +129,6 @@ class Specie():
 
         return
 
-
 # *******************************************************************************
 
 # *******************************************************************************
@@ -148,11 +145,11 @@ class Specie():
     name = property(GetName, SetName, None, None)
 
     def GetFormulaName(self):
-        return self._formulaName
+        return self._formula_name
 
     def SetFormulaName(self, f):
-        self._formulaName = f
-    formulaName = property(GetFormulaName, SetFormulaName, None, None)
+        self._formula_name = f
+    formula_name = property(GetFormulaName, SetFormulaName, None, None)
 
     def GetPhase(self):
         return self._phase
@@ -327,8 +324,9 @@ class Specie():
 
     def __UpdateMolarMass(self):
 
-        if len(self._atoms) == 0:
-            return
+        #if len(self._atoms) == 0:
+        #    self._nAtoms = 0
+        #    return
 
         for entry in self._atoms:
             assert isinstance(entry, str), 'oops'
@@ -450,18 +448,18 @@ class Specie():
 # Printing of data members
 
     def __str__(self):
-        s = '\n\t Specie(): name=%s;' + ' formulaName=%s;' + ' phase=%s;' + '\n\t formula=%s;' + '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + ' molar cc=%9.3e[%s];' + ' mass cc=%9.3e[%s];' + '\n\t flag=%s;' + '\n\t molar radioactivity=%9.3e[%s];' + \
+        s = '\n\t Specie(): name=%s;' + ' formula_name=%s;' + ' phase=%s;' + '\n\t formula=%s;' + '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + ' molar cc=%9.3e[%s];' + ' mass cc=%9.3e[%s];' + '\n\t flag=%s;' + '\n\t molar radioactivity=%9.3e[%s];' + \
             '\n\t radioactivity  dens.=%9.3e[%s];' + '\n\t molar heat pwr=%9.3e[%s];' + '\n\t heat pwr dens.=%9.3e[%s];' + \
             '\n\t molar gamma pwr=%9.3e[%s];' + '\n\t gamma pwr dens.=%9.3e[%s];' + \
             '\n\t atoms=%s;' + '\n\t molar radioactivity fractions=%s'
-        return s % (self.name, self.formulaName, self.phase, self.__ReorderFormula(), self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarRadioactivity *
+        return s % (self.name, self.formula_name, self.phase, self.__ReorderFormula(), self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarRadioactivity *
                     self.molarCC, '[Ci/cc]', self.molarHeatPwr, self.molarHeatPwrUnit, self.molarHeatPwr * self.molarCC, '[W/cc]', self.molarGammaPwr, self.molarGammaPwrUnit, self.molarGammaPwr * self.molarCC, '[W/cc]', [i.split('*')[-1] for i in self.formula], ['%9.3e' % i for i in self.molarRadioactivityFractions])
 
     def __repr__(self):
-        s = '\n\t Specie(): name=%s;' + ' formulaName=%s;' + ' phase=%s;' + '\n\t formula=%s;' + '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + ' molar cc=%9.3e[%s];' + ' mass cc=%9.3e[%s];' + '\n\t flag=%s;' + '\n\t molar radioactivity=%9.3e[%s];' + \
+        s = '\n\t Specie(): name=%s;' + ' formula_name=%s;' + ' phase=%s;' + '\n\t formula=%s;' + '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + ' molar cc=%9.3e[%s];' + ' mass cc=%9.3e[%s];' + '\n\t flag=%s;' + '\n\t molar radioactivity=%9.3e[%s];' + \
             '\n\t radioactivity  dens.=%9.3e[%s];' + '\n\t molar heat pwr=%9.3e[%s];' + '\n\t heat pwr dens.=%9.3e[%s];' + \
             '\n\t molar gamma pwr=%9.3e[%s];' + '\n\t gamma pwr dens.=%9.3e[%s];' + \
             '\n\t atoms=%s;' + '\n\t molar radioactivity fractions=%s'
-        return s % (self.name, self.formulaName, self.phase, self.__ReorderFormula(), self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarRadioactivity *
+        return s % (self.name, self.formula_name, self.phase, self.__ReorderFormula(), self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarRadioactivity *
                     self.molarCC, '[Ci/cc]', self.molarHeatPwr, self.molarHeatPwrUnit, self.molarHeatPwr * self.molarCC, '[W/cc]', self.molarGammaPwr, self.molarGammaPwrUnit, self.molarGammaPwr * self.molarCC, '[W/cc]', [i.split('*')[-1] for i in self.formula], ['%9.3e' % i for i in self.molarRadioactivityFractions])
 # *******************************************************************************

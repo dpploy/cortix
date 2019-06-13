@@ -10,6 +10,7 @@
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 '''
 Simple MyModule module template for developers.
+Rename this file name from cortix_module_template.py to my_module.py.
 '''
 #*********************************************************************************
 import os, sys, io, time
@@ -33,8 +34,8 @@ class MyModule():
             ports = list(),
             cortix_start_time = 0.0,
             cortix_final_time = 0.0,
-            cortix_time_step = 0.0,
-            cortix_time_unit = None 
+            cortix_time_step  = 0.0,
+            cortix_time_unit  = None 
                 ):
 
         #.........................................................................
@@ -102,13 +103,11 @@ class MyModule():
 
     def call_ports( self, cortix_time=0.0 ):
         '''
-        Developer must implement this method.
-        Transfer data at cortix_time. Here call the provide ports first. Then use
-        ports second. This is to avoid the use ports failing on data availability.
-        Note that at the start time, calling the use ports is redundant since all
-        initial data must be available at start time. Calling the provide port at
-        start time is also not necessary for computational purposes but necessary
-        for completion of the data available for plotting (for example).
+        The developer must implement this method. The order in which ports are
+        called is left to the developer because depending on the application a
+        use port should be called before the provide port. Or vice versa. In
+        general the provide port is called before the use port. Or the calling
+        order may not matter.
         '''
 
         # Provide data using the 'provide-port-name' of the module.
@@ -166,10 +165,10 @@ class MyModule():
         return
 
     def __get_port_file( self, use_port_name=None, provide_port_name=None ):
-         '''
-         This may return a None port_file.
-         This implementation only works for a single connection per port.
-         '''
+        '''
+        This may return a None port_file.
+        This implementation only works for a single connection per port.
+        '''
 
         port_file = None
 

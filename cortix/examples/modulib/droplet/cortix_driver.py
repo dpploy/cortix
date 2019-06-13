@@ -38,10 +38,10 @@ class CortixDriver():
             manifesto_full_path_file_name,
             work_dir,
             ports=list(),
-            cortix_start_time =0.0,
+            cortix_start_time = 0.0,
             cortix_final_time = 0.0,
-            cortix_time_step = 0.0,
-            cortix_time_unit = None
+            cortix_time_step  = 0.0,
+            cortix_time_unit  = None
             ):
 
         # Sanity tests.
@@ -79,6 +79,7 @@ class CortixDriver():
     def call_ports(self, cortix_time=0.0):
         '''
         Call all ports at cortix_time
+        Cortix will call this first before excution next (execute method).
         '''
 
         self.__log_debug(cortix_time, 'call_ports')

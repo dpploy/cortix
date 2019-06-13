@@ -222,7 +222,7 @@ class Phase():
 
         return None
 
-    def get_quantity(self, name):
+    def get_quantity(self, name, try_time_stamp=None):
         '''
         New version.
         Get the quantity `name` at a point in time closest to `try_time_stamp` up to a
@@ -233,8 +233,8 @@ class Phase():
         name: str
 
         try_time_stamp: float, int or None
-            Time stamp of desired quantity value. Default: None returns the whole
-            quantity history.
+            Time stamp of desired quantity value. Default: None returns the last
+            time stamp quantity value.
 
         Returns
         -------
@@ -244,7 +244,7 @@ class Phase():
         assert name in self.__phase.columns, 'name %r not in %r'%\
                 (name,self.__phase.columns)
 
-        time_stamp = self.__get_time_stamp( None )
+        time_stamp = self.__get_time_stamp( try_time_stamp )
 
         for quant in self.__quantities:
             if quant.name == name:
@@ -396,6 +396,26 @@ class Phase():
         return
 
     def GetValue(self, actor, try_time_stamp=None):
+        '''
+        Deprecated: use get_value()
+        '''
+
+        assert isinstance(actor, str)
+        assert actor in self.__phase.columns, 'actor %r not in %r'% \
+                   (actor,self.__phase.columns)
+
+        if try_time_stamp is not None:
+           assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float)
+
+        time_stamp = self.__get_time_stamp( try_time_stamp )
+        assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
+
+        return self.__phase.loc[time_stamp, actor]
+
+    def get_value(self, actor, try_time_stamp=None):
+        '''
+        Get value of actor in the data frame.
+        '''
 
         assert isinstance(actor, str)
         assert actor in self.__phase.columns, 'actor %r not in %r'% \
@@ -439,6 +459,25 @@ class Phase():
         #   self.__phase[actor] = self.__phase.astype({actor:type(value)})
         #print('*df.dtypes =', self.__phase.dtypes)
         #print('')
+
+        # Note: user value could have a different type than other column values.
+        # If there is a type change, this will not be checked; user has been advised.
+        self.__phase.loc[time_stamp, actor] = value
+
+        return
+
+    def set_value(self, actor, value, try_time_stamp=None):
+        '''
+        New version. Discontinue using SetValue()
+        '''
+        assert isinstance(actor, str)
+        assert actor in self.__phase.columns
+
+        if try_time_stamp is not None:
+           assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float)
+
+        time_stamp = self.__get_time_stamp( try_time_stamp )
+        assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
 
         # Note: user value could have a different type than other column values.
         # If there is a type change, this will not be checked; user has been advised.
@@ -490,9 +529,9 @@ class Phase():
     def __get_time_stamp(self, try_time_stamp=None):
         '''
         Helper method for finding the closest time stamp to `try_time_stamp` in the
-        phase history. The pandas index container used for storing float data type
+        phase history. The `Pandas` index container used for storing float data type
         time stamps will return the nearest time stamp up to a tolerance.
-        Whether the time index has one value, this function will inspect for the
+        Whether or not the time index has one value, this function will inspect for the
         proximity to that value.
 
         Parameters

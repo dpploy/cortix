@@ -10,15 +10,15 @@
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 -->
-<module_manifesto name='wind' version='0.0'>
+<module_manifesto name='vortex' version='0.0'>
 
  <!-- Ports have four types: use and provide -->
 
     <!-- use ports -->
-    <port type='use'     mode='file.pkl' multiplicity='1'>position</port>
+    <port type='use'     mode='file.pkl' multiplicity='999'>position</port>
 
     <!-- provide ports -->
-    <port type='provide' mode='file.pkl' multiplicity='1'>velocity</port>
+    <port type='provide' mode='file.pkl' multiplicity='999'>velocity</port>
     <port type='provide' mode='file.xml' multiplicity='1'>state</port>
     <port type='provide' mode='file.pkl' multiplicity='1'>output</port>
 
@@ -35,9 +35,9 @@
 
     <diagram> 
    ............................................................................
-   .                        __    ____ __  __ _____                           .
-   .                        \\ /\ //|| ||\\|| ||  )                           .
-   .                         \V/\V/ || || \|| ||_//                           .
+   .                  __ __  _____  _____ _____ _____ _  _                    .
+   .                  \\ // ((   )) ||_//  ||   ||==  \\//                    .
+   .                   \V/   \\_//  || \\  ||   ||___ //\\                    .
    .                      ===========================                         .
    .                      |    USE     |  PROVIDE   |                         .
    .                      |============|============|                         .
@@ -48,21 +48,22 @@
    .                      |            | output     |                         .
    .                      ===========================                         .
    ............................................................................
-   . port type='use'     mode='file.pkl' multiplicity='1' position            .
+   . port type='use'     mode='file.pkl' multiplicity='999' position          .
    .                                                                          .
-   . port type='provide' mode='file.xml' multiplicity='1' velocity            .
+   . port type='provide' mode='file.xml' multiplicity='999' velocity          .
    . port type='provide' mode='file.xml' multiplicity='1' state               .
    . port type='provide' mode='file.pkl' multiplicity='1' output              .
    ............................................................................
     </diagram>
 
     <ascii_art>
-    _____________________________
-    . __    __ __ __  __ ____   .
-    . ||    || || ||\ || || \\  .
-    . \\ /\ // || ||\\|| ||  )) .
-    .  \V/\V/  || || \|| ||_//  .
-    _____________________________
+    __________________________________________
+    . __ __   ___   ____  ______  ____ _   _ .
+    . || ||  // \\  || \\ | || | ||    \\ // .
+    . \\ // ((   )) ||_//   ||   ||==   )X(  .
+    .  \V/   \\_//  || \\   ||   ||___ // \\ .
+    __________________________________________
+
     </ascii_art>
 
 </module_manifesto>
