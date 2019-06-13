@@ -132,6 +132,7 @@ class Specie():
 #*********************************************************************************
 # Public Member Functions
 #*********************************************************************************
+<<<<<<< HEAD
 >>>>>>> specie.py
 # Setters and Getters methods
 # -------------------------------------------------------------------------------
@@ -173,7 +174,7 @@ class Specie():
     name = property(GetName, SetName, None, None)
 
     def GetFormulaName(self):
-        
+
         '''
         Returns the formulaic name of the compound. For example, "Dihydrogen
         monoxide".
@@ -187,11 +188,11 @@ class Specie():
         formulaName: str
 
         '''
-        
+
         return self._formulaName
 
     def SetFormulaName(self, f):
-        
+
         '''
         Sets the formulaic name to f.
 
@@ -203,12 +204,11 @@ class Specie():
         -------
         formulaName: str
         '''
-        
         self._formulaName = f
     formulaName = property(GetFormulaName, SetFormulaName, None, None)
 
     def GetPhase(self):
-        
+
         '''
         Returns the phase history of the species.
 
@@ -220,7 +220,7 @@ class Specie():
         -------
         phase: dataFrame
         '''
-        
+
         return self._phase
 
     def SetPhase(self, p):
@@ -847,6 +847,7 @@ class Specie():
 #*********************************************************************************
 
     def __UpdateMolarMass(self):
+       
         '''
         Updates the molar mass of the species after the molecular formula has
         been changed.
@@ -921,6 +922,7 @@ class Specie():
         return
 
     def __ReorderFormula(self):
+       
         '''
         Takes a list of atoms for a molecular or empirical formula and places
         it in order of decreasing magnitude of stoichiometric coefficient. For
@@ -934,6 +936,7 @@ class Specie():
         -------
         atoms2: list
         '''
+
         atoms1 = self._atoms[:]  # shallow copy
         atoms2 = list()
 

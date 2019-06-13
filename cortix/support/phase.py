@@ -329,8 +329,8 @@ class Phase():
         return None
 
     def get_quantity(self, name, try_time_stamp=None):
-
-        '''
+       
+       '''
         New version.
         Get the quantity `name` at a point in time closest to
         `try_time_stamp` up to a tolerance. If no time stamp is passed, the
@@ -612,6 +612,7 @@ class Phase():
         return
 
     def GetValue(self, actor, try_time_stamp=None):
+       
         '''
         Deprecated: use get_value()
         '''
