@@ -5,7 +5,7 @@
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 
-from cortix.src.utils.cortix_units import Unit
+from cortix.src.utils.cortix_units import Units
 
 class CortixTime:
     """
