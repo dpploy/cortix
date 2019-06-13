@@ -5,13 +5,22 @@
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 
+from enum import Enum
+
+class Units(Enum):
+    """
+    Enum for quantitative units used in Cortix
+    """
+    SEC = 0
+    MIN = 1
+    HOUR = 2
+
 class CortixTime:
     """
     This class wraps a time value + a time unit
     """
-    time_units = ["sec", "min", "hour"]
 
-    def __init__(self, time=0.0, unit="SEC"):
+    def __init__(self, time=0.0, unit=Units.SEC):
         self.time = time
         self.set_unit(unit)
 
@@ -19,5 +28,5 @@ class CortixTime:
         self.time = time
 
     def set_unit(self, unit):
-        assert unit.lower() in time_units, "Time unit must be one of: {}".format(time_units)
+        assert isinstance(unit, Units), "time unit must be of type Unit"
         self.unit = unit
