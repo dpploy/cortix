@@ -132,8 +132,7 @@ class Specie():
 #*********************************************************************************
 # Public Member Functions
 #*********************************************************************************
-<<<<<<< HEAD
->>>>>>> specie.py
+
 # Setters and Getters methods
 # -------------------------------------------------------------------------------
 # These are passing arguments by value effectively. Because the python objects
