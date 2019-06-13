@@ -140,7 +140,7 @@ class Droplet():
         # Setup species in the liquid phase.
         species = list()
 
-        water = Specie( name='water', formulaName='H2O(l)', phase='liquid',
+        water = Specie( name='water', formula_name='H2O(l)', phase='liquid',
                 atoms=['2*H','O'] )
 
         water_mass_cc     = 0.99965 # [g/cc]
@@ -443,7 +443,7 @@ class Droplet():
             fout.write('%17s'%('Time[sec]'))
             # Mass density.
             for specie in self.__liquid_phase.GetSpecies():
-              fout.write('%18s'%(specie.formulaName+'['+specie.massCCUnit+']'))
+              fout.write('%18s'%(specie.formula_name+'['+specie.massCCUnit+']'))
             # Quantities.
             for quant in self.__liquid_phase.GetQuantities():
                 if quant.name == 'position' or quant.name == 'velocity':
@@ -516,7 +516,7 @@ class Droplet():
             # Setup the headers.
             for specie in self.__liquid_phase.species:
                 b = ElementTree.SubElement(a,'var')
-                formula_name = specie.formulaName
+                formula_name = specie.formula_name
                 b.set('name',formula_name)
                 unit = specie.massCCUnit
                 b.set('unit',unit)
