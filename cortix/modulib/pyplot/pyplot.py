@@ -95,7 +95,7 @@ class PyPlot():
         self.__cortix_time_unit  = cortix_time_unit
 
         n_time_steps = ( cortix_final_time - cortix_start_time ) / cortix_time_step
-        n_of_times_to_plot = 10 # during the entire run
+        n_of_times_to_plot = 2 # during the entire run
         # How often to plot.
         self.__plot_interval = round( n_time_steps / n_of_times_to_plot ) + 1
 
@@ -408,7 +408,7 @@ class PyPlot():
         '''
 
         nRows = 2
-        nCols = 1
+        nCols = 2
 
         nSequences = len(self.__time_sequences_tmp)
         if nSequences == 0:

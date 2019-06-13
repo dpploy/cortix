@@ -742,8 +742,8 @@ class Vortex():
         '''
 
         import matplotlib.pyplot as plt
-        (fig,axs) = plt.subplots(2,1)
-        fig.subplots_adjust(hspace=0.5)
+        (fig,axs) = plt.subplots(2,2)
+        fig.subplots_adjust(hspace=0.5,wspace=0.5)
 
         for z in npy.flip( npy.linspace(0,self.__box_height,3), 0 ):
             xval = list()
@@ -754,13 +754,13 @@ class Vortex():
                 vortex_velocity = self.__vortex_velocity( npy.array([x,y,z]) )
                 yval.append(vortex_velocity[1])
 
-            axs[0].plot( xval, yval, label='z ='+str(round(z,2))+' [m]' )
+            axs[0,0].plot( xval, yval, label='z ='+str(round(z,2))+' [m]' )
 
-        axs[0].set_xlabel('Radial distance [m]')
-        axs[0].set_ylabel('Tangential speed [m/s]')
-        axs[0].legend(loc='best')
+        axs[0,0].set_xlabel('Radial distance [m]')
+        axs[0,0].set_ylabel('Tangential speed [m/s]')
+        axs[0,0].legend(loc='best')
         fig.suptitle('Vortex Flow')
-        axs[0].grid(True)
+        axs[0,0].grid(True)
 
         xval = list()
         yval = list()
@@ -769,11 +769,11 @@ class Vortex():
             vortex_velocity = self.__vortex_velocity( npy.array([0.0,0.0,z]) )
             xval.append(vortex_velocity[2])
 
-        axs[1].plot(xval,yval)
+        axs[0,1].plot(xval,yval)
 
-        axs[1].set_xlabel('Vertical speed [m/s]')
-        axs[1].set_ylabel('Height [m]')
-        axs[1].grid(True)
+        axs[0,1].set_xlabel('Vertical speed [m/s]')
+        axs[0,1].set_ylabel('Height [m]')
+        axs[0,1].grid(True)
 
         fig.savefig('vortex_'+str(self.__slot_id)+'.png',dpi=200,format='png')
 
