@@ -59,8 +59,6 @@ import sys
 from cortix.support.periodictable import ELEMENTS
 #*********************************************************************************
 
-#*********************************************************************************
-
 class Specie():
     '''
     todo: phase should not be here; concentrations should not be here
@@ -131,14 +129,9 @@ class Specie():
 
         return
 
-
 #*********************************************************************************
 # Public Member Functions
 #*********************************************************************************
-# Setters and Getters methods
-# -------------------------------------------------------------------------------
-# These are passing arguments by value effectively. Because the python objects
-# passed into/out of the function are immutable.
 
     def GetName(self):
         
@@ -175,7 +168,7 @@ class Specie():
     name = property(GetName, SetName, None, None)
 
     def GetFormulaName(self):
-        
+
         '''
         Returns the formulaic name of the compound. For example, "Dihydrogen
         monoxide".
@@ -189,11 +182,11 @@ class Specie():
         formulaName: str
 
         '''
-        
+
         return self._formulaName
 
     def SetFormulaName(self, f):
-        
+
         '''
         Sets the formulaic name to f.
 
@@ -205,12 +198,12 @@ class Specie():
         -------
         formulaName: str
         '''
-        
+
         self._formulaName = f
     formulaName = property(GetFormulaName, SetFormulaName, None, None)
 
     def GetPhase(self):
-        
+
         '''
         Returns the phase history of the species.
 
@@ -222,7 +215,7 @@ class Specie():
         -------
         phase: dataFrame
         '''
-        
+
         return self._phase
 
     def SetPhase(self, p):
