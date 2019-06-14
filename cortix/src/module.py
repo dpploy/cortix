@@ -20,15 +20,27 @@ class Module:
         """
         Send data through a given provide port
         """
-        assert port in self.ports, "Port not port list!"
-        pass
+        if isinstance(port, string):
+            assert port in [p.name for p in self.ports], "Unknown port!"
+        elif isinstance(port, Port):
+            assert port in self.ports, "Unknown port!"
+        else:
+            raise TypeError("port must be of Port or String type")
+
+        # TODO: Implement MPI calls here
 
     def recv(self, port):
         """
         Receive data from a given use port
         """
-        assert port in self.ports, "Port not port list!"
-        pass
+        if isinstance(port, string):
+            assert port in [p.name for p in self.ports], "Unknown port!"
+        elif isinstance(port, Port):
+            assert port in self.ports, "Unknown port!"
+        else:
+            raise TypeError("port must be of Port or String type")
+
+        # TODO: Implement MPI calls here
 
     def add_port(self, port_name, port_type):
         p = Port(port_name, port_type)
