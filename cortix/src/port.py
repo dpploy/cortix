@@ -9,8 +9,8 @@ class PortType(enum.Enum):
     """
     Ports have two types: use & provide
     """
-    use = 0
-    provide = 1
+    USE = 0
+    PROVIDE = 1
 
     def __str__(self):
         return self.name
@@ -21,7 +21,7 @@ class Port:
     and connecting them to other ports.
     '''
 
-    def __init__(self, name=None, type=PortType.use):
+    def __init__(self, name=None, type=PortType.USE):
         self.set_name(name)
         self.set_type(type)
         self.connections = []
@@ -53,8 +53,8 @@ class Port:
 
 if __name__ == "__main__":
     # Create some ports
-    p1 = Port("test1", PortType.use)
-    p2 = Port("test2", PortType.provide)
+    p1 = Port("test1", PortType.USE)
+    p2 = Port("test2", PortType.PROVIDE)
 
     # Connect the ports
     p1.connect(p2)

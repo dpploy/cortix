@@ -12,7 +12,7 @@ class Module:
     Cortix module. It provides facilities for creating and connecting modules within
     the Cortix network.
     """
-    # Global list of ports (must be populated by the module)
+    # Global list of ports (to be inherited by every module)
     ports =  []
     def __init__(self):
         pass
@@ -44,6 +44,9 @@ class Module:
         # TODO: Implement MPI calls here
 
     def add_port(self, port_name, port_type):
+        '''
+        Construct a port and add it to a module
+        '''
         p = Port(port_name, port_type)
         if p not in self.ports:
             self.ports.append(p)
