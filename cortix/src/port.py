@@ -22,9 +22,9 @@ class Port:
     '''
 
     def __init__(self, name=None, type=PortType.use):
-        self.name = name
-        self.type = type
-        self.connections = list()
+        self.set_name(name)
+        self.set_type(type)
+        self.connections = []
 
     def connect(self, port):
         assert isinstance(port, Port), "Connecting port must be of Port type"
@@ -37,12 +37,12 @@ class Port:
             port.connections.append(self)
 
     def set_name(self, name):
-        assert isinstance(name, string), "Port name must be a string"
+        assert isinstance(name, str), "Port name must be a string"
         self.name = name
 
     def set_type(self, port_type):
-        assert isinstance(port_type, PortType), "Port Type must be of class PortType"
-        self.type = type
+        assert isinstance(port_type, PortType), "Port Type must be of type PortType"
+        self.type = port_type
 
     def __eq__(self, other):
         if isinstance(other, Port):

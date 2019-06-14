@@ -4,6 +4,7 @@
 # https://cortix.org
 
 from cortix.src.port import Port
+from cortix.src.port import PortType
 
 class Module:
     """
@@ -19,10 +20,17 @@ class Module:
         """
         Send data through a given provide port
         """
+        assert port in self.ports, "Port not port list!"
         pass
 
     def recv(self, port):
         """
         Receive data from a given use port
         """
+        assert port in self.ports, "Port not port list!"
         pass
+
+    def add_port(self, port_name, port_type):
+        p = Port(port_name, port_type)
+        if p not in self.ports:
+            self.ports.append(p)
