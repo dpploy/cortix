@@ -43,10 +43,10 @@ class Module:
 
         # TODO: Implement MPI calls here
 
-    def add_port(self, port_name, port_type):
+    def add_port(self, port):
         '''
-        Construct a port and add it to a module
+        Add a port to the module
         '''
-        p = Port(port_name, port_type)
-        if p not in self.ports:
-            self.ports.append(p)
+        assert isinstance(port, Port), "port must be of type Port"
+        if port not in self.ports:
+            self.ports.append(port)

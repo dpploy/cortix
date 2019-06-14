@@ -8,14 +8,21 @@ class MyModule(Module):
     def __init__(self):
         print("Hello from MyModule constructor")
 
-if __name__ == "__main__":
-
+def test_module_init():
     # Initialize the module
     m = MyModule()
 
-    # Add ports via parameters
-    m.add_port("test-use", PortType.USE)
-    m.add_port("test-provide", PortType.PROVIDE)
+    # Construct ports
+    p1 = Port("test-use", PortType.USE)
+    p2 = Port("test-provide", PortType.PROVIDE)
+
+    # Add ports to the module
+    m.add_port(p1)
+    m.add_port(p2)
 
     # Output the list of ports
     print(m.ports)
+    assert(len(m.ports) == 2)
+
+if __name__ == "__main__":
+    test_module_init()
