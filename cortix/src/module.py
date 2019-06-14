@@ -14,6 +14,7 @@ class Module:
     """
 
     def __init__(self):
+        self.rank = None
         self.ports =  []
 
     def send(self, data, port):
@@ -49,3 +50,6 @@ class Module:
         assert isinstance(port, Port), "port must be of type Port"
         if port not in self.ports:
             self.ports.append(port)
+
+    def run():
+        raise NotImplementedError("Modules must implement run()")

@@ -5,5 +5,3 @@ class DummyModule(Module):
 
         # Call the Module class constructor
         super().__init__()
-
-        print("Hello from DummyModule constructor")
