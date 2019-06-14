@@ -97,7 +97,7 @@ class Stream():
 # Public Member Functions
 #*********************************************************************************
     def GetTimeStamp(self):
-        
+
         '''
         Returns the time stamp of the stream.
 
@@ -109,11 +109,11 @@ class Stream():
         -------
         self.timeStamp: float
         '''
-        
+
         return self.timeStamp
 
     def GetActors(self):
-        
+
         '''
         Returns the actors present in the stream of data.
 
@@ -125,11 +125,11 @@ class Stream():
         -------
         list(self.stream.columns): list
         '''
-        
+
         return list(self.stream.columns)
 
     def GetSpecie(self, name):
-        
+
         '''
         Returns a specie named "name" from the stream.
 
@@ -141,14 +141,14 @@ class Stream():
         -------
         specie: obj
         '''
-        
+
         for specie in self.species:
             if specie.name == name:
                 return specie
         return None
 
     def GetSpecies(self):
-        
+
         '''
         Returns a list of all species in the stream.
 
@@ -160,11 +160,11 @@ class Stream():
         -------
         self.species: list
         '''
-        
+
         return self.species
 
     def GetQuantities(self):
-        
+
         '''
         Returns all the quantities given by the stream.
 
@@ -176,11 +176,11 @@ class Stream():
         -------
         self.quantities: list
         '''
-        
+
         return self.quantities
 
     def SetSpecieId(self, name, val):
-        
+
         '''
         Sets the numerical id of the specie of name "name" to val.
 
@@ -193,14 +193,14 @@ class Stream():
         -------
         empty
         '''
-        
+
         for specie in self.species:
             if specie.name == name:
                 specie.flag = val
                 return
 
     def GetQuantity(self, name):
-        
+
         '''
         Returns the specified quantity called "name" from the stream, or none
         if the specified name does not exist.
@@ -213,14 +213,14 @@ class Stream():
         -------
         quant: float
         '''
-        
+
         for quant in self.quantities:
             if quant.name == name:
                 return quant
         return None
 
     def GetRow(self, timeStamp=None):
-        
+
         '''
         Returns an entire row of data from the stream. A row of data is all
         the data in a dataframe at a specified time stamp, given by timeStamp.
@@ -236,7 +236,7 @@ class Stream():
         self.stream.loc[self.timestamp, :]) or self.stream.loc[timeStamp, :]):
         list
         '''
-        
+
         if timeStamp is None:
             return list(self.stream.loc[self.timeStamp, :])
         else:
@@ -245,7 +245,7 @@ class Stream():
             return list(self.stream.loc[timeStamp, :])
 
     def GetValue(self, actor, timeStamp=None):
-        
+
         '''
         Returns the value associated with a specified "actor" at a specified
         "timeStamp". If no timeStamp is specified, then the function will
@@ -262,7 +262,7 @@ class Stream():
         self.stream.loc[self.timeStamp, actor] or self.stream.loc[timeStamp,
         actor]: list or float, respectively.
         '''
-        
+
         assert actor in self.stream.columns
         if timeStamp is None:
             return self.stream.loc[self.timeStamp, actor]
@@ -271,7 +271,7 @@ class Stream():
             return self.stream.loc[timeStamp, actor]
 
     def SetValue(self, actor, value=None, timeStamp=None):
-        
+
         '''
         Sets the value associated with a specified actor at a specified
         timeStamp to "value". If no value is specified, the value will default
@@ -288,7 +288,7 @@ class Stream():
         -------
         empty
         '''
-        
+
         assert actor in self.stream.columns
         if timeStamp is None:
             if value is None:
