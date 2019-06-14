@@ -3,6 +3,8 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 
+from cortix.src.port import Port
+
 class Module:
     """
     The representation of a Cortix module. This class is to be inherited by every
