@@ -8,6 +8,7 @@
 import os
 import shutil
 import logging
+from cortix.src.module import Module
 from cortix.src.utils.cortix_units import Units
 from cortix.src.utils.cortix_time import CortixTime
 
@@ -16,9 +17,8 @@ class Cortix:
     The main Cortix class definition.
     '''
 
-    def __init__(self, name, work_dir="/tmp/"):
-        self.name = name
-        self.work_dir = os.path.join(work_dir, self.name + '-wrk/')
+    def __init__(self, work_dir="/tmp/"):
+        self.work_dir = os.path.join(work_dir, 'cortix-wrk/')
 
         # Create the work directory
         shutil.rmtree(self.work_dir, ignore_errors=True)
@@ -34,19 +34,18 @@ class Cortix:
 
         self.modules = list()
 
-        self.log.info('Created Cortix object %s', self.name)
+        self.log.info('Created Cortix object')
 
     def add_module(self, m):
         assert isinstance(m, Module), "m must be a module"
-        self.__modules.append(m)
+        if m not in self.modules:
+            self.modules.append(m)
 
-    def run(self, task_name=None):
+    def run(self):
         '''
-        This method runs every simulation defined by the Cortix object. At the
-        moment this is done one simulation at a time.
+        Run the simulation
         '''
         pass
-        return
 
     def __create_logger(self):
         '''

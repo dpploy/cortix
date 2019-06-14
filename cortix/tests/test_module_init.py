@@ -1,16 +1,11 @@
 from cortix.src.module import Module
-
 from cortix.src.port import Port
 from cortix.src.port import PortType
-
-
-class MyModule(Module):
-    def __init__(self):
-        print("Hello from MyModule constructor")
+from util.dummy_module import DummyModule
 
 def test_module_init():
     # Initialize the module
-    m = MyModule()
+    m = DummyModule()
 
     # Construct ports
     p1 = Port("test-use", PortType.USE)
