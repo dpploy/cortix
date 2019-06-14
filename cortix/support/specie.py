@@ -82,7 +82,7 @@ class Specie():
         self._name = name
 
         assert isinstance(formula_name, str), 'oops not string.'
-        self._formula_name = formula_name
+        self.__formula_name = formula_name
 
         assert isinstance(phase, str), 'oops not string.'
         self._phase = phase
@@ -154,7 +154,7 @@ class Specie():
 
         return self._name
 
-     def SetName(self, n):
+    def SetName(self, n):
 
         '''
         Sets the empirical  name of the species to n.
@@ -183,11 +183,11 @@ class Specie():
 
         Returns
         -------
-        formulaName: str
+        self.__formula_name: str
 
         '''
 
-        return self._formulaName
+        return self.__formula_name
 
     def SetFormulaName(self, f):
 
@@ -200,11 +200,11 @@ class Specie():
 
         Returns
         -------
-        formulaName: str
+        self.__formula_name: str
         '''
 
-        self._formulaName = f
-    formulaName = property(GetFormulaName, SetFormulaName, None, None)
+        self.__formula_name = f
+    formula_name = property(GetFormulaName, SetFormulaName, None, None)
 
     def GetPhase(self):
 
