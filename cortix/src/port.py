@@ -4,16 +4,7 @@
 # https://cortix.org
 
 import enum
-
-class PortType(enum.Enum):
-    """
-    Ports have two types: use & provide
-    """
-    USE = 0
-    PROVIDE = 1
-
-    def __str__(self):
-        return self.name
+from mpi4py import MPI
 
 class Port:
     '''
@@ -21,9 +12,11 @@ class Port:
     and connecting them to other ports.
     '''
 
-    def __init__(self, name=None, type=PortType.USE):
+    def __init__(self, name=None):
         self.set_name(name)
-        self.set_type(type)
+        self.id = None
+        self.comm = MPI.COMM_WORLD
+        self.rank = self.comm.Get_rank()
         self.connections = []
 
     def connect(self, port):
@@ -36,25 +29,31 @@ class Port:
         if self not in port.connections:
             port.connections.append(self)
 
+    def send(self, data):
+        for port in self.connections:
+            self.comm.send(data, dest=port.rank, tag=self.id)
+
+    def recv(self):
+        data = {}
+        for port in self.connections:
+            data[port.name] = self.comm.recv(source=port.rank, tag=port.id)
+        return data
+
     def set_name(self, name):
         assert isinstance(name, str), "Port name must be a string"
         self.name = name
 
-    def set_type(self, port_type):
-        assert isinstance(port_type, PortType), "Port Type must be of type PortType"
-        self.type = port_type
-
     def __eq__(self, other):
         if isinstance(other, Port):
-            return self.name == other.name and self.type == other.type
+            return self.name == other.name
 
     def __repr__(self):
-        return "<{}, {}>".format(self.name, self.type)
+        return self.name
 
 if __name__ == "__main__":
     # Create some ports
-    p1 = Port("test1", PortType.USE)
-    p2 = Port("test2", PortType.PROVIDE)
+    p1 = Port("test1")
+    p2 = Port("test2")
 
     # Connect the ports
     p1.connect(p2)

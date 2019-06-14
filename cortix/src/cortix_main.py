@@ -45,12 +45,23 @@ class Cortix:
             self.modules.append(m)
             m.rank = len(self.modules)
 
+            # Set all port ranks to module rank
+            for port in m.ports:
+                port.rank = m.rank
+
     def run(self):
         '''
         Run the Cortix simulation
         '''
         # Check for correct number of ranks
         assert self.size == len(self.modules) + 1, "Incorrect nprocs"
+
+        # Set port ids
+        i = 0
+        for mod in self.modules:
+            for port in mod.ports:
+                port.id = i
+                i += 1
 
         # Run each module on its own rank 
         for mod in self.modules:

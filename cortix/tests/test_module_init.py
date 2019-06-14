@@ -1,6 +1,5 @@
 from cortix.src.module import Module
 from cortix.src.port import Port
-from cortix.src.port import PortType
 from util.dummy_module import DummyModule
 
 def test_module_init():
@@ -8,8 +7,8 @@ def test_module_init():
     m = DummyModule()
 
     # Construct ports
-    p1 = Port("test-use", PortType.USE)
-    p2 = Port("test-provide", PortType.PROVIDE)
+    p1 = Port("test-1")
+    p2 = Port("test-2")
 
     # Add ports to the module
     m.add_port(p1)
