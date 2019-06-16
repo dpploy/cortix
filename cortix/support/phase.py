@@ -64,6 +64,8 @@ class Phase:
                 ):
         #TODO
         '''
+        Sometimes an empty Phase object is created by user code. This case needs
+        adequate logic for None types.
         Note on usage: when passing quantities, do set the value argument explicitly
         to help define the type and avoid SetValue() errors with Pandas. This is
         to be investigated later. Also, the usage of a DataFrame needs to be re-evaluated.
@@ -72,17 +74,17 @@ class Phase:
         in Phase that are not in sync.
         '''
 
-        if time_unit is None:
-            self.__time_unit = 's' # second
-
         if time_stamp is None:
             time_stamp = 0.0 # default type is float
+        else:
+            assert isinstance(time_stamp, float)
+            self.__time_stamp = time_stamp
 
-        # Sanity tests
-        assert isinstance(time_stamp, float)
-        assert isinstance(time_unit, str)
-
-        self.__time_unit = time_unit
+        if time_unit is None:
+            self.__time_unit = 's' # second
+        else:
+            assert isinstance(time_unit, str)
+            self.__time_unit = time_unit
 
         if species is not None:
             assert isinstance(species, list)
@@ -119,12 +121,14 @@ class Phase:
         # Time stamps will always be float or int
         self.__phase = pandas.DataFrame( index=[float(time_stamp)], columns=names )
 
-        for specie in species:
-            self.__phase.loc[time_stamp, specie.name] = specie.molarCC
+        if species is not None:
+            for specie in species:
+                self.__phase.loc[time_stamp, specie.name] = specie.molarCC
 
-        for quant in quantities:
-            self.__phase.loc[time_stamp, quant.name] = quant.value
-        #self.__phase.fillna( 0.0, inplace=True )  # dtype defaults to float
+        if quantities is not None:
+            for quant in quantities:
+                self.__phase.loc[time_stamp, quant.name] = quant.value
+                #self.__phase.fillna( 0.0, inplace=True )  # dtype defaults to float
 
         return
 
