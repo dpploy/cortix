@@ -45,7 +45,7 @@ from cortix.support.specie   import Specie
 from cortix.support.quantity import Quantity
 #*********************************************************************************
 
-class Phase():
+class Phase:
     '''
     Phase `history` container. A `Phase` consists of `Species` and `Quantities`
     varying with time. This container is meant to reproduce the basic idea of a
@@ -131,6 +131,7 @@ class Phase():
 #*********************************************************************************
 # Public member functions
 #*********************************************************************************
+
     def has_time_stamp(self, try_time_stamp):
 
         '''
@@ -258,7 +259,6 @@ class Phase():
         return list(self.__phase.columns)  # return all names in order
 
     def GetSpecie(self, name):
-
         '''
         Returns the species specified by name if it exists, or none if it
         doesn't.
@@ -282,7 +282,6 @@ class Phase():
         return None
 
     def SetSpecieId(self, name, val):
-
         '''
         Sets the flag of a specie "name" equal to val.
 

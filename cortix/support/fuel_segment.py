@@ -30,8 +30,9 @@ from cortix.support.specie import Specie
 
 class FuelSegment():
 
-    # Todo: Species should not be here. Need to replace by Phase instead.
+    # TODO: Species should not be here. Need to replace by Phase instead.
     #      Chopper will be affected
+
 #*********************************************************************************
 # Construction
 #*********************************************************************************
@@ -73,9 +74,7 @@ class FuelSegment():
 # Public Member Functions
 #*********************************************************************************
 
-
     def get_geometry(self):
-
         '''
         Returns the geometry of the fuel bundle (cylindrical, hexoganol,
         rectangular, etc).
@@ -135,7 +134,6 @@ class FuelSegment():
 
 # Get stored fuel segment property either overall or on a nuclide basis
 def get_attribute(self, name, nuclide=None, series=None):
-
         '''
         Used to get stored fuel segment properties, either overall (as an
         average), or on a nuclide basis. "name" in this case refers to the
@@ -154,7 +152,7 @@ def get_attribute(self, name, nuclide=None, series=None):
         and heat and heat-dens, respectively).
 
         Finally, density or total mass of a specific nuclide can be determined
-        by passing a specific nuclide to the function, with a name value of 
+        by passing a specific nuclide to the function, with a name value of
         mass or mass-cc.
 
 
@@ -166,6 +164,7 @@ def get_attribute(self, name, nuclide=None, series=None):
 
         Returns
         -------
+        many types
 
         '''
 
@@ -456,7 +455,6 @@ def get_attribute(self, name, nuclide=None, series=None):
 #*********************************************************************************
 
     def __get_fuel_segment_volume(self):
-
         '''
         Returns the total volume of fuel in the fuel segment.
 
@@ -476,7 +474,6 @@ def get_attribute(self, name, nuclide=None, series=None):
 
         return volume
 
-# Printing of data members
     def __str__(self):
 
         '''
@@ -512,4 +509,5 @@ def get_attribute(self, name, nuclide=None, series=None):
 
         s = 'FuelSegment(): %s\n %s\n'
         return s % (self.__geometry, self.__species)
-#============================ # end class fuel_segment ============================
+
+#============================ end class FuelSegment ==============================

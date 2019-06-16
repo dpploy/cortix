@@ -68,7 +68,7 @@ class Actor():
 
         Returns
         -------
-        atoms: str
+        atoms: list(str)
         '''
 
         return self.__atoms

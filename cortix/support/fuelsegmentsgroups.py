@@ -183,7 +183,7 @@ class FuelSegmentsGroups():
 #     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)
 
 #*********************************************************************************
-# Private Helper Functions
+# Private helper functions (internal use: __)
 #*********************************************************************************
 
 # If an attibute is not found, Return 0 even if a groupKey is not found
@@ -366,9 +366,5 @@ class FuelSegmentsGroups():
         assert len(self.groups[groupKey]) == nSegments - 1, 'fatal.'
 
         return
-
-#*********************************************************************************
-# Private helper functions (internal use: __)
-#*********************************************************************************
 
 #========================= end class FuelSegmentsGroups ==========================

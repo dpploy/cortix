@@ -8,7 +8,7 @@
 #
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
-"""
+'''
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 
 Nuclides container.
@@ -19,9 +19,8 @@ some other fission/transmutation code.
 VFdALib support classes
 
 Sat Jun 27 14:46:49 EDT 2015
-"""
-
-# *******************************************************************************
+'''
+#*********************************************************************************
 import os
 import sys
 import io
@@ -33,12 +32,13 @@ import pandas
 
 from cortix.support.periodictable import ELEMENTS
 from cortix.support.periodictable import SERIES
-# *******************************************************************************
+#*********************************************************************************
 
-# *******************************************************************************
+class Nuclides:
 
-
-class Nuclides():
+#*********************************************************************************
+# Construction 
+#*********************************************************************************
 
     def __init__(self,
                  propertyDensities=pandas.DataFrame()
@@ -67,21 +67,26 @@ class Nuclides():
 
         return
 
-# *******************************************************************************
-# Setters and Getters methods
-# -------------------------------------------------------------------------------
-# These are passing arguments by value effectively. Because the python objects
-# passed into/out of the function are immutable.
+#*********************************************************************************
+# Public member functions
+#*********************************************************************************
 
     def GetAttribute(self, name, symbol=None, series=None):
         return self.__GetAttribute(name, symbol, series)
 
+# def __str__( self ):
+#     s = ' %5s %5s %5s '+' molar mass: %6s '+' molar cc: %6s '+' mass cc: %6s '+' flag: %s '+'# atoms: %s'+' atoms: %s\n'
+#     return s % (self.name, self.formulaName, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)
+#
+# def __repr__( self ):
+#     s = ' %5s %5s %5s '+' molar mass: %6s '+' molar cc: %6s '+' mass cc: %6s '+' flag: %s '+'# atoms: %s'+' atoms: %s\n'
+#     return s % (self.name, self.formulaName, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)
 
-# *********************************************************************************
+#*********************************************************************************
+# Private helper functions (internal use: __)
+#*********************************************************************************
 
 # Get property either overall or on a nuclide basis
-
-# ---------------------------------------------------------------------------------
 
     def __GetAttribute(self, attributeName, symbol=None, series=None):
 
@@ -319,15 +324,4 @@ class Nuclides():
 
             return float(density)  # avoid numpy.float64.type
 
-# *********************************************************************************
-
-# *******************************************************************************
-# Printing of data members
-# def __str__( self ):
-#     s = ' %5s %5s %5s '+' molar mass: %6s '+' molar cc: %6s '+' mass cc: %6s '+' flag: %s '+'# atoms: %s'+' atoms: %s\n'
-#     return s % (self.name, self.formulaName, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)
-#
-# def __repr__( self ):
-#     s = ' %5s %5s %5s '+' molar mass: %6s '+' molar cc: %6s '+' mass cc: %6s '+' flag: %s '+'# atoms: %s'+' atoms: %s\n'
-#     return s % (self.name, self.formulaName, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)
-# *******************************************************************************
+#======================= end class Nuclide =======================================

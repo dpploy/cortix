@@ -25,7 +25,6 @@ VFdALib support classes
 
 Thu Dec 15 16:18:39 EST 2016
 '''
-
 # *******************************************************************************
 import os
 import sys
@@ -41,9 +40,6 @@ from cortix.support.periodictable import ELEMENTS
 from cortix.support.periodictable import SERIES
 from cortix.support.phase import Phase
 # *******************************************************************************
-
-# *******************************************************************************
-
 
 class FuelSlug():
 
@@ -120,17 +116,6 @@ class FuelSlug():
         self._fuelHollowSphereRi = ri
 
         return
-
-
-# *******************************************************************************
-
-# *******************************************************************************
-
-# *******************************************************************************
-# Setters and Getters methods
-# -------------------------------------------------------------------------------
-# These are passing arguments by value effectively. Because the python objects
-# passed into/out of the function are immutable.
 
 #*********************************************************************************
 # Public Member Functions
@@ -246,9 +231,16 @@ class FuelSlug():
 
         self.__ReduceFuelVolume(dissolvedVolume)
 
+    def __str__(self):
+        s = 'FuelSlug(): \n\t specs \n\t %s \n\t fuelPhase \n\t %s \n\t claddingPhase \n\t %s'
+        return s % (self._specs, self._fuelPhase, self._claddingPhase)
+
+    def __repr__(self):
+        s = 'FuelSlug(): \n\t specs \n\t %s \n\t fuelPhase \n\t %s \n\t claddingPhase \n\t %s'
+        return s % (self._specs, self._fuelPhase, self._claddingPhase)
 
 # Get stored fuel slug property either overall or on a nuclide basis
-# ---------------------------------------------------------------------------------
+
 #*********************************************************************************
 # Private Member Functions (Internal use: __)
 #*********************************************************************************
@@ -605,7 +597,7 @@ class FuelSlug():
             else:
 
                 assert False
-# ---------------------------------------------------------------------------------
+
     def __GetSlugLength(self):
 
 
@@ -623,7 +615,6 @@ class FuelSlug():
 
         return self._specs['Slug length [cm]']
 
-# ---------------------------------------------------------------------------------
     def __GetFuelLength(self):
 
 
@@ -646,7 +637,6 @@ class FuelSlug():
 
         return fuelLength
 
-# ---------------------------------------------------------------------------------
     def __GetSlugVolume(self):
 
 
@@ -675,7 +665,6 @@ class FuelSlug():
 
         return outerSlugVolume + innerSlugVolume
 
-# ---------------------------------------------------------------------------------
     def __GetFuelVolume(self):
 
 
@@ -714,7 +703,6 @@ class FuelSlug():
 
         return volume
 
-# ---------------------------------------------------------------------------------
     def __GetCladdingVolume(self):
 
 
@@ -735,7 +723,6 @@ class FuelSlug():
 
         return slugVolume - fuelVolume
 
-# ---------------------------------------------------------------------------------
     def __GetFuelArea(self):
 
 
@@ -786,7 +773,6 @@ class FuelSlug():
 
         return outerSlugFuelArea + innerSlugFuelArea
 
-# ---------------------------------------------------------------------------------
     def __GetCladdingArea(self):
 
 
@@ -828,7 +814,6 @@ class FuelSlug():
 
         return outerSlugArea + innerSlugArea
 
-# ---------------------------------------------------------------------------------
     def __GetEquivalentCladdingArea(self):
 
 
@@ -852,7 +837,6 @@ class FuelSlug():
 
         return area
 
-# ---------------------------------------------------------------------------------
     def __GetEquivalentCladdingVolume(self):
 
 
@@ -876,7 +860,6 @@ class FuelSlug():
 
         return volume
 
-# ---------------------------------------------------------------------------------
     def __GetEquivalentFuelVolume(self):
 
 
@@ -900,7 +883,6 @@ class FuelSlug():
 
         return volume
 
-# ---------------------------------------------------------------------------------
     def __GetEquivalentFuelArea(self):
 
 
@@ -923,11 +905,7 @@ class FuelSlug():
 
         return area
 
-
-# *********************************************************************************
 # Shrink the volume based on the equivalent cladding hollow sphere
-
-# ---------------------------------------------------------------------------------
 
     def __ReduceCladdingVolume(self, dissolvedVolume):
 
@@ -1003,9 +981,6 @@ class FuelSlug():
 
         self._claddingPhase.SetValue('mass', massDens * volume)
 
-
-# ---------------------------------------------------------------------------------
-
     def __ReduceFuelVolume(self, dissolvedVolume):
 
 
@@ -1075,18 +1050,4 @@ class FuelSlug():
 
         self._fuelPhase.SetValue('mass', massDens * volume)
 
-
-# *********************************************************************************
-
-
-# *******************************************************************************
-# Printing of data members
-
-    def __str__(self):
-        s = 'FuelSlug(): \n\t specs \n\t %s \n\t fuelPhase \n\t %s \n\t claddingPhase \n\t %s'
-        return s % (self._specs, self._fuelPhase, self._claddingPhase)
-
-    def __repr__(self):
-        s = 'FuelSlug(): \n\t specs \n\t %s \n\t fuelPhase \n\t %s \n\t claddingPhase \n\t %s'
-        return s % (self._specs, self._fuelPhase, self._claddingPhase)
-#=============================end class fuelSlug:=================================
+#============================ end class FuelSlug =================================

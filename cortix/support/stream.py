@@ -17,7 +17,6 @@ VFdALib support classes
 
 Sat Aug 15 17:24:02 EDT 2015
 '''
-
 #*********************************************************************************
 import os
 import sys
@@ -27,10 +26,8 @@ from cortix.support.specie import Specie
 from cortix.support.quantity import Quantity
 #*********************************************************************************
 
-#*********************************************************************************
+class Stream:
 
-
-class Stream():
 #*********************************************************************************
 # Construction
 #*********************************************************************************
@@ -87,15 +84,10 @@ class Stream():
 
         return
 
-
-# Setters and Getters methods
-# -------------------------------------------------------------------------------
-# These are passing arguments by value effectively. Because the python objects
-# passed into/out of the function are immutable.
-
 #*********************************************************************************
 # Public Member Functions
 #*********************************************************************************
+
     def GetTimeStamp(self):
 
         '''
@@ -303,8 +295,6 @@ class Stream():
             else:
                 self.stream.loc[timeStamp, actor] = float(value)
 
-# *******************************************************************************
-# Printing of data members
 # def __str__( self ):
 #     s = ' %5s %5s %5s '+' molar mass: %6s '+' molar cc: %6s '+' mass cc: %6s '+' flag: %s '+'# atoms: %s'+' atoms: %s\n'
 #     return s % (self.name, self.formulaName, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)
@@ -312,5 +302,9 @@ class Stream():
 # def __repr__( self ):
 #     s = ' %5s %5s %5s '+' molar mass: %6s '+' molar cc: %6s '+' mass cc: %6s '+' flag: %s '+'# atoms: %s'+' atoms: %s\n'
 #     return s % (self.name, self.formulaName, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)
-# *******************************************************************************
-#==============================end class stream:==================================
+
+#*********************************************************************************
+# Private helper functions (internal use: __)
+#*********************************************************************************
+
+#============================= end class Stream ==================================

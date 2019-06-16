@@ -24,7 +24,7 @@ import sys
 import numpy as npy
 #*********************************************************************************
 
-class Quantity():
+class Quantity:
     '''
     todo: this probably should not have a "value" for the same reason as Specie.
           this needs some thinking.
@@ -130,7 +130,6 @@ class Quantity():
     value = property(GetValue, SetValue, None, None)
 
     def SetFormalName(self, fn):
-
         '''
         Sets the formal name of the property to fn.
 
@@ -197,11 +196,9 @@ class Quantity():
         return self.__unit
     unit = property(GetUnit, SetUnit, None, None)
 
-
 #*********************************************************************************
 # Private helper functions (internal use: __)
 #*********************************************************************************
-
 
     def __str__(self):
 
