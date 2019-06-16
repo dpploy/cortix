@@ -46,8 +46,8 @@ sphinx-apidoc -o examples_rst/modulib_rst ../examples/modulib
 # Build docs for droplet subdirectory
 sphinx-apidoc -o examples_rst/modulib_rst/droplet_rst ../examples/modulib/droplet
 
-# Build docs for wind subdirectory
-sphinx-apidoc -o examples_rst/modulib_rst/wind_rst ../examples/modulib/wind
+# Build docs for vortex subdirectory
+sphinx-apidoc -o examples_rst/modulib_rst/vortex_rst ../examples/modulib/vortex
 
 # Build docs for notebook_run subdirectory
 #sphinx-apidoc -o examples_rst/notebook_run_rst ../examples/notebook_run
