@@ -5,6 +5,7 @@
 
 import enum
 from mpi4py import MPI
+from threading import Thread
 
 class Port:
     '''
@@ -18,6 +19,7 @@ class Port:
         self.comm = MPI.COMM_WORLD
         self.rank = self.comm.Get_rank()
         self.connections = []
+        self.data = {}
 
     def connect(self, port):
         assert isinstance(port, Port), "Connecting port must be of Port type"
@@ -29,14 +31,23 @@ class Port:
         if self not in port.connections:
             port.connections.append(self)
 
-    def send(self, data):
-        for port in self.connections:
+    def send(self, port, data):
+        if port in self.connections:
             self.comm.send(data, dest=port.rank, tag=self.id)
 
-    def recv(self):
+
+    def send_all(self, data):
+        for port in self.connections:
+            self.send(port, data)
+
+    def recv(self, port):
+        if port in self.connections:
+            return self.comm.recv(source=port.rank, tag=port.id)
+
+    def recv_all(self):
         data = {}
         for port in self.connections:
-            data[port.name] = self.comm.recv(source=port.rank, tag=port.id)
+            data[port.name] = self.recv(port)
         return data
 
     def set_name(self, name):
