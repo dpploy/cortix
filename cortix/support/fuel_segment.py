@@ -135,7 +135,7 @@ class FuelSegment():
 
 # Get stored fuel segment property either overall or on a nuclide basis
 def get_attribute(self, name, nuclide=None, series=None):
-        
+
         '''
         Used to get stored fuel segment properties, either overall (as an
         average), or on a nuclide basis. "name" in this case refers to the
@@ -491,7 +491,7 @@ def get_attribute(self, name, nuclide=None, series=None):
         -------
         s: str
         '''
-        
+
         s = 'FuelSegment(): %s\n %s\n'
         return s % (self.__geometry, self.__species)
 

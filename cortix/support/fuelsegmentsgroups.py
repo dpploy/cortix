@@ -72,7 +72,8 @@ class FuelSegmentsGroups():
 
     def HasGroup(self, key):
         '''
-        Checks if the specified key has a group of fuel segments associated with it.
+        Checks if the specified key has a group of fuel segments associated
+        with it.
 
         Parameters
         ----------
@@ -87,10 +88,10 @@ class FuelSegmentsGroups():
 
     def AddGroup(self, key, fuelSegments=None):
         '''
-        Appends the dictionary with a new key and associated list of fuelSegments.
-        If the specified key is already present in the dictionary, then the specified
-        list of fuel segments will be appended to the list of fuel segments already
-        associated with the specified key.
+        Appends the dictionary with a new key and associated list of
+        fuelSegments. If the specified key is already present in the
+        dictionary, then the specified list of fuel segments will be appended
+        to the list of fuel segments already associated with the specified key.
 
         Parameters
         ----------
@@ -110,13 +111,13 @@ class FuelSegmentsGroups():
     def GetAttribute(self, groupKey=None, attributeName=None,
                      nuclideSymbol=None, nuclideSeries=None):
         '''
-        Returns the average value of an attribute amongst all elements in a group
-        (WARNING: keys with no values associated with them will lower this average!).
-        If groupKey is not specified, the function will return the average attribute
-        value of every fuel segment element in the entire dictionary. If attribute
-        is not specified, the function call will fail. If the key value specified
-        does not match any keys in the dictionary, the function will return a value
-        of 0.
+        Returns the average value of an attribute amongst all elements in a
+        group (WARNING: keys with no values associated with them will lower
+        this average!). If groupKey is not specified, the function will return
+        the average attribute value of every fuel segment element in the
+        entire dictionary. If attribute is not specified, the function call
+        will fail. If the key value specified does not match any keys in the
+        dictionary, the function will return a value of 0.
 
         Parameters
         ----------
@@ -138,10 +139,10 @@ class FuelSegmentsGroups():
 
     def GetFuelSegments(self, groupKey=None):
         '''
-        Returns a list of fuel segments associated with a specified groupkey. If
-        no group key is specified, then all elements in the dictionary will be
-        returned. If the specified group key does not exist, then the function
-        will return an empty list.
+        Returns a list of fuel segments associated with a specified groupkey.
+        If no group key is specified, then all elements in the dictionary
+        will be returned. If the specified group key does not exist, then the
+        function will return an empty list.
 
         Parameters
         ----------
@@ -156,9 +157,9 @@ class FuelSegmentsGroups():
 
     def RemoveFuelSegment(self, groupKey, fuelSegment):
         '''
-        Removes a fuel segment from a list associated with a specified group key.
-        If the specified group key or fuel segment do not exist, the function will
-        fail.
+        Removes a fuel segment from a list associated with a specified group
+        key. If the specified group key or fuel segment do not exist, the
+        function will fail.
 
         Parameters
         ----------
@@ -263,11 +264,11 @@ class FuelSegmentsGroups():
 
     def __GetFuelSegments(self, groupKey=None):
         '''
-        Returns a list of fuel segments associated with a given group (if groupKey
-        is specified), or an ordered list of pairs of all segments in all groups
-        and their keys. [ (timeStamp, fuelSegment), (timeStamp, fuelSegment), ..].
-        If the specified groupKey does not exist, this function will return an
-        empty list.
+        Returns a list of fuel segments associated with a given group
+        (if groupKey is specified), or an ordered list of pairs of all
+        segments in all groups and their keys. [ (timeStamp, fuelSegment),
+        (timeStamp, fuelSegment), ..]. If the specified groupKey does not
+        exist, this function will return an empty list.
 
         Parameters
         ----------
@@ -308,9 +309,9 @@ class FuelSegmentsGroups():
         '''
         If a list of fuel segments and a group key is specified, the
         fuelSegment list is appended to the specified groupKey. If the groupKey
-        specified does not already exist, a new one is created and the fuelSegments
-        list is appended to it. fuelSegments is ALWAYS a list, and may be empty.
-        A group will ALWAYS have a  fuelSegments list.
+        specified does not already exist, a new one is created and the
+        fuelSegments list is appended to it. fuelSegments is ALWAYS a list,
+        and may be empty. A group will ALWAYS have a  fuelSegments list.
 
         Parameters
         ----------
@@ -337,9 +338,9 @@ class FuelSegmentsGroups():
 
     def __RemoveFuelSegment(self, groupKey, fuelSegment_remove):
         '''
-        Removes a fuel segment from a list associated with a specified group key.
-        If the specified group key or fuel segment do not exist, the function will
-        fail.
+        Removes a fuel segment from a list associated with a specified group
+        key. If the specified group key or fuel segment do not exist, the
+        function will fail.
 
         Parameters
         ----------
