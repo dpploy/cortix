@@ -54,7 +54,8 @@ class Cortix:
         Run the Cortix simulation
         '''
         # Check for correct number of ranks
-        assert self.size == len(self.modules) + 1, "Incorrect nprocs"
+        assert self.size == len(self.modules) + 1, "Incorrect number of \
+        processes (Required {}, got {})".format(self.size, len(self.modules))
 
         # Set port ids
         i = 0
@@ -63,7 +64,7 @@ class Cortix:
                 port.id = i
                 i += 1
 
-        # Run each module on its own rank 
+        # Run each module on its own rank
         for mod in self.modules:
             if self.rank == mod.rank:
                 self.log.info("Launching Module {} on rank {}".format(mod, self.rank))
