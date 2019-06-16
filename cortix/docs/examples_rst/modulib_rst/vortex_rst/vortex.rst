@@ -1,7 +1,7 @@
-wind
-====
+vortex module
+=============
 
-.. automodule:: wind
+.. automodule:: vortex
     :members:
     :undoc-members:
     :show-inheritance:
