@@ -132,11 +132,6 @@ class Specie():
 # Public Member Functions
 #*********************************************************************************
 
-# Setters and Getters methods
-# -------------------------------------------------------------------------------
-# These are passing arguments by value effectively. Because the python objects
-# passed into/out of the function are immutable.
-
     def GetName(self):
 
         '''
@@ -1009,4 +1004,4 @@ class Specie():
             '\n\t atoms=%s;' + '\n\t molar radioactivity fractions=%s'
         return s % (self.name, self.__formula_name, self.phase, self.__ReorderFormula(), self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarRadioactivity *
                     self.molarCC, '[Ci/cc]', self.molarHeatPwr, self.molarHeatPwrUnit, self.molarHeatPwr * self.molarCC, '[W/cc]', self.molarGammaPwr, self.molarGammaPwrUnit, self.molarGammaPwr * self.molarCC, '[W/cc]', [i.split('*')[-1] for i in self.formula], ['%9.3e' % i for i in self.molarRadioactivityFractions])
-#============================= end class Specie: =================================
+#============================= end class Specie ==================================
