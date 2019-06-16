@@ -1,34 +1,47 @@
 from cortix.src.module import Module
-
-import os
-import numpy as npy
 from threading import Thread
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-from matplotlib.ticker import MultipleLocator
 
 class DataPlot(Module):
     def __init__(self):
         super().__init__()
 
-        # Time data: port -> data
-        self.time_data = {}
+        self.xlabel = None
+        self.ylabel = None
+        self.title = None
 
     def run(self):
         # Spawn a thread to handle each module
-        threads = []
         for port in self.ports:
-            thread = Thread(target=self.plot_data, args=(port,))
+            thread = Thread(target=self.recv_data, args=(port,))
             thread.start()
-            threads.append(thread)
 
-        for t in threads:
-            t.join()
-
-    def plot_data(self, port):
+    def recv_data(self, port):
+        data = []
         while True:
-            data = self.recv(port)
-            print("Got data = {}".format(data))
+            d = self.recv(port)
+            print("Got data = {}".format(d))
 
             # Exit thread when encountering DONE
-            if data == "DONE": exit(0)
+            if d == "DONE":
+                self.plot_data(data, port)
+                exit(0)
+
+            data.append(d)
+
+    def plot_data(self, data, port):
+        plt.xlabel(self.xlabel)
+        plt.ylabel(self.ylabel)
+        plt.title(self.title)
+        print(data)
+        plt.plot(data)
+        plt.savefig("{}.png".format(port.name))
+
+    def set_xlabel(self, xlabel):
+        self.xlabel = xlabel
+
+    def set_ylabel(self, ylabel):
+        self.ylabel = ylabel
+
+    def set_title(self, title):
+        self.title = title
