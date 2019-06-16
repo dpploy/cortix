@@ -1,12 +1,13 @@
 from cortix.src.module import Module
 from cortix.src.port import Port
 from cortix.util.dataplot import DataPlot
+from cortix.src.cortix_main import Cortix
 
 class PlotData(Module):
-    def __init__():
+    def __init__(self):
         super().__init__()
 
-    def run():
+    def run(self):
         i = 0
         while i < 10:
             data = (i, i**2)

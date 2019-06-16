@@ -29,7 +29,7 @@ class Module:
         else:
             raise TypeError("port must be of Port or String type")
 
-        port.send(data)
+        port.send_all(data)
 
     def recv(self, port):
         """
@@ -43,7 +43,7 @@ class Module:
             assert port in self.ports, "Unknown port!"
         else:
             raise TypeError("port must be of Port or String type")
-        return port.recv()
+        return port.recv_all()
 
     def add_port(self, port):
         """
