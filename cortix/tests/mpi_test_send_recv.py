@@ -1,8 +1,8 @@
 from cortix.src.module import Module
 from cortix.src.port import Port
 
-from util.dummy_module import DummyModule
-from util.dummy_module import DummyModule2
+from cortix.examples.dummy_module import DummyModule
+from cortix.examples.dummy_module import DummyModule2
 
 
 from cortix.src.cortix_main import Cortix

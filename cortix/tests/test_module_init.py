@@ -2,7 +2,7 @@
 
 from cortix.src.module import Module
 from cortix.src.port import Port
-from util.dummy_module import DummyModule
+from cortix.examples.dummy_module import DummyModule
 
 def test_module_init():
     # Initialize the module
