@@ -12,8 +12,8 @@ class DummyModule(Module):
         # Simulate sending data every second
         i = 0
         while i < 10:
-            sleep(5)
-            self.send("test-port1", i)
+            sleep(1)
+            self.send(i, "test-port1")
             print("Sent {}!".format(i))
             i += 1
 
@@ -36,11 +36,9 @@ class DummyModule2(Module):
             data = self.recv("test-port2")
 
             # Extract the data only from test-port1
+            print("Received {}!".format(data))
 
-            port1_data = data["test-port1"]
-            print("Received {}!".format(port1_data))
-
-            assert(port1_data == i)
+            assert(data == i)
             i += 1
 
         print("Finished Receiving!")

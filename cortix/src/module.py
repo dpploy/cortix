@@ -16,7 +16,7 @@ class Module:
         self.rank = None
         self.ports =  []
 
-    def send(self, port, data):
+    def send(self, data, port):
         """
         Send data through a given provide port
         """
@@ -29,7 +29,7 @@ class Module:
         else:
             raise TypeError("port must be of Port or String type")
 
-        port.send_all(data)
+        port.send(data)
 
     def recv(self, port):
         """
@@ -43,7 +43,7 @@ class Module:
             assert port in self.ports, "Unknown port!"
         else:
             raise TypeError("port must be of Port or String type")
-        return port.recv_all()
+        return port.recv()
 
     def add_port(self, port):
         """

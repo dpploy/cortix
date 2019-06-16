@@ -30,10 +30,8 @@ class Cortix:
         # Setup the global logger
         self.__create_logger()
 
-        # Simulation time parameters 
-        self.start_time = CortixTime()
-        self.evolve_time = CortixTime()
-        self.time_step = CortixTime()
+        # Simulation time parameters
+        self.duration = CortixTime()
 
         self.modules = []
 

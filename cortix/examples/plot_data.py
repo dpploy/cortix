@@ -11,9 +11,10 @@ class PlotData(Module):
         i = 0
         while i < 10:
             data = (i, i**2)
-            self.send("plot-out", data)
+            self.send(data, "plot-out")
             print("Sent {}!".format(data))
             i += 1
+        self.send("DONE", "plot-out")
         print("Finished sending!")
 
 if __name__ == "__main__":

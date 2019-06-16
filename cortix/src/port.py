@@ -18,37 +18,20 @@ class Port:
         self.id = None
         self.comm = MPI.COMM_WORLD
         self.rank = self.comm.Get_rank()
-        self.connections = []
+        self.connected = None
         self.data = {}
 
     def connect(self, port):
         assert isinstance(port, Port), "Connecting port must be of Port type"
 
-        # Maintain two way connection
-        if port not in self.connections:
-            self.connections.append(port)
+        self.connected = port
+        port.connected = self
 
-        if self not in port.connections:
-            port.connections.append(self)
+    def send(self, data):
+        self.comm.send(data, dest=self.connected.rank, tag=self.id)
 
-    def send(self, port, data):
-        if port in self.connections:
-            self.comm.send(data, dest=port.rank, tag=self.id)
-
-
-    def send_all(self, data):
-        for port in self.connections:
-            self.send(port, data)
-
-    def recv(self, port):
-        if port in self.connections:
-            return self.comm.recv(source=port.rank, tag=port.id)
-
-    def recv_all(self):
-        data = {}
-        for port in self.connections:
-            data[port.name] = self.recv(port)
-        return data
+    def recv(self):
+        return self.comm.recv(source=self.connected.rank, tag=self.connected.id)
 
     def set_name(self, name):
         assert isinstance(name, str), "Port name must be a string"
@@ -72,5 +55,5 @@ if __name__ == "__main__":
     # View connections
     print(p1)
     print(p2)
-    print(p1.connections)
-    print(p2.connections)
+    print(p1.connected)
+    print(p2.connected)
