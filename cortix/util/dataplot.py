@@ -33,8 +33,7 @@ class DataPlot(Module):
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
         plt.title(self.title)
-        print(data)
-        plt.plot(data)
+        plt.plot([x[0] for x in data], [x[1] for x in data])
         plt.savefig("{}.png".format(port.name))
 
     def set_xlabel(self, xlabel):

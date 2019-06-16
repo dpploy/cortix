@@ -21,6 +21,9 @@ if __name__ == "__main__":
 
     # Cortix built-in DataPlot module
     d = DataPlot()
+    d.set_title("Test Plot")
+    d.set_xlabel("Time")
+    d.set_ylabel("Position")
 
     # Custom class to send dummy data
     p = PlotData()
