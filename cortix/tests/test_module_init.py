@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from cortix.src.module import Module
 from cortix.src.port import Port
 from util.dummy_module import DummyModule
