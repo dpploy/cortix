@@ -41,7 +41,7 @@ from cortix.support.periodictable import SERIES
 from cortix.support.phase import Phase
 # *******************************************************************************
 
-class FuelSlug():
+class FuelSlug:
 
 #*********************************************************************************
 # Construction
@@ -49,7 +49,7 @@ class FuelSlug():
 
     def __init__(self,
                  specs=pandas.Series(),
-                 fuelPhase=Phase(),
+                 fuelPhase = Phase(),
                  claddingPhase=Phase()
                  ):
 

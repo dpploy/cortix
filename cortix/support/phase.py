@@ -72,17 +72,17 @@ class Phase:
         in Phase that are not in sync.
         '''
 
-        # Sanity tests
-        assert isinstance(time_stamp, float)
-        assert isinstance(time_unit, str)
-
-        self.__time_unit = time_unit
-
         if time_unit is None:
             self.__time_unit = 's' # second
 
         if time_stamp is None:
             time_stamp = 0.0 # default type is float
+
+        # Sanity tests
+        assert isinstance(time_stamp, float)
+        assert isinstance(time_unit, str)
+
+        self.__time_unit = time_unit
 
         if species is not None:
             assert isinstance(species, list)

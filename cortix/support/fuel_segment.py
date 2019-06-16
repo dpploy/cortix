@@ -95,7 +95,7 @@ class FuelSegment():
 
         '''
         Returns the species object which describes the composition of the fuel
-        bundle. The species encapsulates all chemical species present in the 
+        bundle. The species encapsulates all chemical species present in the
         fuel bundle.
         Parameters
         ----------
@@ -112,7 +112,7 @@ class FuelSegment():
     def get_specie(self, name):
 
         '''
-        Returns a specie named [name] from the list of species making up the 
+        Returns a specie named [name] from the list of species making up the
         fuel bundle. If no name is specified, this function will return None.
 
 
@@ -133,7 +133,7 @@ class FuelSegment():
     specie = property(get_specie, None, None, None)
 
 # Get stored fuel segment property either overall or on a nuclide basis
-def get_attribute(self, name, nuclide=None, series=None):
+    def get_attribute(self, name, nuclide=None, series=None):
         '''
         Used to get stored fuel segment properties, either overall (as an
         average), or on a nuclide basis. "name" in this case refers to the
@@ -431,7 +431,8 @@ def get_attribute(self, name, nuclide=None, series=None):
                                 '*')[1].split('-')[0].strip()
                             formula_nuclide_mass_number = int(
                                 item.split('*')[1].split('-')[1].strip('m'))
-                            formula_nuclide_molar_mass = ELEMENTS[formula_nuclides_symbol].isotopes[formula_nuclide_mass_number].mass
+                            formula_nuclide_molar_mass = \
+                                    ELEMENTS[formula_nuclides_symbol].isotopes[formula_nuclide_mass_number].mass
 
                             if formula_nuclides_symbol == nuclide:
                                 mole_fraction = float(
