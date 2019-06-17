@@ -6,7 +6,7 @@
 import os
 import shutil
 import logging
-from mpi4py import MPI
+
 from multiprocessing import Process
 from cortix.src.module import Module
 from cortix.src.utils.cortix_units import Units
@@ -17,20 +17,14 @@ class Cortix:
     The main Cortix class definition.
     '''
 
-    def __init__(self, work_dir="/tmp/", use_mpi=True):
-        self.work_dir = os.path.join(work_dir, 'cortix-wrk/')
+    def __init__(self, use_mpi=False):
         self.use_mpi = use_mpi
+
         if self.use_mpi:
+            from mpi4py import MPI
             self.comm = MPI.COMM_WORLD
             self.rank = self.comm.Get_rank()
             self.size = self.comm.size
-        else:
-            self.pid = os.getpid()
-
-        if not self.use_mpi or self.rank == 0:
-            # Create the work directory
-            shutil.rmtree(self.work_dir, ignore_errors=True)
-            os.mkdir(self.work_dir)
 
         # Setup the global logger
         self.__create_logger()
@@ -50,12 +44,10 @@ class Cortix:
         '''
         Run the Cortix simulation
         '''
-        # Check for correct number of ranks
         if self.use_mpi:
             assert self.size == len(self.modules) + 1, "Incorrect number of \
             processes (Required {}, got {})".format(self.size, len(self.modules))
 
-        procs = []
 
         # Set port ids
         i = 0
@@ -66,15 +58,11 @@ class Cortix:
                 i += 1
 
         for mod in self.modules:
-            # Not using MPI -> Launch each module on its own process
             if not self.use_mpi:
-                self.log.info("Launching Module {}".format(mod, self.rank))
+                self.log.info("Launching Module {}".format(mod))
                 p = Process(target=mod.run)
-                procs.append(p)
                 p.start()
-
-            # Using MPI -> Launch each module on its own rank
-            if self.use_mpi and self.rank == mod.rank:
+            elif self.rank == mod.rank:
                 self.log.info("Launching Module {} on rank {}".format(mod, self.rank))
                 mod.run()
 
@@ -85,7 +73,7 @@ class Cortix:
         self.log = logging.getLogger("cortix")
         self.log.setLevel(logging.DEBUG)
 
-        file_handler = logging.FileHandler(self.work_dir + 'cortix.log')
+        file_handler = logging.FileHandler("cortix.log")
         file_handler.setLevel(logging.DEBUG)
 
         console_handler = logging.StreamHandler()
@@ -93,9 +81,9 @@ class Cortix:
 
         # Formatter added to handlers
         if self.use_mpi:
-            fs = '[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s'.format(self.rank)
+            fs = "[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(self.rank)
         else:
-            fs = '[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s'.format(self.rank)
+            fs = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 
         formatter = logging.Formatter(fs)
         file_handler.setFormatter(formatter)
