@@ -4,8 +4,6 @@
 # https://cortix.org
 
 import enum
-from mpi4py import MPI
-from threading import Thread
 
 class Port:
     '''
@@ -13,25 +11,37 @@ class Port:
     and connecting them to other ports.
     '''
 
-    def __init__(self, name=None):
+    def __init__(self, name=None, use_mpi=True):
         self.set_name(name)
         self.id = None
-        self.comm = MPI.COMM_WORLD
-        self.rank = self.comm.Get_rank()
-        self.connected = None
-        self.data = {}
+        self.use_mpi = use_mpi
+        if self.use_mpi:
+            from mpi4py import MPI
+            self.comm = MPI.COMM_WORLD
+            self.rank = self.comm.Get_rank()
+            self.connected = None
+        else:
+            from multiprocessing import Queue
+            self.q = Queue()
 
     def connect(self, port):
         assert isinstance(port, Port), "Connecting port must be of Port type"
 
         self.connected = port
         port.connected = self
+        port.use_mpi = self.use_mpi
 
     def send(self, data):
-        self.comm.send(data, dest=self.connected.rank, tag=self.id)
+        if self.use_mpi:
+            self.comm.send(data, dest=self.connected.rank, tag=self.id)
+        else:
+            self.q.put(data)
 
     def recv(self):
-        return self.comm.recv(source=self.connected.rank, tag=self.connected.id)
+        if self.use_mpi:
+            return self.comm.recv(source=self.connected.rank, tag=self.connected.id)
+        else:
+            return self.connected.q.get()
 
     def set_name(self, name):
         assert isinstance(name, str), "Port name must be a string"
