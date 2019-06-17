@@ -14,9 +14,14 @@ class DataPlot(Module):
 
     def run(self):
         # Spawn a thread to handle each module
+        threads = list()
         for port in self.ports:
             thread = Thread(target=self.recv_data, args=(port,))
             thread.start()
+            threads.append(thread)
+
+        for t in threads:
+            t.join()
 
     def recv_data(self, port):
         data = []

@@ -4,7 +4,6 @@ from cortix.src.port import Port
 from cortix.examples.dummy_module import DummyModule
 from cortix.examples.dummy_module import DummyModule2
 
-
 from cortix.src.cortix_main import Cortix
 
 def mpi_send_recv():
@@ -24,6 +23,7 @@ def mpi_send_recv():
     c.add_module(m1)
     c.add_module(m2)
     c.run()
+
 
 if __name__ == "__main__":
     mpi_send_recv()

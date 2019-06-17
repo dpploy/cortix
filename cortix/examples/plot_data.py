@@ -38,4 +38,5 @@ if __name__ == "__main__":
     c = Cortix()
     c.add_module(d)
     c.add_module(p)
+    c.use_mpi = False
     c.run()
