@@ -409,8 +409,8 @@ class Phase:
         assert new_specie.name not in list(self.__phase.columns), \
                'new_specie: %r exists. Current names: %r' % \
                (new_specie, self.__phase.columns)
-        speciesFormulae = [specie.formulaName for specie in self.__species]
-        assert new_specie.formulaName not in speciesFormulae
+        speciesFormulae = [specie.formula_name for specie in self.__species]
+        assert new_specie.formula_name not in speciesFormulae
         self.__species.append(new_specie)
         newName = new_specie.name
         col = pandas.DataFrame( index=list(self.__phase.index), columns=[newName] )
@@ -750,7 +750,7 @@ class Phase:
             if col in speciesNames:
                 idx = speciesNames.index(col)
                 specie = self.__species[idx]
-                tmp.rename(columns={col: specie.formulaName}, inplace=True)
+                tmp.rename(columns={col: specie.formula_name}, inplace=True)
             elif col in quantityNames:
                 idx = quantityNames.index(col)
                 quant = self.__quantities[idx]
