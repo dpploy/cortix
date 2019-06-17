@@ -172,7 +172,7 @@ class Droplet(Module):
         '''
 
         time = 0.0
-        for i in range(1000):
+        for i in range(10000):
 
             position = self.__liquid_phase.GetValue( 'position' )
             self.send( (time,position), 'velocity-request')
@@ -186,10 +186,10 @@ class Droplet(Module):
             self.send( (time,radius), 'radius')
 
             speed = self.__liquid_phase.GetValue( 'speed' )
-            self.send( (time,speed), 'speed')
+            #self.send( (time,speed), 'speed')
 
         self.send( 'DONE', 'radius')
-        self.send( 'DONE', 'speed')
+        #self.send( 'DONE', 'speed')
 
         self.__liquid_phase.WriteHTML('dp.html')
 

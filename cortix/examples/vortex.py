@@ -17,6 +17,7 @@ import logging
 from collections             import namedtuple
 import math
 import numpy as npy
+from threading import Thread
 
 from cortix.src.module import Module
 
@@ -104,23 +105,19 @@ class Vortex(Module):
 
         return
 
-    def run( self ):
-        '''
-        Evolve system from cortix_time to cortix_time + cortix_time_step
-        '''
+    def run(self):
+        for i in range(10000):
+            time = 0.0
+            for drop_index in range(int(len(self.ports) / 2)):
+                request_port = "droplet-request-{}".format(drop_index)
+                velocity_port = "velocity-{}".format(drop_index)
 
-        time = 0.0
-
-        for i in range(1000):
-
-            (droplet_time,droplet_position) = self.recv('droplet-request')
-            self.__position = droplet_position
-
-            self.__evolve( time, 0.1 )
+                (droplet_time,droplet_position) = self.recv(request_port)
+                self.__position = droplet_position
+                self.__evolve( time, 0.1 )
+                velocity = self.__velocity
+                self.send((time,velocity), velocity_port)
             time += 0.1
-
-            velocity = self.__velocity
-            self.send( (time,velocity), 'velocity' )
 
         return
 

@@ -1,5 +1,6 @@
 from cortix.src.module import Module
 from threading import Thread
+import logging
 import matplotlib
 matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
@@ -12,9 +13,11 @@ class DataPlot(Module):
         self.ylabel = None
         self.title = None
 
+        self.log = logging.getLogger("cortix")
+
     def run(self):
         # Spawn a thread to handle each module
-        threads = list()
+        threads = []
         for port in self.ports:
             thread = Thread(target=self.recv_data, args=(port,))
             thread.start()
@@ -25,14 +28,16 @@ class DataPlot(Module):
 
     def recv_data(self, port):
         data = []
+        print_every = 100
+        i = 1
         while True:
             d = self.recv(port)
-            print("Got data = {}".format(d))
-
-            # Exit thread when encountering DONE
+            if i % print_every == 0:
+                self.log.info("Received: {}".format(d))
             if d == "DONE":
                 self.plot_data(data, port)
                 exit(0)
+            i += 1
 
             data.append(d)
 

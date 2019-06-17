@@ -46,7 +46,7 @@ class Cortix:
         '''
         if self.use_mpi:
             assert self.size == len(self.modules) + 1, "Incorrect number of \
-            processes (Required {}, got {})".format(self.size, len(self.modules))
+            processes (Required {}, got {})".format(len(self.modules) + 1, self.size)
 
 
         # Set port ids

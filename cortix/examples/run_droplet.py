@@ -7,55 +7,43 @@ from cortix.examples.droplet import Droplet
 from cortix.examples.vortex import Vortex
 
 if __name__ == "__main__":
-
-    dp1 = DataPlot()
-    dp1.set_title('Radial Position')
-    dp1.set_xlabel('Time')
-    dp1.set_ylabel('Radius')
-
-    dp2 = DataPlot()
-    dp2.set_title('Speed')
-    dp2.set_xlabel('Time')
-    dp2.set_ylabel('Speed')
-
-    d = Droplet()
-
-    p1 = Port('radius')
-    p2 = Port('radius')
-    p1.connect(p2)
-
+    c = Cortix(use_mpi=True)
     v = Vortex()
 
-    p3 = Port('velocity')
-    p4 = Port('velocity-request')
+    for i in range(5):
+        droplet = Droplet()
+        data_plot = DataPlot()
 
-    p5 = Port('velocity')
-    p6 = Port('droplet-request')
+        data_plot.set_title('Radial Position')
+        data_plot.set_xlabel('Time')
+        data_plot.set_ylabel('Radius')
 
-    p6.connect(p4)
-    p5.connect(p3)
 
-    p7 = Port('speed')
-    p8 = Port('speed')
+        # Initialize ports
+        drop_port = Port("radius")
+        plot_port = Port("radius-{}".format(i))
+        droplet_req_port = Port("droplet-request-{}".format(i))
+        velocity_port = Port("velocity-{}".format(i))
+        vortex_req_port = Port("velocity-request")
+        vortex_velocity_port = Port("velocity")
 
-    p7.connect(p8)
 
-    d.add_port(p3)
-    d.add_port(p4)
+        # Connect ports
+        drop_port.connect(plot_port)
+        droplet_req_port.connect(vortex_req_port)
+        velocity_port.connect(vortex_velocity_port)
 
-    v.add_port(p5)
-    v.add_port(p6)
+        # Add ports to module
+        data_plot.add_port(plot_port)
+        droplet.add_port(drop_port)
+        droplet.add_port(vortex_req_port)
+        droplet.add_port(vortex_velocity_port)
+        v.add_port(droplet_req_port)
+        v.add_port(velocity_port)
 
-    dp1.add_port(p1)
-    dp2.add_port(p7)
+        # Add modules to Cortix
+        c.add_module(droplet)
+        c.add_module(data_plot)
 
-    d.add_port(p2)
-    d.add_port(p8)
-
-    # Custom class to send dummy data
-    c = Cortix()
-    c.add_module(dp1)
-    c.add_module(dp2)
-    c.add_module(d)
     c.add_module(v)
     c.run()
