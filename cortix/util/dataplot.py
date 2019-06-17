@@ -1,5 +1,7 @@
 from cortix.src.module import Module
 from threading import Thread
+import matplotlib
+matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
 
 class DataPlot(Module):
