@@ -4,6 +4,7 @@ from threading import Thread
 import matplotlib
 matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 from cortix.src.module import Module
 
 class DataPlot(Module):
@@ -46,8 +47,18 @@ class DataPlot(Module):
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
         plt.title(self.title)
-        plt.plot([x[0] for x in data], [x[1] for x in data])
-        plt.savefig("{}.png".format(port.name))
+
+        x = [i[0] for i in data]
+        y = [i[1] for i in data]
+
+        if x and len(x[0]) == 2:
+            plt.plot(x, y)
+        elif x and len(x[0]) == 3:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+            ax.plot(x, y, [i[2] for i in data])
+
+        plt.savefig("{}.png".format(port.name), dpi=200)
 
     def set_xlabel(self, xlabel):
         self.xlabel = xlabel
