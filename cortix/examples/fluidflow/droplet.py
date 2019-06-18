@@ -99,16 +99,10 @@ class Droplet(Module):
             self.step(time, 0.1)
 
             time += 0.1
-            radius = self.liquid_phase.GetValue('radial-position')
-            self.send((time,radius), 'radius')
+            radius = self.liquid_phase.GetValue('position')
+            self.send(position, 'position')
 
-            #speed = self.liquid_phase.GetValue('speed')
-            #self.send( (time,speed), 'speed')
-
-        self.send('DONE', 'radius')
-        #self.send('DONE', 'speed')
-
-        self.liquid_phase.WriteHTML('dp.html')
+        self.send('DONE', 'position')
 
     def rhs_fn(self, u_vec, t, params):
         drop_pos = u_vec[:3]

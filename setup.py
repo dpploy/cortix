@@ -8,23 +8,17 @@ with open("requirements.txt", "r") as fh:
 
 setuptools.setup(
     name="cortix",
-    version="0.1.7",
+    version="1.0",
     author="Cortix Computing",
-    author_email="valmor_dealmeida@uml.edu",
-    description=" Cortix is a Python library for system-level\
-                  module coupling, execution, and analysis.",
+    author_email="tazzaoui@cs.uml.edu",
+    description="Cortix is a Python library for system-level\
+                module coupling, execution, and analysis.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     include_package_data=True,
     install_requires=req,
     url="https://cortix.org",
-    packages=['cortix', 'cortix.docs', 'cortix.examples',
-              'cortix.examples.modulib', 'cortix.examples.console_run',
-              'cortix.examples.notebook_run',
-              'cortix.examples.input', 'cortix.examples.modulib.droplet',\
-              'cortix.modulib.pyplot','cortix.src',\
-              'cortix.src.utils', 'cortix.support', 'cortix.tests',
-              'cortix.tests.input', 'cortix.examples.modulib.wind'],
+    packages=setuptools.find_packages(),
     keywords = ['simulation', 'math'],
     classifiers=[
         "Programming Language :: Python :: 3",

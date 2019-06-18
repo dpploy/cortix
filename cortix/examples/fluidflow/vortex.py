@@ -57,7 +57,7 @@ class Vortex(Module):
                 # Send the vortex velocity to the droplet
                 self.send((time,velocity), velocity_port)
             time += 0.1
-        self.plot_vortex_velocity()
+        #self.plot_vortex_velocity()
 
     def compute_velocity(self, position):
         '''
