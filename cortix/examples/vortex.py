@@ -106,7 +106,7 @@ class Vortex(Module):
         return
 
     def run(self):
-        for i in range(10000):
+        for i in range(100):
             time = 0.0
             for drop_index in range(int(len(self.ports) / 2)):
                 request_port = "droplet-request-{}".format(drop_index)
