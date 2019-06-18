@@ -1,9 +1,10 @@
-from cortix.src.module import Module
-from threading import Thread
+import sys
 import logging
+from threading import Thread
 import matplotlib
 matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
+from cortix.src.module import Module
 
 class DataPlot(Module):
     def __init__(self):
@@ -36,7 +37,7 @@ class DataPlot(Module):
                 self.log.info("Received: {}".format(d))
             if d == "DONE":
                 self.plot_data(data, port)
-                exit(0)
+                sys.exit(0)
             i += 1
 
             data.append(d)
