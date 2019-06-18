@@ -6,6 +6,13 @@ from cortix.src.cortix_main import Cortix
 from cortix.examples.droplet import Droplet
 from cortix.examples.vortex import Vortex
 
+"""
+MPI-active version of droplet.
+Run with 12 processes
+
+Usage: mpirun -np 12 python droplet_run.py
+"""
+
 if __name__ == "__main__":
     c = Cortix(use_mpi=True)
     v = Vortex()
