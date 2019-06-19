@@ -44,6 +44,14 @@ class DataPlot(Module):
             data.append(d)
 
     def plot_data(self, data, port):
+        '''
+        Make plot.
+
+        Parameters
+        ----------
+        data: list(tuple)
+        '''
+
         plt.xlabel(self.xlabel)
         plt.ylabel(self.ylabel)
         plt.title(self.title)
@@ -51,9 +59,9 @@ class DataPlot(Module):
         x = [i[0] for i in data]
         y = [i[1] for i in data]
 
-        if x and len(x[0]) == 2:
+        if x and len(data[0]) == 2:
             plt.plot(x, y)
-        elif x and len(x[0]) == 3:
+        elif x and len(data[0]) == 3:
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
             ax.plot(x, y, [i[2] for i in data])
