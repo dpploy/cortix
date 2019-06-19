@@ -7,7 +7,7 @@ from cortix.examples.fluidflow.droplet import Droplet
 from cortix.examples.fluidflow.vortex import Vortex
 
 """
-MPI-active version of droplet.
+MPI-active version of droplet
 Run with 12 processes
 
 Usage: mpirun -np 12 python run_droplet.py
@@ -19,21 +19,17 @@ if __name__ == "__main__":
 
     for i in range(5):
         droplet = Droplet()
+
         data_plot = DataPlot()
-
-        data_plot.set_title('Radial Position')
-        data_plot.set_xlabel('Time')
-        data_plot.set_ylabel('Radius')
-
+        data_plot.title = 'Droplet Position Over Time'
 
         # Initialize ports
-        drop_port = Port("radius")
-        plot_port = Port("radius-{}".format(i))
+        drop_port = Port("position")
+        plot_port = Port("position-{}".format(i))
         droplet_req_port = Port("droplet-request-{}".format(i))
         velocity_port = Port("velocity-{}".format(i))
         vortex_req_port = Port("velocity-request")
         vortex_velocity_port = Port("velocity")
-
 
         # Connect ports
         drop_port.connect(plot_port)
