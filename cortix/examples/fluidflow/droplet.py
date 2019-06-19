@@ -72,7 +72,7 @@ class Droplet(Module):
         self.box_height = 250.0 # H [m]
 
         # Random positioning of the droplet constrained to a box sub-region.
-        x_0 = (2 * np.random.random(3) - np.ones(3)) * self.box_half_length / 2.0
+        x_0 = (2 * np.random.random(3) - np.ones(3)) * self.box_half_length / 4.0
         x_0[2] = self.box_height
         self.liquid_phase.SetValue('position', x_0, self.initial_time)
 
