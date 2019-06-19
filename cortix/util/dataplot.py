@@ -17,6 +17,7 @@ class DataPlot(Module):
         self.title = None
 
         self.log = logging.getLogger("cortix")
+        self.print_freq = 10
 
     def run(self):
         # Spawn a thread to handle each module
@@ -31,11 +32,10 @@ class DataPlot(Module):
 
     def recv_data(self, port):
         data = []
-        print_every = 100
         i = 1
         while True:
             d = self.recv(port)
-            if i % print_every == 0:
+            if i % self.print_freq == 0:
                 self.log.info("Received: {}".format(d))
             if isinstance(d, str) and d == "DONE":
                 self.plot_data(data, port)
