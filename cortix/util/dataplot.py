@@ -45,6 +45,7 @@ class DataPlot(Module):
             data.append(d)
 
     def plot_data(self, data, port):
+<<<<<<< HEAD
         x = [i[0] for i in data]
         y = [i[1] for i in data]
 

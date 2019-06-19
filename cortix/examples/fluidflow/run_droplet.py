@@ -10,7 +10,7 @@ from cortix.examples.fluidflow.vortex import Vortex
 MPI-active version of droplet
 Run with 12 processes
 
-Usage: mpirun -np 12 python droplet_run.py
+Usage: mpirun -np 12 python run_droplet.py
 """
 
 if __name__ == "__main__":

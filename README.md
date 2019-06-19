@@ -46,7 +46,7 @@ Note: you may want to add this line to your ```.bashrc``` in order for it to be 
 
 ### Verify your Cortix install by running the Droplet example
 ```
-mpirun -np 4 examples/droplet_run.py
+mpirun -np 12 examples/droplet_run.py
 ```
 
 ## Testing
@@ -58,7 +58,7 @@ cd tests && py.test
 
 ## Using Cortix
 
-Cortix requires a set of input files, a driver, and a configuration file. See `examples/console_run` for working examples of Cortix simulations. Cortix will output logging information to `stdout` by default, extensive logging of runtime information is also stored in the `<work_dir>` directory specified in the `cortix-config.xml` input file.
+Please refer to the [documentation](https://cortix.org/contents.html) for more on getting started!
 
 ## Team 
 

@@ -8,12 +8,12 @@
 #
 # Licensed under the University of Massachusetts Lowell LICENSE:
 # https://github.com/dpploy/cortix/blob/master/LICENSE.txt
-"""
+'''
 Fuel segment
 Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
 Sat Jun 27 14:46:49 EDT 2015
-"""
-# *******************************************************************************
+'''
+#*********************************************************************************
 import os
 import sys
 import io
@@ -26,12 +26,16 @@ import pandas
 from cortix.support.periodictable import ELEMENTS
 from cortix.support.periodictable import SERIES
 from cortix.support.specie import Specie
-# *******************************************************************************
+#*********************************************************************************
 
 class FuelSegment():
 
-    # Todo: Species should not be here. Need to replace by Phase instead.
+    # TODO: Species should not be here. Need to replace by Phase instead.
     #      Chopper will be affected
+
+#*********************************************************************************
+# Construction
+#*********************************************************************************
 
     def __init__(self,
                  geometry = pandas.Series(),
@@ -65,17 +69,63 @@ class FuelSegment():
 
         self.__geometry = geometry
         self.__species  = species
-# ---------------------- end def __init__():--------------------------------------
+
+#*********************************************************************************
+# Public Member Functions
+#*********************************************************************************
 
     def get_geometry(self):
+        '''
+        Returns the geometry of the fuel bundle (cylindrical, hexoganol,
+        rectangular, etc).
+
+        Parameters
+        ----------
+        Empty:
+
+        Returns
+        -------
+        geometry: str
+        '''
+
         return self.__geometry
     geometry = property(get_geometry, None, None, None)
 
     def get_species(self):
+
+        '''
+        Returns the species object which describes the composition of the fuel
+        bundle. The species encapsulates all chemical species present in the
+        fuel bundle.
+        Parameters
+        ----------
+        None:
+
+        Returns
+        -------
+        species: object
+        '''
+
         return self.__species
     species = property(get_species, None, None, None)
 
     def get_specie(self, name):
+
+        '''
+        Returns a specie named [name] from the list of species making up the
+        fuel bundle. If no name is specified, this function will return None.
+
+
+        Parameters
+        ----------
+        name: str
+
+        Returns
+        -------
+        specie: obj
+
+        '''
+
         for specie in self.__species:
             if specie.name == name:
                 return specie
@@ -84,6 +134,39 @@ class FuelSegment():
 
 # Get stored fuel segment property either overall or on a nuclide basis
     def get_attribute(self, name, nuclide=None, series=None):
+        '''
+        Used to get stored fuel segment properties, either overall (as an
+        average), or on a nuclide basis. "name" in this case refers to the
+        attribute in question. At this point in time, series is not implemented
+        and passing it to this function will result in an error. Possible
+        attributes that may be retrieved with this function, as well as the
+        name to pass to this function to retrieve them are: number of segments
+        in the bundle (n-segments, always equal to 1), the id of the segment
+        that makes up the bundle (segment-id), the volume of the fuel in the
+        bundle  (fuel-volume), the total volume of the segment
+        (segment-volume), the diameter (fuel-diameter) and length
+        (fuel-length) of the segment, the mass or mass density of the segment
+        (mass or mass-cc, respectively), or the total or per-volume
+        radioactivity, gamma radiation density or heat density of the fuel
+        segment (radioactivity and radioactivityDens, gamma and gamma-dens,
+        and heat and heat-dens, respectively).
+
+        Finally, density or total mass of a specific nuclide can be determined
+        by passing a specific nuclide to the function, with a name value of
+        mass or mass-cc.
+
+
+        Parameters
+        ----------
+        name: str
+        nuclide: str
+
+
+        Returns
+        -------
+        many types
+
+        '''
 
         attribute_name = name
 
@@ -348,7 +431,8 @@ class FuelSegment():
                                 '*')[1].split('-')[0].strip()
                             formula_nuclide_mass_number = int(
                                 item.split('*')[1].split('-')[1].strip('m'))
-                            formula_nuclide_molar_mass = ELEMENTS[formula_nuclides_symbol].isotopes[formula_nuclide_mass_number].mass
+                            formula_nuclide_molar_mass = \
+                                    ELEMENTS[formula_nuclides_symbol].isotopes[formula_nuclide_mass_number].mass
 
                             if formula_nuclides_symbol == nuclide:
                                 mole_fraction = float(
@@ -367,8 +451,22 @@ class FuelSegment():
 
                 assert False
 
-# ---------------------------------------------------------------------------------
+#**********************************************************************************
+# Private Helper Functions (internal use: __)
+#*********************************************************************************
+
     def __get_fuel_segment_volume(self):
+        '''
+        Returns the total volume of fuel in the fuel segment.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        volume: float
+        '''
 
         fuel_length = self.__geometry['fuel length [cm]']
         fuel_diam = self.__geometry['fuel diameter [cm]']
@@ -377,15 +475,40 @@ class FuelSegment():
 
         return volume
 
-# *********************************************************************************
-
-# *******************************************************************************
-# Printing of data members
     def __str__(self):
+
+        '''
+        Used to print the geometry of the fuel segment and the species that it
+        consists of.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        s: str
+        '''
+
         s = 'FuelSegment(): %s\n %s\n'
         return s % (self.__geometry, self.__species)
 
     def __repr__(self):
+
+        '''
+        Used to pront the geometry of the fuel segment and the species that it
+        consists of.
+
+        Parameters
+        ----------
+        empty
+
+        Returns
+        -------
+        s: str
+        '''
+
         s = 'FuelSegment(): %s\n %s\n'
         return s % (self.__geometry, self.__species)
-# *******************************************************************************
+
+#============================ end class FuelSegment ==============================

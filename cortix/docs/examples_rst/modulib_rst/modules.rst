@@ -2,7 +2,5 @@ modulib
 =======
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
-   droplet_rst/modules
-   wind_rst/modules
