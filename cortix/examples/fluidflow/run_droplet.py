@@ -16,9 +16,11 @@ Usage: mpirun -np 12 python run_droplet.py
 if __name__ == "__main__":
     c = Cortix(use_mpi=True)
     v = Vortex()
+    v.end_time = 1000
 
     for i in range(5):
         droplet = Droplet()
+        droplet.end_time = 1000
 
         data_plot = DataPlot()
         data_plot.title = 'Droplet Position Over Time'

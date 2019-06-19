@@ -24,6 +24,7 @@ class Droplet(Module):
         quantities = []
         self.ode_params = {}
         self.initial_time = 0.0
+        self.final_time = 100
         self.time_step = 0.1
 
         # Create a drop with random diameter up within 5 and 8 mm.
@@ -71,7 +72,7 @@ class Droplet(Module):
         self.box_height = 250.0 # H [m]
 
         # Random positioning of the droplet constrained to a box sub-region.
-        x_0 = (2 * np.random.random(3) - np.ones(3)) * self.box_half_length / 2.0
+        x_0 = (2 * np.random.random(3) - np.ones(3)) * self.box_half_length / 4.0
         x_0[2] = self.box_height
         self.liquid_phase.SetValue('position', x_0, self.initial_time)
 
@@ -89,8 +90,8 @@ class Droplet(Module):
         self.ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
 
     def run(self):
-        time = 0.0
-        for i in range(100):
+        time = self.initial_time
+        while time < self.final_time:
             # Send position to Vortex
             position = self.liquid_phase.GetValue('position')
             self.send((time,position), 'velocity')
