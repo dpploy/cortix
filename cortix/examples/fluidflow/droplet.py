@@ -24,6 +24,7 @@ class Droplet(Module):
         quantities = []
         self.ode_params = {}
         self.initial_time = 0.0
+        self.time_step = 0.1
 
         # Create a drop with random diameter up within 5 and 8 mm.
         droplet_diameter = (np.random.random(1) * (8 - 5) + 5)[0] * const.milli
@@ -90,19 +91,20 @@ class Droplet(Module):
     def run(self):
         time = 0.0
         for i in range(100):
+            # Send position to Vortex
             position = self.liquid_phase.GetValue('position')
-            self.send( (time,position), 'velocity-request')
+            self.send((time,position), 'velocity')
 
+            # Receive velocity from Vortex 
             (vortex_time,velocity) = self.recv('velocity')
             self.ode_params['flow-velocity'] = velocity
 
-            self.step(time, 0.1)
+            self.step(time)
 
-            time += 0.1
-            radius = self.liquid_phase.GetValue('position')
-            self.send(position, 'position')
+            time += self.time_step
+            self.send(position, 'plot-data')
 
-        self.send('DONE', 'position')
+        self.send('DONE', 'plot-data')
 
     def rhs_fn(self, u_vec, t, params):
         drop_pos = u_vec[:3]
@@ -127,7 +129,7 @@ class Droplet(Module):
         elif reynolds_num >= 6000:
             fric_factor = 0.44
 
-        drag = - fric_factor * area * rho_flow * relative_velo_mag * relative_velo/2.0
+        drag = - fric_factor * area * rho_flow * relative_velo_mag * relative_velo / 2.0
 
         gravity = params['gravity']
         droplet_mass = params['droplet-mass']
@@ -143,7 +145,7 @@ class Droplet(Module):
 
         return [dt_u_0, dt_u_1, dt_u_2, dt_u_3, dt_u_4, dt_u_5]
 
-    def step(self, time=0.0, time_step=0.0):
+    def step(self, time=0.0):
         r'''
         ODE IVP problem:
         Given the initial data at :math:`t=0`,
@@ -161,9 +163,6 @@ class Droplet(Module):
         time: float
             Time in the droplet unit of time (seconds).
 
-        time_step: float
-            Time step in the droplet unit of time (seconds).
-
         Returns
         -------
         None
@@ -172,7 +171,7 @@ class Droplet(Module):
         x_0 = self.liquid_phase.GetValue('position', time)
         v_0 = self.liquid_phase.GetValue('velocity', time)
         u_vec_0 = np.concatenate((x_0,v_0))
-        t_interval_sec = np.linspace(0.0, time_step, num=2)
+        t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
         (u_vec_hist, info_dict) = odeint(self.rhs_fn,
                                          u_vec_0, t_interval_sec,
@@ -185,7 +184,7 @@ class Droplet(Module):
         u_vec = u_vec_hist[1,:]  # solution vector at final time step
         values = self.liquid_phase.GetRow(time) # values at previous time
 
-        time += time_step
+        time += self.time_step
         self.liquid_phase.AddRow(time, values)
 
         # ground impact bounces the drop back up

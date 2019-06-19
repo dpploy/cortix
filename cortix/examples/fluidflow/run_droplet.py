@@ -24,24 +24,19 @@ if __name__ == "__main__":
         data_plot.title = 'Droplet Position Over Time'
 
         # Initialize ports
-        drop_port = Port("position")
-        plot_port = Port("position-{}".format(i))
-        droplet_req_port = Port("droplet-request-{}".format(i))
+        drop_port = Port("plot-data")
+        plot_port = Port("plot-data-{}".format(i))
         velocity_port = Port("velocity-{}".format(i))
-        vortex_req_port = Port("velocity-request")
         vortex_velocity_port = Port("velocity")
 
         # Connect ports
         drop_port.connect(plot_port)
-        droplet_req_port.connect(vortex_req_port)
         velocity_port.connect(vortex_velocity_port)
 
         # Add ports to module
         data_plot.add_port(plot_port)
         droplet.add_port(drop_port)
-        droplet.add_port(vortex_req_port)
         droplet.add_port(vortex_velocity_port)
-        v.add_port(droplet_req_port)
         v.add_port(velocity_port)
 
         # Add modules to Cortix

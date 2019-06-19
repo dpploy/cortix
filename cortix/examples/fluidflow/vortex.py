@@ -44,19 +44,18 @@ class Vortex(Module):
     def run(self):
         for i in range(100):
             time = 0.0
-            for drop_index in range(int(len(self.ports) / 2)):
-                request_port = "droplet-request-{}".format(drop_index)
+            for drop_index in range(len(self.ports)):
                 velocity_port = "velocity-{}".format(drop_index)
 
-                # Query the droplet for a request
-                (droplet_time, droplet_position) = self.recv(request_port)
+                # Query the droplet for its position
+                (droplet_time, droplet_position) = self.recv(velocity_port)
 
                 # Compute the vortex velocity using the droplet position
                 velocity = self.compute_velocity(droplet_position)
 
                 # Send the vortex velocity to the droplet
                 self.send((time,velocity), velocity_port)
-            time += 0.1
+            time += self.time_step
         #self.plot_vortex_velocity()
 
     def compute_velocity(self, position):
