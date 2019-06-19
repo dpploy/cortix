@@ -48,7 +48,6 @@ class Cortix:
             assert self.size == len(self.modules) + 1, "Incorrect number of \
             processes (Required {}, got {})".format(len(self.modules) + 1, self.size)
 
-
         # Set port ids
         i = 0
         for mod in self.modules:
