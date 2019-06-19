@@ -24,6 +24,7 @@ class Droplet(Module):
         quantities = []
         self.ode_params = {}
         self.initial_time = 0.0
+        self.final_time = 100
         self.time_step = 0.1
 
         # Create a drop with random diameter up within 5 and 8 mm.
@@ -89,8 +90,8 @@ class Droplet(Module):
         self.ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
 
     def run(self):
-        time = 0.0
-        for i in range(100):
+        time = self.initial_time
+        while time < self.final_time:
             # Send position to Vortex
             position = self.liquid_phase.GetValue('position')
             self.send((time,position), 'velocity')

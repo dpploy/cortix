@@ -39,24 +39,23 @@ class Vortex(Module):
         self.outer_v_theta   = 1.0 # m/s # angular speed
         self.v_z_0 = 0.50 # [m/s]
 
+        self.initial_time = 0.0
+        self.final_time = 100
         self.time_step = 0.1
 
     def run(self):
-        for i in range(100):
-            time = 0.0
-            for drop_index in range(len(self.ports)):
-                velocity_port = "velocity-{}".format(drop_index)
-
+        time = self.initial_time
+        while time < self.final_time:
+            for droplet_port in self.ports:
                 # Query the droplet for its position
-                (droplet_time, droplet_position) = self.recv(velocity_port)
+                (droplet_time, droplet_position) = self.recv(droplet_port)
 
                 # Compute the vortex velocity using the droplet position
                 velocity = self.compute_velocity(droplet_position)
 
                 # Send the vortex velocity to the droplet
-                self.send((time,velocity), velocity_port)
+                self.send((time, velocity), droplet_port)
             time += self.time_step
-        #self.plot_vortex_velocity()
 
     def compute_velocity(self, position):
         '''
