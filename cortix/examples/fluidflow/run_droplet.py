@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# This file is part of the Cortix toolkit environment
+# https://cortix.org
+
 from cortix.src.module import Module
 from cortix.src.port import Port
 from cortix.util.dataplot import DataPlot
