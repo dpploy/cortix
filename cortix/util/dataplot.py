@@ -58,7 +58,7 @@ class DataPlot(Module):
         # 3D-Plot
         elif data and len(data[0]) == 3:
             fig = plt.figure()
-            ax = fig.add_subplot(001, projection='3d')
+            ax = fig.add_subplot(111, projection='3d')
             ax.set_xlabel(self.xlabel)
             ax.set_ylabel(self.ylabel)
             ax.set_zlabel(self.zlabel)
