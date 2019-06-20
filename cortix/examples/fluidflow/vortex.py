@@ -4,6 +4,7 @@
 # https://cortix.org
 
 import numpy as np
+import scipy.constants as const
 from threading import Thread
 import matplotlib.pyplot as plt
 from cortix.src.module import Module
@@ -14,6 +15,11 @@ from cortix.support.quantity import Quantity
 class Vortex(Module):
     '''
     Vortex module used to model fluid flow using Cortix.
+
+    Ports
+    =====
+    velocity:slot_id
+    fluid-properties:slot_id
     '''
 
     def __init__(self):
@@ -27,6 +33,10 @@ class Vortex(Module):
         air.molarCCUnit = 'mole/cc'
         air.molarMass = 0.3 * 16 * 2 + 0.7 * 14 *2
         species.append(air)
+
+        # Constant values for the vortex fluid.
+        self.mass_density  = 0.1 * const.gram / const.centi**3 # [kg/m^3]
+        self.dyn_viscosity = 1.81e-5 # kg/(m s)
 
         # Domain box dimensions: LxLxH m^3 box with given H.
         # z coordinate pointing upwards. -L <= x <= L, -L <= y <= L, 
@@ -44,17 +54,27 @@ class Vortex(Module):
         self.time_step = 0.1
 
     def run(self):
+
         time = self.initial_time
+
+        # this is verbose and needs to be in the time loop after receiving a position
+        fluid_props = (self.mass_density, self.dyn_viscosity)
+        for port in self.ports:
+            if port.name.split(':')[0].strip() == 'fluid-properties':
+                self.send(fluid_props,port)
+
         while time < self.final_time:
-            for droplet_port in self.ports:
-                # Query the droplet for its position
-                (droplet_time, droplet_position) = self.recv(droplet_port)
 
-                # Compute the vortex velocity using the droplet position
-                velocity = self.compute_velocity(droplet_position)
+            for port in self.ports:
+                if port.name.split(':')[0].strip() == 'velocity':
+                    (dummy_time, position) = self.recv(port)
 
-                # Send the vortex velocity to the droplet
-                self.send((time, velocity), droplet_port)
+                # Compute the vortex velocity using the given position
+                velocity = self.compute_velocity(position)
+
+                # Send the vortex velocity to caller
+                self.send((time, velocity), port)
+
             time += self.time_step
 
     def compute_velocity(self, position):

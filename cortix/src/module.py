@@ -22,7 +22,8 @@ class Module:
         """
         if isinstance(port, str):
             matches = [p for p in self.ports if p.name == port]
-            assert(len(matches) == 1)
+            assert len(matches) == 1,\
+                    'matches= %r port= %r, ports= %r'%(matches,port,self.ports)
             port = matches[0]
         elif isinstance(port, Port):
             assert port in self.ports, "Unknown port!"
@@ -43,6 +44,7 @@ class Module:
             assert port in self.ports, "Unknown port!"
         else:
             raise TypeError("port must be of Port or String type")
+
         return port.recv()
 
     def add_port(self, port):
