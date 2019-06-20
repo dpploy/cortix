@@ -4,6 +4,7 @@
 # https://cortix.org
 
 import numpy as np
+import scipy.constants as const
 from threading import Thread
 import matplotlib.pyplot as plt
 from cortix.src.module import Module
@@ -33,6 +34,10 @@ class Vortex(Module):
         air.molarMass = 0.3 * 16 * 2 + 0.7 * 14 *2
         species.append(air)
 
+        # Constant values for the vortex fluid.
+        self.mass_density  = 0.1 * const.gram / const.centi**3 # [kg/m^3]
+        self.dyn_viscosity = 1.81e-5 # kg/(m s)
+
         # Domain box dimensions: LxLxH m^3 box with given H.
         # z coordinate pointing upwards. -L <= x <= L, -L <= y <= L, 
         # z component is positive => vortex is blowing upwards.
@@ -51,6 +56,12 @@ class Vortex(Module):
     def run(self):
 
         time = self.initial_time
+
+        # this is verbose and needs to be in the time loop after receiving a position
+        fluid_props = (self.mass_density, self.dyn_viscosity)
+        for port in self.ports:
+            if port.name.split(':')[0].strip() == 'fluid-properties':
+                self.send(fluid_props,port)
 
         while time < self.final_time:
 

@@ -36,35 +36,33 @@ if __name__ == "__main__":
         droplet = Droplet()
         droplet.end_time = 1000
 
-        flow_velocity_port   = Port('flow-velocity')
-        position_port        = Port('position')
-        state_port           = Port('state')
-        ext_fluid_props_port = Port('external-fluid-properties')
+        flow_velocity   = Port('flow-velocity')
+        position        = Port('position')
+        ext_fluid_props = Port('external-fluid-properties')
 
-        droplet.add_port(flow_velocity_port)
-        droplet.add_port(position_port)
-        droplet.add_port(state_port)
-        droplet.add_port(ext_fluid_props_port)
+        droplet.add_port(flow_velocity)
+        droplet.add_port(position)
+        droplet.add_port(ext_fluid_props)
 
         # DataPlot modules.
         data_plot = DataPlot()
         data_plot.title = 'Droplet Position Over Time'
 
-        plot_port = Port("plot-data:{}".format(i))
+        plot = Port("plot-data:{}".format(i))
 
-        data_plot.add_port(plot_port)
+        data_plot.add_port(plot)
 
         # Vortex module.
-        velocity_port    = Port("velocity:{}".format(i))
-        #fluid_props_port = Port("fluid-properties:{}".format(i))
+        velocity = Port("velocity:{}".format(i))
+        fluid_props = Port("fluid-properties:{}".format(i))
 
-        vortex.add_port(velocity_port)
-        #vortex.add_port(fluid_props_port)
+        vortex.add_port(velocity)
+        vortex.add_port(fluid_props)
 
         # Connect ports
-        flow_velocity_port.connect(velocity_port)
-        #ext_fluid_props_port.connect(fluid_props_port)
-        position_port.connect(plot_port)
+        flow_velocity.connect(velocity)
+        ext_fluid_props.connect(fluid_props)
+        position.connect(plot)
 
         # Add modules to Cortix
         c.add_module(droplet)

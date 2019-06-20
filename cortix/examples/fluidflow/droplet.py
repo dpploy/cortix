@@ -19,8 +19,8 @@ class Droplet(Module):
     =====
     flow-velocity:
     external-fluid-properties:
-    position:
-    state:
+    position: single-valued:
+    state: single-valued:
     '''
 
     def __init__(self):
@@ -35,9 +35,9 @@ class Droplet(Module):
         self.time_step = 0.1
 
         # Create a drop with random diameter up within 5 and 8 mm.
-        droplet_diameter = (np.random.random(1) * (8 - 5) + 5)[0] * const.milli
-        self.ode_params['droplet-diameter'] = droplet_diameter
-        self.ode_params['droplet-xsec-area'] = np.pi * (droplet_diameter/2.0)**2
+        self.droplet_diameter = (np.random.random(1) * (8 - 5) + 5)[0] * const.milli
+        self.ode_params['droplet-diameter'] = self.droplet_diameter
+        self.ode_params['droplet-xsec-area'] = np.pi * (self.droplet_diameter/2.0)**2
         self.ode_params['gravity'] = const.g
 
         # Species in the liquid phase
@@ -48,7 +48,7 @@ class Droplet(Module):
         water.molarCCUnit = 'mole/cc'
         species.append(water)
 
-        droplet_mass = 4/3 * np.pi * (droplet_diameter/2)**3 * water.massCC * \
+        droplet_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * water.massCC * \
                 const.gram / const.centi**3  # [kg]
         self.ode_params['droplet-mass'] = droplet_mass
 
@@ -88,13 +88,16 @@ class Droplet(Module):
         self.liquid_phase.SetValue('position', x_0, self.initial_time)
 
         # Droplet Initial velocity = 0 -> placed still in the flow
-        self.liquid_phase.SetValue('velocity', np.array([0.0,0.0,0.0]), self.initial_time)
+        self.liquid_phase.SetValue('velocity', np.array([0.0,0.0,0.0]), \
+                self.initial_time)
 
-        # Default value for the medium surrounding the droplet
+        # Default value for the medium surrounding the droplet if data is not passed
+        # through port.
         medium_mass_density = 0.1 * const.gram / const.centi**3 # [kg/m^3]
         self.ode_params['medium-mass-density'] = medium_mass_density
 
-        medium_displaced_mass = 4/3 * np.pi * (droplet_diameter/2)**3 * medium_mass_density # [kg]
+        medium_displaced_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * \
+                medium_mass_density # [kg]
         self.ode_params['medium-displaced-mass'] = medium_displaced_mass
 
         medium_dyn_viscosity = 1.81e-5 # kg/(m s)
@@ -103,6 +106,20 @@ class Droplet(Module):
     def run(self):
 
         time = self.initial_time
+
+        # this is too verbose...modify later; also need to be time-dependent.
+        for port in self.ports:
+            if port.name == 'external-fluid-properties':
+                (medium_mass_density, medium_dyn_viscosity) = \
+                        self.recv('external-fluid-properties')
+
+                self.ode_params['medium-mass-density'] = medium_mass_density
+
+                medium_displaced_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * \
+                        medium_mass_density # [kg]
+                self.ode_params['medium-displaced-mass'] = medium_displaced_mass
+
+                self.ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
 
         while time < self.final_time:
 
