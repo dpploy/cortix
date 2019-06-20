@@ -14,6 +14,11 @@ from cortix.support.quantity import Quantity
 class Vortex(Module):
     '''
     Vortex module used to model fluid flow using Cortix.
+
+    Ports
+    =====
+    velocity:slot_id
+    fluid-properties:slot_id
     '''
 
     def __init__(self):
@@ -44,17 +49,21 @@ class Vortex(Module):
         self.time_step = 0.1
 
     def run(self):
+
         time = self.initial_time
+
         while time < self.final_time:
-            for droplet_port in self.ports:
-                # Query the droplet for its position
-                (droplet_time, droplet_position) = self.recv(droplet_port)
 
-                # Compute the vortex velocity using the droplet position
-                velocity = self.compute_velocity(droplet_position)
+            for port in self.ports:
+                if port.name.split(':')[0].strip() == 'velocity':
+                    (dummy_time, position) = self.recv(port)
 
-                # Send the vortex velocity to the droplet
-                self.send((time, velocity), droplet_port)
+                # Compute the vortex velocity using the given position
+                velocity = self.compute_velocity(position)
+
+                # Send the vortex velocity to caller
+                self.send((time, velocity), port)
+
             time += self.time_step
 
     def compute_velocity(self, position):

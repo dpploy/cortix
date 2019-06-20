@@ -13,7 +13,14 @@ from cortix.support.quantity import Quantity
 
 class Droplet(Module):
     '''
-    Droplet module used to model fluid
+    Droplet module used to model very simple fluid-particle interactions.
+
+    Ports
+    =====
+    flow-velocity:
+    external-fluid-properties:
+    position:
+    state:
     '''
 
     def __init__(self):
@@ -34,13 +41,15 @@ class Droplet(Module):
         self.ode_params['gravity'] = const.g
 
         # Species in the liquid phase
-        water = Specie(name='water', formula_name='H2O(l)', phase='liquid', atoms=['2*H','O'])
+        water = Specie(name='water', formula_name='H2O(l)', phase='liquid', \
+                atoms=['2*H','O'])
         water.massCC =  0.99965 # [g/cc]
         water.massCCUnit = 'g/cc'
         water.molarCCUnit = 'mole/cc'
         species.append(water)
 
-        droplet_mass = 4/3 * np.pi * (droplet_diameter/2)**3 * water.massCC * const.gram / const.centi**3  # [kg]
+        droplet_mass = 4/3 * np.pi * (droplet_diameter/2)**3 * water.massCC * \
+                const.gram / const.centi**3  # [kg]
         self.ode_params['droplet-mass'] = droplet_mass
 
         # Spatial position
@@ -58,11 +67,13 @@ class Droplet(Module):
         quantities.append(speed)
 
         # Radial position
-        radial_pos = Quantity(name='radial-position', formalName='Radius', unit='m', value=np.linalg.norm(x_0[0:2]))
+        radial_pos = Quantity(name='radial-position', formalName='Radius', unit='m', \
+                value=np.linalg.norm(x_0[0:2]))
         quantities.append(radial_pos)
 
         # Liquid phase 
-        self.liquid_phase = Phase(self.initial_time, time_unit='s', species=species, quantities=quantities)
+        self.liquid_phase = Phase(self.initial_time, time_unit='s', species=species, \
+                quantities=quantities)
         self.liquid_phase.SetValue('water', water.massCC, self.initial_time)
 
         # Domain box dimensions: LxLxH m^3 box with given H.
@@ -90,22 +101,26 @@ class Droplet(Module):
         self.ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
 
     def run(self):
-        time = self.initial_time
-        while time < self.final_time:
-            # Send position to Vortex
-            position = self.liquid_phase.GetValue('position')
-            self.send((time,position), 'velocity')
 
-            # Receive velocity from Vortex 
-            (vortex_time,velocity) = self.recv('velocity')
+        time = self.initial_time
+
+        while time < self.final_time:
+
+            # Put position in the flow-velocity port
+            position = self.liquid_phase.GetValue('position')
+            self.send((time,position), 'flow-velocity')
+            # Get velocity from the flow-velocity port
+            (dummy_time,velocity) = self.recv('flow-velocity')
             self.ode_params['flow-velocity'] = velocity
 
             self.step(time)
 
             time += self.time_step
-            self.send(position, 'plot-data')
 
-        self.send('DONE', 'plot-data')
+            # Put position in the position port
+            self.send(position, 'position')
+
+        self.send('DONE', 'position')
 
     def rhs_fn(self, u_vec, t, params):
         drop_pos = u_vec[:3]
