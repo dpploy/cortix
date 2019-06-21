@@ -8,8 +8,12 @@ from multiprocessing import Queue
 
 class Port:
     '''
-    The Port class provides an interface for creating ports
-    and connecting them to other ports.
+    The Port class provides an interface for creating ports and connecting them to
+    other ports for the purpose of data tranfer. Data exchange takes place by
+    send and/or receive calls on a given port. The concept of a port is that of a data
+    transfer "interaction." This can be one- or two-way but no two sends or receives
+    should be issued simultaneously on the same port, else the order of arrival of
+    messages is unknown.
     '''
 
     def __init__(self, name=None):
@@ -38,12 +42,15 @@ class Port:
 
     def send(self, data):
         if self.use_mpi:
+            # Blocking send. This may block until the message is received. Behavior
+            # is implementation dependent.
             self.comm.send(data, dest=self.connected.rank, tag=self.id)
         else:
             self.q.put(data)
 
     def recv(self):
         if self.use_mpi:
+            # Blocking receive.
             return self.comm.recv(source=self.connected.rank, tag=self.connected.id)
         else:
             return self.connected.q.get()

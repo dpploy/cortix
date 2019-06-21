@@ -6,11 +6,11 @@
 from cortix.src.port import Port
 
 class Module:
-    """
+    '''
     The representation of a Cortix module.
     This class is to be inherited by every Cortix module.
     It provides facilities for creating modules within the Cortix network.
-    """
+    '''
 
     def __init__(self):
         self.rank = None
@@ -18,7 +18,7 @@ class Module:
 
     def send(self, data, port):
         """
-        Send data through a given provide port
+        Send data through a given port
         """
         if isinstance(port, str):
             matches = [p for p in self.ports if p.name == port]
