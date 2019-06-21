@@ -17,10 +17,8 @@ class Droplet(Module):
 
     Ports
     =====
-    flow-velocity:
-    external-fluid-properties:
-    position: single-valued:
-    state: single-valued:
+    external-flow:
+    visualization:
     '''
 
     def __init__(self):
@@ -29,9 +27,11 @@ class Droplet(Module):
 
         species = []
         quantities = []
+
         self.ode_params = {}
+
         self.initial_time = 0.0
-        self.final_time = 100
+        self.end_time = 100
         self.time_step = 0.1
 
         # Create a drop with random diameter up within 5 and 8 mm.
@@ -92,7 +92,7 @@ class Droplet(Module):
                 self.initial_time)
 
         # Default value for the medium surrounding the droplet if data is not passed
-        # through port.
+        # through a conneted port.
         medium_mass_density = 0.1 * const.gram / const.centi**3 # [kg/m^3]
         self.ode_params['medium-mass-density'] = medium_mass_density
 
@@ -107,37 +107,37 @@ class Droplet(Module):
 
         time = self.initial_time
 
-        # this is too verbose...modify later; also need to be time-dependent.
-        for port in self.ports:
-            if port.name == 'external-fluid-properties':
-                (medium_mass_density, medium_dyn_viscosity) = \
-                        self.recv('external-fluid-properties')
+        while time < self.end_time:
 
-                self.ode_params['medium-mass-density'] = medium_mass_density
-
-                medium_displaced_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * \
-                        medium_mass_density # [kg]
-                self.ode_params['medium-displaced-mass'] = medium_displaced_mass
-
-                self.ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
-
-        while time < self.final_time:
-
-            # Put position in the flow-velocity port
+            # Interactions in the external-flow port
             position = self.liquid_phase.GetValue('position')
-            self.send((time,position), 'flow-velocity')
-            # Get velocity from the flow-velocity port
-            (dummy_time,velocity) = self.recv('flow-velocity')
+            self.send((time,position), 'external-flow')
+
+            (dummy_time,velocity,fluid_props) = self.recv('external-flow')
             self.ode_params['flow-velocity'] = velocity
 
+            #medium_mass_density  = fluid_props.mass_density  # see Vortex
+            #medium_dyn_viscosity = fluid_props.dyn_viscosity # see Vortex
+            medium_mass_density  = fluid_props[0]
+            medium_dyn_viscosity = fluid_props[1]
+
+            self.ode_params['medium-mass-density'] = medium_mass_density
+
+            medium_displaced_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * \
+                    medium_mass_density # [kg]
+            self.ode_params['medium-displaced-mass'] = medium_displaced_mass
+
+            self.ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
+
+            # Interactions in the visualization port
+            self.send(position, 'visualization')
+
+            # Evolve droplet state
             self.step(time)
 
             time += self.time_step
 
-            # Put position in the position port
-            self.send(position, 'position')
-
-        self.send('DONE', 'position')
+        self.send('DONE', 'visualization')
 
     def rhs_fn(self, u_vec, t, params):
         drop_pos = u_vec[:3]

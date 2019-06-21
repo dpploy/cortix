@@ -5,7 +5,7 @@
 
 import numpy as np
 import scipy.constants as const
-from threading import Thread
+from collections import namedtuple
 import matplotlib.pyplot as plt
 from cortix.src.module import Module
 from cortix.support.phase import Phase
@@ -18,15 +18,21 @@ class Vortex(Module):
 
     Ports
     =====
-    velocity:slot_id
-    fluid-properties:slot_id
+    fluid_flow:slot_id
     '''
 
     def __init__(self):
+
         super().__init__()
 
         species = []
         quantities = []
+
+        self.initial_time = 0.0
+        self.end_time = 100
+        self.time_step = 0.1
+
+        self.show_time = (False,10)
 
         air = Specie(name='air', formula_name='Air', phase='gas')
         air.massCCUnit = 'g/cc'
@@ -49,31 +55,31 @@ class Vortex(Module):
         self.outer_v_theta   = 1.0 # m/s # angular speed
         self.v_z_0 = 0.50 # [m/s]
 
-        self.initial_time = 0.0
-        self.final_time = 100
-        self.time_step = 0.1
-
     def run(self):
+
+        # namedtuple does not pickle into send message; investigate later: vfda TODO
+        #Props = namedtuple('Props',['mass_density','dyn_viscosity'])
+        #fluid_props = Props( self.mass_density, self.dyn_viscosity )
+        fluid_props = ( self.mass_density, self.dyn_viscosity )
 
         time = self.initial_time
 
-        # this is verbose and needs to be in the time loop after receiving a position
-        fluid_props = (self.mass_density, self.dyn_viscosity)
-        for port in self.ports:
-            if port.name.split(':')[0].strip() == 'fluid-properties':
-                self.send(fluid_props,port)
+        count = 0
+        while time < self.end_time:
 
-        while time < self.final_time:
+            if self.show_time[0] and count%self.show_time[1] == 0 :
+                print('TIME =',round(time,1))
+            count += 1
 
             for port in self.ports:
-                if port.name.split(':')[0].strip() == 'velocity':
+                if port.name.split(':')[0].strip() == 'fluid-flow':
                     (dummy_time, position) = self.recv(port)
 
                 # Compute the vortex velocity using the given position
                 velocity = self.compute_velocity(position)
 
                 # Send the vortex velocity to caller
-                self.send((time, velocity), port)
+                self.send( (time, velocity, fluid_props), port )
 
             time += self.time_step
 
@@ -119,6 +125,7 @@ class Vortex(Module):
         '''
         Plot the vortex velocity as a function of height
         '''
+
         (fig,axs) = plt.subplots(2,2)
         fig.subplots_adjust(hspace=0.5, wspace=0.5)
 
