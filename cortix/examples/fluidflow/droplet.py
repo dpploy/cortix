@@ -115,7 +115,8 @@ class Droplet(Module):
             position = self.liquid_phase.GetValue('position')
             port.send( (time,position) )
 
-            (dummy_time,velocity,fluid_props) = port.recv()
+            (check_time,velocity,fluid_props) = port.recv()
+            assert abs(check_time-time) <= 1e-6
             self.ode_params['flow-velocity'] = velocity
 
             #medium_mass_density  = fluid_props.mass_density  # see Vortex

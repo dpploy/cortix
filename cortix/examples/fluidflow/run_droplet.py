@@ -23,7 +23,7 @@ Usage: mpirun -np nprocs run_droplet.py
 if __name__ == "__main__":
 
     # Parameters
-    n_droplets = 5
+    n_droplets = 3
     end_time   = 500
     time_step  = 0.1
 
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
         # DataPlot modules.
         data_plot = DataPlot()
-        data_plot.title = 'Droplet Trajectory'
+        data_plot.title = 'Droplet Trajectory '+str(i)
         # Ports def.
         plot = Port("viz-data:{}".format(i))
         data_plot.add_port(plot)
