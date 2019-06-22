@@ -11,14 +11,14 @@ from cortix.src.cortix_main import Cortix
 from cortix.examples.fluidflow.droplet import Droplet
 from cortix.examples.fluidflow.vortex import Vortex
 
-"""
+'''
 MPI-active version of droplet
 Run with
 
 nprocs = 2*n_droplets + 2 processes
 
 Usage: mpirun -np nprocs run_droplet.py
-"""
+'''
 
 if __name__ == "__main__":
 

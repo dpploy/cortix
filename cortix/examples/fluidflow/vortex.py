@@ -68,7 +68,7 @@ class Vortex(Module):
         while time < self.end_time:
 
             if self.show_time[0] and count%self.show_time[1] == 0 :
-                print('TIME =',round(time,1))
+                print('Vortex::time[s] =',round(time,1))
             count += 1
 
             for port in self.ports:
