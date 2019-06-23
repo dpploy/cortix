@@ -33,7 +33,7 @@ if __name__ == "__main__":
     vortex = Vortex()
     vortex.show_time = (True,100)
     vortex.end_time = end_time
-    vortex.time_step = 0.1
+    vortex.time_step = time_step
 
     for i in range(n_droplets):
 
