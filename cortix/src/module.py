@@ -17,9 +17,9 @@ class Module:
         self.ports =  []
 
     def send(self, data, port):
-        """
-        Send data through a given port
-        """
+        '''
+        Send data through a given port.
+        '''
         if isinstance(port, str):
             matches = [p for p in self.ports if p.name == port]
             assert len(matches) == 1,\
@@ -33,9 +33,9 @@ class Module:
         port.send(data)
 
     def recv(self, port):
-        """
+        '''
         Receive data from a given port
-        """
+        '''
         if isinstance(port, str):
             matches = [p for p in self.ports if p.name == port]
             assert(len(matches) == 1)
@@ -48,12 +48,23 @@ class Module:
         return port.recv()
 
     def add_port(self, port):
-        """
+        '''
         Add a port to the module
-        """
+        '''
         assert isinstance(port, Port), "port must be of type Port"
         if port not in self.ports:
             self.ports.append(port)
 
+    def get_port(self, name):
+        '''
+        Get port by name.
+        '''
+        assert isinstance(name, str), 'port name must be of type str'
+        port = None
+        for port in self.ports:
+            if port.name == name:
+                break
+        return port
+
     def run(self):
-        raise NotImplementedError("Modules must implement run()")
+        raise NotImplementedError('Modules must implement run()')

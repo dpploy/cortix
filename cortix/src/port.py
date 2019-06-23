@@ -13,7 +13,8 @@ class Port:
     send and/or receive calls on a given port. The concept of a port is that of a data
     transfer "interaction." This can be one- or two-way but no two sends or receives
     should be issued simultaneously on the same port, else the order of arrival of
-    messages is unknown.
+    messages is unknown since the default tag used in the underlying MPI send/receive
+    is the name of the port; that is, the same tag.
     '''
 
     def __init__(self, name=None):
@@ -42,7 +43,7 @@ class Port:
 
     def send(self, data):
         if self.use_mpi:
-            # Blocking send. This may block until the message is received. Behavior
+            # Blocking send. This "may" block until the message is received. Behavior
             # is implementation dependent.
             self.comm.send(data, dest=self.connected.rank, tag=self.id)
         else:

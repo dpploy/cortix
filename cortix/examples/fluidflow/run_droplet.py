@@ -11,19 +11,19 @@ from cortix.src.cortix_main import Cortix
 from cortix.examples.fluidflow.droplet import Droplet
 from cortix.examples.fluidflow.vortex import Vortex
 
-"""
+'''
 MPI-active version of droplet
 Run with
 
 nprocs = 2*n_droplets + 2 processes
 
 Usage: mpirun -np nprocs run_droplet.py
-"""
+'''
 
 if __name__ == "__main__":
 
     # Parameters
-    n_droplets = 5
+    n_droplets = 3
     end_time   = 500
     time_step  = 0.1
 
@@ -33,7 +33,7 @@ if __name__ == "__main__":
     vortex = Vortex()
     vortex.show_time = (True,100)
     vortex.end_time = end_time
-    vortex.time_step = 0.1
+    vortex.time_step = time_step
 
     for i in range(n_droplets):
 
@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
         # DataPlot modules.
         data_plot = DataPlot()
-        data_plot.title = 'Droplet Trajectory'
+        data_plot.title = 'Droplet Trajectory '+str(i)
         # Ports def.
         plot = Port("viz-data:{}".format(i))
         data_plot.add_port(plot)

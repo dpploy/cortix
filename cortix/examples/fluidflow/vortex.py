@@ -55,6 +55,8 @@ class Vortex(Module):
         self.outer_v_theta   = 1.0 # m/s # angular speed
         self.v_z_0 = 0.50 # [m/s]
 
+        self.period = 20 # wind change period
+
     def run(self):
 
         # namedtuple does not pickle into send message; investigate later: vfda TODO
@@ -68,34 +70,42 @@ class Vortex(Module):
         while time < self.end_time:
 
             if self.show_time[0] and count%self.show_time[1] == 0 :
-                print('TIME =',round(time,1))
+                print('Vortex::time[s] =',round(time,1))
             count += 1
 
             for port in self.ports:
+
                 if port.name.split(':')[0].strip() == 'fluid-flow':
-                    (dummy_time, position) = self.recv(port)
+                    (message_time, position) = port.recv()
 
                 # Compute the vortex velocity using the given position
-                velocity = self.compute_velocity(position)
+                velocity = self.compute_velocity(message_time,position)
 
                 # Send the vortex velocity to caller
-                self.send( (time, velocity, fluid_props), port )
+                port.send( (message_time, velocity, fluid_props) )
 
             time += self.time_step
 
-    def compute_velocity(self, position):
+    def compute_velocity(self, time, position):
         '''
         Compute the vortex velocity at the given external
         position using a vortex flow model
 
         Parameters
         ----------
+        time: float
+            Time in SI unit.
         position: numpy.ndarray(3)
+            Spatial position in SI unit.
 
         Returns
         -------
         vortex_velocity: numpy.ndarray(3)
         '''
+        import math
+
+        cycle_freq  = 1/self.period
+        radian_freq = 2*math.pi*cycle_freq
 
         outer_cylindrical_radius = np.hypot(self.box_half_length, self.box_half_length)
         circulation = 2 * np.pi * outer_cylindrical_radius * self.outer_v_theta # m^2/s
@@ -107,14 +117,15 @@ class Vortex(Module):
 
         relax_length = self.box_height / 2.0
         z_relax_factor = np.exp(-(self.box_height-z)/relax_length)
-        v_z = self.v_z_0 * z_relax_factor
+        v_z = self.v_z_0 * z_relax_factor * abs(math.sin( radian_freq * time))
 
         cylindrical_radius = np.hypot(x,y)
         azimuth = np.arctan2(y,x)
 
         v_theta = (1 - np.exp(-cylindrical_radius**2 / 8 / core_radius**2)) *\
-                   circulation / 2 / np.pi / max(cylindrical_radius,self.min_core_radius) *\
-                   z_relax_factor
+                   circulation / 2 / np.pi /\
+                   max(cylindrical_radius,self.min_core_radius) *\
+                   z_relax_factor * abs(math.sin( radian_freq * time))
 
         v_x = - v_theta * np.sin(azimuth)
         v_y =   v_theta * np.cos(azimuth)

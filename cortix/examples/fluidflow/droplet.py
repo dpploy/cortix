@@ -110,10 +110,13 @@ class Droplet(Module):
         while time < self.end_time:
 
             # Interactions in the external-flow port
-            position = self.liquid_phase.GetValue('position')
-            self.send((time,position), 'external-flow')
+            port = self.get_port('external-flow')
 
-            (dummy_time,velocity,fluid_props) = self.recv('external-flow')
+            position = self.liquid_phase.GetValue('position')
+            port.send( (time,position) )
+
+            (check_time,velocity,fluid_props) = port.recv()
+            assert abs(check_time-time) <= 1e-6
             self.ode_params['flow-velocity'] = velocity
 
             #medium_mass_density  = fluid_props.mass_density  # see Vortex
@@ -130,14 +133,16 @@ class Droplet(Module):
             self.ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
 
             # Interactions in the visualization port
-            self.send(position, 'visualization')
+            port = self.get_port('visualization')
+
+            port.send( position )
 
             # Evolve droplet state
             self.step(time)
 
             time += self.time_step
 
-        self.send('DONE', 'visualization')
+        port.send('DONE')
 
     def rhs_fn(self, u_vec, t, params):
         drop_pos = u_vec[:3]
