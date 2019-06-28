@@ -86,7 +86,7 @@ class FuelSegment():
 
         Returns
         -------
-        geometry: str
+        geometry: pandas.series
         '''
 
         return self.__geometry
@@ -95,8 +95,7 @@ class FuelSegment():
     def get_species(self):
 
         '''
-        Returns the species object which describes the composition of the fuel
-        bundle. The species encapsulates all chemical species present in the
+        Returns the list containing all the specie objects that make up the
         fuel bundle.
 
         Parameters
@@ -105,7 +104,7 @@ class FuelSegment():
 
         Returns
         -------
-        species: object
+        species: list of objects
         '''
 
         return self.__species
@@ -498,7 +497,7 @@ class FuelSegment():
     def __repr__(self):
 
         '''
-        Used to pront the geometry of the fuel segment and the species that it
+        Used to print the geometry of the fuel segment and the species that it
         consists of.
 
         Parameters

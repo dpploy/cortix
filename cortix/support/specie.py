@@ -205,7 +205,7 @@ class Specie:
     def GetPhase(self):
 
         '''
-        Returns the phase history of the species.
+        Returns the phase that the specie is in.
 
         Parameters
         ----------
@@ -213,7 +213,7 @@ class Specie:
 
         Returns
         -------
-        phase: dataFrame
+        phase: str
         '''
 
         return self._phase
@@ -225,7 +225,7 @@ class Specie:
 
         Parameters
         ----------
-        p: dataFrame
+        p: str
 
         Returns
         -------
@@ -360,7 +360,7 @@ class Specie:
 
         '''
         Sets molarRadioactivityFractions equal to fracs. Fracs must be a list
-        of floatswith the same length as there are different atoms in the
+        of floats with the same length as there are different atoms in the
         species, or the function call will fail. (e.g. self._atoms and fracs
         must be of the same length). Take care to ensure that the elements of
         fracs match with the elements of self._atoms! (65% is in the same

@@ -130,6 +130,7 @@ class Quantity:
     value = property(GetValue, SetValue, None, None)
 
     def SetFormalName(self, fn):
+
         '''
         Sets the formal name of the property to fn.
 
