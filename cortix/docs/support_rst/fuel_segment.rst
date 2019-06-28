@@ -1,5 +1,5 @@
-fuel\_segment
-=============
+fuel_segment
+============
 
 .. automodule:: fuel_segment
     :members:

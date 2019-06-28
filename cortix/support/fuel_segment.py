@@ -75,6 +75,7 @@ class FuelSegment():
 #*********************************************************************************
 
     def get_geometry(self):
+
         '''
         Returns the geometry of the fuel bundle (cylindrical, hexoganol,
         rectangular, etc).
@@ -97,9 +98,10 @@ class FuelSegment():
         Returns the species object which describes the composition of the fuel
         bundle. The species encapsulates all chemical species present in the
         fuel bundle.
+
         Parameters
         ----------
-        None:
+        Empty:
 
         Returns
         -------
@@ -115,7 +117,6 @@ class FuelSegment():
         Returns a specie named [name] from the list of species making up the
         fuel bundle. If no name is specified, this function will return None.
 
-
         Parameters
         ----------
         name: str
@@ -123,7 +124,6 @@ class FuelSegment():
         Returns
         -------
         specie: obj
-
         '''
 
         for specie in self.__species:
@@ -134,6 +134,7 @@ class FuelSegment():
 
 # Get stored fuel segment property either overall or on a nuclide basis
     def get_attribute(self, name, nuclide=None, series=None):
+
         '''
         Used to get stored fuel segment properties, either overall (as an
         average), or on a nuclide basis. "name" in this case refers to the
@@ -456,6 +457,7 @@ class FuelSegment():
 #*********************************************************************************
 
     def __get_fuel_segment_volume(self):
+
         '''
         Returns the total volume of fuel in the fuel segment.
 

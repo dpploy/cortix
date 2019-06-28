@@ -55,6 +55,7 @@ class FuelBucket():
     # Start: Pre-irradiation information
 
     def get_name(self):
+
         '''
         Returns the name of the fuel bucket.
 
@@ -71,6 +72,7 @@ class FuelBucket():
     name = property(get_name, None, None, None)
 
     def get_slug_type(self):
+
         '''
         Returns the type of slugs being stored in the bucket (inner slug or
         outer slug).
@@ -88,6 +90,7 @@ class FuelBucket():
     slug_type = property(get_slug_type, None, None, None)
 
     def get_n_slugs(self):
+
         '''
         Returns the number of fuel slugs in the bucket.
 
@@ -104,6 +107,7 @@ class FuelBucket():
     n_slugs = property(get_n_slugs, None, None, None)
 
     def get_fuel_enrichment(self):
+
         '''
         Returns the enrichment of the fuel slugs in the bucket, in %.
 
@@ -120,6 +124,7 @@ class FuelBucket():
     fuel_enrichment = property(get_fuel_enrichment, None, None, None)
 
     def get_fresh_u_mass(self):
+
         '''
         Returns the total amount of uranium in the bucket, in grams.
 
@@ -136,6 +141,7 @@ class FuelBucket():
     fresh_u_mass = property(get_fresh_u_mass, None, None, None)
 
     def get_fresh_u238_mass(self):
+
         '''
         Returns the total amount of uranium-238 in the bucket, in grams.
 
@@ -169,6 +175,7 @@ class FuelBucket():
     fresh_u235_mass = property(get_fresh_u235_mass, None, None, None)
 
     def get_cladding_mass(self):
+
         '''
         Returns the total mass of cladding material in the bucket, in grams.
 
@@ -397,6 +404,7 @@ class FuelBucket():
     cladding_volume = property(get_cladding_volume, None, None, None)
 
     def get_fuel_mass(self):
+
         '''
         Returns the total mass of fuel in the solid phase in the bucket.
 
@@ -485,6 +493,7 @@ class FuelBucket():
 
     def get_fuel_radioactivity(self):
         # radioactivity of the solid phase
+
         '''
         Returns the total radioactivity of the solid phase fuel, in units of
         curies.
@@ -502,6 +511,7 @@ class FuelBucket():
     fuel_radioactivity = property(get_fuel_radioactivity, None, None, None)
 
     def get_fuel_phase(self):
+
         '''
         Returns the phase history of the fuel.
 
