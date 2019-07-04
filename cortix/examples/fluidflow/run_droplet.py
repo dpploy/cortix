@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     # Parameters
     n_droplets = 3
-    end_time   = 500
+    end_time   = 50
     time_step  = 0.1
 
     c = Cortix(use_mpi=True)
@@ -51,12 +51,12 @@ if __name__ == "__main__":
         data_plot = DataPlot()
         data_plot.title = 'Droplet Trajectory '+str(i)
         # Ports def.
-        plot = Port("viz-data:{}".format(i))
+        plot = Port('viz-data:{:05}'.format(i))
         data_plot.add_port(plot)
 
         # Vortex module.
         # Ports def.
-        fluid_flow = Port("fluid-flow:{}".format(i))
+        fluid_flow = Port('fluid-flow:{}'.format(i))
         vortex.add_port(fluid_flow)
 
         # Network connectivity

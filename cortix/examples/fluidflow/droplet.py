@@ -13,7 +13,7 @@ from cortix.support.quantity import Quantity
 
 class Droplet(Module):
     '''
-    Droplet module used to model very simple fluid-particle interactions.
+    Droplet Cortix module used to model very simple fluid-particle interactions.
 
     Ports
     =====
@@ -142,7 +142,9 @@ class Droplet(Module):
 
             time += self.time_step
 
-        port.send('DONE')
+        port.send('DONE')  # this should not be needed: TODO
+
+        #self.__save_state()
 
     def rhs_fn(self, u_vec, t, params):
         drop_pos = u_vec[:3]
