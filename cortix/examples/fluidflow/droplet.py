@@ -144,7 +144,7 @@ class Droplet(Module):
 
         port.send('DONE')  # this should not be needed: TODO
 
-        self.__save_state()
+        #self.__save_state()
 
     def rhs_fn(self, u_vec, t, params):
         drop_pos = u_vec[:3]
