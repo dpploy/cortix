@@ -37,6 +37,7 @@ if __name__ == "__main__":
     vortex.show_time = (True,100)
     vortex.end_time = end_time
     vortex.time_step = time_step
+    vortex.plot_velocity()
 
     # DataPlot module (single).
     data_plot = DataPlot()

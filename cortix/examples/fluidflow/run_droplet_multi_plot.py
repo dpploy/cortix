@@ -37,6 +37,7 @@ if __name__ == "__main__":
     vortex.show_time = (True,100)
     vortex.end_time = end_time
     vortex.time_step = time_step
+    vortix.plot_velocity()
 
     for i in range(n_droplets):
 

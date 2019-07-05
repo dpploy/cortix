@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# This file is part of the Cortix toolkit environment
+# This file is part of the Cortix toolkit environment.
 # https://cortix.org
 
 import numpy as np

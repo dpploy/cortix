@@ -117,7 +117,7 @@ class Vortex(Module):
 
         relax_length = self.box_height / 2.0
         z_relax_factor = np.exp(-(self.box_height-z)/relax_length)
-        v_z = self.v_z_0 * z_relax_factor * abs(math.sin( radian_freq * time))
+        v_z = self.v_z_0 * z_relax_factor * abs(math.cos( radian_freq * time))
 
         cylindrical_radius = np.hypot(x,y)
         azimuth = np.arctan2(y,x)
@@ -125,28 +125,31 @@ class Vortex(Module):
         v_theta = (1 - np.exp(-cylindrical_radius**2 / 8 / core_radius**2)) *\
                    circulation / 2 / np.pi /\
                    max(cylindrical_radius,self.min_core_radius) *\
-                   z_relax_factor * abs(math.sin( radian_freq * time))
+                   z_relax_factor * abs(math.cos( radian_freq * time))
 
         v_x = - v_theta * np.sin(azimuth)
         v_y =   v_theta * np.cos(azimuth)
 
         return np.array([v_x,v_y,v_z])
 
-    def plot_vortex_velocity(self):
+    def plot_velocity(self, time=None):
         '''
         Plot the vortex velocity as a function of height
         '''
+
+        if time is None:
+            time = self.initial_time
 
         (fig,axs) = plt.subplots(2,2)
         fig.subplots_adjust(hspace=0.5, wspace=0.5)
 
         for z in np.flip(np.linspace(0, self.box_height,3), 0):
-            xval = []
-            yval = []
+            xval = list()
+            yval = list()
             for x in np.linspace(0, self.box_half_length, 500):
                 xval.append(x)
                 y = 0.0
-                vortex_velocity = self.compute_velocity(np.array([x,y,z]))
+                vortex_velocity = self.compute_velocity( time,np.array([x,y,z]) )
                 yval.append(vortex_velocity[1])
 
             axs[0,0].plot(xval, yval, label='z =' + str(round(z,2))+' [m]')
@@ -157,11 +160,11 @@ class Vortex(Module):
         fig.suptitle('Vortex Flow')
         axs[0,0].grid(True)
 
-        xval = []
-        yval = []
+        xval = list()
+        yval = list()
         for z in np.linspace(0,self.box_height,50):
             yval.append(z)
-            vortex_velocity = self.compute_velocity(np.array([0.0,0.0,z]) )
+            vortex_velocity = self.compute_velocity( time,np.array([0.0,0.0,z]) )
             xval.append(vortex_velocity[2])
 
         axs[0,1].plot(xval,yval)
