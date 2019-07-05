@@ -20,7 +20,7 @@ Run with
 
 nprocs = n_droplets + 1 vortex + 1 data_plot + 1 cortix processes
 
-Usage: mpirun -np nprocs run_droplet.py
+Usage: mpirun -np nprocs run_droplet_single_plot.py
 '''
 
 if __name__ == "__main__":
