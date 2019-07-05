@@ -83,7 +83,7 @@ class Droplet(Module):
         # Origin of cartesian coordinate system at the bottom of the box. 
         # z coordinate pointing upwards. -L <= x <= L, -L <= y <= L, 
         self.box_half_length = 250.0 # L [m]
-        self.box_height = 250.0 # H [m]
+        self.box_height = 500.0 # H [m]
 
         # Random positioning of the droplet constrained to a box sub-region.
         x_0 = (2 * np.random.random(3) - np.ones(3)) * self.box_half_length / 4.0

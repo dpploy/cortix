@@ -48,7 +48,7 @@ class Vortex(Module):
         # z coordinate pointing upwards. -L <= x <= L, -L <= y <= L, 
         # z component is positive => vortex is blowing upwards.
         self.box_half_length = 250.0 # vortex box [m] 
-        self.box_height      = 250.0 # [m]
+        self.box_height      = 500.0 # [m]
 
         # Vortex parameters.
         self.min_core_radius = 2.5 # [m]
@@ -157,7 +157,7 @@ class Vortex(Module):
         axs[0,0].set_xlabel('Radial distance [m]')
         axs[0,0].set_ylabel('Tangential speed [m/s]')
         axs[0,0].legend(loc='best')
-        fig.suptitle('Vortex Flow')
+        fig.suptitle('Vortex Flow at '+str(round(time,1))+' [s]')
         axs[0,0].grid(True)
 
         xval = list()
