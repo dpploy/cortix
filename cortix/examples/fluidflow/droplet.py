@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# This file is part of the Cortix toolkit environment
+# This file is part of the Cortix toolkit environment.
 # https://cortix.org
 
 import numpy as np
@@ -24,6 +24,9 @@ class Droplet(Module):
     def __init__(self):
 
         super().__init__()
+
+        self.bounce = True
+        self.slip   = True
 
         species = []
         quantities = []
@@ -80,7 +83,7 @@ class Droplet(Module):
         # Origin of cartesian coordinate system at the bottom of the box. 
         # z coordinate pointing upwards. -L <= x <= L, -L <= y <= L, 
         self.box_half_length = 250.0 # L [m]
-        self.box_height = 250.0 # H [m]
+        self.box_height = 500.0 # H [m]
 
         # Random positioning of the droplet constrained to a box sub-region.
         x_0 = (2 * np.random.random(3) - np.ones(3)) * self.box_half_length / 4.0
@@ -227,11 +230,17 @@ class Droplet(Module):
         time += self.time_step
         self.liquid_phase.AddRow(time, values)
 
-        # ground impact bounces the drop back up
-        if u_vec[2] <= 0.0:
+        # ground impact with bouncing drop
+        if u_vec[2] <= 0.0 and self.bounce:
             position = self.liquid_phase.GetValue('position', self.initial_time)
             bounced_position = position[2] * np.random.random(1)
             u_vec[2]  = bounced_position
+            u_vec[3:] = 0.0  # zero velocity
+        # ground impact with no bouncing drop and slip velocity
+        elif u_vec[2] <= 0.0 and not self.bounce and self.slip:
+            u_vec[2]  = 0.0
+        elif u_vec[2] <= 0.0 and not self.bounce and not self.slip:
+            u_vec[2]  = 0.0
             u_vec[3:] = 0.0  # zero velocity
 
         # Update current values
