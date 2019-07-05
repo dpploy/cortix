@@ -8,7 +8,9 @@ import matplotlib.pyplot as plt
 from cortix.src.module import Module
 
 class DataPlot(Module):
+
     def __init__(self):
+
         super().__init__()
 
         self.xlabel = "x"
@@ -37,7 +39,7 @@ class DataPlot(Module):
         while True:
             d = self.recv(port)
             if self.debug and i % self.print_freq == 0:
-                self.log.info("Received: {}".format(d))
+                self.log.info('DataPlot::'+port.name+' received: {}'.format(d))
             if isinstance(d, str) and d == "DONE":
                 self.plot_data(data, port)
                 sys.exit(0)
@@ -51,6 +53,7 @@ class DataPlot(Module):
 
         # 2D-Plot
         if data and len(data[0]) == 2:
+            fig = plt.figure(port.name)
             plt.xlabel(self.xlabel)
             plt.ylabel(self.ylabel)
             plt.title(self.title)
@@ -58,7 +61,7 @@ class DataPlot(Module):
 
         # 3D-Plot
         elif data and len(data[0]) == 3:
-            fig = plt.figure()
+            fig = plt.figure(port.name)
             ax = fig.add_subplot(111, projection='3d')
             ax.set_xlabel(self.xlabel)
             ax.set_ylabel(self.ylabel)
