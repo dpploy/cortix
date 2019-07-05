@@ -15,6 +15,7 @@ class DataPlot(Module):
         super().__init__()
 
         self.same_axes = False
+        self.dpi = 300
 
         self.xlabel = 'x'
         self.ylabel = 'y'
@@ -77,7 +78,7 @@ class DataPlot(Module):
             ax.set_title(self.title)
             ax.plot(x, y, [i[2] for i in data])
 
-        plt.savefig('{}.png'.format(port.name), dpi=200)
+        plt.savefig('{}.png'.format(port.name), dpi=self.dpi)
 
     def new_plot_data(self):
 
@@ -120,7 +121,7 @@ class DataPlot(Module):
                 ax.plot(x, y, [i[2] for i in data])
 
                 if not self.same_axes:
-                    plt.savefig('{}.png'.format(key), dpi=200)
+                    plt.savefig('{}.png'.format(key), dpi=self.dpi)
 
         if self.same_axes:
-            plt.savefig('{}.png'.format(key.split(':')[0]), dpi=200)
+            plt.savefig('{}.png'.format(key.split(':')[0]), dpi=self.dpi)
