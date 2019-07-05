@@ -26,8 +26,8 @@ Usage: mpirun -np nprocs run_droplet.py
 if __name__ == "__main__":
 
     # Parameters
-    n_droplets = 3
-    end_time   = 100
+    n_droplets = 5
+    end_time   = 300
     time_step  = 0.1
 
     cortix = Cortix(use_mpi=True)
@@ -41,6 +41,7 @@ if __name__ == "__main__":
     # DataPlot module (single).
     data_plot = DataPlot()
     data_plot.title = 'Droplet Trajectories'
+    data_plot.same_axes = True
 
     for i in range(n_droplets):
 
