@@ -42,6 +42,7 @@ if __name__ == "__main__":
     data_plot = DataPlot()
     data_plot.title = 'Droplet Trajectories'
     data_plot.same_axes = True
+    data_plot.dpi = 300
 
     for i in range(n_droplets):
 
@@ -49,6 +50,8 @@ if __name__ == "__main__":
         droplet = Droplet()
         droplet.end_time = end_time
         droplet.time_step = time_step
+        droplet.bounce = False
+        droplet.slip = False
         # Ports def.
         external_flow = Port('external-flow')
         droplet.add_port(external_flow)

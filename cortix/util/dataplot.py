@@ -15,7 +15,7 @@ class DataPlot(Module):
         super().__init__()
 
         self.same_axes = False
-        self.dpi = 300
+        self.dpi = 200
 
         self.xlabel = 'x'
         self.ylabel = 'y'

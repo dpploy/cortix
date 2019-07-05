@@ -25,6 +25,9 @@ class Droplet(Module):
 
         super().__init__()
 
+        self.bounce = True
+        self.slip   = True
+
         species = []
         quantities = []
 
@@ -227,11 +230,17 @@ class Droplet(Module):
         time += self.time_step
         self.liquid_phase.AddRow(time, values)
 
-        # ground impact bounces the drop back up
-        if u_vec[2] <= 0.0:
+        # ground impact with bouncing drop
+        if u_vec[2] <= 0.0 and self.bounce:
             position = self.liquid_phase.GetValue('position', self.initial_time)
             bounced_position = position[2] * np.random.random(1)
             u_vec[2]  = bounced_position
+            u_vec[3:] = 0.0  # zero velocity
+        # ground impact with no bouncing drop and slip velocity
+        elif u_vec[2] <= 0.0 and not self.bounce and self.slip:
+            u_vec[2]  = 0.0
+        elif u_vec[2] <= 0.0 and not self.bounce and not self.slip:
+            u_vec[2]  = 0.0
             u_vec[3:] = 0.0  # zero velocity
 
         # Update current values

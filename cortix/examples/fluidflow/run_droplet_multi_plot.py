@@ -44,6 +44,8 @@ if __name__ == "__main__":
         droplet = Droplet()
         droplet.end_time = end_time
         droplet.time_step = time_step
+        droplet.bounce = False
+        droplet.slip = False
         # Ports def.
         external_flow = Port('external-flow')
         droplet.add_port(external_flow)
@@ -53,6 +55,7 @@ if __name__ == "__main__":
         # DataPlot modules.
         data_plot = DataPlot()
         data_plot.title = 'Droplet Trajectory '+str(i)
+        data_plot.dpi = 300
         # Ports def.
         plot = Port('viz-data:{:05}'.format(i))
         data_plot.add_port(plot)
