@@ -79,4 +79,5 @@ if __name__ == "__main__":
     cortix.add_module(data_plot)
     cortix.add_module(vortex)
 
+    cortix.save_network("network.png")
     cortix.run()

@@ -6,15 +6,19 @@
 import os
 import shutil
 import logging
-
+import networkx as nx
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 from multiprocessing import Process
 from cortix.src.module import Module
-from cortix.src.utils.cortix_units import Units
-from cortix.src.utils.cortix_time import CortixTime
 
 class Cortix:
     '''
-    The main Cortix class definition.
+    The main Cortix class definition:
+    1. Create the object
+    2. Add modules
+    3. Run the simulation
     '''
 
     def __init__(self, use_mpi=False):
@@ -64,6 +68,27 @@ class Cortix:
             elif self.rank == mod.rank:
                 self.log.info("Launching Module {} on rank {}".format(mod, self.rank))
                 mod.run()
+
+    def save_network(self, file_name):
+        if self.rank == 0:
+            conn = []
+            g = nx.MultiDiGraph()
+            for mod_one in self.modules:
+                for mod_two in self.modules:
+                    if mod_one != mod_two:
+                        for port in mod_one.ports:
+                            if port.connected in mod_two.ports:
+                                mod_one_name = "{}_{}".format(mod_one.__class__.__name__, self.modules.index(mod_one))
+                                mod_two_name = "{}_{}".format(mod_two.__class__.__name__, self.modules.index(mod_two))
+                                mod_pair = (mod_one_name, mod_two_name)
+                                if mod_pair not in conn and mod_pair[::-1] not in conn:
+                                    g.add_edge(mod_one_name, mod_two_name)
+                                    conn.append(mod_pair)
+            f = plt.figure()
+            pos = nx.shell_layout(g)
+            nx.draw(g, pos, ax=f.add_subplot(111), with_labels=True)
+            f.savefig(file_name, dpi=220)
+
 
     def __create_logger(self):
         '''
