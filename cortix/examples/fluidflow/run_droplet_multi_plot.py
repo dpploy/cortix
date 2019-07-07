@@ -27,17 +27,17 @@ if __name__ == "__main__":
 
     # Parameters
     n_droplets = 3
-    end_time   = 500
+    end_time   = 20
     time_step  = 0.1
 
-    cortix = Cortix(use_mpi=True)
+    cortix = Cortix(use_mpi=False)
 
     # Vortex module (single).
     vortex = Vortex()
     vortex.show_time = (True,100)
     vortex.end_time = end_time
     vortex.time_step = time_step
-    vortix.plot_velocity()
+    vortex.plot_velocity()
 
     for i in range(n_droplets):
 
