@@ -70,16 +70,17 @@ class Cortix:
                 self.log.info("Launching Module {} on rank {}".format(mod, self.rank))
                 mod.run()
 
-    def save_network(self, file_name):
+    def draw_network(self, file_name):
         if self.rank == 0:
             conn = []
             colors = ["blue", "red", "green", "teal"]
             class_map = {}
             cmap = {}
-            g = nx.MultiDiGraph()
+            g = nx.MultiGraph()
             for mod_one in self.modules:
                 class_name = mod_one.__class__.__name__
                 index = self.modules.index(mod_one)
+                print(index)
                 mod_one_name = "{}_{}".format(class_name, index)
                 for mod_two in self.modules:
                     if mod_one != mod_two:
@@ -94,9 +95,10 @@ class Cortix:
                     class_map[class_name] = colors[index % len(colors)]
                 cmap[mod_one_name] = class_map[class_name]
             f = plt.figure()
-            pos = nx.shell_layout(g)
-            nx.draw(g, pos, node_color=[cmap[n] for n in g.nodes], ax=f.add_subplot(111), with_labels=False)
-
+            pos = nx.spring_layout(g)
+            node_size = [50 if n.split("_")[0] == "Droplet" else 500 for n in g.nodes]
+            nx.draw(g, pos, node_color=[cmap[n] for n in g.nodes],
+                    ax=f.add_subplot(111), node_size=node_size)
             patches = []
             for c in class_map:
                 patch = mpatches.Patch(color=class_map[c], label = c)

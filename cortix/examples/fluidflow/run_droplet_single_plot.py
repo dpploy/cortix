@@ -26,11 +26,11 @@ Usage: mpirun -np nprocs run_droplet_single_plot.py
 if __name__ == "__main__":
 
     # Parameters
-    n_droplets = 5
+    n_droplets = 500
     end_time   = 300
     time_step  = 0.1
 
-    cortix = Cortix(use_mpi=True)
+    cortix = Cortix(use_mpi=False)
 
     # Vortex module (single).
     vortex = Vortex()
@@ -53,6 +53,7 @@ if __name__ == "__main__":
         droplet.time_step = time_step
         droplet.bounce = False
         droplet.slip = False
+
         # Ports def.
         external_flow = Port('external-flow')
         droplet.add_port(external_flow)
@@ -79,5 +80,5 @@ if __name__ == "__main__":
     cortix.add_module(data_plot)
     cortix.add_module(vortex)
 
-    cortix.save_network("network.png")
-    cortix.run()
+    cortix.draw_network("network.png")
+    #cortix.run()
