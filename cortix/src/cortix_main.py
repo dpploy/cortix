@@ -71,7 +71,7 @@ class Cortix:
                 mod.run()
 
     def draw_network(self, file_name):
-        if self.rank == 0:
+        if not self.use_mpi or self.rank == 0:
             conn = []
             colors = ["blue", "red", "green", "teal"]
             class_map = {}
@@ -80,7 +80,6 @@ class Cortix:
             for mod_one in self.modules:
                 class_name = mod_one.__class__.__name__
                 index = self.modules.index(mod_one)
-                print(index)
                 mod_one_name = "{}_{}".format(class_name, index)
                 for mod_two in self.modules:
                     if mod_one != mod_two:
@@ -92,20 +91,19 @@ class Cortix:
                                     g.add_edge(mod_one_name, mod_two_name)
                                     conn.append(mod_pair)
                 if class_name not in class_map:
-                    class_map[class_name] = colors[index % len(colors)]
+                    class_map[class_name] = colors[len(class_map) % len(colors)]
                 cmap[mod_one_name] = class_map[class_name]
             f = plt.figure()
-            pos = nx.spring_layout(g)
-            node_size = [50 if n.split("_")[0] == "Droplet" else 500 for n in g.nodes]
-            nx.draw(g, pos, node_color=[cmap[n] for n in g.nodes],
-                    ax=f.add_subplot(111), node_size=node_size)
+            pos = nx.spring_layout(g, k=0.15, iterations=20)
+            node_size = [50 if n.split("_")[0] == "Droplet" else 2000 for n in g.nodes]
+            nx.draw(g, pos, node_color=[cmap[n] for n in g.nodes], ax=f.add_subplot(111), node_size=node_size, linewidths=0.01)
             patches = []
+            print(class_map)
             for c in class_map:
-                patch = mpatches.Patch(color=class_map[c], label = c)
+                patch = mpatches.Patch(color=class_map[c], label=c)
                 patches.append(patch)
             plt.legend(handles=patches)
             f.savefig(file_name, dpi=220)
-
 
     def __create_logger(self):
         '''
