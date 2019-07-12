@@ -17,8 +17,10 @@ class Droplet(Module):
 
     Ports
     =====
-    external-flow:
-    visualization:
+    external-flow: this is a port that exchanges data with any other module that
+    provides information about the flow outside the droplet.
+
+    visualization: this is a port that sends data to a visualization module.
     '''
 
     def __init__(self):
