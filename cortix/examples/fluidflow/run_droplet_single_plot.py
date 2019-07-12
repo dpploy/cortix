@@ -30,7 +30,7 @@ if __name__ == "__main__":
     end_time   = 300
     time_step  = 0.1
 
-    cortix = Cortix(use_mpi=False)
+    cortix = Cortix(use_mpi=True)
 
     # Vortex module (single).
     vortex = Vortex()
