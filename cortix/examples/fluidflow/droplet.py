@@ -28,10 +28,10 @@ class Droplet(Module):
         self.bounce = True
         self.slip   = True
 
-        species = []
-        quantities = []
+        species = list()
+        quantities = list()
 
-        self.ode_params = {}
+        self.ode_params = dict()
 
         self.initial_time = 0.0
         self.end_time = 100
@@ -110,42 +110,48 @@ class Droplet(Module):
 
         time = self.initial_time
 
+        # Access ports
+        ext_flow_port = self.get_port('external-flow')
+        viz_port      = self.get_port('visualization')
+
         while time < self.end_time:
 
             # Interactions in the external-flow port
-            port = self.get_port('external-flow')
+            if ext_flow_port:
 
-            position = self.liquid_phase.GetValue('position')
-            port.send( (time,position) )
+                ext_flow_port = self.get_port('external-flow')
 
-            (check_time,velocity,fluid_props) = port.recv()
-            assert abs(check_time-time) <= 1e-6
-            self.ode_params['flow-velocity'] = velocity
+                position = self.liquid_phase.GetValue('position')
+                ext_flow_port.send( (time,position) )
 
-            #medium_mass_density  = fluid_props.mass_density  # see Vortex
-            #medium_dyn_viscosity = fluid_props.dyn_viscosity # see Vortex
-            medium_mass_density  = fluid_props[0]
-            medium_dyn_viscosity = fluid_props[1]
+                (check_time,velocity,fluid_props) = ext_flow_port.recv()
+                assert abs(check_time-time) <= 1e-6
+                self.ode_params['flow-velocity'] = velocity
 
-            self.ode_params['medium-mass-density'] = medium_mass_density
+                #medium_mass_density  = fluid_props.mass_density  # see Vortex
+                #medium_dyn_viscosity = fluid_props.dyn_viscosity # see Vortex
+                medium_mass_density  = fluid_props[0]
+                medium_dyn_viscosity = fluid_props[1]
 
-            medium_displaced_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * \
-                    medium_mass_density # [kg]
-            self.ode_params['medium-displaced-mass'] = medium_displaced_mass
+                self.ode_params['medium-mass-density'] = medium_mass_density
 
-            self.ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
+                medium_displaced_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * \
+                        medium_mass_density # [kg]
+                self.ode_params['medium-displaced-mass'] = medium_displaced_mass
+
+                self.ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
 
             # Interactions in the visualization port
-            port = self.get_port('visualization')
+            if viz_port:
 
-            port.send( position )
+                viz_port = self.get_port('visualization')
 
-            # Evolve droplet state
-            self.step(time)
+                viz_port.send( position )
 
-            time += self.time_step
+            # Evolve droplet state to next time stamp
+            time = self.step( time )
 
-        port.send('DONE')  # this should not be needed: TODO
+        viz_port.send('DONE')  # this should not be needed: TODO
 
         #self.__save_state()
 
@@ -228,6 +234,7 @@ class Droplet(Module):
         values = self.liquid_phase.GetRow(time) # values at previous time
 
         time += self.time_step
+
         self.liquid_phase.AddRow(time, values)
 
         # ground impact with bouncing drop
@@ -248,3 +255,5 @@ class Droplet(Module):
         self.liquid_phase.SetValue('velocity', u_vec[3:], time)
         self.liquid_phase.SetValue('speed', np.linalg.norm(u_vec[3:]), time)
         self.liquid_phase.SetValue('radial-position', np.linalg.norm(u_vec[0:2]), time)
+
+        return time

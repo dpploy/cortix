@@ -6,6 +6,7 @@
 import os
 import shutil
 import logging
+import datetime
 
 from multiprocessing import Process
 from cortix.src.module import Module
@@ -40,10 +41,10 @@ class Cortix:
 
     def __del__(self):
 
-        if (self.use_mpi and self.rank == 0) or not self.use_mpi:
-            #self.log.info('Destroyed Cortix object %s', self.__get_splash(begin=False))
-            print('del hello')
-            self.log.info('Destroyed Cortix object')
+        if self.use_mpi and self.rank == 0 or not self.use_mpi:
+                print('\n'+self.end_of_run_date+': Destroyed Cortix object '+
+                        self.__get_splash(begin=False))
+
         return
 
     def add_module(self, m):
@@ -73,17 +74,27 @@ class Cortix:
 
         for mod in self.modules:
             if not self.use_mpi:
+                processes = list()
                 self.log.info('Launching Module {}'.format(mod))
                 p = Process(target=mod.run)
+                processes.append(p)
                 p.start()
             elif self.rank == mod.rank:
                 self.log.info('Launching Module {} on rank {}'.format(mod, self.rank))
                 mod.run()
 
+        if self.use_mpi:
+            self.comm.barrier()
+        else:
+            [p.join() for p in processes]
+
+        self.end_of_run_date = datetime.datetime.today().strftime("%d%b%y %H:%M:%S")
+
     def __create_logger(self):
         '''
-        A helper function to setup the logging facility used in constructor
+        A helper function to setup the logging facility used in the constructor.
         '''
+
         self.log = logging.getLogger('cortix')
         self.log.setLevel(logging.DEBUG)
 
@@ -103,7 +114,7 @@ class Cortix:
         file_handler.setFormatter(formatter)
         console_handler.setFormatter(formatter)
 
-        # add handlers to logger
+        # Add handlers to logger
         self.log.addHandler(file_handler)
         self.log.addHandler(console_handler)
 
