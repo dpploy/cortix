@@ -133,7 +133,7 @@ class Vortex(Module):
 
     def plot_velocity(self, time=None):
         '''
-        Plot the vortex velocity as a function of height
+        Plot the vortex velocity as a function of height.
         '''
 
         if time is None:
@@ -172,3 +172,6 @@ class Vortex(Module):
         axs[0,1].grid(True)
 
         fig.savefig('vortex_velocity.png',dpi=200)
+        plt.close(fig)
+
+        return

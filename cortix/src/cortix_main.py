@@ -5,6 +5,7 @@
 
 import os
 import logging
+import datetime
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -35,8 +36,20 @@ class Cortix:
         # Setup the global logger
         self.__create_logger()
         self.modules = []
-        self.log.info('Created Cortix object')
         self.nx_graph = None
+
+        # Modules storage
+        self.modules = list()
+
+        # Done
+        if (self.use_mpi and self.rank == 0) or not self.use_mpi:
+            self.log.info("Created Cortix object %s", self.__get_splash(begin=True))
+
+        return
+
+    def __del__(self):
+        if (self.use_mpi and self.rank == 0) or not self.use_mpi:
+                print("Destroyed Cortix object " + self.__get_splash(begin=False))
 
     def add_module(self, m):
         """
@@ -70,11 +83,13 @@ class Cortix:
 
         for mod in self.modules:
             if not self.use_mpi:
-                self.log.info("Launching Module {}".format(mod))
+                processes = list()
+                self.log.info('Launching Module {}'.format(mod))
                 p = Process(target=mod.run)
+                processes.append(p)
                 p.start()
             elif self.rank == mod.rank:
-                self.log.info("Launching Module {} on rank {}".format(mod, self.rank))
+                self.log.info('Launching Module {} on rank {}'.format(mod, self.rank))
                 mod.run()
 
     def get_network(self):
@@ -125,14 +140,15 @@ class Cortix:
         f.savefig(file_name, dpi=dpi)
 
     def __create_logger(self):
-        """
-        A helper function used to setup the logging facility
-        """
+        '''
+        A helper function to setup the logging facility used in the constructor.
+        '''
 
-        self.log = logging.getLogger("cortix")
+        self.log = logging.getLogger('cortix')
+
         self.log.setLevel(logging.DEBUG)
 
-        file_handler = logging.FileHandler("cortix.log")
+        file_handler = logging.FileHandler('cortix.log')
         file_handler.setLevel(logging.DEBUG)
 
         console_handler = logging.StreamHandler()
@@ -140,17 +156,49 @@ class Cortix:
 
         # Formatter added to handlers
         if self.use_mpi:
-            fs = "[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(self.rank)
+            fs = '[rank:{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s'.format(self.rank)
         else:
+
             fs = "[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(os.getpid())
 
         formatter = logging.Formatter(fs)
         file_handler.setFormatter(formatter)
         console_handler.setFormatter(formatter)
 
-        # add handlers to logger
+        # Add handlers to logger
         self.log.addHandler(file_handler)
         self.log.addHandler(console_handler)
 
-if __name__ == "__main__":
+    def __get_splash(self, begin=True):
+
+        splash = \
+        '_____________________________________________________________________________\n'+\
+        '      ...                                        s       .\n'+\
+        '   xH88"`~ .x8X                                 :8      @88>\n'+\
+        ' :8888   .f"8888Hf        u.      .u    .      .88      %8P      uL   ..\n'+\
+        ':8888>  X8L  ^""`   ...ue888b   .d88B :@8c    :888ooo    .     .@88b  @88R\n'+\
+        'X8888  X888h        888R Y888r ="8888f8888r -*8888888  .@88u  ""Y888k/"*P\n'+\
+        '88888  !88888.      888R I888>   4888>"88"    8888    ''888E`    Y888L\n'+\
+        '88888   %88888      888R I888>   4888> "      8888      888E      8888\n'+\
+        '88888 `> `8888>     888R I888>   4888>        8888      888E      `888N\n'+\
+        '`8888L %  ?888   ! u8888cJ888   .d888L .+    .8888Lu=   888E   .u./"888&\n'+\
+        ' `8888  `-*""   /   "*888*P"    ^"8888*"     ^%888*     888&  d888" Y888*"\n'+\
+        '   "888.      :"      "Y"          "Y"         "Y"      R888" ` "Y   Y"\n'+\
+        '     `""***~"`                                           ""\n'+\
+        '                             https://cortix.org                              \n'+\
+        '_____________________________________________________________________________'
+
+        if begin:
+            message = \
+            '\n_____________________________________________________________________________\n'+\
+            '                             L A U N C H I N G                               \n'
+
+        else:
+            message = \
+            '\n_____________________________________________________________________________\n'+\
+            '                           T E R M I N A T I N G                             \n'
+
+        return message + splash
+
+if __name__ == '__main__':
     c = Cortix()
