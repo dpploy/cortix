@@ -74,15 +74,14 @@ class Vortex(Module):
             count += 1
 
             for port in self.ports:
-
                 if port.name.split(':')[0].strip() == 'fluid-flow':
                     (message_time, position) = port.recv()
 
-                # Compute the vortex velocity using the given position
-                velocity = self.compute_velocity(message_time,position)
+                    # Compute the vortex velocity using the given position
+                    velocity = self.compute_velocity(message_time, position)
 
-                # Send the vortex velocity to caller
-                port.send( (message_time, velocity, fluid_props) )
+                    # Send the vortex velocity to caller
+                    port.send( (message_time, velocity, fluid_props) )
 
             time += self.time_step
 
