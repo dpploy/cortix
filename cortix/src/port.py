@@ -43,15 +43,12 @@ class Port:
 
     def send(self, data):
         if self.use_mpi:
-            # Blocking send. This "may" block until the message is received. Behavior
-            # is implementation dependent.
             self.comm.send(data, dest=self.connected.rank, tag=self.id)
         else:
             self.q.put(data)
 
     def recv(self):
         if self.use_mpi:
-            # Blocking receive.
             return self.comm.recv(source=self.connected.rank, tag=self.connected.id)
         else:
             return self.connected.q.get()

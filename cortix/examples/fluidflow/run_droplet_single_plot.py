@@ -81,4 +81,4 @@ if __name__ == "__main__":
     cortix.add_module(vortex)
 
     cortix.draw_network("network.png")
-    #cortix.run()
+    cortix.run()

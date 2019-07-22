@@ -7,8 +7,6 @@ import os
 import shutil
 import logging
 import networkx as nx
-import matplotlib
-matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from multiprocessing import Process
@@ -35,6 +33,7 @@ class Cortix:
         self.__create_logger()
         self.modules = []
         self.log.info('Created Cortix object')
+        self.nx_graph = None
 
     def add_module(self, m):
         assert isinstance(m, Module), "m must be a module"
@@ -70,40 +69,53 @@ class Cortix:
                 self.log.info("Launching Module {} on rank {}".format(mod, self.rank))
                 mod.run()
 
-    def draw_network(self, file_name):
+    def get_network(self):
+        """
+        Constructs and returns a networkx graph object representation of the
+        Cortix module network.
+        """
         if not self.use_mpi or self.rank == 0:
-            conn = []
-            colors = ["blue", "red", "green", "teal"]
-            class_map = {}
-            cmap = {}
-            g = nx.MultiGraph()
-            for mod_one in self.modules:
-                class_name = mod_one.__class__.__name__
-                index = self.modules.index(mod_one)
-                mod_one_name = "{}_{}".format(class_name, index)
-                for mod_two in self.modules:
-                    if mod_one != mod_two:
-                        for port in mod_one.ports:
-                            if port.connected in mod_two.ports:
-                                mod_two_name = "{}_{}".format(mod_two.__class__.__name__, self.modules.index(mod_two))
-                                mod_pair = (mod_one_name, mod_two_name)
-                                if mod_pair not in conn and mod_pair[::-1] not in conn:
-                                    g.add_edge(mod_one_name, mod_two_name)
-                                    conn.append(mod_pair)
-                if class_name not in class_map:
-                    class_map[class_name] = colors[len(class_map) % len(colors)]
-                cmap[mod_one_name] = class_map[class_name]
-            f = plt.figure()
-            pos = nx.spring_layout(g, k=0.15, iterations=20)
-            node_size = [50 if n.split("_")[0] == "Droplet" else 2000 for n in g.nodes]
-            nx.draw(g, pos, node_color=[cmap[n] for n in g.nodes], ax=f.add_subplot(111), node_size=node_size, linewidths=0.01)
-            patches = []
-            print(class_map)
-            for c in class_map:
-                patch = mpatches.Patch(color=class_map[c], label=c)
-                patches.append(patch)
-            plt.legend(handles=patches)
-            f.savefig(file_name, dpi=220)
+            if not self.nx_graph:
+                g = nx.MultiGraph()
+                for mod_one in self.modules:
+                    class_name = mod_one.__class__.__name__
+                    index = self.modules.index(mod_one)
+                    mod_one_name = "{}_{}".format(class_name, index)
+                    for mod_two in self.modules:
+                        if mod_one != mod_two:
+                            for port in mod_one.ports:
+                                if port.connected in mod_two.ports:
+                                    mod_two_name = "{}_{}".format(mod_two.__class__.__name__, self.modules.index(mod_two))
+                                    if mod_two_name not in g or mod_one_name not in g.neighbors(mod_two_name):
+                                        g.add_edge(mod_one_name, mod_two_name)
+                self.nx_graph = g
+            return self.nx_graph
+
+    def draw_network(self, file_name="network.png", dpi=220):
+        """
+        Draws the networkx Module network graph using matplotlib
+
+        `file_name`: The resulting network diagram output file name
+        `dpi`: dpi used for generating the network image
+        """
+        g = self.nx_graph if self.nx_graph else self.get_network()
+        colors = ["blue", "red", "green", "teal"]
+        class_map = {}
+        color_map = {}
+        for node in g.nodes():
+            class_name = "_".join(node.split("_")[:-1])
+            if class_name not in class_map:
+                class_map[class_name] = colors[len(class_map) % len(colors)]
+            color_map[node] = class_map[class_name]
+        f = plt.figure()
+        pos = nx.spring_layout(g, k=0.15, iterations=20)
+        nx.draw(g, pos, node_color=[color_map[n] for n in g.nodes], ax=f.add_subplot(111), linewidths=0.01)
+        patches = []
+        for c in class_map:
+            patch = mpatches.Patch(color=class_map[c], label=c)
+            patches.append(patch)
+        plt.legend(handles=patches)
+        f.savefig(file_name, dpi=dpi)
 
     def __create_logger(self):
         '''
