@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
-# Licensed under the University of Massachusetts Lowell LICENSE:
-# https://github.com/dpploy/cortix/blob/master/LICENSE.txt
 
 from enum import Enum
 

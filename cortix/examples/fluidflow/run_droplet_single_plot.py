@@ -26,7 +26,7 @@ Usage: mpirun -np nprocs run_droplet_single_plot.py
 if __name__ == "__main__":
 
     # Parameters
-    n_droplets = 500
+    n_droplets = 5
     end_time   = 300
     time_step  = 0.1
 

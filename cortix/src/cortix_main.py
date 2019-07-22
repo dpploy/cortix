@@ -4,7 +4,6 @@
 # https://cortix.org
 
 import os
-import shutil
 import logging
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -23,11 +22,15 @@ class Cortix:
     def __init__(self, use_mpi=False):
         self.use_mpi = use_mpi
 
+        # Fall back to multiprocessing if mpi4py is not available
         if self.use_mpi:
-            from mpi4py import MPI
-            self.comm = MPI.COMM_WORLD
-            self.rank = self.comm.Get_rank()
-            self.size = self.comm.size
+            try:
+                from mpi4py import MPI
+                self.comm = MPI.COMM_WORLD
+                self.rank = self.comm.Get_rank()
+                self.size = self.comm.size
+            except ImportError:
+                self.use_mpi = False
 
         # Setup the global logger
         self.__create_logger()
@@ -36,6 +39,11 @@ class Cortix:
         self.nx_graph = None
 
     def add_module(self, m):
+        """
+        Add a module to the Cortix object
+
+        `m`: An instance of a class that inherits from the Module base class
+        """
         assert isinstance(m, Module), "m must be a module"
         if m not in self.modules:
             self.modules.append(m)
@@ -45,9 +53,9 @@ class Cortix:
                     port.rank = m.rank
 
     def run(self):
-        '''
-        Run the Cortix simulation
-        '''
+        """
+        Run the Cortix simulation with MPI if available o.w. fallback to multiprocessing
+        """
         if self.use_mpi:
             assert self.size == len(self.modules) + 1, "Incorrect number of \
             processes (Required {}, got {})".format(len(self.modules) + 1, self.size)
@@ -71,8 +79,7 @@ class Cortix:
 
     def get_network(self):
         """
-        Constructs and returns a networkx graph object representation of the
-        Cortix module network.
+        Constructs and returns a networkx graph representation of the module network.
         """
         if not self.use_mpi or self.rank == 0:
             if not self.nx_graph:
@@ -118,9 +125,10 @@ class Cortix:
         f.savefig(file_name, dpi=dpi)
 
     def __create_logger(self):
-        '''
-        A helper function to setup the logging facility used in constructor
-        '''
+        """
+        A helper function used to setup the logging facility
+        """
+
         self.log = logging.getLogger("cortix")
         self.log.setLevel(logging.DEBUG)
 
@@ -134,7 +142,7 @@ class Cortix:
         if self.use_mpi:
             fs = "[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(self.rank)
         else:
-            fs = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+            fs = "[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(os.getpid())
 
         formatter = logging.Formatter(fs)
         file_handler.setFormatter(formatter)
