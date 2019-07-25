@@ -18,10 +18,11 @@ class Port:
     '''
 
     def __init__(self, name=None):
-        self.set_name(name)
         self.id = None
+        self.name = name
         self.use_mpi = True
 
+        # Fall back to multiprocessing if mpi4py is not found
         try:
             from mpi4py import MPI
         except ImportError:
@@ -35,6 +36,11 @@ class Port:
         self.connected = None
 
     def connect(self, port):
+        """
+        Connect the port to another port
+
+        `port`: A Port object that represents the port to connect to.
+        """
         assert isinstance(port, Port), "Connecting port must be of Port type"
 
         self.connected = port
@@ -42,29 +48,40 @@ class Port:
         port.use_mpi = self.use_mpi
 
     def send(self, data):
-        if self.use_mpi:
-            # Blocking send. This "may" block until the message is received. Behavior
-            # is implementation dependent.
-            self.comm.send(data, dest=self.connected.rank, tag=self.id)
-        else:
-            self.q.put(data)
+        """
+        Send data to the connected port
+
+        `data`: Any pickelable form of data
+        """
+        if self.connected:
+            if self.use_mpi:
+                self.comm.send(data, dest=self.connected.rank, tag=self.id)
+            else:
+                self.q.put(data)
 
     def recv(self):
-        if self.use_mpi:
-            # Blocking receive.
-            return self.comm.recv(source=self.connected.rank, tag=self.connected.id)
-        else:
-            return self.connected.q.get()
+        """
+        Returns the data recieved from the connected port.
+        NOTE: This function will block until data is received from the connected port
+        """
+        if self.connected:
+            if self.use_mpi:
+                return self.comm.recv(source=self.connected.rank, tag=self.connected.id)
+            else:
+                return self.connected.q.get()
 
-    def set_name(self, name):
-        assert isinstance(name, str), "Port name must be a string"
-        self.name = name
 
     def __eq__(self, other):
+        """
+        Ports are the same if their names are the same
+        """
         if isinstance(other, Port):
             return self.name == other.name
 
     def __repr__(self):
+        """
+        Port name representation
+        """
         return self.name
 
 if __name__ == "__main__":

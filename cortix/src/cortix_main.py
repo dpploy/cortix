@@ -4,50 +4,59 @@
 # https://cortix.org
 
 import os
-import shutil
 import logging
 import datetime
-
+import networkx as nx
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 from multiprocessing import Process
 from cortix.src.module import Module
-from cortix.src.utils.cortix_units import Units
-from cortix.src.utils.cortix_time import CortixTime
 
 class Cortix:
     '''
-    The main Cortix class definition.
+    The main Cortix class definition:
+    1. Create the object
+    2. Add modules
+    3. Run the simulation
     '''
 
     def __init__(self, use_mpi=False):
         self.use_mpi = use_mpi
 
+        # Fall back to multiprocessing if mpi4py is not available
         if self.use_mpi:
-            from mpi4py import MPI
-            self.comm = MPI.COMM_WORLD
-            self.rank = self.comm.Get_rank()
-            self.size = self.comm.size
+            try:
+                from mpi4py import MPI
+                self.comm = MPI.COMM_WORLD
+                self.rank = self.comm.Get_rank()
+                self.size = self.comm.size
+            except ImportError:
+                self.use_mpi = False
 
         # Setup the global logger
         self.__create_logger()
+        self.modules = []
+        self.nx_graph = None
 
         # Modules storage
         self.modules = list()
 
         # Done
         if (self.use_mpi and self.rank == 0) or not self.use_mpi:
-            self.log.info('Created Cortix object %s', self.__get_splash(begin=True))
+            self.log.info("Created Cortix object %s", self.__get_splash(begin=True))
 
         return
 
     def __del__(self):
-
-        if self.use_mpi and self.rank == 0 or not self.use_mpi:
-                print('\n'+self.end_of_run_date+': Destroyed Cortix object '+
-                        self.__get_splash(begin=False))
-
-        return
+        if (self.use_mpi and self.rank == 0) or not self.use_mpi:
+                print("Destroyed Cortix object " + self.__get_splash(begin=False))
 
     def add_module(self, m):
+        """
+        Add a module to the Cortix object
+
+        `m`: An instance of a class that inherits from the Module base class
+        """
         assert isinstance(m, Module), "m must be a module"
         if m not in self.modules:
             self.modules.append(m)
@@ -57,9 +66,9 @@ class Cortix:
                     port.rank = m.rank
 
     def run(self):
-        '''
-        Run the Cortix simulation
-        '''
+        """
+        Run the Cortix simulation with MPI if available o.w. fallback to multiprocessing
+        """
         if self.use_mpi:
             assert self.size == len(self.modules) + 1, "Incorrect number of \
             processes (Required {}, got {})".format(len(self.modules) + 1, self.size)
@@ -83,12 +92,52 @@ class Cortix:
                 self.log.info('Launching Module {} on rank {}'.format(mod, self.rank))
                 mod.run()
 
-        if self.use_mpi:
-            self.comm.barrier()
-        else:
-            [p.join() for p in processes]
+    def get_network(self):
+        """
+        Constructs and returns a networkx graph representation of the module network.
+        """
+        if not self.use_mpi or self.rank == 0:
+            if not self.nx_graph:
+                g = nx.MultiGraph()
+                for mod_one in self.modules:
+                    class_name = mod_one.__class__.__name__
+                    index = self.modules.index(mod_one)
+                    mod_one_name = "{}_{}".format(class_name, index)
+                    for mod_two in self.modules:
+                        if mod_one != mod_two:
+                            for port in mod_one.ports:
+                                if port.connected in mod_two.ports:
+                                    mod_two_name = "{}_{}".format(mod_two.__class__.__name__, self.modules.index(mod_two))
+                                    if mod_two_name not in g or mod_one_name not in g.neighbors(mod_two_name):
+                                        g.add_edge(mod_one_name, mod_two_name)
+                self.nx_graph = g
+            return self.nx_graph
 
-        self.end_of_run_date = datetime.datetime.today().strftime("%d%b%y %H:%M:%S")
+    def draw_network(self, file_name="network.png", dpi=220):
+        """
+        Draws the networkx Module network graph using matplotlib
+
+        `file_name`: The resulting network diagram output file name
+        `dpi`: dpi used for generating the network image
+        """
+        g = self.nx_graph if self.nx_graph else self.get_network()
+        colors = ["blue", "red", "green", "teal"]
+        class_map = {}
+        color_map = {}
+        for node in g.nodes():
+            class_name = "_".join(node.split("_")[:-1])
+            if class_name not in class_map:
+                class_map[class_name] = colors[len(class_map) % len(colors)]
+            color_map[node] = class_map[class_name]
+        f = plt.figure()
+        pos = nx.spring_layout(g, k=0.15, iterations=20)
+        nx.draw(g, pos, node_color=[color_map[n] for n in g.nodes], ax=f.add_subplot(111), linewidths=0.01)
+        patches = []
+        for c in class_map:
+            patch = mpatches.Patch(color=class_map[c], label=c)
+            patches.append(patch)
+        plt.legend(handles=patches)
+        f.savefig(file_name, dpi=dpi)
 
     def __create_logger(self):
         '''
@@ -96,6 +145,7 @@ class Cortix:
         '''
 
         self.log = logging.getLogger('cortix')
+
         self.log.setLevel(logging.DEBUG)
 
         file_handler = logging.FileHandler('cortix.log')
@@ -108,7 +158,8 @@ class Cortix:
         if self.use_mpi:
             fs = '[rank:{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s'.format(self.rank)
         else:
-            fs = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+            fs = "[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(os.getpid())
 
         formatter = logging.Formatter(fs)
         file_handler.setFormatter(formatter)
@@ -134,10 +185,10 @@ class Cortix:
         ' `8888  `-*""   /   "*888*P"    ^"8888*"     ^%888*     888&  d888" Y888*"\n'+\
         '   "888.      :"      "Y"          "Y"         "Y"      R888" ` "Y   Y"\n'+\
         '     `""***~"`                                           ""\n'+\
-        '                             https://cortix.org                (TAAG Fraktur)\n'+\
+        '                             https://cortix.org                              \n'+\
         '_____________________________________________________________________________'
 
-        if begin == True:
+        if begin:
             message = \
             '\n_____________________________________________________________________________\n'+\
             '                             L A U N C H I N G                               \n'
@@ -147,7 +198,7 @@ class Cortix:
             '\n_____________________________________________________________________________\n'+\
             '                           T E R M I N A T I N G                             \n'
 
-        return message+splash
+        return message + splash
 
 if __name__ == '__main__':
     c = Cortix()
