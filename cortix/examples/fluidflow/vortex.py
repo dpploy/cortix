@@ -18,15 +18,16 @@ class Vortex(Module):
 
     Ports
     =====
-    fluid_flow:slot_id
+    fluid-flow:slot_id: many ports can be created through the use of a `slot_id`.
+    This allows for multiple external ports to be connected to this module.
     '''
 
     def __init__(self):
 
         super().__init__()
 
-        species = []
-        quantities = []
+        species = list()
+        quantities = list()
 
         self.initial_time = 0.0
         self.end_time = 100
@@ -66,12 +67,12 @@ class Vortex(Module):
 
         time = self.initial_time
 
-        count = 0
+        print_counter = 0
         while time < self.end_time:
 
-            if self.show_time[0] and count%self.show_time[1] == 0 :
+            if self.show_time[0] and print_counter%self.show_time[1] == 0 :
                 print('Vortex::time[s] =',round(time,1))
-            count += 1
+            print_counter += 1
 
             for port in self.ports:
                 if port.name.split(':')[0].strip() == 'fluid-flow':
