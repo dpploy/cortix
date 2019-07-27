@@ -21,17 +21,9 @@ import os
 import sys
 # sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../src'))
-sys.path.insert(0, os.path.abspath('../src/utils'))
 sys.path.insert(0, os.path.abspath('../support'))
 sys.path.insert(0, os.path.abspath('../examples'))
-sys.path.insert(0, os.path.abspath('../examples/console_run'))
-sys.path.insert(0, os.path.abspath('../examples/input'))
-sys.path.insert(0, os.path.abspath('../examples/modulib'))
-sys.path.insert(0, os.path.abspath('../examples/modulib/droplet'))
-sys.path.insert(0, os.path.abspath('../examples/modulib/wind'))
 # sys.path.insert(0, os.path.abspath('../examples/notebook_run'))
-sys.path.insert(0, os.path.abspath('../modulib'))
-sys.path.insert(0, os.path.abspath('../modulib/pyplot'))
 
 # -- General configuration ------------------------------------------------
 
