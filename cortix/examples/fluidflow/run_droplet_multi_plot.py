@@ -27,10 +27,10 @@ if __name__ == "__main__":
 
     # Parameters
     n_droplets = 3
-    end_time   = 300
+    end_time   = 40
     time_step  = 0.1
 
-    cortix = Cortix(use_mpi=True)
+    cortix = Cortix(use_mpi=False)
 
     # Vortex module (single).
     vortex = Vortex()
@@ -76,4 +76,5 @@ if __name__ == "__main__":
 
     cortix.add_module(vortex)
 
+    cortix.draw_network('network.png')
     cortix.run()

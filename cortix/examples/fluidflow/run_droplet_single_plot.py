@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     # Parameters
     n_droplets = 5
-    end_time   = 300
+    end_time   = 30
     time_step  = 0.1
 
     cortix = Cortix(use_mpi=False)

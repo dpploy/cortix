@@ -5,6 +5,7 @@
 
 import os
 import logging
+import time
 import datetime
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -21,7 +22,11 @@ class Cortix:
     '''
 
     def __init__(self, use_mpi=False):
+
         self.use_mpi = use_mpi
+        self.comm = None
+        self.rank = None
+        self.size = None
 
         # Fall back to multiprocessing if mpi4py is not available
         if self.use_mpi:
@@ -33,31 +38,45 @@ class Cortix:
             except ImportError:
                 self.use_mpi = False
 
-        # Setup the global logger
+        # Setup the global logger 
+
         self.__create_logger()
-        self.modules = []
-        self.nx_graph = None
+
+        # Setup the network graph
+        if self.rank == 0 or not self.use_mpi:
+            self.nx_graph = None
 
         # Modules storage
         self.modules = list()
 
         # Done
-        if (self.use_mpi and self.rank == 0) or not self.use_mpi:
-            self.log.info("Created Cortix object %s", self.__get_splash(begin=True))
+        if self.rank == 0 or not self.use_mpi:
+            self.log.info('Created Cortix object %s', self.__get_splash(begin=True))
+            self.wall_clock_time_start = time.time()
 
         return
 
     def __del__(self):
-        if (self.use_mpi and self.rank == 0) or not self.use_mpi:
-                print("Destroyed Cortix object " + self.__get_splash(begin=False))
+        '''
+        Note: by the time the body of this function is executed, the machinery of
+        variables may have been deleted already. For example, `logging` is no longer
+        there; do the least amount of work here.
+        '''
+
+        if self.rank == 0 or not self.use_mpi:
+            print('Destroyed Cortix object on '+self.end_run_date+
+                    self.__get_splash(begin=False))
+            self.wall_clock_time_end = time.time()
+            print('Elapsed wall clock time [s]: '+
+                    str(round(self.wall_clock_time_end-self.wall_clock_time_start,2)))
 
     def add_module(self, m):
-        """
+        '''
         Add a module to the Cortix object
 
         `m`: An instance of a class that inherits from the Module base class
-        """
-        assert isinstance(m, Module), "m must be a module"
+        '''
+        assert isinstance(m, Module), 'm must be a module'
         if m not in self.modules:
             self.modules.append(m)
             if self.use_mpi:
@@ -66,12 +85,16 @@ class Cortix:
                     port.rank = m.rank
 
     def run(self):
-        """
+        '''
         Run the Cortix simulation with MPI if available o.w. fallback to multiprocessing
-        """
+        '''
+
+        # Synchronize in the beginning
         if self.use_mpi:
-            assert self.size == len(self.modules) + 1, "Incorrect number of \
-            processes (Required {}, got {})".format(len(self.modules) + 1, self.size)
+            self.comm.Barrier()
+            assert self.size == len(self.modules) + 1,\
+                'Incorrect number of processes (Required %r, got %r)'%\
+                (len(self.modules) + 1, self.size)
 
         # Set port ids
         i = 0
@@ -81,6 +104,7 @@ class Cortix:
                 port.id = i
                 i += 1
 
+        # Run all modules in parallel
         for mod in self.modules:
             if not self.use_mpi:
                 processes = list()
@@ -92,10 +116,22 @@ class Cortix:
                 self.log.info('Launching Module {} on rank {}'.format(mod, self.rank))
                 mod.run()
 
+        # Synchronize at the end
+        if self.use_mpi:
+            self.comm.Barrier()
+        else:
+            for p in processes:
+                p.join()
+
+        if self.rank == 0 or not self.use_mpi:
+            self.end_run_date = datetime.datetime.today().strftime('%d%b%y %H:%M:%S')
+
+        return
+
     def get_network(self):
-        """
+        '''
         Constructs and returns a networkx graph representation of the module network.
-        """
+        '''
         if not self.use_mpi or self.rank == 0:
             if not self.nx_graph:
                 g = nx.MultiGraph()
@@ -120,6 +156,9 @@ class Cortix:
         `file_name`: The resulting network diagram output file name
         `dpi`: dpi used for generating the network image
         """
+        if self.rank != 0:
+            return
+
         g = self.nx_graph if self.nx_graph else self.get_network()
         colors = ["blue", "red", "green", "teal"]
         class_map = {}
@@ -143,6 +182,15 @@ class Cortix:
         '''
         A helper function to setup the logging facility used in the constructor.
         '''
+
+        # File removal
+        if self.rank == 0 or not self.use_mpi:
+            if os.path.isfile('cortix.log'):
+                os.system('rm -rf cortix.log')
+
+        # Sync here to allow for file removal
+        if self.use_mpi:
+            self.comm.Barrier()
 
         self.log = logging.getLogger('cortix')
 
@@ -173,7 +221,7 @@ class Cortix:
 
         splash = \
         '_____________________________________________________________________________\n'+\
-        '      ...                                        s       .\n'+\
+        '      ...                                        s       .     (TAAG Fraktur)\n'+\
         '   xH88"`~ .x8X                                 :8      @88>\n'+\
         ' :8888   .f"8888Hf        u.      .u    .      .88      %8P      uL   ..\n'+\
         ':8888>  X8L  ^""`   ...ue888b   .d88B :@8c    :888ooo    .     .@88b  @88R\n'+\
