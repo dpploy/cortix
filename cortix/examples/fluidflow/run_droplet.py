@@ -96,7 +96,8 @@ if __name__ == "__main__":
         # Ports def.
         external_flow = Port('external-flow')
         droplet.add_port(external_flow)
-        visualization = Port('visualization')
+        #visualization = Port('visualization')
+        visualization = Port('visualization-{}'.format(i))
         droplet.add_port(visualization)
 
         # DataPlot modules (multiple).
@@ -128,6 +129,6 @@ if __name__ == "__main__":
     if use_single_plot:
         cortix.add_module(data_plot)
 
-    #cortix.draw_network("network.png")
+    cortix.draw_network("network.png")
 
     cortix.run()

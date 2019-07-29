@@ -54,6 +54,9 @@ class Cortix:
             self.log.info('Created Cortix object %s', self.__get_splash(begin=True))
             self.wall_clock_time_start = time.time()
 
+            self.wall_clock_time_end = self.wall_clock_time_start
+            self.end_run_date = datetime.datetime.today().strftime('%d%b%y %H:%M:%S')
+
         return
 
     def __del__(self):
@@ -66,7 +69,6 @@ class Cortix:
         if self.rank == 0 or not self.use_mpi:
             print('Destroyed Cortix object on '+self.end_run_date+
                     self.__get_splash(begin=False))
-            self.wall_clock_time_end = time.time()
             print('Elapsed wall clock time [s]: '+
                     str(round(self.wall_clock_time_end-self.wall_clock_time_start,2)))
 
@@ -125,6 +127,7 @@ class Cortix:
 
         if self.rank == 0 or not self.use_mpi:
             self.end_run_date = datetime.datetime.today().strftime('%d%b%y %H:%M:%S')
+            self.wall_clock_time_end = time.time()
 
         return
 

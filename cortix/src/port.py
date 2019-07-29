@@ -11,10 +11,7 @@ class Port:
     The Port class provides an interface for creating ports and connecting them to
     other ports for the purpose of data tranfer. Data exchange takes place by
     send and/or receive calls on a given port. The concept of a port is that of a data
-    transfer "interaction." This can be one- or two-way but no two sends or receives
-    should be issued simultaneously on the same port, else the order of arrival of
-    messages is unknown since the default tag used in the underlying MPI send/receive
-    is the name of the port; that is, the same tag.
+    transfer "interaction." This can be one- or two-way with sends and receives.
     '''
 
     def __init__(self, name=None):
