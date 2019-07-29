@@ -11,10 +11,7 @@ class Port:
     The Port class provides an interface for creating ports and connecting them to
     other ports for the purpose of data tranfer. Data exchange takes place by
     send and/or receive calls on a given port. The concept of a port is that of a data
-    transfer "interaction." This can be one- or two-way but no two sends or receives
-    should be issued simultaneously on the same port, else the order of arrival of
-    messages is unknown since the default tag used in the underlying MPI send/receive
-    is the name of the port; that is, the same tag.
+    transfer "interaction." This can be one- or two-way with sends and receives.
     '''
 
     def __init__(self, name=None):
@@ -36,11 +33,11 @@ class Port:
         self.connected = None
 
     def connect(self, port):
-        """
+        '''
         Connect the port to another port
 
         `port`: A Port object that represents the port to connect to.
-        """
+        '''
         assert isinstance(port, Port), "Connecting port must be of Port type"
 
         self.connected = port
@@ -48,11 +45,11 @@ class Port:
         port.use_mpi = self.use_mpi
 
     def send(self, data):
-        """
+        '''
         Send data to the connected port
 
         `data`: Any pickelable form of data
-        """
+        '''
         if self.connected:
             if self.use_mpi:
                 self.comm.send(data, dest=self.connected.rank, tag=self.id)
@@ -60,10 +57,10 @@ class Port:
                 self.q.put(data)
 
     def recv(self):
-        """
+        '''
         Returns the data recieved from the connected port.
         NOTE: This function will block until data is received from the connected port
-        """
+        '''
         if self.connected:
             if self.use_mpi:
                 return self.comm.recv(source=self.connected.rank, tag=self.connected.id)
@@ -72,22 +69,22 @@ class Port:
 
 
     def __eq__(self, other):
-        """
+        '''
         Ports are the same if their names are the same
-        """
+        '''
         if isinstance(other, Port):
             return self.name == other.name
 
     def __repr__(self):
-        """
+        '''
         Port name representation
-        """
+        '''
         return self.name
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # Create some ports
-    p1 = Port("test1")
-    p2 = Port("test2")
+    p1 = Port('test1')
+    p2 = Port('test2')
 
     # Connect the ports
     p1.connect(p2)
