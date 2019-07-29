@@ -60,10 +60,10 @@ if __name__ == "__main__":
     # Configuration Parameters
     use_single_plot = True  # True for a single plot output
                             # False for multiple plot files and network
-    use_mpi         = False
+    use_mpi         = True
 
     n_droplets = 5
-    end_time   = 40
+    end_time   = 300
     time_step  = 0.1
 
     cortix = Cortix(use_mpi=use_mpi)
