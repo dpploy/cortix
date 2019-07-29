@@ -60,7 +60,7 @@ if __name__ == "__main__":
     # Configuration Parameters
     use_single_plot = False # True for a single plot output
                             # False for multiple plot files and network
-    use_mpi         = False
+    use_mpi         = True
 
     n_droplets = 5
     end_time   = 40
@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
     # Vortex module (single).
     vortex = Vortex()
-    cortix.add_module(vortex)
+    #cortix.add_module(vortex)
     vortex.show_time = (True,100)
     vortex.end_time = end_time
     vortex.time_step = time_step
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     # DataPlot module (single).
     if use_single_plot:
         data_plot = DataPlot()
-        cortix.add_module(data_plot)
+        #cortix.add_module(data_plot)
         data_plot.title = 'Droplet Trajectories'
         data_plot.same_axes = True
         data_plot.dpi = 300
@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
         # Droplet modules.
         droplet = Droplet()
-        cortix.add_module(droplet)
+        #cortix.add_module(droplet)
         droplet.end_time = end_time
         droplet.time_step = time_step
         droplet.bounce = False
@@ -102,7 +102,7 @@ if __name__ == "__main__":
         # DataPlot modules (multiple).
         if not use_single_plot:
             data_plot = DataPlot()
-            cortix.add_module(data_plot)
+            #cortix.add_module(data_plot)
             data_plot.title = 'Droplet Trajectory '+str(i)
             data_plot.dpi = 300
         # Ports def.
@@ -118,5 +118,15 @@ if __name__ == "__main__":
         external_flow.connect(fluid_flow)
         visualization.connect(plot)
 
+        cortix.add_module(droplet)
+
+        if not use_single_plot:
+            cortix.add_module(data_plot)
+
     #cortix.draw_network("network.png")
+    cortix.add_module(vortex)
+
+    if use_single_plot:
+        cortix.add_module(data_plot)
+
     cortix.run()
