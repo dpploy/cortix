@@ -114,14 +114,14 @@ class Droplet(Module):
 
         # Access ports
         ext_flow_port = self.get_port('external-flow')
+        assert ext_flow_port,'"external-flow" port not found.'
         viz_port      = self.get_port('visualization')
+        assert viz_port,'"visualization" port not found.'
 
         while time < self.end_time:
 
             # Interactions in the external-flow port
             if ext_flow_port:
-
-                ext_flow_port = self.get_port('external-flow')
 
                 position = self.liquid_phase.GetValue('position')
                 ext_flow_port.send( (time,position) )
@@ -145,8 +145,6 @@ class Droplet(Module):
 
             # Interactions in the visualization port
             if viz_port:
-
-                viz_port = self.get_port('visualization')
 
                 viz_port.send( position )
 

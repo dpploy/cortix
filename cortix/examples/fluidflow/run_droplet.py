@@ -96,8 +96,7 @@ if __name__ == "__main__":
         # Ports def.
         external_flow = Port('external-flow')
         droplet.add_port(external_flow)
-        #visualization = Port('visualization')
-        visualization = Port('visualization-{}'.format(i))
+        visualization = Port('visualization')
         droplet.add_port(visualization)
 
         # DataPlot modules (multiple).

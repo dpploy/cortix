@@ -14,7 +14,7 @@ class Module:
 
     def __init__(self):
         self.rank = None
-        self.ports =  []
+        self.ports = []
 
     def send(self, data, port):
         '''
@@ -61,8 +61,9 @@ class Module:
         '''
         assert isinstance(name, str), 'port name must be of type str'
         port = None
-        for port in self.ports:
-            if port.name == name:
+        for p in self.ports:
+            if p.name == name:
+                port = p
                 break
         return port
 
