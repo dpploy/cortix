@@ -5,11 +5,11 @@
 
 from cortix.src.module import Module
 from cortix.src.port import Port
-from cortix.util.dataplot import DataPlot
 from cortix.src.cortix_main import Cortix
 
-from cortix.examples.fluidflow.droplet import Droplet
-from cortix.examples.fluidflow.vortex import Vortex
+from cortix.examples.dataplot import DataPlot
+from cortix.examples.droplet import Droplet
+from cortix.examples.vortex import Vortex
 
 '''
 This example uses three modules instantiated many times in two different networks.
@@ -58,7 +58,7 @@ command line as
 if __name__ == "__main__":
 
     # Configuration Parameters
-    use_single_plot = True  # True for a single plot output
+    use_single_plot = True # True for a single plot output
                             # False for multiple plot files and network
     use_mpi         = True
 
