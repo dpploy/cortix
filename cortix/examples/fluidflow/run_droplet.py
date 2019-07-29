@@ -58,9 +58,9 @@ command line as
 if __name__ == "__main__":
 
     # Configuration Parameters
-    use_single_plot = True  # True for a single plot output
+    use_single_plot = False  # True for a single plot output
                             # False for multiple plot files and network
-    use_mpi         = True
+    use_mpi         = False
 
     n_droplets = 5
     end_time   = 300
@@ -128,6 +128,5 @@ if __name__ == "__main__":
     if use_single_plot:
         cortix.add_module(data_plot)
 
-    cortix.draw_network("network.png")
-
+    cortix.draw_network()
     cortix.run()

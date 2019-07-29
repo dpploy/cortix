@@ -145,10 +145,11 @@ class Cortix:
                     for mod_two in self.modules:
                         if mod_one != mod_two:
                             for port in mod_one.ports:
-                                if port.connected in mod_two.ports:
-                                    mod_two_name = "{}_{}".format(mod_two.__class__.__name__, self.modules.index(mod_two))
-                                    if mod_two_name not in g or mod_one_name not in g.neighbors(mod_two_name):
-                                        g.add_edge(mod_one_name, mod_two_name)
+                                for p2 in mod_two.ports:
+                                    if id(port.connected) == id(p2):
+                                        mod_two_name = "{}_{}".format(mod_two.__class__.__name__, self.modules.index(mod_two))
+                                        if mod_two_name not in g or mod_one_name not in g.neighbors(mod_two_name):
+                                            g.add_edge(mod_one_name, mod_two_name)
                 self.nx_graph = g
             return self.nx_graph
 
@@ -159,7 +160,7 @@ class Cortix:
         `file_name`: The resulting network diagram output file name
         `dpi`: dpi used for generating the network image
         """
-        if self.rank != 0:
+        if self.use_mpi and self.rank != 0:
             return
 
         g = self.nx_graph if self.nx_graph else self.get_network()
