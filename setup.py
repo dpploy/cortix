@@ -8,7 +8,7 @@ with open("requirements.txt", "r") as fh:
 
 setuptools.setup(
     name="cortix",
-    version="1.0",
+    version="1.0.2",
     author="Cortix Computing",
     author_email="tazzaoui@cs.uml.edu",
     description="Cortix is a Python library for system-level\
@@ -18,7 +18,7 @@ setuptools.setup(
     include_package_data=True,
     install_requires=req,
     url="https://cortix.org",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_namespace_packages(),
     keywords = ['simulation', 'math'],
     classifiers=[
         "Programming Language :: Python :: 3",
