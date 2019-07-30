@@ -58,9 +58,11 @@ command line as
 if __name__ == "__main__":
 
     # Configuration Parameters
-    use_single_plot = True  # True for a single plot output
+    use_single_plot = False # True for a single plot output
                             # False for multiple plot files and network
-    use_mpi         = True
+    use_mpi         = False
+
+    plot_vortex_profile = False # This can crash the X server.
 
     n_droplets = 5
     end_time   = 30
@@ -77,7 +79,8 @@ if __name__ == "__main__":
         vortex.show_time = (True,100)
         vortex.end_time = end_time
         vortex.time_step = time_step
-        vortex.plot_velocity()
+        if plot_vortex_profile:
+            vortex.plot_velocity()
 
         # DataPlot module (single).
         data_plot = DataPlot()
@@ -127,7 +130,8 @@ if __name__ == "__main__":
         vortex.show_time = (True,100)
         vortex.end_time = end_time
         vortex.time_step = time_step
-        vortex.plot_velocity()
+        if plot_vortex_profile:
+            vortex.plot_velocity()
 
         for i in range(n_droplets):
 

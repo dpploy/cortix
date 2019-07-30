@@ -44,15 +44,18 @@ class Port:
         port.connected = self
         port.use_mpi = self.use_mpi
 
-    def send(self, data):
+    def send(self, data, tag=None):
         '''
         Send data to the connected port
 
         `data`: Any pickelable form of data
         '''
+        if not tag:
+            tag = self.id
+
         if self.connected:
             if self.use_mpi:
-                self.comm.send(data, dest=self.connected.rank, tag=self.id)
+                self.comm.send(data, dest=self.connected.rank, tag=tag)
             else:
                 self.q.put(data)
 
