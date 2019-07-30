@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# This file is part of the Cortix toolkit environment
+# https://cortix.org
+
 import sys
 import logging
 from threading import Thread
@@ -5,6 +10,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib
 matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
+
 from cortix.src.module import Module
 
 class DataPlot(Module):
