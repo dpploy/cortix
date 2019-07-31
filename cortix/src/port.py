@@ -22,7 +22,7 @@ class Port:
         if self.use_mpi:
             from mpi4py import MPI
             self.comm = MPI.COMM_WORLD
-            self.rank = self.comm.Get_rank()
+            self.rank = None
 
         self.q = Queue()
         self.connected_port = None

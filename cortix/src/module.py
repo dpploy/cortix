@@ -75,8 +75,9 @@ class Module:
     def _get_reserved_port_names(self):
         '''
         This is a helper function to check for reserved names of ports in the module.
-        If there is no reservation on names or no checking of reserved names is wanted,
-        this function is the default function.
+        If there is no reservation on names or no checking of reserved names wanted,
+        this function is the default function and nothing needs to be done on the
+        developer side of the module child class.
         Otherwise this function must be overriden and an iterable container of strings
         must be returned.
         '''
