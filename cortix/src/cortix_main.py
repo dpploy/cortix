@@ -80,6 +80,7 @@ class Cortix:
         '''
         assert isinstance(m, Module), 'm must be a module'
         if m not in self.modules:
+            m.use_mpi = self.use_mpi
             self.modules.append(m)
 
     def run(self):

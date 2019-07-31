@@ -3,7 +3,6 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 
-import enum
 from multiprocessing import Queue
 
 class Port:
@@ -14,19 +13,14 @@ class Port:
     transfer "interaction." This can be one- or two-way with sends and receives.
     '''
 
-    def __init__(self, name=None):
+    def __init__(self, name=None, use_mpi=False):
 
         self.id = None
         self.name = name
-        self.use_mpi = True
-
-        # Fall back to multiprocessing if mpi4py is not found
-        try:
-            from mpi4py import MPI
-        except ImportError:
-            self.use_mpi = False
+        self.use_mpi = use_mpi
 
         if self.use_mpi:
+            from mpi4py import MPI
             self.comm = MPI.COMM_WORLD
             self.rank = self.comm.Get_rank()
 
@@ -70,7 +64,6 @@ class Port:
                 return self.comm.recv(source=self.connected_port.rank, tag=self.connected_port.id)
             else:
                 return self.connected_port.q.get()
-
 
     def __eq__(self, other):
         '''

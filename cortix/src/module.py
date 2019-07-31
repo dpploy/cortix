@@ -14,6 +14,7 @@ class Module:
 
     def __init__(self):
 
+        self.use_mpi = False
         self.ports = []
 
     def send(self, data, port):
@@ -47,17 +48,9 @@ class Module:
 
         return port.recv()
 
-    def add_port(self, port):
-        '''
-        Add a port to the module
-        '''
-        assert isinstance(port, Port), "port must be of type Port"
-        if port not in self.ports:
-            self.ports.append(port)
-
     def get_port(self, name):
         '''
-        Get port by name.
+        Get port by name; if it does not exist, create one.
         '''
         assert isinstance(name, str), 'port name must be of type str'
         port = None
@@ -65,6 +58,11 @@ class Module:
             if p.name == name:
                 port = p
                 break
+
+        if port is None:
+            port = Port(name,self.use_mpi)
+            self.ports.append(port)
+
         return port
 
     def run(self):
