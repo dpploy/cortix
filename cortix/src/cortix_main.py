@@ -124,17 +124,6 @@ class Cortix:
                 processes.append(p)
                 p.start()
 
-        #for mod in self.modules:
-        #    if not self.use_mpi:
-        #        processes = list()
-        #        self.log.info('Launching Module {}'.format(mod))
-        #        p = Process(target=mod.run)
-        #        processes.append(p)
-        #        p.start()
-        #    elif self.rank == mod.rank:
-        #        self.log.info('Launching Module {} on rank {}'.format(mod, self.rank))
-        #        mod.run()
-
         # Synchronize at the end
         if self.use_mpi:
             self.comm.Barrier()
