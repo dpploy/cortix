@@ -69,6 +69,16 @@ class Module:
 
         return port
 
+    def connect(self, port_name, connected_port):
+        '''
+        A simpler interface to create module connectivity. Connect the module port
+        with `port_name` to a given `connected_port`.
+        '''
+
+        my_port = self.get_port(port_name)
+        assert isinstance(connected_port, Port), "Connecting port must be of Port type"
+        my_port.connect(connected_port)
+
     def run(self):
         raise NotImplementedError('Modules must implement run()')
 

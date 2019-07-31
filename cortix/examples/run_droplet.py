@@ -61,7 +61,7 @@ if __name__ == "__main__":
                             # False for multiple plot files and network
     use_mpi         = True  # True for MPI; False for Python multiprocessing
 
-    plot_vortex_profile = True  # True may crash the X server.
+    plot_vortex_profile = False # True may crash the X server.
 
     n_droplets = 5
     end_time   = 300
@@ -98,15 +98,9 @@ if __name__ == "__main__":
             droplet.bounce = False
             droplet.slip = False
 
-            # Ports used
-            droplet_external_flow_port = droplet.get_port('external-flow')
-            droplet_visualization_port = droplet.get_port('visualization')
-            data_plot_viz_port         = data_plot.get_port('viz-data:{:05}'.format(i))
-            vortex_fluid_flow_port     = vortex.get_port('fluid-flow:{}'.format(i))
-
-            # Network connectivity (connect ports)
-            droplet_external_flow_port.connect(vortex_fluid_flow_port)
-            droplet_visualization_port.connect(data_plot_viz_port)
+            # Network port connectivity (connect modules through their ports)
+            droplet.connect('external-flow', vortex.get_port('fluid-flow:{}'.format(i)))
+            droplet.connect('visualization', data_plot.get_port('viz-data:{:05}'.format(i)))
 
     # Network for a multiple plot case
     if not use_single_plot:
@@ -136,15 +130,9 @@ if __name__ == "__main__":
             data_plot.title = 'Droplet Trajectory '+str(i)
             data_plot.dpi = 300
 
-            # Ports used
-            droplet_external_flow_port = droplet.get_port('external-flow')
-            droplet_visualization_port = droplet.get_port('visualization')
-            data_plot_viz_port         = data_plot.get_port('viz-data:{:05}'.format(i))
-            vortex_fluid_flow_port     = vortex.get_port('fluid-flow:{}'.format(i))
-
-            # Network connectivity (connect ports)
-            droplet_external_flow_port.connect(vortex_fluid_flow_port)
-            droplet_visualization_port.connect(data_plot_viz_port)
+            # Network port connectivity (connect modules through their ports)
+            droplet.connect('external-flow', vortex.get_port('fluid-flow:{}'.format(i)))
+            droplet.connect('visualization', data_plot.get_port('viz-data:{:05}'.format(i)))
 
     cortix.draw_network('network.png')
 
