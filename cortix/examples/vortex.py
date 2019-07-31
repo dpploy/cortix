@@ -179,3 +179,7 @@ class Vortex(Module):
         plt.close(fig)
 
         return
+
+    def _get_reserved_port_names(self):
+
+        return None

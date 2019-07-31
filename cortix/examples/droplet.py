@@ -257,3 +257,7 @@ class Droplet(Module):
         self.liquid_phase.SetValue('radial-position', np.linalg.norm(u_vec[0:2]), time)
 
         return time
+
+    def _get_reserved_port_names(self):
+
+        return ['external-flow','visualization']

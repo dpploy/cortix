@@ -15,7 +15,6 @@ from cortix.src.module import Module
 
 class DataPlot(Module):
 
-
     def __init__(self):
 
         super().__init__()
@@ -131,3 +130,7 @@ class DataPlot(Module):
 
         if self.same_axes:
             plt.savefig('{}.png'.format(key.split(':')[0]), dpi=self.dpi)
+
+    def _get_reserved_port_names(self):
+
+        return None

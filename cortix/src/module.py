@@ -60,6 +60,10 @@ class Module:
                 break
 
         if port is None:
+            reserved_port_names = self._get_reserved_port_names()
+            if reserved_port_names is not None:
+                assert name in reserved_port_names,\
+                        'port name: {}, not allowed by module: {}'.format(name,self)
             port = Port(name,self.use_mpi)
             self.ports.append(port)
 
@@ -67,3 +71,14 @@ class Module:
 
     def run(self):
         raise NotImplementedError('Modules must implement run()')
+
+    def _get_reserved_port_names(self):
+        '''
+        This is a helper function to check for reserved names of ports in the module.
+        If there is no reservation on names or no checking of reserved names is wanted,
+        this function is the default function.
+        Otherwise this function must be overriden and an iterable container of strings
+        must be returned.
+        '''
+
+        return None
