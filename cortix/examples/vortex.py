@@ -21,8 +21,7 @@ class Vortex(Module):
 
     Ports
     =====
-    fluid-flow:slot_id: many ports can be created through the use of a `slot_id`.
-    This allows for multiple external ports to be connected to this module.
+    Any port name and any number of ports are allowed.
     '''
 
     def __init__(self):
@@ -78,14 +77,13 @@ class Vortex(Module):
             print_counter += 1
 
             for port in self.ports:
-                if port.name.split(':')[0].strip() == 'fluid-flow':
-                    (message_time, position) = port.recv()
+                (message_time, position) = port.recv()
 
-                    # Compute the vortex velocity using the given position
-                    velocity = self.compute_velocity(message_time, position)
+                # Compute the vortex velocity using the given position
+                velocity = self.compute_velocity(message_time, position)
 
-                    # Send the vortex velocity to caller
-                    port.send( (message_time, velocity, fluid_props) )
+                # Send the vortex velocity to caller
+                port.send( (message_time, velocity, fluid_props) )
 
             time += self.time_step
 
@@ -179,7 +177,3 @@ class Vortex(Module):
         plt.close(fig)
 
         return
-
-    def _get_reserved_port_names(self):
-
-        return None

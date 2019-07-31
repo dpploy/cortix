@@ -44,7 +44,7 @@ class DataPlot(Module):
         for t in threads:
             t.join()
 
-        self.new_plot_data()
+        self.plot_data()
 
     def recv_data(self, port):
         data = []
@@ -54,38 +54,13 @@ class DataPlot(Module):
             if self.debug and i % self.print_freq == 0:
                 self.log.info('DataPlot::'+port.name+' received: {}'.format(d))
             if isinstance(d, str) and d == "DONE":
-                #self.plot_data(data, port)
                 self.data[port.name] = data
                 sys.exit(0)
             i += 1
 
             data.append(d)
 
-    def plot_data(self, data, port):
-        x = [i[0] for i in data]
-        y = [i[1] for i in data]
-
-        # 2D-Plot
-        if data and len(data[0]) == 2:
-            fig = plt.figure(port.name)
-            plt.xlabel(self.xlabel)
-            plt.ylabel(self.ylabel)
-            plt.title(self.title)
-            plt.plot(x, y)
-
-        # 3D-Plot
-        elif data and len(data[0]) == 3:
-            fig = plt.figure(port.name)
-            ax = fig.add_subplot(111, projection='3d')
-            ax.set_xlabel(self.xlabel)
-            ax.set_ylabel(self.ylabel)
-            ax.set_zlabel(self.zlabel)
-            ax.set_title(self.title)
-            ax.plot(x, y, [i[2] for i in data])
-
-        plt.savefig('{}.png'.format(port.name), dpi=self.dpi)
-
-    def new_plot_data(self):
+    def plot_data(self):
 
         if self.same_axes:
             fig = plt.figure(1)
@@ -130,7 +105,3 @@ class DataPlot(Module):
 
         if self.same_axes:
             plt.savefig('{}.png'.format(key.split(':')[0]), dpi=self.dpi)
-
-    def _get_reserved_port_names(self):
-
-        return None
