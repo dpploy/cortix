@@ -93,10 +93,10 @@ class Cortix:
 
         # Synchronize in the beginning
         if self.use_mpi:
-            self.comm.Barrier()
             assert self.size == len(self.modules) + 1,\
                 'Incorrect number of processes (Required %r, got %r)'%\
                 (len(self.modules) + 1, self.size)
+            self.comm.Barrier()
 
         # Set port ids
         i = 0
@@ -146,7 +146,7 @@ class Cortix:
                         if mod_one != mod_two:
                             for port in mod_one.ports:
                                 for p2 in mod_two.ports:
-                                    if id(port.connected) == id(p2):
+                                    if id(port.connected_port) == id(p2):
                                         mod_two_name = "{}_{}".format(mod_two.__class__.__name__, self.modules.index(mod_two))
                                         if mod_two_name not in g or mod_one_name not in g.neighbors(mod_two_name):
                                             g.add_edge(mod_one_name, mod_two_name)

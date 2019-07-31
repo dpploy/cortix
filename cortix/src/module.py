@@ -13,7 +13,7 @@ class Module:
     '''
 
     def __init__(self):
-        self.rank = None
+
         self.ports = []
 
     def send(self, data, port):
