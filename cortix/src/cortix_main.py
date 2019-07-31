@@ -81,10 +81,6 @@ class Cortix:
         assert isinstance(m, Module), 'm must be a module'
         if m not in self.modules:
             self.modules.append(m)
-            if self.use_mpi:
-                m.rank = len(self.modules)
-                for port in m.ports:
-                    port.rank = m.rank
 
     def run(self):
         '''
@@ -98,7 +94,14 @@ class Cortix:
                 (len(self.modules) + 1, self.size)
             self.comm.Barrier()
 
-        # Set port ids
+        # Assign an mpi rank to all ports of a module using the module list index
+        if self.use_mpi:
+            for m in self.modules:
+                rank = self.modules.index(m)+1
+                for port in m.ports:
+                    port.rank = rank
+
+        # Assign a unique port id to all ports
         i = 0
         for mod in self.modules:
             for port in mod.ports:
@@ -106,17 +109,31 @@ class Cortix:
                 port.id = i
                 i += 1
 
-        # Run all modules in parallel
-        for mod in self.modules:
-            if not self.use_mpi:
+        # Parallel run module in MPI
+        if self.use_mpi and self.rank != 0:
+            mod = self.modules[self.rank-1]
+            self.log.info('Launching Module {}'.format(mod))
+            mod.run()
+
+        # Parallel run all modules in Python multiprocessing
+        if not self.use_mpi:
+            for mod in self.modules:
                 processes = list()
                 self.log.info('Launching Module {}'.format(mod))
                 p = Process(target=mod.run)
                 processes.append(p)
                 p.start()
-            elif self.rank == mod.rank:
-                self.log.info('Launching Module {} on rank {}'.format(mod, self.rank))
-                mod.run()
+
+        #for mod in self.modules:
+        #    if not self.use_mpi:
+        #        processes = list()
+        #        self.log.info('Launching Module {}'.format(mod))
+        #        p = Process(target=mod.run)
+        #        processes.append(p)
+        #        p.start()
+        #    elif self.rank == mod.rank:
+        #        self.log.info('Launching Module {} on rank {}'.format(mod, self.rank))
+        #        mod.run()
 
         # Synchronize at the end
         if self.use_mpi:
