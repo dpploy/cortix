@@ -76,6 +76,9 @@ class Vortex(Module):
                 print('Vortex::time[s] =',round(time,1))
             print_counter += 1
 
+            # Interactions in all nameless ports (lower level port send/recv used)
+            #---------------------------------------------------------------------
+
             for port in self.ports:
                 (message_time, position) = port.recv()
 
