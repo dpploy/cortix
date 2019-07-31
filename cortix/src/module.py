@@ -21,11 +21,13 @@ class Module:
         '''
         Send data through a given port.
         '''
+
         if isinstance(port, str):
-            matches = [p for p in self.ports if p.name == port]
-            assert len(matches) == 1,\
-                    'matches= %r port= %r, ports= %r'%(matches,port,self.ports)
-            port = matches[0]
+            port = self.get_port(port)
+            #matches = [p for p in self.ports if p.name == port]
+            #assert len(matches) == 1,\
+            #        'matches= %r port= %r, ports= %r'%(matches,port,self.ports)
+            #port = matches[0]
         elif isinstance(port, Port):
             assert port in self.ports, "Unknown port!"
         else:
@@ -37,10 +39,12 @@ class Module:
         '''
         Receive data from a given port
         '''
+
         if isinstance(port, str):
-            matches = [p for p in self.ports if p.name == port]
-            assert(len(matches) == 1)
-            port = matches[0]
+            port = self.get_port(port)
+            #matches = [p for p in self.ports if p.name == port]
+            #assert(len(matches) == 1)
+            #port = matches[0]
         elif isinstance(port, Port):
             assert port in self.ports, "Unknown port!"
         else:
@@ -52,8 +56,10 @@ class Module:
         '''
         Get port by name; if it does not exist, create one.
         '''
+
         assert isinstance(name, str), 'port name must be of type str'
         port = None
+
         for p in self.ports:
             if p.name == name:
                 port = p
