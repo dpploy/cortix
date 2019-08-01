@@ -1,20 +1,15 @@
 #!/usr/bin/env python
 
 from cortix.src.module import Module
-from cortix.src.port import Port
 from cortix.examples.dummy_module import DummyModule
 
 def test_module_init():
     # Initialize the module
     m = DummyModule()
 
-    # Construct ports
-    p1 = Port("test-1")
-    p2 = Port("test-2")
-
-    # Add ports to the module
-    m.add_port(p1)
-    m.add_port(p2)
+    # get ports
+    p1 = m.get_port('test-1')
+    p2 = m.get_port('test-2')
 
     # Output the list of ports
     print(m.ports)

@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# This file is part of the Cortix toolkit environment
+# https://cortix.org
+
 import sys
 import logging
 from threading import Thread
@@ -5,10 +10,12 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib
 matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
+
+import pickle
+
 from cortix.src.module import Module
 
 class DataPlot(Module):
-
 
     def __init__(self):
 
@@ -27,10 +34,15 @@ class DataPlot(Module):
         self.print_freq = 10
 
         self.data = dict()
+        self.data_file_name = 'data_plot.pkl'
 
     def run(self):
-        # Spawn a thread to handle each module
+        '''
+        Spawn a thread to handle each port connection
+        '''
+
         threads = []
+
         for port in self.ports:
             thread = Thread(target=self.recv_data, args=(port,))
             thread.start()
@@ -39,54 +51,40 @@ class DataPlot(Module):
         for t in threads:
             t.join()
 
-        self.new_plot_data()
+        self.plot_data()
+
+        # Save data dict; TODO this should not be here but self.data vanishes after run()
+        pickle.dump( self.data, open(self.data_file_name,'wb') )
 
     def recv_data(self, port):
+        '''
+        Keep listening on the port and receiving data.
+        '''
+
         data = []
+
         i = 1
         while True:
             d = self.recv(port)
             if self.debug and i % self.print_freq == 0:
                 self.log.info('DataPlot::'+port.name+' received: {}'.format(d))
             if isinstance(d, str) and d == "DONE":
-                #self.plot_data(data, port)
                 self.data[port.name] = data
-                sys.exit(0)
+                sys.exit(0) # kill thread
             i += 1
 
             data.append(d)
 
-    def plot_data(self, data, port):
-        x = [i[0] for i in data]
-        y = [i[1] for i in data]
+    def plot_data(self, data_input=None):
 
-        # 2D-Plot
-        if data and len(data[0]) == 2:
-            fig = plt.figure(port.name)
-            plt.xlabel(self.xlabel)
-            plt.ylabel(self.ylabel)
-            plt.title(self.title)
-            plt.plot(x, y)
-
-        # 3D-Plot
-        elif data and len(data[0]) == 3:
-            fig = plt.figure(port.name)
-            ax = fig.add_subplot(111, projection='3d')
-            ax.set_xlabel(self.xlabel)
-            ax.set_ylabel(self.ylabel)
-            ax.set_zlabel(self.zlabel)
-            ax.set_title(self.title)
-            ax.plot(x, y, [i[2] for i in data])
-
-        plt.savefig('{}.png'.format(port.name), dpi=self.dpi)
-
-    def new_plot_data(self):
+        if data_input is None:
+            data_input = self.data
 
         if self.same_axes:
             fig = plt.figure(1)
             ax = None
 
-        for (key,data) in self.data.items():
+        for (key,data) in data_input.items():
 
             x = [i[0] for i in data]
             y = [i[1] for i in data]

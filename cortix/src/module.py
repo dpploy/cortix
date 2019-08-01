@@ -13,18 +13,21 @@ class Module:
     '''
 
     def __init__(self):
-        self.rank = None
+
+        self.use_mpi = False
         self.ports = []
 
     def send(self, data, port):
         '''
         Send data through a given port.
         '''
+
         if isinstance(port, str):
-            matches = [p for p in self.ports if p.name == port]
-            assert len(matches) == 1,\
-                    'matches= %r port= %r, ports= %r'%(matches,port,self.ports)
-            port = matches[0]
+            port = self.get_port(port)
+            #matches = [p for p in self.ports if p.name == port]
+            #assert len(matches) == 1,\
+            #        'matches= %r port= %r, ports= %r'%(matches,port,self.ports)
+            #port = matches[0]
         elif isinstance(port, Port):
             assert port in self.ports, "Unknown port!"
         else:
@@ -36,10 +39,12 @@ class Module:
         '''
         Receive data from a given port
         '''
+
         if isinstance(port, str):
-            matches = [p for p in self.ports if p.name == port]
-            assert(len(matches) == 1)
-            port = matches[0]
+            port = self.get_port(port)
+            #matches = [p for p in self.ports if p.name == port]
+            #assert(len(matches) == 1)
+            #port = matches[0]
         elif isinstance(port, Port):
             assert port in self.ports, "Unknown port!"
         else:
@@ -47,25 +52,50 @@ class Module:
 
         return port.recv()
 
-    def add_port(self, port):
-        '''
-        Add a port to the module
-        '''
-        assert isinstance(port, Port), "port must be of type Port"
-        if port not in self.ports:
-            self.ports.append(port)
-
     def get_port(self, name):
         '''
-        Get port by name.
+        Get port by name; if it does not exist, create one.
         '''
+
         assert isinstance(name, str), 'port name must be of type str'
         port = None
+
         for p in self.ports:
             if p.name == name:
                 port = p
                 break
+
+        if port is None:
+            reserved_port_names = self._get_reserved_port_names()
+            if reserved_port_names is not None:
+                assert name in reserved_port_names,\
+                        'port name: {}, not allowed by module: {}'.format(name,self)
+            port = Port(name,self.use_mpi)
+            self.ports.append(port)
+
         return port
+
+    def connect(self, port_name, connected_port):
+        '''
+        A simpler interface to create module connectivity. Connect the module port
+        with `port_name` to a given `connected_port`.
+        '''
+
+        my_port = self.get_port(port_name)
+        assert isinstance(connected_port, Port), "Connecting port must be of Port type"
+        my_port.connect(connected_port)
 
     def run(self):
         raise NotImplementedError('Modules must implement run()')
+
+    def _get_reserved_port_names(self):
+        '''
+        This is a helper function to check for reserved names of ports in the module.
+        If there is no reservation on names or no checking of reserved names wanted,
+        this function is the default function and nothing needs to be done on the
+        developer side of the module child class.
+        Otherwise this function must be overriden and an iterable container of strings
+        must be returned.
+        '''
+
+        return None

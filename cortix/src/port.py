@@ -3,7 +3,6 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 
-import enum
 from multiprocessing import Queue
 
 class Port:
@@ -14,23 +13,19 @@ class Port:
     transfer "interaction." This can be one- or two-way with sends and receives.
     '''
 
-    def __init__(self, name=None):
+    def __init__(self, name=None, use_mpi=False):
+
         self.id = None
         self.name = name
-        self.use_mpi = True
-
-        # Fall back to multiprocessing if mpi4py is not found
-        try:
-            from mpi4py import MPI
-        except ImportError:
-            self.use_mpi = False
+        self.use_mpi = use_mpi
 
         if self.use_mpi:
+            from mpi4py import MPI
             self.comm = MPI.COMM_WORLD
-            self.rank = self.comm.Get_rank()
+            self.rank = None
 
         self.q = Queue()
-        self.connected = None
+        self.connected_port = None
 
     def connect(self, port):
         '''
@@ -40,19 +35,22 @@ class Port:
         '''
         assert isinstance(port, Port), "Connecting port must be of Port type"
 
-        self.connected = port
-        port.connected = self
+        self.connected_port = port
+        port.connected_port = self
         port.use_mpi = self.use_mpi
 
-    def send(self, data):
+    def send(self, data, tag=None):
         '''
         Send data to the connected port
 
         `data`: Any pickelable form of data
         '''
-        if self.connected:
+        if not tag:
+            tag = self.id
+
+        if self.connected_port:
             if self.use_mpi:
-                self.comm.send(data, dest=self.connected.rank, tag=self.id)
+                self.comm.send(data, dest=self.connected_port.rank, tag=tag)
             else:
                 self.q.put(data)
 
@@ -61,12 +59,11 @@ class Port:
         Returns the data recieved from the connected port.
         NOTE: This function will block until data is received from the connected port
         '''
-        if self.connected:
+        if self.connected_port:
             if self.use_mpi:
-                return self.comm.recv(source=self.connected.rank, tag=self.connected.id)
+                return self.comm.recv(source=self.connected_port.rank, tag=self.connected_port.id)
             else:
-                return self.connected.q.get()
-
+                return self.connected_port.q.get()
 
     def __eq__(self, other):
         '''
@@ -92,5 +89,5 @@ if __name__ == '__main__':
     # View connections
     print(p1)
     print(p2)
-    print(p1.connected)
-    print(p2.connected)
+    print(p1.connected_port)
+    print(p2.connected_port)

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from cortix.src.module import Module
-from cortix.src.port import Port
 from cortix.examples.dummy_module import DummyModule
 
 from cortix.src.cortix_main import Cortix
@@ -17,16 +16,11 @@ def test_cortix_add_module():
     for i in range(num_modules):
         # Initialize the module
         m = DummyModule()
-
-        # Construct ports
-        p1 = Port("test1-{}".format(i))
-        p2 = Port("test2-{}".format(i))
-
-        # Add ports to the module
-        m.add_port(p1)
-        m.add_port(p2)
-
         c.add_module(m)
+
+        # Get ports
+        p1 = m.get_port('test1-{}'.format(i))
+        p2 = m.get_port('test2-{}'.format(i))
 
     # Make sure we have the correct modules
     assert len(c.modules) == num_modules

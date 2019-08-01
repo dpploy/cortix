@@ -21,12 +21,14 @@ class Cortix:
     3. Run the simulation
     '''
 
-    def __init__(self, use_mpi=False):
+    def __init__(self, use_mpi=False, splash=True):
 
         self.use_mpi = use_mpi
         self.comm = None
         self.rank = None
         self.size = None
+
+        self.splash = splash
 
         # Fall back to multiprocessing if mpi4py is not available
         if self.use_mpi:
@@ -51,7 +53,12 @@ class Cortix:
 
         # Done
         if self.rank == 0 or not self.use_mpi:
-            self.log.info('Created Cortix object %s', self.__get_splash(begin=True))
+
+            if self.splash:
+                self.log.info('Created Cortix object %s', self.__get_splash(begin=True))
+            else:
+                self.log.info('Created Cortix object')
+
             self.wall_clock_time_start = time.time()
 
             self.wall_clock_time_end = self.wall_clock_time_start
@@ -67,8 +74,13 @@ class Cortix:
         '''
 
         if self.rank == 0 or not self.use_mpi:
-            print('Destroyed Cortix object on '+self.end_run_date+
-                    self.__get_splash(begin=False))
+
+            if self.splash:
+                print('Destroyed Cortix object on '+self.end_run_date+
+                        self.__get_splash(begin=False))
+            else:
+                print('Destroyed Cortix object on '+self.end_run_date)
+
             print('Elapsed wall clock time [s]: '+
                     str(round(self.wall_clock_time_end-self.wall_clock_time_start,2)))
 
@@ -80,11 +92,8 @@ class Cortix:
         '''
         assert isinstance(m, Module), 'm must be a module'
         if m not in self.modules:
+            m.use_mpi = self.use_mpi
             self.modules.append(m)
-            if self.use_mpi:
-                m.rank = len(self.modules)
-                for port in m.ports:
-                    port.rank = m.rank
 
     def run(self):
         '''
@@ -93,12 +102,19 @@ class Cortix:
 
         # Synchronize in the beginning
         if self.use_mpi:
-            self.comm.Barrier()
             assert self.size == len(self.modules) + 1,\
                 'Incorrect number of processes (Required %r, got %r)'%\
                 (len(self.modules) + 1, self.size)
+            self.comm.Barrier()
 
-        # Set port ids
+        # Assign an mpi rank to all ports of a module using the module list index
+        if self.use_mpi:
+            for m in self.modules:
+                rank = self.modules.index(m)+1
+                for port in m.ports:
+                    port.rank = rank
+
+        # Assign a unique port id to all ports
         i = 0
         for mod in self.modules:
             for port in mod.ports:
@@ -106,17 +122,20 @@ class Cortix:
                 port.id = i
                 i += 1
 
-        # Run all modules in parallel
-        for mod in self.modules:
-            if not self.use_mpi:
+        # Parallel run module in MPI
+        if self.use_mpi and self.rank != 0:
+            mod = self.modules[self.rank-1]
+            self.log.info('Launching Module {}'.format(mod))
+            mod.run()
+
+        # Parallel run all modules in Python multiprocessing
+        if not self.use_mpi:
+            for mod in self.modules:
                 processes = list()
                 self.log.info('Launching Module {}'.format(mod))
                 p = Process(target=mod.run)
                 processes.append(p)
                 p.start()
-            elif self.rank == mod.rank:
-                self.log.info('Launching Module {} on rank {}'.format(mod, self.rank))
-                mod.run()
 
         # Synchronize at the end
         if self.use_mpi:
@@ -146,20 +165,20 @@ class Cortix:
                         if mod_one != mod_two:
                             for port in mod_one.ports:
                                 for p2 in mod_two.ports:
-                                    if id(port.connected) == id(p2):
+                                    if id(port.connected_port) == id(p2):
                                         mod_two_name = "{}_{}".format(mod_two.__class__.__name__, self.modules.index(mod_two))
                                         if mod_two_name not in g or mod_one_name not in g.neighbors(mod_two_name):
                                             g.add_edge(mod_one_name, mod_two_name)
                 self.nx_graph = g
             return self.nx_graph
 
-    def draw_network(self, file_name="network.png", dpi=220):
-        """
+    def draw_network(self, file_name='network.png', dpi=220):
+        '''
         Draws the networkx Module network graph using matplotlib
 
         `file_name`: The resulting network diagram output file name
         `dpi`: dpi used for generating the network image
-        """
+        '''
         if self.use_mpi and self.rank != 0:
             return
 
