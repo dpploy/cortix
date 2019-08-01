@@ -11,6 +11,8 @@ import matplotlib
 matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
 
+import pickle
+
 from cortix.src.module import Module
 
 class DataPlot(Module):
@@ -32,10 +34,15 @@ class DataPlot(Module):
         self.print_freq = 10
 
         self.data = dict()
+        self.data_file_name = 'data_plot.pkl'
 
     def run(self):
-        # Spawn a thread to handle each module
+        '''
+        Spawn a thread to handle each port connection
+        '''
+
         threads = []
+
         for port in self.ports:
             thread = Thread(target=self.recv_data, args=(port,))
             thread.start()
@@ -46,8 +53,16 @@ class DataPlot(Module):
 
         self.plot_data()
 
+        # Save data dict; TODO this should not be here but self.data vanishes after run()
+        pickle.dump( self.data, open(self.data_file_name,'wb') )
+
     def recv_data(self, port):
+        '''
+        Keep listening on the port and receiving data.
+        '''
+
         data = []
+
         i = 1
         while True:
             d = self.recv(port)
@@ -55,18 +70,21 @@ class DataPlot(Module):
                 self.log.info('DataPlot::'+port.name+' received: {}'.format(d))
             if isinstance(d, str) and d == "DONE":
                 self.data[port.name] = data
-                sys.exit(0)
+                sys.exit(0) # kill thread
             i += 1
 
             data.append(d)
 
-    def plot_data(self):
+    def plot_data(self, data_input=None):
+
+        if data_input is None:
+            data_input = self.data
 
         if self.same_axes:
             fig = plt.figure(1)
             ax = None
 
-        for (key,data) in self.data.items():
+        for (key,data) in data_input.items():
 
             x = [i[0] for i in data]
             y = [i[1] for i in data]

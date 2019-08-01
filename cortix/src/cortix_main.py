@@ -21,12 +21,14 @@ class Cortix:
     3. Run the simulation
     '''
 
-    def __init__(self, use_mpi=False):
+    def __init__(self, use_mpi=False, splash=True):
 
         self.use_mpi = use_mpi
         self.comm = None
         self.rank = None
         self.size = None
+
+        self.splash = splash
 
         # Fall back to multiprocessing if mpi4py is not available
         if self.use_mpi:
@@ -51,7 +53,12 @@ class Cortix:
 
         # Done
         if self.rank == 0 or not self.use_mpi:
-            self.log.info('Created Cortix object %s', self.__get_splash(begin=True))
+
+            if self.splash:
+                self.log.info('Created Cortix object %s', self.__get_splash(begin=True))
+            else:
+                self.log.info('Created Cortix object')
+
             self.wall_clock_time_start = time.time()
 
             self.wall_clock_time_end = self.wall_clock_time_start
@@ -67,8 +74,13 @@ class Cortix:
         '''
 
         if self.rank == 0 or not self.use_mpi:
-            print('Destroyed Cortix object on '+self.end_run_date+
-                    self.__get_splash(begin=False))
+
+            if self.splash:
+                print('Destroyed Cortix object on '+self.end_run_date+
+                        self.__get_splash(begin=False))
+            else:
+                print('Destroyed Cortix object on '+self.end_run_date)
+
             print('Elapsed wall clock time [s]: '+
                     str(round(self.wall_clock_time_end-self.wall_clock_time_start,2)))
 
@@ -160,13 +172,13 @@ class Cortix:
                 self.nx_graph = g
             return self.nx_graph
 
-    def draw_network(self, file_name="network.png", dpi=220):
-        """
+    def draw_network(self, file_name='network.png', dpi=220):
+        '''
         Draws the networkx Module network graph using matplotlib
 
         `file_name`: The resulting network diagram output file name
         `dpi`: dpi used for generating the network image
-        """
+        '''
         if self.use_mpi and self.rank != 0:
             return
 
