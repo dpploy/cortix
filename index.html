@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Cortix: network dynamics simulation &#8212; Cortix 0.1.0 documentation</title>
+    <title>Network dynamics simulation &#8212; Cortix 0.1.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -29,29 +29,30 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <hr class="docutils" />
-<div class="section" id="cortix-network-dynamics-simulation">
-<h1>Cortix: network dynamics simulation<a class="headerlink" href="#cortix-network-dynamics-simulation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="network-dynamics-simulation">
+<h1>Network dynamics simulation<a class="headerlink" href="#network-dynamics-simulation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="what-is-cortix">
 <h2>What is Cortix?<a class="headerlink" href="#what-is-cortix" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Cortix is a Python library for system-level module coupling, execution, and
-analysis of dynamical system models that exchange time-dependent data.</li>
-<li>Cortix allows you to assemble a coupled system by connecting discrete
-<cite>modules</cite> into a <cite>network</cite></li>
-<li>Cortix takes as input a collection of computational modules and provides an
-environment for the coupling of these modules into a single simulation.</li>
+<li>Cortix is an open-source Python library for enabling develoment and simulation of
+<cite>network</cite> models on <cite>massively</cite> parallel computers.</li>
+<li>Cortix takes a collection of computational <cite>modules</cite> and provides an
+environment for the coupling of these modules into a <cite>network</cite> simulation.</li>
+<li>Cortix provides a layer for data communication between <cite>modules</cite> in the <cite>network</cite>
+using parallel libraries (MPI for heterogeneous computing, and the Python
+multiprocessing library for multi-core computing).</li>
+<li>Virtually any computational model that can be mapped onto a network is a
+candidate for Cortix development.</li>
 </ul>
 <img alt="https://cortix.org/cortix-cover.png" src="https://cortix.org/cortix-cover.png" />
 </div>
 <div class="section" id="features">
 <h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li>Massively parallel execution with <a class="reference external" href="https://mpi4py.readthedocs.io/en/stable/">mpi4py</a></li>
-<li>Efficient ODE and DAE solver</li>
-<li>Built-in time synchronization</li>
-<li>Data visualization</li>
-<li>Extensive logging</li>
+<li>Module parent class for module development and coupling.</li>
+<li>Massively parallel execution with <cite>mpi4py &lt;https://mpi4py.readthedocs.io/en/stable/&gt;</cite></li>
+<li>Support classes for building applications and modules.</li>
+<li>Examples of applications using Cortix.</li>
 </ul>
 </div>
 <div class="section" id="documentation">
@@ -69,10 +70,11 @@ environment for the coupling of these modules into a single simulation.</li>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><img src="https://cortix.org/logo.jpg" alt="Cortix">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
 <h3>About Cortix</h3>
 <p>
-Cortix is a Python library for system-level module coupling, execution, and analysis.
+Cortix is a Python library for network modeling and parallel simulation.
 </p>
 <p>
 Cortix Group <br>
@@ -83,6 +85,8 @@ Lower, MA 01852
 
 </p>
 
+<!---->
+
 <h3><a href="#">Table Of Contents</a></h3>
 <ul>
 <li><a href="#">Home</a></li>
@@ -90,8 +94,6 @@ Lower, MA 01852
 <li><a href="contents.html">Documentation</a></li>
 <li><a href="license.html">License</a></li>
 </ul>
-
-<!---->
 
 <h3>Useful Links</h3>
 <ul>

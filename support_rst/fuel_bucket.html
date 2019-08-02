@@ -43,290 +43,1061 @@ responsible to make the “history” of the phases consistent. See Phase() info
 <dt id="fuel_bucket.FuelBucket">
 <em class="property">class </em><code class="descclassname">fuel_bucket.</code><code class="descname">FuelBucket</code><span class="sig-paren">(</span><em>specs=Empty DataFrame Columns: [] Index: []</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="method">
+<dt id="fuel_bucket.FuelBucket.__repr__">
+<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="fuel_bucket.FuelBucket.__str__">
+<code class="descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.__str__" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.cladding_end_thickness">
 <code class="descname">cladding_end_thickness</code><a class="headerlink" href="#fuel_bucket.FuelBucket.cladding_end_thickness" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Gets the thickness of the hemispherical cladding end caps that are
+placed on the top and bottom of the fuel slug, in cm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>cladding_end_thickness</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">cm</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.cladding_mass">
 <code class="descname">cladding_mass</code><a class="headerlink" href="#fuel_bucket.FuelBucket.cladding_mass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total mass of cladding material in the bucket, in grams.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>cladding_mass</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.cladding_phase">
 <code class="descname">cladding_phase</code><a class="headerlink" href="#fuel_bucket.FuelBucket.cladding_phase" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the phase history of the cladding.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>cladding_phase</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.cladding_volume">
 <code class="descname">cladding_volume</code><a class="headerlink" href="#fuel_bucket.FuelBucket.cladding_volume" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total volume of cladding in the bucket, in cm^3.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>cladding_volume</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.cladding_wall_thickness">
 <code class="descname">cladding_wall_thickness</code><a class="headerlink" href="#fuel_bucket.FuelBucket.cladding_wall_thickness" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the thickness of the cladding wall which is on the outside of
+every fuel slug, and in between both sections of fuel, in cm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>cladding_wall_thickness</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.fresh_u235_mass">
 <code class="descname">fresh_u235_mass</code><a class="headerlink" href="#fuel_bucket.FuelBucket.fresh_u235_mass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total amount of uranium-235 in the bucket, in grams.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fresh_u235_mass</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.fresh_u238_mass">
 <code class="descname">fresh_u238_mass</code><a class="headerlink" href="#fuel_bucket.FuelBucket.fresh_u238_mass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total amount of uranium-238 in the bucket, in grams.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fresh_u238_mass</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.fresh_u_mass">
 <code class="descname">fresh_u_mass</code><a class="headerlink" href="#fuel_bucket.FuelBucket.fresh_u_mass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total amount of uranium in the bucket, in grams.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fresh_u_mass</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.fuel_enrichment">
 <code class="descname">fuel_enrichment</code><a class="headerlink" href="#fuel_bucket.FuelBucket.fuel_enrichment" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the enrichment of the fuel slugs in the bucket, in %.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_enrichment</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.fuel_mass">
 <code class="descname">fuel_mass</code><a class="headerlink" href="#fuel_bucket.FuelBucket.fuel_mass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total mass of fuel in the solid phase in the bucket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_mass</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.fuel_mass_unit">
 <code class="descname">fuel_mass_unit</code><a class="headerlink" href="#fuel_bucket.FuelBucket.fuel_mass_unit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the unit that is used to measure the mass of fuel in the
+bucket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_mass_unit</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.fuel_phase">
 <code class="descname">fuel_phase</code><a class="headerlink" href="#fuel_bucket.FuelBucket.fuel_phase" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the phase history of the fuel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_phase</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pandas.core.frame.DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.fuel_radioactivity">
 <code class="descname">fuel_radioactivity</code><a class="headerlink" href="#fuel_bucket.FuelBucket.fuel_radioactivity" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total radioactivity of the solid phase fuel, in units of
+curies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_radioactivity</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.fuel_volume">
 <code class="descname">fuel_volume</code><a class="headerlink" href="#fuel_bucket.FuelBucket.fuel_volume" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total volume of fuel in the entire bucket, in cm^3.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_volume</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.gamma_pwr">
 <code class="descname">gamma_pwr</code><a class="headerlink" href="#fuel_bucket.FuelBucket.gamma_pwr" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the amount of gamma radiation given off by the fuel bucket,
+in units of watts.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>gamma_pwr</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_cladding_end_thickness">
 <code class="descname">get_cladding_end_thickness</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_cladding_end_thickness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_cladding_end_thickness" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Gets the thickness of the hemispherical cladding end caps that are
+placed on the top and bottom of the fuel slug, in cm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>cladding_end_thickness</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">cm</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_cladding_mass">
 <code class="descname">get_cladding_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_cladding_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_cladding_mass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total mass of cladding material in the bucket, in grams.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>cladding_mass</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_cladding_phase">
 <code class="descname">get_cladding_phase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_cladding_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_cladding_phase" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the phase history of the cladding.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>cladding_phase</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_cladding_volume">
 <code class="descname">get_cladding_volume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_cladding_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_cladding_volume" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total volume of cladding in the bucket, in cm^3.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>cladding_volume</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_cladding_wall_thickness">
 <code class="descname">get_cladding_wall_thickness</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_cladding_wall_thickness"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_cladding_wall_thickness" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the thickness of the cladding wall which is on the outside of
+every fuel slug, and in between both sections of fuel, in cm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>cladding_wall_thickness</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_fresh_u235_mass">
 <code class="descname">get_fresh_u235_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_fresh_u235_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_fresh_u235_mass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total amount of uranium-235 in the bucket, in grams.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fresh_u235_mass</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_fresh_u238_mass">
 <code class="descname">get_fresh_u238_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_fresh_u238_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_fresh_u238_mass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total amount of uranium-238 in the bucket, in grams.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fresh_u238_mass</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_fresh_u_mass">
 <code class="descname">get_fresh_u_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_fresh_u_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_fresh_u_mass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total amount of uranium in the bucket, in grams.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fresh_u_mass</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_fuel_enrichment">
 <code class="descname">get_fuel_enrichment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_fuel_enrichment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_fuel_enrichment" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the enrichment of the fuel slugs in the bucket, in %.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_enrichment</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_fuel_mass">
 <code class="descname">get_fuel_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_fuel_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_fuel_mass" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total mass of fuel in the solid phase in the bucket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_mass</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_fuel_mass_unit">
 <code class="descname">get_fuel_mass_unit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_fuel_mass_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_fuel_mass_unit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the unit that is used to measure the mass of fuel in the
+bucket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_mass_unit</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_fuel_phase">
 <code class="descname">get_fuel_phase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_fuel_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_fuel_phase" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the phase history of the fuel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_phase</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">pandas.core.frame.DataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_fuel_radioactivity">
 <code class="descname">get_fuel_radioactivity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_fuel_radioactivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_fuel_radioactivity" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total radioactivity of the solid phase fuel, in units of
+curies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_radioactivity</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_fuel_volume">
 <code class="descname">get_fuel_volume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_fuel_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_fuel_volume" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total volume of fuel in the entire bucket, in cm^3.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_volume</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_gamma_pwr">
 <code class="descname">get_gamma_pwr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_gamma_pwr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_gamma_pwr" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the amount of gamma radiation given off by the fuel bucket,
+in units of watts.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>gamma_pwr</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_heat_pwr">
 <code class="descname">get_heat_pwr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_heat_pwr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_heat_pwr" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total amount of heat generated by the bucket, in units of
+watts.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>heat_pwr</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_inner_slug_id">
 <code class="descname">get_inner_slug_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_inner_slug_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_inner_slug_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the inner diameter of the inner section of fuel, in cm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>inner_slug_id</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_inner_slug_od">
 <code class="descname">get_inner_slug_od</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_inner_slug_od"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_inner_slug_od" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the outer  diameter of the inner section of fuel, in cm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>inner_slug_od</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_n_slugs">
 <code class="descname">get_n_slugs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_n_slugs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_n_slugs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the number of fuel slugs in the bucket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>n_slugs</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_name">
 <code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the name of the fuel bucket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>name</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_outer_slug_id">
 <code class="descname">get_outer_slug_id</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_outer_slug_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_outer_slug_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the inner diameter of the outer section of fuel, in cm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>outer_slug_id</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_outer_slug_od">
 <code class="descname">get_outer_slug_od</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_outer_slug_od"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_outer_slug_od" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the outer diameter of the outer section of fuel, in cm. A fuel
+slug consists of an outer section of fuel and an inner section of fuel,
+with cladding on the outside of the slug and between the inner and
+outer sections of fuel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>outer_slug_od</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_radioactivity">
 <code class="descname">get_radioactivity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_radioactivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_radioactivity" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the radioactivity of the fuel bucket, in units of curies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>radioactivity</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_slug_cladding_volume">
 <code class="descname">get_slug_cladding_volume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_slug_cladding_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_slug_cladding_volume" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the volume of cladding present in a single fuel slug, in cm^3.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>slug_cladding_volume</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_slug_fuel_volume">
 <code class="descname">get_slug_fuel_volume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_slug_fuel_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_slug_fuel_volume" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the volume of fuel present in a single fuel slug, in cm^3.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>slug_fuel_volume</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_slug_length">
 <code class="descname">get_slug_length</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_slug_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_slug_length" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the length of each slug in the fuel bucket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>slug_length</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.get_slug_type">
 <code class="descname">get_slug_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.get_slug_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.get_slug_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the type of slugs being stored in the bucket (inner slug or
+outer slug).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>slug_type</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.heat_pwr">
 <code class="descname">heat_pwr</code><a class="headerlink" href="#fuel_bucket.FuelBucket.heat_pwr" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the total amount of heat generated by the bucket, in units of
+watts.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>heat_pwr</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.inner_slug_id">
 <code class="descname">inner_slug_id</code><a class="headerlink" href="#fuel_bucket.FuelBucket.inner_slug_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the inner diameter of the inner section of fuel, in cm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>inner_slug_id</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.inner_slug_od">
 <code class="descname">inner_slug_od</code><a class="headerlink" href="#fuel_bucket.FuelBucket.inner_slug_od" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the outer  diameter of the inner section of fuel, in cm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>inner_slug_od</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.n_slugs">
 <code class="descname">n_slugs</code><a class="headerlink" href="#fuel_bucket.FuelBucket.n_slugs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the number of fuel slugs in the bucket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>n_slugs</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.name">
 <code class="descname">name</code><a class="headerlink" href="#fuel_bucket.FuelBucket.name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the name of the fuel bucket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>name</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.outer_slug_id">
 <code class="descname">outer_slug_id</code><a class="headerlink" href="#fuel_bucket.FuelBucket.outer_slug_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the inner diameter of the outer section of fuel, in cm.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>outer_slug_id</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.outer_slug_od">
 <code class="descname">outer_slug_od</code><a class="headerlink" href="#fuel_bucket.FuelBucket.outer_slug_od" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the outer diameter of the outer section of fuel, in cm. A fuel
+slug consists of an outer section of fuel and an inner section of fuel,
+with cladding on the outside of the slug and between the inner and
+outer sections of fuel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>outer_slug_od</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.radioactivity">
 <code class="descname">radioactivity</code><a class="headerlink" href="#fuel_bucket.FuelBucket.radioactivity" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the radioactivity of the fuel bucket, in units of curies.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>radioactivity</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.set_cladding_phase">
 <code class="descname">set_cladding_phase</code><span class="sig-paren">(</span><em>phase</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.set_cladding_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.set_cladding_phase" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Set’s the phase history to specific values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>phase</strong> (<em>dataFrame</em>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">empty</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.set_fuel_phase">
 <code class="descname">set_fuel_phase</code><span class="sig-paren">(</span><em>phase</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.set_fuel_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.set_fuel_phase" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sets the current fuel phase to a specified phase value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>phase</strong> (<em>dataFrame</em>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">empty</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuel_bucket.FuelBucket.set_slug_length">
 <code class="descname">set_slug_length</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuel_bucket.html#FuelBucket.set_slug_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bucket.FuelBucket.set_slug_length" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sets the length of all slugs in the bucket to x. Used for chopping.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">empty</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.slug_cladding_volume">
 <code class="descname">slug_cladding_volume</code><a class="headerlink" href="#fuel_bucket.FuelBucket.slug_cladding_volume" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the volume of cladding present in a single fuel slug, in cm^3.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>slug_cladding_volume</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.slug_fuel_volume">
 <code class="descname">slug_fuel_volume</code><a class="headerlink" href="#fuel_bucket.FuelBucket.slug_fuel_volume" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the volume of fuel present in a single fuel slug, in cm^3.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>slug_fuel_volume</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.slug_length">
 <code class="descname">slug_length</code><a class="headerlink" href="#fuel_bucket.FuelBucket.slug_length" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the length of each slug in the fuel bucket.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>slug_length</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bucket.FuelBucket.slug_type">
 <code class="descname">slug_type</code><a class="headerlink" href="#fuel_bucket.FuelBucket.slug_type" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the type of slugs being stored in the bucket (inner slug or
+outer slug).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>slug_type</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -337,10 +1108,11 @@ responsible to make the “history” of the phases consistent. See Phase() info
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><img src="https://cortix.org/logo.jpg" alt="Cortix" height="210">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
 <h3>About Cortix</h3>
 <p>
-Cortix is a Python library for system-level module coupling, execution, and analysis.
+Cortix is a Python library for network modeling and parallel simulation.
 </p>
 <p>
 Cortix Group <br>
@@ -351,6 +1123,8 @@ Lower, MA 01852
 
 </p>
 
+<!---->
+
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li><a href="../index.html">Home</a></li>
@@ -358,8 +1132,6 @@ Lower, MA 01852
 <li><a href="../contents.html">Documentation</a></li>
 <li><a href="../license.html">License</a></li>
 </ul>
-
-<!---->
 
 <h3>Useful Links</h3>
 <ul>

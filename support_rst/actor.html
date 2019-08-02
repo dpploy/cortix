@@ -33,8 +33,8 @@
 <span id="actor"></span><h1>actor<a class="headerlink" href="#module-actor" title="Permalink to this headline">¶</a></h1>
 <p>This is a simple way to hide the name of species of interest in a simulation.
 The user would modify and copy this class into the Cortix module of interest
-and keep it private.</p>
-<p>Author: Valmor de Almeida <a class="reference external" href="mailto:dealmeidav&#37;&#52;&#48;ornl&#46;gov">dealmeidav<span>&#64;</span>ornl<span>&#46;</span>gov</a>; vfda
+and keep it private.
+Author: Valmor de Almeida <a class="reference external" href="mailto:dealmeidav&#37;&#52;&#48;ornl&#46;gov">dealmeidav<span>&#64;</span>ornl<span>&#46;</span>gov</a>; vfda
 Sat Aug 15 13:41:12 EDT 2015</p>
 <dl class="class">
 <dt id="actor.Actor">
@@ -44,12 +44,38 @@ Sat Aug 15 13:41:12 EDT 2015</p>
 <dl class="attribute">
 <dt id="actor.Actor.atoms">
 <code class="descname">atoms</code><a class="headerlink" href="#actor.Actor.atoms" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the specific nuclides found in the specified chemical.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>atoms</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="actor.Actor.formula">
 <code class="descname">formula</code><a class="headerlink" href="#actor.Actor.formula" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the formula of the chemical in question.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>formula</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -60,10 +86,11 @@ Sat Aug 15 13:41:12 EDT 2015</p>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><img src="https://cortix.org/logo.jpg" alt="Cortix" height="210">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
 <h3>About Cortix</h3>
 <p>
-Cortix is a Python library for system-level module coupling, execution, and analysis.
+Cortix is a Python library for network modeling and parallel simulation.
 </p>
 <p>
 Cortix Group <br>
@@ -74,6 +101,8 @@ Lower, MA 01852
 
 </p>
 
+<!---->
+
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li><a href="../index.html">Home</a></li>
@@ -81,8 +110,6 @@ Lower, MA 01852
 <li><a href="../contents.html">Documentation</a></li>
 <li><a href="../license.html">License</a></li>
 </ul>
-
-<!---->
 
 <h3>Useful Links</h3>
 <ul>

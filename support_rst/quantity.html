@@ -42,65 +42,282 @@
 <dt id="quantity.Quantity">
 <em class="property">class </em><code class="descclassname">quantity.</code><code class="descname">Quantity</code><span class="sig-paren">(</span><em>name='null-quantity'</em>, <em>formalName='null-quantity'</em>, <em>value=0.0</em>, <em>unit='null-unit'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/quantity.html#Quantity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#quantity.Quantity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="docutils">
+<dt>todo: this probably should not have a “value” for the same reason as Specie.</dt>
+<dd>this needs some thinking.</dd>
+</dl>
 <dl class="method">
 <dt id="quantity.Quantity.GetFormalName">
 <code class="descname">GetFormalName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/quantity.html#Quantity.GetFormalName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#quantity.Quantity.GetFormalName" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the formal name of the quantity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>formalName</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="quantity.Quantity.GetUnit">
 <code class="descname">GetUnit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/quantity.html#Quantity.GetUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#quantity.Quantity.GetUnit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the units of the quantity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>unit</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="quantity.Quantity.GetValue">
 <code class="descname">GetValue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/quantity.html#Quantity.GetValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#quantity.Quantity.GetValue" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Gets the numerical value of the quantity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>value</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="quantity.Quantity.SetFormalName">
 <code class="descname">SetFormalName</code><span class="sig-paren">(</span><em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/quantity.html#Quantity.SetFormalName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#quantity.Quantity.SetFormalName" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sets the formal name of the property to fn.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fn</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">empty</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="quantity.Quantity.SetName">
 <code class="descname">SetName</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/quantity.html#Quantity.SetName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#quantity.Quantity.SetName" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sets the name of the quantity in question to n.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">empty</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="quantity.Quantity.SetUnit">
 <code class="descname">SetUnit</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/quantity.html#Quantity.SetUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#quantity.Quantity.SetUnit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sets the units of the quantity to f (for example, density would be in
+units of g/cc.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>f</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">empty</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="quantity.Quantity.SetValue">
 <code class="descname">SetValue</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/quantity.html#Quantity.SetValue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#quantity.Quantity.SetValue" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Sets the numerical value of the quantity to v.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">empty</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="quantity.Quantity.__repr__">
+<code class="descname">__repr__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/quantity.html#Quantity.__repr__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#quantity.Quantity.__repr__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to print the data stored by the quantity class. Will print out
+name, formal name, the value of the quantity and its unit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>s</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="quantity.Quantity.__str__">
+<code class="descname">__str__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/quantity.html#Quantity.__str__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#quantity.Quantity.__str__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to print the data stored by the quantity class. Will print out
+name, formal name, the value of the quantity and its unit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>s</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="quantity.Quantity.formalName">
 <code class="descname">formalName</code><a class="headerlink" href="#quantity.Quantity.formalName" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the formal name of the quantity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>formalName</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="quantity.Quantity.formal_name">
+<code class="descname">formal_name</code><a class="headerlink" href="#quantity.Quantity.formal_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the formal name of the quantity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>formalName</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="quantity.Quantity.get_name">
 <code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/quantity.html#Quantity.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#quantity.Quantity.get_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the name of the quantity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>name</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="quantity.Quantity.name">
 <code class="descname">name</code><a class="headerlink" href="#quantity.Quantity.name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the name of the quantity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>name</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="quantity.Quantity.unit">
 <code class="descname">unit</code><a class="headerlink" href="#quantity.Quantity.unit" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the units of the quantity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>unit</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="quantity.Quantity.value">
 <code class="descname">value</code><a class="headerlink" href="#quantity.Quantity.value" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Gets the numerical value of the quantity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>value</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -111,10 +328,11 @@
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><img src="https://cortix.org/logo.jpg" alt="Cortix" height="210">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
 <h3>About Cortix</h3>
 <p>
-Cortix is a Python library for system-level module coupling, execution, and analysis.
+Cortix is a Python library for network modeling and parallel simulation.
 </p>
 <p>
 Cortix Group <br>
@@ -125,6 +343,8 @@ Lower, MA 01852
 
 </p>
 
+<!---->
+
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li><a href="../index.html">Home</a></li>
@@ -132,8 +352,6 @@ Lower, MA 01852
 <li><a href="../contents.html">Documentation</a></li>
 <li><a href="../license.html">License</a></li>
 </ul>
-
-<!---->
 
 <h3>Useful Links</h3>
 <ul>

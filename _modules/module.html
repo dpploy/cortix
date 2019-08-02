@@ -34,356 +34,114 @@
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># This file is part of the Cortix toolkit environment</span>
 <span class="c1"># https://cortix.org</span>
-<span class="c1">#</span>
-<span class="c1"># All rights reserved, see COPYRIGHT for full restrictions.</span>
-<span class="c1"># https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt</span>
-<span class="c1">#</span>
-<span class="c1"># Licensed under the University of Massachusetts Lowell LICENSE:</span>
-<span class="c1"># https://github.com/dpploy/cortix/blob/master/LICENSE.txt</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">Cortix Module class defintion.</span>
 
-<span class="sd">Cortix: a program for system-level modules coupling, execution, and analysis.</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="c1">#**********************************************************************************</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">cortix.src.utils.xmltree</span> <span class="k">import</span> <span class="n">XMLTree</span>
-
-<span class="kn">from</span> <span class="nn">cortix.src.launcher</span> <span class="k">import</span> <span class="n">Launcher</span>
-<span class="c1">#**********************************************************************************</span>
+<span class="kn">from</span> <span class="nn">cortix.src.port</span> <span class="k">import</span> <span class="n">Port</span>
 
 <div class="viewcode-block" id="Module"><a class="viewcode-back" href="../src_rst/module.html#module.Module">[docs]</a><span class="k">class</span> <span class="nc">Module</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    The Module class encapsulates a computational module of some scientific domain.</span>
+<span class="sd">    The representation of a Cortix module.</span>
+<span class="sd">    This class is to be inherited by every Cortix module.</span>
+<span class="sd">    It provides facilities for creating modules within the Cortix network.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-<span class="c1">#*********************************************************************************</span>
-<span class="c1"># Construction </span>
-<span class="c1">#*********************************************************************************</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> 
-            <span class="n">logger</span><span class="p">,</span>
-            <span class="n">importlib_name</span><span class="p">,</span> <span class="n">library_parent_dir</span><span class="p">,</span> 
-            <span class="n">config_xml_tree</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ports</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">),</span><span class="s1">&#39;ctx::mod: logger is invalid.&#39;</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">importlib_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;ctx::mod: importlib_name is invalid.&#39;</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">library_parent_dir</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span><span class="s1">&#39;ctx:mod: library_parent is invalid.&#39;</span>
-
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config_xml_tree</span><span class="p">,</span> <span class="n">XMLTree</span><span class="p">),</span><span class="s1">&#39;ctx:mod: config_xml_tree is invalid.&#39;</span>
-        <span class="k">assert</span> <span class="n">config_xml_tree</span><span class="o">.</span><span class="n">get_node_tag</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;module&#39;</span><span class="p">,</span><span class="s1">&#39;ctx:mod:invalid module xml tree.&#39;</span>
-        <span class="c1"># Read the module name and type</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__mod_name</span> <span class="o">=</span> <span class="n">config_xml_tree</span><span class="o">.</span><span class="n">get_node_attribute</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span> <span class="c1"># e.g. wind</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__mod_type</span> <span class="o">=</span> <span class="n">config_xml_tree</span><span class="o">.</span><span class="n">get_node_attribute</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span> <span class="c1"># e.g. native</span>
-
-        <span class="c1"># Specify module library with upstream information</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__library_parent_dir</span> <span class="o">=</span> <span class="n">library_parent_dir</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__importlib_name</span>       <span class="o">=</span> <span class="n">importlib_name</span>
-
-        <span class="c1"># executable is deprecated; eliminate</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__executable_name</span> <span class="o">=</span> <span class="s1">&#39;null-executable_name&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__executable_path</span> <span class="o">=</span> <span class="s1">&#39;null-executable_path&#39;</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__input_file_name</span> <span class="o">=</span> <span class="s1">&#39;null-input_file_name&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__input_file_path</span> <span class="o">=</span> <span class="s1">&#39;null-input_file_path&#39;</span>
-
-        <span class="c1"># Get config data  </span>
-        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">config_xml_tree</span><span class="o">.</span><span class="n">get_node_children</span><span class="p">():</span>
-
-            <span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span> <span class="o">=</span> <span class="n">child</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mod_type</span> <span class="o">!=</span> <span class="s1">&#39;native&#39;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;executable_name&#39;</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">__executable_name</span> <span class="o">=</span> <span class="n">text</span>
-
-            <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;executable_path&#39;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">text</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
-                    <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__executable_path</span> <span class="o">=</span> <span class="n">text</span>
-
-            <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;input_file_name&#39;</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__input_file_name</span> <span class="o">=</span> <span class="n">text</span>
-
-            <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;input_file_path&#39;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">text</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
-                    <span class="n">text</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__input_file_path</span> <span class="o">=</span> <span class="n">text</span>
-
-            <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;library&#39;</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;only name of library allowed.&#39;</span>
-                <span class="n">key</span> <span class="o">=</span> <span class="n">attributes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">assert</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;importlib_name&#39;</span><span class="p">,</span> <span class="s1">&#39;invalid attribute key.&#39;</span>
-                <span class="n">val</span> <span class="o">=</span> <span class="n">attributes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__importlib_name</span> <span class="o">=</span> <span class="n">val</span>
-
-                <span class="n">node</span> <span class="o">=</span> <span class="n">XMLTree</span><span class="p">(</span> <span class="n">elem</span> <span class="p">)</span> <span class="c1"># fixme: remove this wrapper</span>
-                <span class="n">sub_node</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get_sub_node</span><span class="p">(</span><span class="s1">&#39;parent_dir&#39;</span><span class="p">)</span>
-
-                <span class="c1"># override parent_dir</span>
-                <span class="c1"># fixme: no root node needed</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__library_parent_dir</span> <span class="o">=</span> <span class="n">sub_node</span><span class="o">.</span><span class="n">get_root_node</span><span class="p">()</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__library_parent_dir</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">__library_parent_dir</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
-
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__mod_name</span><span class="o">+</span><span class="s1">&#39;: read module config info&#39;</span><span class="p">)</span>
-
-        <span class="c1"># Take care of a few full path issue</span>
-        <span class="n">cortix_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="vm">__file__</span><span class="p">,</span> <span class="s1">&#39;../../..&#39;</span><span class="p">))</span>
-
-        <span class="n">manifest_full_path_file_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__library_parent_dir</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> \
-                <span class="bp">self</span><span class="o">.</span><span class="n">__mod_name</span> <span class="o">+</span> <span class="s1">&#39;/manifest.xml&#39;</span>
-
-        <span class="k">if</span> <span class="s1">&#39;$CORTIX&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__input_file_path</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__input_file_path</span> <span class="o">=</span> \
-                    <span class="bp">self</span><span class="o">.</span><span class="n">__input_file_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;$CORTIX&#39;</span><span class="p">,</span> <span class="n">cortix_path</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="s1">&#39;$CORTIX&#39;</span> <span class="ow">in</span> <span class="n">manifest_full_path_file_name</span><span class="p">:</span>
-            <span class="n">manifest_full_path_file_name</span> <span class="o">=</span> \
-                    <span class="n">manifest_full_path_file_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;$CORTIX&#39;</span><span class="p">,</span> <span class="n">cortix_path</span><span class="p">)</span>
-
-        <span class="c1"># Read the module&#39;s port information from the module manifest</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__read_manifest_ports</span><span class="p">(</span> <span class="n">manifest_full_path_file_name</span> <span class="p">)</span>
-
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__mod_name</span><span class="o">+</span><span class="s1">&#39;: read manifest ports</span><span class="se">\n</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">__diagram</span><span class="p">)</span>
-
-        <span class="k">return</span>
-
-<span class="c1">#*********************************************************************************</span>
-<span class="c1"># Public member functions</span>
-<span class="c1">#*********************************************************************************</span>
-
-    <span class="k">def</span> <span class="nf">__get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Module.send"><a class="viewcode-back" href="../src_rst/module.html#module.Module.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        `str`:Module name</span>
+<span class="sd">        Send data through a given port.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mod_name</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_port</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+            <span class="c1">#matches = [p for p in self.ports if p.name == port]</span>
+            <span class="c1">#assert len(matches) == 1,\</span>
+            <span class="c1">#        &#39;matches= %r port= %r, ports= %r&#39;%(matches,port,self.ports)</span>
+            <span class="c1">#port = matches[0]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="n">Port</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="p">,</span> <span class="s2">&quot;Unknown port!&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;port must be of Port or String type&quot;</span><span class="p">)</span>
 
-    <span class="n">name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">port</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">__get_importlib_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Module.recv"><a class="viewcode-back" href="../src_rst/module.html#module.Module.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        `str`:Module library name</span>
+<span class="sd">        Receive data from a given port</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__importlib_name</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_port</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+            <span class="c1">#matches = [p for p in self.ports if p.name == port]</span>
+            <span class="c1">#assert(len(matches) == 1)</span>
+            <span class="c1">#port = matches[0]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="n">Port</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="p">,</span> <span class="s2">&quot;Unknown port!&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;port must be of Port or String type&quot;</span><span class="p">)</span>
 
-    <span class="n">importlib_name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_importlib_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">port</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">__get_library_parent_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Module.get_port"><a class="viewcode-back" href="../src_rst/module.html#module.Module.get_port">[docs]</a>    <span class="k">def</span> <span class="nf">get_port</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        `str`:Library parent directory</span>
+<span class="sd">        Get port by name; if it does not exist, create one.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__library_parent_dir</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;port name must be of type str&#39;</span>
+        <span class="n">port</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="n">library_parent_dir</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_library_parent_dir</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="n">port</span> <span class="o">=</span> <span class="n">p</span>
+                <span class="k">break</span>
 
-    <span class="k">def</span> <span class="nf">__get_ports</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">reserved_port_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_reserved_port_names</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">reserved_port_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">reserved_port_names</span><span class="p">,</span>\
+                        <span class="s1">&#39;port name: </span><span class="si">{}</span><span class="s1">, not allowed by module: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span>
+            <span class="n">port</span> <span class="o">=</span> <span class="n">Port</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">port</span></div>
+
+<div class="viewcode-block" id="Module.connect"><a class="viewcode-back" href="../src_rst/module.html#module.Module.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_name</span><span class="p">,</span> <span class="n">connected_port</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">       `list(tuple)`: Module&#39;s ports</span>
+<span class="sd">        A simpler interface to create module connectivity. Connect the module port</span>
+<span class="sd">        with `port_name` to a given `connected_port`.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ports</span>
+        <span class="n">my_port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_port</span><span class="p">(</span><span class="n">port_name</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">connected_port</span><span class="p">,</span> <span class="n">Port</span><span class="p">),</span> <span class="s2">&quot;Connecting port must be of Port type&quot;</span>
+        <span class="n">my_port</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">connected_port</span><span class="p">)</span></div>
 
-    <span class="n">ports</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_ports</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<div class="viewcode-block" id="Module.run"><a class="viewcode-back" href="../src_rst/module.html#module.Module.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Modules must implement run()&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Module.get_port_type"><a class="viewcode-back" href="../src_rst/module.html#module.Module.get_port_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_port_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_reserved_port_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns the port type specified by port_name</span>
+<span class="sd">        This is a helper function to check for reserved names of ports in the module.</span>
+<span class="sd">        If there is no reservation on names or no checking of reserved names wanted,</span>
+<span class="sd">        this function is the default function and nothing needs to be done on the</span>
+<span class="sd">        developer side of the module child class.</span>
+<span class="sd">        Otherwise this function must be overriden and an iterable container of strings</span>
+<span class="sd">        must be returned.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="n">port_type</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ports</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">port</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">port_name</span><span class="p">:</span>
-                <span class="n">port_type</span> <span class="o">=</span> <span class="n">port</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-
-        <span class="k">return</span> <span class="n">port_type</span></div>
-
-<div class="viewcode-block" id="Module.get_port_mode"><a class="viewcode-back" href="../src_rst/module.html#module.Module.get_port_mode">[docs]</a>    <span class="k">def</span> <span class="nf">get_port_mode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_name</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns the port mode specified by port_name</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="n">port_mode</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ports</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">port</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">port_name</span><span class="p">:</span>
-                <span class="n">port_mode</span> <span class="o">=</span> <span class="n">port</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-
-        <span class="k">return</span> <span class="n">port_mode</span></div>
-
-    <span class="k">def</span> <span class="nf">__get_port_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        `list(tuple)`:List of names of module&#39;s ports</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="n">port_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ports</span><span class="p">:</span>
-            <span class="n">port_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">port</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">port_names</span>
-
-    <span class="n">port_names</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_port_names</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-
-<div class="viewcode-block" id="Module.has_port_name"><a class="viewcode-back" href="../src_rst/module.html#module.Module.has_port_name">[docs]</a>    <span class="k">def</span> <span class="nf">has_port_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_name</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns true if a port with the name</span>
-<span class="sd">        port_name is available in the module.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ports</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">port</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">port_name</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">True</span>
-
-        <span class="k">return</span> <span class="kc">False</span></div>
-
-    <span class="k">def</span> <span class="nf">__get_diagram</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Return the diagram string from the module manifest or a null place holder.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__diagram</span>
-
-    <span class="n">diagram</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_diagram</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-
-<div class="viewcode-block" id="Module.execute"><a class="viewcode-back" href="../src_rst/module.html#module.Module.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">slot_id</span><span class="p">,</span>
-                 <span class="n">runtime_cortix_param_file</span><span class="p">,</span>
-                 <span class="n">runtime_cortix_comm_file</span>    <span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Spawns a worker process to execute the module.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="k">assert</span> <span class="n">runtime_cortix_param_file</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;/&#39;</span>
-        <span class="k">assert</span> <span class="n">runtime_cortix_comm_file</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;/&#39;</span>
-
-        <span class="n">module_input</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__input_file_path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__input_file_name</span>
-        <span class="n">param</span> <span class="o">=</span> <span class="n">runtime_cortix_param_file</span>
-        <span class="n">comm</span>  <span class="o">=</span> <span class="n">runtime_cortix_comm_file</span>
-
-        <span class="n">full_path_comm_dir</span> <span class="o">=</span> <span class="n">comm</span><span class="p">[:</span><span class="n">comm</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span> <span class="c1"># extract directory name</span>
-        <span class="n">runtime_module_status_file</span> <span class="o">=</span> <span class="n">full_path_comm_dir</span> <span class="o">+</span> <span class="s1">&#39;runtime-status.xml&#39;</span>
-
-        <span class="n">status</span> <span class="o">=</span> <span class="n">runtime_module_status_file</span>
-
-        <span class="n">importlib_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__importlib_name</span>
-        <span class="n">library_parent_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__library_parent_dir</span>
-        <span class="n">mod_name</span>     <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mod_name</span>
-
-        <span class="c1"># provide a wrk/ for each modules for additional work IO data</span>
-        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">full_path_comm_dir</span><span class="p">),</span> \
-               <span class="s1">&#39;module directory </span><span class="si">%r</span><span class="s1"> not available.&#39;</span> <span class="o">%</span> <span class="n">full_path_comm_dir</span>
-
-        <span class="n">mod_work_dir</span> <span class="o">=</span> <span class="n">full_path_comm_dir</span> <span class="o">+</span> <span class="s1">&#39;wrk/&#39;</span>
-
-        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;mkdir -p &#39;</span> <span class="o">+</span> <span class="n">mod_work_dir</span><span class="p">)</span>
-
-        <span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">mod_work_dir</span><span class="p">),</span> \
-               <span class="s1">&#39;module work directory </span><span class="si">%r</span><span class="s1"> not available.&#39;</span> <span class="o">%</span> <span class="n">mod_work_dir</span>
-
-        <span class="c1"># only for wrapped modules (deprecated; remove in the future)</span>
-        <span class="n">mod_exec_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__executable_path</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__executable_name</span>
-
-        <span class="c1"># the laucher &quot;loads&quot; the module dynamically and provides the method for</span>
-        <span class="c1"># threading</span>
-        <span class="n">launch</span> <span class="o">=</span> <span class="n">Launcher</span><span class="p">(</span> <span class="n">importlib_name</span><span class="p">,</span> <span class="n">library_parent_dir</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">,</span>
-                           <span class="n">slot_id</span><span class="p">,</span>
-                           <span class="n">module_input</span><span class="p">,</span>
-                           <span class="n">mod_exec_name</span><span class="p">,</span>
-                           <span class="n">mod_work_dir</span><span class="p">,</span>
-                           <span class="n">param</span><span class="p">,</span> <span class="n">comm</span><span class="p">,</span> <span class="n">status</span> <span class="p">)</span>
-
-        <span class="c1"># run module on its own process (file IO communication will take place</span>
-        <span class="c1"># between modules)</span>
-        <span class="n">launch</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="c1"># this start a thread and runs the run() method of launch</span>
-
-        <span class="k">return</span> <span class="n">runtime_module_status_file</span></div>
-
-<span class="c1">#*********************************************************************************</span>
-<span class="c1"># Private helper functions (internal use: __)</span>
-<span class="c1">#*********************************************************************************</span>
-
-    <span class="k">def</span> <span class="nf">__read_manifest_ports</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">xml_tree_file</span> <span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Get ports</span>
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">xml_tree_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
-
-        <span class="c1"># Read the manifest </span>
-        <span class="n">xml_tree</span> <span class="o">=</span> <span class="n">XMLTree</span><span class="p">(</span> <span class="n">xml_tree_file</span><span class="o">=</span><span class="n">xml_tree_file</span> <span class="p">)</span>
-
-        <span class="k">assert</span> <span class="n">xml_tree</span><span class="o">.</span><span class="n">get_node_tag</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;module_manifest&#39;</span>
-
-        <span class="k">assert</span> <span class="n">xml_tree</span><span class="o">.</span><span class="n">get_node_attribute</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mod_name</span>
-
-        <span class="c1"># List of (port_name, port_type, port_mode, port_multiplicity)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__ports</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__diagram</span> <span class="o">=</span> <span class="s1">&#39;null-module-diagram&#39;</span>
-
-        <span class="c1"># Get config data  </span>
-        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">xml_tree</span><span class="o">.</span><span class="n">get_node_children</span><span class="p">():</span>
-            <span class="p">(</span><span class="n">elem</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span> <span class="o">=</span> <span class="n">child</span>
-
-            <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;port&#39;</span><span class="p">:</span>
-
-                <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-
-                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">attributes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;only &lt;= 3 attributes allowed.&quot;</span>
-
-                <span class="n">tmp</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>  <span class="c1"># store port name and three attributes</span>
-
-                <span class="k">for</span> <span class="n">attribute</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
-                    <span class="n">key</span> <span class="o">=</span> <span class="n">attribute</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-                    <span class="n">val</span> <span class="o">=</span> <span class="n">attribute</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-
-                    <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span>
-                        <span class="k">assert</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;use&#39;</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;provide&#39;</span> <span class="ow">or</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;input&#39;</span> <span class="ow">or</span> \
-                            <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;output&#39;</span><span class="p">,</span> <span class="s1">&#39;port attribute value invalid.&#39;</span>
-                        <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;port_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text</span>  <span class="c1"># port_name</span>
-                        <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;port_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>   <span class="c1"># port_type</span>
-                    <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;mode&#39;</span><span class="p">:</span>
-                        <span class="n">file_value</span> <span class="o">=</span> <span class="n">val</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-                        <span class="k">assert</span> <span class="n">file_value</span> <span class="o">==</span> <span class="s1">&#39;file&#39;</span> <span class="ow">or</span> <span class="n">file_value</span> <span class="o">==</span> <span class="s1">&#39;directory&#39;</span><span class="p">,</span>\
-                            <span class="s1">&#39;port attribute value invalid.&#39;</span>
-                        <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;port_mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-                    <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;multiplicity&#39;</span><span class="p">:</span>
-                        <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;port_multiplicity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>  <span class="c1"># port_multiplicity</span>
-                    <span class="k">else</span><span class="p">:</span>
-                        <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;invalid port attribute: </span><span class="si">%r</span><span class="s1">=</span><span class="si">%r</span><span class="s1">. fatal.&#39;</span><span class="o">%</span>\
-                                <span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="n">val</span><span class="p">)</span>
-
-                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
-                <span class="n">store</span> <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;port_name&#39;</span><span class="p">],</span> <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;port_type&#39;</span><span class="p">],</span> <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;port_mode&#39;</span><span class="p">],</span>
-                         <span class="n">tmp</span><span class="p">[</span><span class="s1">&#39;port_multiplicity&#39;</span><span class="p">])</span>
-
-                <span class="c1"># (port_name, port_type, port_mode, port_multiplicity)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__ports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">store</span><span class="p">)</span>
-
-                <span class="c1"># clear</span>
-                <span class="n">tmp</span>   <span class="o">=</span> <span class="kc">None</span>
-                <span class="n">store</span> <span class="o">=</span> <span class="kc">None</span>
-
-            <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;diagram&#39;</span><span class="p">:</span>
-
-                <span class="bp">self</span><span class="o">.</span><span class="n">__diagram</span> <span class="o">=</span> <span class="n">text</span>
-
-
-        <span class="k">return</span></div>
-
-<span class="c1">#======================= end class Module: =======================================</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
 </pre></div>
 
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><img src="https://cortix.org/logo.jpg" alt="Cortix" height="210">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
 <h3>About Cortix</h3>
 <p>
-Cortix is a Python library for system-level module coupling, execution, and analysis.
+Cortix is a Python library for network modeling and parallel simulation.
 </p>
 <p>
 Cortix Group <br>
@@ -394,6 +152,8 @@ Lower, MA 01852
 
 </p>
 
+<!---->
+
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li><a href="../index.html">Home</a></li>
@@ -401,8 +161,6 @@ Lower, MA 01852
 <li><a href="../contents.html">Documentation</a></li>
 <li><a href="../license.html">License</a></li>
 </ul>
-
-<!---->
 
 <h3>Useful Links</h3>
 <ul>

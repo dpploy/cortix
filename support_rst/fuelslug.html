@@ -43,52 +43,185 @@ best use the underlying history data in the Phase() container of each phase.</p>
 <p>Thu Dec 15 16:18:39 EST 2016</p>
 <dl class="class">
 <dt id="fuelslug.FuelSlug">
-<em class="property">class </em><code class="descclassname">fuelslug.</code><code class="descname">FuelSlug</code><span class="sig-paren">(</span><em>specs=Series([]</em>, <em>dtype: float64)</em>, <em>fuelPhase= 	 **Phase()**:  	 *quantities*: None 	 *species*: None 	 *history* #time_stamp=1 	 *history end* &#64;0.0 Series([]</em>, <em>Name: 0.0</em>, <em>dtype: float64)</em>, <em>claddingPhase= 	 **Phase()**:  	 *quantities*: None 	 *species*: None 	 *history* #time_stamp=1 	 *history end* &#64;0.0 Series([]</em>, <em>Name: 0.0</em>, <em>dtype: float64)</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuelslug.html#FuelSlug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuelslug.FuelSlug" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">fuelslug.</code><code class="descname">FuelSlug</code><span class="sig-paren">(</span><em>specs=Series([]</em>, <em>dtype: float64)</em>, <em>fuelPhase= 	 **Phase()**:  	 time unit: s 	 *quantities*: None 	 *species*: None 	 *history* #time_stamp=1 	 *history end* &#64;0.0 Series([]</em>, <em>Name: 0.0</em>, <em>dtype: float64)</em>, <em>claddingPhase= 	 **Phase()**:  	 time unit: s 	 *quantities*: None 	 *species*: None 	 *history* #time_stamp=1 	 *history end* &#64;0.0 Series([]</em>, <em>Name: 0.0</em>, <em>dtype: float64)</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuelslug.html#FuelSlug"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuelslug.FuelSlug" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="method">
 <dt id="fuelslug.FuelSlug.GetAttribute">
 <code class="descname">GetAttribute</code><span class="sig-paren">(</span><em>name</em>, <em>phase=None</em>, <em>symbol=None</em>, <em>series=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuelslug.html#FuelSlug.GetAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuelslug.FuelSlug.GetAttribute" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the value of the specified attribute. Any attribute that is
+specified in class construction can be retrieved using this function.
+The attribute may also be retrived from a speciefic phase, a specific
+nuclide OR a specific series.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </li>
+<li><strong>phase</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </li>
+<li><strong>symbol</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </li>
+<li><strong>series</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>attribute</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuelslug.FuelSlug.GetCladdingPhase">
 <code class="descname">GetCladdingPhase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuelslug.html#FuelSlug.GetCladdingPhase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuelslug.FuelSlug.GetCladdingPhase" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the phase history of the cladding.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>claddingPhase</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuelslug.FuelSlug.GetFuelPhase">
 <code class="descname">GetFuelPhase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuelslug.html#FuelSlug.GetFuelPhase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuelslug.FuelSlug.GetFuelPhase" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the phase history of the solid fuel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuelPhase</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuelslug.FuelSlug.GetSpecs">
 <code class="descname">GetSpecs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuelslug.html#FuelSlug.GetSpecs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuelslug.FuelSlug.GetSpecs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the species associated with this fuel slug.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>specs</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuelslug.FuelSlug.ReduceCladdingVolume">
 <code class="descname">ReduceCladdingVolume</code><span class="sig-paren">(</span><em>dissolvedVolume</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuelslug.html#FuelSlug.ReduceCladdingVolume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuelslug.FuelSlug.ReduceCladdingVolume" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Reduces the amount of cladding in the slug by dissolvedvolume.
+This will also update the dimensions of the cladding walls and
+end caps; volume will be taken from all sections equally such that the
+relative dimensions stay the same.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dissolvedVolume</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">empty</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuelslug.FuelSlug.ReduceFuelVolume">
 <code class="descname">ReduceFuelVolume</code><span class="sig-paren">(</span><em>dissolvedVolume</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuelslug.html#FuelSlug.ReduceFuelVolume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuelslug.FuelSlug.ReduceFuelVolume" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Reduces the amount of fuel in the slug by dissolvedVolume. This
+will also update the dimensions of the fuel slug, mainly the thickness
+of each fuel layers.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dissolvedVolume</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">empty</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuelslug.FuelSlug.claddingPhase">
 <code class="descname">claddingPhase</code><a class="headerlink" href="#fuelslug.FuelSlug.claddingPhase" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the phase history of the cladding.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>claddingPhase</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuelslug.FuelSlug.fuelPhase">
 <code class="descname">fuelPhase</code><a class="headerlink" href="#fuelslug.FuelSlug.fuelPhase" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the phase history of the solid fuel.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuelPhase</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="fuelslug.FuelSlug.specs">
 <code class="descname">specs</code><a class="headerlink" href="#fuelslug.FuelSlug.specs" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the species associated with this fuel slug.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>empty</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>specs</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -100,10 +233,11 @@ best use the underlying history data in the Phase() container of each phase.</p>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><img src="https://cortix.org/logo.jpg" alt="Cortix" height="210">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
 <h3>About Cortix</h3>
 <p>
-Cortix is a Python library for system-level module coupling, execution, and analysis.
+Cortix is a Python library for network modeling and parallel simulation.
 </p>
 <p>
 Cortix Group <br>
@@ -114,6 +248,8 @@ Lower, MA 01852
 
 </p>
 
+<!---->
+
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li><a href="../index.html">Home</a></li>
@@ -121,8 +257,6 @@ Lower, MA 01852
 <li><a href="../contents.html">Documentation</a></li>
 <li><a href="../license.html">License</a></li>
 </ul>
-
-<!---->
 
 <h3>Useful Links</h3>
 <ul>

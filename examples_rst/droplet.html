@@ -1,0 +1,158 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>droplet module &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-droplet">
+<span id="droplet-module"></span><h1>droplet module<a class="headerlink" href="#module-droplet" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="droplet.Droplet">
+<em class="property">class </em><code class="descclassname">droplet.</code><code class="descname">Droplet</code><a class="reference internal" href="../_modules/droplet.html#Droplet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#droplet.Droplet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cortix.src.module.Module</span></code></p>
+<p>Droplet Cortix module used to model very simple fluid-particle interactions.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p><cite>external-flow</cite>: this is a <cite>port</cite> that exchanges data with any other module that
+provides information about the flow outside the droplet.</p>
+<p class="last"><cite>visualization</cite>: this is a <cite>port</cite> that sends data to a visualization module.</p>
+</div>
+<dl class="method">
+<dt id="droplet.Droplet.rhs_fn">
+<code class="descname">rhs_fn</code><span class="sig-paren">(</span><em>u_vec</em>, <em>t</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/droplet.html#Droplet.rhs_fn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#droplet.Droplet.rhs_fn" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="droplet.Droplet.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/droplet.html#Droplet.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#droplet.Droplet.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="droplet.Droplet.step">
+<code class="descname">step</code><span class="sig-paren">(</span><em>time=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/droplet.html#Droplet.step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#droplet.Droplet.step" title="Permalink to this definition">¶</a></dt>
+<dd><p>ODE IVP problem:
+Given the initial data at <img class="math" src="../_images/math/c9c0db14206d811c979283bc2269384bec23557d.svg" alt="t=0"/>,
+<img class="math" src="../_images/math/04d154680dfe068e5aa43ae53985a6721f17acd9.svg" alt="(u_1(0),u_2(0),u_3(0)) = (x_0,x_1,x_2)"/>,
+<img class="math" src="../_images/math/a3a8916bbdd47f4561ff9e843e10e56782b7dc96.svg" alt="(u_4(0),u_5(0),u_6(0)) = (v_0,v_1,v_2) =
+(\dot{u}_1(0),\dot{u}_2(0),\dot{u}_3(0))"/>,
+solve <img class="math" src="../_images/math/6dc56e03fc4925c43dc948b4652e5c28b3f5a089.svg" alt="\frac{\text{d}u}{\text{d}t} = f(u)"/> in the interval
+<img class="math" src="../_images/math/47dfc08576060d50f4579e3816a573bb79346540.svg" alt="0\le t \le t_f"/>.
+When <img class="math" src="../_images/math/fdffd00fd5ea97c10895de227f630c27c8f2cb96.svg" alt="u_3(t)"/> is negative, bounce the droplet to a random height between
+0 and <img class="math" src="../_images/math/fd09f7b023aaf3c1e03b034f3d9cc4b8da668288.svg" alt="1.0\,x_0"/> with no velocity, and continue the time integration until
+<img class="math" src="../_images/math/ad8ff49872c18dd90656fad9911718358f0963c8.svg" alt="t = t_f"/>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Time in the droplet unit of time (seconds).</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
+<h3>About Cortix</h3>
+<p>
+Cortix is a Python library for network modeling and parallel simulation.
+</p>
+<p>
+Cortix Group <br>
+c/o <a href="https://www.uml.edu/innovation-hub">UMass Innovation Hub</a> <br>
+110 Canal St., 3rd Floor <br>
+Lower, MA 01852
+</p>
+
+</p>
+
+<!---->
+
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul>
+<li><a href="../index.html">Home</a></li>
+<li><a href="../install.html">Install</a></li>
+<li><a href="../contents.html">Documentation</a></li>
+<li><a href="../license.html">License</a></li>
+</ul>
+
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="https://pypi.org/project/cortix/">Cortix @ PyPI</a></li>
+  <li><a href="https://github.com/dpploy/cortix">Cortix @ GitHub</a></li>
+  <li><a href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master">Cortix @ binder</a></li>
+  <li><a href="https://nbviewer.jupyter.org/github/dpploy/cortix-nb/tree/master/">Cortix @ nbviewer</a></li>
+  <li><a href="https://github.com/dpploy/cortix-nb">Cortix Jupyter Notebooks</a></li>
+  <li><a href="https://github.com/dpploy/cortix/issues">Issue Tracker</a></li>
+  <li><a href="https://dpploy.github.io/cortix/Cortix.pdf">PDF Documentation</a></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, University of Massachusetts Lowell.
+      
+      |
+      <a href="../_sources/examples_rst/droplet.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+    <a href="https://github.com/dpploy/cortix" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>

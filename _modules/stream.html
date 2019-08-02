@@ -40,7 +40,7 @@
 <span class="c1">#</span>
 <span class="c1"># Licensed under the University of Massachusetts Lowell LICENSE:</span>
 <span class="c1"># https://github.com/dpploy/cortix/blob/master/LICENSE.txt</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda</span>
 
 <span class="sd">Stream container</span>
@@ -48,21 +48,21 @@
 <span class="sd">VFdALib support classes</span>
 
 <span class="sd">Sat Aug 15 17:24:02 EDT 2015</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
-<span class="c1"># *******************************************************************************</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="c1">#*********************************************************************************</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
 
 <span class="kn">from</span> <span class="nn">cortix.support.specie</span> <span class="k">import</span> <span class="n">Specie</span>
 <span class="kn">from</span> <span class="nn">cortix.support.quantity</span> <span class="k">import</span> <span class="n">Quantity</span>
-<span class="c1"># *******************************************************************************</span>
+<span class="c1">#*********************************************************************************</span>
 
-<span class="c1"># *******************************************************************************</span>
+<div class="viewcode-block" id="Stream"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream">[docs]</a><span class="k">class</span> <span class="nc">Stream</span><span class="p">:</span>
 
-
-<div class="viewcode-block" id="Stream"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream">[docs]</a><span class="k">class</span> <span class="nc">Stream</span><span class="p">():</span>
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Construction</span>
+<span class="c1">#*********************************************************************************</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">timeStamp</span><span class="p">,</span>
@@ -116,44 +116,151 @@
 
         <span class="k">return</span>
 
-
-<span class="c1"># *******************************************************************************</span>
-<span class="c1"># Setters and Getters methods</span>
-<span class="c1"># -------------------------------------------------------------------------------</span>
-<span class="c1"># These are passing arguments by value effectively. Because the python objects</span>
-<span class="c1"># passed into/out of the function are immutable.</span>
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Public Member Functions</span>
+<span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="Stream.GetTimeStamp"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetTimeStamp">[docs]</a>    <span class="k">def</span> <span class="nf">GetTimeStamp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the time stamp of the stream.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.timeStamp: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span></div>
 
 <div class="viewcode-block" id="Stream.GetActors"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetActors">[docs]</a>    <span class="k">def</span> <span class="nf">GetActors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the actors present in the stream of data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list(self.stream.columns): list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Stream.GetSpecie"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetSpecie">[docs]</a>    <span class="k">def</span> <span class="nf">GetSpecie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a specie named &quot;name&quot; from the stream.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name: str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        specie: obj</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">specie</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">specie</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Stream.GetSpecies"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">GetSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a list of all species in the stream.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.species: list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span></div>
 
 <div class="viewcode-block" id="Stream.GetQuantities"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetQuantities">[docs]</a>    <span class="k">def</span> <span class="nf">GetQuantities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns all the quantities given by the stream.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.quantities: list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantities</span></div>
 
 <div class="viewcode-block" id="Stream.SetSpecieId"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.SetSpecieId">[docs]</a>    <span class="k">def</span> <span class="nf">SetSpecieId</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets the numerical id of the specie of name &quot;name&quot; to val.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name: str</span>
+<span class="sd">        val: int</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        empty</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">specie</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
                 <span class="n">specie</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="n">val</span>
                 <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Stream.GetQuantity"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetQuantity">[docs]</a>    <span class="k">def</span> <span class="nf">GetQuantity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the specified quantity called &quot;name&quot; from the stream, or none</span>
+<span class="sd">        if the specified name does not exist.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name: str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        quant: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantities</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">quant</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">quant</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Stream.GetRow"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetRow">[docs]</a>    <span class="k">def</span> <span class="nf">GetRow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeStamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns an entire row of data from the stream. A row of data is all</span>
+<span class="sd">        the data in a dataframe at a specified time stamp, given by timeStamp.</span>
+<span class="sd">        If timeStamp is not specified, this function will return the entire</span>
+<span class="sd">        stream dataframe.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        timeStamp: float</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.stream.loc[self.timestamp, :]) or self.stream.loc[timeStamp, :]):</span>
+<span class="sd">        list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">if</span> <span class="n">timeStamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span><span class="p">,</span> <span class="p">:])</span>
         <span class="k">else</span><span class="p">:</span>
@@ -162,6 +269,24 @@
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,</span> <span class="p">:])</span></div>
 
 <div class="viewcode-block" id="Stream.GetValue"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetValue">[docs]</a>    <span class="k">def</span> <span class="nf">GetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">timeStamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the value associated with a specified &quot;actor&quot; at a specified</span>
+<span class="sd">        &quot;timeStamp&quot;. If no timeStamp is specified, then the function will</span>
+<span class="sd">        return all values associated with the specified actor at all time</span>
+<span class="sd">        stamps.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        actor: str</span>
+<span class="sd">        timeStamp: float</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.stream.loc[self.timeStamp, actor] or self.stream.loc[timeStamp,</span>
+<span class="sd">        actor]: list or float, respectively.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">assert</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">columns</span>
         <span class="k">if</span> <span class="n">timeStamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">actor</span><span class="p">]</span>
@@ -170,6 +295,24 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">actor</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Stream.SetValue"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.SetValue">[docs]</a>    <span class="k">def</span> <span class="nf">SetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeStamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets the value associated with a specified actor at a specified</span>
+<span class="sd">        timeStamp to &quot;value&quot;. If no value is specified, the value will default</span>
+<span class="sd">        to 0.0. If no timeStamp is specified, it will set all values associated</span>
+<span class="sd">        with actor to the specified value (or 0.0 if value = None).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        actor: str</span>
+<span class="sd">        value: float</span>
+<span class="sd">        timeStamp: float</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        empty</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">assert</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">columns</span>
         <span class="k">if</span> <span class="n">timeStamp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -184,8 +327,6 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">actor</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div></div>
 
-<span class="c1"># *******************************************************************************</span>
-<span class="c1"># Printing of data members</span>
 <span class="c1"># def __str__( self ):</span>
 <span class="c1">#     s = &#39; %5s %5s %5s &#39;+&#39; molar mass: %6s &#39;+&#39; molar cc: %6s &#39;+&#39; mass cc: %6s &#39;+&#39; flag: %s &#39;+&#39;# atoms: %s&#39;+&#39; atoms: %s\n&#39;</span>
 <span class="c1">#     return s % (self.name, self.formulaName, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)</span>
@@ -193,17 +334,23 @@
 <span class="c1"># def __repr__( self ):</span>
 <span class="c1">#     s = &#39; %5s %5s %5s &#39;+&#39; molar mass: %6s &#39;+&#39; molar cc: %6s &#39;+&#39; mass cc: %6s &#39;+&#39; flag: %s &#39;+&#39;# atoms: %s&#39;+&#39; atoms: %s\n&#39;</span>
 <span class="c1">#     return s % (self.name, self.formulaName, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)</span>
-<span class="c1"># *******************************************************************************</span>
+
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Private helper functions (internal use: __)</span>
+<span class="c1">#*********************************************************************************</span>
+
+<span class="c1">#============================= end class Stream ==================================</span>
 </pre></div>
 
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><img src="https://cortix.org/logo.jpg" alt="Cortix" height="210">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
 <h3>About Cortix</h3>
 <p>
-Cortix is a Python library for system-level module coupling, execution, and analysis.
+Cortix is a Python library for network modeling and parallel simulation.
 </p>
 <p>
 Cortix Group <br>
@@ -214,6 +361,8 @@ Lower, MA 01852
 
 </p>
 
+<!---->
+
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li><a href="../index.html">Home</a></li>
@@ -221,8 +370,6 @@ Lower, MA 01852
 <li><a href="../contents.html">Documentation</a></li>
 <li><a href="../license.html">License</a></li>
 </ul>
-
-<!---->
 
 <h3>Useful Links</h3>
 <ul>

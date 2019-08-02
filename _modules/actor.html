@@ -40,67 +40,104 @@
 <span class="c1">#</span>
 <span class="c1"># Licensed under the University of Massachusetts Lowell LICENSE:</span>
 <span class="c1"># https://github.com/dpploy/cortix/blob/master/LICENSE.txt</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">This is a simple way to hide the name of species of interest in a simulation.</span>
 <span class="sd">The user would modify and copy this class into the Cortix module of interest</span>
 <span class="sd">and keep it private.</span>
-
 <span class="sd">Author: Valmor de Almeida dealmeidav@ornl.gov; vfda</span>
 <span class="sd">Sat Aug 15 13:41:12 EDT 2015</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="c1">#*******************************************************************************</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="c1">#*********************************************************************************</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="c1">#*******************************************************************************</span>
+<span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="Actor"><a class="viewcode-back" href="../support_rst/actor.html#actor.Actor">[docs]</a><span class="k">class</span> <span class="nc">Actor</span><span class="p">():</span>
- <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd"> See atoms list in Specie.</span>
-<span class="sd"> &quot;&quot;&quot;</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    See atoms list in Specie.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
- <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">):</span>
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Construction</span>
+<span class="c1">#*********************************************************************************</span>
 
-  <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">name</span> <span class="p">):</span>
 
- <span class="c1"># ** this is the section to be modified by the user of this class **</span>
-  <span class="bp">self</span><span class="o">.</span><span class="n">__name_atoms_formula</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;water16&#39;</span>   <span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;2*H-1&#39;</span><span class="p">,</span><span class="s1">&#39;O-16&#39;</span><span class="p">],</span><span class="s1">&#39;H2O&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;spc(v)&#39;</span>    <span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;2*O-16&#39;</span><span class="p">],</span><span class="s1">&#39;O2&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;spc1(v)&#39;</span>   <span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;O-16&#39;</span><span class="p">],</span><span class="s1">&#39;O&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;spc2(v)&#39;</span>   <span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;Xe-136&#39;</span><span class="p">],</span><span class="s1">&#39;Xe&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;spc3(v)&#39;</span>   <span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;I-127&#39;</span><span class="p">],</span><span class="s1">&#39;I&#39;</span><span class="p">],</span>
-            <span class="p">}</span>
- <span class="c1"># ** do not modify beyond this point **</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
 
-  <span class="k">assert</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name_atoms_formula</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s1">&#39;name </span><span class="si">%r</span><span class="s1"> not valid.&#39;</span> <span class="o">%</span> <span class="n">name</span>
+        <span class="c1"># ** this is the section to be modified by the user of this class **</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name_atoms_formula</span> <span class="o">=</span> <span class="p">{</span>
+              <span class="s1">&#39;water16&#39;</span>   <span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;2*H-1&#39;</span><span class="p">,</span><span class="s1">&#39;O-16&#39;</span><span class="p">],</span><span class="s1">&#39;H2O&#39;</span><span class="p">],</span>
+              <span class="s1">&#39;spc(v)&#39;</span>    <span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;2*O-16&#39;</span><span class="p">],</span><span class="s1">&#39;O2&#39;</span><span class="p">],</span>
+              <span class="s1">&#39;spc1(v)&#39;</span>   <span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;O-16&#39;</span><span class="p">],</span><span class="s1">&#39;O&#39;</span><span class="p">],</span>
+              <span class="s1">&#39;spc2(v)&#39;</span>   <span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;Xe-136&#39;</span><span class="p">],</span><span class="s1">&#39;Xe&#39;</span><span class="p">],</span>
+              <span class="s1">&#39;spc3(v)&#39;</span>   <span class="p">:</span> <span class="p">[[</span><span class="s1">&#39;I-127&#39;</span><span class="p">],</span><span class="s1">&#39;I&#39;</span><span class="p">],</span>
+               <span class="p">}</span>
 
-  <span class="bp">self</span><span class="o">.</span><span class="n">__atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name_atoms_formula</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># ** do not modify beyond this point **</span>
 
-  <span class="n">formula</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name_atoms_formula</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-  <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;formula </span><span class="si">%r</span><span class="s1"> not valid.&#39;</span> <span class="o">%</span> <span class="n">formula</span>
-  <span class="bp">self</span><span class="o">.</span><span class="n">__formula</span> <span class="o">=</span> <span class="n">formula</span>
-<span class="c1">#----------------------- end def __init__():--------------------------------------</span>
+        <span class="k">assert</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name_atoms_formula</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s1">&#39;name </span><span class="si">%r</span><span class="s1"> not valid.&#39;</span> <span class="o">%</span> <span class="n">name</span>
 
- <span class="k">def</span> <span class="nf">__get_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-  <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__atoms</span>
- <span class="n">atoms</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_atoms</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name_atoms_formula</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
 
- <span class="k">def</span> <span class="nf">__get_formula</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-  <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__formula</span>
- <span class="n">formula</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_formula</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+        <span class="n">formula</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name_atoms_formula</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;formula </span><span class="si">%r</span><span class="s1"> not valid.&#39;</span> <span class="o">%</span> <span class="n">formula</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__formula</span> <span class="o">=</span> <span class="n">formula</span>
 
-<span class="c1">#======================= end class Launcher: =====================================</span>
+        <span class="k">return</span>
 
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Public member functions</span>
+<span class="c1">#*********************************************************************************</span>
+
+    <span class="k">def</span> <span class="nf">__get_atoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the specific nuclides found in the specified chemical.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty:</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        atoms: list(str)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__atoms</span>
+    <span class="n">atoms</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_atoms</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__get_formula</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the formula of the chemical in question.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty:</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        formula: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__formula</span>
+    <span class="n">formula</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_formula</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Private helper functions (internal use: __)</span>
+<span class="c1">#*********************************************************************************</span>
+
+<span class="c1">#======================= end class Actor =========================================</span>
 </pre></div>
 
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><img src="https://cortix.org/logo.jpg" alt="Cortix" height="210">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
 <h3>About Cortix</h3>
 <p>
-Cortix is a Python library for system-level module coupling, execution, and analysis.
+Cortix is a Python library for network modeling and parallel simulation.
 </p>
 <p>
 Cortix Group <br>
@@ -111,6 +148,8 @@ Lower, MA 01852
 
 </p>
 
+<!---->
+
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li><a href="../index.html">Home</a></li>
@@ -118,8 +157,6 @@ Lower, MA 01852
 <li><a href="../contents.html">Documentation</a></li>
 <li><a href="../license.html">License</a></li>
 </ul>
-
-<!---->
 
 <h3>Useful Links</h3>
 <ul>

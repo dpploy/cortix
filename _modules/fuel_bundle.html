@@ -40,7 +40,7 @@
 <span class="c1">#</span>
 <span class="c1"># Licensed under the University of Massachusetts Lowell LICENSE:</span>
 <span class="c1"># https://github.com/dpploy/cortix/blob/master/LICENSE.txt</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">This FuelBundle class is a container for usage with other plant-level process modules.</span>
 <span class="sd">It is meant to represent a fuel bundle of an oxide fuel LWR reactor.</span>
 <span class="sd">There are three main data structures:</span>
@@ -55,16 +55,20 @@
 
 <span class="sd">Author: Valmor de Almeida dealmeidav@ornl.gov; vfda</span>
 <span class="sd">Sun Dec 27 15:06:55 EST 2015</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="c1"># *******************************************************************************</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="c1">#*********************************************************************************</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
-<span class="c1"># *******************************************************************************</span>
+<span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="FuelBundle"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle">[docs]</a><span class="k">class</span> <span class="nc">FuelBundle</span><span class="p">():</span>
+
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Constructor</span>
+<span class="c1">#*********************************************************************************</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">specs</span><span class="o">=</span><span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
@@ -78,36 +82,117 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__gas_phase</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">return</span>
-<span class="c1"># ---------------------- end def __init__():------------------------------</span>
 
     <span class="c1"># ------</span>
     <span class="c1"># Start: Pre-irradiation information</span>
 
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Public Member Functions</span>
+<span class="c1">#*********************************************************************************</span>
+
 <div class="viewcode-block" id="FuelBundle.get_name"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the name of the fuel bundle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        name: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Name&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span></div>
     <span class="n">name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_fuel_enrichment"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_fuel_enrichment">[docs]</a>    <span class="k">def</span> <span class="nf">get_fuel_enrichment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the enrichment of the fuel pins in the bundle, in %.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fuel_enrichment: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fuel_enrichment</span><span class="p">()</span></div>
     <span class="n">fuel_enrichment</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fuel_enrichment</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_fresh_u_mass"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_fresh_u_mass">[docs]</a>    <span class="k">def</span> <span class="nf">get_fresh_u_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the amount of uranium in the bundle, in grams.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fresh_u_mass: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fresh_u_mass</span><span class="p">()</span></div>
     <span class="n">fresh_u_mass</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fresh_u_mass</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_fresh_u238_mass"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_fresh_u238_mass">[docs]</a>    <span class="k">def</span> <span class="nf">get_fresh_u238_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the amount of uranium-238 in the bucket, in grams.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fresh_u238_mass: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="n">total_mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fresh_u_mass</span><span class="p">()</span>
         <span class="n">fuel_enrichment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fuel_enrichment</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">total_mass</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">fuel_enrichment</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)</span></div>
     <span class="n">fresh_u238_mass</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fresh_u238_mass</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_fresh_U235_mass"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_fresh_U235_mass">[docs]</a>    <span class="k">def</span> <span class="nf">get_fresh_U235_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the amount of uranium-235 in the bucket, in grams.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fresh_u235_mass: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="n">total_u_Mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fresh_u_mass</span><span class="p">()</span>
         <span class="n">fuel_enrichment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fuel_enrichment</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">total_u_mass</span> <span class="o">*</span> <span class="n">fuel_enrichment</span> <span class="o">/</span> <span class="mf">100.0</span></div>
     <span class="n">fresh_u235_mass</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fresh_U235_mass</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_n_fuel_rods"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_n_fuel_rods">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_fuel_rods</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the number of fuel rods in the bundle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        n_fuel_rods: int</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_n_fuel_rods</span><span class="p">()</span></div>
     <span class="n">n_fuel_rods</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_n_fuel_rods</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
@@ -115,121 +200,476 @@
     <span class="c1"># ------</span>
 
 <div class="viewcode-block" id="FuelBundle.get_fuel_pin_length"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_fuel_pin_length">[docs]</a>    <span class="k">def</span> <span class="nf">get_fuel_pin_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the length of each fuel pin in the fuel bundle. A fuel pin is</span>
+<span class="sd">        a cylindircal section of uranium fuel that is surrounded by cladding.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fuel_pin_length: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fuel_pin_length</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="FuelBundle.set_fuel_pin_length"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.set_fuel_pin_length">[docs]</a>    <span class="k">def</span> <span class="nf">set_fuel_pin_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets the length of all fuel pins in the bundle to x.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        x: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Fuel rods fuel length [in]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="mf">2.54</span>  <span class="c1"># in</span>
         <span class="k">return</span></div>
     <span class="n">fuel_pin_length</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fuel_pin_length</span><span class="p">,</span> <span class="n">set_fuel_pin_length</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_fuel_rod_od"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_fuel_rod_od">[docs]</a>    <span class="k">def</span> <span class="nf">get_fuel_rod_od</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        returns the outer diameter of the fuel rod, in cm.</span>
+<span class="sd">        A fuel rod consists of a fuel pin surrounded by cladding.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fuel_rod_od: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fuel_rod_od</span><span class="p">()</span></div>
     <span class="n">fuel_rod_od</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fuel_rod_od</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_fuel_pin_radius"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_fuel_pin_radius">[docs]</a>    <span class="k">def</span> <span class="nf">get_fuel_pin_radius</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the radius of the fuel pin, in cm.</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fuel_pin_radius</span><span class="p">()</span></div>
     <span class="n">fuel_pin_radius</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fuel_pin_radius</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_fuel_pin_volume"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_fuel_pin_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_fuel_pin_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the volume of fuel in each fuel pin, in cm^3.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fuel_pin_volume: float</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fuel_pin_volume</span><span class="p">()</span></div>
     <span class="n">fuel_pin_volume</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fuel_pin_volume</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_fuel_volume"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_fuel_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_fuel_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the total volume of fuel in the bundle, in cm^3.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fuel_volume: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fuel_volume</span><span class="p">()</span></div>
     <span class="n">fuel_volume</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fuel_volume</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="c1"># mass of the solid phase (gas phase in plenum not added)</span>
 <div class="viewcode-block" id="FuelBundle.get_fuel_mass"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_fuel_mass">[docs]</a>    <span class="k">def</span> <span class="nf">get_fuel_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the total numerical value for  mass of fuel in the solid phase</span>
+<span class="sd">        in the bundle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fuel_mass: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__solid_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;mass&#39;</span><span class="p">)</span></div>
     <span class="n">fuel_mass</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fuel_mass</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_fuel_mass_unit"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_fuel_mass_unit">[docs]</a>    <span class="k">def</span> <span class="nf">get_fuel_mass_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the unit used to measure the mass of fuel in the bundle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fuel_mass_unit: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__solid_phase</span><span class="o">.</span><span class="n">GetQuantity</span><span class="p">(</span><span class="s1">&#39;mass&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">unit</span></div>
     <span class="n">fuel_mass_unit</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fuel_mass_unit</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_gas_mass"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_gas_mass">[docs]</a>    <span class="k">def</span> <span class="nf">get_gas_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the total numerical value for mass of the fuel in the gas</span>
+<span class="sd">        phase.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gas_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;mass&#39;</span><span class="p">)</span></div>
     <span class="n">gas_mass</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_gas_mass</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_radioactivity"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_radioactivity">[docs]</a>    <span class="k">def</span> <span class="nf">get_radioactivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the total radioactivity of the fuel bundle, in curies.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        raduioactivity: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__solid_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;radioactivity&#39;</span><span class="p">)</span> <span class="o">+</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">__gas_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;radioactivity&#39;</span><span class="p">)</span></div>
     <span class="n">radioactivity</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_radioactivity</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_gamma_pwr"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_gamma_pwr">[docs]</a>    <span class="k">def</span> <span class="nf">get_gamma_pwr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the total amount of gamma radiation given by the fuel bundle,</span>
+<span class="sd">        in watts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        gamma_pwr: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__solid_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;gamma&#39;</span><span class="p">)</span> <span class="o">+</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">__gas_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;gamma&#39;</span><span class="p">)</span></div>
     <span class="n">gamma_pwr</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_gamma_pwr</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_heat_pwr"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_heat_pwr">[docs]</a>    <span class="k">def</span> <span class="nf">get_heat_pwr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the total amount of heat produced by the fuel bundle, in watts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        heat_pwr: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__solid_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;heat&#39;</span><span class="p">)</span> <span class="o">+</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">__gas_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;heat&#39;</span><span class="p">)</span></div>
     <span class="n">heat_pwr</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_heat_pwr</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FuelBundle.get_fuel_radioactivity"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_fuel_radioactivity">[docs]</a>    <span class="k">def</span> <span class="nf">get_fuel_radioactivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>       <span class="c1"># radioactivity of the solid phase</span>
+<div class="viewcode-block" id="FuelBundle.get_fuel_radioactivity"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_fuel_radioactivity">[docs]</a>    <span class="k">def</span> <span class="nf">get_fuel_radioactivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c1"># radioactivity of the solid phase</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the total radioactivity of the fuel in the solid phase in the</span>
+<span class="sd">        fuel bundle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fuel_radioactivity: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__solid_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;radioactivity&#39;</span><span class="p">)</span></div>
     <span class="n">fuel_radioactivity</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fuel_radioactivity</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FuelBundle.get_gas_radioactivity"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_gas_radioactivity">[docs]</a>    <span class="k">def</span> <span class="nf">get_gas_radioactivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># radioactivity of the gas phase</span>
+<div class="viewcode-block" id="FuelBundle.get_gas_radioactivity"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_gas_radioactivity">[docs]</a>    <span class="k">def</span> <span class="nf">get_gas_radioactivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># radioactivity of the gas phase</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the total radioactivity of the fuel in the gas phase in the</span>
+<span class="sd">        fuel bundle, in curies.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        gas_radioactivity: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gas_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;radioactivity&#39;</span><span class="p">)</span></div>
     <span class="n">gas_radioactivity</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_gas_radioactivity</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_solid_phase"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_solid_phase">[docs]</a>    <span class="k">def</span> <span class="nf">get_solid_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the solid phase history associated with this fuel bundle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        solidPhase: dataFrame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__solid_phase</span></div>
 
 <div class="viewcode-block" id="FuelBundle.set_solid_phase"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.set_solid_phase">[docs]</a>    <span class="k">def</span> <span class="nf">set_solid_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets the solid phase history of the fuel equal to phase.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        phase: dataFrame</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        empty</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">__solid_phase</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span></div>
     <span class="n">solid_phase</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_solid_phase</span><span class="p">,</span> <span class="n">set_solid_phase</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBundle.get_gas_phase"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.get_gas_phase">[docs]</a>    <span class="k">def</span> <span class="nf">get_gas_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the gas phase history of the fuel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        gas_phase: dataFrame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gas_phase</span></div>
 
 <div class="viewcode-block" id="FuelBundle.set_gas_phase"><a class="viewcode-back" href="../support_rst/fuel_bundle.html#fuel_bundle.FuelBundle.set_gas_phase">[docs]</a>    <span class="k">def</span> <span class="nf">set_gas_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets the gas phase history of the fuel equal to phase.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        phase: dataFrame</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        empty</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">__gas_phase</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span></div>
     <span class="n">gas_phase</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_gas_phase</span><span class="p">,</span> <span class="n">set_gas_phase</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<span class="c1"># *********************************************************************************</span>
+<span class="c1">#*********************************************************************************</span>
 <span class="c1"># Private helper functions (internal use: __)</span>
+<span class="c1">#*********************************************************************************</span>
 
     <span class="k">def</span> <span class="nf">__get_fuel_enrichment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the enrichment of the fuel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.__specs.loc[&#39;Enrichment [U-235 wt%]&#39;, 1]: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Enrichment [U-235 wt%]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">__get_fresh_u_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the mass of fuel in the bundle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.__specs.loc[&#39;U mass per assy [kg]&#39;, 1]) * 1000</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;U mass per assy [kg]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1000.0</span>  <span class="c1"># [g]</span>
 
     <span class="k">def</span> <span class="nf">__get_n_fuel_rods</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the number of fuel rods in the bundle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.__specs.loc[&#39;Fuel rods number&#39;, 1]): int</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Fuel rods number&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">__get_fuel_pin_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the length of the fuel pins in the bundle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.__specs.loc[&quot;fuel rods fuel length [in]&#39;, 1]) * 2.54</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Fuel rods fuel length [in]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">2.54</span>  <span class="c1"># cm</span>
 
     <span class="k">def</span> <span class="nf">__get_fuel_rod_od</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the outer diameter of the fuel rods in the bundle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.__specs.loc[&#39;Fuel rods O.D. [in]&#39;, 1]) * 2.54: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Fuel rods O.D. [in]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">2.54</span>  <span class="c1"># cm</span>
 
     <span class="k">def</span> <span class="nf">__get_fuel_rod_wall_thickness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the thickness of the cladding wall on the outside of the fuel</span>
+<span class="sd">        rod.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self.__specs.loc[&#39;Fuel rods wall thickness [in]&#39;, 1]) * 2.54: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Fuel rods wall thickness [in]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">2.54</span>  <span class="c1"># cm</span>
 
     <span class="k">def</span> <span class="nf">__get_fuel_pin_radius</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the radius of the fuel pins.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fuel_pin_radius: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="n">fuel_rod_od</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fuel_rod_od</span><span class="p">()</span>
         <span class="n">fuel_rod_wall_thickness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fuel_rod_wall_thickness</span><span class="p">()</span>
         <span class="n">fuel_pin_radius</span> <span class="o">=</span> <span class="p">(</span><span class="n">fuel_rod_od</span> <span class="o">-</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">fuel_rod_wall_thickness</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
         <span class="k">return</span> <span class="n">fuel_pin_radius</span>
 
     <span class="k">def</span> <span class="nf">__get_fuel_pin_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the volume of each fuel pin.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fuel_pin_length * math.pi * fuel_pin_radius ** 2: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="n">fuel_pin_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fuel_pin_length</span><span class="p">()</span>
         <span class="n">fuel_pin_radius</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fuel_pin_radius</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">fuel_pin_length</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">fuel_pin_radius</span> <span class="o">**</span> <span class="mi">2</span>
 
     <span class="k">def</span> <span class="nf">__get_fuel_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the volume of fuel in the bundle, in cm^3.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fuel_pin_volume * n_fuel_rods: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="n">fuel_pin_volume</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_fuel_pin_volume</span><span class="p">()</span>
         <span class="n">n_fuel_rods</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_n_fuel_rods</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">fuel_pin_volume</span> <span class="o">*</span> <span class="n">n_fuel_rods</span>
 
-<span class="c1"># ********************************************************************************</span>
-<span class="c1"># Printing of data members</span>
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;FuelBundle():</span><span class="se">\n</span><span class="s1"> </span><span class="si">%s</span><span class="se">\n</span><span class="s1"> </span><span class="si">%s</span><span class="se">\n</span><span class="s1"> </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__solid_phase</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gas_phase</span><span class="p">)</span>
@@ -238,17 +678,18 @@
         <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;FuelBundle():</span><span class="se">\n</span><span class="s1"> </span><span class="si">%s</span><span class="se">\n</span><span class="s1"> </span><span class="si">%s</span><span class="se">\n</span><span class="s1"> </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__solid_phase</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gas_phase</span><span class="p">)</span></div>
 
-<span class="c1"># ====================== end class FuelBundle: ===================================</span>
+<span class="c1">#======================= end class FuelBundle ====================================</span>
 </pre></div>
 
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><img src="https://cortix.org/logo.jpg" alt="Cortix" height="210">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
 <h3>About Cortix</h3>
 <p>
-Cortix is a Python library for system-level module coupling, execution, and analysis.
+Cortix is a Python library for network modeling and parallel simulation.
 </p>
 <p>
 Cortix Group <br>
@@ -259,6 +700,8 @@ Lower, MA 01852
 
 </p>
 
+<!---->
+
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li><a href="../index.html">Home</a></li>
@@ -266,8 +709,6 @@ Lower, MA 01852
 <li><a href="../contents.html">Documentation</a></li>
 <li><a href="../license.html">License</a></li>
 </ul>
-
-<!---->
 
 <h3>Useful Links</h3>
 <ul>

@@ -39,30 +39,134 @@
 <dt id="fuelsegmentsgroups.FuelSegmentsGroups">
 <em class="property">class </em><code class="descclassname">fuelsegmentsgroups.</code><code class="descname">FuelSegmentsGroups</code><span class="sig-paren">(</span><em>key=None</em>, <em>fuelSegments=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuelsegmentsgroups.html#FuelSegmentsGroups"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuelsegmentsgroups.FuelSegmentsGroups" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Creates a dictionary of lists of fuel segment objects, with the keys
+typically being timestamps. Each fuel segment object has two data members,
+a <cite>Pandas</cite> Series for geometry spec and a panda DataFrame for property
+density.</p>
 <dl class="method">
 <dt id="fuelsegmentsgroups.FuelSegmentsGroups.AddGroup">
 <code class="descname">AddGroup</code><span class="sig-paren">(</span><em>key</em>, <em>fuelSegments=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuelsegmentsgroups.html#FuelSegmentsGroups.AddGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuelsegmentsgroups.FuelSegmentsGroups.AddGroup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Appends the dictionary with a new key and associated list of
+fuelSegments. If the specified key is already present in the
+dictionary, then the specified list of fuel segments will be appended
+to the list of fuel segments already associated with the specified key.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </li>
+<li><strong>fuelSegments</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">empty</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuelsegmentsgroups.FuelSegmentsGroups.GetAttribute">
 <code class="descname">GetAttribute</code><span class="sig-paren">(</span><em>groupKey=None</em>, <em>attributeName=None</em>, <em>nuclideSymbol=None</em>, <em>nuclideSeries=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuelsegmentsgroups.html#FuelSegmentsGroups.GetAttribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuelsegmentsgroups.FuelSegmentsGroups.GetAttribute" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns the average value of an attribute amongst all elements in a
+group (WARNING: keys with no values associated with them will lower
+this average!). If groupKey is not specified, the function will return
+the average attribute value of every fuel segment element in the
+entire dictionary. If attribute is not specified, the function call
+will fail. If the key value specified does not match any keys in the
+dictionary, the function will return a value of 0.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>groupKey</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </li>
+<li><strong>attributeName</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </li>
+<li><strong>nuclideSymbol</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </li>
+<li><strong>nuclideSeries</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>groupAttribute</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuelsegmentsgroups.FuelSegmentsGroups.GetFuelSegments">
 <code class="descname">GetFuelSegments</code><span class="sig-paren">(</span><em>groupKey=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuelsegmentsgroups.html#FuelSegmentsGroups.GetFuelSegments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuelsegmentsgroups.FuelSegmentsGroups.GetFuelSegments" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Returns a list of fuel segments associated with a specified groupkey.
+If no group key is specified, then all elements in the dictionary
+will be returned. If the specified group key does not exist, then the
+function will return an empty list.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>groupKey</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuelSegments</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuelsegmentsgroups.FuelSegmentsGroups.HasGroup">
 <code class="descname">HasGroup</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuelsegmentsgroups.html#FuelSegmentsGroups.HasGroup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuelsegmentsgroups.FuelSegmentsGroups.HasGroup" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Checks if the specified key has a group of fuel segments associated
+with it.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>key</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="fuelsegmentsgroups.FuelSegmentsGroups.RemoveFuelSegment">
 <code class="descname">RemoveFuelSegment</code><span class="sig-paren">(</span><em>groupKey</em>, <em>fuelSegment</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/fuelsegmentsgroups.html#FuelSegmentsGroups.RemoveFuelSegment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuelsegmentsgroups.FuelSegmentsGroups.RemoveFuelSegment" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Removes a fuel segment from a list associated with a specified group
+key. If the specified group key or fuel segment do not exist, the
+function will fail.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>groupKey</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </li>
+<li><strong>fuelSegment</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">empty</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -73,10 +177,11 @@
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><img src="https://cortix.org/logo.jpg" alt="Cortix" height="210">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
 <h3>About Cortix</h3>
 <p>
-Cortix is a Python library for system-level module coupling, execution, and analysis.
+Cortix is a Python library for network modeling and parallel simulation.
 </p>
 <p>
 Cortix Group <br>
@@ -87,6 +192,8 @@ Lower, MA 01852
 
 </p>
 
+<!---->
+
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li><a href="../index.html">Home</a></li>
@@ -94,8 +201,6 @@ Lower, MA 01852
 <li><a href="../contents.html">Documentation</a></li>
 <li><a href="../license.html">License</a></li>
 </ul>
-
-<!---->
 
 <h3>Useful Links</h3>
 <ul>

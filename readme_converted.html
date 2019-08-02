@@ -33,17 +33,18 @@
 <div>A Python library for system-level module coupling, execution, and
 analysis.</div></blockquote>
 <div class="line-block">
-<div class="line"><a class="reference external" href="https://cortix.org"><img alt="Repo Size" src="https://img.shields.io/github/repo-size/dpploy/cortix.svg?style=flat" /></a></div>
+<div class="line"><img alt="Website" src="https://img.shields.io/website/https/github.com/dpploy/cortix.svg" /></div>
 <div class="line"><a class="reference external" href="https://travis-ci.org/dpploy/cortix"><img alt="Build Status" src="https://travis-ci.org/dpploy/cortix.svg?branch=master" /></a></div>
 <div class="line"><a class="reference external" href="https://badge.fury.io/py/cortix"><img alt="PyPI version" src="https://badge.fury.io/py/cortix.svg" /></a></div>
+<div class="line"><a class="reference external" href="https://cortix.org"><img alt="Repo Size" src="https://img.shields.io/github/repo-size/dpploy/cortix.svg?style=flat" /></a></div>
 <div class="line"><a class="reference external" href="https://badge.fury.io/py/cortix"><img alt="PyPI - Python Version" src="https://img.shields.io/pypi/pyversions/Django.svg" /></a></div>
 </div>
-<p><img alt="image4" src="_images/cortix-cover.png" /></p>
+<p><img alt="image5" src="_images/cortix-cover.png" /></p>
 <div class="section" id="what-is-cortix">
 <h1>What is Cortix?<a class="headerlink" href="#what-is-cortix" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
-<li>Cortix is a Python library for system-level module coupling,
-execution, and
+<li>Cortix is a massively parallel Python library for system-level module
+coupling, execution, and
 analysis of dynamical system models that exchange time-dependent
 data.</li>
 <li>Cortix takes as input a collection of computational modules and
@@ -51,17 +52,17 @@ provides an
 environment for the coupling of these modules into a single
 simulation.</li>
 <li>Cortix supports:<ul>
+<li>Module decoupling</li>
 <li>Communication between modules</li>
-<li>Time synchronization</li>
 <li>Data visualization</li>
 </ul>
 </li>
+<li>Cortix runs on top of <a class="reference external" href="https://www.open-mpi.org/">MPI</a> and scales
+across many cores.</li>
 </ul>
-<p>The basic concepts in Cortix are the creation of an <code class="docutils literal notranslate"><span class="pre">Application</span></code> and
-a <code class="docutils literal notranslate"><span class="pre">Simulation</span></code> involving <code class="docutils literal notranslate"><span class="pre">Tasks</span></code>.</p>
 </div>
-<div class="section" id="installation-cortix-can-be-installed-on-any-unix-based-environment">
-<h1>Installation: Cortix can be installed on any Unix-based environment<a class="headerlink" href="#installation-cortix-can-be-installed-on-any-unix-based-environment" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="installation-start-by-installing-mpi">
+<h1>Installation: start by installing <a class="reference external" href="https://www.open-mpi.org/">MPI</a><a class="headerlink" href="#installation-start-by-installing-mpi" title="Permalink to this headline">¶</a></h1>
 </div>
 <div class="section" id="installing-via-pypi">
 <h1>Installing via PyPI<a class="headerlink" href="#installing-via-pypi" title="Permalink to this headline">¶</a></h1>
@@ -72,13 +73,12 @@ a <code class="docutils literal notranslate"><span class="pre">Simulation</span>
 <div class="section" id="installing-from-source">
 <h1>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline">¶</a></h1>
 <ol class="arabic">
-<li><p class="first">Clone this repository to install the current version of Cortix in
-PyPI.</p>
+<li><p class="first">Clone this repository to install the latest version of Cortix</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">dpploy</span><span class="o">/</span><span class="n">cortix</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 </li>
-<li><p class="first">Install the required dependencies listed in requirements.txt</p>
+<li><p class="first">Install the required dependencies listed in <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code></p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="o">-</span><span class="n">r</span> <span class="n">cortix</span><span class="o">/</span><span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
 </pre></div>
 </div>
@@ -91,37 +91,49 @@ PyPI.</p>
 it to be persistent</p>
 </li>
 </ol>
+<div class="section" id="verify-your-cortix-install-by-running-the-droplet-example">
+<h2>Verify your Cortix install by running the Droplet example<a class="headerlink" href="#verify-your-cortix-install-by-running-the-droplet-example" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mpirun</span> <span class="o">-</span><span class="n">np</span> <span class="mi">12</span> <span class="n">examples</span><span class="o">/</span><span class="n">droplet_run</span><span class="o">.</span><span class="n">py</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="testing">
 <h1>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h1>
-<p>Testing is facilitated through PyTest. To test your Cortix install, run
-the droplet example from the python shell</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;&gt;</span> <span class="kn">from</span> <span class="nn">cortix.examples.console_run</span> <span class="k">import</span> <span class="n">droplet_run</span> <span class="k">as</span> <span class="n">droplet</span>
-<span class="o">&gt;&gt;</span> <span class="n">droplet</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<p>Testing is facilitated by <a class="reference external" href="http://pytest.org">PyTest</a>. Tests can be
+run locally from within the <code class="docutils literal notranslate"><span class="pre">tests</span></code> directory</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">tests</span> <span class="o">&amp;&amp;</span> <span class="n">py</span><span class="o">.</span><span class="n">test</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="using-cortix">
 <h1>Using Cortix<a class="headerlink" href="#using-cortix" title="Permalink to this headline">¶</a></h1>
-<p>Cortix requires a set of input files, a driver, and a configuration
-file. See <code class="docutils literal notranslate"><span class="pre">examples/console_run</span></code> for working examples of Cortix
-simulations. Cortix will output logging information to <code class="docutils literal notranslate"><span class="pre">stdout</span></code> by
-default, extensive logging of runtime information is also stored in the
-<code class="docutils literal notranslate"><span class="pre">&lt;work_dir&gt;</span></code> directory specified in the <code class="docutils literal notranslate"><span class="pre">cortix-config.xml</span></code> input
-file.</p>
+<p>Please refer to the <a class="reference external" href="https://cortix.org/contents.html">documentation</a>
+for more on getting started!</p>
 </div>
-<div class="section" id="developers">
-<h1>Developers<a class="headerlink" href="#developers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="team">
+<h1>Team<a class="headerlink" href="#team" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
-<li>Valmor F. de Almeida: Valmor_<a class="reference external" href="mailto:deAlmeida&#37;&#52;&#48;uml&#46;edu">deAlmeida<span>&#64;</span>uml<span>&#46;</span>edu</a></li>
+<li>Valmor F. de Almeida: valmor_<a class="reference external" href="mailto:dealmeida&#37;&#52;&#48;uml&#46;edu">dealmeida<span>&#64;</span>uml<span>&#46;</span>edu</a></li>
 <li>Taha M. Azzaoui: <a class="reference external" href="mailto:tazzaoui&#37;&#52;&#48;cs&#46;uml&#46;edu">tazzaoui<span>&#64;</span>cs<span>&#46;</span>uml<span>&#46;</span>edu</a></li>
-</ul>
-</div>
-<div class="section" id="documentation">
-<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
+<li>Seamus D. Gallagher: seamus_<a class="reference external" href="mailto:gallagher&#37;&#52;&#48;student&#46;uml&#46;edu">gallagher<span>&#64;</span>student<span>&#46;</span>uml<span>&#46;</span>edu</a></li>
+<li>Austin Rotker: <a class="reference external" href="mailto:austin_rotker&#37;&#52;&#48;student&#46;uml&#46;edu">austin_rotker<span>&#64;</span>student<span>&#46;</span>uml<span>&#46;</span>edu</a></li>
 <li>Gilberto E. Alas: gilberto_<a class="reference external" href="mailto:alas&#37;&#52;&#48;student&#46;uml&#46;edu">alas<span>&#64;</span>student<span>&#46;</span>uml<span>&#46;</span>edu</a></li>
 </ul>
+</div>
+<div class="section" id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h1>
+<p>Pull requests are welcome. For major changes, please open an
+<a class="reference external" href="https://github.com/dpploy/cortix/issues">issue</a> first to discuss
+what you would like to change.</p>
+<p>Please make sure to update tests as appropriate.</p>
+</div>
+<div class="section" id="location">
+<h1>Location<a class="headerlink" href="#location" title="Permalink to this headline">¶</a></h1>
+<p>Cortix Group</p>
+<p>c/o <a class="reference external" href="https://www.uml.edu/Innovation-Hub/">UMass Innovation Hub</a></p>
+<p>110 Canal St., 3rd Floor</p>
+<p>Lowell, MA 01852</p>
 </div>
 
 
@@ -129,10 +141,11 @@ file.</p>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><img src="https://cortix.org/logo.jpg" alt="Cortix" height="210">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
 <h3>About Cortix</h3>
 <p>
-Cortix is a Python library for system-level module coupling, execution, and analysis.
+Cortix is a Python library for network modeling and parallel simulation.
 </p>
 <p>
 Cortix Group <br>
@@ -143,6 +156,8 @@ Lower, MA 01852
 
 </p>
 
+<!---->
+
 <h3><a href="index.html">Table Of Contents</a></h3>
 <ul>
 <li><a href="index.html">Home</a></li>
@@ -150,8 +165,6 @@ Lower, MA 01852
 <li><a href="contents.html">Documentation</a></li>
 <li><a href="license.html">License</a></li>
 </ul>
-
-<!---->
 
 <h3>Useful Links</h3>
 <ul>

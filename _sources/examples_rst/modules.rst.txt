@@ -2,8 +2,11 @@ examples
 ========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
-   console_run_rst/modules
-   input_rst/modules
-   modulib_rst/modules
+   dataplot
+   droplet
+   dummy_module
+   plot_data
+   run_droplet
+   vortex

@@ -1,18 +1,19 @@
     A Python library for system-level module coupling, execution, and
     analysis.
 
-| |Repo Size|
+| |Website|
 | |Build Status|
 | |PyPI version|
+| |Repo Size|
 | |PyPI - Python Version|
 
-|image4|
+|image5|
 
 What is Cortix?
 ---------------
 
--  Cortix is a Python library for system-level module coupling,
-   execution, and
+-  Cortix is a massively parallel Python library for system-level module
+   coupling, execution, and
    analysis of dynamical system models that exchange time-dependent
    data.
 -  Cortix takes as input a collection of computational modules and
@@ -21,15 +22,15 @@ What is Cortix?
    simulation.
 -  Cortix supports:
 
+   -  Module decoupling
    -  Communication between modules
-   -  Time synchronization
    -  Data visualization
 
-The basic concepts in Cortix are the creation of an ``Application`` and
-a ``Simulation`` involving ``Tasks``.
+-  Cortix runs on top of `MPI <https://www.open-mpi.org/>`__ and scales
+   across many cores.
 
-Installation: Cortix can be installed on any Unix-based environment
--------------------------------------------------------------------
+Installation: start by installing `MPI <https://www.open-mpi.org/>`__
+---------------------------------------------------------------------
 
 Installing via PyPI
 -------------------
@@ -41,14 +42,13 @@ Installing via PyPI
 Installing from source
 ----------------------
 
-#. Clone this repository to install the current version of Cortix in
-   PyPI.
+#. Clone this repository to install the latest version of Cortix
 
    ::
 
        git clone https://github.com/dpploy/cortix.git
 
-#. Install the required dependencies listed in requirements.txt
+#. Install the required dependencies listed in ``requirements.txt``
 
    ::
 
@@ -63,45 +63,66 @@ Installing from source
    Note: you may want to add this line to your ``.bashrc`` in order for
    it to be persistent
 
-Testing
--------
-
-Testing is facilitated through PyTest. To test your Cortix install, run
-the droplet example from the python shell
+Verify your Cortix install by running the Droplet example
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ::
 
-       >> from cortix.examples.console_run import droplet_run as droplet 
-       >> droplet.run()
+    mpirun -np 12 examples/droplet_run.py
+
+Testing
+-------
+
+Testing is facilitated by `PyTest <http://pytest.org>`__. Tests can be
+run locally from within the ``tests`` directory
+
+::
+
+    cd tests && py.test
 
 Using Cortix
 ------------
 
-Cortix requires a set of input files, a driver, and a configuration
-file. See ``examples/console_run`` for working examples of Cortix
-simulations. Cortix will output logging information to ``stdout`` by
-default, extensive logging of runtime information is also stored in the
-``<work_dir>`` directory specified in the ``cortix-config.xml`` input
-file.
+Please refer to the `documentation <https://cortix.org/contents.html>`__
+for more on getting started!
 
-Developers
-----------
+Team
+----
 
--  Valmor F. de Almeida: Valmor\_\ deAlmeida@uml.edu
+-  Valmor F. de Almeida: valmor\_\ dealmeida@uml.edu
 -  Taha M. Azzaoui: tazzaoui@cs.uml.edu
-
-Documentation
--------------
-
+-  Seamus D. Gallagher: seamus\_\ gallagher@student.uml.edu
+-  Austin Rotker: austin_rotker@student.uml.edu
 -  Gilberto E. Alas: gilberto\_\ alas@student.uml.edu
 
-.. |Repo Size| image:: https://img.shields.io/github/repo-size/dpploy/cortix.svg?style=flat
-   :target: https://cortix.org
+Contributing
+------------
+
+Pull requests are welcome. For major changes, please open an
+`issue <https://github.com/dpploy/cortix/issues>`__ first to discuss
+what you would like to change.
+
+Please make sure to update tests as appropriate.
+
+Location
+--------
+
+Cortix Group
+
+c/o `UMass Innovation Hub <https://www.uml.edu/Innovation-Hub/>`__
+
+110 Canal St., 3rd Floor
+
+Lowell, MA 01852
+
+.. |Website| image:: https://img.shields.io/website/https/github.com/dpploy/cortix.svg
 .. |Build Status| image:: https://travis-ci.org/dpploy/cortix.svg?branch=master
    :target: https://travis-ci.org/dpploy/cortix
 .. |PyPI version| image:: https://badge.fury.io/py/cortix.svg
    :target: https://badge.fury.io/py/cortix
+.. |Repo Size| image:: https://img.shields.io/github/repo-size/dpploy/cortix.svg?style=flat
+   :target: https://cortix.org
 .. |PyPI - Python Version| image:: https://img.shields.io/pypi/pyversions/Django.svg
    :target: https://badge.fury.io/py/cortix
-.. |image4| image:: cortix-cover.png
+.. |image5| image:: cortix-cover.png
 

@@ -4,28 +4,29 @@
    contain the root `toctree` directive.
    
 =========================================
-
-Cortix: system dynamics simulation
+Network dynamics simulation
 =========================================
 
 What is Cortix?
 ---------------
-* Cortix is a Python library for system-level module coupling, execution, and
-  analysis of dynamical system models that exchange time-dependent data.
-* Cortix allows you to assemble a coupled system by connecting discrete
-  `modules` into a `network` 
-* Cortix takes as input a collection of computational modules and provides an 
-  environment for the coupling of these modules into a single simulation.
+* Cortix is an open-source Python library for enabling develoment and simulation of
+  `network` models on `massively` parallel computers.
+* Cortix takes a collection of computational `modules` and provides an 
+  environment for the coupling of these modules into a `network` simulation.
+* Cortix provides a layer for data communication between `modules` in the `network`
+  using parallel libraries (MPI for heterogeneous computing, and the Python 
+  multiprocessing library for multi-core computing).
+* Virtually any computational model that can be mapped onto a network is a 
+  candidate for Cortix development.
 
 .. image:: https://cortix.org/cortix-cover.png
 
 Features
 --------
-* Massively parallel execution with `mpi4py <https://mpi4py.readthedocs.io/en/stable/>`_
-* Efficient ODE and DAE solver
-* Built-in time synchronization
-* Data visualization
-* Extensive logging
+* Module parent class for module development and coupling.
+* Massively parallel execution with `mpi4py <https://mpi4py.readthedocs.io/en/stable/>`
+* Support classes for building applications and modules.
+* Examples of applications using Cortix.
 
 Documentation
 -------------

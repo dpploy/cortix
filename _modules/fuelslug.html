@@ -40,7 +40,7 @@
 <span class="c1">#</span>
 <span class="c1"># Licensed under the University of Massachusetts Lowell LICENSE:</span>
 <span class="c1"># https://github.com/dpploy/cortix/blob/master/LICENSE.txt</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">Author: Valmor de Almeida dealmeidav@ornl.gov; vfda</span>
 
 <span class="sd">Fuel slug</span>
@@ -56,8 +56,7 @@
 <span class="sd">VFdALib support classes</span>
 
 <span class="sd">Thu Dec 15 16:18:39 EST 2016</span>
-<span class="sd">&quot;&quot;&quot;</span>
-
+<span class="sd">&#39;&#39;&#39;</span>
 <span class="c1"># *******************************************************************************</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
@@ -74,14 +73,15 @@
 <span class="kn">from</span> <span class="nn">cortix.support.phase</span> <span class="k">import</span> <span class="n">Phase</span>
 <span class="c1"># *******************************************************************************</span>
 
-<span class="c1"># *******************************************************************************</span>
+<div class="viewcode-block" id="FuelSlug"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug">[docs]</a><span class="k">class</span> <span class="nc">FuelSlug</span><span class="p">:</span>
 
-
-<div class="viewcode-block" id="FuelSlug"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug">[docs]</a><span class="k">class</span> <span class="nc">FuelSlug</span><span class="p">():</span>
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Construction</span>
+<span class="c1">#*********************************************************************************</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">specs</span><span class="o">=</span><span class="n">pandas</span><span class="o">.</span><span class="n">Series</span><span class="p">(),</span>
-                 <span class="n">fuelPhase</span><span class="o">=</span><span class="n">Phase</span><span class="p">(),</span>
+                 <span class="n">fuelPhase</span> <span class="o">=</span> <span class="n">Phase</span><span class="p">(),</span>
                  <span class="n">claddingPhase</span><span class="o">=</span><span class="n">Phase</span><span class="p">()</span>
                  <span class="p">):</span>
 
@@ -149,43 +149,151 @@
 
         <span class="k">return</span>
 
-
-<span class="c1"># *******************************************************************************</span>
-
-<span class="c1"># *******************************************************************************</span>
-
-<span class="c1"># *******************************************************************************</span>
-<span class="c1"># Setters and Getters methods</span>
-<span class="c1"># -------------------------------------------------------------------------------</span>
-<span class="c1"># These are passing arguments by value effectively. Because the python objects</span>
-<span class="c1"># passed into/out of the function are immutable.</span>
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Public Member Functions</span>
+<span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="FuelSlug.GetSpecs"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.GetSpecs">[docs]</a>    <span class="k">def</span> <span class="nf">GetSpecs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the species associated with this fuel slug.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        specs: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span></div>
     <span class="n">specs</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetSpecs</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelSlug.GetFuelPhase"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.GetFuelPhase">[docs]</a>    <span class="k">def</span> <span class="nf">GetFuelPhase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the phase history of the solid fuel.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fuelPhase: dataFrame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span></div>
     <span class="n">fuelPhase</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetFuelPhase</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelSlug.GetCladdingPhase"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.GetCladdingPhase">[docs]</a>    <span class="k">def</span> <span class="nf">GetCladdingPhase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the phase history of the cladding.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        claddingPhase: dataFrame</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span></div>
     <span class="n">claddingPhase</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetCladdingPhase</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelSlug.GetAttribute"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.GetAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">symbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">series</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the value of the specified attribute. Any attribute that is</span>
+<span class="sd">        specified in class construction can be retrieved using this function.</span>
+<span class="sd">        The attribute may also be retrived from a speciefic phase, a specific</span>
+<span class="sd">        nuclide OR a specific series.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name: str</span>
+<span class="sd">        phase: str</span>
+<span class="sd">        symbol: str</span>
+<span class="sd">        series: str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        attribute: int or float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetAttribute</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">series</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FuelSlug.ReduceCladdingVolume"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.ReduceCladdingVolume">[docs]</a>    <span class="k">def</span> <span class="nf">ReduceCladdingVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dissolvedVolume</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Reduces the amount of cladding in the slug by dissolvedvolume.</span>
+<span class="sd">        This will also update the dimensions of the cladding walls and</span>
+<span class="sd">        end caps; volume will be taken from all sections equally such that the</span>
+<span class="sd">        relative dimensions stay the same.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dissolvedVolume: float</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        empty</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">__ReduceCladdingVolume</span><span class="p">(</span><span class="n">dissolvedVolume</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FuelSlug.ReduceFuelVolume"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.ReduceFuelVolume">[docs]</a>    <span class="k">def</span> <span class="nf">ReduceFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dissolvedVolume</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Reduces the amount of fuel in the slug by dissolvedVolume. This</span>
+<span class="sd">        will also update the dimensions of the fuel slug, mainly the thickness</span>
+<span class="sd">        of each fuel layers.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dissolvedVolume: float</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        empty</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">__ReduceFuelVolume</span><span class="p">(</span><span class="n">dissolvedVolume</span><span class="p">)</span></div>
 
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;FuelSlug(): </span><span class="se">\n\t</span><span class="s1"> specs </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n\t</span><span class="s1"> fuelPhase </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n\t</span><span class="s1"> claddingPhase </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;FuelSlug(): </span><span class="se">\n\t</span><span class="s1"> specs </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n\t</span><span class="s1"> fuelPhase </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n\t</span><span class="s1"> claddingPhase </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span><span class="p">)</span>
 
 <span class="c1"># Get stored fuel slug property either overall or on a nuclide basis</span>
-<span class="c1"># ---------------------------------------------------------------------------------</span>
+
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Private Member Functions (Internal use: __)</span>
+<span class="c1">#*********************************************************************************</span>
 
     <span class="k">def</span> <span class="nf">__GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attributeName</span><span class="p">,</span> <span class="n">nuclide</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">series</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the specified attribute. Series and nuclide must both be</span>
+<span class="sd">        specified if the other is specified!</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        attributeName: str</span>
+<span class="sd">        nuclide: str</span>
+<span class="sd">        series: str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Various attributes.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
 
         <span class="k">assert</span> <span class="n">attributeName</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributeNames</span><span class="p">,</span> <span class="s1">&#39; attribute name: </span><span class="si">%r</span><span class="s1">; options: </span><span class="si">%r</span><span class="s1">; fail.&#39;</span> <span class="o">%</span> <span class="p">(</span>
             <span class="n">attributeName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">attributeNames</span><span class="p">)</span>
@@ -522,13 +630,37 @@
 
                 <span class="k">assert</span> <span class="kc">False</span>
 
-<span class="c1"># ---------------------------------------------------------------------------------</span>
     <span class="k">def</span> <span class="nf">__GetSlugLength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the length of the fuelslug in cm (includes the end caps).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        self._specs[&#39;Slug length [cm]&#39;]: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Slug length [cm]&#39;</span><span class="p">]</span>
 
-<span class="c1"># ---------------------------------------------------------------------------------</span>
     <span class="k">def</span> <span class="nf">__GetFuelLength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the length of the fuel section in the slug (this is the length</span>
+<span class="sd">        of the fuel slug without the cladding end caps). Given in cm.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        fuelLength: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">slugLength</span> <span class="o">=</span> <span class="n">__GetSlugLength</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -537,8 +669,20 @@
 
         <span class="k">return</span> <span class="n">fuelLength</span>
 
-<span class="c1"># ---------------------------------------------------------------------------------</span>
     <span class="k">def</span> <span class="nf">__GetSlugVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the total volume of the fuel slug, in cm^3.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        outerSlugVolume + innerSlugVolume: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">slugLength</span> <span class="o">=</span> <span class="n">__GetSlugLength</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -553,8 +697,20 @@
 
         <span class="k">return</span> <span class="n">outerSlugVolume</span> <span class="o">+</span> <span class="n">innerSlugVolume</span>
 
-<span class="c1"># ---------------------------------------------------------------------------------</span>
     <span class="k">def</span> <span class="nf">__GetFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the total volume of fuel in the slug, in cm^3.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        volume: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">fuelLength</span> <span class="o">=</span> <span class="n">__GetFuelLength</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -579,16 +735,40 @@
 
         <span class="k">return</span> <span class="n">volume</span>
 
-<span class="c1"># ---------------------------------------------------------------------------------</span>
     <span class="k">def</span> <span class="nf">__GetCladdingVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the total volume of cladding in the slug.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        slugVolume - fuelVolume: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">slugVolume</span> <span class="o">=</span> <span class="n">__GetSlugVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">fuelVolume</span> <span class="o">=</span> <span class="n">__GetFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">slugVolume</span> <span class="o">-</span> <span class="n">fuelVolume</span>
 
-<span class="c1"># ---------------------------------------------------------------------------------</span>
     <span class="k">def</span> <span class="nf">__GetFuelArea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the surface area of the fuel, in cm^2.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        outerSlugFuelArea + innerSlugFuelArea: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">pi</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span>
 
@@ -625,8 +805,20 @@
 
         <span class="k">return</span> <span class="n">outerSlugFuelArea</span> <span class="o">+</span> <span class="n">innerSlugFuelArea</span>
 
-<span class="c1"># ---------------------------------------------------------------------------------</span>
     <span class="k">def</span> <span class="nf">__GetCladdingArea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the surface area of the cladding, in cm^2.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        outerSlugArea + innerSlugArea: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">slugLength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">[</span><span class="s1">&#39;Slug length [cm]&#39;</span><span class="p">]</span>
 
@@ -654,8 +846,22 @@
 
         <span class="k">return</span> <span class="n">outerSlugArea</span> <span class="o">+</span> <span class="n">innerSlugArea</span>
 
-<span class="c1"># ---------------------------------------------------------------------------------</span>
     <span class="k">def</span> <span class="nf">__GetEquivalentCladdingArea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the surface area of a sphere with a radius given by</span>
+<span class="sd">        self._claddingHollowSphereRo with the same surface area as the cladding</span>
+<span class="sd">        on the fuel slug, in cm^2.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        area: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">ro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRo</span>
 
@@ -663,8 +869,21 @@
 
         <span class="k">return</span> <span class="n">area</span>
 
-<span class="c1"># ---------------------------------------------------------------------------------</span>
     <span class="k">def</span> <span class="nf">__GetEquivalentCladdingVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the equivalent cladding volume of a hollow sphere that is</span>
+<span class="sd">        equal to the cladding volume in the fuel slug, in cm^3.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        volume: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">ro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRo</span>
         <span class="n">ri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingHollowSphereRi</span>
@@ -673,8 +892,21 @@
 
         <span class="k">return</span> <span class="n">volume</span>
 
-<span class="c1"># ---------------------------------------------------------------------------------</span>
     <span class="k">def</span> <span class="nf">__GetEquivalentFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This function does the same thing as __GetEquivalentCladdingVolume but</span>
+<span class="sd">        for fuel instead of clading.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        volume: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">ro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelHollowSphereRo</span>
         <span class="n">ri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelHollowSphereRi</span>
@@ -683,8 +915,21 @@
 
         <span class="k">return</span> <span class="n">volume</span>
 
-<span class="c1"># ---------------------------------------------------------------------------------</span>
     <span class="k">def</span> <span class="nf">__GetEquivalentFuelArea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This function does the same thing as __GetEquiavelntCladdingArea, but</span>
+<span class="sd">        for fuel instead of cladding.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        area: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">ro</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelHollowSphereRo</span>
 
@@ -692,13 +937,27 @@
 
         <span class="k">return</span> <span class="n">area</span>
 
-
-<span class="c1"># *********************************************************************************</span>
 <span class="c1"># Shrink the volume based on the equivalent cladding hollow sphere</span>
 
-<span class="c1"># ---------------------------------------------------------------------------------</span>
-
     <span class="k">def</span> <span class="nf">__ReduceCladdingVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dissolvedVolume</span><span class="p">):</span>
+
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Reduces the volume of cladding by the specified amount and then shrinks</span>
+<span class="sd">        the dimensions of the cladding walls to fit the new volume. The</span>
+<span class="sd">        function does this by first creating a hollow sphere with the same</span>
+<span class="sd">        volume as the cladding, reduces this sphere&#39;s radius until an amount</span>
+<span class="sd">        of volume specified by dissolvedVolume has been lost, and then</span>
+<span class="sd">        translates this new volume into new cladding wall dimensions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dissolvedVolume: float</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        empty</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">assert</span> <span class="n">dissolvedVolume</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;dissolved volume= </span><span class="si">%r</span><span class="s1">; failed.&#39;</span> <span class="o">%</span> <span class="p">(</span>
             <span class="n">dissolvedVolume</span><span class="p">)</span>
@@ -754,10 +1013,20 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;mass&#39;</span><span class="p">,</span> <span class="n">massDens</span> <span class="o">*</span> <span class="n">volume</span><span class="p">)</span>
 
-
-<span class="c1"># ---------------------------------------------------------------------------------</span>
-
     <span class="k">def</span> <span class="nf">__ReduceFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dissolvedVolume</span><span class="p">):</span>
+
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        See __ReduceCladdingVolume, above.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dissolvedVolume: float</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        empty</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">assert</span> <span class="n">dissolvedVolume</span> <span class="o">&gt;=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;dissolved volume= </span><span class="si">%r</span><span class="s1">; failed.&#39;</span> <span class="o">%</span> <span class="p">(</span>
             <span class="n">dissolvedVolume</span><span class="p">)</span>
@@ -811,33 +1080,20 @@
         <span class="n">volume</span> <span class="o">=</span> <span class="n">_GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;equivalentFuelVolume&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;volume&#39;</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;mass&#39;</span><span class="p">,</span> <span class="n">massDens</span> <span class="o">*</span> <span class="n">volume</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;mass&#39;</span><span class="p">,</span> <span class="n">massDens</span> <span class="o">*</span> <span class="n">volume</span><span class="p">)</span></div>
 
-
-<span class="c1"># *********************************************************************************</span>
-
-
-<span class="c1"># *******************************************************************************</span>
-<span class="c1"># Printing of data members</span>
-
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;FuelSlug(): </span><span class="se">\n\t</span><span class="s1"> specs </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n\t</span><span class="s1"> fuelPhase </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n\t</span><span class="s1"> claddingPhase </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span>
-        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;FuelSlug(): </span><span class="se">\n\t</span><span class="s1"> specs </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n\t</span><span class="s1"> fuelPhase </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="se">\n\t</span><span class="s1"> claddingPhase </span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span>
-        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_specs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span><span class="p">)</span></div>
-<span class="c1"># *******************************************************************************</span>
+<span class="c1">#============================ end class FuelSlug =================================</span>
 </pre></div>
 
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><img src="https://cortix.org/logo.jpg" alt="Cortix" height="210">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
 <h3>About Cortix</h3>
 <p>
-Cortix is a Python library for system-level module coupling, execution, and analysis.
+Cortix is a Python library for network modeling and parallel simulation.
 </p>
 <p>
 Cortix Group <br>
@@ -848,6 +1104,8 @@ Lower, MA 01852
 
 </p>
 
+<!---->
+
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li><a href="../index.html">Home</a></li>
@@ -855,8 +1113,6 @@ Lower, MA 01852
 <li><a href="../contents.html">Documentation</a></li>
 <li><a href="../license.html">License</a></li>
 </ul>
-
-<!---->
 
 <h3>Useful Links</h3>
 <ul>

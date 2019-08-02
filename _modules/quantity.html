@@ -40,7 +40,7 @@
 <span class="c1">#</span>
 <span class="c1"># Licensed under the University of Massachusetts Lowell LICENSE:</span>
 <span class="c1"># https://github.com/dpploy/cortix/blob/master/LICENSE.txt</span>
-<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">Author: Valmor de Almeida dealmeidav@ornl.gov; vfda</span>
 
 <span class="sd">This Quantity class is to be used with other classes in plant-level process modules.</span>
@@ -49,113 +49,237 @@
 <span class="sd">    python quantity.py</span>
 
 <span class="sd">Sat Sep  5 12:51:34 EDT 2015</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="c1"># *******************************************************************************</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="c1">#*********************************************************************************</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">npy</span>
-<span class="c1"># *******************************************************************************</span>
+<span class="c1">#*********************************************************************************</span>
 
-<div class="viewcode-block" id="Quantity"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity">[docs]</a><span class="k">class</span> <span class="nc">Quantity</span><span class="p">():</span>
+<div class="viewcode-block" id="Quantity"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity">[docs]</a><span class="k">class</span> <span class="nc">Quantity</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    todo: this probably should not have a &quot;value&quot; for the same reason as Specie.</span>
+<span class="sd">          this needs some thinking.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="c1"># todo: this probably should not have a &quot;value&quot; for the same reason as Specie.</span>
-    <span class="c1">#      this needs some thinking.</span>
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Construction</span>
+<span class="c1">#*********************************************************************************</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">name</span><span class="o">=</span><span class="s1">&#39;null-quantity&#39;</span><span class="p">,</span>
-                 <span class="n">formalName</span><span class="o">=</span><span class="s1">&#39;null-quantity&#39;</span><span class="p">,</span>
-                 <span class="n">value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span>  <span class="c1"># float, int, or npy.ndarray (float or int)</span>
-                 <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;null-unit&#39;</span>
-                 <span class="p">):</span>
+                 <span class="n">name</span>       <span class="o">=</span> <span class="s1">&#39;null-quantity&#39;</span><span class="p">,</span>
+                 <span class="n">formalName</span> <span class="o">=</span> <span class="s1">&#39;null-quantity&#39;</span><span class="p">,</span>
+                 <span class="n">value</span>      <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span>  <span class="c1"># this can be any type</span>
+                 <span class="n">unit</span>       <span class="o">=</span> <span class="s1">&#39;null-unit&#39;</span>
+                <span class="p">):</span>
 
+        <span class="c1"># Sanity tests here</span>
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;oops not string.&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">formalName</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;oops not string.&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span> <span class="o">=</span> <span class="n">formalName</span>
 
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span>  \
-               <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">npy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span><span class="s1">&#39;illegal value.&#39;</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">npy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
-           <span class="k">assert</span> <span class="n">value</span><span class="o">.</span><span class="n">dtype</span><span class="p">[:</span><span class="mi">4</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;float&#39;</span> <span class="ow">or</span> <span class="n">value</span><span class="o">.</span><span class="n">dtype</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;int&#39;</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">value</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;oops not string.&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span> <span class="o">=</span> <span class="n">unit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__unit</span> <span class="o">=</span> <span class="n">unit</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span> <span class="o">=</span> <span class="n">formalName</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span> <span class="o">=</span> <span class="n">unit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__unit</span> <span class="o">=</span> <span class="n">unit</span>
 
         <span class="k">return</span>
 
-<span class="c1"># *******************************************************************************</span>
-
-<span class="c1"># *******************************************************************************</span>
-<span class="c1"># Setters and Getters methods</span>
-<span class="c1"># -------------------------------------------------------------------------------</span>
-<span class="c1"># These are passing arguments by value effectively. Because the python objects</span>
-<span class="c1"># passed into/out of the function are immutable.</span>
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Public member functions</span>
+<span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="Quantity.SetName"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetName">[docs]</a>    <span class="k">def</span> <span class="nf">SetName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">n</span></div>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets the name of the quantity in question to n.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        n: str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        empty</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">n</span></div>
 
 <div class="viewcode-block" id="Quantity.get_name"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span></div>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the name of the quantity.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        name: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span></div>
     <span class="n">name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_name</span><span class="p">,</span> <span class="n">SetName</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Quantity.SetValue"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetValue">[docs]</a>    <span class="k">def</span> <span class="nf">SetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="n">v</span></div>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets the numerical value of the quantity to v.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        v: float</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">v</span></div>
 
 <div class="viewcode-block" id="Quantity.GetValue"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.GetValue">[docs]</a>    <span class="k">def</span> <span class="nf">GetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span></div>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Gets the numerical value of the quantity.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        value: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span></div>
     <span class="n">value</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetValue</span><span class="p">,</span> <span class="n">SetValue</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Quantity.SetFormalName"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetFormalName">[docs]</a>    <span class="k">def</span> <span class="nf">SetFormalName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets the formal name of the property to fn.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fn: str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        empty</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span> <span class="o">=</span> <span class="n">fn</span></div>
 
 <div class="viewcode-block" id="Quantity.GetFormalName"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.GetFormalName">[docs]</a>    <span class="k">def</span> <span class="nf">GetFormalName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the formal name of the quantity.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        formalName: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span></div>
     <span class="n">formalName</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetFormalName</span><span class="p">,</span> <span class="n">SetFormalName</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">formal_name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetFormalName</span><span class="p">,</span> <span class="n">SetFormalName</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Quantity.SetUnit"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetUnit">[docs]</a>    <span class="k">def</span> <span class="nf">SetUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span> <span class="o">=</span> <span class="n">f</span></div>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Sets the units of the quantity to f (for example, density would be in</span>
+<span class="sd">        units of g/cc.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        f: str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        empty</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__unit</span> <span class="o">=</span> <span class="n">f</span></div>
 
 <div class="viewcode-block" id="Quantity.GetUnit"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.GetUnit">[docs]</a>    <span class="k">def</span> <span class="nf">GetUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_unit</span></div>
+
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the units of the quantity.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        unit: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unit</span></div>
     <span class="n">unit</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetUnit</span><span class="p">,</span> <span class="n">SetUnit</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<span class="c1"># *******************************************************************************</span>
-<span class="c1"># Internal helpers</span>
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Private helper functions (internal use: __)</span>
+<span class="c1">#*********************************************************************************</span>
 
-<span class="c1"># *******************************************************************************</span>
-<span class="c1"># Printing of data members</span>
-    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> Quantity(): </span><span class="se">\n\t</span><span class="s1"> name=</span><span class="si">%s</span><span class="s1">; formalName=</span><span class="si">%s</span><span class="s1">; value=</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">]&#39;</span>
-        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">formalName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span>
+<div class="viewcode-block" id="Quantity.__str__"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> Quantity(): </span><span class="se">\n\t</span><span class="s1"> name=</span><span class="si">%s</span><span class="s1">; formalName=</span><span class="si">%s</span><span class="s1">; value=</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">]&#39;</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Used to print the data stored by the quantity class. Will print out</span>
+<span class="sd">        name, formal name, the value of the quantity and its unit.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        s: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> Quantity(): </span><span class="se">\n\t</span><span class="s1"> name=</span><span class="si">%s</span><span class="s1">; formal name=</span><span class="si">%s</span><span class="s1">; value=</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">]&#39;</span>
         <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">formalName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Quantity.__repr__"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
-<span class="c1"># *******************************************************************************</span>
-<span class="c1"># Usage: -&gt; python interface.py</span>
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Unit testing for Quantity&#39;</span><span class="p">)</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Used to print the data stored by the quantity class. Will print out</span>
+<span class="sd">        name, formal name, the value of the quantity and its unit.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        empty</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        s: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> Quantity(): </span><span class="se">\n\t</span><span class="s1"> name=</span><span class="si">%s</span><span class="s1">; formal name=</span><span class="si">%s</span><span class="s1">; value=</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">]&#39;</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">formalName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div></div>
+
+<span class="c1">#======================= end class Quantity ======================================</span>
 </pre></div>
 
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><img src="https://cortix.org/logo.jpg" alt="Cortix" height="210">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
 <h3>About Cortix</h3>
 <p>
-Cortix is a Python library for system-level module coupling, execution, and analysis.
+Cortix is a Python library for network modeling and parallel simulation.
 </p>
 <p>
 Cortix Group <br>
@@ -166,6 +290,8 @@ Lower, MA 01852
 
 </p>
 
+<!---->
+
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li><a href="../index.html">Home</a></li>
@@ -173,8 +299,6 @@ Lower, MA 01852
 <li><a href="../contents.html">Documentation</a></li>
 <li><a href="../license.html">License</a></li>
 </ul>
-
-<!---->
 
 <h3>Useful Links</h3>
 <ul>

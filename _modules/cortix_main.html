@@ -34,195 +34,288 @@
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># This file is part of the Cortix toolkit environment</span>
 <span class="c1"># https://cortix.org</span>
-<span class="c1">#</span>
-<span class="c1"># All rights reserved, see COPYRIGHT for full restrictions.</span>
-<span class="c1"># https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt</span>
-<span class="c1">#</span>
-<span class="c1"># Licensed under the University of Massachusetts Lowell LICENSE:</span>
-<span class="c1"># https://github.com/dpploy/cortix/blob/master/LICENSE.txt</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">The Cortix class definition.</span>
 
-<span class="sd">Cortix: a program for system-level modules coupling, execution, and analysis.</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="c1">#*********************************************************************************</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">cortix.src.simulation</span> <span class="k">import</span> <span class="n">Simulation</span>
-<span class="kn">from</span> <span class="nn">cortix.src.utils.xmltree</span> <span class="k">import</span> <span class="n">XMLTree</span>
-<span class="kn">from</span> <span class="nn">cortix.src.utils.set_logger_level</span> <span class="k">import</span> <span class="n">set_logger_level</span>
-<span class="c1">#*********************************************************************************</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">mpatches</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="k">import</span> <span class="n">Process</span>
+<span class="kn">from</span> <span class="nn">cortix.src.module</span> <span class="k">import</span> <span class="n">Module</span>
 
-<div class="viewcode-block" id="Cortix"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix">[docs]</a><span class="k">class</span> <span class="nc">Cortix</span><span class="p">():</span>
+<div class="viewcode-block" id="Cortix"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix">[docs]</a><span class="k">class</span> <span class="nc">Cortix</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    The main Cortix class definition. This class encapsulates the</span>
-<span class="sd">    concepts of simulations, tasks, and modules, for a given application providing</span>
-<span class="sd">    the user with an interface to the simulations.</span>
+<span class="sd">    The main Cortix class definition:</span>
+<span class="sd">    1. Create the object</span>
+<span class="sd">    2. Add modules</span>
+<span class="sd">    3. Run the simulation</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-<span class="c1">#*********************************************************************************</span>
-<span class="c1"># Construction </span>
-<span class="c1">#*********************************************************************************</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_mpi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">splash</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">config_xml_file</span><span class="o">=</span><span class="s1">&#39;cortix-config.xml&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="n">use_mpi</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;must give Cortix object a name&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">splash</span> <span class="o">=</span> <span class="n">splash</span>
 
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config_xml_file</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;-&gt; config_xml_file not a str.&#39;</span>
+        <span class="c1"># Fall back to multiprocessing if mpi4py is not available</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="k">import</span> <span class="n">MPI</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="kc">False</span>
 
-        <span class="c1"># Create the configuration XML tree</span>
-        <span class="n">config_xml_tree</span> <span class="o">=</span> <span class="n">XMLTree</span><span class="p">(</span> <span class="n">xml_tree_file</span><span class="o">=</span><span class="n">config_xml_file</span> <span class="p">)</span>
+        <span class="c1"># Setup the global logger </span>
 
-        <span class="k">assert</span> <span class="n">config_xml_tree</span><span class="o">.</span><span class="n">get_node_tag</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;cortix_config&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__create_logger</span><span class="p">()</span>
 
-        <span class="c1"># Read the cortix config element (tag) name &lt;name&gt;&lt;/name&gt;</span>
-        <span class="n">node</span> <span class="o">=</span> <span class="n">config_xml_tree</span><span class="o">.</span><span class="n">get_sub_node</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span> <span class="c1"># get sub_node w/ tag: name (XML element)</span>
+        <span class="c1"># Setup the network graph</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nx_graph</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="c1"># Set the Cortix configuration name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get_node_content</span><span class="p">()</span>  <span class="c1"># name is now, say, &#39;droplet-fall&#39;</span>
+        <span class="c1"># Modules storage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
 
-        <span class="c1"># Consistency check</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">==</span> <span class="n">name</span><span class="p">,</span>\
-            <span class="s1">&#39;Runtime Cortix object name </span><span class="si">%r</span><span class="s1"> conflicts with cortix-config.xml </span><span class="si">%r</span><span class="s1">&#39;</span> \
-            <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="c1"># Done</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
 
-        <span class="c1"># Read the work directory name</span>
-        <span class="n">node</span> <span class="o">=</span> <span class="n">config_xml_tree</span><span class="o">.</span><span class="n">get_sub_node</span><span class="p">(</span><span class="s1">&#39;work_dir&#39;</span><span class="p">)</span>
-        <span class="n">work_dir</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get_node_content</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">work_dir</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
-            <span class="n">work_dir</span> <span class="o">+=</span> <span class="s1">&#39;/&#39;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">splash</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Created Cortix object </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_splash</span><span class="p">(</span><span class="n">begin</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Created Cortix object&#39;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span> <span class="o">=</span> <span class="n">work_dir</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">+</span> <span class="s1">&#39;-wrk/&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
-        <span class="c1"># Create the work directory</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span><span class="p">):</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;rm -rf &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span><span class="p">)</span>
-
-        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;mkdir -p &#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span><span class="p">)</span>
-
-        <span class="c1"># Create the logging facility for each object</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__create_logging</span><span class="p">(</span> <span class="n">config_xml_tree</span> <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Created Cortix work directory: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span><span class="p">)</span>
-
-        <span class="c1">#==================</span>
-        <span class="c1"># Setup simulations (one or more as specified in the config file)</span>
-        <span class="c1">#==================</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__setup_simulations</span><span class="p">(</span> <span class="n">config_xml_tree</span> <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Created Cortix object </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_start</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">end_run_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">%b%y %H:%M:%S&#39;</span><span class="p">)</span>
 
         <span class="k">return</span>
 
-    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Destroyed Cortix object: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">)</span>
-
-        <span class="k">return</span>
-
-<span class="c1">#*********************************************************************************</span>
-<span class="c1"># Public member functions</span>
-<span class="c1">#*********************************************************************************</span>
-
-<div class="viewcode-block" id="Cortix.run_simulations"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.run_simulations">[docs]</a>    <span class="k">def</span> <span class="nf">run_simulations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task_name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Cortix.__del__"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.__del__">[docs]</a>    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        This method runs every simulation defined by the Cortix object. At the </span>
-<span class="sd">        moment this is done one simulation at a time.</span>
+<span class="sd">        Note: by the time the body of this function is executed, the machinery of</span>
+<span class="sd">        variables may have been deleted already. For example, `logging` is no longer</span>
+<span class="sd">        there; do the least amount of work here.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="k">for</span> <span class="n">sim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__simulations</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
 
-            <span class="n">sim</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span> <span class="n">task_name</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">splash</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Destroyed Cortix object on &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">end_run_date</span><span class="o">+</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__get_splash</span><span class="p">(</span><span class="n">begin</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Destroyed Cortix object on &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">end_run_date</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Elapsed wall clock time [s]: &#39;</span><span class="o">+</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_end</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_start</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="Cortix.add_module"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.add_module">[docs]</a>    <span class="k">def</span> <span class="nf">add_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Add a module to the Cortix object</span>
+
+<span class="sd">        `m`: An instance of a class that inherits from the Module base class</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">Module</span><span class="p">),</span> <span class="s1">&#39;m must be a module&#39;</span>
+        <span class="k">if</span> <span class="n">m</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Cortix.run"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Run the Cortix simulation with MPI if available o.w. fallback to multiprocessing</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># Synchronize in the beginning</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>\
+                <span class="s1">&#39;Incorrect number of processes (Required </span><span class="si">%r</span><span class="s1">, got </span><span class="si">%r</span><span class="s1">)&#39;</span><span class="o">%</span>\
+                <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+
+        <span class="c1"># Assign an mpi rank to all ports of a module using the module list index</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+                <span class="n">rank</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+                <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
+                    <span class="n">port</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="n">rank</span>
+
+        <span class="c1"># Assign a unique port id to all ports</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
+                <span class="n">port</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span>
+                <span class="n">port</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Parallel run module in MPI</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">mod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Launching Module </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mod</span><span class="p">))</span>
+            <span class="n">mod</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+        <span class="c1"># Parallel run all modules in Python multiprocessing</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+                <span class="n">processes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Launching Module </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mod</span><span class="p">))</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">mod</span><span class="o">.</span><span class="n">run</span><span class="p">)</span>
+                <span class="n">processes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="c1"># Synchronize at the end</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">processes</span><span class="p">:</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">end_run_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">%b%y %H:%M:%S&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
         <span class="k">return</span></div>
 
-<span class="c1">#*********************************************************************************</span>
-<span class="c1"># Private helper functions (internal use: __)</span>
-<span class="c1">#*********************************************************************************</span>
-
-    <span class="k">def</span> <span class="nf">__create_logging</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_xml_tree</span><span class="p">):</span>
+<div class="viewcode-block" id="Cortix.get_network"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.get_network">[docs]</a>    <span class="k">def</span> <span class="nf">get_network</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        A helper function to setup the logging facility used in self.__init__()</span>
+<span class="sd">        Constructs and returns a networkx graph representation of the module network.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx_graph</span><span class="p">:</span>
+                <span class="n">g</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">mod_one</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+                    <span class="n">class_name</span> <span class="o">=</span> <span class="n">mod_one</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mod_one</span><span class="p">)</span>
+                    <span class="n">mod_one_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">mod_two</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">mod_one</span> <span class="o">!=</span> <span class="n">mod_two</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">mod_one</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
+                                <span class="k">for</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">mod_two</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
+                                    <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">port</span><span class="o">.</span><span class="n">connected_port</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">p2</span><span class="p">):</span>
+                                        <span class="n">mod_two_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mod_two</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mod_two</span><span class="p">))</span>
+                                        <span class="k">if</span> <span class="n">mod_two_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">or</span> <span class="n">mod_one_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">mod_two_name</span><span class="p">):</span>
+                                            <span class="n">g</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">mod_one_name</span><span class="p">,</span> <span class="n">mod_two_name</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">nx_graph</span> <span class="o">=</span> <span class="n">g</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx_graph</span></div>
+
+<div class="viewcode-block" id="Cortix.draw_network"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.draw_network">[docs]</a>    <span class="k">def</span> <span class="nf">draw_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;network.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">220</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Draws the networkx Module network graph using matplotlib</span>
+
+<span class="sd">        `file_name`: The resulting network diagram output file name</span>
+<span class="sd">        `dpi`: dpi used for generating the network image</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx_graph</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx_graph</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_network</span><span class="p">()</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="s2">&quot;teal&quot;</span><span class="p">]</span>
+        <span class="n">class_map</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">color_map</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">():</span>
+            <span class="n">class_name</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">class_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">class_map</span><span class="p">:</span>
+                <span class="n">class_map</span><span class="p">[</span><span class="n">class_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">class_map</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)]</span>
+            <span class="n">color_map</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="n">class_map</span><span class="p">[</span><span class="n">class_name</span><span class="p">]</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+        <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="p">[</span><span class="n">color_map</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">),</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+        <span class="n">patches</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">class_map</span><span class="p">:</span>
+            <span class="n">patch</span> <span class="o">=</span> <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">class_map</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
+            <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="n">patches</span><span class="p">)</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__create_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        A helper function to setup the logging facility used in the constructor.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="n">logger_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
+        <span class="c1"># File removal</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;cortix.log&#39;</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;rm -rf cortix.log&#39;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">logger_name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">)</span>
+        <span class="c1"># Sync here to allow for file removal</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
 
-        <span class="n">node</span> <span class="o">=</span> <span class="n">config_xml_tree</span><span class="o">.</span><span class="n">get_sub_node</span><span class="p">(</span><span class="s1">&#39;logger&#39;</span><span class="p">)</span> <span class="c1"># tag name is logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;cortix&#39;</span><span class="p">)</span>
 
-        <span class="n">logger_level</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">get_node_attribute</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span> <span class="o">=</span> <span class="n">set_logger_level</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="p">,</span> <span class="n">logger_name</span><span class="p">,</span> <span class="n">logger_level</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
-        <span class="n">file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span> <span class="o">+</span> <span class="s1">&#39;cortix.log&#39;</span><span class="p">)</span>
-        <span class="n">file_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">)</span>
-        <span class="n">file_handler_level</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="s1">&#39;cortix.log&#39;</span><span class="p">)</span>
+        <span class="n">file_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
         <span class="n">console_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
-        <span class="n">console_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">NOTSET</span><span class="p">)</span>
-        <span class="n">console_handler_level</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">get_node_children</span><span class="p">():</span>
-            <span class="p">(</span><span class="n">elem</span><span class="p">,</span><span class="n">tag</span><span class="p">,</span><span class="n">attributes</span><span class="p">,</span><span class="n">text</span><span class="p">)</span> <span class="o">=</span> <span class="n">child</span>
-            <span class="n">elem</span> <span class="o">=</span> <span class="n">XMLTree</span><span class="p">(</span> <span class="n">elem</span> <span class="p">)</span> <span class="c1"># fixme: remove wrapping</span>
-            <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;file_handler&#39;</span><span class="p">:</span>
-                <span class="n">file_handler_level</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get_node_attribute</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span>
-                <span class="n">file_handler</span> <span class="o">=</span> <span class="n">set_logger_level</span><span class="p">(</span><span class="n">file_handler</span><span class="p">,</span> <span class="n">logger_name</span><span class="p">,</span>
-                                                <span class="n">file_handler_level</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;console_handler&#39;</span><span class="p">:</span>
-                <span class="n">console_handler_level</span> <span class="o">=</span> <span class="n">elem</span><span class="o">.</span><span class="n">get_node_attribute</span><span class="p">(</span><span class="s1">&#39;level&#39;</span><span class="p">)</span>
-                <span class="n">console_handler</span> <span class="o">=</span> <span class="n">set_logger_level</span><span class="p">(</span><span class="n">console_handler</span><span class="p">,</span> <span class="n">logger_name</span><span class="p">,</span>
-                                                   <span class="n">console_handler_level</span><span class="p">)</span>
+        <span class="n">console_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
 
         <span class="c1"># Formatter added to handlers</span>
-        <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span>
-            <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+            <span class="n">fs</span> <span class="o">=</span> <span class="s1">&#39;[rank:</span><span class="si">{}</span><span class="s1">] </span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">fs</span> <span class="o">=</span> <span class="s2">&quot;[</span><span class="si">{}</span><span class="s2">] </span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(name)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">())</span>
+
+        <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fs</span><span class="p">)</span>
         <span class="n">file_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
         <span class="n">console_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
 
-        <span class="c1"># add handlers to logger</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">file_handler</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console_handler</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Created Cortix logger: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Logger level: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">logger_level</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Logger file handler level: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">file_handler_level</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Logger console handler level: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">console_handler_level</span><span class="p">)</span>
+        <span class="c1"># Add handlers to logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">file_handler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console_handler</span><span class="p">)</span>
 
-        <span class="k">return</span>
+    <span class="k">def</span> <span class="nf">__get_splash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">begin</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__setup_simulations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_xml_tree</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        This method is a helper function for the Cortix constructor whose purpose is </span>
-<span class="sd">        to set up the simulations defined by the Cortix configuration.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">splash</span> <span class="o">=</span> \
+        <span class="s1">&#39;_____________________________________________________________________________</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;      ...                                        s       .     (TAAG Fraktur)</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;   xH88&quot;`~ .x8X                                 :8      @88&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39; :8888   .f&quot;8888Hf        u.      .u    .      .88      %8P      uL   ..</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;:8888&gt;  X8L  ^&quot;&quot;`   ...ue888b   .d88B :@8c    :888ooo    .     .@88b  @88R</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;X8888  X888h        888R Y888r =&quot;8888f8888r -*8888888  .@88u  &quot;&quot;Y888k/&quot;*P</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;88888  !88888.      888R I888&gt;   4888&gt;&quot;88&quot;    8888    &#39;&#39;888E`    Y888L</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;88888   %88888      888R I888&gt;   4888&gt; &quot;      8888      888E      8888</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;88888 `&gt; `8888&gt;     888R I888&gt;   4888&gt;        8888      888E      `888N</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;`8888L %  ?888   ! u8888cJ888   .d888L .+    .8888Lu=   888E   .u./&quot;888&amp;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39; `8888  `-*&quot;&quot;   /   &quot;*888*P&quot;    ^&quot;8888*&quot;     ^%888*     888&amp;  d888&quot; Y888*&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;   &quot;888.      :&quot;      &quot;Y&quot;          &quot;Y&quot;         &quot;Y&quot;      R888&quot; ` &quot;Y   Y&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;     `&quot;&quot;***~&quot;`                                           &quot;&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;                             https://cortix.org                              </span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;_____________________________________________________________________________&#39;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__simulations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">begin</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> \
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">_____________________________________________________________________________</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+            <span class="s1">&#39;                             L A U N C H I N G                               </span><span class="se">\n</span><span class="s1">&#39;</span>
 
-        <span class="k">for</span> <span class="n">sim_config_xml_node</span> <span class="ow">in</span> <span class="n">config_xml_tree</span><span class="o">.</span><span class="n">get_all_sub_nodes</span><span class="p">(</span><span class="s1">&#39;simulation&#39;</span><span class="p">):</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> \
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">_____________________________________________________________________________</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+            <span class="s1">&#39;                           T E R M I N A T I N G                             </span><span class="se">\n</span><span class="s1">&#39;</span>
 
-            <span class="k">assert</span> <span class="n">sim_config_xml_node</span><span class="o">.</span><span class="n">get_node_tag</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;simulation&#39;</span>
+        <span class="k">return</span> <span class="n">message</span> <span class="o">+</span> <span class="n">splash</span></div>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">__log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;__setup_simulations(): simulation name: </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
-                    <span class="n">sim_config_xml_node</span><span class="o">.</span><span class="n">get_node_attribute</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">))</span>
-
-            <span class="n">simulation</span> <span class="o">=</span> <span class="n">Simulation</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__work_dir</span><span class="p">,</span> <span class="n">sim_config_xml_node</span> <span class="p">)</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">__simulations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">simulation</span><span class="p">)</span>
-
-        <span class="k">return</span></div>
-
-<span class="c1">#======================= end class Cortix: =======================================</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cortix</span><span class="p">()</span>
 </pre></div>
 
           </div>
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><img src="https://cortix.org/logo.jpg" alt="Cortix" height="210">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
 <h3>About Cortix</h3>
 <p>
-Cortix is a Python library for system-level module coupling, execution, and analysis.
+Cortix is a Python library for network modeling and parallel simulation.
 </p>
 <p>
 Cortix Group <br>
@@ -233,6 +326,8 @@ Lower, MA 01852
 
 </p>
 
+<!---->
+
 <h3><a href="../index.html">Table Of Contents</a></h3>
 <ul>
 <li><a href="../index.html">Home</a></li>
@@ -240,8 +335,6 @@ Lower, MA 01852
 <li><a href="../contents.html">Documentation</a></li>
 <li><a href="../license.html">License</a></li>
 </ul>
-
-<!---->
 
 <h3>Useful Links</h3>
 <ul>
