@@ -1,7 +1,7 @@
-main\_mpi
-=========
+dataplot module
+===============
 
-.. automodule:: main_mpi
+.. automodule:: dataplot
     :members:
     :undoc-members:
     :show-inheritance:

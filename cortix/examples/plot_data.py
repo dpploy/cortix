@@ -1,6 +1,6 @@
 from cortix.src.module import Module
 from cortix.src.port import Port
-from cortix.util.dataplot import DataPlot
+from cortix.examples.dataplot import DataPlot
 from cortix.src.cortix_main import Cortix
 
 class PlotData(Module):

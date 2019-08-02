@@ -144,6 +144,7 @@ class Phase:
         Parameters
         ----------
         try_time_stamp:
+
         Returns
         -------
 
@@ -161,8 +162,8 @@ class Phase:
         '''
         Returns the time unit of the `Phase.`
 
-        Paramers
-        --------
+        Parameters
+        ----------
         empty
 
         Returns
@@ -732,7 +733,7 @@ class Phase:
         '''
         Convert the `Phase` container into an HTML file.
 
-        Paramters
+        Parameters
         ---------
         fileName: str
 
