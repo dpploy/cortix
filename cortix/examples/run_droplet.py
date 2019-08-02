@@ -54,7 +54,7 @@ command line as
     `run_droplet.py`
 '''
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     # Configuration Parameters
     use_single_plot = True  # True for a single plot output

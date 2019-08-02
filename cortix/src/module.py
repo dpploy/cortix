@@ -15,6 +15,7 @@ class Module:
     def __init__(self):
 
         self.use_mpi = False
+
         self.ports = []
 
     def send(self, data, port):
@@ -86,7 +87,7 @@ class Module:
         my_port.connect(connected_port)
 
     def run(self):
-        raise NotImplementedError('Modules must implement run()')
+        raise NotImplementedError('Module must implement run()')
 
     def _get_reserved_port_names(self):
         '''

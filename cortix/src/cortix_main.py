@@ -10,7 +10,7 @@ import datetime
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-from multiprocessing import Process
+from multiprocessing import Process, Queue
 from cortix.src.module import Module
 
 class Cortix:
@@ -90,6 +90,7 @@ class Cortix:
 
         `m`: An instance of a class that inherits from the Module base class
         '''
+
         assert isinstance(m, Module), 'm must be a module'
         if m not in self.modules:
             m.use_mpi = self.use_mpi
@@ -100,50 +101,56 @@ class Cortix:
         Run the Cortix simulation with MPI if available o.w. fallback to multiprocessing
         '''
 
-        # Synchronize in the beginning
+        # Running under MPI
+        #------------------
         if self.use_mpi:
+
+            # Synchronize in the beginning
             assert self.size == len(self.modules) + 1,\
                 'Incorrect number of processes (Required %r, got %r)'%\
                 (len(self.modules) + 1, self.size)
             self.comm.Barrier()
 
-        # Assign an mpi rank to all ports of a module using the module list index
-        if self.use_mpi:
+            # Assign an mpi rank to all ports of a module using the module list index
             for m in self.modules:
                 rank = self.modules.index(m)+1
                 for port in m.ports:
                     port.rank = rank
 
-        # Assign a unique port id to all ports
-        i = 0
-        for mod in self.modules:
-            for port in mod.ports:
-                port.use_mpi = self.use_mpi
-                port.id = i
-                i += 1
-
-        # Parallel run module in MPI
-        if self.use_mpi and self.rank != 0:
-            mod = self.modules[self.rank-1]
-            self.log.info('Launching Module {}'.format(mod))
-            mod.run()
-
-        # Parallel run all modules in Python multiprocessing
-        if not self.use_mpi:
+            # Assign a unique port id to all ports
+            i = 0
             for mod in self.modules:
-                processes = list()
+                for port in mod.ports:
+                    port.use_mpi = self.use_mpi
+                    port.id = i
+                    i += 1
+
+            # Parallel run module in MPI
+            if self.rank != 0:
+                mod = self.modules[self.rank-1]
+                self.log.info('Launching Module {}'.format(mod))
+                mod.run()
+
+            # Synchronize at the end
+            self.comm.Barrier()
+
+        # Running under Python multiprocessing
+        #-------------------------------------
+        else:
+
+            # Parallel run all modules in Python multiprocessing
+            processes = list()
+            for mod in self.modules:
                 self.log.info('Launching Module {}'.format(mod))
                 p = Process(target=mod.run)
                 processes.append(p)
                 p.start()
 
-        # Synchronize at the end
-        if self.use_mpi:
-            self.comm.Barrier()
-        else:
+            # Synchronize at the end
             for p in processes:
                 p.join()
 
+        # Record time at the end of the run method
         if self.rank == 0 or not self.use_mpi:
             self.end_run_date = datetime.datetime.today().strftime('%d%b%y %H:%M:%S')
             self.wall_clock_time_end = time.time()
