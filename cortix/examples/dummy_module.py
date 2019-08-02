@@ -8,7 +8,7 @@ class DummyModule(Module):
         # Call the Module class constructor
         super().__init__()
 
-    def run(self):
+    def run(self, state_comm=None):
         # Simulate sending data every second
         i = 0
         while i < 10:
@@ -19,13 +19,16 @@ class DummyModule(Module):
 
         print("Finished Sending!")
 
+        if state_comm:
+            state_comm.put(self.state)
+
 class DummyModule2(Module):
     def __init__(self):
 
         # Call the Module class constructor
         super().__init__()
 
-    def run(self):
+    def run(self, state_comm=None):
         # Simulate receiving data every two seconds 
         i = 0
         while i < 10:
@@ -42,3 +45,6 @@ class DummyModule2(Module):
             i += 1
 
         print("Finished Receiving!")
+
+        if state_comm:
+            state_comm.put(self.state)
