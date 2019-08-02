@@ -6,6 +6,7 @@
 import sys
 import logging
 from threading import Thread
+import pickle
 
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib
@@ -33,13 +34,12 @@ class DataPlot(Module):
         self.print_freq = 10
 
         self.data = dict()
-        self.data_file_name = 'data_plot.pkl'
 
         self.state = None
 
     def run(self, state_comm=None):
         '''
-        Spawn a thread to handle each port connection
+        Spawn a thread to handle each port connection.
         '''
 
         threads = []
@@ -55,7 +55,14 @@ class DataPlot(Module):
         self.plot_data()
 
         if state_comm:
-            state_comm.put(self.state)
+            try:
+                pickle.dumps(self.state)
+            except pickle.PicklingError:
+                state_comm.put(None)
+            else:
+                state_comm.put(self.state)
+
+        print('dataplot: done')
 
         return
 

@@ -3,6 +3,8 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 
+import pickle
+
 import numpy as np
 import scipy.constants as const
 from collections import namedtuple
@@ -93,7 +95,15 @@ class Vortex(Module):
             time += self.time_step
 
         if state_comm:
-            state_comm.put(self.state)
+
+            try:
+              pickle.dumps(self.state)
+            except pickle.PicklingError:
+                state_comm.put(None)
+            else:
+                state_comm.put(self.state)
+
+        print('vortex: done')
 
         return
 

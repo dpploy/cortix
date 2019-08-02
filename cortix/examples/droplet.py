@@ -3,6 +3,8 @@
 # This file is part of the Cortix toolkit environment.
 # https://cortix.org
 
+import pickle
+
 import numpy as np
 import scipy.constants as const
 from scipy.integrate import odeint
@@ -108,7 +110,7 @@ class Droplet(Module):
         medium_dyn_viscosity = 1.81e-5 # kg/(m s)
         self.ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
 
-        self.state = None
+        self.state = self.liquid_phase
 
     def run(self, state_comm=None):
 
@@ -152,7 +154,14 @@ class Droplet(Module):
         self.send('DONE', 'visualization') # this should not be needed: TODO
 
         if state_comm:
-            state_comm.put(self.state)
+            try:
+                pickle.dumps(self.state)
+            except pickle.PicklingError:
+                state_comm.put(None)
+            else:
+                state_comm.put(self.state)
+
+        print('droplet: done')
 
         return
 
