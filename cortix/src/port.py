@@ -11,6 +11,7 @@ class Port:
     other ports for the purpose of data tranfer. Data exchange takes place by
     send and/or receive calls on a given port. The concept of a port is that of a data
     transfer "interaction." This can be one- or two-way with sends and receives.
+    A port is connected to only one other port; as two ends of a pipe are connected.
     '''
 
     def __init__(self, name=None, use_mpi=False):
@@ -24,8 +25,9 @@ class Port:
             self.comm = MPI.COMM_WORLD
             self.rank = None
 
-        self.q = Queue()
-        self.connected_port = None
+        self.q = Queue()    # only passes picke-able objects
+
+        self.connected_port = None # the `other` port connected to `this` port
 
     def connect(self, port):
         '''

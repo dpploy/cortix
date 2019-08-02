@@ -6,12 +6,12 @@
 import sys
 import logging
 from threading import Thread
+import pickle
+
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib
 matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
-
-import pickle
 
 from cortix.src.module import Module
 
@@ -34,11 +34,12 @@ class DataPlot(Module):
         self.print_freq = 10
 
         self.data = dict()
-        self.data_file_name = 'data_plot.pkl'
 
-    def run(self):
+        self.state = self.data
+
+    def run(self, state_comm=None, idx_comm=None):
         '''
-        Spawn a thread to handle each port connection
+        Spawn a thread to handle each port connection.
         '''
 
         threads = []
@@ -53,8 +54,15 @@ class DataPlot(Module):
 
         self.plot_data()
 
-        # Save data dict; TODO this should not be here but self.data vanishes after run()
-        pickle.dump( self.data, open(self.data_file_name,'wb') )
+        if state_comm:
+            try:
+                pickle.dumps(self.state)
+            except pickle.PicklingError:
+                state_comm.put((idx_comm,None))
+            else:
+                state_comm.put((idx_comm,self.state))
+
+        return
 
     def recv_data(self, port):
         '''
@@ -75,16 +83,13 @@ class DataPlot(Module):
 
             data.append(d)
 
-    def plot_data(self, data_input=None):
-
-        if data_input is None:
-            data_input = self.data
+    def plot_data(self):
 
         if self.same_axes:
             fig = plt.figure(1)
             ax = None
 
-        for (key,data) in data_input.items():
+        for (key,data) in self.data.items():
 
             x = [i[0] for i in data]
             y = [i[1] for i in data]

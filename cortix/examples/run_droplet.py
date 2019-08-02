@@ -54,12 +54,12 @@ command line as
     `run_droplet.py`
 '''
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     # Configuration Parameters
     use_single_plot = True  # True for a single plot output
                             # False for multiple plot files and network
-    use_mpi         = True  # True for MPI; False for Python multiprocessing
+    use_mpi         = False # True for MPI; False for Python multiprocessing
 
     plot_vortex_profile = False # True may crash the X server.
 

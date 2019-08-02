@@ -3,6 +3,8 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 
+import pickle
+
 import numpy as np
 import scipy.constants as const
 from collections import namedtuple
@@ -60,7 +62,9 @@ class Vortex(Module):
 
         self.period = 20 # wind change period
 
-    def run(self):
+        self.state = None
+
+    def run(self, state_comm=None, idx_comm=None):
 
         # namedtuple does not pickle into send message; investigate later: vfda TODO
         #Props = namedtuple('Props',['mass_density','dyn_viscosity'])
@@ -89,6 +93,17 @@ class Vortex(Module):
                 port.send( (message_time, velocity, fluid_props) )
 
             time += self.time_step
+
+        if state_comm:
+
+            try:
+              pickle.dumps(self.state)
+            except pickle.PicklingError:
+                state_comm.put((idx_comm,None))
+            else:
+                state_comm.put((idx_comm,self.state))
+
+        return
 
     def compute_velocity(self, time, position):
         '''
