@@ -12,8 +12,6 @@ import matplotlib
 matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
 
-import pickle
-
 from cortix.src.module import Module
 
 class DataPlot(Module):
@@ -37,7 +35,7 @@ class DataPlot(Module):
         self.data = dict()
         self.data_file_name = 'data_plot.pkl'
 
-        self.state = self.data
+        self.state = None
 
     def run(self, state_comm=None):
         '''
@@ -55,9 +53,6 @@ class DataPlot(Module):
             t.join()
 
         self.plot_data()
-
-        # Save data dict; TODO this should not be here but self.data vanishes after run()
-        pickle.dump( self.data, open(self.data_file_name,'wb') )
 
         if state_comm:
             state_comm.put(self.state)
@@ -83,16 +78,13 @@ class DataPlot(Module):
 
             data.append(d)
 
-    def plot_data(self, data_input=None):
-
-        if data_input is None:
-            data_input = self.data
+    def plot_data(self):
 
         if self.same_axes:
             fig = plt.figure(1)
             ax = None
 
-        for (key,data) in data_input.items():
+        for (key,data) in self.data.items():
 
             x = [i[0] for i in data]
             y = [i[1] for i in data]

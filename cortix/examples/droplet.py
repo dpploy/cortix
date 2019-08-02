@@ -108,7 +108,7 @@ class Droplet(Module):
         medium_dyn_viscosity = 1.81e-5 # kg/(m s)
         self.ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
 
-        self.state = self.liquid_phase.quantities
+        self.state = None
 
     def run(self, state_comm=None):
 

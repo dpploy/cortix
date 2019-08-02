@@ -148,7 +148,8 @@ class Cortix:
                 p.start()
 
             # Synchronize at the end
-            for p in processes:
+            for (p,mod) in zip(processes, self.modules):
+                self.log.info('Sync Module {}'.format(mod))
                 p.join()
 
             assert modules_new_state.qsize() == len(self.modules)

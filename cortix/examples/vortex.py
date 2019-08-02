@@ -60,7 +60,7 @@ class Vortex(Module):
 
         self.period = 20 # wind change period
 
-        self.state = species
+        self.state = None
 
     def run(self, state_comm=None):
 
