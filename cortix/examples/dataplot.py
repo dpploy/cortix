@@ -37,6 +37,8 @@ class DataPlot(Module):
         self.data = dict()
         self.data_file_name = 'data_plot.pkl'
 
+        self.state = self.data
+
     def run(self, state_comm=None):
         '''
         Spawn a thread to handle each port connection

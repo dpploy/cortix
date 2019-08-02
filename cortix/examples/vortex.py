@@ -60,6 +60,8 @@ class Vortex(Module):
 
         self.period = 20 # wind change period
 
+        self.state = self.species
+
     def run(self, state_comm=None):
 
         # namedtuple does not pickle into send message; investigate later: vfda TODO

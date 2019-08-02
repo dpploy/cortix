@@ -154,6 +154,7 @@ class Cortix:
             assert modules_new_state.qsize() == len(self.modules)
 
             for mod in self.modules:
+                self.log.info('Module {} getting new state'.format(mod))
                 mod.state = modules_new_state.get()
 
         # Record time at the end of the run method
