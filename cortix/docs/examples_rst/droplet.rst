@@ -1,7 +1,7 @@
-droplet\_run
-============
+droplet module
+==============
 
-.. automodule:: droplet_run
+.. automodule:: droplet
     :members:
     :undoc-members:
     :show-inheritance:

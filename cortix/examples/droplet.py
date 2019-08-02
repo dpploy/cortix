@@ -15,12 +15,12 @@ class Droplet(Module):
     '''
     Droplet Cortix module used to model very simple fluid-particle interactions.
 
-    Ports
-    =====
-    external-flow: this is a port that exchanges data with any other module that
+    Note
+    ----
+    `external-flow`: this is a `port` that exchanges data with any other module that
     provides information about the flow outside the droplet.
 
-    visualization: this is a port that sends data to a visualization module.
+    `visualization`: this is a `port` that sends data to a visualization module.
     '''
 
     def __init__(self):

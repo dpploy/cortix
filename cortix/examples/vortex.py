@@ -19,9 +19,9 @@ class Vortex(Module):
     '''
     Vortex module used to model fluid flow using Cortix.
 
-    Ports
-    =====
-    Any port name and any number of ports are allowed.
+    Note
+    ----
+    Any `port` name and any number of ports are allowed.
     '''
 
     def __init__(self):

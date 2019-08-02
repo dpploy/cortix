@@ -49,9 +49,19 @@ imgmath_image_format = 'svg'
 #
 todo_include_todos=True
 #
+# vfda Thu 01 Aug 2019 07:14:56 PM EDT
+#
+# For docstrings to be semi-automatically used, the docstrings must of course be written 
+# in correct reStructuredText. You can then use all of the usual Sphinx markup in the 
+# docstrings, and it will end up correctly in the documentation.
+#
+#If you prefer NumPy or Google style docstrings over reStructuredText, you can also 
+# enable the napoleon extension. napoleon is a preprocessor that converts your 
+# docstrings to correct reStructuredText before autodoc processes them.
+#
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
-napoleon_include_init_with_doc = False
+napoleon_include_init_with_doc = False  # include private functions "_func_name()"
 napoleon_include_private_with_doc = False
 napoleon_include_special_with_doc = True
 napoleon_use_admonition_for_examples = False
