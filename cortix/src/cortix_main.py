@@ -141,22 +141,23 @@ class Cortix:
             # Parallel run all modules in Python multiprocessing
             processes = list()
             modules_new_state = Queue()
+
             for mod in self.modules:
                 self.log.info('Launching Module {}'.format(mod))
-                p = Process(target=mod.run, args=(modules_new_state,))
+                p = Process(target=mod.run,
+                        args=( modules_new_state, self.modules.index(mod)) )
                 processes.append(p)
                 p.start()
 
+            # Update module states in the parent process
+            for q in range(len(processes)):
+                (mod_idx, new_state) = modules_new_state.get()
+                self.modules[mod_idx].state = new_state
+                self.log.info('Module {} getting new state'.format(self.modules[mod_idx]))
+
             # Synchronize at the end
-            for (p,mod) in zip(processes, self.modules):
-                self.log.info('Sync Module {}'.format(mod))
+            for p in processes:
                 p.join()
-
-            assert modules_new_state.qsize() == len(self.modules)
-
-            for mod in self.modules:
-                self.log.info('Module {} getting new state'.format(mod))
-                mod.state = modules_new_state.get()
 
         # Record time at the end of the run method
         if self.rank == 0 or not self.use_mpi:

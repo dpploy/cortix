@@ -88,7 +88,7 @@ class Module:
         assert isinstance(connected_port, Port), "Connecting port must be of Port type"
         my_port.connect(connected_port)
 
-    def run(self, state_comm=None):
+    def run(self, state_comm=None, idx_comm=None):
         '''
         Run method.
 
@@ -98,6 +98,8 @@ class Module:
             When using the Python `multiprocessing` library `state_comm` must have
             the module's `self.state` in it. That is, `state_comm.put(self.state)`
             must be the last command in the method before `return`.
+
+        idx: index of the state in the communication queue.
         '''
         raise NotImplementedError('Module must implement run()')
 

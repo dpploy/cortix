@@ -35,9 +35,9 @@ class DataPlot(Module):
 
         self.data = dict()
 
-        self.state = None
+        self.state = self.data
 
-    def run(self, state_comm=None):
+    def run(self, state_comm=None, idx_comm=None):
         '''
         Spawn a thread to handle each port connection.
         '''
@@ -58,11 +58,9 @@ class DataPlot(Module):
             try:
                 pickle.dumps(self.state)
             except pickle.PicklingError:
-                state_comm.put(None)
+                state_comm.put((idx_comm,None))
             else:
-                state_comm.put(self.state)
-
-        print('dataplot: done')
+                state_comm.put((idx_comm,self.state))
 
         return
 

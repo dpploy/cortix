@@ -112,7 +112,7 @@ class Droplet(Module):
 
         self.state = self.liquid_phase
 
-    def run(self, state_comm=None):
+    def run(self, state_comm=None, idx_comm=None):
 
         time = self.initial_time
 
@@ -157,11 +157,9 @@ class Droplet(Module):
             try:
                 pickle.dumps(self.state)
             except pickle.PicklingError:
-                state_comm.put(None)
+                state_comm.put((idx_comm,None))
             else:
-                state_comm.put(self.state)
-
-        print('droplet: done')
+                state_comm.put((idx_comm,self.state))
 
         return
 

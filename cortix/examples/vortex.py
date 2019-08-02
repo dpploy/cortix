@@ -64,7 +64,7 @@ class Vortex(Module):
 
         self.state = None
 
-    def run(self, state_comm=None):
+    def run(self, state_comm=None, idx_comm=None):
 
         # namedtuple does not pickle into send message; investigate later: vfda TODO
         #Props = namedtuple('Props',['mass_density','dyn_viscosity'])
@@ -99,11 +99,9 @@ class Vortex(Module):
             try:
               pickle.dumps(self.state)
             except pickle.PicklingError:
-                state_comm.put(None)
+                state_comm.put((idx_comm,None))
             else:
-                state_comm.put(self.state)
-
-        print('vortex: done')
+                state_comm.put((idx_comm,self.state))
 
         return
 
