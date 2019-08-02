@@ -60,7 +60,7 @@ class Vortex(Module):
 
         self.period = 20 # wind change period
 
-    def run(self):
+    def run(self, state_comm=None):
 
         # namedtuple does not pickle into send message; investigate later: vfda TODO
         #Props = namedtuple('Props',['mass_density','dyn_viscosity'])
@@ -89,6 +89,11 @@ class Vortex(Module):
                 port.send( (message_time, velocity, fluid_props) )
 
             time += self.time_step
+
+        if state_comm:
+            state_comm.put(self.state)
+
+        return
 
     def compute_velocity(self, time, position):
         '''

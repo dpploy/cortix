@@ -108,7 +108,7 @@ class Droplet(Module):
         medium_dyn_viscosity = 1.81e-5 # kg/(m s)
         self.ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
 
-    def run(self):
+    def run(self, state_comm=None):
 
         time = self.initial_time
 
@@ -149,7 +149,10 @@ class Droplet(Module):
 
         self.send('DONE', 'visualization') # this should not be needed: TODO
 
-        #self.__save_state()
+        if state_comm:
+            state_comm.put(self.state)
+
+        return
 
     def rhs_fn(self, u_vec, t, params):
         drop_pos = u_vec[:3]

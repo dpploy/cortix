@@ -24,6 +24,7 @@ class Cortix:
     def __init__(self, use_mpi=False, splash=True):
 
         self.use_mpi = use_mpi
+
         self.comm = None
         self.rank = None
         self.size = None
@@ -41,7 +42,6 @@ class Cortix:
                 self.use_mpi = False
 
         # Setup the global logger 
-
         self.__create_logger()
 
         # Setup the network graph
@@ -140,15 +140,21 @@ class Cortix:
 
             # Parallel run all modules in Python multiprocessing
             processes = list()
+            modules_new_state = Queue()
             for mod in self.modules:
                 self.log.info('Launching Module {}'.format(mod))
-                p = Process(target=mod.run)
+                p = Process(target=mod.run, args=(modules_new_state,))
                 processes.append(p)
                 p.start()
 
             # Synchronize at the end
             for p in processes:
                 p.join()
+
+            assert modules_new_state.qsize() == len(self.modules)
+
+            for mod in self.modules:
+                mod.state = modules_new_state.get()
 
         # Record time at the end of the run method
         if self.rank == 0 or not self.use_mpi:

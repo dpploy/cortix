@@ -6,6 +6,7 @@
 import sys
 import logging
 from threading import Thread
+
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib
 matplotlib.use('Agg', warn=False)
@@ -36,7 +37,7 @@ class DataPlot(Module):
         self.data = dict()
         self.data_file_name = 'data_plot.pkl'
 
-    def run(self):
+    def run(self, state_comm=None):
         '''
         Spawn a thread to handle each port connection
         '''
@@ -55,6 +56,11 @@ class DataPlot(Module):
 
         # Save data dict; TODO this should not be here but self.data vanishes after run()
         pickle.dump( self.data, open(self.data_file_name,'wb') )
+
+        if state_comm:
+            state_comm.put(self.state)
+
+        return
 
     def recv_data(self, port):
         '''
