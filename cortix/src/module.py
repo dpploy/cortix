@@ -99,7 +99,7 @@ class Module:
             the module's `self.state` in it. That is, `state_comm.put(self.state)`
             must be the last command in the method before `return`.
 
-        idx: index of the state in the communication queue.
+        idx_comm: index of the state in the communication queue.
         '''
         raise NotImplementedError('Module must implement run()')
 

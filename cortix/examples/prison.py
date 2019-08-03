@@ -9,108 +9,92 @@ import numpy as np
 import scipy.constants as const
 from scipy.integrate import odeint
 from cortix.src.module import Module
-from cortix.support.phase import Phase
-from cortix.support.specie import Specie
 from cortix.support.quantity import Quantity
 
-class Droplet(Module):
+class Prison(Module):
     '''
-    Droplet Cortix module used to model very simple fluid-particle interactions.
+    Prison Cortix module used to model criminal group population in a prison.
 
     Note
     ----
-    `external-flow`: this is a `port` that exchanges data with any other module that
-    provides information about the flow outside the droplet.
+    `parole`: this is a `port` for the rate of population groups to/from the
+        parole domain.
 
-    `visualization`: this is a `port` that sends data to a visualization module.
+    `street`: this is a `port` for the rate of population groups to/from the Street
+        (Awaiting Adjugation) domain.
+
+    `jail`: this is a `port` for the rate of population groups to/from the Jail
+        domain module.
     '''
 
     def __init__(self):
 
         super().__init__()
 
-        self.bounce = True
-        self.slip   = True
-
-        species = list()
         quantities = list()
-
         self.ode_params = dict()
 
         self.initial_time = 0.0
         self.end_time = 100
         self.time_step = 0.1
 
-        # Create a drop with random diameter up within 5 and 8 mm.
-        self.droplet_diameter = (np.random.random(1) * (8 - 5) + 5)[0] * const.milli
-        self.ode_params['droplet-diameter'] = self.droplet_diameter
-        self.ode_params['droplet-xsec-area'] = np.pi * (self.droplet_diameter/2.0)**2
-        self.ode_params['gravity'] = const.g
+        # Population group 1
+        factor = 100.0
+        g1_prison = Quantity(name='g1-prison', formalName='grp-1-prison',
+                unit='individual', value=np.random.random()*factor)
+        quantities.append(g1_prison)
 
-        # Species in the liquid phase
-        water = Specie(name='water', formula_name='H2O(l)', phase='liquid', \
-                atoms=['2*H','O'])
-        water.massCC =  0.99965 # [g/cc]
-        water.massCCUnit = 'g/cc'
-        water.molarCCUnit = 'mole/cc'
-        species.append(water)
+        g2_prison = Quantity(name='g2-prison', formalName='grp-2-prison',
+                unit='individual', value=np.random.random()*factor)
+        quantities.append(g2_prison)
 
-        droplet_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * water.massCC * \
-                const.gram / const.centi**3  # [kg]
-        self.ode_params['droplet-mass'] = droplet_mass
+        g3_prison = Quantity(name='g3-prison', formalName='grp-3-prison',
+                unit='individual', value=np.random.random()*factor)
+        quantities.append(g3_prison)
 
-        # Spatial position
-        x_0 = np.zeros(3)
-        position = Quantity(name='position', formalName='Pos.', unit='m', value=x_0)
-        quantities.append(position)
+        factor = 80.0
+        g1_parole = Quantity(name='g1-parole', formalName='grp-1-parole',
+                unit='individual', value=np.random.random()*factor)
+        quantities.append(g1_parole)
 
-        # Velocity
-        v_0 = np.zeros(3)
-        velocity = Quantity(name='velocity', formalName='Veloc.', unit='m/s', value=v_0)
-        quantities.append(velocity)
+        factor = 30.0
+        g2_street = Quantity(name='g2-street', formalName='grp-2-street',
+                unit='individual', value=np.random.random()*factor)
+        quantities.append(g2_street)
 
-        # Speed
-        speed = Quantity(name='speed', formalName='Speed', unit='m/s', value=0.0)
-        quantities.append(speed)
+        factor = 30.0
+        g3_street = Quantity(name='g3-street', formalName='grp-3-street',
+                unit='individual', value=np.random.random()*factor)
+        quantities.append(g3_street)
 
-        # Radial position
-        radial_pos = Quantity(name='radial-position', formalName='Radius', unit='m', \
-                value=np.linalg.norm(x_0[0:2]))
-        quantities.append(radial_pos)
+        factor = 20.0
+        g1_jail = Quantity(name='g1-jail', formalName='grp-1-jail',
+                unit='individual', value=np.random.random()*factor)
+        quantities.append(g1_jail)
 
-        # Liquid phase 
-        self.liquid_phase = Phase(self.initial_time, time_unit='s', species=species, \
-                quantities=quantities)
-        self.liquid_phase.SetValue('water', water.massCC, self.initial_time)
+        g2_jail = Quantity(name='g2-jail', formalName='grp-2-jail',
+                unit='individual', value=np.random.random()*factor)
+        quantities.append(g2_jail)
 
-        # Domain box dimensions: LxLxH m^3 box with given H.
-        # Origin of cartesian coordinate system at the bottom of the box. 
-        # z coordinate pointing upwards. -L <= x <= L, -L <= y <= L, 
-        self.box_half_length = 250.0 # L [m]
-        self.box_height = 500.0 # H [m]
+        g3_jail = Quantity(name='g3-jail', formalName='grp-3-jail',
+                unit='individual', value=np.random.random()*factor)
+        quantities.append(g3_jail)
 
-        # Random positioning of the droplet constrained to a box sub-region.
-        x_0 = (2 * np.random.random(3) - np.ones(3)) * self.box_half_length / 4.0
-        x_0[2] = self.box_height
-        self.liquid_phase.SetValue('position', x_0, self.initial_time)
+        # Model parameters (group- and time-dependent)
+        self.prison_unconditional_release_rate = 0.2
+        self.ode_params['prison-unconditional-release-rate'] =
+                self.prison_unconditional_release_rate
 
-        # Droplet Initial velocity = 0 -> placed still in the flow
-        self.liquid_phase.SetValue('velocity', np.array([0.0,0.0,0.0]), \
-                self.initial_time)
+        self.prison_release_rate_mod = 0.12
+        self.ode_params['prison-release-rate-mod'] = self.prison_release_rate_mod
 
-        # Default value for the medium surrounding the droplet if data is not passed
-        # through a conneted port.
-        medium_mass_density = 0.1 * const.gram / const.centi**3 # [kg/m^3]
-        self.ode_params['medium-mass-density'] = medium_mass_density
+        self.parole_rate = 0.11
+        self.ode_params['parole-rate'] = self.parole_rate
 
-        medium_displaced_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * \
-                medium_mass_density # [kg]
-        self.ode_params['medium-displaced-mass'] = medium_displaced_mass
+        self.parole_rate_mod = 0.08
+        self.ode_params['parole-rate-mod'] = self.parole_rate_mod
 
-        medium_dyn_viscosity = 1.81e-5 # kg/(m s)
-        self.ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
-
-        self.state = self.liquid_phase
+        return
 
     def run(self, state_comm=None, idx_comm=None):
 
@@ -118,40 +102,20 @@ class Droplet(Module):
 
         while time < self.end_time:
 
-            # Interactions in the external-flow port
-            #---------------------------------------
+            # Interactions in the parole port
+            #--------------------------------
 
-            position = self.liquid_phase.GetValue('position')
-            self.send( (time,position), 'external-flow' )
+            self.send( time )
 
-            (check_time, velocity,fluid_props) = self.recv( 'external-flow' )
+            (check_time, g1_parole_return_rate) = recv('parole')
 
             assert abs(check_time-time) <= 1e-6
-            self.ode_params['flow-velocity'] = velocity
-            #medium_mass_density  = fluid_props.mass_density  # see Vortex
-            #medium_dyn_viscosity = fluid_props.dyn_viscosity # see Vortex
-            medium_mass_density  = fluid_props[0]
-            medium_dyn_viscosity = fluid_props[1]
+            self.ode_params['g1_parole_return_rate'] = g1_parole_return_rate
 
-            self.ode_params['medium-mass-density'] = medium_mass_density
-
-            medium_displaced_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * \
-                    medium_mass_density # [kg]
-            self.ode_params['medium-displaced-mass'] = medium_displaced_mass
-
-            self.ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
-
-            # Interactions in the visualization port
-            #---------------------------------------
-
-            self.send( position, 'visualization' )
-
-            # Evolve droplet state to next time stamp
-            #----------------------------------------
+            # Evolve prison group population to the next time stamp
+            #------------------------------------------------------
 
             time = self.step( time )
-
-        self.send('DONE', 'visualization') # this should not be needed: TODO
 
         if state_comm:
             try:
@@ -160,8 +124,6 @@ class Droplet(Module):
                 state_comm.put((idx_comm,None))
             else:
                 state_comm.put((idx_comm,self.state))
-
-        return
 
     def rhs_fn(self, u_vec, t, params):
         drop_pos = u_vec[:3]
@@ -265,7 +227,3 @@ class Droplet(Module):
         self.liquid_phase.SetValue('radial-position', np.linalg.norm(u_vec[0:2]), time)
 
         return time
-
-    def _get_reserved_port_names(self):
-
-        return ['external-flow','visualization']

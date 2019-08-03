@@ -24,8 +24,8 @@ class Port:
             from mpi4py import MPI
             self.comm = MPI.COMM_WORLD
             self.rank = None
-
-        self.q = Queue()    # only passes picke-able objects
+        else:
+            self.q = Queue()    # only passes picke-able objects
 
         self.connected_port = None # the `other` port connected to `this` port
 
@@ -35,7 +35,7 @@ class Port:
 
         `port`: A Port object that represents the port to connect to.
         '''
-        assert isinstance(port, Port), "Connecting port must be of Port type"
+        assert isinstance(port, Port), 'Connecting port must be of Port type'
 
         self.connected_port = port
         port.connected_port = self
@@ -63,7 +63,8 @@ class Port:
         '''
         if self.connected_port:
             if self.use_mpi:
-                return self.comm.recv(source=self.connected_port.rank, tag=self.connected_port.id)
+                return self.comm.recv(source=self.connected_port.rank,
+                        tag=self.connected_port.id)
             else:
                 return self.connected_port.q.get()
 
