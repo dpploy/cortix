@@ -33,7 +33,7 @@ class Probation(Module):
     `visualization`: this is a `port` that sends data to a visualization module.
     '''
 
-    def __init__(self, n_groups=1):
+    def __init__(self, n_groups=1, pool_size=0.0):
 
         super().__init__()
 
@@ -46,10 +46,9 @@ class Probation(Module):
 
         # Population groups
         self.n_groups = n_groups
-        factor = 0.0
 
         # Probation population groups
-        fbg_0 = np.random.random(self.n_groups) * factor
+        fbg_0 = np.random.random(self.n_groups) * pool_size
         fbg = Quantity(name='fbg', formalName='probation-pop-grps',
                 unit='individual', value=fbg_0)
         quantities.append(fbg)

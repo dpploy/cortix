@@ -33,7 +33,7 @@ class Prison(Module):
     `visualization`: this is a `port` that sends data to a visualization module.
     '''
 
-    def __init__(self, n_groups=1):
+    def __init__(self, n_groups=1, pool_size=0.0):
 
         super().__init__()
 
@@ -46,10 +46,9 @@ class Prison(Module):
 
         # Population groups
         self.n_groups = n_groups
-        factor = 0.0
 
         # Prison population groups
-        fpg_0 = np.random.random(self.n_groups) * factor
+        fpg_0 = np.random.random(self.n_groups) * pool_size
         fpg = Quantity(name='fpg', formalName='prison-pop-grps',
                 unit='individual', value=fpg_0)
         quantities.append(fpg)

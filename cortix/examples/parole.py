@@ -27,7 +27,7 @@ class Parole(Module):
     `visualization`: this is a `port` that sends data to a visualization module.
     '''
 
-    def __init__(self, n_groups=1):
+    def __init__(self, n_groups=1, pool_size=0.0):
 
         super().__init__()
 
@@ -40,10 +40,9 @@ class Parole(Module):
 
         # Population groups
         self.n_groups = n_groups
-        factor = 0.0
 
         # Parole population groups
-        feg_0 = np.random.random(self.n_groups) * factor
+        feg_0 = np.random.random(self.n_groups) * pool_size
         feg = Quantity(name='feg', formalName='parole-pop-grps',
                 unit='individual', value=feg_0)
         quantities.append(feg)

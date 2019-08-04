@@ -12,9 +12,9 @@ from cortix.src.module import Module
 from cortix.support.phase import Phase
 from cortix.support.quantity import Quantity
 
-class Arrested(Module):
+class Community(Module):
     '''
-    Arrested Cortix module used to model criminal group population in a arrested system.
+    Community Cortix module used to model criminal group population in a community system.
 
     Note
     ----

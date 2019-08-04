@@ -36,7 +36,7 @@ class Jail(Module):
     `visualization`: this is a `port` that sends data to a visualization module.
     '''
 
-    def __init__(self, n_groups=1):
+    def __init__(self, n_groups=1, pool_size=0.0):
 
         super().__init__()
 
@@ -49,10 +49,9 @@ class Jail(Module):
 
         # Population groups
         self.n_groups = n_groups
-        factor = 0.0
 
         # Jail population groups
-        fjg_0 = np.random.random(self.n_groups) * factor
+        fjg_0 = np.random.random(self.n_groups) * pool_size
         fjg = Quantity(name='fjg', formalName='jail-pop-grps',
                 unit='individual', value=fjg_0)
         quantities.append(fjg)
