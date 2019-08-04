@@ -23,7 +23,7 @@ Crimninal justice example in progress.
 if __name__ == "__main__":
 
     # Configuration Parameters
-    use_mpi = False # True for MPI; False for Python multiprocessing
+    use_mpi = True  # True for MPI; False for Python multiprocessing
 
     end_time  = 200 * const.day
     time_step = 0.5 * const.day
@@ -65,6 +65,7 @@ if __name__ == "__main__":
     cortix.add_module(community)
     community.end_time = end_time
     community.time_step = time_step
+    community.show_time = (True,10*const.day)
 
     prison.connect( 'parole', parole.get_port('prison') )
     adjudication.connect( 'prison', prison.get_port('adjudication') )

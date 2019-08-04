@@ -50,6 +50,8 @@ class Community(Module):
         self.end_time     = 100 * const.day
         self.time_step    = 0.5 * const.day
 
+        self.show_time = (False,10*const.day)
+
         # Population groups
         self.n_groups = n_groups
 
@@ -114,6 +116,9 @@ class Community(Module):
         time = self.initial_time
 
         while time < self.end_time:
+
+            if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
+                print('Community::time[d] =',round(time,1)/const.day)
 
             # Interactions in the jail port
             #--------------------------------
