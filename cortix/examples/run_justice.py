@@ -12,6 +12,7 @@ from cortix.examples.prison import Prison
 from cortix.examples.parole import Parole
 from cortix.examples.adjudication import Adjudication
 from cortix.examples.jail import Jail
+from cortix.examples.arrested import Arrested
 
 '''
 Crimninal justice example in progress.
@@ -24,7 +25,7 @@ if __name__ == "__main__":
 
     end_time  = 200 * const.day
     time_step = 0.5 * const.day
-    n_groups  = 5   # number of population groups
+    n_groups  = 450 # number of population groups
 
     cortix = Cortix(use_mpi=use_mpi)
 
@@ -48,10 +49,17 @@ if __name__ == "__main__":
     jail.end_time = end_time
     jail.time_step = time_step
 
+    arrested = Arrested(n_groups=n_groups)
+    cortix.add_module(arrested)
+    arrested.end_time = end_time
+    arrested.time_step = time_step
+
     prison.connect( 'parole', parole.get_port('prison') )
     adjudication.connect( 'prison', prison.get_port('adjudication') )
     jail.connect( 'prison', prison.get_port('jail') )
     jail.connect( 'adjudication', adjudication.get_port('jail') )
+    arrested.connect( 'jail', jail.get_port('arrested') )
+    arrested.connect( 'adjudication', adjudication.get_port('arrested') )
 
     cortix.draw_network('network.png')
 

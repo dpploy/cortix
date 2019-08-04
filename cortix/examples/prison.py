@@ -104,18 +104,22 @@ class Prison(Module):
 
             # Interactions in the parole port
             #--------------------------------
+            # two way "from" and "to" parole
 
+            # from
             self.send( time, 'parole' )
             (check_time, parole_inflow_rates) = self.recv('parole')
             assert abs(check_time-time) <= 1e-6
             self.ode_params['parole-inflow-rates'] = parole_inflow_rates
 
+            # to
             message_time = self.recv('parole')
             parole_outflow_rates = self.compute_outflow_rates( message_time, 'parole' )
             self.send( (message_time, parole_outflow_rates), 'parole' )
 
             # Interactions in the adjudication port
             #------------------------------------
+            # one way "from" adjudication
 
             self.send( time, 'adjudication' )
             (check_time, adjudication_inflow_rates) = self.recv('adjudication')
@@ -124,6 +128,7 @@ class Prison(Module):
 
             # Interactions in the jail port
             #------------------------------
+            # one way "from" prison
 
             self.send( time, 'jail' )
             (check_time, jail_inflow_rates) = self.recv('jail')

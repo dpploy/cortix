@@ -107,6 +107,7 @@ class Jail(Module):
 
             # Interactions in the prison port
             #--------------------------------
+            # one way "to" prison
 
             message_time = self.recv('prison')
             prison_outflow_rates = self.compute_outflow_rates( message_time, 'prison' )
@@ -114,6 +115,7 @@ class Jail(Module):
 
             # Interactions in the adjudication port
             #------------------------------------
+            # one way "from" adjudication
 
             self.send( time, 'adjudication' )
             (check_time, adjudication_inflow_rates) = self.recv('adjudication')
@@ -122,8 +124,12 @@ class Jail(Module):
 
             # Interactions in the arrested port
             #----------------------------------
+            # one way "from" arrested
 
-            self.ode_params['arrested-inflow-rates'] = np.ones(self.n_groups) / const.day
+            self.send( time, 'arrested' )
+            (check_time, arrested_inflow_rates) = self.recv('arrested')
+            assert abs(check_time-time) <= 1e-6
+            self.ode_params['arrested-inflow-rates'] = arrested_inflow_rates
 
             # Interactions in the probation port
             #-----------------------------------

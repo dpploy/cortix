@@ -98,11 +98,14 @@ class Parole(Module):
 
             # Interactions in the prison port
             #--------------------------------
+            # two way "to" and "from" prison
 
+            # to
             message_time = self.recv('prison')
             prison_outflow_rates = self.compute_outflow_rates( message_time, 'prison' )
             self.send( (message_time, prison_outflow_rates), 'prison' )
 
+            # from
             self.send( time, 'prison' )
             (check_time, prison_inflow_rates) = self.recv('prison')
             assert abs(check_time-time) <= 1e-6
