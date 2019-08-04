@@ -44,7 +44,7 @@ class Parole(Module):
 
         # Parole population groups
         feg_0 = np.random.random(self.n_groups) * factor
-        feg = Quantity(name='feg', formalName='prision-pop-grps',
+        feg = Quantity(name='feg', formalName='parole-pop-grps',
                 unit='individual', value=feg_0)
         quantities.append(feg)
 

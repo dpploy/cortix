@@ -125,7 +125,10 @@ class Prison(Module):
             # Interactions in the jail port
             #------------------------------
 
-            self.ode_params['jail-inflow-rates'] = np.ones(self.n_groups) / const.day
+            self.send( time, 'jail' )
+            (check_time, jail_inflow_rates) = self.recv('jail')
+            assert abs(check_time-time) <= 1e-6
+            self.ode_params['jail-inflow-rates'] = jail_inflow_rates
 
             # Interactions in the freedom port
             #------------------------------

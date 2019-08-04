@@ -138,6 +138,13 @@ class Adjudication(Module):
             prison_outflow_rates = self.compute_outflow_rates( message_time, 'prison' )
             self.send( (message_time, prison_outflow_rates), 'prison' )
 
+            # Interactions in the jail port
+            #------------------------------
+
+            message_time = self.recv('jail')
+            jail_outflow_rates = self.compute_outflow_rates( message_time, 'jail' )
+            self.send( (message_time, jail_outflow_rates), 'jail' )
+
             # Interactions in the arrested port
             #----------------------------------
 

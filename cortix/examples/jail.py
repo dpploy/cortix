@@ -115,9 +115,10 @@ class Jail(Module):
             # Interactions in the adjudication port
             #------------------------------------
 
-            message_time = self.recv('prison')
-            prison_outflow_rates = self.compute_outflow_rates( message_time, 'prison' )
-            self.send( (message_time, prison_outflow_rates), 'prison' )
+            self.send( time, 'adjudication' )
+            (check_time, adjudication_inflow_rates) = self.recv('adjudication')
+            assert abs(check_time-time) <= 1e-6
+            self.ode_params['adjudication-inflow-rates'] = adjudication_inflow_rates
 
             # Interactions in the arrested port
             #----------------------------------
@@ -159,23 +160,20 @@ class Jail(Module):
 
         fjg = u_vec  # prison population groups
 
-        arrested_inflow_rates = params['arrested-inflow-rates']
+        arrested_inflow_rates    = params['arrested-inflow-rates']
+        probation_inflow_rates   = params['probation-inflow-rates']
+        adjudication_inflow_rates = params['adjudication-inflow-rates']
 
-        inflow_rates  = arrested_inflow_rates
+        inflow_rates  = arrested_inflow_rates + probation_inflow_rates + \
+                        adjudication_inflow_rates
 
         cj0g = self.ode_params['commit-to-freedom-coeff-grps']
         mj0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
 
-        cajg = self.ode_params['commit-to-jail-coeff-grps']
-        majg = self.ode_params['commit-to-jail-coeff-mod-grps']
-
-        cabg = self.ode_params['commit-to-probation-coeff-grps']
-        mabg = self.ode_params['commit-to-probation-coeff-mod-grps']
-
         cjpg = self.ode_params['commit-to-prison-coeff-grps']
         mjpg = self.ode_params['commit-to-prison-coeff-mod-grps']
 
-        outflow_rates = ( cj0g * mj0g + cajg * majg + cabg * mabg + cjpg * mjpg ) * fjg
+        outflow_rates = ( cj0g * mj0g + cjpg * mjpg ) * fjg
 
         death_rates = params['prison-death-rates']
 
