@@ -199,7 +199,7 @@ class Cortix:
             return
 
         g = self.nx_graph if self.nx_graph else self.get_network()
-        colors = ['blue', 'red', 'green', 'teal', 'orange', 'brown']
+        colors = ['blue', 'red', 'green', 'pink', 'orange', 'brown']
         class_map = {}
         color_map = {}
         for node in g.nodes():

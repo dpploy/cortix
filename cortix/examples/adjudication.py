@@ -49,7 +49,7 @@ class Adjudication(Module):
 
         # Population groups
         self.n_groups = n_groups
-        factor = 100.0 # percent basis
+        factor = 0.0
 
         # Adjudication population groups
         fag_0 = np.random.random(self.n_groups) * factor
@@ -155,6 +155,14 @@ class Adjudication(Module):
             (check_time, arrested_inflow_rates) = self.recv('arrested')
             assert abs(check_time-time) <= 1e-6
             self.ode_params['arrested-inflow-rates'] = arrested_inflow_rates
+
+            # Interactions in the probation port
+            #-----------------------------------
+            # one way "to" probation
+
+            message_time = self.recv('probation')
+            probation_outflow_rates = self.compute_outflow_rates( message_time, 'probation' )
+            self.send( (message_time, probation_outflow_rates), 'probation' )
 
             # Interactions in the freedom port
             #------------------------------

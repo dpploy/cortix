@@ -46,7 +46,7 @@ class Prison(Module):
 
         # Population groups
         self.n_groups = n_groups
-        factor = 100.0 # percent basis
+        factor = 0.0
 
         # Prison population groups
         fpg_0 = np.random.random(self.n_groups) * factor

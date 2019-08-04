@@ -12,23 +12,20 @@ from cortix.src.module import Module
 from cortix.support.phase import Phase
 from cortix.support.quantity import Quantity
 
-class Jail(Module):
+class Probation(Module):
     '''
-    Jail Cortix module used to model criminal group population in a jail.
+    Probation Cortix module used to model criminal group population in a probation.
 
     Note
     ----
-    `probation`: this is a `port` for the rate of population groups to/from the
-        Probation domain.
-
     `adjudication`: this is a `port` for the rate of population groups to/from the
         Adjudication domain module.
 
     `arrested`: this is a `port` for the rate of population groups to/from the
         Arrested domain module.
 
-    `prison`: this is a `port` for the rate of population groups to/from the
-        Prison domain module.
+    `jail`: this is a `port` for the rate of population groups to/from the
+        Jail domain module.
 
     `freedom`: this is a `port` for the rate of population groups to/from the Freedom
         domain module.
@@ -51,48 +48,48 @@ class Jail(Module):
         self.n_groups = n_groups
         factor = 0.0
 
-        # Jail population groups
-        fjg_0 = np.random.random(self.n_groups) * factor
-        fjg = Quantity(name='fjg', formalName='jail-pop-grps',
-                unit='individual', value=fjg_0)
-        quantities.append(fjg)
+        # Probation population groups
+        fbg_0 = np.random.random(self.n_groups) * factor
+        fbg = Quantity(name='fbg', formalName='probation-pop-grps',
+                unit='individual', value=fbg_0)
+        quantities.append(fbg)
 
         # Model parameters: commitment coefficients and their modifiers
 
-        # Jail to freedom
-        cj0g_0 = np.random.random(self.n_groups) / const.day
-        cj0g = Quantity(name='cj0g', formalName='commit-freedom-coeff-grps',
-               unit='individual', value=cj0g_0)
-        self.ode_params['commit-to-freedom-coeff-grps'] = cj0g_0
-        quantities.append(cj0g)
+        # Probation to freedom
+        cb0g_0 = np.random.random(self.n_groups) / const.day
+        cb0g = Quantity(name='cb0g', formalName='commit-freedom-coeff-grps',
+               unit='individual', value=cb0g_0)
+        self.ode_params['commit-to-freedom-coeff-grps'] = cb0g_0
+        quantities.append(cb0g)
 
-        mj0g_0 = np.random.random(self.n_groups)
-        mj0g = Quantity(name='mj0g', formalName='commit-freedom-coeff-mod-grps',
-               unit='individual', value=mj0g_0)
-        self.ode_params['commit-to-freedom-coeff-mod-grps'] = mj0g_0
-        quantities.append(mj0g)
+        mb0g_0 = np.random.random(self.n_groups)
+        mb0g = Quantity(name='mb0g', formalName='commit-freedom-coeff-mod-grps',
+               unit='individual', value=mb0g_0)
+        self.ode_params['commit-to-freedom-coeff-mod-grps'] = mb0g_0
+        quantities.append(mb0g)
 
-        # Jail to prison    
-        cjpg_0 = np.random.random(self.n_groups) / const.day
-        cjpg = Quantity(name='cjpg', formalName='commit-prison-coeff-grps',
-               unit='individual', value=cjpg_0)
-        self.ode_params['commit-to-prison-coeff-grps'] = cjpg_0
-        quantities.append(cjpg)
+        # Probation to jail
+        cbjg_0 = np.random.random(self.n_groups) / const.day
+        cbjg = Quantity(name='cbjg', formalName='commit-jail-coeff-grps',
+               unit='individual', value=cbjg_0)
+        self.ode_params['commit-to-jail-coeff-grps'] = cbjg_0
+        quantities.append(cbjg)
 
-        mjpg_0 = np.random.random(self.n_groups)
-        mjpg = Quantity(name='mjpg', formalName='commit-prison-coeff-mod-grps',
-               unit='individual', value=mjpg_0)
-        self.ode_params['commit-to-prison-coeff-mod-grps'] = mjpg_0
-        quantities.append(mjpg)
+        mbjg_0 = np.random.random(self.n_groups)
+        mbjg = Quantity(name='mbjg', formalName='commit-jail-coeff-mod-grps',
+               unit='individual', value=mbjg_0)
+        self.ode_params['commit-to-jail-coeff-mod-grps'] = mbjg_0
+        quantities.append(mbjg)
 
         # Death term
-        self.ode_params['jail-death-rates'] = np.zeros(self.n_groups)
+        self.ode_params['probation-death-rates'] = np.zeros(self.n_groups)
 
         # Phase state
         self.population_phase = Phase(self.initial_time, time_unit='s',
                 quantities=quantities)
 
-        self.population_phase.SetValue('fjg', fjg_0, self.initial_time)
+        self.population_phase.SetValue('fbg', fbg_0, self.initial_time)
 
         # Set the state to the phase state
         self.state = self.population_phase
@@ -105,13 +102,13 @@ class Jail(Module):
 
         while time < self.end_time:
 
-            # Interactions in the prison port
-            #--------------------------------
-            # one way "to" prison
+            # Interactions in the jail port
+            #------------------------------
+            # one way "to" jail
 
-            message_time = self.recv('prison')
-            prison_outflow_rates = self.compute_outflow_rates( message_time, 'prison' )
-            self.send( (message_time, prison_outflow_rates), 'prison' )
+            message_time = self.recv('jail')
+            jail_outflow_rates = self.compute_outflow_rates( message_time, 'jail' )
+            self.send( (message_time, jail_outflow_rates), 'jail' )
 
             # Interactions in the adjudication port
             #------------------------------------
@@ -131,15 +128,6 @@ class Jail(Module):
             assert abs(check_time-time) <= 1e-6
             self.ode_params['arrested-inflow-rates'] = arrested_inflow_rates
 
-            # Interactions in the probation port
-            #-----------------------------------
-            # one way "from" probation
-
-            self.send( time, 'probation' )
-            (check_time, probation_inflow_rates) = self.recv('probation')
-            assert abs(check_time-time) <= 1e-6
-            self.ode_params['probation-inflow-rates'] = probation_inflow_rates
-
             # Interactions in the freedom port
             #------------------------------
 
@@ -148,11 +136,11 @@ class Jail(Module):
             # Interactions in the visualization port
             #---------------------------------------
 
-            fjg = self.population_phase.GetValue('fjg')
-            self.send( fjg, 'visualization' )
+            fbg = self.population_phase.GetValue('fbg')
+            self.send( fbg, 'visualization' )
 
-            # Evolve jail group population to the next time stamp
-            #----------------------------------------------------
+            # Evolve probation group population to the next time stamp
+            #---------------------------------------------------------
 
             time = self.step( time )
 
@@ -168,28 +156,26 @@ class Jail(Module):
 
     def rhs_fn(self, u_vec, t, params):
 
-        fjg = u_vec  # jail population groups
+        fbg = u_vec  # probation population groups
 
-        arrested_inflow_rates    = params['arrested-inflow-rates']
-        probation_inflow_rates   = params['probation-inflow-rates']
+        arrested_inflow_rates     = params['arrested-inflow-rates']
         adjudication_inflow_rates = params['adjudication-inflow-rates']
 
-        inflow_rates  = arrested_inflow_rates + probation_inflow_rates + \
-                        adjudication_inflow_rates
+        inflow_rates  = arrested_inflow_rates + adjudication_inflow_rates
 
-        cj0g = self.ode_params['commit-to-freedom-coeff-grps']
-        mj0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
+        cb0g = self.ode_params['commit-to-freedom-coeff-grps']
+        mb0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
 
-        cjpg = self.ode_params['commit-to-prison-coeff-grps']
-        mjpg = self.ode_params['commit-to-prison-coeff-mod-grps']
+        cbjg = self.ode_params['commit-to-jail-coeff-grps']
+        mbjg = self.ode_params['commit-to-jail-coeff-mod-grps']
 
-        outflow_rates = ( cj0g * mj0g + cjpg * mjpg ) * fjg
+        outflow_rates = ( cb0g * mb0g + cbjg * mbjg ) * fbg
 
-        death_rates = params['jail-death-rates']
+        death_rates = params['probation-death-rates']
 
-        dt_fjg = inflow_rates - outflow_rates - death_rates
+        dt_fbg = inflow_rates - outflow_rates - death_rates
 
-        return dt_fjg
+        return dt_fbg
 
     def step(self, time=0.0):
         r'''
@@ -209,7 +195,7 @@ class Jail(Module):
         None
         '''
 
-        u_vec_0 = self.population_phase.GetValue('fjg', time)
+        u_vec_0 = self.population_phase.GetValue('fbg', time)
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
         (u_vec_hist, info_dict) = odeint(self.rhs_fn,
@@ -228,26 +214,28 @@ class Jail(Module):
         self.population_phase.AddRow(time, values)
 
         # Update current values
-        self.population_phase.SetValue('fjg', u_vec, time)
+        self.population_phase.SetValue('fbg', u_vec, time)
 
         return time
 
     def compute_outflow_rates(self, time, name):
 
-        fjg = self.population_phase.GetValue('fjg',time)
+        fbg = self.population_phase.GetValue('fbg',time)
 
-        if name == 'prison':
+        if name == 'jail':
 
-            cjpg = self.ode_params['commit-to-prison-coeff-grps']
-            mjpg = self.ode_params['commit-to-prison-coeff-mod-grps']
+            cbjg = self.ode_params['commit-to-jail-coeff-grps']
+            mbjg = self.ode_params['commit-to-jail-coeff-mod-grps']
 
-            outflow_rates = cjpg * mjpg * fjg
+            outflow_rates = cbjg * mbjg * fbg
+
+            return outflow_rates
 
         if name == 'freedom':
 
-            cj0g = self.ode_params['commit-to-freedom-coeff-grps']
-            mj0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
+            cb0g = self.ode_params['commit-to-freedom-coeff-grps']
+            mb0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
 
-            outflow_rates = cj0g * mj0g * fjg
+            outflow_rates = cb0g * mb0g * fbg
 
-        return outflow_rates
+            return outflow_rates
