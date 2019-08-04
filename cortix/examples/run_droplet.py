@@ -85,7 +85,7 @@ if __name__ == '__main__':
         data_plot = DataPlot()
         cortix.add_module(data_plot)
         data_plot.title = 'Droplet Trajectories'
-        data_plot.same_axes = True
+        data_plot.same_axis = True
         data_plot.dpi = 300
 
         for i in range(n_droplets):

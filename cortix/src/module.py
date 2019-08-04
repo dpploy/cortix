@@ -27,10 +27,6 @@ class Module:
 
         if isinstance(port, str):
             port = self.get_port(port)
-            #matches = [p for p in self.ports if p.name == port]
-            #assert len(matches) == 1,\
-            #        'matches= %r port= %r, ports= %r'%(matches,port,self.ports)
-            #port = matches[0]
         elif isinstance(port, Port):
             assert port in self.ports, "Unknown port!"
         else:
@@ -45,9 +41,6 @@ class Module:
 
         if isinstance(port, str):
             port = self.get_port(port)
-            #matches = [p for p in self.ports if p.name == port]
-            #assert(len(matches) == 1)
-            #port = matches[0]
         elif isinstance(port, Port):
             assert port in self.ports, "Unknown port!"
         else:

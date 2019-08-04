@@ -9,6 +9,7 @@ import numpy as np
 import scipy.constants as const
 from scipy.integrate import odeint
 from cortix.src.module import Module
+from cortix.support.phase import Phase
 from cortix.support.quantity import Quantity
 
 class Prison(Module):
@@ -25,74 +26,73 @@ class Prison(Module):
 
     `jail`: this is a `port` for the rate of population groups to/from the Jail
         domain module.
+
+    `freedom`: this is a `port` for the rate of population groups to/from the Freedom
+        domain module.
+
+    `visualization`: this is a `port` that sends data to a visualization module.
     '''
 
-    def __init__(self):
+    def __init__(self, n_groups=1):
 
         super().__init__()
 
-        quantities = list()
+        quantities      = list()
         self.ode_params = dict()
 
-        self.initial_time = 0.0
-        self.end_time = 100
-        self.time_step = 0.1
+        self.initial_time = 0.0 * const.day
+        self.end_time     = 100 * const.day
+        self.time_step    = 0.5 * const.day
 
-        # Population group 1
-        factor = 100.0
-        g1_prison = Quantity(name='g1-prison', formalName='grp-1-prison',
-                unit='individual', value=np.random.random()*factor)
-        quantities.append(g1_prison)
+        # Population groups
+        self.n_groups = n_groups
+        factor = 50.0 # percent basis
 
-        g2_prison = Quantity(name='g2-prison', formalName='grp-2-prison',
-                unit='individual', value=np.random.random()*factor)
-        quantities.append(g2_prison)
+        # Prison population groups
+        fpg_0 = np.random.random(self.n_groups) * factor
+        fpg = Quantity(name='fpg', formalName='prison-pop-grps',
+                unit='individual', value=fpg_0)
+        quantities.append(fpg)
 
-        g3_prison = Quantity(name='g3-prison', formalName='grp-3-prison',
-                unit='individual', value=np.random.random()*factor)
-        quantities.append(g3_prison)
+        # Model parameters: commitment coefficients and their modifiers
 
-        factor = 80.0
-        g1_parole = Quantity(name='g1-parole', formalName='grp-1-parole',
-                unit='individual', value=np.random.random()*factor)
-        quantities.append(g1_parole)
+        # Prison to freedom
+        cp0g_0 = np.random.random(self.n_groups) / const.day
+        cp0g = Quantity(name='cp0g', formalName='commit-freedom-coeff-grps',
+               unit='individual', value=cp0g_0)
+        self.ode_params['commit-to-freedom-coeff-grps'] = cp0g_0
+        quantities.append(cp0g)
 
-        factor = 30.0
-        g2_street = Quantity(name='g2-street', formalName='grp-2-street',
-                unit='individual', value=np.random.random()*factor)
-        quantities.append(g2_street)
+        mp0g_0 = np.random.random(self.n_groups)
+        mp0g = Quantity(name='mp0g', formalName='commit-freedom-coeff-mod-grps',
+               unit='individual', value=mp0g_0)
+        self.ode_params['commit-to-freedom-coeff-mod-grps'] = mp0g_0
+        quantities.append(mp0g)
 
-        factor = 30.0
-        g3_street = Quantity(name='g3-street', formalName='grp-3-street',
-                unit='individual', value=np.random.random()*factor)
-        quantities.append(g3_street)
+        # Prison to parole  
+        cpeg_0 = np.random.random(self.n_groups) / const.day
+        cpeg = Quantity(name='cpeg', formalName='commit-parole-coeff-grps',
+               unit='individual', value=cpeg_0)
+        self.ode_params['commit-to-parole-coeff-grps'] = cpeg_0
+        quantities.append(cpeg)
 
-        factor = 20.0
-        g1_jail = Quantity(name='g1-jail', formalName='grp-1-jail',
-                unit='individual', value=np.random.random()*factor)
-        quantities.append(g1_jail)
+        mpeg_0 = np.random.random(self.n_groups)
+        mpeg = Quantity(name='mpeg', formalName='commit-parole-coeff-mod-grps',
+               unit='individual', value=mpeg_0)
+        self.ode_params['commit-to-parole-coeff-mod-grps'] = mpeg_0
+        quantities.append(mpeg)
 
-        g2_jail = Quantity(name='g2-jail', formalName='grp-2-jail',
-                unit='individual', value=np.random.random()*factor)
-        quantities.append(g2_jail)
+        # Death term
+        self.ode_params['prison-death-rates'] = np.zeros(self.n_groups)
 
-        g3_jail = Quantity(name='g3-jail', formalName='grp-3-jail',
-                unit='individual', value=np.random.random()*factor)
-        quantities.append(g3_jail)
+        # Phase state
+        self.population_phase = Phase(self.initial_time, time_unit='s',
+                quantities=quantities)
 
-        # Model parameters (group- and time-dependent)
-        self.prison_unconditional_release_rate = 0.2
-        self.ode_params['prison-unconditional-release-rate'] =
-                self.prison_unconditional_release_rate
+        self.population_phase.SetValue('fpg', fpg_0, self.initial_time)
 
-        self.prison_release_rate_mod = 0.12
-        self.ode_params['prison-release-rate-mod'] = self.prison_release_rate_mod
-
-        self.parole_rate = 0.11
-        self.ode_params['parole-rate'] = self.parole_rate
-
-        self.parole_rate_mod = 0.08
-        self.ode_params['parole-rate-mod'] = self.parole_rate_mod
+        # Set the state to the phase state
+        self.state = self.population_phase
 
         return
 
@@ -105,17 +105,42 @@ class Prison(Module):
             # Interactions in the parole port
             #--------------------------------
 
-            self.send( time )
-
-            (check_time, g1_parole_return_rate) = recv('parole')
-
+            self.send( time, 'parole' )
+            (check_time, parole_inflow_rates) = self.recv('parole')
             assert abs(check_time-time) <= 1e-6
-            self.ode_params['g1_parole_return_rate'] = g1_parole_return_rate
+            self.ode_params['parole-inflow-rates'] = parole_inflow_rates
+
+            message_time = self.recv('parole')
+            parole_outflow_rates = self.compute_outflow_rates( message_time, 'parole' )
+            self.send( (message_time, parole_outflow_rates), 'parole' )
+
+            # Interactions in the street port
+            #--------------------------------
+
+            self.ode_params['street-inflow-rates'] = np.ones(self.n_groups) / const.day
+
+            # Interactions in the jail port
+            #------------------------------
+
+            self.ode_params['jail-inflow-rates'] = np.ones(self.n_groups) / const.day
+
+            # Interactions in the freedom port
+            #------------------------------
+
+            # compute freedom outflow rate
+
+            # Interactions in the visualization port
+            #---------------------------------------
+
+            fpg = self.population_phase.GetValue('fpg')
+            self.send( fpg, 'visualization' )
 
             # Evolve prison group population to the next time stamp
             #------------------------------------------------------
 
             time = self.step( time )
+
+        self.send('DONE', 'visualization') # this should not be needed: TODO
 
         if state_comm:
             try:
@@ -126,56 +151,36 @@ class Prison(Module):
                 state_comm.put((idx_comm,self.state))
 
     def rhs_fn(self, u_vec, t, params):
-        drop_pos = u_vec[:3]
-        flow_velo = params['flow-velocity']
 
-        drop_velo = u_vec[3:]
-        relative_velo = drop_velo - flow_velo
-        relative_velo_mag = np.linalg.norm(relative_velo)
-        area = params['droplet-xsec-area']
-        diameter = params['droplet-diameter']
-        dyn_visco = params['medium-dyn-viscosity']
-        rho_flow = params['medium-mass-density']
+        fpg = u_vec  # prison population groups
 
-        # Calculate the friction factor
-        reynolds_num = rho_flow * relative_velo_mag * diameter / dyn_visco
-        if reynolds_num <= 0.0:
-            fric_factor = 0.0
-        elif reynolds_num < 0.1:
-            fric_factor = 24 / reynolds_num
-        elif reynolds_num >= 0.1 and reynolds_num < 6000.0:
-            fric_factor = (np.sqrt(24 / reynolds_num) + 0.5407)**2
-        elif reynolds_num >= 6000:
-            fric_factor = 0.44
+        parole_inflow_rates = params['parole-inflow-rates']
+        street_inflow_rates = params['street-inflow-rates']
+        jail_inflow_rates   = params['jail-inflow-rates']
 
-        drag = - fric_factor * area * rho_flow * relative_velo_mag * relative_velo / 2.0
+        inflow_rates  = parole_inflow_rates + street_inflow_rates + jail_inflow_rates
 
-        gravity = params['gravity']
-        droplet_mass = params['droplet-mass']
-        medium_displaced_mass = params['medium-displaced-mass']
-        buoyant_force = (droplet_mass - medium_displaced_mass) * gravity
+        cp0g = self.ode_params['commit-to-freedom-coeff-grps']
+        mp0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
 
-        dt_u_0 = u_vec[3]                               #  d_t u_1 = u_4
-        dt_u_3 = drag[0]/droplet_mass                   #  d_t u_4 = f_1/m
-        dt_u_1 = u_vec[4]                               #  d_t u_2 = u_5
-        dt_u_4 = drag[1]/droplet_mass                   #  d_t u_5 = f_2/m
-        dt_u_2 = u_vec[5]                               #  d_t u_3 = u_6
-        dt_u_5 = (drag[2] - buoyant_force)/droplet_mass #  d_t u_6 = f_3/m
+        cpeg = self.ode_params['commit-to-parole-coeff-grps']
+        mpeg = self.ode_params['commit-to-parole-coeff-mod-grps']
 
-        return [dt_u_0, dt_u_1, dt_u_2, dt_u_3, dt_u_4, dt_u_5]
+        outflow_rates = ( cp0g * mp0g + cpeg * mpeg ) * fpg
+
+        death_rates = params['prison-death-rates']
+
+        dt_fpg = inflow_rates - outflow_rates - death_rates
+
+        return dt_fpg
 
     def step(self, time=0.0):
         r'''
         ODE IVP problem:
         Given the initial data at :math:`t=0`,
-        :math:`(u_1(0),u_2(0),u_3(0)) = (x_0,x_1,x_2)`,
-        :math:`(u_4(0),u_5(0),u_6(0)) = (v_0,v_1,v_2) =
-        (\dot{u}_1(0),\dot{u}_2(0),\dot{u}_3(0))`,
+        :math:`u = (u_1(0),u_2(0),\ldots)`
         solve :math:`\frac{\text{d}u}{\text{d}t} = f(u)` in the interval
         :math:`0\le t \le t_f`.
-        When :math:`u_3(t)` is negative, bounce the droplet to a random height between
-        0 and :math:`1.0\,x_0` with no velocity, and continue the time integration until
-        :math:`t = t_f`.
 
         Parameters
         ----------
@@ -187,9 +192,7 @@ class Prison(Module):
         None
         '''
 
-        x_0 = self.liquid_phase.GetValue('position', time)
-        v_0 = self.liquid_phase.GetValue('velocity', time)
-        u_vec_0 = np.concatenate((x_0,v_0))
+        u_vec_0 = self.population_phase.GetValue('fpg', time)
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
         (u_vec_hist, info_dict) = odeint(self.rhs_fn,
@@ -201,29 +204,35 @@ class Prison(Module):
         assert info_dict['message'] =='Integration successful.', info_dict['message']
 
         u_vec = u_vec_hist[1,:]  # solution vector at final time step
-        values = self.liquid_phase.GetRow(time) # values at previous time
+        values = self.population_phase.GetRow(time) # values at previous time
 
         time += self.time_step
 
-        self.liquid_phase.AddRow(time, values)
-
-        # Ground impact with bouncing drop
-        if u_vec[2] <= 0.0 and self.bounce:
-            position = self.liquid_phase.GetValue('position', self.initial_time)
-            bounced_position = position[2] * np.random.random(1)
-            u_vec[2]  = bounced_position
-            u_vec[3:] = 0.0  # zero velocity
-        # Ground impact with no bouncing drop and slip velocity
-        elif u_vec[2] <= 0.0 and not self.bounce and self.slip:
-            u_vec[2]  = 0.0
-        elif u_vec[2] <= 0.0 and not self.bounce and not self.slip:
-            u_vec[2]  = 0.0
-            u_vec[3:] = 0.0  # zero velocity
+        self.population_phase.AddRow(time, values)
 
         # Update current values
-        self.liquid_phase.SetValue('position', u_vec[0:3], time)
-        self.liquid_phase.SetValue('velocity', u_vec[3:], time)
-        self.liquid_phase.SetValue('speed', np.linalg.norm(u_vec[3:]), time)
-        self.liquid_phase.SetValue('radial-position', np.linalg.norm(u_vec[0:2]), time)
+        self.population_phase.SetValue('fpg', u_vec, time)
 
         return time
+
+    def compute_outflow_rates(self, time, name):
+
+        fpg = self.population_phase.GetValue('fpg',time)
+
+        if name == 'parole':
+
+            cpeg = self.ode_params['commit-to-parole-coeff-grps']
+            mpeg = self.ode_params['commit-to-parole-coeff-mod-grps']
+
+            outflow_rates = cpeg * mpeg * fpg
+
+            return outflow_rates
+
+        if name == 'freedom':
+
+            cp0g = self.ode_params['commit-to-freedom-coeff-grps']
+            mp0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
+
+            outflow_rates = cp0g * mp0g * fpg
+
+            return outflow_rates
