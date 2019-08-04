@@ -40,7 +40,7 @@ class Parole(Module):
 
         # Population groups
         self.n_groups = n_groups
-        factor = 80.0 # percent basis
+        factor = 100.0 # percent basis
 
         # Parole population groups
         feg_0 = np.random.random(self.n_groups) * factor
@@ -218,5 +218,3 @@ class Parole(Module):
             outflow_rates = ce0g * me0g * feg
 
             return outflow_rates
-
-
