@@ -133,35 +133,39 @@ class Arrested(Module):
             # one way "to" jail
 
             message_time = self.recv('jail')
-            jail_outflow_rates = self.compute_outflow_rates( message_time,
-                    'jail' )
-            self.send( (message_time, jail_outflow_rates), 'jail' )
+            outflow_rates = self.compute_outflow_rates( message_time, 'jail' )
+            self.send( (message_time, outflow_rates), 'jail' )
 
             # Interactions in the adjudication port
             #--------------------------------------
             # one way "to" adjudication
 
             message_time = self.recv('adjudication')
-            adjudication_outflow_rates = self.compute_outflow_rates( message_time,
-                    'adjudication' )
-            self.send( (message_time, adjudication_outflow_rates), 'adjudication' )
+            outflow_rates = self.compute_outflow_rates( message_time, 'adjudication' )
+            self.send( (message_time, outflow_rates), 'adjudication' )
 
             # Interactions in the probation port
             #--------------------------------
             # one way "to" probation
 
             message_time = self.recv('probation')
-            probation_outflow_rates = self.compute_outflow_rates( message_time,
-                    'probation' )
-            self.send( (message_time, probation_outflow_rates), 'probation' )
+            outflow_rates = self.compute_outflow_rates( message_time, 'probation' )
+            self.send( (message_time, outflow_rates), 'probation' )
 
             # Interactions in the community port
             #---------------------------------
             # two way "from" and "to"
 
-            # compute community outflow rate
+            # from
+            self.send( time, 'community' )
+            (check_time, community_inflow_rates) = self.recv('community')
+            assert abs(check_time-time) <= 1e-6
+            self.ode_params['community-inflow-rates'] = community_inflow_rates
 
-            self.ode_params['community-inflow-rates'] = np.ones(self.n_groups)/const.day
+            # to
+            message_time = self.recv('community')
+            outflow_rates = self.compute_outflow_rates( message_time, 'community' )
+            self.send( (message_time, outflow_rates), 'community' )
 
             # Interactions in the visualization port
             #---------------------------------------

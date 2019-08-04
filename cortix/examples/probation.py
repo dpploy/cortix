@@ -106,8 +106,8 @@ class Probation(Module):
             # one way "to" jail
 
             message_time = self.recv('jail')
-            jail_outflow_rates = self.compute_outflow_rates( message_time, 'jail' )
-            self.send( (message_time, jail_outflow_rates), 'jail' )
+            outflow_rates = self.compute_outflow_rates( message_time, 'jail' )
+            self.send( (message_time, outflow_rates), 'jail' )
 
             # Interactions in the adjudication port
             #------------------------------------
@@ -129,8 +129,11 @@ class Probation(Module):
 
             # Interactions in the community port
             #------------------------------
+            # one way "to" community
 
-            # compute community outflow rate
+            message_time = self.recv('community')
+            outflow_rates = self.compute_outflow_rates( message_time, 'community' )
+            self.send( (message_time, outflow_rates), 'community' )
 
             # Interactions in the visualization port
             #---------------------------------------

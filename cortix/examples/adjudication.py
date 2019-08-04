@@ -160,13 +160,16 @@ class Adjudication(Module):
             # one way "to" probation
 
             message_time = self.recv('probation')
-            probation_outflow_rates = self.compute_outflow_rates( message_time, 'probation' )
-            self.send( (message_time, probation_outflow_rates), 'probation' )
+            outflow_rates = self.compute_outflow_rates( message_time, 'probation' )
+            self.send( (message_time, outflow_rates), 'probation' )
 
             # Interactions in the community port
             #-----------------------------------
+            # one way "to" community
 
-            # compute community outflow rate
+            message_time = self.recv('community')
+            outflow_rates = self.compute_outflow_rates( message_time, 'community' )
+            self.send( (message_time, outflow_rates), 'community' )
 
             # Interactions in the visualization port
             #---------------------------------------
@@ -191,7 +194,7 @@ class Adjudication(Module):
 
     def rhs_fn(self, u_vec, t, params):
 
-        fag = u_vec  # prison population groups
+        fag = u_vec  # adjudication population groups
 
         arrested_inflow_rates = params['arrested-inflow-rates']
 

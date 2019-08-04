@@ -101,8 +101,8 @@ class Parole(Module):
 
             # to
             message_time = self.recv('prison')
-            prison_outflow_rates = self.compute_outflow_rates( message_time, 'prison' )
-            self.send( (message_time, prison_outflow_rates), 'prison' )
+            outflow_rates = self.compute_outflow_rates( message_time, 'prison' )
+            self.send( (message_time, outflow_rates), 'prison' )
 
             # from
             self.send( time, 'prison' )
@@ -111,9 +111,12 @@ class Parole(Module):
             self.ode_params['prison-inflow-rates'] = prison_inflow_rates
 
             # Interactions in the community port
-            #------------------------------
+            #-----------------------------------
+            # one way "to" community
 
-            # compute community outflow rate
+            message_time = self.recv('community')
+            outflow_rates = self.compute_outflow_rates( message_time, 'community' )
+            self.send( (message_time, outflow_rates), 'community' )
 
             # Interactions in the visualization port
             #---------------------------------------
@@ -121,7 +124,7 @@ class Parole(Module):
             feg = self.population_phase.GetValue('feg')
             self.send( feg, 'visualization' )
 
-            # Evolve prison group population to the next time stamp
+            # Evolve parole group population to the next time stamp
             #------------------------------------------------------
 
             time = self.step( time )

@@ -14,6 +14,7 @@ from cortix.examples.adjudication import Adjudication
 from cortix.examples.jail import Jail
 from cortix.examples.arrested import Arrested
 from cortix.examples.probation import Probation
+from cortix.examples.community import Community
 
 '''
 Crimninal justice example in progress.
@@ -60,6 +61,11 @@ if __name__ == "__main__":
     probation.end_time = end_time
     probation.time_step = time_step
 
+    community = Community(n_groups=n_groups)
+    cortix.add_module(community)
+    community.end_time = end_time
+    community.time_step = time_step
+
     prison.connect( 'parole', parole.get_port('prison') )
     adjudication.connect( 'prison', prison.get_port('adjudication') )
     jail.connect( 'prison', prison.get_port('jail') )
@@ -69,6 +75,12 @@ if __name__ == "__main__":
     probation.connect( 'arrested', arrested.get_port('probation') )
     probation.connect( 'jail', jail.get_port('probation') )
     probation.connect( 'adjudication', adjudication.get_port('probation') )
+    community.connect( 'arrested', arrested.get_port('community') )
+    community.connect( 'jail', jail.get_port('community') )
+    community.connect( 'probation', probation.get_port('community') )
+    community.connect( 'adjudication', adjudication.get_port('community') )
+    community.connect( 'prison', prison.get_port('community') )
+    community.connect( 'parole', parole.get_port('community') )
 
     cortix.draw_network('network.png')
 
