@@ -12,7 +12,7 @@ from cortix.src.module import Module
 from cortix.support.phase import Phase
 from cortix.support.quantity import Quantity
 
-class Adjucation(Module):
+class Adjudication(Module):
     '''
     Prison Cortix module used to model criminal group population in a prison.
 
@@ -51,15 +51,15 @@ class Adjucation(Module):
         self.n_groups = n_groups
         factor = 100.0 # percent basis
 
-        # Adjucation population groups
+        # Adjudication population groups
         fag_0 = np.random.random(self.n_groups) * factor
-        fag = Quantity(name='fag', formalName='adjucation-pop-grps',
+        fag = Quantity(name='fag', formalName='adjudication-pop-grps',
                 unit='individual', value=fag_0)
         quantities.append(fag)
 
         # Model parameters: commitment coefficients and their modifiers
 
-        # Adjucation to freedom
+        # Adjudication to freedom
         ca0g_0 = np.random.random(self.n_groups) / const.day
         ca0g = Quantity(name='ca0g', formalName='commit-freedom-coeff-grps',
                unit='individual', value=ca0g_0)
@@ -72,7 +72,7 @@ class Adjucation(Module):
         self.ode_params['commit-to-freedom-coeff-mod-grps'] = ma0g_0
         quantities.append(ma0g)
 
-        # Adjucation to jail    
+        # Adjudication to jail    
         cajg_0 = np.random.random(self.n_groups) / const.day
         cajg = Quantity(name='cajg', formalName='commit-parole-coeff-grps',
                unit='individual', value=cajg_0)
@@ -85,7 +85,7 @@ class Adjucation(Module):
         self.ode_params['commit-to-jail-coeff-mod-grps'] = majg_0
         quantities.append(majg)
 
-        # Adjucation to probation
+        # Adjudication to probation
         cabg_0 = np.random.random(self.n_groups) / const.day
         cabg = Quantity(name='cabg', formalName='commit-probation-coeff-grps',
                unit='individual', value=cabg_0)
@@ -98,7 +98,7 @@ class Adjucation(Module):
         self.ode_params['commit-to-probation-coeff-mod-grps'] = mabg_0
         quantities.append(mabg)
 
-        # Adjucation to prison    
+        # Adjudication to prison    
         capg_0 = np.random.random(self.n_groups) / const.day
         capg = Quantity(name='capg', formalName='commit-prison-coeff-grps',
                unit='individual', value=capg_0)

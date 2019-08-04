@@ -10,7 +10,7 @@ from cortix.src.cortix_main import Cortix
 
 from cortix.examples.prison import Prison
 from cortix.examples.parole import Parole
-from cortix.examples.adjucation import Adjucation
+from cortix.examples.adjudication import Adjudication
 
 '''
 Crimninal justice example in progress.
@@ -37,13 +37,13 @@ if __name__ == "__main__":
     parole.end_time = end_time
     parole.time_step = time_step
 
-    adjucation = Adjucation(n_groups=n_groups)
-    cortix.add_module(adjucation)
-    adjucation.end_time = end_time
-    adjucation.time_step = time_step
+    adjudication = Adjudication(n_groups=n_groups)
+    cortix.add_module(adjudication)
+    adjudication.end_time = end_time
+    adjudication.time_step = time_step
 
     prison.connect( 'parole', parole.get_port('prison') )
-    adjucation.connect( 'prison', prison.get_port('adjucation') )
+    adjudication.connect( 'prison', prison.get_port('adjudication') )
 
     cortix.draw_network('network.png')
 

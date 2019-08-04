@@ -21,8 +21,8 @@ class Prison(Module):
     `parole`: this is a `port` for the rate of population groups to/from the
         parole domain.
 
-    `adjucation`: this is a `port` for the rate of population groups to/from the
-        Adjucation (Awaiting Adjugation) domain.
+    `adjudication`: this is a `port` for the rate of population groups to/from the
+        Adjudication (Awaiting Adjudication) domain.
 
     `jail`: this is a `port` for the rate of population groups to/from the Jail
         domain module.
@@ -114,13 +114,13 @@ class Prison(Module):
             parole_outflow_rates = self.compute_outflow_rates( message_time, 'parole' )
             self.send( (message_time, parole_outflow_rates), 'parole' )
 
-            # Interactions in the adjucation port
+            # Interactions in the adjudication port
             #------------------------------------
 
-            self.send( time, 'adjucation' )
-            (check_time, adjucation_inflow_rates) = self.recv('adjucation')
+            self.send( time, 'adjudication' )
+            (check_time, adjudication_inflow_rates) = self.recv('adjudication')
             assert abs(check_time-time) <= 1e-6
-            self.ode_params['adjucation-inflow-rates'] = adjucation_inflow_rates
+            self.ode_params['adjudication-inflow-rates'] = adjudication_inflow_rates
 
             # Interactions in the jail port
             #------------------------------
@@ -158,10 +158,10 @@ class Prison(Module):
         fpg = u_vec  # prison population groups
 
         parole_inflow_rates     = params['parole-inflow-rates']
-        adjucation_inflow_rates = params['adjucation-inflow-rates']
+        adjudication_inflow_rates = params['adjudication-inflow-rates']
         jail_inflow_rates       = params['jail-inflow-rates']
 
-        inflow_rates  = parole_inflow_rates + adjucation_inflow_rates + jail_inflow_rates
+        inflow_rates  = parole_inflow_rates + adjudication_inflow_rates + jail_inflow_rates
 
         cp0g = self.ode_params['commit-to-freedom-coeff-grps']
         mp0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
