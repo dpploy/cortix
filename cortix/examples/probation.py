@@ -27,7 +27,7 @@ class Probation(Module):
     `jail`: this is a `port` for the rate of population groups to/from the
         Jail domain module.
 
-    `freedom`: this is a `port` for the rate of population groups to/from the Freedom
+    `community`: this is a `port` for the rate of population groups to/from the Community
         domain module.
 
     `visualization`: this is a `port` that sends data to a visualization module.
@@ -56,17 +56,17 @@ class Probation(Module):
 
         # Model parameters: commitment coefficients and their modifiers
 
-        # Probation to freedom
+        # Probation to community
         cb0g_0 = np.random.random(self.n_groups) / const.day
-        cb0g = Quantity(name='cb0g', formalName='commit-freedom-coeff-grps',
+        cb0g = Quantity(name='cb0g', formalName='commit-community-coeff-grps',
                unit='individual', value=cb0g_0)
-        self.ode_params['commit-to-freedom-coeff-grps'] = cb0g_0
+        self.ode_params['commit-to-community-coeff-grps'] = cb0g_0
         quantities.append(cb0g)
 
         mb0g_0 = np.random.random(self.n_groups)
-        mb0g = Quantity(name='mb0g', formalName='commit-freedom-coeff-mod-grps',
+        mb0g = Quantity(name='mb0g', formalName='commit-community-coeff-mod-grps',
                unit='individual', value=mb0g_0)
-        self.ode_params['commit-to-freedom-coeff-mod-grps'] = mb0g_0
+        self.ode_params['commit-to-community-coeff-mod-grps'] = mb0g_0
         quantities.append(mb0g)
 
         # Probation to jail
@@ -128,10 +128,10 @@ class Probation(Module):
             assert abs(check_time-time) <= 1e-6
             self.ode_params['arrested-inflow-rates'] = arrested_inflow_rates
 
-            # Interactions in the freedom port
+            # Interactions in the community port
             #------------------------------
 
-            # compute freedom outflow rate
+            # compute community outflow rate
 
             # Interactions in the visualization port
             #---------------------------------------
@@ -163,8 +163,8 @@ class Probation(Module):
 
         inflow_rates  = arrested_inflow_rates + adjudication_inflow_rates
 
-        cb0g = self.ode_params['commit-to-freedom-coeff-grps']
-        mb0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
+        cb0g = self.ode_params['commit-to-community-coeff-grps']
+        mb0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
         cbjg = self.ode_params['commit-to-jail-coeff-grps']
         mbjg = self.ode_params['commit-to-jail-coeff-mod-grps']
@@ -231,10 +231,10 @@ class Probation(Module):
 
             return outflow_rates
 
-        if name == 'freedom':
+        if name == 'community':
 
-            cb0g = self.ode_params['commit-to-freedom-coeff-grps']
-            mb0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
+            cb0g = self.ode_params['commit-to-community-coeff-grps']
+            mb0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
             outflow_rates = cb0g * mb0g * fbg
 

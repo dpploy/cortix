@@ -27,7 +27,7 @@ class Arrested(Module):
     `jail`: this is a `port` for the rate of population groups to/from the
         Jail domain.
 
-    `freedom`: this is a `port` for the rate of population groups to/from the Freedom
+    `community`: this is a `port` for the rate of population groups to/from the Community
         domain module.
 
     `visualization`: this is a `port` that sends data to a visualization module.
@@ -56,17 +56,17 @@ class Arrested(Module):
 
         # Model parameters: commitment coefficients and their modifiers
 
-        # Arrested to freedom
+        # Arrested to community
         cr0g_0 = np.random.random(self.n_groups) / const.day
-        cr0g = Quantity(name='cr0g', formalName='commit-freedom-coeff-grps',
+        cr0g = Quantity(name='cr0g', formalName='commit-community-coeff-grps',
                unit='individual', value=cr0g_0)
-        self.ode_params['commit-to-freedom-coeff-grps'] = cr0g_0
+        self.ode_params['commit-to-community-coeff-grps'] = cr0g_0
         quantities.append(cr0g)
 
         mr0g_0 = np.random.random(self.n_groups)
-        mr0g = Quantity(name='mr0g', formalName='commit-freedom-coeff-mod-grps',
+        mr0g = Quantity(name='mr0g', formalName='commit-community-coeff-mod-grps',
                unit='individual', value=mr0g_0)
-        self.ode_params['commit-to-freedom-coeff-mod-grps'] = mr0g_0
+        self.ode_params['commit-to-community-coeff-mod-grps'] = mr0g_0
         quantities.append(mr0g)
 
         # Arrested to probation  
@@ -156,13 +156,13 @@ class Arrested(Module):
                     'probation' )
             self.send( (message_time, probation_outflow_rates), 'probation' )
 
-            # Interactions in the freedom port
+            # Interactions in the community port
             #---------------------------------
             # two way "from" and "to"
 
-            # compute freedom outflow rate
+            # compute community outflow rate
 
-            self.ode_params['freedom-inflow-rates'] = np.ones(self.n_groups)/const.day
+            self.ode_params['community-inflow-rates'] = np.ones(self.n_groups)/const.day
 
             # Interactions in the visualization port
             #---------------------------------------
@@ -189,12 +189,12 @@ class Arrested(Module):
 
         frg = u_vec  # arrested population groups
 
-        freedom_inflow_rates = params['freedom-inflow-rates']
+        community_inflow_rates = params['community-inflow-rates']
 
-        inflow_rates  = freedom_inflow_rates
+        inflow_rates  = community_inflow_rates
 
-        cr0g = self.ode_params['commit-to-freedom-coeff-grps']
-        mr0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
+        cr0g = self.ode_params['commit-to-community-coeff-grps']
+        mr0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
         crbg = self.ode_params['commit-to-probation-coeff-grps']
         mrbg = self.ode_params['commit-to-probation-coeff-mod-grps']
@@ -285,10 +285,10 @@ class Arrested(Module):
 
             return outflow_rates
 
-        if name == 'freedom':
+        if name == 'community':
 
-            cr0g = self.ode_params['commit-to-freedom-coeff-grps']
-            mr0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
+            cr0g = self.ode_params['commit-to-community-coeff-grps']
+            mr0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
             outflow_rates = cr0g * mr0g * frg
 
