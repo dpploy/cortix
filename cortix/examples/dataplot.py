@@ -21,7 +21,7 @@ class DataPlot(Module):
 
         super().__init__()
 
-        self.same_axes = False
+        self.same_axis = False
         self.dpi = 200
 
         self.xlabel = 'x'
@@ -85,7 +85,7 @@ class DataPlot(Module):
 
     def plot_data(self):
 
-        if self.same_axes:
+        if self.same_axis:
             fig = plt.figure(1)
             ax = None
 
@@ -96,7 +96,7 @@ class DataPlot(Module):
 
         # 2D-Plot
             if data and len(data[0]) == 2:
-                if not self.same_axes:
+                if not self.same_axis:
                     fig = plt.figure(key)
                 plt.xlabel(self.xlabel)
                 plt.ylabel(self.ylabel)
@@ -106,14 +106,14 @@ class DataPlot(Module):
         # 3D-Plot
             elif data and len(data[0]) == 3:
 
-                if self.same_axes and ax is None:
+                if self.same_axis and ax is None:
                     ax = fig.add_subplot(111, projection='3d')
                     ax.set_xlabel(self.xlabel)
                     ax.set_ylabel(self.ylabel)
                     ax.set_zlabel(self.zlabel)
                     ax.set_title(self.title)
 
-                if not self.same_axes:
+                if not self.same_axis:
                     fig = plt.figure(key)
                     ax = fig.add_subplot(111, projection='3d')
                     ax.set_xlabel(self.xlabel)
@@ -123,8 +123,8 @@ class DataPlot(Module):
 
                 ax.plot(x, y, [i[2] for i in data])
 
-                if not self.same_axes:
+                if not self.same_axis:
                     plt.savefig('{}.png'.format(key), dpi=self.dpi)
 
-        if self.same_axes:
+        if self.same_axis:
             plt.savefig('{}.png'.format(key.split(':')[0]), dpi=self.dpi)

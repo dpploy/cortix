@@ -59,7 +59,7 @@ if __name__ == '__main__':
     # Configuration Parameters
     use_single_plot = True  # True for a single plot output
                             # False for multiple plot files and network
-    use_mpi         = False # True for MPI; False for Python multiprocessing
+    use_mpi         = True  # True for MPI; False for Python multiprocessing
 
     plot_vortex_profile = False # True may crash the X server.
 
@@ -85,7 +85,7 @@ if __name__ == '__main__':
         data_plot = DataPlot()
         cortix.add_module(data_plot)
         data_plot.title = 'Droplet Trajectories'
-        data_plot.same_axes = True
+        data_plot.same_axis = True
         data_plot.dpi = 300
 
         for i in range(n_droplets):

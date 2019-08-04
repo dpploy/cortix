@@ -24,8 +24,8 @@ class Port:
             from mpi4py import MPI
             self.comm = MPI.COMM_WORLD
             self.rank = None
-
-        self.q = Queue()    # only passes picke-able objects
+        else:
+            self.q = Queue()    # only passes picke-able objects
 
         self.connected_port = None # the `other` port connected to `this` port
 
@@ -35,7 +35,7 @@ class Port:
 
         `port`: A Port object that represents the port to connect to.
         '''
-        assert isinstance(port, Port), "Connecting port must be of Port type"
+        assert isinstance(port, Port), 'Connecting port must be of Port type'
 
         self.connected_port = port
         port.connected_port = self
@@ -43,27 +43,36 @@ class Port:
 
     def send(self, data, tag=None):
         '''
-        Send data to the connected port
+        Send data to the connected port. If the sending port is not connected do nothing.
 
-        `data`: Any pickelable form of data
+        Parameters
+        ----------
+        data: any pickle-able data
+
+        Returns
+        -------
+        None
         '''
+
         if not tag:
             tag = self.id
 
         if self.connected_port:
             if self.use_mpi:
+                # This is an MPI blocking send
                 self.comm.send(data, dest=self.connected_port.rank, tag=tag)
             else:
                 self.q.put(data)
 
     def recv(self):
         '''
-        Returns the data recieved from the connected port.
-        NOTE: This function will block until data is received from the connected port
+        Returns the data received from the connected port.
         '''
         if self.connected_port:
             if self.use_mpi:
-                return self.comm.recv(source=self.connected_port.rank, tag=self.connected_port.id)
+                # This is an MPI blocking receive
+                return self.comm.recv(source=self.connected_port.rank,
+                        tag=self.connected_port.id)
             else:
                 return self.connected_port.q.get()
 

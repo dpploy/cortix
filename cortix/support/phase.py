@@ -379,7 +379,7 @@ class Phase:
 
         Returns
         -------
-        quant_history: tuple(Quantity,float)
+        quant_history: tuple(Quantity,str)
         '''
 
         assert name in self.__phase.columns, 'name %r not in %r'%\

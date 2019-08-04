@@ -124,7 +124,7 @@ class Droplet(Module):
             position = self.liquid_phase.GetValue('position')
             self.send( (time,position), 'external-flow' )
 
-            (check_time,velocity,fluid_props) = self.recv( 'external-flow' )
+            (check_time, velocity,fluid_props) = self.recv( 'external-flow' )
 
             assert abs(check_time-time) <= 1e-6
             self.ode_params['flow-velocity'] = velocity

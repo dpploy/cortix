@@ -27,10 +27,6 @@ class Module:
 
         if isinstance(port, str):
             port = self.get_port(port)
-            #matches = [p for p in self.ports if p.name == port]
-            #assert len(matches) == 1,\
-            #        'matches= %r port= %r, ports= %r'%(matches,port,self.ports)
-            #port = matches[0]
         elif isinstance(port, Port):
             assert port in self.ports, "Unknown port!"
         else:
@@ -45,9 +41,6 @@ class Module:
 
         if isinstance(port, str):
             port = self.get_port(port)
-            #matches = [p for p in self.ports if p.name == port]
-            #assert(len(matches) == 1)
-            #port = matches[0]
         elif isinstance(port, Port):
             assert port in self.ports, "Unknown port!"
         else:
@@ -99,7 +92,7 @@ class Module:
             the module's `self.state` in it. That is, `state_comm.put(self.state)`
             must be the last command in the method before `return`.
 
-        idx: index of the state in the communication queue.
+        idx_comm: index of the state in the communication queue.
         '''
         raise NotImplementedError('Module must implement run()')
 
