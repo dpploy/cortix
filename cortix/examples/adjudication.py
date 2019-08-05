@@ -30,13 +30,13 @@ class Adjudication(Module):
     `prison`: this is a `port` for the rate of population groups to/from the
         Prison domain module.
 
-    `freedom`: this is a `port` for the rate of population groups to/from the Freedom
+    `community`: this is a `port` for the rate of population groups to/from the Community
         domain module.
 
     `visualization`: this is a `port` that sends data to a visualization module.
     '''
 
-    def __init__(self, n_groups=1):
+    def __init__(self, n_groups=1, pool_size=0.0):
 
         super().__init__()
 
@@ -49,27 +49,26 @@ class Adjudication(Module):
 
         # Population groups
         self.n_groups = n_groups
-        factor = 100.0 # percent basis
 
         # Adjudication population groups
-        fag_0 = np.random.random(self.n_groups) * factor
+        fag_0 = np.random.random(self.n_groups) * pool_size
         fag = Quantity(name='fag', formalName='adjudication-pop-grps',
                 unit='individual', value=fag_0)
         quantities.append(fag)
 
         # Model parameters: commitment coefficients and their modifiers
 
-        # Adjudication to freedom
+        # Adjudication to community
         ca0g_0 = np.random.random(self.n_groups) / const.day
-        ca0g = Quantity(name='ca0g', formalName='commit-freedom-coeff-grps',
+        ca0g = Quantity(name='ca0g', formalName='commit-community-coeff-grps',
                unit='individual', value=ca0g_0)
-        self.ode_params['commit-to-freedom-coeff-grps'] = ca0g_0
+        self.ode_params['commit-to-community-coeff-grps'] = ca0g_0
         quantities.append(ca0g)
 
         ma0g_0 = np.random.random(self.n_groups)
-        ma0g = Quantity(name='ma0g', formalName='commit-freedom-coeff-mod-grps',
+        ma0g = Quantity(name='ma0g', formalName='commit-community-coeff-mod-grps',
                unit='individual', value=ma0g_0)
-        self.ode_params['commit-to-freedom-coeff-mod-grps'] = ma0g_0
+        self.ode_params['commit-to-community-coeff-mod-grps'] = ma0g_0
         quantities.append(ma0g)
 
         # Adjudication to jail    
@@ -156,10 +155,21 @@ class Adjudication(Module):
             assert abs(check_time-time) <= 1e-6
             self.ode_params['arrested-inflow-rates'] = arrested_inflow_rates
 
-            # Interactions in the freedom port
-            #------------------------------
+            # Interactions in the probation port
+            #-----------------------------------
+            # one way "to" probation
 
-            # compute freedom outflow rate
+            message_time = self.recv('probation')
+            outflow_rates = self.compute_outflow_rates( message_time, 'probation' )
+            self.send( (message_time, outflow_rates), 'probation' )
+
+            # Interactions in the community port
+            #-----------------------------------
+            # one way "to" community
+
+            message_time = self.recv('community')
+            outflow_rates = self.compute_outflow_rates( message_time, 'community' )
+            self.send( (message_time, outflow_rates), 'community' )
 
             # Interactions in the visualization port
             #---------------------------------------
@@ -184,14 +194,14 @@ class Adjudication(Module):
 
     def rhs_fn(self, u_vec, t, params):
 
-        fag = u_vec  # prison population groups
+        fag = u_vec  # adjudication population groups
 
         arrested_inflow_rates = params['arrested-inflow-rates']
 
         inflow_rates  = arrested_inflow_rates
 
-        ca0g = self.ode_params['commit-to-freedom-coeff-grps']
-        ma0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
+        ca0g = self.ode_params['commit-to-community-coeff-grps']
+        ma0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
         cajg = self.ode_params['commit-to-jail-coeff-grps']
         majg = self.ode_params['commit-to-jail-coeff-mod-grps']
@@ -282,10 +292,10 @@ class Adjudication(Module):
 
             return outflow_rates
 
-        if name == 'freedom':
+        if name == 'community':
 
-            ca0g = self.ode_params['commit-to-freedom-coeff-grps']
-            ma0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
+            ca0g = self.ode_params['commit-to-community-coeff-grps']
+            ma0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
             outflow_rates = ca0g * ma0g * fag
 

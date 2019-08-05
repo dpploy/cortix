@@ -27,13 +27,13 @@ class Prison(Module):
     `jail`: this is a `port` for the rate of population groups to/from the Jail
         domain module.
 
-    `freedom`: this is a `port` for the rate of population groups to/from the Freedom
+    `community`: this is a `port` for the rate of population groups to/from the Community
         domain module.
 
     `visualization`: this is a `port` that sends data to a visualization module.
     '''
 
-    def __init__(self, n_groups=1):
+    def __init__(self, n_groups=1, pool_size=0.0):
 
         super().__init__()
 
@@ -46,27 +46,26 @@ class Prison(Module):
 
         # Population groups
         self.n_groups = n_groups
-        factor = 100.0 # percent basis
 
         # Prison population groups
-        fpg_0 = np.random.random(self.n_groups) * factor
+        fpg_0 = np.random.random(self.n_groups) * pool_size
         fpg = Quantity(name='fpg', formalName='prison-pop-grps',
                 unit='individual', value=fpg_0)
         quantities.append(fpg)
 
         # Model parameters: commitment coefficients and their modifiers
 
-        # Prison to freedom
+        # Prison to community
         cp0g_0 = np.random.random(self.n_groups) / const.day
-        cp0g = Quantity(name='cp0g', formalName='commit-freedom-coeff-grps',
+        cp0g = Quantity(name='cp0g', formalName='commit-community-coeff-grps',
                unit='individual', value=cp0g_0)
-        self.ode_params['commit-to-freedom-coeff-grps'] = cp0g_0
+        self.ode_params['commit-to-community-coeff-grps'] = cp0g_0
         quantities.append(cp0g)
 
         mp0g_0 = np.random.random(self.n_groups)
-        mp0g = Quantity(name='mp0g', formalName='commit-freedom-coeff-mod-grps',
+        mp0g = Quantity(name='mp0g', formalName='commit-community-coeff-mod-grps',
                unit='individual', value=mp0g_0)
-        self.ode_params['commit-to-freedom-coeff-mod-grps'] = mp0g_0
+        self.ode_params['commit-to-community-coeff-mod-grps'] = mp0g_0
         quantities.append(mp0g)
 
         # Prison to parole  
@@ -114,8 +113,8 @@ class Prison(Module):
 
             # to
             message_time = self.recv('parole')
-            parole_outflow_rates = self.compute_outflow_rates( message_time, 'parole' )
-            self.send( (message_time, parole_outflow_rates), 'parole' )
+            outflow_rates = self.compute_outflow_rates( message_time, 'parole' )
+            self.send( (message_time, outflow_rates), 'parole' )
 
             # Interactions in the adjudication port
             #------------------------------------
@@ -128,17 +127,20 @@ class Prison(Module):
 
             # Interactions in the jail port
             #------------------------------
-            # one way "from" prison
+            # one way "from" jail
 
             self.send( time, 'jail' )
             (check_time, jail_inflow_rates) = self.recv('jail')
             assert abs(check_time-time) <= 1e-6
             self.ode_params['jail-inflow-rates'] = jail_inflow_rates
 
-            # Interactions in the freedom port
+            # Interactions in the community port
             #------------------------------
+            # one way "to" community
 
-            # compute freedom outflow rate
+            message_time = self.recv('community')
+            outflow_rates = self.compute_outflow_rates( message_time, 'community' )
+            self.send( (message_time, outflow_rates), 'community' )
 
             # Interactions in the visualization port
             #---------------------------------------
@@ -171,8 +173,8 @@ class Prison(Module):
 
         inflow_rates  = parole_inflow_rates + adjudication_inflow_rates + jail_inflow_rates
 
-        cp0g = self.ode_params['commit-to-freedom-coeff-grps']
-        mp0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
+        cp0g = self.ode_params['commit-to-community-coeff-grps']
+        mp0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
         cpeg = self.ode_params['commit-to-parole-coeff-grps']
         mpeg = self.ode_params['commit-to-parole-coeff-mod-grps']
@@ -239,10 +241,10 @@ class Prison(Module):
 
             return outflow_rates
 
-        if name == 'freedom':
+        if name == 'community':
 
-            cp0g = self.ode_params['commit-to-freedom-coeff-grps']
-            mp0g = self.ode_params['commit-to-freedom-coeff-mod-grps']
+            cp0g = self.ode_params['commit-to-community-coeff-grps']
+            mp0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
             outflow_rates = cp0g * mp0g * fpg
 

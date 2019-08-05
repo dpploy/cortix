@@ -3,6 +3,8 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 
+import scipy.constants as const
+
 from cortix.src.module import Module
 from cortix.src.cortix_main import Cortix
 
@@ -59,12 +61,12 @@ if __name__ == '__main__':
     # Configuration Parameters
     use_single_plot = True  # True for a single plot output
                             # False for multiple plot files and network
-    use_mpi         = True  # True for MPI; False for Python multiprocessing
+    use_mpi         = False # True for MPI; False for Python multiprocessing
 
     plot_vortex_profile = False # True may crash the X server.
 
     n_droplets = 5
-    end_time   = 300
+    end_time   = 5*const.minute
     time_step  = 0.1
 
     cortix = Cortix(use_mpi=use_mpi)
@@ -75,7 +77,7 @@ if __name__ == '__main__':
         # Vortex module (single).
         vortex = Vortex()
         cortix.add_module(vortex)
-        vortex.show_time = (True,100)
+        vortex.show_time = (True,1*const.minute)
         vortex.end_time = end_time
         vortex.time_step = time_step
         if plot_vortex_profile:

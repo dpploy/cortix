@@ -34,10 +34,10 @@ class Vortex(Module):
         quantities = list()
 
         self.initial_time = 0.0
-        self.end_time = 100
+        self.end_time = 5*const.minute
         self.time_step = 0.1
 
-        self.show_time = (False,10)
+        self.show_time = (False,1*const.minute)
 
         air = Specie(name='air', formula_name='Air', phase='gas')
         air.massCCUnit = 'g/cc'
@@ -73,12 +73,10 @@ class Vortex(Module):
 
         time = self.initial_time
 
-        print_counter = 0
         while time < self.end_time:
 
-            if self.show_time[0] and print_counter%self.show_time[1] == 0 :
-                print('Vortex::time[s] =',round(time,1))
-            print_counter += 1
+            if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
+                print('Vortex::time[min] =',round(time/const.minute,1))
 
             # Interactions in all nameless ports (lower level port send/recv used)
             #---------------------------------------------------------------------
