@@ -43,6 +43,7 @@
 <span class="sd">    other ports for the purpose of data tranfer. Data exchange takes place by</span>
 <span class="sd">    send and/or receive calls on a given port. The concept of a port is that of a data</span>
 <span class="sd">    transfer &quot;interaction.&quot; This can be one- or two-way with sends and receives.</span>
+<span class="sd">    A port is connected to only one other port; as two ends of a pipe are connected.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">use_mpi</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -55,9 +56,10 @@
             <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="k">import</span> <span class="n">MPI</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>    <span class="c1"># only passes picke-able objects</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">connected_port</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connected_port</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># the `other` port connected to `this` port</span>
 
 <div class="viewcode-block" id="Port.connect"><a class="viewcode-back" href="../src_rst/port.html#port.Port.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -65,7 +67,7 @@
 
 <span class="sd">        `port`: A Port object that represents the port to connect to.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="n">Port</span><span class="p">),</span> <span class="s2">&quot;Connecting port must be of Port type&quot;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="n">Port</span><span class="p">),</span> <span class="s1">&#39;Connecting port must be of Port type&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">connected_port</span> <span class="o">=</span> <span class="n">port</span>
         <span class="n">port</span><span class="o">.</span><span class="n">connected_port</span> <span class="o">=</span> <span class="bp">self</span>
@@ -73,27 +75,36 @@
 
 <div class="viewcode-block" id="Port.send"><a class="viewcode-back" href="../src_rst/port.html#port.Port.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Send data to the connected port</span>
+<span class="sd">        Send data to the connected port. If the sending port is not connected do nothing.</span>
 
-<span class="sd">        `data`: Any pickelable form of data</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data: any pickle-able data</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
 <span class="sd">        &#39;&#39;&#39;</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">tag</span><span class="p">:</span>
             <span class="n">tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected_port</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+                <span class="c1"># This is an MPI blocking send</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">connected_port</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="n">tag</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Port.recv"><a class="viewcode-back" href="../src_rst/port.html#port.Port.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Returns the data recieved from the connected port.</span>
-<span class="sd">        NOTE: This function will block until data is received from the connected port</span>
+<span class="sd">        Returns the data received from the connected port.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected_port</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">connected_port</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">connected_port</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                <span class="c1"># This is an MPI blocking receive</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">connected_port</span><span class="o">.</span><span class="n">rank</span><span class="p">,</span>
+                        <span class="n">tag</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">connected_port</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected_port</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">get</span><span class="p">()</span></div>
 

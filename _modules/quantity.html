@@ -53,13 +53,19 @@
 <span class="c1">#*********************************************************************************</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">npy</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">,</span> <span class="n">warn</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="Quantity"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity">[docs]</a><span class="k">class</span> <span class="nc">Quantity</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    todo: this probably should not have a &quot;value&quot; for the same reason as Specie.</span>
 <span class="sd">          this needs some thinking.</span>
+<span class="sd">    well not so fast. This can be used to build a quantity with anything as a</span>
+<span class="sd">    value. For instance a history of the quantity as a time series.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
 <span class="c1">#*********************************************************************************</span>
@@ -69,24 +75,23 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                  <span class="n">name</span>       <span class="o">=</span> <span class="s1">&#39;null-quantity&#39;</span><span class="p">,</span>
                  <span class="n">formalName</span> <span class="o">=</span> <span class="s1">&#39;null-quantity&#39;</span><span class="p">,</span>
-                 <span class="n">value</span>      <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span>  <span class="c1"># this can be any type</span>
+                 <span class="n">value</span>      <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span>      <span class="c1"># this can be any type</span>
                  <span class="n">unit</span>       <span class="o">=</span> <span class="s1">&#39;null-unit&#39;</span>
                 <span class="p">):</span>
 
-        <span class="c1"># Sanity tests here</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;oops not string.&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;not a string.&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">name</span>
 
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">formalName</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;oops not string.&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span> <span class="o">=</span> <span class="n">formalName</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">formalName</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;not a string.&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__formalName</span> <span class="o">=</span> <span class="n">formalName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__formal_name</span> <span class="o">=</span> <span class="n">formalName</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">value</span>
 
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;oops not string.&#39;</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;not a string.&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__unit</span> <span class="o">=</span> <span class="n">unit</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span> <span class="o">=</span> <span class="n">formalName</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__unit</span> <span class="o">=</span> <span class="n">unit</span>
 
@@ -155,7 +160,7 @@
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        value: float</span>
+<span class="sd">        value: any type</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span></div>
@@ -174,7 +179,8 @@
 <span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span> <span class="o">=</span> <span class="n">fn</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__formalName</span> <span class="o">=</span> <span class="n">fn</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__formal_name</span> <span class="o">=</span> <span class="n">fn</span></div>
 
 <div class="viewcode-block" id="Quantity.GetFormalName"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.GetFormalName">[docs]</a>    <span class="k">def</span> <span class="nf">GetFormalName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
@@ -190,7 +196,7 @@
 <span class="sd">        formalName: str</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formalName</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__formalName</span></div>
     <span class="n">formalName</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetFormalName</span><span class="p">,</span> <span class="n">SetFormalName</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="n">formal_name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetFormalName</span><span class="p">,</span> <span class="n">SetFormalName</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
@@ -227,6 +233,58 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__unit</span></div>
     <span class="n">unit</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetUnit</span><span class="p">,</span> <span class="n">SetUnit</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Quantity.plot"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.plot">[docs]</a>    <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_scaling</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">y_scaling</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">x_label</span><span class="o">=</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="n">y_label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">same_axis</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        This will support a few possibities for data storage in the self.__value</span>
+<span class="sd">        member.</span>
+
+<span class="sd">        Pandas Series. If self.__value is a Pandas Series, plot against the index.</span>
+<span class="sd">        However the type stored in the Series matter. Suppose it is a series</span>
+<span class="sd">        of a `numpy` array. This must be of the same rank for every entry.</span>
+<span class="sd">        Thi plot method assumes it is an iterable type of the same length for every</span>
+<span class="sd">        entry in the series. A plot of all elements in the type against the index of</span>
+<span class="sd">        the series will be made. The plot may have all elements in one axis or</span>
+<span class="sd">        each element in its own axis.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">,</span> <span class="n">pandas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">series</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">title</span><span class="p">:</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formal_name</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">y_label</span><span class="p">:</span>
+            <span class="n">y_label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="n">n_dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="o">.</span><span class="n">index</span>
+
+        <span class="k">if</span> <span class="n">same_axis</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__formal_name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_dim</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">same_axis</span><span class="p">:</span>
+                <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__formal_name</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)):</span>
+                <span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="p">)</span> <span class="c1"># must use iat()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">x_label</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">y_label</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x_scaling</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">same_axis</span> <span class="ow">and</span> <span class="n">file_name</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">file_name</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">same_axis</span> <span class="ow">and</span> <span class="n">file_name</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">file_name</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+
+        <span class="k">return</span></div>
 
 <span class="c1">#*********************************************************************************</span>
 <span class="c1"># Private helper functions (internal use: __)</span>

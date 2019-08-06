@@ -42,12 +42,31 @@
 <span class="sd">    The representation of a Cortix module.</span>
 <span class="sd">    This class is to be inherited by every Cortix module.</span>
 <span class="sd">    It provides facilities for creating modules within the Cortix network.</span>
+<span class="sd">    In addition Cortix will map one object of this class to a Python</span>
+<span class="sd">    multiprocessing child process, or one executable object of this class to</span>
+<span class="sd">    one MPI process.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Module.__init__"><a class="viewcode-back" href="../src_rst/module.html#module.Module.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Attributes</span>
+<span class="sd">        ----------</span>
+<span class="sd">        port_names_expected: list(str) or None</span>
+<span class="sd">            A list of names of ports expected in the module. This will be compared</span>
+<span class="sd">            to port names during runtime to check against the intended use of the</span>
+<span class="sd">            module.</span>
+<span class="sd">        state: any</span>
+<span class="sd">            Any `pickle-able` data structure to be passed in a `multiprocessing.Queue`</span>
+<span class="sd">            to the parent process.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ports</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># state data passed to parent process if any</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">port_names_expected</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># list of expected port names</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ports</span> <span class="o">=</span> <span class="p">[]</span></div>
 
 <div class="viewcode-block" id="Module.send"><a class="viewcode-back" href="../src_rst/module.html#module.Module.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -56,10 +75,6 @@
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_port</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
-            <span class="c1">#matches = [p for p in self.ports if p.name == port]</span>
-            <span class="c1">#assert len(matches) == 1,\</span>
-            <span class="c1">#        &#39;matches= %r port= %r, ports= %r&#39;%(matches,port,self.ports)</span>
-            <span class="c1">#port = matches[0]</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="n">Port</span><span class="p">):</span>
             <span class="k">assert</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="p">,</span> <span class="s2">&quot;Unknown port!&quot;</span>
         <span class="k">else</span><span class="p">:</span>
@@ -74,9 +89,6 @@
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_port</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
-            <span class="c1">#matches = [p for p in self.ports if p.name == port]</span>
-            <span class="c1">#assert(len(matches) == 1)</span>
-            <span class="c1">#port = matches[0]</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="n">Port</span><span class="p">):</span>
             <span class="k">assert</span> <span class="n">port</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="p">,</span> <span class="s2">&quot;Unknown port!&quot;</span>
         <span class="k">else</span><span class="p">:</span>
@@ -98,39 +110,47 @@
                 <span class="k">break</span>
 
         <span class="k">if</span> <span class="n">port</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">reserved_port_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_reserved_port_names</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">reserved_port_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">assert</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">reserved_port_names</span><span class="p">,</span>\
-                        <span class="s1">&#39;port name: </span><span class="si">{}</span><span class="s1">, not allowed by module: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_names_expected</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">port_names_expected</span><span class="p">,</span>\
+                        <span class="s1">&#39;port name: </span><span class="si">{}</span><span class="s1">, not expected by module: </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="p">)</span>
             <span class="n">port</span> <span class="o">=</span> <span class="n">Port</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">port</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">port</span></div>
 
-<div class="viewcode-block" id="Module.connect"><a class="viewcode-back" href="../src_rst/module.html#module.Module.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_name</span><span class="p">,</span> <span class="n">connected_port</span><span class="p">):</span>
+<div class="viewcode-block" id="Module.connect"><a class="viewcode-back" href="../src_rst/module.html#module.Module.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_name</span><span class="p">,</span> <span class="n">other_port</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        A simpler interface to create module connectivity. Connect the module port</span>
-<span class="sd">        with `port_name` to a given `connected_port`.</span>
+<span class="sd">        with `my_port_name` to a given `other_port`.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">my_port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_port</span><span class="p">(</span><span class="n">port_name</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">connected_port</span><span class="p">,</span> <span class="n">Port</span><span class="p">),</span> <span class="s2">&quot;Connecting port must be of Port type&quot;</span>
-        <span class="n">my_port</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">connected_port</span><span class="p">)</span></div>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other_port</span><span class="p">,</span> <span class="n">Port</span><span class="p">),</span> <span class="s2">&quot;Other port must be of Port type&quot;</span>
+        <span class="n">my_port</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">other_port</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Module.run"><a class="viewcode-back" href="../src_rst/module.html#module.Module.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Modules must implement run()&#39;</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="nf">_get_reserved_port_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Module.run"><a class="viewcode-back" href="../src_rst/module.html#module.Module.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">idx_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        This is a helper function to check for reserved names of ports in the module.</span>
-<span class="sd">        If there is no reservation on names or no checking of reserved names wanted,</span>
-<span class="sd">        this function is the default function and nothing needs to be done on the</span>
-<span class="sd">        developer side of the module child class.</span>
-<span class="sd">        Otherwise this function must be overriden and an iterable container of strings</span>
-<span class="sd">        must be returned.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        Run method with an option to pass data back to the parent process when running</span>
+<span class="sd">        Python multiprocessing mode.</span>
 
-        <span class="k">return</span> <span class="kc">None</span></div>
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        For now, add this command: `state_comm.put((idx_comm,self.state))`</span>
+<span class="sd">        to the bottom of your method. If you are not using `self.state`, then the</span>
+<span class="sd">        command can be issued anywhere in the body of the function.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        state_comm: multiprocessing.Queue</span>
+<span class="sd">            When using the Python `multiprocessing` library `state_comm` must have</span>
+<span class="sd">            the module&#39;s `self.state` in it. That is,</span>
+<span class="sd">            `state_comm.put((idx_comm,self.state))` must be the last command in the</span>
+<span class="sd">            method before `return`. In addition, self.state must be `pickle-able`.</span>
+
+<span class="sd">        idx_comm: int</span>
+<span class="sd">            Index of the state in the communication queue.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Module must implement run()&#39;</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

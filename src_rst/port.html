@@ -38,7 +38,8 @@
 <p>The Port class provides an interface for creating ports and connecting them to
 other ports for the purpose of data tranfer. Data exchange takes place by
 send and/or receive calls on a given port. The concept of a port is that of a data
-transfer “interaction.” This can be one- or two-way with sends and receives.</p>
+transfer “interaction.” This can be one- or two-way with sends and receives.
+A port is connected to only one other port; as two ends of a pipe are connected.</p>
 <dl class="method">
 <dt id="port.Port.__eq__">
 <code class="descname">__eq__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/port.html#Port.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#port.Port.__eq__" title="Permalink to this definition">¶</a></dt>
@@ -61,15 +62,25 @@ transfer “interaction.” This can be one- or two-way with sends and receives.
 <dl class="method">
 <dt id="port.Port.recv">
 <code class="descname">recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/port.html#Port.recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#port.Port.recv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the data recieved from the connected port.
-NOTE: This function will block until data is received from the connected port</p>
+<dd><p>Returns the data received from the connected port.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="port.Port.send">
 <code class="descname">send</code><span class="sig-paren">(</span><em>data</em>, <em>tag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/port.html#Port.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#port.Port.send" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send data to the connected port</p>
-<p><cite>data</cite>: Any pickelable form of data</p>
+<dd><p>Send data to the connected port. If the sending port is not connected do nothing.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>any pickle-able data</em>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

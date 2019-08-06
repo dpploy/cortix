@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>dummy_module module &#8212; Cortix 0.1.0 documentation</title>
+    <title>arrested module &#8212; Cortix 0.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -29,33 +29,30 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-dummy_module">
-<span id="dummy-module-module"></span><h1>dummy_module module<a class="headerlink" href="#module-dummy_module" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-arrested">
+<span id="arrested-module"></span><h1>arrested module<a class="headerlink" href="#module-arrested" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="dummy_module.DummyModule">
-<em class="property">class </em><code class="descclassname">dummy_module.</code><code class="descname">DummyModule</code><a class="reference internal" href="../_modules/dummy_module.html#DummyModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dummy_module.DummyModule" title="Permalink to this definition">¶</a></dt>
+<dt id="arrested.Arrested">
+<em class="property">class </em><code class="descclassname">arrested.</code><code class="descname">Arrested</code><span class="sig-paren">(</span><em>n_groups=1</em>, <em>pool_size=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arrested.html#Arrested"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#arrested.Arrested" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cortix.src.module.Module</span></code></p>
-<dl class="method">
-<dt id="dummy_module.DummyModule.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>state_comm=None</em>, <em>idx_comm=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dummy_module.html#DummyModule.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dummy_module.DummyModule.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run method with an option to pass data back to the parent process when running
-Python multiprocessing mode.</p>
+<p>Arrested Cortix module used to model criminal group population in an arrested system.</p>
 <div class="admonition-notes admonition">
 <p class="first admonition-title">Notes</p>
-<p class="last">For now, add this command: <cite>state_comm.put((idx_comm,self.state))</cite>
-to the bottom of your method. If you are not using <cite>self.state</cite>, then the
-command can be issued anywhere in the body of the function.</p>
+<p class="last">These are the <cite>port</cite> names available in this module to connect to respective
+modules: <cite>probation</cite>, <cite>adjudication</cite>, <cite>jail</cite>, and <cite>community</cite>.
+See instance attribute <cite>port_names_expected</cite>.</p>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
+<dl class="method">
+<dt id="arrested.Arrested.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>n_groups=1</em>, <em>pool_size=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arrested.html#Arrested.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#arrested.Arrested.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>state_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v3.7)"><em>multiprocessing.Queue</em></a>) – When using the Python <cite>multiprocessing</cite> library <cite>state_comm</cite> must have
-the module’s <cite>self.state</cite> in it. That is,
-<cite>state_comm.put((idx_comm,self.state))</cite> must be the last command in the
-method before <cite>return</cite>. In addition, self.state must be <cite>pickle-able</cite>.</li>
-<li><strong>idx_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index of the state in the communication queue.</li>
+<li><strong>n_groups</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of groups in the population.</li>
+<li><strong>pool_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Upperbound on the range of the existing population groups. A random value
+from 0 to the upperbound value will be assigned to each group.</li>
 </ul>
 </td>
 </tr>
@@ -63,15 +60,9 @@ method before <cite>return</cite>. In addition, self.state must be <cite>pickle-
 </table>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="class">
-<dt id="dummy_module.DummyModule2">
-<em class="property">class </em><code class="descclassname">dummy_module.</code><code class="descname">DummyModule2</code><a class="reference internal" href="../_modules/dummy_module.html#DummyModule2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dummy_module.DummyModule2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cortix.src.module.Module</span></code></p>
 <dl class="method">
-<dt id="dummy_module.DummyModule2.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>state_comm=None</em>, <em>idx_comm=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dummy_module.html#DummyModule2.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dummy_module.DummyModule2.run" title="Permalink to this definition">¶</a></dt>
+<dt id="arrested.Arrested.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>state_comm=None</em>, <em>idx_comm=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/arrested.html#Arrested.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#arrested.Arrested.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run method with an option to pass data back to the parent process when running
 Python multiprocessing mode.</p>
 <div class="admonition-notes admonition">
@@ -161,7 +152,7 @@ Lower, MA 01852
       &copy;2019, University of Massachusetts Lowell.
       
       |
-      <a href="../_sources/examples_rst/dummy_module.rst.txt"
+      <a href="../_sources/examples_rst/arrested.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

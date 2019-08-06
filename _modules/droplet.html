@@ -35,6 +35,8 @@
 <span class="c1"># This file is part of the Cortix toolkit environment.</span>
 <span class="c1"># https://cortix.org</span>
 
+<span class="kn">import</span> <span class="nn">pickle</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.constants</span> <span class="k">as</span> <span class="nn">const</span>
 <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="k">import</span> <span class="n">odeint</span>
@@ -140,7 +142,9 @@
         <span class="n">medium_dyn_viscosity</span> <span class="o">=</span> <span class="mf">1.81e-5</span> <span class="c1"># kg/(m s)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;medium-dyn-viscosity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">medium_dyn_viscosity</span>
 
-<div class="viewcode-block" id="Droplet.run"><a class="viewcode-back" href="../examples_rst/droplet.html#droplet.Droplet.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">liquid_phase</span>
+
+<div class="viewcode-block" id="Droplet.run"><a class="viewcode-back" href="../examples_rst/droplet.html#droplet.Droplet.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">idx_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_time</span>
 
@@ -152,7 +156,7 @@
             <span class="n">position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">liquid_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;position&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span> <span class="p">(</span><span class="n">time</span><span class="p">,</span><span class="n">position</span><span class="p">),</span> <span class="s1">&#39;external-flow&#39;</span> <span class="p">)</span>
 
-            <span class="p">(</span><span class="n">check_time</span><span class="p">,</span><span class="n">velocity</span><span class="p">,</span><span class="n">fluid_props</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span> <span class="s1">&#39;external-flow&#39;</span> <span class="p">)</span>
+            <span class="p">(</span><span class="n">check_time</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span><span class="n">fluid_props</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span> <span class="s1">&#39;external-flow&#39;</span> <span class="p">)</span>
 
             <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">check_time</span><span class="o">-</span><span class="n">time</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1e-6</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;flow-velocity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">velocity</span>
@@ -179,9 +183,17 @@
 
             <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">(</span> <span class="n">time</span> <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s1">&#39;DONE&#39;</span><span class="p">,</span> <span class="s1">&#39;visualization&#39;</span><span class="p">)</span> <span class="c1"># this should not be needed: TODO</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s1">&#39;DONE&#39;</span><span class="p">,</span> <span class="s1">&#39;visualization&#39;</span><span class="p">)</span> <span class="c1"># this should not be needed: TODO</span>
 
-        <span class="c1">#self.__save_state()</span>
+        <span class="k">if</span> <span class="n">state_comm</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">pickle</span><span class="o">.</span><span class="n">PicklingError</span><span class="p">:</span>
+                <span class="n">state_comm</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">idx_comm</span><span class="p">,</span><span class="kc">None</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">state_comm</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">idx_comm</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span>
+
+        <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Droplet.rhs_fn"><a class="viewcode-back" href="../examples_rst/droplet.html#droplet.Droplet.rhs_fn">[docs]</a>    <span class="k">def</span> <span class="nf">rhs_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u_vec</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
         <span class="n">drop_pos</span> <span class="o">=</span> <span class="n">u_vec</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>

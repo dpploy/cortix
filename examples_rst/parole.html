@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>dataplot module &#8212; Cortix 0.1.0 documentation</title>
+    <title>parole module &#8212; Cortix 0.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -29,27 +29,50 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-dataplot">
-<span id="dataplot-module"></span><h1>dataplot module<a class="headerlink" href="#module-dataplot" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-parole">
+<span id="parole-module"></span><h1>parole module<a class="headerlink" href="#module-parole" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="dataplot.DataPlot">
-<em class="property">class </em><code class="descclassname">dataplot.</code><code class="descname">DataPlot</code><a class="reference internal" href="../_modules/dataplot.html#DataPlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataplot.DataPlot" title="Permalink to this definition">¶</a></dt>
+<dt id="parole.Parole">
+<em class="property">class </em><code class="descclassname">parole.</code><code class="descname">Parole</code><span class="sig-paren">(</span><em>n_groups=1</em>, <em>pool_size=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parole.html#Parole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parole.Parole" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cortix.src.module.Module</span></code></p>
+<p>Parole Cortix module used to model criminal group population in a parole system.</p>
+<div class="admonition-notes admonition">
+<p class="first admonition-title">Notes</p>
+<p class="last">These are the <cite>port</cite> names available in this module to connect to respective
+modules: <cite>prison</cite> and <cite>community</cite>.
+See instance attribute <cite>port_names_expected</cite>.</p>
+</div>
 <dl class="method">
-<dt id="dataplot.DataPlot.plot_data">
-<code class="descname">plot_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataplot.html#DataPlot.plot_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataplot.DataPlot.plot_data" title="Permalink to this definition">¶</a></dt>
+<dt id="parole.Parole.compute_outflow_rates">
+<code class="descname">compute_outflow_rates</code><span class="sig-paren">(</span><em>time</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parole.html#Parole.compute_outflow_rates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parole.Parole.compute_outflow_rates" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="dataplot.DataPlot.recv_data">
-<code class="descname">recv_data</code><span class="sig-paren">(</span><em>port</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataplot.html#DataPlot.recv_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataplot.DataPlot.recv_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Keep listening on the port and receiving data.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="dataplot.DataPlot.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>state_comm=None</em>, <em>idx_comm=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/dataplot.html#DataPlot.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#dataplot.DataPlot.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Spawn a thread to handle each port connection.</p>
+<dt id="parole.Parole.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>state_comm=None</em>, <em>idx_comm=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/parole.html#Parole.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#parole.Parole.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run method with an option to pass data back to the parent process when running
+Python multiprocessing mode.</p>
+<div class="admonition-notes admonition">
+<p class="first admonition-title">Notes</p>
+<p class="last">For now, add this command: <cite>state_comm.put((idx_comm,self.state))</cite>
+to the bottom of your method. If you are not using <cite>self.state</cite>, then the
+command can be issued anywhere in the body of the function.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>state_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v3.7)"><em>multiprocessing.Queue</em></a>) – When using the Python <cite>multiprocessing</cite> library <cite>state_comm</cite> must have
+the module’s <cite>self.state</cite> in it. That is,
+<cite>state_comm.put((idx_comm,self.state))</cite> must be the last command in the
+method before <cite>return</cite>. In addition, self.state must be <cite>pickle-able</cite>.</li>
+<li><strong>idx_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index of the state in the communication queue.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -116,7 +139,7 @@ Lower, MA 01852
       &copy;2019, University of Massachusetts Lowell.
       
       |
-      <a href="../_sources/examples_rst/dataplot.rst.txt"
+      <a href="../_sources/examples_rst/parole.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

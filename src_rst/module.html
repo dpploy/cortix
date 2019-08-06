@@ -37,12 +37,35 @@
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The representation of a Cortix module.
 This class is to be inherited by every Cortix module.
-It provides facilities for creating modules within the Cortix network.</p>
+It provides facilities for creating modules within the Cortix network.
+In addition Cortix will map one object of this class to a Python
+multiprocessing child process, or one executable object of this class to
+one MPI process.</p>
+<dl class="method">
+<dt id="module.Module.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="module.Module.port_names_expected">
+<code class="descname">port_names_expected</code><a class="headerlink" href="#module.Module.port_names_expected" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list(str) or None</em> – A list of names of ports expected in the module. This will be compared
+to port names during runtime to check against the intended use of the
+module.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.state">
+<code class="descname">state</code><a class="headerlink" href="#module.Module.state" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>any</em> – Any <cite>pickle-able</cite> data structure to be passed in a <cite>multiprocessing.Queue</cite>
+to the parent process.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="method">
 <dt id="module.Module.connect">
-<code class="descname">connect</code><span class="sig-paren">(</span><em>port_name</em>, <em>connected_port</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.connect" title="Permalink to this definition">¶</a></dt>
+<code class="descname">connect</code><span class="sig-paren">(</span><em>port_name</em>, <em>other_port</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.connect" title="Permalink to this definition">¶</a></dt>
 <dd><p>A simpler interface to create module connectivity. Connect the module port
-with <cite>port_name</cite> to a given <cite>connected_port</cite>.</p>
+with <cite>my_port_name</cite> to a given <cite>other_port</cite>.</p>
 </dd></dl>
 
 <dl class="method">
@@ -59,8 +82,31 @@ with <cite>port_name</cite> to a given <cite>connected_port</cite>.</p>
 
 <dl class="method">
 <dt id="module.Module.run">
-<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.run" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<code class="descname">run</code><span class="sig-paren">(</span><em>state_comm=None</em>, <em>idx_comm=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run method with an option to pass data back to the parent process when running
+Python multiprocessing mode.</p>
+<div class="admonition-notes admonition">
+<p class="first admonition-title">Notes</p>
+<p class="last">For now, add this command: <cite>state_comm.put((idx_comm,self.state))</cite>
+to the bottom of your method. If you are not using <cite>self.state</cite>, then the
+command can be issued anywhere in the body of the function.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>state_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v3.7)"><em>multiprocessing.Queue</em></a>) – When using the Python <cite>multiprocessing</cite> library <cite>state_comm</cite> must have
+the module’s <cite>self.state</cite> in it. That is,
+<cite>state_comm.put((idx_comm,self.state))</cite> must be the last command in the
+method before <cite>return</cite>. In addition, self.state must be <cite>pickle-able</cite>.</li>
+<li><strong>idx_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index of the state in the communication queue.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="module.Module.send">
