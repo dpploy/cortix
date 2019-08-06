@@ -41,7 +41,6 @@ Please use the `GitHub issue tracker <https://github.com/dpploy/cortix/issues>`_
    -----------------
    .. toctree::
       src_rst/modules
-      modulib_rst/modules
       examples_rst/modules
       support_rst/modules
       :maxdepth: 2

@@ -14,28 +14,29 @@ from cortix.support.quantity import Quantity
 
 class Arrested(Module):
     '''
-    Arrested Cortix module used to model criminal group population in a arrested system.
+    Arrested Cortix module used to model criminal group population in an arrested system.
 
-    Note
-    ----
-    `probation`: this is a `port` for the rate of population groups to/from the
-        Probation domain.
-
-    `adjudication`: this is a `port` for the rate of population groups to/from the
-        Adjudication domain.
-
-    `jail`: this is a `port` for the rate of population groups to/from the
-        Jail domain.
-
-    `community`: this is a `port` for the rate of population groups to/from the Community
-        domain module.
-
-    `visualization`: this is a `port` that sends data to a visualization module.
+    Notes
+    -----
+    These are the `port` names available in this module to connect to respective
+    modules: `probation`, `adjudication`, `jail`, and `community`.
+    See instance attribute `port_names_expected`.
     '''
 
     def __init__(self, n_groups=1, pool_size=0.0):
+        '''
+        Parameters
+        ----------
+        n_groups: int
+            Number of groups in the population.
+        pool_size: float
+            Upperbound on the range of the existing population groups. A random value
+            from 0 to the upperbound value will be assigned to each group.
+        '''
 
         super().__init__()
+
+        self.port_names_expected = ['probation','adjudication','jail','community']
 
         quantities      = list()
         self.ode_params = dict()
@@ -108,13 +109,16 @@ class Arrested(Module):
         quantities.append(mrag)
 
         # Death term
-        self.ode_params['arrested-death-rates'] = np.zeros(self.n_groups)
+        self.ode_params['death-rates'] = np.zeros(self.n_groups)
 
         # Phase state
         self.population_phase = Phase(self.initial_time, time_unit='s',
                 quantities=quantities)
 
         self.population_phase.SetValue('frg', frg_0, self.initial_time)
+
+        # Initialize inflows to zero
+        self.ode_params['community-inflow-rates'] = np.zeros(self.n_groups)
 
         # Set the state to the phase state
         self.state = self.population_phase
@@ -123,17 +127,18 @@ class Arrested(Module):
 
     def run(self, state_comm=None, idx_comm=None):
 
+        self.__zero_ode_parameters()
+
         time = self.initial_time
 
         while time < self.end_time:
-
 
             # Interactions in the jail port
             #--------------------------------
             # one way "to" jail
 
             message_time = self.recv('jail')
-            outflow_rates = self.compute_outflow_rates( message_time, 'jail' )
+            outflow_rates = self.__compute_outflow_rates( message_time, 'jail' )
             self.send( (message_time, outflow_rates), 'jail' )
 
             # Interactions in the adjudication port
@@ -141,7 +146,7 @@ class Arrested(Module):
             # one way "to" adjudication
 
             message_time = self.recv('adjudication')
-            outflow_rates = self.compute_outflow_rates( message_time, 'adjudication' )
+            outflow_rates = self.__compute_outflow_rates( message_time, 'adjudication' )
             self.send( (message_time, outflow_rates), 'adjudication' )
 
             # Interactions in the probation port
@@ -149,7 +154,7 @@ class Arrested(Module):
             # one way "to" probation
 
             message_time = self.recv('probation')
-            outflow_rates = self.compute_outflow_rates( message_time, 'probation' )
+            outflow_rates = self.__compute_outflow_rates( message_time, 'probation' )
             self.send( (message_time, outflow_rates), 'probation' )
 
             # Interactions in the community port
@@ -164,21 +169,13 @@ class Arrested(Module):
 
             # to
             message_time = self.recv('community')
-            outflow_rates = self.compute_outflow_rates( message_time, 'community' )
+            outflow_rates = self.__compute_outflow_rates( message_time, 'community' )
             self.send( (message_time, outflow_rates), 'community' )
-
-            # Interactions in the visualization port
-            #---------------------------------------
-
-            frg = self.population_phase.GetValue('frg')
-            self.send( frg, 'visualization' )
 
             # Evolve arrested group population to the next time stamp
             #--------------------------------------------------------
 
-            time = self.step( time )
-
-        self.send('DONE', 'visualization') # this should not be needed: TODO
+            time = self.__step( time )
 
         if state_comm:
             try:
@@ -188,7 +185,7 @@ class Arrested(Module):
             else:
                 state_comm.put((idx_comm,self.state))
 
-    def rhs_fn(self, u_vec, t, params):
+    def __rhs_fn(self, u_vec, t, params):
 
         frg = u_vec  # arrested population groups
 
@@ -210,13 +207,13 @@ class Arrested(Module):
 
         outflow_rates = ( cr0g * mr0g + crbg * mrbg + crjg * mrjg + crag * mrag ) * frg
 
-        death_rates = params['arrested-death-rates']
+        death_rates = params['death-rates']
 
         dt_frg = inflow_rates - outflow_rates - death_rates
 
         return dt_frg
 
-    def step(self, time=0.0):
+    def __step(self, time=0.0):
         r'''
         ODE IVP problem:
         Given the initial data at :math:`t=0`,
@@ -227,7 +224,7 @@ class Arrested(Module):
         Parameters
         ----------
         time: float
-            Time in the droplet unit of time (seconds).
+            Time in SI units.
 
         Returns
         -------
@@ -237,7 +234,7 @@ class Arrested(Module):
         u_vec_0 = self.population_phase.GetValue('frg', time)
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
-        (u_vec_hist, info_dict) = odeint(self.rhs_fn,
+        (u_vec_hist, info_dict) = odeint(self.__rhs_fn,
                                          u_vec_0, t_interval_sec,
                                          args=( self.ode_params, ),
                                          rtol=1e-4, atol=1e-8, mxstep=200,
@@ -257,7 +254,7 @@ class Arrested(Module):
 
         return time
 
-    def compute_outflow_rates(self, time, name):
+    def __compute_outflow_rates(self, time, name):
 
         frg = self.population_phase.GetValue('frg',time)
 
@@ -296,3 +293,30 @@ class Arrested(Module):
             outflow_rates = cr0g * mr0g * frg
 
             return outflow_rates
+
+    def __zero_ode_parameters(self):
+        '''
+        If ports are not connected the corresponding outflows must be zero.
+        '''
+
+        zeros = np.zeros(self.n_groups)
+
+        p_names = [p.name for p in self.ports]
+
+        if 'community' not in p_names:
+            self.ode_params['commit-to-community-coeff-grps']     = zeros
+            self.ode_params['commit-to-community-coeff-mod-grps'] = zeros
+
+        if 'jail' not in p_names:
+            self.ode_params['commit-to-jail-coeff-grps'] = zeros
+            self.ode_params['commit-to-jail-coeff-mod-grps'] = zeros
+
+        if 'probation' not in p_names:
+            self.ode_params['commit-to-probation-coeff-grps'] = zeros
+            self.ode_params['commit-to-probation-coeff-mod-grps'] = zeros
+
+        if 'adjudication' not in p_names:
+            self.ode_params['commit-to-adjudication-coeff-grps'] = zeros
+            self.ode_params['commit-to-adjudication-coeff-mod-grps'] = zeros
+
+        return

@@ -5,7 +5,6 @@
 
 import scipy.constants as const
 
-from cortix.src.module import Module
 from cortix.src.cortix_main import Cortix
 
 from cortix.examples.prison import Prison
@@ -23,11 +22,11 @@ Crimninal justice example in progress.
 if __name__ == "__main__":
 
     # Configuration Parameters
-    use_mpi = True  # True for MPI; False for Python multiprocessing
+    use_mpi = False  # True for MPI; False for Python multiprocessing
 
-    end_time  = 200 * const.day
+    end_time  = 50 * const.day
     time_step = 0.5 * const.day
-    n_groups  = 450 # number of population groups
+    n_groups  = 150 # number of population groups
 
     cortix = Cortix(use_mpi=use_mpi)
 
@@ -61,7 +60,7 @@ if __name__ == "__main__":
     probation.end_time = end_time
     probation.time_step = time_step
 
-    community = Community(n_groups=n_groups)
+    community = Community(n_groups=n_groups, maturity_rate=100/const.day, offender_pool_size=10)
     cortix.add_module(community)
     community.end_time = end_time
     community.time_step = time_step

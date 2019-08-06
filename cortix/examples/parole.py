@@ -16,20 +16,18 @@ class Parole(Module):
     '''
     Parole Cortix module used to model criminal group population in a parole system.
 
-    Note
-    ----
-    `prison`: this is a `port` for the rate of population groups to/from the
-        Prison domain.
-
-    `community`: this is a `port` for the rate of population groups to/from the Community
-        domain module.
-
-    `visualization`: this is a `port` that sends data to a visualization module.
+    Notes
+    -----
+    These are the `port` names available in this module to connect to respective
+    modules: `prison` and `community`.
+    See instance attribute `port_names_expected`.
     '''
 
     def __init__(self, n_groups=1, pool_size=0.0):
 
         super().__init__()
+
+        self.port_names_expected = ['prison','community']
 
         quantities      = list()
         self.ode_params = dict()
@@ -84,12 +82,17 @@ class Parole(Module):
 
         self.population_phase.SetValue('feg', feg_0, self.initial_time)
 
+        # Initialize inflows to zero
+        self.ode_params['prison-inflow-rates'] = np.zeros(self.n_groups)
+
         # Set the state to the phase state
         self.state = self.population_phase
 
         return
 
     def run(self, state_comm=None, idx_comm=None):
+
+        self.__zero_ode_parameters()
 
         time = self.initial_time
 
@@ -118,18 +121,10 @@ class Parole(Module):
             outflow_rates = self.compute_outflow_rates( message_time, 'community' )
             self.send( (message_time, outflow_rates), 'community' )
 
-            # Interactions in the visualization port
-            #---------------------------------------
-
-            feg = self.population_phase.GetValue('feg')
-            self.send( feg, 'visualization' )
-
             # Evolve parole group population to the next time stamp
             #------------------------------------------------------
 
-            time = self.step( time )
-
-        self.send('DONE', 'visualization') # this should not be needed: TODO
+            time = self.__step( time )
 
         if state_comm:
             try:
@@ -139,7 +134,7 @@ class Parole(Module):
             else:
                 state_comm.put((idx_comm,self.state))
 
-    def rhs_fn(self, u_vec, t, params):
+    def __rhs_fn(self, u_vec, t, params):
 
         feg = u_vec  # parole population groups
 
@@ -161,7 +156,7 @@ class Parole(Module):
 
         return dt_feg
 
-    def step(self, time=0.0):
+    def __step(self, time=0.0):
         r'''
         ODE IVP problem:
         Given the initial data at :math:`t=0`,
@@ -172,7 +167,7 @@ class Parole(Module):
         Parameters
         ----------
         time: float
-            Time in the droplet unit of time (seconds).
+            Time in SI unit.
 
         Returns
         -------
@@ -182,7 +177,7 @@ class Parole(Module):
         u_vec_0 = self.population_phase.GetValue('feg', time)
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
-        (u_vec_hist, info_dict) = odeint(self.rhs_fn,
+        (u_vec_hist, info_dict) = odeint(self.__rhs_fn,
                                          u_vec_0, t_interval_sec,
                                          args=( self.ode_params, ),
                                          rtol=1e-4, atol=1e-8, mxstep=200,
@@ -223,3 +218,22 @@ class Parole(Module):
             outflow_rates = ce0g * me0g * feg
 
             return outflow_rates
+
+    def __zero_ode_parameters(self):
+        '''
+        If ports are not connected the corresponding outflows must be zero.
+        '''
+
+        zeros = np.zeros(self.n_groups)
+
+        p_names = [p.name for p in self.ports]
+
+        if 'community' not in p_names:
+            self.ode_params['commit-to-community-coeff-grps']     = zeros
+            self.ode_params['commit-to-community-coeff-mod-grps'] = zeros
+
+        if 'prison' not in p_names:
+            self.ode_params['commit-to-prison-coeff-grps'] = zeros
+            self.ode_params['commit-to-prison-coeff-mod-grps'] = zeros
+
+        return

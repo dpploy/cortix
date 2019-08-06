@@ -16,29 +16,28 @@ class Jail(Module):
     '''
     Jail Cortix module used to model criminal group population in a jail.
 
-    Note
-    ----
-    `probation`: this is a `port` for the rate of population groups to/from the
-        Probation domain.
-
-    `adjudication`: this is a `port` for the rate of population groups to/from the
-        Adjudication domain module.
-
-    `arrested`: this is a `port` for the rate of population groups to/from the
-        Arrested domain module.
-
-    `prison`: this is a `port` for the rate of population groups to/from the
-        Prison domain module.
-
-    `community`: this is a `port` for the rate of population groups to/from the Community
-        domain module.
-
-    `visualization`: this is a `port` that sends data to a visualization module.
+    Notes
+    -----
+    These are the `port` names available in this module to connect to respective
+    modules: `probation`, `adjudication`, `arrested`, `prison`, and `community`.
+    See instance attribute `port_names_expected`.
     '''
 
     def __init__(self, n_groups=1, pool_size=0.0):
+        '''
+        Parameters
+        ----------
+        n_groups: int
+            Number of groups in the population.
+        pool_size: float
+            Upperbound on the range of the existing population groups. A random value
+            from 0 to the upperbound value will be assigned to each group.
+        '''
 
         super().__init__()
+
+        self.port_names_expected = ['probation','adjudication','arrested','prison',
+                                    'community']
 
         quantities      = list()
         self.ode_params = dict()
@@ -93,12 +92,19 @@ class Jail(Module):
 
         self.population_phase.SetValue('fjg', fjg_0, self.initial_time)
 
+        # Initialize inflows to zero
+        self.ode_params['arrested-inflow-rates']     = np.zeros(self.n_groups)
+        self.ode_params['probation-inflow-rates']    = np.zeros(self.n_groups)
+        self.ode_params['adjudication-inflow-rates'] = np.zeros(self.n_groups)
+
         # Set the state to the phase state
         self.state = self.population_phase
 
         return
 
     def run(self, state_comm=None, idx_comm=None):
+
+        self.__zero_ode_parameters()
 
         time = self.initial_time
 
@@ -109,7 +115,7 @@ class Jail(Module):
             # one way "to" prison
 
             message_time = self.recv('prison')
-            outflow_rates = self.compute_outflow_rates( message_time, 'prison' )
+            outflow_rates = self.__compute_outflow_rates( message_time, 'prison' )
             self.send( (message_time, outflow_rates), 'prison' )
 
             # Interactions in the adjudication port
@@ -144,21 +150,13 @@ class Jail(Module):
             # one way "to" community
 
             message_time = self.recv('community')
-            outflow_rates = self.compute_outflow_rates( message_time, 'community' )
+            outflow_rates = self.__compute_outflow_rates( message_time, 'community' )
             self.send( (message_time, outflow_rates), 'community' )
-
-            # Interactions in the visualization port
-            #---------------------------------------
-
-            fjg = self.population_phase.GetValue('fjg')
-            self.send( fjg, 'visualization' )
 
             # Evolve jail group population to the next time stamp
             #----------------------------------------------------
 
-            time = self.step( time )
-
-        self.send('DONE', 'visualization') # this should not be needed: TODO
+            time = self.__step( time )
 
         if state_comm:
             try:
@@ -168,7 +166,7 @@ class Jail(Module):
             else:
                 state_comm.put((idx_comm,self.state))
 
-    def rhs_fn(self, u_vec, t, params):
+    def __rhs_fn(self, u_vec, t, params):
 
         fjg = u_vec  # jail population groups
 
@@ -193,7 +191,7 @@ class Jail(Module):
 
         return dt_fjg
 
-    def step(self, time=0.0):
+    def __step(self, time=0.0):
         r'''
         ODE IVP problem:
         Given the initial data at :math:`t=0`,
@@ -204,7 +202,7 @@ class Jail(Module):
         Parameters
         ----------
         time: float
-            Time in the droplet unit of time (seconds).
+            Time in SI unit.
 
         Returns
         -------
@@ -214,7 +212,7 @@ class Jail(Module):
         u_vec_0 = self.population_phase.GetValue('fjg', time)
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
-        (u_vec_hist, info_dict) = odeint(self.rhs_fn,
+        (u_vec_hist, info_dict) = odeint(self.__rhs_fn,
                                          u_vec_0, t_interval_sec,
                                          args=( self.ode_params, ),
                                          rtol=1e-4, atol=1e-8, mxstep=200,
@@ -234,7 +232,7 @@ class Jail(Module):
 
         return time
 
-    def compute_outflow_rates(self, time, name):
+    def __compute_outflow_rates(self, time, name):
 
         fjg = self.population_phase.GetValue('fjg',time)
 
@@ -253,3 +251,22 @@ class Jail(Module):
             outflow_rates = cj0g * mj0g * fjg
 
         return outflow_rates
+
+    def __zero_ode_parameters(self):
+        '''
+        If ports are not connected the corresponding outflows must be zero.
+        '''
+
+        zeros = np.zeros(self.n_groups)
+
+        p_names = [p.name for p in self.ports]
+
+        if 'community' not in p_names:
+            self.ode_params['commit-to-community-coeff-grps']     = zeros
+            self.ode_params['commit-to-community-coeff-mod-grps'] = zeros
+
+        if 'prison' not in p_names:
+            self.ode_params['commit-to-prison-coeff-grps'] = zeros
+            self.ode_params['commit-to-prison-coeff-mod-grps'] = zeros
+
+        return

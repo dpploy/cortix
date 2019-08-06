@@ -144,7 +144,7 @@ class Cortix:
 
             for mod in self.modules:
                 self.log.info('Launching Module {}'.format(mod))
-                p = Process(target=mod.run,
+                p = Process( target=mod.run,
                         args=( modules_new_state, self.modules.index(mod)) )
                 processes.append(p)
                 p.start()
