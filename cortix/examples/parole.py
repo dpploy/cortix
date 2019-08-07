@@ -104,7 +104,7 @@ class Parole(Module):
 
             # to
             message_time = self.recv('prison')
-            outflow_rates = self.compute_outflow_rates( message_time, 'prison' )
+            outflow_rates = self.__compute_outflow_rates( message_time, 'prison' )
             self.send( (message_time, outflow_rates), 'prison' )
 
             # from
@@ -118,7 +118,7 @@ class Parole(Module):
             # one way "to" community
 
             message_time = self.recv('community')
-            outflow_rates = self.compute_outflow_rates( message_time, 'community' )
+            outflow_rates = self.__compute_outflow_rates( message_time, 'community' )
             self.send( (message_time, outflow_rates), 'community' )
 
             # Evolve parole group population to the next time stamp
@@ -197,7 +197,7 @@ class Parole(Module):
 
         return time
 
-    def compute_outflow_rates(self, time, name):
+    def __compute_outflow_rates(self, time, name):
 
         feg = self.population_phase.GetValue('feg',time)
 
