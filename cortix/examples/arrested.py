@@ -36,6 +36,8 @@ class Arrested(Module):
 
         super().__init__()
 
+        self.name = 'arrested'
+
         self.port_names_expected = ['probation','adjudication','jail','community']
 
         quantities      = list()

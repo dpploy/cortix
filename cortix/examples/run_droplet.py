@@ -65,9 +65,9 @@ if __name__ == '__main__':
 
     plot_vortex_profile = False # True may crash the X server.
 
-    n_droplets = 5
-    end_time   = 5*const.minute
-    time_step  = 0.1
+    n_droplets = 15
+    end_time   = 3*const.minute
+    time_step  = 0.2
 
     cortix = Cortix(use_mpi=use_mpi)
 

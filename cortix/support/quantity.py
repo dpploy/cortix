@@ -231,7 +231,15 @@ class Quantity:
         if not y_label:
             y_label = self.name
 
-        n_dim = len(self.__value[0])
+        if isinstance(self.__value[0],float) or isinstance(self.__value[0],int) \
+                or isinstance(self.__value[0],bool):
+            n_dim = 1
+            # Turn series of values into a series of a list of one value to allow for
+            # the indexing below
+            for i in range (len(self.__value[:])):
+                self.__value.iat[i] = [ self.__value.iat[i] ]  # list of one element
+        else:
+           n_dim = len(self.__value[0])
 
         x = self.__value.index
 

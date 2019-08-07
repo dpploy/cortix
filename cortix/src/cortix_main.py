@@ -21,7 +21,7 @@ class Cortix:
     3. Run the simulation
     '''
 
-    def __init__(self, use_mpi=False, splash=True):
+    def __init__(self, use_mpi=False, splash=False):
 
         self.use_mpi = use_mpi
 

@@ -19,20 +19,24 @@ class Module:
         '''
         Attributes
         ----------
+        name: str
+            A name given to the instance. Default is `None`.
         port_names_expected: list(str) or None
             A list of names of ports expected in the module. This will be compared
             to port names during runtime to check against the intended use of the
             module.
         state: any
             Any `pickle-able` data structure to be passed in a `multiprocessing.Queue`
-            to the parent process.
+            to the parent process. Default is `None`.
         '''
 
-        self.use_mpi = False
+        self.name = None
+
+        self.port_names_expected = None  # list of expected port names
 
         self.state = None  # state data passed to parent process if any
 
-        self.port_names_expected = None  # list of expected port names
+        self.use_mpi = False
 
         self.ports = []
 
@@ -86,20 +90,48 @@ class Module:
 
         return port
 
-    def connect(self, port_name, other_port):
+    def connect(self, port_name_or_module, to_other_port=None):
         '''
-        A simpler interface to create module connectivity. Connect the module port
-        with `my_port_name` to a given `other_port`.
+        A simpler interface (as compared to direct `port` connection) to create
+        module connectivity. Connect the module `port` (or `module`) to a given
+        `to_other_port` port.
+
+        Parameters
+        ----------
+        port_name_or_module: str or Module
+            Either a `port` name or a `Module` can be given. In the latter case
+            the `name` attribute of the module will be used to get the `port`
+            of the module passed. This port will be connected to the port of the
+            calling object.
+        to_other_port: Port
+            A `port` object to connect to. This must be `None` or absent if the
+            first argument is a `Module`.
         '''
 
-        my_port = self.get_port(port_name)
-        assert isinstance(other_port, Port), "Other port must be of Port type"
-        my_port.connect(other_port)
+        # Infer from types what to do with the intended module
+        if isinstance(port_name_or_module, Module):
+            assert to_other_port is None, 'Illegal syntax.'
+            other_module = port_name_or_module
+            other_module_name = other_module.name
+            if not other_module.name:
+                other_module_name = other_module.__class__.__name__.lower()
+            my_port = self.get_port(other_module_name)
+            my_name = self.name
+            if not my_name:
+                my_name = self.__class__.__name__.lower()
+            other_port = other_module.get_port(my_name)
+            my_port.connect(other_port)
+
+        if isinstance(port_name_or_module, str):
+            assert isinstance(to_other_port, Port), 'Other port must be of Port type'
+            port_name = port_name_or_module
+            my_port = self.get_port(port_name)
+            my_port.connect(to_other_port)
 
     def run(self, state_comm=None, idx_comm=None):
         '''
         Run method with an option to pass data back to the parent process when running
-        Python multiprocessing mode.
+        in Python multiprocessing mode.
 
         Notes
         -----
