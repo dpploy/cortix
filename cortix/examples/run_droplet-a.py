@@ -35,7 +35,7 @@ command line as
 if __name__ == '__main__':
 
     # Configuration Parameters
-    use_mpi         = False # True for MPI; False for Python multiprocessing
+    use_mpi  = False # True for MPI; False for Python multiprocessing
 
     plot_vortex_profile = False # True may crash the X server.
 
@@ -78,6 +78,8 @@ if __name__ == '__main__':
 
     if not use_mpi or cortix.rank == 0:
 
+        # All droplets' trajectory
+
         from mpl_toolkits.mplot3d import Axes3D
         import matplotlib.pyplot as plt
 
@@ -99,3 +101,34 @@ if __name__ == '__main__':
 
         fig.savefig('trajectories.png', dpi=300)
 
+        # All droplets' speed
+
+        fig = plt.figure(2)
+        plt.xlabel('Time [s]')
+        plt.ylabel('Speed [m/s]')
+        plt.title('All Droplets')
+
+        for m in modules[1:]:
+            speed_series = m.state.get_quantity_history('speed')[0].value
+            x = list(p.index)
+            y = list(speed_series[:])
+            plt.plot(x,y)
+
+        plt.grid()
+        fig.savefig('speeds.png', dpi=300)
+
+        # All droplets' radial position
+
+        fig = plt.figure(3)
+        plt.xlabel('Time [s]')
+        plt.ylabel('Radial Position [m]')
+        plt.title('All Droplets')
+
+        for m in modules[1:]:
+            speed_series = m.state.get_quantity_history('radial-position')[0].value
+            x = list(p.index)[1:]
+            y = list(speed_series[:])[1:]
+            plt.plot(x,y)
+
+        plt.grid()
+        fig.savefig('radialpos.png', dpi=300)
