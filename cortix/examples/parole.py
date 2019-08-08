@@ -90,7 +90,7 @@ class Parole(Module):
 
         return
 
-    def run(self, state_comm=None, idx_comm=None):
+    def run(self, *args):
 
         self.__zero_ode_parameters()
 
@@ -126,13 +126,14 @@ class Parole(Module):
 
             time = self.__step( time )
 
-        if state_comm:
+        # Share state with parent process
+        if not self.use_mpi:
             try:
                 pickle.dumps(self.state)
             except pickle.PicklingError:
-                state_comm.put((idx_comm,None))
+                args[1].put((args[0],None))
             else:
-                state_comm.put((idx_comm,self.state))
+                args[1].put((args[0],self.state))
 
     def __rhs_fn(self, u_vec, t, params):
 

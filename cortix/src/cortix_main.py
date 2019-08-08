@@ -96,9 +96,18 @@ class Cortix:
             m.use_mpi = self.use_mpi
             self.modules.append(m)
 
+    def get_modules(self):
+        '''
+        Return the list of modules in the root (master) process. If the `run()`
+        method has completed, the list is updated with data from the other processes.
+        '''
+
+        if self.rank == 0 or not self.use_mpi:
+            return self.modules
+
     def run(self):
         '''
-        Run the Cortix simulation with MPI if available o.w. fallback to multiprocessing
+        Run the Cortix simulation with either MPI or Python multiprocessing.
         '''
 
         # Running under MPI
@@ -134,23 +143,40 @@ class Cortix:
             # Synchronize at the end
             self.comm.Barrier()
 
+            # Collect at the root process all state data from modules
+            if self.rank == 0:
+                state = None
+            else:
+                state = self.modules[self.rank-1].state
+
+            modules_state = self.comm.gather( state, root=0 )
+
+            if self.rank == 0:
+                for i in range(self.size-1):
+                    self.modules[i].state = modules_state[i+1]
+
         # Running under Python multiprocessing
         #-------------------------------------
         else:
 
             # Parallel run all modules in Python multiprocessing
             processes = list()
-            modules_new_state = Queue()
 
+            modules_new_state = Queue() # for sharing data with master process if used
+
+            count_mods_status_attr = 0
             for mod in self.modules:
                 self.log.info('Launching Module {}'.format(mod))
-                p = Process( target=mod.run,
-                        args=( modules_new_state, self.modules.index(mod)) )
+                if mod.state: # if not None pass arguments for user: run(self,*args)
+                    p = Process( target=mod.run,
+                            args=( self.modules.index(mod), modules_new_state ) )
+                    count_mods_status_attr += 1
+                else: # if None pass no arguments for user: run(self)
+                    p = Process( target=mod.run )
                 processes.append(p)
                 p.start()
 
-            # Update module states in the parent process
-            for q in range(len(processes)):
+            for i in range(count_mods_status_attr):
                 (mod_idx, new_state) = modules_new_state.get()
                 self.modules[mod_idx].state = new_state
                 self.log.info('Module {} getting new state'.format(self.modules[mod_idx]))
