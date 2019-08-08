@@ -33,7 +33,7 @@
 <span id="cortix-main"></span><h1>cortix_main<a class="headerlink" href="#module-cortix_main" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="cortix_main.Cortix">
-<em class="property">class </em><code class="descclassname">cortix_main.</code><code class="descname">Cortix</code><span class="sig-paren">(</span><em>use_mpi=False</em>, <em>splash=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_main.html#Cortix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_main.Cortix" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">cortix_main.</code><code class="descname">Cortix</code><span class="sig-paren">(</span><em>use_mpi=False</em>, <em>splash=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_main.html#Cortix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_main.Cortix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>The main Cortix class definition:
 1. Create the object
@@ -63,6 +63,13 @@ there; do the least amount of work here.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="cortix_main.Cortix.get_modules">
+<code class="descname">get_modules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_main.html#Cortix.get_modules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_main.Cortix.get_modules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the list of modules in the root (master) process. If the <cite>run()</cite>
+method has completed, the list is updated with data from the other processes.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="cortix_main.Cortix.get_network">
 <code class="descname">get_network</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_main.html#Cortix.get_network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_main.Cortix.get_network" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructs and returns a networkx graph representation of the module network.</p>
@@ -71,7 +78,7 @@ there; do the least amount of work here.</p>
 <dl class="method">
 <dt id="cortix_main.Cortix.run">
 <code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_main.html#Cortix.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_main.Cortix.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run the Cortix simulation with MPI if available o.w. fallback to multiprocessing</p>
+<dd><p>Run the Cortix simulation with either MPI or Python multiprocessing.</p>
 </dd></dl>
 
 </dd></dl>

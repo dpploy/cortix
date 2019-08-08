@@ -53,8 +53,8 @@
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Vortex module used to model fluid flow using Cortix.</span>
 
-<span class="sd">    Note</span>
-<span class="sd">    ----</span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
 <span class="sd">    Any `port` name and any number of ports are allowed.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -96,7 +96,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="Vortex.run"><a class="viewcode-back" href="../examples_rst/vortex.html#vortex.Vortex.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">idx_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Vortex.run"><a class="viewcode-back" href="../examples_rst/vortex.html#vortex.Vortex.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="c1"># namedtuple does not pickle into send message; investigate later: vfda TODO</span>
         <span class="c1">#Props = namedtuple(&#39;Props&#39;,[&#39;mass_density&#39;,&#39;dyn_viscosity&#39;])</span>
@@ -123,15 +123,6 @@
                 <span class="n">port</span><span class="o">.</span><span class="n">send</span><span class="p">(</span> <span class="p">(</span><span class="n">message_time</span><span class="p">,</span> <span class="n">velocity</span><span class="p">,</span> <span class="n">fluid_props</span><span class="p">)</span> <span class="p">)</span>
 
             <span class="n">time</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step</span>
-
-        <span class="k">if</span> <span class="n">state_comm</span><span class="p">:</span>
-
-            <span class="k">try</span><span class="p">:</span>
-              <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
-            <span class="k">except</span> <span class="n">pickle</span><span class="o">.</span><span class="n">PicklingError</span><span class="p">:</span>
-                <span class="n">state_comm</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">idx_comm</span><span class="p">,</span><span class="kc">None</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">state_comm</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">idx_comm</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span>
 
         <span class="k">return</span></div>
 

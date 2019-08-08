@@ -40,7 +40,7 @@
         <span class="c1"># Call the Module class constructor</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-<div class="viewcode-block" id="DummyModule.run"><a class="viewcode-back" href="../examples_rst/dummy_module.html#dummy_module.DummyModule.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">idx_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DummyModule.run"><a class="viewcode-back" href="../examples_rst/dummy_module.html#dummy_module.DummyModule.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Simulate sending data every second</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
@@ -49,10 +49,7 @@
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sent </span><span class="si">{}</span><span class="s2">!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finished Sending!&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">state_comm</span><span class="p">:</span>
-            <span class="n">state_comm</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">idx_comm</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span></div></div>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finished Sending!&quot;</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="DummyModule2"><a class="viewcode-back" href="../examples_rst/dummy_module.html#dummy_module.DummyModule2">[docs]</a><span class="k">class</span> <span class="nc">DummyModule2</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -60,7 +57,7 @@
         <span class="c1"># Call the Module class constructor</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-<div class="viewcode-block" id="DummyModule2.run"><a class="viewcode-back" href="../examples_rst/dummy_module.html#dummy_module.DummyModule2.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">idx_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="DummyModule2.run"><a class="viewcode-back" href="../examples_rst/dummy_module.html#dummy_module.DummyModule2.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Simulate receiving data every two seconds </span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
@@ -76,10 +73,7 @@
             <span class="k">assert</span><span class="p">(</span><span class="n">data</span> <span class="o">==</span> <span class="n">i</span><span class="p">)</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finished Receiving!&quot;</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">state_comm</span><span class="p">:</span>
-            <span class="n">state_comm</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">idx_comm</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span></div></div>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Finished Receiving!&quot;</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

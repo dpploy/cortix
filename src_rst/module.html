@@ -45,6 +45,12 @@ one MPI process.</p>
 <dt id="module.Module.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="attribute">
+<dt id="module.Module.name">
+<code class="descname">name</code><a class="headerlink" href="#module.Module.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – A name given to the instance. Default is <cite>None</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="module.Module.port_names_expected">
 <code class="descname">port_names_expected</code><a class="headerlink" href="#module.Module.port_names_expected" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>list(str) or None</em> – A list of names of ports expected in the module. This will be compared
@@ -56,16 +62,34 @@ module.</p>
 <dt id="module.Module.state">
 <code class="descname">state</code><a class="headerlink" href="#module.Module.state" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>any</em> – Any <cite>pickle-able</cite> data structure to be passed in a <cite>multiprocessing.Queue</cite>
-to the parent process.</p>
+to the parent process or to be gathered in the root MPI process.
+Default is <cite>None</cite>.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="method">
 <dt id="module.Module.connect">
-<code class="descname">connect</code><span class="sig-paren">(</span><em>port_name</em>, <em>other_port</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.connect" title="Permalink to this definition">¶</a></dt>
-<dd><p>A simpler interface to create module connectivity. Connect the module port
-with <cite>my_port_name</cite> to a given <cite>other_port</cite>.</p>
+<code class="descname">connect</code><span class="sig-paren">(</span><em>port_name_or_module</em>, <em>to_other_port=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>A simpler interface (as compared to direct <cite>port</cite> connection) to create
+module connectivity. Connect the module <cite>port</cite> (or <cite>module</cite>) to a given
+<cite>to_other_port</cite> port.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>port_name_or_module</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference internal" href="#module.Module" title="module.Module"><em>Module</em></a>) – Either a <cite>port</cite> name or a <cite>Module</cite> can be given. In the latter case
+the <cite>name</cite> attribute of the module will be used to get the <cite>port</cite>
+of the module passed. This port will be connected to the port of the
+calling object.</li>
+<li><strong>to_other_port</strong> (<a class="reference internal" href="port.html#port.Port" title="port.Port"><em>Port</em></a>) – A <cite>port</cite> object to connect to. This must be <cite>None</cite> or absent if the
+first argument is a <cite>Module</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -82,25 +106,44 @@ with <cite>my_port_name</cite> to a given <cite>other_port</cite>.</p>
 
 <dl class="method">
 <dt id="module.Module.run">
-<code class="descname">run</code><span class="sig-paren">(</span><em>state_comm=None</em>, <em>idx_comm=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.run" title="Permalink to this definition">¶</a></dt>
+<code class="descname">run</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.run" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run method with an option to pass data back to the parent process when running
-Python multiprocessing mode.</p>
+in Python multiprocessing mode. If the user does not want to share data with
+the parent process, this function can be overriden with <cite>run(self)</cite>
+or <cite>run(self, *args)</cite> as long as <cite>self.state = None</cite>.
+If <cite>self.state</cite> points to anything but <cite>None</cite>, the user must use
+<a href="#id1"><span class="problematic" id="id2">`</span></a>run(self, <a href="#id3"><span class="problematic" id="id4">*</span></a>args).</p>
 <div class="admonition-notes admonition">
 <p class="first admonition-title">Notes</p>
-<p class="last">For now, add this command: <cite>state_comm.put((idx_comm,self.state))</cite>
-to the bottom of your method. If you are not using <cite>self.state</cite>, then the
-command can be issued anywhere in the body of the function.</p>
+<p>When in multiprocessing, <cite>*args</cite> has two elements: <cite>comm_idx</cite> and <cite>comm_state</cite>.
+To pass back the state of the module, the user should insert the provided
+index <cite>comm_idx</cite> and the <cite>state</cite> into the queue as follows:</p>
+<blockquote>
+<div><p># Share state with the parent process
+if not self.use_mpi:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>try:</dt>
+<dd>pickle.dumps(self.state)</dd>
+<dt>except pickle.PicklingError:</dt>
+<dd>args[1].put((arg[0],None))</dd>
+<dt>else:</dt>
+<dd>args[1].put((arg[0],self.state))</dd>
+</dl>
+</div></blockquote>
+</div></blockquote>
+<p class="last">at the bottom of the user defined run() function.</p>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>state_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v3.7)"><em>multiprocessing.Queue</em></a>) – When using the Python <cite>multiprocessing</cite> library <cite>state_comm</cite> must have
+<li><strong>comm_idx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index of the state in the communication queue.</li>
+<li><strong>comm_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v3.7)"><em>multiprocessing.Queue</em></a>) – When using the Python <cite>multiprocessing</cite> library <cite>state_comm</cite> must have
 the module’s <cite>self.state</cite> in it. That is,
 <cite>state_comm.put((idx_comm,self.state))</cite> must be the last command in the
 method before <cite>return</cite>. In addition, self.state must be <cite>pickle-able</cite>.</li>
-<li><strong>idx_comm</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index of the state in the communication queue.</li>
 </ul>
 </td>
 </tr>

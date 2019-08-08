@@ -122,7 +122,7 @@
 
         <span class="k">return</span>
 
-<div class="viewcode-block" id="Parole.run"><a class="viewcode-back" href="../examples_rst/parole.html#parole.Parole.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">idx_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Parole.run"><a class="viewcode-back" href="../examples_rst/parole.html#parole.Parole.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__zero_ode_parameters</span><span class="p">()</span>
 
@@ -136,7 +136,7 @@
 
             <span class="c1"># to</span>
             <span class="n">message_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="s1">&#39;prison&#39;</span><span class="p">)</span>
-            <span class="n">outflow_rates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_outflow_rates</span><span class="p">(</span> <span class="n">message_time</span><span class="p">,</span> <span class="s1">&#39;prison&#39;</span> <span class="p">)</span>
+            <span class="n">outflow_rates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__compute_outflow_rates</span><span class="p">(</span> <span class="n">message_time</span><span class="p">,</span> <span class="s1">&#39;prison&#39;</span> <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span> <span class="p">(</span><span class="n">message_time</span><span class="p">,</span> <span class="n">outflow_rates</span><span class="p">),</span> <span class="s1">&#39;prison&#39;</span> <span class="p">)</span>
 
             <span class="c1"># from</span>
@@ -150,7 +150,7 @@
             <span class="c1"># one way &quot;to&quot; community</span>
 
             <span class="n">message_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="s1">&#39;community&#39;</span><span class="p">)</span>
-            <span class="n">outflow_rates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_outflow_rates</span><span class="p">(</span> <span class="n">message_time</span><span class="p">,</span> <span class="s1">&#39;community&#39;</span> <span class="p">)</span>
+            <span class="n">outflow_rates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__compute_outflow_rates</span><span class="p">(</span> <span class="n">message_time</span><span class="p">,</span> <span class="s1">&#39;community&#39;</span> <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send</span><span class="p">(</span> <span class="p">(</span><span class="n">message_time</span><span class="p">,</span> <span class="n">outflow_rates</span><span class="p">),</span> <span class="s1">&#39;community&#39;</span> <span class="p">)</span>
 
             <span class="c1"># Evolve parole group population to the next time stamp</span>
@@ -158,13 +158,14 @@
 
             <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__step</span><span class="p">(</span> <span class="n">time</span> <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">state_comm</span><span class="p">:</span>
+        <span class="c1"># Share state with parent process</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
             <span class="k">except</span> <span class="n">pickle</span><span class="o">.</span><span class="n">PicklingError</span><span class="p">:</span>
-                <span class="n">state_comm</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">idx_comm</span><span class="p">,</span><span class="kc">None</span><span class="p">))</span>
+                <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="kc">None</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">state_comm</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">idx_comm</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span></div>
+                <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">__rhs_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u_vec</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
 
@@ -229,7 +230,7 @@
 
         <span class="k">return</span> <span class="n">time</span>
 
-<div class="viewcode-block" id="Parole.compute_outflow_rates"><a class="viewcode-back" href="../examples_rst/parole.html#parole.Parole.compute_outflow_rates">[docs]</a>    <span class="k">def</span> <span class="nf">compute_outflow_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__compute_outflow_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 
         <span class="n">feg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;feg&#39;</span><span class="p">,</span><span class="n">time</span><span class="p">)</span>
 
@@ -249,7 +250,7 @@
 
             <span class="n">outflow_rates</span> <span class="o">=</span> <span class="n">ce0g</span> <span class="o">*</span> <span class="n">me0g</span> <span class="o">*</span> <span class="n">feg</span>
 
-            <span class="k">return</span> <span class="n">outflow_rates</span></div>
+            <span class="k">return</span> <span class="n">outflow_rates</span>
 
     <span class="k">def</span> <span class="nf">__zero_ode_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>

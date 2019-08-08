@@ -134,7 +134,7 @@
 
         <span class="k">return</span></div>
 
-<div class="viewcode-block" id="Jail.run"><a class="viewcode-back" href="../examples_rst/jail.html#jail.Jail.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">idx_comm</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Jail.run"><a class="viewcode-back" href="../examples_rst/jail.html#jail.Jail.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__zero_ode_parameters</span><span class="p">()</span>
 
@@ -190,13 +190,14 @@
 
             <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__step</span><span class="p">(</span> <span class="n">time</span> <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">state_comm</span><span class="p">:</span>
+        <span class="c1"># Share state with parent process</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
             <span class="k">except</span> <span class="n">pickle</span><span class="o">.</span><span class="n">PicklingError</span><span class="p">:</span>
-                <span class="n">state_comm</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">idx_comm</span><span class="p">,</span><span class="kc">None</span><span class="p">))</span>
+                <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="kc">None</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">state_comm</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">idx_comm</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span></div>
+                <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span></div>
 
     <span class="k">def</span> <span class="nf">__rhs_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u_vec</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
 
