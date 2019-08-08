@@ -17,17 +17,18 @@ class Droplet(Module):
     '''
     Droplet Cortix module used to model very simple fluid-particle interactions.
 
-    Note
-    ----
-    `external-flow`: this is a `port` that exchanges data with any other module that
-    provides information about the flow outside the droplet.
-
-    `visualization`: this is a `port` that sends data to a visualization module.
+    Notes
+    -----
+    Port names used in this module: `external-flow` exchanges data with any other
+    module that provides information about the flow outside the droplet,
+    `visualization` sends data to a visualization module.
     '''
 
     def __init__(self):
 
         super().__init__()
+
+        self.port_names_expected = ['external-flow','visualization']
 
         self.bounce = True
         self.slip   = True
@@ -112,7 +113,7 @@ class Droplet(Module):
 
         self.state = self.liquid_phase
 
-    def run(self, state_comm=None, idx_comm=None):
+    def run(self, *args):
 
         time = self.initial_time
 
@@ -153,13 +154,14 @@ class Droplet(Module):
 
         self.send('DONE', 'visualization') # this should not be needed: TODO
 
-        if state_comm:
+        # Share state with parent process
+        if not self.use_mpi:
             try:
                 pickle.dumps(self.state)
             except pickle.PicklingError:
-                state_comm.put((idx_comm,None))
+                args[1].put((args[0],None))
             else:
-                state_comm.put((idx_comm,self.state))
+                args[1].put((args[0],self.state))
 
         return
 
@@ -265,7 +267,3 @@ class Droplet(Module):
         self.liquid_phase.SetValue('radial-position', np.linalg.norm(u_vec[0:2]), time)
 
         return time
-
-    def _get_reserved_port_names(self):
-
-        return ['external-flow','visualization']

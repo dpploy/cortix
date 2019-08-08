@@ -27,7 +27,8 @@ class Module:
             module.
         state: any
             Any `pickle-able` data structure to be passed in a `multiprocessing.Queue`
-            to the parent process. Default is `None`.
+            to the parent process or to be gathered in the root MPI process.
+            Default is `None`.
         '''
 
         self.name = None
@@ -128,26 +129,42 @@ class Module:
             my_port = self.get_port(port_name)
             my_port.connect(to_other_port)
 
-    def run(self, state_comm=None, idx_comm=None):
+    #def run(self, state_comm=None, idx_comm=None):
+    def run(self, *args):
         '''
         Run method with an option to pass data back to the parent process when running
-        in Python multiprocessing mode.
+        in Python multiprocessing mode. If the user does not want to share data with
+        the parent process, this function can be overriden with `run(self)`
+        or `run(self, *args)` as long as `self.state = None`.
+        If `self.state` points to anything but `None`, the user must use
+        `run(self, *args).
 
         Notes
         -----
-        For now, add this command: `state_comm.put((idx_comm,self.state))`
-        to the bottom of your method. If you are not using `self.state`, then the
-        command can be issued anywhere in the body of the function.
+        When in multiprocessing, `*args` has two elements: `comm_idx` and `comm_state`.
+        To pass back the state of the module, the user should insert the provided
+        index `comm_idx` and the `state` into the queue as follows:
+
+            # Share state with the parent process
+            if not self.use_mpi:
+                try:
+                    pickle.dumps(self.state)
+                except pickle.PicklingError:
+                    args[1].put((arg[0],None))
+                else:
+                    args[1].put((arg[0],self.state))
+
+        at the bottom of the user defined run() function.
 
         Parameters
         ----------
-        state_comm: multiprocessing.Queue
+        comm_idx: int
+            Index of the state in the communication queue.
+
+        comm_state: multiprocessing.Queue
             When using the Python `multiprocessing` library `state_comm` must have
             the module's `self.state` in it. That is,
             `state_comm.put((idx_comm,self.state))` must be the last command in the
             method before `return`. In addition, self.state must be `pickle-able`.
-
-        idx_comm: int
-            Index of the state in the communication queue.
         '''
         raise NotImplementedError('Module must implement run()')

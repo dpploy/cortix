@@ -21,8 +21,8 @@ class Vortex(Module):
     '''
     Vortex module used to model fluid flow using Cortix.
 
-    Note
-    ----
+    Notes
+    -----
     Any `port` name and any number of ports are allowed.
     '''
 
@@ -64,7 +64,7 @@ class Vortex(Module):
 
         self.state = None
 
-    def run(self, state_comm=None, idx_comm=None):
+    def run(self):
 
         # namedtuple does not pickle into send message; investigate later: vfda TODO
         #Props = namedtuple('Props',['mass_density','dyn_viscosity'])
@@ -91,15 +91,6 @@ class Vortex(Module):
                 port.send( (message_time, velocity, fluid_props) )
 
             time += self.time_step
-
-        if state_comm:
-
-            try:
-              pickle.dumps(self.state)
-            except pickle.PicklingError:
-                state_comm.put((idx_comm,None))
-            else:
-                state_comm.put((idx_comm,self.state))
 
         return
 
