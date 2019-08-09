@@ -37,7 +37,7 @@ class DataPlot(Module):
 
         self.state = self.data
 
-    def run(self, state_comm=None, idx_comm=None):
+    def run(self, *args):
         '''
         Spawn a thread to handle each port connection.
         '''
@@ -54,13 +54,14 @@ class DataPlot(Module):
 
         self.plot_data()
 
-        if state_comm:
+        # Share state with parent process
+        if not self.use_mpi:
             try:
                 pickle.dumps(self.state)
             except pickle.PicklingError:
-                state_comm.put((idx_comm,None))
+                args[1].put((args[0],None))
             else:
-                state_comm.put((idx_comm,self.state))
+                args[1].put((args[0],self.state))
 
         return
 

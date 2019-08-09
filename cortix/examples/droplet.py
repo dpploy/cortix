@@ -25,6 +25,16 @@ class Droplet(Module):
     '''
 
     def __init__(self):
+        '''
+        Attributes
+        ----------
+        initial_time: float
+        end_time: float
+        time_step: float
+        show_time: tuple
+            Two-element tuple, `(bool,float)`, `True` will print to standard
+            output.
+        '''
 
         super().__init__()
 
@@ -41,6 +51,8 @@ class Droplet(Module):
         self.initial_time = 0.0
         self.end_time = 100
         self.time_step = 0.1
+        self.show_time = (False,1*const.minute)
+        self.log = logging.getLogger('cortix')
 
         # Create a drop with random diameter up within 5 and 8 mm.
         self.droplet_diameter = (np.random.random(1) * (8 - 5) + 5)[0] * const.milli
