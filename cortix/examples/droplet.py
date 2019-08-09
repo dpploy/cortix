@@ -238,8 +238,8 @@ class Droplet(Module):
                                          rtol=1e-4, atol=1e-8, mxstep=200,
                                          full_output=True)
 
-        assert info_dict['message'] =='Integration successful.', 'At time %r message:'%\
-                (time, info_dict['message'])
+        assert info_dict['message'] =='Integration successful.', \
+                'At time: %r message: %r'%(time, info_dict['message'])
 
         u_vec = u_vec_hist[1,:]  # solution vector at final time step
         values = self.liquid_phase.GetRow(time) # values at previous time
