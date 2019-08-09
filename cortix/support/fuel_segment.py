@@ -79,10 +79,6 @@ class FuelSegment():
         Returns the geometry of the fuel bundle (cylindrical, hexoganol,
         rectangular, etc).
 
-        Parameters
-        ----------
-        Empty:
-
         Returns
         -------
         geometry: str
@@ -92,14 +88,10 @@ class FuelSegment():
     geometry = property(get_geometry, None, None, None)
 
     def get_species(self):
-
         '''
         Returns the species object which describes the composition of the fuel
         bundle. The species encapsulates all chemical species present in the
         fuel bundle.
-        Parameters
-        ----------
-        None:
 
         Returns
         -------
@@ -110,11 +102,9 @@ class FuelSegment():
     species = property(get_species, None, None, None)
 
     def get_specie(self, name):
-
         '''
         Returns a specie named [name] from the list of species making up the
         fuel bundle. If no name is specified, this function will return None.
-
 
         Parameters
         ----------
@@ -123,7 +113,6 @@ class FuelSegment():
         Returns
         -------
         specie: obj
-
         '''
 
         for specie in self.__species:
@@ -155,17 +144,14 @@ class FuelSegment():
         by passing a specific nuclide to the function, with a name value of
         mass or mass-cc.
 
-
         Parameters
         ----------
         name: str
         nuclide: str
 
-
         Returns
         -------
         many types
-
         '''
 
         attribute_name = name
@@ -197,7 +183,7 @@ class FuelSegment():
             return 1
 
 # .................................................................................
-# segment id 
+# segment id
 
         if attribute_name == 'segment-id':
             return self.__geometry['segment id']
@@ -459,10 +445,6 @@ class FuelSegment():
         '''
         Returns the total volume of fuel in the fuel segment.
 
-        Parameters
-        ----------
-        empty
-
         Returns
         -------
         volume: float
@@ -476,14 +458,9 @@ class FuelSegment():
         return volume
 
     def __str__(self):
-
         '''
         Used to print the geometry of the fuel segment and the species that it
         consists of.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -494,14 +471,9 @@ class FuelSegment():
         return s % (self.__geometry, self.__species)
 
     def __repr__(self):
-
         '''
         Used to pront the geometry of the fuel segment and the species that it
         consists of.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------

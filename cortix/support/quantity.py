@@ -70,28 +70,18 @@ class Quantity:
 #*********************************************************************************
 
     def SetName(self, n):
-
         '''
         Sets the name of the quantity in question to n.
 
         Parameters
         ----------
         n: str
-
-        Returns
-        -------
-        empty
         '''
         self.__name = n
 
     def get_name(self):
-
         '''
         Returns the name of the quantity.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -102,29 +92,18 @@ class Quantity:
     name = property(get_name, SetName, None, None)
 
     def SetValue(self, v):
-
         '''
         Sets the numerical value of the quantity to v.
 
         Parameters
         ----------
         v: float
-
-        Returns
-        -------
-        empty
-
         '''
         self.__value = v
 
     def GetValue(self):
-
         '''
         Gets the numerical value of the quantity.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -141,23 +120,14 @@ class Quantity:
         Parameters
         ----------
         fn: str
-
-        Returns
-        -------
-        empty
         '''
 
         self.__formalName = fn
         self.__formal_name = fn
 
     def GetFormalName(self):
-
         '''
         Returns the formal name of the quantity.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -169,7 +139,6 @@ class Quantity:
     formal_name = property(GetFormalName, SetFormalName, None, None)
 
     def SetUnit(self, f):
-
         '''
         Sets the units of the quantity to f (for example, density would be in
         units of g/cc.
@@ -177,22 +146,13 @@ class Quantity:
         Parameters
         ----------
         f: str
-
-        Returns
-        -------
-        empty
         '''
 
         self.__unit = f
 
     def GetUnit(self):
-
         '''
         Returns the units of the quantity.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -267,14 +227,9 @@ class Quantity:
 #*********************************************************************************
 
     def __str__(self):
-
         '''
         Used to print the data stored by the quantity class. Will print out
         name, formal name, the value of the quantity and its unit.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -285,14 +240,9 @@ class Quantity:
         return s % (self.name, self.formalName, self.value, self.unit)
 
     def __repr__(self):
-
         '''
         Used to print the data stored by the quantity class. Will print out
         name, formal name, the value of the quantity and its unit.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------

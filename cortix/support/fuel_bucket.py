@@ -58,10 +58,6 @@ class FuelBucket():
         '''
         Returns the name of the fuel bucket.
 
-        Parameters
-        ----------
-        empty
-
         Returns
         -------
         name: str
@@ -75,10 +71,6 @@ class FuelBucket():
         Returns the type of slugs being stored in the bucket (inner slug or
         outer slug).
 
-        Parameters
-        ----------
-        empty
-
         Returns
         -------
         slug_type: str
@@ -90,10 +82,6 @@ class FuelBucket():
     def get_n_slugs(self):
         '''
         Returns the number of fuel slugs in the bucket.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -107,10 +95,6 @@ class FuelBucket():
         '''
         Returns the enrichment of the fuel slugs in the bucket, in %.
 
-        Parameters
-        ----------
-        empty
-
         Returns
         -------
         fuel_enrichment: float
@@ -122,10 +106,6 @@ class FuelBucket():
     def get_fresh_u_mass(self):
         '''
         Returns the total amount of uranium in the bucket, in grams.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -139,10 +119,6 @@ class FuelBucket():
         '''
         Returns the total amount of uranium-238 in the bucket, in grams.
 
-        Parameters
-        ----------
-        empty
-
         Returns
         -------
         fresh_u238_mass: float
@@ -152,13 +128,8 @@ class FuelBucket():
     fresh_u238_mass = property(get_fresh_u238_mass, None, None, None)
 
     def get_fresh_u235_mass(self):
-
         '''
         Returns the total amount of uranium-235 in the bucket, in grams.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -172,10 +143,6 @@ class FuelBucket():
         '''
         Returns the total mass of cladding material in the bucket, in grams.
 
-        Parameters
-        ----------
-        empty
-
         Returns
         -------
         cladding_mass: float
@@ -188,13 +155,8 @@ class FuelBucket():
     #------
 
     def get_slug_length(self):
-
         '''
         Returns the length of each slug in the fuel bucket.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -204,33 +166,23 @@ class FuelBucket():
         return self.__get_slug_length()
 
     def set_slug_length(self, x):
-
         '''
         Sets the length of all slugs in the bucket to x. Used for chopping.
 
         Parameters
         ----------
         x: float
-
-        Returns
-        -------
-        empty
         '''
 
         self.__set_slug_length(x)
     slug_length = property(get_slug_length, set_slug_length, None, None)
 
     def get_outer_slug_od(self):
-
         '''
         Returns the outer diameter of the outer section of fuel, in cm. A fuel
         slug consists of an outer section of fuel and an inner section of fuel,
         with cladding on the outside of the slug and between the inner and
         outer sections of fuel.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -241,13 +193,8 @@ class FuelBucket():
     outer_slug_od = property(get_outer_slug_od, None, None, None)
 
     def get_outer_slug_id(self):
-
         '''
         Returns the inner diameter of the outer section of fuel, in cm.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -258,13 +205,8 @@ class FuelBucket():
     outer_slug_id = property(get_outer_slug_id, None, None, None)
 
     def get_inner_slug_od(self):
-
         '''
         Returns the outer  diameter of the inner section of fuel, in cm.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -275,13 +217,8 @@ class FuelBucket():
     inner_slug_od = property(get_inner_slug_od, None, None, None)
 
     def get_inner_slug_id(self):
-
         '''
         Returns the inner diameter of the inner section of fuel, in cm.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -292,14 +229,9 @@ class FuelBucket():
     inner_slug_id = property(get_inner_slug_id, None, None, None)
 
     def get_cladding_wall_thickness(self):
-
         '''
         Returns the thickness of the cladding wall which is on the outside of
         every fuel slug, and in between both sections of fuel, in cm.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -311,31 +243,21 @@ class FuelBucket():
         get_cladding_wall_thickness, None, None, None)
 
     def get_cladding_end_thickness(self):
-
         '''
         Gets the thickness of the hemispherical cladding end caps that are
         placed on the top and bottom of the fuel slug, in cm.
 
-        Parameters
-        ----------
-        empty
-
         Returns
         -------
-        cladding_end_thickness: cm
+        cladding_end_thickness: float
         '''
 
         return self.__get_cladding_end_thickness()
     cladding_end_thickness = property(get_cladding_end_thickness, None, None, None)
 
     def get_slug_fuel_volume(self):
-
         '''
         Returns the volume of fuel present in a single fuel slug, in cm^3.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -346,13 +268,8 @@ class FuelBucket():
     slug_fuel_volume = property(get_slug_fuel_volume, None, None, None)
 
     def get_fuel_volume(self):
-
         '''
         Returns the total volume of fuel in the entire bucket, in cm^3.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -363,13 +280,8 @@ class FuelBucket():
     fuel_volume = property(get_fuel_volume, None, None, None)
 
     def get_slug_cladding_volume(self):
-
         '''
         Returns the volume of cladding present in a single fuel slug, in cm^3.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -380,13 +292,8 @@ class FuelBucket():
     slug_cladding_volume = property(get_slug_cladding_volume, None, None, None)
 
     def get_cladding_volume(self):
-
         '''
         Returns the total volume of cladding in the bucket, in cm^3.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -400,10 +307,6 @@ class FuelBucket():
         '''
         Returns the total mass of fuel in the solid phase in the bucket.
 
-        Parameters
-        ----------
-        empty
-
         Returns
         -------
         fuel_mass: float
@@ -413,14 +316,9 @@ class FuelBucket():
     fuel_mass = property(get_fuel_mass, None, None, None)
 
     def get_fuel_mass_unit(self):
-
         '''
         Returns the unit that is used to measure the mass of fuel in the
         bucket.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -431,13 +329,8 @@ class FuelBucket():
     fuel_mass_unit = property(get_fuel_mass_unit, None, None, None)
 
     def get_radioactivity(self):   # radioactivity of the fuel bucket (fix me)
-
         '''
         Returns the radioactivity of the fuel bucket, in units of curies.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -448,14 +341,9 @@ class FuelBucket():
     radioactivity = property(get_radioactivity, None, None, None)
 
     def get_gamma_pwr(self):
-
         '''
         Returns the amount of gamma radiation given off by the fuel bucket,
         in units of watts.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -466,14 +354,9 @@ class FuelBucket():
     gamma_pwr = property(get_gamma_pwr, None, None, None)
 
     def get_heat_pwr(self):
-
         '''
         Returns the total amount of heat generated by the bucket, in units of
         watts.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -489,10 +372,6 @@ class FuelBucket():
         Returns the total radioactivity of the solid phase fuel, in units of
         curies.
 
-        Parameters
-        ----------
-        empty
-
         Returns
         -------
         fuel_radioactivity: float
@@ -505,10 +384,6 @@ class FuelBucket():
         '''
         Returns the phase history of the fuel.
 
-        Parameters
-        ----------
-        empty
-
         Returns
         -------
         fuel_phase: pandas.core.frame.DataFrame
@@ -517,30 +392,20 @@ class FuelBucket():
         return self.__fuel_phase
 
     def set_fuel_phase(self, phase):
-
         '''
         Sets the current fuel phase to a specified phase value.
 
         Parameters
         ----------
         phase: dataFrame
-
-        Returns
-        -------
-        empty
         '''
 
         self.__fuel_phase = deepcopy(phase)
     fuel_phase = property(get_fuel_phase, set_fuel_phase, None, None)
 
     def get_cladding_phase(self):
-
         '''
         Returns the phase history of the cladding.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -550,17 +415,12 @@ class FuelBucket():
         return self.__cladding_phase
 
     def set_cladding_phase(self, phase):
-
         '''
         Set's the phase history to specific values.
 
         Parameters
         ----------
         phase: dataFrame
-
-        Returns
-        -------
-        empty
         '''
 
         self.__cladding_phase = deepcopy(phase)
@@ -571,13 +431,8 @@ class FuelBucket():
 #**********************************************************************************
 
     def __get_n_slugs(self):
-
         '''
         Returns the number of fuel slugs in the bucket.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -587,13 +442,8 @@ class FuelBucket():
         return int(self.__specs.loc['Number of slugs', 1])
 
     def __get_fuel_enrichment(self):
-
         '''
         Returns the enrichment of the fuel in the bucket, in %.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -603,14 +453,9 @@ class FuelBucket():
         return float(self.__specs.loc['Enrichment [U-235 wt%]', 1])
 
     def __get_outer_slug_fresh_u_mass(self):
-
         '''
         Returns the the mass of uranium present in the outer part of a fuel
         slug, in grams.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -620,14 +465,9 @@ class FuelBucket():
         return float(self.__specs.loc['U mass outer slug [kg]', 1]) * 1000.0  # [g]
 
     def __get_inner_slug_fresh_u_mass(self):
-
         '''
         Returns the mass of uranium present in the inner part of the fuel slug,
         in grams.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -638,14 +478,9 @@ class FuelBucket():
             self.__specs.loc['U mass inner slug [kg]', 1]) * 1000.0  # [g]
 
     def __get_outer_slug_cladding_mass(self):
-
         '''
         Returns the mass of cladding present in the outer part of the slug, in
         grams.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -656,29 +491,18 @@ class FuelBucket():
             self.__specs.loc['Cladding mass outer slug [kg]', 1]) * 1000.0  # [g]
 
     def __get_inner_slug_cladding_mass(self):
-
         '''
         Returns the mass of cladding present in the inner part of the slug, in
         grams.
-        Parameters
-        ----------
-
-        Returns
-        -------
         '''
 
         return float(
             self.__specs.loc['Cladding mass inner slug [kg]', 1]) * 1000.0  # [g]
 
     def __get_fresh_u_mass(self):
-
         '''
         Returns the total amount of uranium present in the fuel bucket, in
         grams.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -691,14 +515,9 @@ class FuelBucket():
         return n_slugs * (uMassOuterSlug + uMassInnerSlug)
 
     def __get_fresh_u238_mass(self):
-
         '''
         Returns the total mass of uranium-238 present in the fuel bucket, in
         grams.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -710,13 +529,8 @@ class FuelBucket():
         return totalUMass * (1.0 - fuelEnrichment / 100.0)
 
     def __get_fresh_u235_mass(self):
-
         '''
         Returns the total amount of uranium-235 present in the bucket in grams.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -728,13 +542,8 @@ class FuelBucket():
         return totalUMass * fuelEnrichment / 100.0
 
     def __get_cladding_mass(self):
-
         '''
         Returns the total amount of cladding present in the bucket, in grams.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -747,13 +556,8 @@ class FuelBucket():
         return n_slugs * (cladMassOuterSlug + cladMassInnerSlug)
 
     def __get_slug_length(self):
-
         '''
         Returns the length of a fuel slug, in cm. Does NOT include end caps.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -763,30 +567,20 @@ class FuelBucket():
         return float(self.__specs.loc['Slug length [in]', 1]) * 2.54  # cm
 
     def __set_slug_length(self, x):
-
         '''
         Sets the length of a fuel slug to a specified value. Used for chopping.
 
         Parameters
         ----------
         x: float
-
-        Returns
-        -------
-        empty
         '''
 
         self.__specs.loc['Slug length [in]', 1] = x / 2.54  # in
         return
 
     def __get_outer_slug_od(self):
-
         '''
         Returns the outer diameter of the outer fuel section of the slug in cm.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -796,13 +590,8 @@ class FuelBucket():
         return float(self.__specs.loc['Outer slug O.D. [in]', 1]) * 2.54  # cm
 
     def __get_outer_slug_id(self):
-
         '''
         Returns the inner diameter of the outer fuel section of the slug in cm.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -812,13 +601,8 @@ class FuelBucket():
         return float(self.__specs.loc['Outer slug I.D. [in]', 1]) * 2.54  # cm
 
     def __get_inner_slug_od(self):
-
         '''
         Returns the outer diameter of the inner fuel section of the slug in cm.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -828,13 +612,8 @@ class FuelBucket():
         return float(self.__specs.loc['Inner slug O.D. [in]', 1]) * 2.54  # cm
 
     def __get_inner_slug_id(self):
-
         '''
         Returns the inner diameter of the inner fuel section of the slug in cm.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -848,10 +627,6 @@ class FuelBucket():
         Returns the thickness of the cladding material used on the outside of
         the fuel slug and between the inner and outer fuel sections.
 
-        Parameters
-        ----------
-        empty
-
         Returns
         -------
         self.__specs.loc['Cladding wall thickness [mm]', 1]) /10: float
@@ -861,14 +636,9 @@ class FuelBucket():
             self.__specs.loc['Cladding wall thickness [mm]', 1]) / 10.0  # cm
 
     def __get_cladding_end_thickness(self):
-
         '''
         Returns the thickness of the hemispherical end caps placed on either
         end of the cylindrical fuel slug, in cm.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -879,14 +649,9 @@ class FuelBucket():
             self.__specs.loc['Cladding end cap thickness [mm]', 1]) / 10.0  # cm
 
     def __get_slug_fuel_volume(self):
-
         '''
         Returns the volume of fuel contained within a single fuel slug, in
         cm^3.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -908,18 +673,9 @@ class FuelBucket():
         return outerVolume + innerVolume
 
     def __get_slug_volume(self):
-
         '''
         Returns the total volume of a single fuel slug, in cm^3. Does not
         include the end caps.
-
-        Parameters
-        ----------
-        empty
-
-        Returns
-        -------
-
         '''
 
         slugLength = self.__get_slug_length()
@@ -934,14 +690,9 @@ class FuelBucket():
         return outerVolume + innerVolume
 
     def __get_slug_cladding_volume(self):
-
         '''
         Returns the total volume of cladding in a single fuel slug. Does not
         include the end caps. Given in units of cm^3.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -951,13 +702,8 @@ class FuelBucket():
         return self.__get_slug_volume() - self.__get_slug_fuel_volume()
 
     def __get_fuel_volume(self):
-
         '''
         Returns the total volume of fuel in the bucket, in cm^3.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -969,14 +715,9 @@ class FuelBucket():
         return slugFuelVolume * nFuelSlugs
 
     def __get_cladding_volume(self):
-
         '''
         Returns the total volume of cladding material in the bucket, in cm^3.
         Does not include end caps.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -989,12 +730,7 @@ class FuelBucket():
 
     def __str__(self):
         '''
-
-        Parameters
-        ----------
-
-        Returns
-        -------
+        Converts to string.
         '''
 
         s = '\nFuelBucket():\n\t*******\n\t specs:\n\t*******\n\t %s\n'
@@ -1006,12 +742,7 @@ class FuelBucket():
     def __repr__(self):
 
         '''
-
-        Parameters
-        ----------
-
-        Returns
-        -------
+        Converts to string.
         '''
 
         s = '\nFuelBucket():\n\t*******\n\t specs:\n\t*******\n\t %s\n'
