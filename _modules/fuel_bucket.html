@@ -90,10 +90,6 @@
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the name of the fuel bucket.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        name: str</span>
@@ -107,10 +103,6 @@
 <span class="sd">        Returns the type of slugs being stored in the bucket (inner slug or</span>
 <span class="sd">        outer slug).</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        slug_type: str</span>
@@ -122,10 +114,6 @@
 <div class="viewcode-block" id="FuelBucket.get_n_slugs"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_n_slugs">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_slugs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the number of fuel slugs in the bucket.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -139,10 +127,6 @@
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the enrichment of the fuel slugs in the bucket, in %.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        fuel_enrichment: float</span>
@@ -154,10 +138,6 @@
 <div class="viewcode-block" id="FuelBucket.get_fresh_u_mass"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_fresh_u_mass">[docs]</a>    <span class="k">def</span> <span class="nf">get_fresh_u_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total amount of uranium in the bucket, in grams.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -171,10 +151,6 @@
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total amount of uranium-238 in the bucket, in grams.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        fresh_u238_mass: float</span>
@@ -184,13 +160,8 @@
     <span class="n">fresh_u238_mass</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fresh_u238_mass</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_fresh_u235_mass"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_fresh_u235_mass">[docs]</a>    <span class="k">def</span> <span class="nf">get_fresh_u235_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total amount of uranium-235 in the bucket, in grams.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -204,10 +175,6 @@
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total mass of cladding material in the bucket, in grams.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        cladding_mass: float</span>
@@ -220,13 +187,8 @@
     <span class="c1">#------</span>
 
 <div class="viewcode-block" id="FuelBucket.get_slug_length"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_slug_length">[docs]</a>    <span class="k">def</span> <span class="nf">get_slug_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the length of each slug in the fuel bucket.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -236,33 +198,23 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_slug_length</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="FuelBucket.set_slug_length"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.set_slug_length">[docs]</a>    <span class="k">def</span> <span class="nf">set_slug_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the length of all slugs in the bucket to x. Used for chopping.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        x: float</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__set_slug_length</span><span class="p">(</span><span class="n">x</span><span class="p">)</span></div>
     <span class="n">slug_length</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_slug_length</span><span class="p">,</span> <span class="n">set_slug_length</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_outer_slug_od"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_outer_slug_od">[docs]</a>    <span class="k">def</span> <span class="nf">get_outer_slug_od</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the outer diameter of the outer section of fuel, in cm. A fuel</span>
 <span class="sd">        slug consists of an outer section of fuel and an inner section of fuel,</span>
 <span class="sd">        with cladding on the outside of the slug and between the inner and</span>
 <span class="sd">        outer sections of fuel.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -273,13 +225,8 @@
     <span class="n">outer_slug_od</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_outer_slug_od</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_outer_slug_id"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_outer_slug_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_outer_slug_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the inner diameter of the outer section of fuel, in cm.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -290,13 +237,8 @@
     <span class="n">outer_slug_id</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_outer_slug_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_inner_slug_od"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_inner_slug_od">[docs]</a>    <span class="k">def</span> <span class="nf">get_inner_slug_od</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the outer  diameter of the inner section of fuel, in cm.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -307,13 +249,8 @@
     <span class="n">inner_slug_od</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_inner_slug_od</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_inner_slug_id"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_inner_slug_id">[docs]</a>    <span class="k">def</span> <span class="nf">get_inner_slug_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the inner diameter of the inner section of fuel, in cm.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -324,14 +261,9 @@
     <span class="n">inner_slug_id</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_inner_slug_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_cladding_wall_thickness"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_cladding_wall_thickness">[docs]</a>    <span class="k">def</span> <span class="nf">get_cladding_wall_thickness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the thickness of the cladding wall which is on the outside of</span>
 <span class="sd">        every fuel slug, and in between both sections of fuel, in cm.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -343,31 +275,21 @@
         <span class="n">get_cladding_wall_thickness</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_cladding_end_thickness"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_cladding_end_thickness">[docs]</a>    <span class="k">def</span> <span class="nf">get_cladding_end_thickness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Gets the thickness of the hemispherical cladding end caps that are</span>
 <span class="sd">        placed on the top and bottom of the fuel slug, in cm.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        cladding_end_thickness: cm</span>
+<span class="sd">        cladding_end_thickness: float</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_cladding_end_thickness</span><span class="p">()</span></div>
     <span class="n">cladding_end_thickness</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_cladding_end_thickness</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_slug_fuel_volume"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_slug_fuel_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_slug_fuel_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the volume of fuel present in a single fuel slug, in cm^3.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -378,13 +300,8 @@
     <span class="n">slug_fuel_volume</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_slug_fuel_volume</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_fuel_volume"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_fuel_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_fuel_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total volume of fuel in the entire bucket, in cm^3.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -395,13 +312,8 @@
     <span class="n">fuel_volume</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fuel_volume</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_slug_cladding_volume"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_slug_cladding_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_slug_cladding_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the volume of cladding present in a single fuel slug, in cm^3.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -412,13 +324,8 @@
     <span class="n">slug_cladding_volume</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_slug_cladding_volume</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_cladding_volume"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_cladding_volume">[docs]</a>    <span class="k">def</span> <span class="nf">get_cladding_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total volume of cladding in the bucket, in cm^3.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -432,10 +339,6 @@
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total mass of fuel in the solid phase in the bucket.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        fuel_mass: float</span>
@@ -445,14 +348,9 @@
     <span class="n">fuel_mass</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fuel_mass</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_fuel_mass_unit"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_fuel_mass_unit">[docs]</a>    <span class="k">def</span> <span class="nf">get_fuel_mass_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the unit that is used to measure the mass of fuel in the</span>
 <span class="sd">        bucket.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -463,13 +361,8 @@
     <span class="n">fuel_mass_unit</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fuel_mass_unit</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_radioactivity"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_radioactivity">[docs]</a>    <span class="k">def</span> <span class="nf">get_radioactivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>   <span class="c1"># radioactivity of the fuel bucket (fix me)</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the radioactivity of the fuel bucket, in units of curies.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -480,14 +373,9 @@
     <span class="n">radioactivity</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_radioactivity</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_gamma_pwr"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_gamma_pwr">[docs]</a>    <span class="k">def</span> <span class="nf">get_gamma_pwr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the amount of gamma radiation given off by the fuel bucket,</span>
 <span class="sd">        in units of watts.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -498,14 +386,9 @@
     <span class="n">gamma_pwr</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_gamma_pwr</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_heat_pwr"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_heat_pwr">[docs]</a>    <span class="k">def</span> <span class="nf">get_heat_pwr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total amount of heat generated by the bucket, in units of</span>
 <span class="sd">        watts.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -521,10 +404,6 @@
 <span class="sd">        Returns the total radioactivity of the solid phase fuel, in units of</span>
 <span class="sd">        curies.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        fuel_radioactivity: float</span>
@@ -537,10 +416,6 @@
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the phase history of the fuel.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        fuel_phase: pandas.core.frame.DataFrame</span>
@@ -549,30 +424,20 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fuel_phase</span></div>
 
 <div class="viewcode-block" id="FuelBucket.set_fuel_phase"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.set_fuel_phase">[docs]</a>    <span class="k">def</span> <span class="nf">set_fuel_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the current fuel phase to a specified phase value.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        phase: dataFrame</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__fuel_phase</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span></div>
     <span class="n">fuel_phase</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_fuel_phase</span><span class="p">,</span> <span class="n">set_fuel_phase</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelBucket.get_cladding_phase"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.get_cladding_phase">[docs]</a>    <span class="k">def</span> <span class="nf">get_cladding_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the phase history of the cladding.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -582,17 +447,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cladding_phase</span></div>
 
 <div class="viewcode-block" id="FuelBucket.set_cladding_phase"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.set_cladding_phase">[docs]</a>    <span class="k">def</span> <span class="nf">set_cladding_phase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Set&#39;s the phase history to specific values.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        phase: dataFrame</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__cladding_phase</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span></div>
@@ -603,13 +463,8 @@
 <span class="c1">#**********************************************************************************</span>
 
     <span class="k">def</span> <span class="nf">__get_n_slugs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the number of fuel slugs in the bucket.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -619,13 +474,8 @@
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Number of slugs&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">__get_fuel_enrichment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the enrichment of the fuel in the bucket, in %.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -635,14 +485,9 @@
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Enrichment [U-235 wt%]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">__get_outer_slug_fresh_u_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the the mass of uranium present in the outer part of a fuel</span>
 <span class="sd">        slug, in grams.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -652,14 +497,9 @@
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;U mass outer slug [kg]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1000.0</span>  <span class="c1"># [g]</span>
 
     <span class="k">def</span> <span class="nf">__get_inner_slug_fresh_u_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the mass of uranium present in the inner part of the fuel slug,</span>
 <span class="sd">        in grams.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -670,14 +510,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;U mass inner slug [kg]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1000.0</span>  <span class="c1"># [g]</span>
 
     <span class="k">def</span> <span class="nf">__get_outer_slug_cladding_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the mass of cladding present in the outer part of the slug, in</span>
 <span class="sd">        grams.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -688,29 +523,18 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Cladding mass outer slug [kg]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1000.0</span>  <span class="c1"># [g]</span>
 
     <span class="k">def</span> <span class="nf">__get_inner_slug_cladding_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the mass of cladding present in the inner part of the slug, in</span>
 <span class="sd">        grams.</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Cladding mass inner slug [kg]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">1000.0</span>  <span class="c1"># [g]</span>
 
     <span class="k">def</span> <span class="nf">__get_fresh_u_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total amount of uranium present in the fuel bucket, in</span>
 <span class="sd">        grams.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -723,14 +547,9 @@
         <span class="k">return</span> <span class="n">n_slugs</span> <span class="o">*</span> <span class="p">(</span><span class="n">uMassOuterSlug</span> <span class="o">+</span> <span class="n">uMassInnerSlug</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__get_fresh_u238_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total mass of uranium-238 present in the fuel bucket, in</span>
 <span class="sd">        grams.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -742,13 +561,8 @@
         <span class="k">return</span> <span class="n">totalUMass</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">fuelEnrichment</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__get_fresh_u235_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total amount of uranium-235 present in the bucket in grams.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -760,13 +574,8 @@
         <span class="k">return</span> <span class="n">totalUMass</span> <span class="o">*</span> <span class="n">fuelEnrichment</span> <span class="o">/</span> <span class="mf">100.0</span>
 
     <span class="k">def</span> <span class="nf">__get_cladding_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total amount of cladding present in the bucket, in grams.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -779,13 +588,8 @@
         <span class="k">return</span> <span class="n">n_slugs</span> <span class="o">*</span> <span class="p">(</span><span class="n">cladMassOuterSlug</span> <span class="o">+</span> <span class="n">cladMassInnerSlug</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__get_slug_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the length of a fuel slug, in cm. Does NOT include end caps.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -795,30 +599,20 @@
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Slug length [in]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">2.54</span>  <span class="c1"># cm</span>
 
     <span class="k">def</span> <span class="nf">__set_slug_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the length of a fuel slug to a specified value. Used for chopping.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        x: float</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Slug length [in]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span> <span class="o">/</span> <span class="mf">2.54</span>  <span class="c1"># in</span>
         <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">__get_outer_slug_od</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the outer diameter of the outer fuel section of the slug in cm.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -828,13 +622,8 @@
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Outer slug O.D. [in]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">2.54</span>  <span class="c1"># cm</span>
 
     <span class="k">def</span> <span class="nf">__get_outer_slug_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the inner diameter of the outer fuel section of the slug in cm.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -844,13 +633,8 @@
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Outer slug I.D. [in]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">2.54</span>  <span class="c1"># cm</span>
 
     <span class="k">def</span> <span class="nf">__get_inner_slug_od</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the outer diameter of the inner fuel section of the slug in cm.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -860,13 +644,8 @@
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Inner slug O.D. [in]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="mf">2.54</span>  <span class="c1"># cm</span>
 
     <span class="k">def</span> <span class="nf">__get_inner_slug_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the inner diameter of the inner fuel section of the slug in cm.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -880,10 +659,6 @@
 <span class="sd">        Returns the thickness of the cladding material used on the outside of</span>
 <span class="sd">        the fuel slug and between the inner and outer fuel sections.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        self.__specs.loc[&#39;Cladding wall thickness [mm]&#39;, 1]) /10: float</span>
@@ -893,14 +668,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Cladding wall thickness [mm]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">10.0</span>  <span class="c1"># cm</span>
 
     <span class="k">def</span> <span class="nf">__get_cladding_end_thickness</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the thickness of the hemispherical end caps placed on either</span>
 <span class="sd">        end of the cylindrical fuel slug, in cm.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -911,14 +681,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__specs</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s1">&#39;Cladding end cap thickness [mm]&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mf">10.0</span>  <span class="c1"># cm</span>
 
     <span class="k">def</span> <span class="nf">__get_slug_fuel_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the volume of fuel contained within a single fuel slug, in</span>
 <span class="sd">        cm^3.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -940,18 +705,9 @@
         <span class="k">return</span> <span class="n">outerVolume</span> <span class="o">+</span> <span class="n">innerVolume</span>
 
     <span class="k">def</span> <span class="nf">__get_slug_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total volume of a single fuel slug, in cm^3. Does not</span>
 <span class="sd">        include the end caps.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">slugLength</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_slug_length</span><span class="p">()</span>
@@ -966,14 +722,9 @@
         <span class="k">return</span> <span class="n">outerVolume</span> <span class="o">+</span> <span class="n">innerVolume</span>
 
     <span class="k">def</span> <span class="nf">__get_slug_cladding_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total volume of cladding in a single fuel slug. Does not</span>
 <span class="sd">        include the end caps. Given in units of cm^3.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -983,13 +734,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_slug_volume</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_slug_fuel_volume</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">__get_fuel_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total volume of fuel in the bucket, in cm^3.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1001,14 +747,9 @@
         <span class="k">return</span> <span class="n">slugFuelVolume</span> <span class="o">*</span> <span class="n">nFuelSlugs</span>
 
     <span class="k">def</span> <span class="nf">__get_cladding_volume</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total volume of cladding material in the bucket, in cm^3.</span>
 <span class="sd">        Does not include end caps.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1021,12 +762,7 @@
 
 <div class="viewcode-block" id="FuelBucket.__str__"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
+<span class="sd">        Converts to string.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">FuelBucket():</span><span class="se">\n\t</span><span class="s1">*******</span><span class="se">\n\t</span><span class="s1"> specs:</span><span class="se">\n\t</span><span class="s1">*******</span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>
@@ -1038,12 +774,7 @@
 <div class="viewcode-block" id="FuelBucket.__repr__"><a class="viewcode-back" href="../support_rst/fuel_bucket.html#fuel_bucket.FuelBucket.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
         <span class="sd">&#39;&#39;&#39;</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
+<span class="sd">        Converts to string.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">FuelBucket():</span><span class="se">\n\t</span><span class="s1">*******</span><span class="se">\n\t</span><span class="s1"> specs:</span><span class="se">\n\t</span><span class="s1">*******</span><span class="se">\n\t</span><span class="s1"> </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span>

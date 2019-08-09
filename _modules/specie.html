@@ -165,13 +165,8 @@
 <span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="Specie.GetName"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetName">[docs]</a>    <span class="k">def</span> <span class="nf">GetName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the empirical name of the species. For example, &quot;water&quot;.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -182,52 +177,35 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span></div>
 
 <div class="viewcode-block" id="Specie.SetName"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetName">[docs]</a>    <span class="k">def</span> <span class="nf">SetName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the empirical  name of the species to n.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        n: str</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">n</span></div>
     <span class="n">name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetName</span><span class="p">,</span> <span class="n">SetName</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetFormulaName"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetFormulaName">[docs]</a>    <span class="k">def</span> <span class="nf">GetFormulaName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the formulaic name of the compound. For example, &quot;Dihydrogen</span>
 <span class="sd">        monoxide&quot;.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        self.__formula_name: str</span>
-
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__formula_name</span></div>
 
 <div class="viewcode-block" id="Specie.SetFormulaName"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetFormulaName">[docs]</a>    <span class="k">def</span> <span class="nf">SetFormulaName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the formulaic name to f.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        self.__formula_name: str</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
@@ -235,13 +213,8 @@
     <span class="n">formula_name</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetFormulaName</span><span class="p">,</span> <span class="n">SetFormulaName</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetPhase"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetPhase">[docs]</a>    <span class="k">def</span> <span class="nf">GetPhase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the phase history of the species.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -251,31 +224,21 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phase</span></div>
 
 <div class="viewcode-block" id="Specie.SetPhase"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetPhase">[docs]</a>    <span class="k">def</span> <span class="nf">SetPhase</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the phase history to p.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        p: dataFrame</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_mass</span> <span class="o">=</span> <span class="n">p</span></div>
     <span class="n">phase</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetPhase</span><span class="p">,</span> <span class="n">SetPhase</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetMolarMass"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetMolarMass">[docs]</a>    <span class="k">def</span> <span class="nf">GetMolarMass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the numerical value for the molar mass of the species. Units</span>
 <span class="sd">        are given by molarMassUnit.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -285,30 +248,20 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_molarMass</span></div>
 
 <div class="viewcode-block" id="Specie.SetMolarMass"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetMolarMass">[docs]</a>    <span class="k">def</span> <span class="nf">SetMolarMass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the molar mass of the species equal to v.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        v: float</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_molarMass</span> <span class="o">=</span> <span class="n">v</span></div>
     <span class="n">molarMass</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetMolarMass</span><span class="p">,</span> <span class="n">SetMolarMass</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetMolarMassUnit"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetMolarMassUnit">[docs]</a>    <span class="k">def</span> <span class="nf">GetMolarMassUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the unit used to measure the molar mass of the species.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -318,30 +271,20 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_molarMassUnit</span></div>
 
 <div class="viewcode-block" id="Specie.SetMolarMassUnit"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetMolarMassUnit">[docs]</a>    <span class="k">def</span> <span class="nf">SetMolarMassUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the unit used to measure the molar mass of the species to v.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        v: str</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_molarMassUnit</span> <span class="o">=</span> <span class="n">v</span></div>
     <span class="n">molarMassUnit</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetMolarMassUnit</span><span class="p">,</span> <span class="n">SetMolarMassUnit</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetMolarRadioactivity"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetMolarRadioactivity">[docs]</a>    <span class="k">def</span> <span class="nf">GetMolarRadioactivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the numerical value for molar radioactivity of the species.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -351,17 +294,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_molarRadioactivity</span></div>
 
 <div class="viewcode-block" id="Specie.SetMolarRadioactivity"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetMolarRadioactivity">[docs]</a>    <span class="k">def</span> <span class="nf">SetMolarRadioactivity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the molar radioactivity of the species equal to v.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        v: float</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_molarRadioactivity</span> <span class="o">=</span> <span class="n">v</span></div>
@@ -369,17 +307,12 @@
             <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetMolarRadioactivityFractions"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetMolarRadioactivityFractions">[docs]</a>    <span class="k">def</span> <span class="nf">GetMolarRadioactivityFractions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns a list of numbers that speciefies the % of molar reactivity</span>
 <span class="sd">        that comes from each type of atom in the species. For example, a</span>
 <span class="sd">        molarRadioactivityFraction of [0.65, 0.35] for water means that 65%</span>
 <span class="sd">        of the molar radioactivity comes from the hydrogen atoms and 35% comes</span>
 <span class="sd">        from the oxygen atom.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -389,7 +322,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_molarRadioactivityFractions</span></div>
 
 <div class="viewcode-block" id="Specie.SetMolarRadioactivityFractions"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetMolarRadioactivityFractions">[docs]</a>    <span class="k">def</span> <span class="nf">SetMolarRadioactivityFractions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fracs</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets molarRadioactivityFractions equal to fracs. Fracs must be a list</span>
 <span class="sd">        of floatswith the same length as there are different atoms in the</span>
@@ -402,10 +334,6 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        fracs: list</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fracs</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="s1">&#39;oops not list.&#39;</span>
@@ -418,13 +346,8 @@
             <span class="n">SetMolarRadioactivityFractions</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetMolarRadioactivityUnit"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetMolarRadioactivityUnit">[docs]</a>    <span class="k">def</span> <span class="nf">GetMolarRadioactivityUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the unit used to measure molar radioactivity.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -434,17 +357,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_molarRadioactivityUnit</span></div>
 
 <div class="viewcode-block" id="Specie.SetMolarRadioactivityUnit"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetMolarRadioactivityUnit">[docs]</a>    <span class="k">def</span> <span class="nf">SetMolarRadioactivityUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the unit used to measure molar radioactivity to v.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        v: str</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_molarRadioactivityUnit</span> <span class="o">=</span> <span class="n">v</span></div>
@@ -452,13 +370,8 @@
             <span class="n">SetMolarRadioactivityUnit</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetMolarHeatPwr"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetMolarHeatPwr">[docs]</a>    <span class="k">def</span> <span class="nf">GetMolarHeatPwr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the amount of heat generated per mole of this species.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -468,31 +381,21 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_molarHeatPwr</span></div>
 
 <div class="viewcode-block" id="Specie.SetMolarHeatPwr"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetMolarHeatPwr">[docs]</a>    <span class="k">def</span> <span class="nf">SetMolarHeatPwr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the amount of heat generated per mole of this species to v.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        v: float</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_molarHeatPwr</span> <span class="o">=</span> <span class="n">v</span></div>
     <span class="n">molarHeatPwr</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetMolarHeatPwr</span><span class="p">,</span> <span class="n">SetMolarHeatPwr</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetMolarHeatPwrUnit"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetMolarHeatPwrUnit">[docs]</a>    <span class="k">def</span> <span class="nf">GetMolarHeatPwrUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the unit used to measure the amount of heat generated per mole</span>
 <span class="sd">        of this species.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -502,7 +405,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_molarHeatPwrUnit</span></div>
 
 <div class="viewcode-block" id="Specie.SetMolarHeatPwrUnit"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetMolarHeatPwrUnit">[docs]</a>    <span class="k">def</span> <span class="nf">SetMolarHeatPwrUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the unit used to measure the amount of heat generated per mole of</span>
 <span class="sd">        this species to v.</span>
@@ -510,10 +412,6 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        v: str</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_molarHeatPwrUnit</span> <span class="o">=</span> <span class="n">v</span></div>
@@ -521,14 +419,9 @@
             <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetMolarGammaPwr"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetMolarGammaPwr">[docs]</a>    <span class="k">def</span> <span class="nf">GetMolarGammaPwr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the amount of gamma radiation produced per mole of this species</span>
 <span class="sd">        (measured in units of power).</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -538,7 +431,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_molarGammaPwr</span></div>
 
 <div class="viewcode-block" id="Specie.SetMolarGammaPwr"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetMolarGammaPwr">[docs]</a>    <span class="k">def</span> <span class="nf">SetMolarGammaPwr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the amount of gamma radiation produced per mole of this species to</span>
 <span class="sd">        v.</span>
@@ -546,24 +438,15 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        v: float</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_molarGammaPwr</span> <span class="o">=</span> <span class="n">v</span></div>
     <span class="n">molarGammaPwr</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetMolarGammaPwr</span><span class="p">,</span> <span class="n">SetMolarGammaPwr</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetMolarGammaPwrUnit"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetMolarGammaPwrUnit">[docs]</a>    <span class="k">def</span> <span class="nf">GetMolarGammaPwrUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the unit used to measure the amount of gamma radiation produced</span>
 <span class="sd">        per mole of this species.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -573,7 +456,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_molarGammaPwrUnit</span></div>
 
 <div class="viewcode-block" id="Specie.SetMolarGammaPwrUnit"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetMolarGammaPwrUnit">[docs]</a>    <span class="k">def</span> <span class="nf">SetMolarGammaPwrUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the unit used to measure the amount of gamma radiation produced</span>
 <span class="sd">        per mole of this species to v.</span>
@@ -581,10 +463,6 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        v: str</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_molarGammaPwrUnit</span> <span class="o">=</span> <span class="n">v</span></div>
@@ -606,13 +484,9 @@
 
     <span class="c1"># New interface</span>
 <div class="viewcode-block" id="Specie.GetFormula"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetFormula">[docs]</a>    <span class="k">def</span> <span class="nf">GetFormula</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the molecular or empirical formula of the species. It is</span>
 <span class="sd">        usually a list, for example, of the form [&#39;2*H&#39;, &#39;O&#39;].</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -622,7 +496,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_atoms</span></div>
 
 <div class="viewcode-block" id="Specie.SetFormula"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetFormula">[docs]</a>    <span class="k">def</span> <span class="nf">SetFormula</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atoms</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the species&#39; formula equal to atoms. Will automatically update</span>
 <span class="sd">        the molar mass of the species, and will also fail if atoms is not a</span>
@@ -631,10 +504,6 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        atoms: list</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="s1">&#39;oops not list.&#39;</span>
@@ -645,14 +514,9 @@
     <span class="n">formula</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetFormula</span><span class="p">,</span> <span class="n">SetFormula</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetNAtoms"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetNAtoms">[docs]</a>    <span class="k">def</span> <span class="nf">GetNAtoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># number of ficticious atoms in the species (see NB above)</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total number of atoms comprising the species. For example,</span>
 <span class="sd">        water is comprised of three atoms.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -664,15 +528,10 @@
 
     <span class="c1"># number of nuclide types involved in the species definition</span>
 <div class="viewcode-block" id="Specie.GetNNuclideTypes"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetNNuclideTypes">[docs]</a>    <span class="k">def</span> <span class="nf">GetNNuclideTypes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the number of different types of atoms comprising the species.</span>
 <span class="sd">        For example, water is composed of two different types of atoms,</span>
 <span class="sd">        hydrogen and oxygen.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -683,29 +542,19 @@
     <span class="n">nNuclideTypes</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetNNuclideTypes</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.SetFlag"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetFlag">[docs]</a>    <span class="k">def</span> <span class="nf">SetFlag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the flag associated with the species to f.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        f: str</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_flag</span> <span class="o">=</span> <span class="n">f</span></div>
 
 <div class="viewcode-block" id="Specie.GetFlag"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetFlag">[docs]</a>    <span class="k">def</span> <span class="nf">GetFlag</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the flag associated with the species.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -716,14 +565,9 @@
     <span class="n">flag</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetFlag</span><span class="p">,</span> <span class="n">SetFlag</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetMolarCC"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetMolarCC">[docs]</a>    <span class="k">def</span> <span class="nf">GetMolarCC</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the numerical value for the number (molar) density of the</span>
 <span class="sd">        species (moles/volume).</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -733,17 +577,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_molarCC</span></div>
 
 <div class="viewcode-block" id="Specie.SetMolarCC"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetMolarCC">[docs]</a>    <span class="k">def</span> <span class="nf">SetMolarCC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the numerical value for the molar density of the species to v.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        v: float</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_molarCC</span> <span class="o">=</span> <span class="n">v</span>
@@ -751,13 +590,8 @@
     <span class="n">molarCC</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetMolarCC</span><span class="p">,</span> <span class="n">SetMolarCC</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetMolarCCUnit"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetMolarCCUnit">[docs]</a>    <span class="k">def</span> <span class="nf">GetMolarCCUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the unit used to measure molar density of the species.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -767,31 +601,21 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_molarCCUnit</span></div>
 
 <div class="viewcode-block" id="Specie.SetMolarCCUnit"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetMolarCCUnit">[docs]</a>    <span class="k">def</span> <span class="nf">SetMolarCCUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the unit used to measure the molar density of the species to v.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        v: str</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_molarCCUnit</span> <span class="o">=</span> <span class="n">v</span></div>
     <span class="n">molarCCUnit</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetMolarCCUnit</span><span class="p">,</span> <span class="n">SetMolarCCUnit</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetMassCC"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetMassCC">[docs]</a>    <span class="k">def</span> <span class="nf">GetMassCC</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the numerical value of the mass density of the species</span>
 <span class="sd">        (mass/volume).</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -801,17 +625,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_massCC</span></div>
 
 <div class="viewcode-block" id="Specie.SetMassCC"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetMassCC">[docs]</a>    <span class="k">def</span> <span class="nf">SetMassCC</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the numerical value of the mass density equal to v.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        v: float</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_massCC</span> <span class="o">=</span> <span class="n">v</span>
@@ -822,13 +641,8 @@
     <span class="n">massCC</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetMassCC</span><span class="p">,</span> <span class="n">SetMassCC</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Specie.GetMassCCUnit"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.GetMassCCUnit">[docs]</a>    <span class="k">def</span> <span class="nf">GetMassCCUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the unit used to measure the mass density of the species.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -838,17 +652,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_massCCUnit</span></div>
 
 <div class="viewcode-block" id="Specie.SetMassCCUnit"><a class="viewcode-back" href="../support_rst/specie.html#specie.Specie.SetMassCCUnit">[docs]</a>    <span class="k">def</span> <span class="nf">SetMassCCUnit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the units used to measure mass density to v.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        v: str</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_massCCUnit</span> <span class="o">=</span> <span class="n">v</span></div>
@@ -878,14 +687,6 @@
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Updates the molar mass of the species after the molecular formula has</span>
 <span class="sd">        been changed.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="c1">#if len(self._atoms) == 0:</span>
@@ -949,15 +750,10 @@
         <span class="k">return</span>
 
     <span class="k">def</span> <span class="nf">__ReorderFormula</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Takes a list of atoms for a molecular or empirical formula and places</span>
 <span class="sd">        it in order of decreasing magnitude of stoichiometric coefficient. For</span>
 <span class="sd">        example, [O, 2*H] will be returned as [2*H, O].</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>

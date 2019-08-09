@@ -146,7 +146,7 @@
         <span class="k">if</span> <span class="n">quantities</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__quantities</span><span class="p">:</span>
                 <span class="n">names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">quant</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
-                <span class="n">quant</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">0.0</span>    <span class="c1"># clear these values </span>
+                <span class="n">quant</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="mf">0.0</span>    <span class="c1"># clear these values</span>
                                      <span class="c1"># todo: eliminate them from Quantity in the future</span>
 
         <span class="c1"># Table data phase without data type assigned; this is left to the user</span>
@@ -169,17 +169,12 @@
 <span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="Phase.has_time_stamp"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.has_time_stamp">[docs]</a>    <span class="k">def</span> <span class="nf">has_time_stamp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Checks to see if try_time_stamp exists in the phase history.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        try_time_stamp:</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-
 <span class="sd">        &#39;&#39;&#39;</span>
 
 
@@ -194,10 +189,6 @@
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the time unit of the `Phase.`</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        time_unit: str</span>
@@ -207,13 +198,8 @@
     <span class="n">time_unit</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_time_unit</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">,</span><span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Phase.GetTimeStamps"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetTimeStamps">[docs]</a>    <span class="k">def</span> <span class="nf">GetTimeStamps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns a list of all the time stamps in the phase history.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -224,13 +210,8 @@
     <span class="n">timeStamps</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetTimeStamps</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__get_time_stamps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Get all time stamps in the index of the data frame.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -241,13 +222,8 @@
     <span class="n">time_stamps</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_time_stamps</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Phase.GetSpecies"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">GetSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns every single species in the phase history.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -260,14 +236,9 @@
     <span class="n">species</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetSpecies</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Phase.GetQuantities"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetQuantities">[docs]</a>    <span class="k">def</span> <span class="nf">GetQuantities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the list of `Quantities`. The values in each `Quantity` are</span>
 <span class="sd">        synchronized with the `Phase` data frame.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -280,13 +251,8 @@
     <span class="n">quantities</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetQuantities</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Phase.GetActors"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetActors">[docs]</a>    <span class="k">def</span> <span class="nf">GetActors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns a list of all the actors in the phase history.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -326,11 +292,6 @@
 <span class="sd">        ----------</span>
 <span class="sd">        name: str</span>
 <span class="sd">        val: int</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
-
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__species</span><span class="p">:</span>
@@ -339,7 +300,6 @@
                 <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Phase.GetQuantity"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetQuantity">[docs]</a>    <span class="k">def</span> <span class="nf">GetQuantity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the quantity evaluated at the last time step of the phase</span>
 <span class="sd">        history. This also updates the value of the quantity object. If the</span>
@@ -348,10 +308,6 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        name: str</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">for</span> <span class="n">quant</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__quantities</span><span class="p">:</span>
@@ -365,7 +321,6 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Phase.get_quantity"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.get_quantity">[docs]</a>    <span class="k">def</span> <span class="nf">get_quantity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        New version.</span>
 <span class="sd">        Get the quantity `name` at a point in time closest to</span>
@@ -375,7 +330,6 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        name: str</span>
-
 <span class="sd">        try_time_stamp: float, int or None</span>
 <span class="sd">            Time stamp of desired quantity value. Default: None returns the</span>
 <span class="sd">            whole quantity history.</span>
@@ -396,7 +350,6 @@
                 <span class="k">return</span> <span class="n">quant</span>  <span class="c1"># return quantity syncronized with the phase</span></div>
 
 <div class="viewcode-block" id="Phase.get_quantity_history"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.get_quantity_history">[docs]</a>    <span class="k">def</span> <span class="nf">get_quantity_history</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Create a Quantity `name` history. This will create a fully qualified</span>
 <span class="sd">        Quantity object and return to the caller. The function is typically</span>
@@ -424,7 +377,6 @@
                 <span class="k">return</span> <span class="p">(</span><span class="n">quant_history</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">__time_unit</span><span class="p">)</span> <span class="c1"># return tuple</span></div>
 
 <div class="viewcode-block" id="Phase.AddSpecie"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.AddSpecie">[docs]</a>    <span class="k">def</span> <span class="nf">AddSpecie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_specie</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Adds a new specie object to the phase history. See species.py for</span>
 <span class="sd">        more details on the specie class.</span>
@@ -432,10 +384,6 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        new_specie: obj</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new_specie</span><span class="p">,</span> <span class="n">Specie</span><span class="p">)</span>
@@ -452,7 +400,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>   <span class="c1"># for species have float as default</span></div>
 
 <div class="viewcode-block" id="Phase.AddQuantity"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.AddQuantity">[docs]</a>    <span class="k">def</span> <span class="nf">AddQuantity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">newQuant</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Adds a new quantity object to the dataframe. See quantity.py for more</span>
 <span class="sd">        details on the quantity class.</span>
@@ -460,10 +407,6 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        newQuant: object</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">newQuant</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">)</span>
@@ -475,7 +418,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__quantities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">newQuant</span><span class="p">)</span>
         <span class="n">newName</span> <span class="o">=</span> <span class="n">newQuant</span><span class="o">.</span><span class="n">name</span>
 
-        <span class="c1"># create a col with object data type; user must fill out column </span>
+        <span class="c1"># create a col with object data type; user must fill out column</span>
         <span class="n">col</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span> <span class="n">index</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">index</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="n">newName</span><span class="p">],</span>
                                 <span class="n">dtype</span><span class="o">=</span><span class="nb">object</span> <span class="p">)</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span>
@@ -483,8 +426,6 @@
         <span class="c1">#self.__phase = df.fillna(newQuant.value)</span>
 
 <div class="viewcode-block" id="Phase.AddRow"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.AddRow">[docs]</a>    <span class="k">def</span> <span class="nf">AddRow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="p">,</span> <span class="n">row_values</span><span class="p">):</span>
-
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Adds a row to the dataframe, with a timestamp of try_time_stamp and</span>
 <span class="sd">        row values equal to row_values. Take care that the dimensions and order</span>
@@ -494,10 +435,6 @@
 <span class="sd">        ----------</span>
 <span class="sd">        try_time_stamp: float</span>
 <span class="sd">        row_values: list</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">assert</span> <span class="n">try_time_stamp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;already used time_stamp: </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span>\
@@ -522,7 +459,6 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Phase.GetRow"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetRow">[docs]</a>    <span class="k">def</span> <span class="nf">GetRow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns an entire row of the phase dataframe. A row is a series of</span>
 <span class="sd">        values that are all at the same time stamp.</span>
@@ -541,7 +477,6 @@
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_stamp</span><span class="p">,</span> <span class="p">:])</span></div>
 
 <div class="viewcode-block" id="Phase.GetColumn"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetColumn">[docs]</a>    <span class="k">def</span> <span class="nf">GetColumn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns an entire column of data. A column is the entire history</span>
 <span class="sd">        of data associated with a specific actor.</span>
@@ -561,7 +496,6 @@
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">actor</span><span class="p">])</span></div>
 
 <div class="viewcode-block" id="Phase.ScaleRow"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.ScaleRow">[docs]</a>    <span class="k">def</span> <span class="nf">ScaleRow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Multiplies all of the data in a row (except time stamp) by a scalar</span>
 <span class="sd">        value.</span>
@@ -570,10 +504,6 @@
 <span class="sd">        ----------</span>
 <span class="sd">        try_time_stamp: float</span>
 <span class="sd">        value: float</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">try_time_stamp</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
@@ -584,7 +514,6 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Phase.ClearHistory"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.ClearHistory">[docs]</a>    <span class="k">def</span> <span class="nf">ClearHistory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Set species and quantities of history to a given value</span>
 <span class="sd">        (default to zero value), all time stamps are preserved.</span>
@@ -592,10 +521,6 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        value: float</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
@@ -604,7 +529,6 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Phase.ResetHistory"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.ResetHistory">[docs]</a>    <span class="k">def</span> <span class="nf">ResetHistory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Set species and quantities of history to a given value</span>
 <span class="sd">        (default to zero value) only one time stamp is preserved (default to</span>
@@ -614,10 +538,6 @@
 <span class="sd">        ----------</span>
 <span class="sd">        try_time_stamp: float</span>
 <span class="sd">        value: float</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -648,7 +568,6 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Phase.GetValue"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.GetValue">[docs]</a>    <span class="k">def</span> <span class="nf">GetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Deprecated: use get_value()</span>
 <span class="sd">        &#39;&#39;&#39;</span>
@@ -666,7 +585,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_stamp</span><span class="p">,</span> <span class="n">actor</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Phase.get_value"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the value associated with a specified actor at a specified</span>
 <span class="sd">        time stamp.</span>
@@ -694,7 +612,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__phase</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">time_stamp</span><span class="p">,</span> <span class="n">actor</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Phase.SetValue"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.SetValue">[docs]</a>    <span class="k">def</span> <span class="nf">SetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        For the record: old def SetValue(self, time_stamp, actor, value):</span>
 
@@ -703,10 +620,6 @@
 <span class="sd">        actor: str</span>
 <span class="sd">        value: float</span>
 <span class="sd">        try_time_stamp: float</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">actor</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
@@ -761,17 +674,12 @@
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Phase.WriteHTML"><a class="viewcode-back" href="../support_rst/phase.html#phase.Phase.WriteHTML">[docs]</a>    <span class="k">def</span> <span class="nf">WriteHTML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fileName</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Convert the `Phase` container into an HTML file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ---------</span>
 <span class="sd">        fileName: str</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fileName</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
@@ -811,7 +719,6 @@
 <span class="c1">#*********************************************************************************</span>
 
     <span class="k">def</span> <span class="nf">__get_time_stamp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">try_time_stamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Helper method for finding the closest time stamp to `try_time_stamp`</span>
 <span class="sd">        in the phase history. The pandas index container used for storing</span>
@@ -828,7 +735,6 @@
 <span class="sd">        -------</span>
 <span class="sd">        self.__phase.index[loc]: float or None</span>
 <span class="sd">            Will return None if no time stamp within tolerance is found.</span>
-
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>

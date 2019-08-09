@@ -111,10 +111,6 @@
 <span class="sd">        Returns the geometry of the fuel bundle (cylindrical, hexoganol,</span>
 <span class="sd">        rectangular, etc).</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        Empty:</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        geometry: str</span>
@@ -124,14 +120,10 @@
     <span class="n">geometry</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_geometry</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelSegment.get_species"><a class="viewcode-back" href="../support_rst/fuel_segment.html#fuel_segment.FuelSegment.get_species">[docs]</a>    <span class="k">def</span> <span class="nf">get_species</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the species object which describes the composition of the fuel</span>
 <span class="sd">        bundle. The species encapsulates all chemical species present in the</span>
 <span class="sd">        fuel bundle.</span>
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        None:</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -142,11 +134,9 @@
     <span class="n">species</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">get_species</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="FuelSegment.get_specie"><a class="viewcode-back" href="../support_rst/fuel_segment.html#fuel_segment.FuelSegment.get_specie">[docs]</a>    <span class="k">def</span> <span class="nf">get_specie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns a specie named [name] from the list of species making up the</span>
 <span class="sd">        fuel bundle. If no name is specified, this function will return None.</span>
-
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -155,7 +145,6 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        specie: obj</span>
-
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__species</span><span class="p">:</span>
@@ -187,17 +176,14 @@
 <span class="sd">        by passing a specific nuclide to the function, with a name value of</span>
 <span class="sd">        mass or mass-cc.</span>
 
-
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        name: str</span>
 <span class="sd">        nuclide: str</span>
 
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        many types</span>
-
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">attribute_name</span> <span class="o">=</span> <span class="n">name</span>
@@ -229,7 +215,7 @@
             <span class="k">return</span> <span class="mi">1</span>
 
 <span class="c1"># .................................................................................</span>
-<span class="c1"># segment id </span>
+<span class="c1"># segment id</span>
 
         <span class="k">if</span> <span class="n">attribute_name</span> <span class="o">==</span> <span class="s1">&#39;segment-id&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__geometry</span><span class="p">[</span><span class="s1">&#39;segment id&#39;</span><span class="p">]</span>
@@ -491,10 +477,6 @@
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the total volume of fuel in the fuel segment.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        volume: float</span>
@@ -508,14 +490,9 @@
         <span class="k">return</span> <span class="n">volume</span>
 
 <div class="viewcode-block" id="FuelSegment.__str__"><a class="viewcode-back" href="../support_rst/fuel_segment.html#fuel_segment.FuelSegment.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Used to print the geometry of the fuel segment and the species that it</span>
 <span class="sd">        consists of.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -526,14 +503,9 @@
         <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__geometry</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__species</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="FuelSegment.__repr__"><a class="viewcode-back" href="../support_rst/fuel_segment.html#fuel_segment.FuelSegment.__repr__">[docs]</a>    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Used to pront the geometry of the fuel segment and the species that it</span>
 <span class="sd">        consists of.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>

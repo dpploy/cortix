@@ -121,13 +121,8 @@
 <span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="Stream.GetTimeStamp"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetTimeStamp">[docs]</a>    <span class="k">def</span> <span class="nf">GetTimeStamp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the time stamp of the stream.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -137,13 +132,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeStamp</span></div>
 
 <div class="viewcode-block" id="Stream.GetActors"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetActors">[docs]</a>    <span class="k">def</span> <span class="nf">GetActors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the actors present in the stream of data.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -153,7 +143,6 @@
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Stream.GetSpecie"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetSpecie">[docs]</a>    <span class="k">def</span> <span class="nf">GetSpecie</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns a specie named &quot;name&quot; from the stream.</span>
 
@@ -172,13 +161,8 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Stream.GetSpecies"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetSpecies">[docs]</a>    <span class="k">def</span> <span class="nf">GetSpecies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns a list of all species in the stream.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -188,13 +172,8 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span></div>
 
 <div class="viewcode-block" id="Stream.GetQuantities"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetQuantities">[docs]</a>    <span class="k">def</span> <span class="nf">GetQuantities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns all the quantities given by the stream.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        empty</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -204,7 +183,6 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">quantities</span></div>
 
 <div class="viewcode-block" id="Stream.SetSpecieId"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.SetSpecieId">[docs]</a>    <span class="k">def</span> <span class="nf">SetSpecieId</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the numerical id of the specie of name &quot;name&quot; to val.</span>
 
@@ -212,10 +190,6 @@
 <span class="sd">        ----------</span>
 <span class="sd">        name: str</span>
 <span class="sd">        val: int</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">for</span> <span class="n">specie</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">species</span><span class="p">:</span>
@@ -224,7 +198,6 @@
                 <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Stream.GetQuantity"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetQuantity">[docs]</a>    <span class="k">def</span> <span class="nf">GetQuantity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the specified quantity called &quot;name&quot; from the stream, or none</span>
 <span class="sd">        if the specified name does not exist.</span>
@@ -244,7 +217,6 @@
         <span class="k">return</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Stream.GetRow"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetRow">[docs]</a>    <span class="k">def</span> <span class="nf">GetRow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeStamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns an entire row of data from the stream. A row of data is all</span>
 <span class="sd">        the data in a dataframe at a specified time stamp, given by timeStamp.</span>
@@ -269,7 +241,6 @@
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,</span> <span class="p">:])</span></div>
 
 <div class="viewcode-block" id="Stream.GetValue"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.GetValue">[docs]</a>    <span class="k">def</span> <span class="nf">GetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">timeStamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the value associated with a specified &quot;actor&quot; at a specified</span>
 <span class="sd">        &quot;timeStamp&quot;. If no timeStamp is specified, then the function will</span>
@@ -295,7 +266,6 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">actor</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Stream.SetValue"><a class="viewcode-back" href="../support_rst/stream.html#stream.Stream.SetValue">[docs]</a>    <span class="k">def</span> <span class="nf">SetValue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">actor</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeStamp</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Sets the value associated with a specified actor at a specified</span>
 <span class="sd">        timeStamp to &quot;value&quot;. If no value is specified, the value will default</span>
@@ -307,10 +277,6 @@
 <span class="sd">        actor: str</span>
 <span class="sd">        value: float</span>
 <span class="sd">        timeStamp: float</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        empty</span>
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">assert</span> <span class="n">actor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">columns</span>
