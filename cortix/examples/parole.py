@@ -27,6 +27,8 @@ class Parole(Module):
 
         super().__init__()
 
+        self.name = 'parole'
+
         self.port_names_expected = ['prison','community']
 
         quantities      = list()

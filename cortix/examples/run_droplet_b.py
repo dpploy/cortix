@@ -69,7 +69,7 @@ if __name__ == '__main__':
     end_time   = 3*const.minute
     time_step  = 0.2
 
-    cortix = Cortix(use_mpi=use_mpi)
+    cortix = Cortix(use_mpi=use_mpi, splash=True)
 
     # Network for a single plot case
     if use_single_plot:

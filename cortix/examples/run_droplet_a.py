@@ -35,17 +35,15 @@ command line as
 if __name__ == '__main__':
 
     # Configuration Parameters
-    use_mpi  = False # True for MPI; False for Python multiprocessing
+    use_mpi  = True # True for MPI; False for Python multiprocessing
 
     plot_vortex_profile = False # True may crash the X server.
 
-    n_droplets = 10
-    end_time   = 3*const.minute
-    time_step  = 0.2
+    n_droplets = 5
+    end_time   = 1*const.minute
+    time_step  = 0.1
 
-    cortix = Cortix(use_mpi=use_mpi)
-
-    # Network for a single plot case
+    cortix = Cortix(use_mpi=use_mpi, splash=True)
 
     # Vortex module (single).
     vortex = Vortex()
@@ -104,13 +102,13 @@ if __name__ == '__main__':
         # All droplets' speed
 
         fig = plt.figure(2)
-        plt.xlabel('Time [s]')
+        plt.xlabel('Time [min]')
         plt.ylabel('Speed [m/s]')
         plt.title('All Droplets')
 
         for m in modules[1:]:
             speed_series = m.state.get_quantity_history('speed')[0].value
-            x = list(p.index)
+            x = list(p.index/60)
             y = list(speed_series[:])
             plt.plot(x,y)
 
@@ -120,13 +118,13 @@ if __name__ == '__main__':
         # All droplets' radial position
 
         fig = plt.figure(3)
-        plt.xlabel('Time [s]')
+        plt.xlabel('Time [min]')
         plt.ylabel('Radial Position [m]')
         plt.title('All Droplets')
 
         for m in modules[1:]:
             speed_series = m.state.get_quantity_history('radial-position')[0].value
-            x = list(p.index)[1:]
+            x = list(p.index/60)[1:]
             y = list(speed_series[:])[1:]
             plt.plot(x,y)
 

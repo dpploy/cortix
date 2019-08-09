@@ -145,7 +145,6 @@ class Module:
         To pass back the state of the module, the user should insert the provided
         index `comm_idx` and the `state` into the queue as follows:
 
-            # Share state with the parent process
             if not self.use_mpi:
                 try:
                     pickle.dumps(self.state)

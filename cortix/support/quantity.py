@@ -211,7 +211,7 @@ class Quantity:
         Pandas Series. If self.__value is a Pandas Series, plot against the index.
         However the type stored in the Series matter. Suppose it is a series
         of a `numpy` array. This must be of the same rank for every entry.
-        Thi plot method assumes it is an iterable type of the same length for every
+        This plot method assumes it is an iterable type of the same length for every
         entry in the series. A plot of all elements in the type against the index of
         the series will be made. The plot may have all elements in one axis or
         each element in its own axis.

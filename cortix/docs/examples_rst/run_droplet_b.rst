@@ -1,7 +1,7 @@
-run\_droplet\-a module
+run\_droplet\_b module
 ======================
 
-.. automodule:: run_droplet-a
+.. automodule:: run_droplet_b
     :members:
     :undoc-members:
     :show-inheritance:
