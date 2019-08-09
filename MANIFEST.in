@@ -1,5 +1,0 @@
-include cortix/examples/input/*
-include cortix/tests/input/*
-include cortix/examples/modulib/wind/manifesto.xml
-include cortix/examples/modulib/droplet/manifesto.xml
-include cortix/modulib/pyplot/manifesto.xml
