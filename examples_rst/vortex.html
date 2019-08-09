@@ -86,10 +86,9 @@ If <cite>self.state</cite> points to anything but <cite>None</cite>, the user mu
 To pass back the state of the module, the user should insert the provided
 index <cite>comm_idx</cite> and the <cite>state</cite> into the queue as follows:</p>
 <blockquote>
-<div><p># Share state with the parent process
-if not self.use_mpi:</p>
-<blockquote>
 <div><dl class="docutils">
+<dt>if not self.use_mpi:</dt>
+<dd><dl class="first last docutils">
 <dt>try:</dt>
 <dd>pickle.dumps(self.state)</dd>
 <dt>except pickle.PicklingError:</dt>
@@ -97,7 +96,8 @@ if not self.use_mpi:</p>
 <dt>else:</dt>
 <dd>args[1].put((arg[0],self.state))</dd>
 </dl>
-</div></blockquote>
+</dd>
+</dl>
 </div></blockquote>
 <p class="last">at the bottom of the user defined run() function.</p>
 </div>
