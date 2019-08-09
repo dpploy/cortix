@@ -35,15 +35,52 @@
 <dt id="port.Port">
 <em class="property">class </em><code class="descclassname">port.</code><code class="descname">Port</code><span class="sig-paren">(</span><em>name=None</em>, <em>use_mpi=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/port.html#Port"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#port.Port" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Provides a method of communication between modules</p>
 <p>The Port class provides an interface for creating ports and connecting them to
-other ports for the purpose of data tranfer. Data exchange takes place by
+other ports for the purpose of data transfer. Data exchange takes place by
 send and/or receive calls on a given port. The concept of a port is that of a data
 transfer “interaction.” This can be one- or two-way with sends and receives.
 A port is connected to only one other port; as two ends of a pipe are connected.</p>
+<dl class="attribute">
+<dt id="port.Port.id">
+<code class="descname">id</code><a class="headerlink" href="#port.Port.id" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="port.Port.name">
+<code class="descname">name</code><a class="headerlink" href="#port.Port.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>string</em></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="port.Port.use_mpi">
+<code class="descname">use_mpi</code><a class="headerlink" href="#port.Port.use_mpi" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em></p>
+</dd></dl>
+
 <dl class="method">
 <dt id="port.Port.__eq__">
 <code class="descname">__eq__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/port.html#Port.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#port.Port.__eq__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Ports are the same if their names are the same</p>
+<dd><p>Check for port equality</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="port.Port.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>name=None</em>, <em>use_mpi=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/port.html#Port.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#port.Port.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructs a Port object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the Port object</li>
+<li><strong>use_mpi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – True for MPI, False for Multiprocessing</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -55,29 +92,52 @@ A port is connected to only one other port; as two ends of a pipe are connected.
 <dl class="method">
 <dt id="port.Port.connect">
 <code class="descname">connect</code><span class="sig-paren">(</span><em>port</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/port.html#Port.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#port.Port.connect" title="Permalink to this definition">¶</a></dt>
-<dd><p>Connect the port to another port</p>
-<p><cite>port</cite>: A Port object that represents the port to connect to.</p>
+<dd><p>Connect this port to another port</p>
+<p>Ports must be connected for data to flow between them.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>port</strong> (<a class="reference internal" href="#port.Port" title="port.Port"><em>Port</em></a>) – A Port object to connect to</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="port.Port.recv">
 <code class="descname">recv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/port.html#Port.recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#port.Port.recv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the data received from the connected port.</p>
+<dd><p>Receive data from the connected port.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This function will block if no data has been sent yet.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>data</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">any</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="port.Port.send">
 <code class="descname">send</code><span class="sig-paren">(</span><em>data</em>, <em>tag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/port.html#Port.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#port.Port.send" title="Permalink to this definition">¶</a></dt>
-<dd><p>Send data to the connected port. If the sending port is not connected do nothing.</p>
+<dd><p>Send data to the connected port.</p>
+<p>If the sending port is not connected do nothing.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data</strong> (<em>any pickle-able data</em>) – </td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> (<em>any</em>) – This data must be pickleable</li>
+<li><strong>tag</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – MPI tag used in sending data</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>

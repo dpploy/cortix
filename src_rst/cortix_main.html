@@ -35,50 +35,147 @@
 <dt id="cortix_main.Cortix">
 <em class="property">class </em><code class="descclassname">cortix_main.</code><code class="descname">Cortix</code><span class="sig-paren">(</span><em>use_mpi=False</em>, <em>splash=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_main.html#Cortix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_main.Cortix" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>The main Cortix class definition:
-1. Create the object
-2. Add modules
-3. Run the simulation</p>
+<p>Cortix main class definition</p>
+<p>The typical Cortix workflow:</p>
+<ol class="arabic simple">
+<li>Create the object</li>
+<li>Add and connect modules</li>
+<li>Run the simulation</li>
+</ol>
+<dl class="attribute">
+<dt id="cortix_main.Cortix.use_mpi">
+<code class="descname">use_mpi</code><a class="headerlink" href="#cortix_main.Cortix.use_mpi" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – True for MPI, False for multiprocessing</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cortix_main.Cortix.splash">
+<code class="descname">splash</code><a class="headerlink" href="#cortix_main.Cortix.splash" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – Show the Cortix splash image</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cortix_main.Cortix.comm">
+<code class="descname">comm</code><a class="headerlink" href="#cortix_main.Cortix.comm" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>mpi4py.MPI.Intracomm</em> – MPI.COMM_WORLD (if using MPI else None)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cortix_main.Cortix.rank">
+<code class="descname">rank</code><a class="headerlink" href="#cortix_main.Cortix.rank" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – The current MPI rank (if using MPI else None)</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cortix_main.Cortix.size">
+<code class="descname">size</code><a class="headerlink" href="#cortix_main.Cortix.size" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – size of the group associated with MPI.COMM_WORLD</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="cortix_main.Cortix.__del__">
 <code class="descname">__del__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_main.html#Cortix.__del__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_main.Cortix.__del__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Note: by the time the body of this function is executed, the machinery of
+<dd><p>Destructs a Cortix simulation object</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">By the time the body of this function is executed, the machinery of
 variables may have been deleted already. For example, <cite>logging</cite> is no longer
 there; do the least amount of work here.</p>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="cortix_main.Cortix.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>use_mpi=False</em>, <em>splash=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_main.html#Cortix.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_main.Cortix.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a Cortix simulation object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>use_mpi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – True for MPI, False for multiprocessing</li>
+<li><strong>splash</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Show the Cortix splash image</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="cortix_main.Cortix.add_module">
 <code class="descname">add_module</code><span class="sig-paren">(</span><em>m</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_main.html#Cortix.add_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_main.Cortix.add_module" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a module to the Cortix object</p>
-<p><cite>m</cite>: An instance of a class that inherits from the Module base class</p>
+<dd><p>Add a Module object to the Cortix Simulation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>m</strong> (<a class="reference internal" href="module.html#module.Module" title="module.Module"><em>Module</em></a>) – The Module object to be added</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="cortix_main.Cortix.draw_network">
 <code class="descname">draw_network</code><span class="sig-paren">(</span><em>file_name='network.png'</em>, <em>dpi=220</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_main.html#Cortix.draw_network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_main.Cortix.draw_network" title="Permalink to this definition">¶</a></dt>
-<dd><p>Draws the networkx Module network graph using matplotlib</p>
-<p><cite>file_name</cite>: The resulting network diagram output file name
-<cite>dpi</cite>: dpi used for generating the network image</p>
+<dd><p>Draws the networkx Module network graph to an image</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>file_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – The resulting network diagram output file name</li>
+<li><strong>dpi</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><em>optional</em>) – dpi used for generating the network image</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="cortix_main.Cortix.get_modules">
 <code class="descname">get_modules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_main.html#Cortix.get_modules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_main.Cortix.get_modules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the list of modules in the root (master) process. If the <cite>run()</cite>
-method has completed, the list is updated with data from the other processes.</p>
+<dd><p>Return a list of all the Cortix modules from the master process</p>
+<p>If the <cite>run()</cite> method has completed, the list is updated with data
+from the other processes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>modules</strong> – The list of modules in the Cortix simulation</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a>(<a class="reference internal" href="module.html#module.Module" title="module.Module">Module</a>)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="cortix_main.Cortix.get_network">
 <code class="descname">get_network</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_main.html#Cortix.get_network"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_main.Cortix.get_network" title="Permalink to this definition">¶</a></dt>
-<dd><p>Constructs and returns a networkx graph representation of the module network.</p>
+<dd><p>Constructs and returns a the module network</p>
+<p>Returns a networkx MultiGraph representation of the module network.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>g</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">networkx.classes.multigraph.MultiGraph</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="cortix_main.Cortix.run">
 <code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/cortix_main.html#Cortix.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cortix_main.Cortix.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run the Cortix simulation with either MPI or Python multiprocessing.</p>
+<dd><p>Run the Cortix simulation</p>
+<p>This function concurrently executes the cortix.src.module.run function
+for each module in the simulation. Modules are run using either MPI or
+Multiprocessing, depending on the user configuration.</p>
 </dd></dl>
 
 </dd></dl>

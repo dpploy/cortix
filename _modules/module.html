@@ -38,44 +38,62 @@
 <span class="kn">from</span> <span class="nn">cortix.src.port</span> <span class="k">import</span> <span class="n">Port</span>
 
 <div class="viewcode-block" id="Module"><a class="viewcode-back" href="../src_rst/module.html#module.Module">[docs]</a><span class="k">class</span> <span class="nc">Module</span><span class="p">:</span>
-    <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    The representation of a Cortix module.</span>
+    <span class="sd">&#39;&#39;&#39;Cortix module super class</span>
+
+<span class="sd">    This class provides facilities for creating modules within the Cortix network.</span>
+<span class="sd">    Cortix will map one object of this class to either a Multiprocessing or MPI</span>
+<span class="sd">    process depending on the user&#39;s configuration.</span>
+
+
+<span class="sd">    Note</span>
+<span class="sd">    ----</span>
 <span class="sd">    This class is to be inherited by every Cortix module.</span>
-<span class="sd">    It provides facilities for creating modules within the Cortix network.</span>
-<span class="sd">    In addition Cortix will map one object of this class to a Python</span>
-<span class="sd">    multiprocessing child process, or one executable object of this class to</span>
-<span class="sd">    one MPI process.</span>
+<span class="sd">    In order to execute, modules *must* override the `run` method, which will be</span>
+<span class="sd">    executed during the simulation</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    name: str</span>
+<span class="sd">        A name given to the instance. Default is `None`.</span>
+<span class="sd">    port_names_expected: list(str), None</span>
+<span class="sd">        A list of names of ports expected in the module. This will be compared</span>
+<span class="sd">        to port names during runtime to check against the intended use of the</span>
+<span class="sd">        module.</span>
+<span class="sd">    state: any</span>
+<span class="sd">        Any `pickle-able` data structure to be passed in a `multiprocessing.Queue`</span>
+<span class="sd">        to the parent process or to be gathered in the root MPI process.</span>
+<span class="sd">        Default is `None`.</span>
+<span class="sd">    use_mpi: bool</span>
+<span class="sd">        True for MPI, false for Multiprocessing</span>
+<span class="sd">    ports: list(Port)</span>
+<span class="sd">        A list of ports contained by the module</span>
+
 <span class="sd">    &#39;&#39;&#39;</span>
 
 <div class="viewcode-block" id="Module.__init__"><a class="viewcode-back" href="../src_rst/module.html#module.Module.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Attributes</span>
-<span class="sd">        ----------</span>
-<span class="sd">        name: str</span>
-<span class="sd">            A name given to the instance. Default is `None`.</span>
-<span class="sd">        port_names_expected: list(str) or None</span>
-<span class="sd">            A list of names of ports expected in the module. This will be compared</span>
-<span class="sd">            to port names during runtime to check against the intended use of the</span>
-<span class="sd">            module.</span>
-<span class="sd">        state: any</span>
-<span class="sd">            Any `pickle-able` data structure to be passed in a `multiprocessing.Queue`</span>
-<span class="sd">            to the parent process or to be gathered in the root MPI process.</span>
-<span class="sd">            Default is `None`.</span>
-<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="sd">&#39;&#39;&#39;Module super class constructor</span>
 
+<span class="sd">        This must be called in the constructor of every Cortix module like so:</span>
+
+<span class="sd">        &gt;&gt; super()__init__()</span>
+
+<span class="sd">       &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">port_names_expected</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># list of expected port names</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># state data passed to parent process if any</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">port_names_expected</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="kc">False</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">ports</span> <span class="o">=</span> <span class="p">[]</span></div>
 
 <div class="viewcode-block" id="Module.send"><a class="viewcode-back" href="../src_rst/module.html#module.Module.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Send data through a given port.</span>
+        <span class="sd">&#39;&#39;&#39;Send data through a given port.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data: any</span>
+<span class="sd">            The data being sent out - must be pickleable</span>
+<span class="sd">        port: Port, str</span>
+<span class="sd">            A Port object to send the data through, or its string name</span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -88,8 +106,22 @@
         <span class="n">port</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Module.recv"><a class="viewcode-back" href="../src_rst/module.html#module.Module.recv">[docs]</a>    <span class="k">def</span> <span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Receive data from a given port</span>
+        <span class="sd">&#39;&#39;&#39;Receive data from a given port</span>
+
+<span class="sd">        Warning</span>
+<span class="sd">        -------</span>
+<span class="sd">        This function will block until data is available</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        port: Port, str</span>
+<span class="sd">            A Port object to send the data through, or its string name</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        data: any</span>
+<span class="sd">            The data received through the port</span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">port</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -102,8 +134,18 @@
         <span class="k">return</span> <span class="n">port</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="Module.get_port"><a class="viewcode-back" href="../src_rst/module.html#module.Module.get_port">[docs]</a>    <span class="k">def</span> <span class="nf">get_port</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        Get port by name; if it does not exist, create one.</span>
+        <span class="sd">&#39;&#39;&#39;Get port by name; if it does not exist, create one.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name: str</span>
+<span class="sd">            The name of the port to get</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        port: Port</span>
+<span class="sd">            The port object with the corresponding name</span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;port name must be of type str&#39;</span>
@@ -124,14 +166,11 @@
         <span class="k">return</span> <span class="n">port</span></div>
 
 <div class="viewcode-block" id="Module.connect"><a class="viewcode-back" href="../src_rst/module.html#module.Module.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_name_or_module</span><span class="p">,</span> <span class="n">to_other_port</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        A simpler interface (as compared to direct `port` connection) to create</span>
-<span class="sd">        module connectivity. Connect the module `port` (or `module`) to a given</span>
-<span class="sd">        `to_other_port` port.</span>
+        <span class="sd">&#39;&#39;&#39;Connect two modules using ports corresponding to their name</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        port_name_or_module: str or Module</span>
+<span class="sd">        port_name_or_module: str, Module</span>
 <span class="sd">            Either a `port` name or a `Module` can be given. In the latter case</span>
 <span class="sd">            the `name` attribute of the module will be used to get the `port`</span>
 <span class="sd">            of the module passed. This port will be connected to the port of the</span>
@@ -161,9 +200,9 @@
             <span class="n">my_port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_port</span><span class="p">(</span><span class="n">port_name</span><span class="p">)</span>
             <span class="n">my_port</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">to_other_port</span><span class="p">)</span></div>
 
-    <span class="c1">#def run(self, state_comm=None, idx_comm=None):</span>
 <div class="viewcode-block" id="Module.run"><a class="viewcode-back" href="../src_rst/module.html#module.Module.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;</span>
+        <span class="sd">&#39;&#39;&#39;Module run function</span>
+
 <span class="sd">        Run method with an option to pass data back to the parent process when running</span>
 <span class="sd">        in Python multiprocessing mode. If the user does not want to share data with</span>
 <span class="sd">        the parent process, this function can be overriden with `run(self)`</span>
@@ -187,6 +226,10 @@
 
 <span class="sd">        at the bottom of the user defined run() function.</span>
 
+<span class="sd">        Warning</span>
+<span class="sd">        -------</span>
+<span class="sd">        This function must be overridden by all Cortix modules</span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        comm_idx: int</span>
@@ -194,9 +237,8 @@
 
 <span class="sd">        comm_state: multiprocessing.Queue</span>
 <span class="sd">            When using the Python `multiprocessing` library `state_comm` must have</span>
-<span class="sd">            the module&#39;s `self.state` in it. That is,</span>
-<span class="sd">            `state_comm.put((idx_comm,self.state))` must be the last command in the</span>
-<span class="sd">            method before `return`. In addition, self.state must be `pickle-able`.</span>
+<span class="sd">            the module&#39;s `self.state` in it. That is, `state_comm.put((idx_comm,self.state))`</span>
+<span class="sd">            must be the last command in the method before `return`. In addition, self.state must be `pickle-able`.</span>
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Module must implement run()&#39;</span><span class="p">)</span></div></div>
 </pre></div>

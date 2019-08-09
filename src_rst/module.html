@@ -35,16 +35,17 @@
 <dt id="module.Module">
 <em class="property">class </em><code class="descclassname">module.</code><code class="descname">Module</code><a class="reference internal" href="../_modules/module.html#Module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>The representation of a Cortix module.
-This class is to be inherited by every Cortix module.
-It provides facilities for creating modules within the Cortix network.
-In addition Cortix will map one object of this class to a Python
-multiprocessing child process, or one executable object of this class to
-one MPI process.</p>
-<dl class="method">
-<dt id="module.Module.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="attribute">
+<p>Cortix module super class</p>
+<p>This class provides facilities for creating modules within the Cortix network.
+Cortix will map one object of this class to either a Multiprocessing or MPI
+process depending on the user’s configuration.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This class is to be inherited by every Cortix module.
+In order to execute, modules <em>must</em> override the <cite>run</cite> method, which will be
+executed during the simulation</p>
+</div>
+<dl class="attribute">
 <dt id="module.Module.name">
 <code class="descname">name</code><a class="headerlink" href="#module.Module.name" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>str</em> – A name given to the instance. Default is <cite>None</cite>.</p>
@@ -53,7 +54,7 @@ one MPI process.</p>
 <dl class="attribute">
 <dt id="module.Module.port_names_expected">
 <code class="descname">port_names_expected</code><a class="headerlink" href="#module.Module.port_names_expected" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>list(str) or None</em> – A list of names of ports expected in the module. This will be compared
+<dd><p><em>list(str), None</em> – A list of names of ports expected in the module. This will be compared
 to port names during runtime to check against the intended use of the
 module.</p>
 </dd></dl>
@@ -66,20 +67,36 @@ to the parent process or to be gathered in the root MPI process.
 Default is <cite>None</cite>.</p>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="module.Module.use_mpi">
+<code class="descname">use_mpi</code><a class="headerlink" href="#module.Module.use_mpi" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – True for MPI, false for Multiprocessing</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.ports">
+<code class="descname">ports</code><a class="headerlink" href="#module.Module.ports" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list(Port)</em> – A list of ports contained by the module</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="module.Module.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Module super class constructor</p>
+<p>This must be called in the constructor of every Cortix module like so:</p>
+<p>&gt;&gt; super()__init__()</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="module.Module.connect">
 <code class="descname">connect</code><span class="sig-paren">(</span><em>port_name_or_module</em>, <em>to_other_port=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.connect" title="Permalink to this definition">¶</a></dt>
-<dd><p>A simpler interface (as compared to direct <cite>port</cite> connection) to create
-module connectivity. Connect the module <cite>port</cite> (or <cite>module</cite>) to a given
-<cite>to_other_port</cite> port.</p>
+<dd><p>Connect two modules using ports corresponding to their name</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>port_name_or_module</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference internal" href="#module.Module" title="module.Module"><em>Module</em></a>) – Either a <cite>port</cite> name or a <cite>Module</cite> can be given. In the latter case
+<li><strong>port_name_or_module</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference internal" href="#module.Module" title="module.Module"><em>Module</em></a>) – Either a <cite>port</cite> name or a <cite>Module</cite> can be given. In the latter case
 the <cite>name</cite> attribute of the module will be used to get the <cite>port</cite>
 of the module passed. This port will be connected to the port of the
 calling object.</li>
@@ -96,18 +113,47 @@ first argument is a <cite>Module</cite>.</li>
 <dt id="module.Module.get_port">
 <code class="descname">get_port</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_port"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_port" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get port by name; if it does not exist, create one.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the port to get</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>port</strong> – The port object with the corresponding name</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="port.html#port.Port" title="port.Port">Port</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="module.Module.recv">
 <code class="descname">recv</code><span class="sig-paren">(</span><em>port</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.recv" title="Permalink to this definition">¶</a></dt>
 <dd><p>Receive data from a given port</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This function will block until data is available</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>port</strong> (<a class="reference internal" href="port.html#port.Port" title="port.Port"><em>Port</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A Port object to send the data through, or its string name</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>data</strong> – The data received through the port</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">any</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="module.Module.run">
 <code class="descname">run</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run method with an option to pass data back to the parent process when running
+<dd><p>Module run function</p>
+<p>Run method with an option to pass data back to the parent process when running
 in Python multiprocessing mode. If the user does not want to share data with
 the parent process, this function can be overriden with <cite>run(self)</cite>
 or <cite>run(self, *args)</cite> as long as <cite>self.state = None</cite>.
@@ -134,6 +180,10 @@ index <cite>comm_idx</cite> and the <cite>state</cite> into the queue as follows
 </div></blockquote>
 <p class="last">at the bottom of the user defined run() function.</p>
 </div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This function must be overridden by all Cortix modules</p>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -141,9 +191,8 @@ index <cite>comm_idx</cite> and the <cite>state</cite> into the queue as follows
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>comm_idx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index of the state in the communication queue.</li>
 <li><strong>comm_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v3.7)"><em>multiprocessing.Queue</em></a>) – When using the Python <cite>multiprocessing</cite> library <cite>state_comm</cite> must have
-the module’s <cite>self.state</cite> in it. That is,
-<cite>state_comm.put((idx_comm,self.state))</cite> must be the last command in the
-method before <cite>return</cite>. In addition, self.state must be <cite>pickle-able</cite>.</li>
+the module’s <cite>self.state</cite> in it. That is, <cite>state_comm.put((idx_comm,self.state))</cite>
+must be the last command in the method before <cite>return</cite>. In addition, self.state must be <cite>pickle-able</cite>.</li>
 </ul>
 </td>
 </tr>
@@ -155,6 +204,18 @@ method before <cite>return</cite>. In addition, self.state must be <cite>pickle-
 <dt id="module.Module.send">
 <code class="descname">send</code><span class="sig-paren">(</span><em>data</em>, <em>port</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.send" title="Permalink to this definition">¶</a></dt>
 <dd><p>Send data through a given port.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> (<em>any</em>) – The data being sent out - must be pickleable</li>
+<li><strong>port</strong> (<a class="reference internal" href="port.html#port.Port" title="port.Port"><em>Port</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A Port object to send the data through, or its string name</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

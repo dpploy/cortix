@@ -43,14 +43,40 @@ module that provides information about the flow outside the droplet,
 <cite>visualization</cite> sends data to a visualization module.</p>
 </div>
 <dl class="method">
-<dt id="droplet.Droplet.rhs_fn">
-<code class="descname">rhs_fn</code><span class="sig-paren">(</span><em>u_vec</em>, <em>t</em>, <em>params</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/droplet.html#Droplet.rhs_fn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#droplet.Droplet.rhs_fn" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="droplet.Droplet.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/droplet.html#Droplet.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#droplet.Droplet.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="droplet.Droplet.initial_time">
+<code class="descname">initial_time</code><a class="headerlink" href="#droplet.Droplet.initial_time" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="droplet.Droplet.end_time">
+<code class="descname">end_time</code><a class="headerlink" href="#droplet.Droplet.end_time" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="droplet.Droplet.time_step">
+<code class="descname">time_step</code><a class="headerlink" href="#droplet.Droplet.time_step" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="droplet.Droplet.show_time">
+<code class="descname">show_time</code><a class="headerlink" href="#droplet.Droplet.show_time" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>tuple</em> – Two-element tuple, <cite>(bool,float)</cite>, <cite>True</cite> will print to standard
+output.</p>
+</dd></dl>
+
+</dd></dl>
 
 <dl class="method">
 <dt id="droplet.Droplet.run">
 <code class="descname">run</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/droplet.html#Droplet.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#droplet.Droplet.run" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run method with an option to pass data back to the parent process when running
+<dd><p>Module run function</p>
+<p>Run method with an option to pass data back to the parent process when running
 in Python multiprocessing mode. If the user does not want to share data with
 the parent process, this function can be overriden with <cite>run(self)</cite>
 or <cite>run(self, *args)</cite> as long as <cite>self.state = None</cite>.
@@ -77,6 +103,10 @@ index <cite>comm_idx</cite> and the <cite>state</cite> into the queue as follows
 </div></blockquote>
 <p class="last">at the bottom of the user defined run() function.</p>
 </div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This function must be overridden by all Cortix modules</p>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -84,38 +114,10 @@ index <cite>comm_idx</cite> and the <cite>state</cite> into the queue as follows
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>comm_idx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index of the state in the communication queue.</li>
 <li><strong>comm_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v3.7)"><em>multiprocessing.Queue</em></a>) – When using the Python <cite>multiprocessing</cite> library <cite>state_comm</cite> must have
-the module’s <cite>self.state</cite> in it. That is,
-<cite>state_comm.put((idx_comm,self.state))</cite> must be the last command in the
-method before <cite>return</cite>. In addition, self.state must be <cite>pickle-able</cite>.</li>
+the module’s <cite>self.state</cite> in it. That is, <cite>state_comm.put((idx_comm,self.state))</cite>
+must be the last command in the method before <cite>return</cite>. In addition, self.state must be <cite>pickle-able</cite>.</li>
 </ul>
 </td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="droplet.Droplet.step">
-<code class="descname">step</code><span class="sig-paren">(</span><em>time=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/droplet.html#Droplet.step"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#droplet.Droplet.step" title="Permalink to this definition">¶</a></dt>
-<dd><p>ODE IVP problem:
-Given the initial data at <img class="math" src="../_images/math/c9c0db14206d811c979283bc2269384bec23557d.svg" alt="t=0"/>,
-<img class="math" src="../_images/math/04d154680dfe068e5aa43ae53985a6721f17acd9.svg" alt="(u_1(0),u_2(0),u_3(0)) = (x_0,x_1,x_2)"/>,
-<img class="math" src="../_images/math/a3a8916bbdd47f4561ff9e843e10e56782b7dc96.svg" alt="(u_4(0),u_5(0),u_6(0)) = (v_0,v_1,v_2) =
-(\dot{u}_1(0),\dot{u}_2(0),\dot{u}_3(0))"/>,
-solve <img class="math" src="../_images/math/6dc56e03fc4925c43dc948b4652e5c28b3f5a089.svg" alt="\frac{\text{d}u}{\text{d}t} = f(u)"/> in the interval
-<img class="math" src="../_images/math/47dfc08576060d50f4579e3816a573bb79346540.svg" alt="0\le t \le t_f"/>.
-When <img class="math" src="../_images/math/fdffd00fd5ea97c10895de227f630c27c8f2cb96.svg" alt="u_3(t)"/> is negative, bounce the droplet to a random height between
-0 and <img class="math" src="../_images/math/fd09f7b023aaf3c1e03b034f3d9cc4b8da668288.svg" alt="1.0\,x_0"/> with no velocity, and continue the time integration until
-<img class="math" src="../_images/math/ad8ff49872c18dd90656fad9911718358f0963c8.svg" alt="t = t_f"/>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>time</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Time in the droplet unit of time (seconds).</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
 </tr>
 </tbody>
 </table>

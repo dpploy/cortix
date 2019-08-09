@@ -35,7 +35,7 @@
 <span class="c1"># This file is part of the Cortix toolkit environment</span>
 <span class="c1"># https://cortix.org</span>
 
-<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.constants</span> <span class="k">as</span> <span class="nn">const</span>
@@ -58,7 +58,17 @@
 <span class="sd">    Any `port` name and any number of ports are allowed.</span>
 <span class="sd">    &#39;&#39;&#39;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Vortex.__init__"><a class="viewcode-back" href="../examples_rst/vortex.html#vortex.Vortex.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Attributes</span>
+<span class="sd">        ----------</span>
+<span class="sd">        initial_time: float</span>
+<span class="sd">        end_time: float</span>
+<span class="sd">        time_step: float</span>
+<span class="sd">        show_time: tuple</span>
+<span class="sd">            Two-element tuple, `(bool,float)`, `True` will print to standard</span>
+<span class="sd">            output.</span>
+<span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
@@ -68,8 +78,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">initial_time</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="mi">5</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">minute</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time_step</span> <span class="o">=</span> <span class="mf">0.1</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">show_time</span> <span class="o">=</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span><span class="mi">1</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">minute</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;cortix&#39;</span><span class="p">)</span>
 
         <span class="n">air</span> <span class="o">=</span> <span class="n">Specie</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;air&#39;</span><span class="p">,</span> <span class="n">formula_name</span><span class="o">=</span><span class="s1">&#39;Air&#39;</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="s1">&#39;gas&#39;</span><span class="p">)</span>
         <span class="n">air</span><span class="o">.</span><span class="n">massCCUnit</span> <span class="o">=</span> <span class="s1">&#39;g/cc&#39;</span>
@@ -94,7 +104,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">period</span> <span class="o">=</span> <span class="mi">20</span> <span class="c1"># wind change period</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Vortex.run"><a class="viewcode-back" href="../examples_rst/vortex.html#vortex.Vortex.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 
@@ -108,7 +118,7 @@
         <span class="k">while</span> <span class="n">time</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="p">:</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">time</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">show_time</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mf">0.0</span><span class="p">)</span><span class="o">&lt;=</span><span class="mf">1.e-1</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Vortex::time[min] =&#39;</span><span class="p">,</span><span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="o">/</span><span class="n">const</span><span class="o">.</span><span class="n">minute</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Vortex::time[min] = &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="o">/</span><span class="n">const</span><span class="o">.</span><span class="n">minute</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
 
             <span class="c1"># Interactions in all nameless ports (lower level port send/recv used)</span>
             <span class="c1">#---------------------------------------------------------------------</span>

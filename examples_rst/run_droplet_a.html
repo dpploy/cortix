@@ -31,6 +31,21 @@
             
   <div class="section" id="module-run_droplet_a">
 <span id="run-droplet-a-module"></span><h1>run_droplet_a module<a class="headerlink" href="#module-run_droplet_a" title="Permalink to this headline">¶</a></h1>
+<p>This example uses two modules instantiated many times.
+This example can be executed with MPI (if mpi4py is available) or
+with the Python multiprocessing library. These choices are made by variables listed
+below in the executable portion of this run file.</p>
+<p>To run this case using MPI you should compute the number of
+processes as follows:</p>
+<blockquote>
+<div><cite>nprocs = n_droplets + 1 vortex + 1 cortix</cite></div></blockquote>
+<p>then issue the MPI run command as follows (replace <cite>nprocs</cite> with a number):</p>
+<blockquote>
+<div><cite>mpiexec -n nprocs run_droplet.py</cite></div></blockquote>
+<p>To run this case with the Python multiprocessing library, just run this file at the
+command line as</p>
+<blockquote>
+<div><cite>run_droplet.py</cite></div></blockquote>
 </div>
 
 
