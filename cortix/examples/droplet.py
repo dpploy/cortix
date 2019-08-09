@@ -150,7 +150,7 @@ class Droplet(Module):
             # Evolve droplet state to next time stamp
             #----------------------------------------
 
-            time = self.step( time )
+            time = self.__step( time )
 
         self.send('DONE', 'visualization') # this should not be needed: TODO
 
@@ -165,7 +165,7 @@ class Droplet(Module):
 
         return
 
-    def rhs_fn(self, u_vec, t, params):
+    def __rhs_fn(self, u_vec, t, params):
         drop_pos = u_vec[:3]
         flow_velo = params['flow-velocity']
 
@@ -204,7 +204,7 @@ class Droplet(Module):
 
         return [dt_u_0, dt_u_1, dt_u_2, dt_u_3, dt_u_4, dt_u_5]
 
-    def step(self, time=0.0):
+    def __step(self, time=0.0):
         r'''
         ODE IVP problem:
         Given the initial data at :math:`t=0`,
@@ -232,13 +232,14 @@ class Droplet(Module):
         u_vec_0 = np.concatenate((x_0,v_0))
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
-        (u_vec_hist, info_dict) = odeint(self.rhs_fn,
+        (u_vec_hist, info_dict) = odeint(self.__rhs_fn,
                                          u_vec_0, t_interval_sec,
                                          args=( self.ode_params, ),
                                          rtol=1e-4, atol=1e-8, mxstep=200,
                                          full_output=True)
 
-        assert info_dict['message'] =='Integration successful.', info_dict['message']
+        assert info_dict['message'] =='Integration successful.', 'At time %r message:',\
+                (time, info_dict['message'])
 
         u_vec = u_vec_hist[1,:]  # solution vector at final time step
         values = self.liquid_phase.GetRow(time) # values at previous time
@@ -255,9 +256,9 @@ class Droplet(Module):
             u_vec[3:] = 0.0  # zero velocity
         # Ground impact with no bouncing drop and slip velocity
         elif u_vec[2] <= 0.0 and not self.bounce and self.slip:
-            u_vec[2]  = 0.0
+            u_vec[2]  = 0.0  # don't bounce
         elif u_vec[2] <= 0.0 and not self.bounce and not self.slip:
-            u_vec[2]  = 0.0
+            u_vec[2]  = 0.0  # don't bounce
             u_vec[3:] = 0.0  # zero velocity
 
         # Update current values
