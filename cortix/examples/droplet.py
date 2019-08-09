@@ -235,7 +235,7 @@ class Droplet(Module):
         (u_vec_hist, info_dict) = odeint(self.__rhs_fn,
                                          u_vec_0, t_interval_sec,
                                          args=( self.ode_params, ),
-                                         rtol=1e-4, atol=1e-8, mxstep=200,
+                                         rtol=1e-4, atol=1e-7, mxstep=300,
                                          full_output=True)
 
         assert info_dict['message'] =='Integration successful.', \
