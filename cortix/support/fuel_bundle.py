@@ -59,13 +59,8 @@ class FuelBundle():
 #*********************************************************************************
 
     def get_name(self):
-
         '''
         Returns the name of the fuel bundle.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -76,13 +71,8 @@ class FuelBundle():
     name = property(get_name, None, None, None)
 
     def get_fuel_enrichment(self):
-
         '''
         Returns the enrichment of the fuel pins in the bundle, in %.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -93,13 +83,8 @@ class FuelBundle():
     fuel_enrichment = property(get_fuel_enrichment, None, None, None)
 
     def get_fresh_u_mass(self):
-
         '''
         Returns the amount of uranium in the bundle, in grams.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -110,13 +95,8 @@ class FuelBundle():
     fresh_u_mass = property(get_fresh_u_mass, None, None, None)
 
     def get_fresh_u238_mass(self):
-
         '''
         Returns the amount of uranium-238 in the bucket, in grams.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -129,13 +109,8 @@ class FuelBundle():
     fresh_u238_mass = property(get_fresh_u238_mass, None, None, None)
 
     def get_fresh_U235_mass(self):
-
         '''
         Returns the amount of uranium-235 in the bucket, in grams.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -148,13 +123,8 @@ class FuelBundle():
     fresh_u235_mass = property(get_fresh_U235_mass, None, None, None)
 
     def get_n_fuel_rods(self):
-
         '''
         Returns the number of fuel rods in the bundle.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -168,14 +138,9 @@ class FuelBundle():
     # ------
 
     def get_fuel_pin_length(self):
-
         '''
         Returns the length of each fuel pin in the fuel bundle. A fuel pin is
         a cylindircal section of uranium fuel that is surrounded by cladding.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -185,13 +150,8 @@ class FuelBundle():
         return self.__get_fuel_pin_length()
 
     def set_fuel_pin_length(self, x):
-
         '''
         Sets the length of all fuel pins in the bundle to x.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -203,14 +163,9 @@ class FuelBundle():
     fuel_pin_length = property(get_fuel_pin_length, set_fuel_pin_length, None, None)
 
     def get_fuel_rod_od(self):
-
         '''
-        returns the outer diameter of the fuel rod, in cm.
+        Returns the outer diameter of the fuel rod, in cm.
         A fuel rod consists of a fuel pin surrounded by cladding.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -221,33 +176,20 @@ class FuelBundle():
     fuel_rod_od = property(get_fuel_rod_od, None, None, None)
 
     def get_fuel_pin_radius(self):
-
         '''
         Returns the radius of the fuel pin, in cm.
-        Parameters
-        ----------
-
-        Returns
-        -------
-
         '''
 
         return self.__get_fuel_pin_radius()
     fuel_pin_radius = property(get_fuel_pin_radius, None, None, None)
 
     def get_fuel_pin_volume(self):
-
         '''
         Returns the volume of fuel in each fuel pin, in cm^3.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
         fuel_pin_volume: float
-
         '''
 
         return self.__get_fuel_pin_volume()
@@ -256,10 +198,6 @@ class FuelBundle():
     def get_fuel_volume(self):
         '''
         Returns the total volume of fuel in the bundle, in cm^3.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -271,14 +209,9 @@ class FuelBundle():
 
     # mass of the solid phase (gas phase in plenum not added)
     def get_fuel_mass(self):
-
         '''
         Returns the total numerical value for  mass of fuel in the solid phase
         in the bundle.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -289,13 +222,8 @@ class FuelBundle():
     fuel_mass = property(get_fuel_mass, None, None, None)
 
     def get_fuel_mass_unit(self):
-
         '''
         Returns the unit used to measure the mass of fuel in the bundle.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -306,30 +234,17 @@ class FuelBundle():
     fuel_mass_unit = property(get_fuel_mass_unit, None, None, None)
 
     def get_gas_mass(self):
-
         '''
         Returns the total numerical value for mass of the fuel in the gas
         phase.
-
-        Parameters
-        ----------
-
-        Returns
-        -------
-
         '''
 
         return self.__gas_phase.GetValue('mass')
     gas_mass = property(get_gas_mass, None, None, None)
 
     def get_radioactivity(self):
-
         '''
         Returns the total radioactivity of the fuel bundle, in curies.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -341,14 +256,9 @@ class FuelBundle():
     radioactivity = property(get_radioactivity, None, None, None)
 
     def get_gamma_pwr(self):
-
         '''
         Returns the total amount of gamma radiation given by the fuel bundle,
         in watts.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -360,13 +270,8 @@ class FuelBundle():
     gamma_pwr = property(get_gamma_pwr, None, None, None)
 
     def get_heat_pwr(self):
-
         '''
         Returns the total amount of heat produced by the fuel bundle, in watts.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -379,14 +284,9 @@ class FuelBundle():
 
     def get_fuel_radioactivity(self):
     # radioactivity of the solid phase
-
         '''
         Returns the total radioactivity of the fuel in the solid phase in the
         fuel bundle.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -398,14 +298,9 @@ class FuelBundle():
 
     def get_gas_radioactivity(self):
         # radioactivity of the gas phase
-
         '''
         Returns the total radioactivity of the fuel in the gas phase in the
         fuel bundle, in curies.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -416,13 +311,8 @@ class FuelBundle():
     gas_radioactivity = property(get_gas_radioactivity, None, None, None)
 
     def get_solid_phase(self):
-
         '''
         Returns the solid phase history associated with this fuel bundle.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -432,30 +322,20 @@ class FuelBundle():
         return self.__solid_phase
 
     def set_solid_phase(self, phase):
-
         '''
         Sets the solid phase history of the fuel equal to phase.
 
         Parameters
         ----------
         phase: dataFrame
-
-        Returns
-        -------
-        empty
         '''
 
         self.__solid_phase = deepcopy(phase)
     solid_phase = property(get_solid_phase, set_solid_phase, None, None)
 
     def get_gas_phase(self):
-
         '''
         Returns the gas phase history of the fuel.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -465,17 +345,12 @@ class FuelBundle():
         return self.__gas_phase
 
     def set_gas_phase(self, phase):
-
         '''
         Sets the gas phase history of the fuel equal to phase.
 
         Parameters
         ----------
         phase: dataFrame
-
-        Returns
-        -------
-        empty
         '''
 
         self.__gas_phase = deepcopy(phase)
@@ -486,13 +361,8 @@ class FuelBundle():
 #*********************************************************************************
 
     def __get_fuel_enrichment(self):
-
         '''
         Returns the enrichment of the fuel.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -505,10 +375,6 @@ class FuelBundle():
         '''
         Returns the mass of fuel in the bundle.
 
-        Parameters
-        ----------
-        empty
-
         Returns
         -------
         self.__specs.loc['U mass per assy [kg]', 1]) * 1000
@@ -518,13 +384,8 @@ class FuelBundle():
             self.__specs.loc['U mass per assy [kg]', 1]) * 1000.0  # [g]
 
     def __get_n_fuel_rods(self):
-
         '''
         Returns the number of fuel rods in the bundle.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -534,13 +395,8 @@ class FuelBundle():
         return int(self.__specs.loc['Fuel rods number', 1])
 
     def __get_fuel_pin_length(self):
-
         '''
         Returns the length of the fuel pins in the bundle.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -551,13 +407,8 @@ class FuelBundle():
             self.__specs.loc['Fuel rods fuel length [in]', 1]) * 2.54  # cm
 
     def __get_fuel_rod_od(self):
-
         '''
         Returns the outer diameter of the fuel rods in the bundle.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -567,14 +418,9 @@ class FuelBundle():
         return float(self.__specs.loc['Fuel rods O.D. [in]', 1]) * 2.54  # cm
 
     def __get_fuel_rod_wall_thickness(self):
-
         '''
         Returns the thickness of the cladding wall on the outside of the fuel
         rod.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -585,13 +431,8 @@ class FuelBundle():
             self.__specs.loc['Fuel rods wall thickness [in]', 1]) * 2.54  # cm
 
     def __get_fuel_pin_radius(self):
-
         '''
         Returns the radius of the fuel pins.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -604,13 +445,8 @@ class FuelBundle():
         return fuel_pin_radius
 
     def __get_fuel_pin_volume(self):
-
         '''
         Returns the volume of each fuel pin.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -624,10 +460,6 @@ class FuelBundle():
     def __get_fuel_volume(self):
         '''
         Returns the volume of fuel in the bundle, in cm^3.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------

@@ -96,12 +96,7 @@ class FuelSegmentsGroups():
         Parameters
         ----------
         key: str
-
         fuelSegments: list
-
-        Returns
-        -------
-        empty:
         '''
 
         self.__AddGroup(key, fuelSegments)
@@ -122,11 +117,8 @@ class FuelSegmentsGroups():
         Parameters
         ----------
         groupKey: str
-
         attributeName: str
-
         nuclideSymbol: str
-
         nuclideSeries: str
 
         Returns
@@ -164,7 +156,6 @@ class FuelSegmentsGroups():
         Parameters
         ----------
         groupKey: str
-
         fuelSegment: str
 
         Returns
@@ -199,11 +190,8 @@ class FuelSegmentsGroups():
         Parameters
         ----------
         groupKey: str
-
         attributeName: str
-
         symbol: str
-
         series: list
 
         Returns
@@ -316,12 +304,7 @@ class FuelSegmentsGroups():
         Parameters
         ----------
         groupKey: str
-
         fuelSegments: list
-
-        Returns
-        -------
-        None
         '''
 
         if fuelSegments is None:
@@ -345,12 +328,7 @@ class FuelSegmentsGroups():
         Parameters
         ----------
         groupKey: str
-
         fuelSegment: str
-
-        Returns
-        -------
-        None
         '''
 
         assert groupKey in self.groups.keys(), 'fail.'

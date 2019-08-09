@@ -122,13 +122,8 @@ class FuelSlug:
 #*********************************************************************************
 
     def GetSpecs(self):
-
         '''
         Returns the species associated with this fuel slug.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -139,13 +134,8 @@ class FuelSlug:
     specs = property(GetSpecs, None, None, None)
 
     def GetFuelPhase(self):
-
         '''
         Returns the phase history of the solid fuel.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -156,13 +146,8 @@ class FuelSlug:
     fuelPhase = property(GetFuelPhase, None, None, None)
 
     def GetCladdingPhase(self):
-
         '''
         Returns the phase history of the cladding.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -173,7 +158,6 @@ class FuelSlug:
     claddingPhase = property(GetCladdingPhase, None, None, None)
 
     def GetAttribute(self, name, phase=None, symbol=None, series=None):
-
         '''
         Returns the value of the specified attribute. Any attribute that is
         specified in class construction can be retrieved using this function.
@@ -195,7 +179,6 @@ class FuelSlug:
         return self.__GetAttribute(name, symbol, series)
 
     def ReduceCladdingVolume(self, dissolvedVolume):
-
         '''
         Reduces the amount of cladding in the slug by dissolvedvolume.
         This will also update the dimensions of the cladding walls and
@@ -205,16 +188,11 @@ class FuelSlug:
         Parameters
         ----------
         dissolvedVolume: float
-
-        Returns
-        -------
-        empty
         '''
 
         self.__ReduceCladdingVolume(dissolvedVolume)
 
     def ReduceFuelVolume(self, dissolvedVolume):
-
         '''
         Reduces the amount of fuel in the slug by dissolvedVolume. This
         will also update the dimensions of the fuel slug, mainly the thickness
@@ -223,10 +201,6 @@ class FuelSlug:
         Parameters
         ----------
         dissolvedVolume: float
-
-        Returns
-        -------
-        empty
         '''
 
         self.__ReduceFuelVolume(dissolvedVolume)
@@ -246,7 +220,6 @@ class FuelSlug:
 #*********************************************************************************
 
     def __GetAttribute(self, attributeName, nuclide=None, series=None):
-
         '''
         Returns the specified attribute. Series and nuclide must both be
         specified if the other is specified!
@@ -599,14 +572,8 @@ class FuelSlug:
                 assert False
 
     def __GetSlugLength(self):
-
-
         '''
         Returns the length of the fuelslug in cm (includes the end caps).
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -616,15 +583,10 @@ class FuelSlug:
         return self._specs['Slug length [cm]']
 
     def __GetFuelLength(self):
-
-
         '''
         Returns the length of the fuel section in the slug (this is the length
         of the fuel slug without the cladding end caps). Given in cm.
 
-        Parameters
-        ----------
-        empty
         Returns
         -------
         fuelLength: float
@@ -638,14 +600,8 @@ class FuelSlug:
         return fuelLength
 
     def __GetSlugVolume(self):
-
-
         '''
         Returns the total volume of the fuel slug, in cm^3.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -666,14 +622,8 @@ class FuelSlug:
         return outerSlugVolume + innerSlugVolume
 
     def __GetFuelVolume(self):
-
-
         '''
         Returns the total volume of fuel in the slug, in cm^3.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -704,14 +654,8 @@ class FuelSlug:
         return volume
 
     def __GetCladdingVolume(self):
-
-
         '''
         Returns the total volume of cladding in the slug.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -724,14 +668,8 @@ class FuelSlug:
         return slugVolume - fuelVolume
 
     def __GetFuelArea(self):
-
-
         '''
         Returns the surface area of the fuel, in cm^2.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -774,14 +712,8 @@ class FuelSlug:
         return outerSlugFuelArea + innerSlugFuelArea
 
     def __GetCladdingArea(self):
-
-
         '''
         Returns the surface area of the cladding, in cm^2.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -815,16 +747,10 @@ class FuelSlug:
         return outerSlugArea + innerSlugArea
 
     def __GetEquivalentCladdingArea(self):
-
-
         '''
         Returns the surface area of a sphere with a radius given by
         self._claddingHollowSphereRo with the same surface area as the cladding
         on the fuel slug, in cm^2.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -838,15 +764,9 @@ class FuelSlug:
         return area
 
     def __GetEquivalentCladdingVolume(self):
-
-
         '''
         Returns the equivalent cladding volume of a hollow sphere that is
         equal to the cladding volume in the fuel slug, in cm^3.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -861,15 +781,9 @@ class FuelSlug:
         return volume
 
     def __GetEquivalentFuelVolume(self):
-
-
         '''
         This function does the same thing as __GetEquivalentCladdingVolume but
         for fuel instead of clading.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -884,15 +798,9 @@ class FuelSlug:
         return volume
 
     def __GetEquivalentFuelArea(self):
-
-
         '''
         This function does the same thing as __GetEquiavelntCladdingArea, but
         for fuel instead of cladding.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -908,8 +816,6 @@ class FuelSlug:
 # Shrink the volume based on the equivalent cladding hollow sphere
 
     def __ReduceCladdingVolume(self, dissolvedVolume):
-
-
         '''
         Reduces the volume of cladding by the specified amount and then shrinks
         the dimensions of the cladding walls to fit the new volume. The
@@ -921,10 +827,6 @@ class FuelSlug:
         Parameters
         ----------
         dissolvedVolume: float
-
-        Returns
-        -------
-        empty
         '''
 
         assert dissolvedVolume >= 0.0, 'dissolved volume= %r; failed.' % (
@@ -982,18 +884,12 @@ class FuelSlug:
         self._claddingPhase.SetValue('mass', massDens * volume)
 
     def __ReduceFuelVolume(self, dissolvedVolume):
-
-
         '''
         See __ReduceCladdingVolume, above.
 
         Parameters
         ----------
         dissolvedVolume: float
-
-        Returns
-        -------
-        empty
         '''
 
         assert dissolvedVolume >= 0.0, 'dissolved volume= %r; failed.' % (

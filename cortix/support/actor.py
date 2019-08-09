@@ -62,10 +62,6 @@ class Actor():
         '''
         Returns the specific nuclides found in the specified chemical.
 
-        Parameters
-        ----------
-        empty:
-
         Returns
         -------
         atoms: list(str)
@@ -77,10 +73,6 @@ class Actor():
     def __get_formula(self):
         '''
         Returns the formula of the chemical in question.
-
-        Parameters
-        ----------
-        empty:
 
         Returns
         -------
