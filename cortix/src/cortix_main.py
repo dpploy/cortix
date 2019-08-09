@@ -19,7 +19,7 @@ class Cortix:
     The typical Cortix workflow:
 
     1. Create the object
-    2. Add modules
+    2. Add and connect modules
     3. Run the simulation
 
     Attributes
