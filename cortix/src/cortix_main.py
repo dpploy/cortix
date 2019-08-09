@@ -233,9 +233,13 @@ class Cortix:
             if class_name not in class_map:
                 class_map[class_name] = colors[len(class_map) % len(colors)]
             color_map[node] = class_map[class_name]
+
         f = plt.figure()
+
         pos = nx.spring_layout(g, k=0.15, iterations=20)
-        nx.draw(g, pos, node_color=[color_map[n] for n in g.nodes], ax=f.add_subplot(111), linewidths=0.01)
+        nx.draw( g, pos, node_color=[color_map[n] for n in g.nodes],
+                 ax=f.add_subplot(111), linewidths=0.01 )
+
         patches = []
         for c in class_map:
             patch = mpatches.Patch(color=class_map[c], label=c)
