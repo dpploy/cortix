@@ -25,6 +25,16 @@ class Droplet(Module):
     '''
 
     def __init__(self):
+        '''
+        Attributes
+        ----------
+        initial_time: float
+        end_time: float
+        time_step: float
+        show_time: tuple
+            Two-element tuple, `(bool,float)`, `True` will print to standard
+            output.
+        '''
 
         super().__init__()
 
@@ -41,6 +51,8 @@ class Droplet(Module):
         self.initial_time = 0.0
         self.end_time = 100
         self.time_step = 0.1
+        self.show_time = (False,1*const.minute)
+        self.log = logging.getLogger('cortix')
 
         # Create a drop with random diameter up within 5 and 8 mm.
         self.droplet_diameter = (np.random.random(1) * (8 - 5) + 5)[0] * const.milli
@@ -117,6 +129,8 @@ class Droplet(Module):
 
         time = self.initial_time
 
+        self.bottom_impact = False
+
         while time < self.end_time:
 
             # Interactions in the external-flow port
@@ -150,7 +164,7 @@ class Droplet(Module):
             # Evolve droplet state to next time stamp
             #----------------------------------------
 
-            time = self.step( time )
+            time = self.__step( time )
 
         self.send('DONE', 'visualization') # this should not be needed: TODO
 
@@ -165,7 +179,7 @@ class Droplet(Module):
 
         return
 
-    def rhs_fn(self, u_vec, t, params):
+    def __rhs_fn(self, u_vec, t, params):
         drop_pos = u_vec[:3]
         flow_velo = params['flow-velocity']
 
@@ -204,7 +218,7 @@ class Droplet(Module):
 
         return [dt_u_0, dt_u_1, dt_u_2, dt_u_3, dt_u_4, dt_u_5]
 
-    def step(self, time=0.0):
+    def __step(self, time=0.0):
         r'''
         ODE IVP problem:
         Given the initial data at :math:`t=0`,
@@ -227,43 +241,54 @@ class Droplet(Module):
         None
         '''
 
-        x_0 = self.liquid_phase.GetValue('position', time)
-        v_0 = self.liquid_phase.GetValue('velocity', time)
-        u_vec_0 = np.concatenate((x_0,v_0))
-        t_interval_sec = np.linspace(0.0, self.time_step, num=2)
+        if not self.bottom_impact:
 
-        (u_vec_hist, info_dict) = odeint(self.rhs_fn,
-                                         u_vec_0, t_interval_sec,
-                                         args=( self.ode_params, ),
-                                         rtol=1e-4, atol=1e-8, mxstep=200,
-                                         full_output=True)
+           x_0 = self.liquid_phase.GetValue('position', time)
+           v_0 = self.liquid_phase.GetValue('velocity', time)
+           u_vec_0 = np.concatenate((x_0,v_0))
 
-        assert info_dict['message'] =='Integration successful.', info_dict['message']
+           t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
-        u_vec = u_vec_hist[1,:]  # solution vector at final time step
+           (u_vec_hist, info_dict) = odeint(self.__rhs_fn,
+                                            u_vec_0, t_interval_sec,
+                                            args=( self.ode_params, ),
+                                            rtol=1e-4, atol=1e-8, mxstep=300,
+                                            full_output=True)
+
+           assert info_dict['message'] =='Integration successful.', \
+                   'At time: %r; state: %r; message: %r; full output: %r'%\
+                   (round(time,2), u_vec_0, info_dict['message'], info_dict)
+
+           u_vec = u_vec_hist[1,:]  # solution vector at final time step
+
         values = self.liquid_phase.GetRow(time) # values at previous time
 
         time += self.time_step
 
         self.liquid_phase.AddRow(time, values)
 
-        # Ground impact with bouncing drop
-        if u_vec[2] <= 0.0 and self.bounce:
-            position = self.liquid_phase.GetValue('position', self.initial_time)
-            bounced_position = position[2] * np.random.random(1)
-            u_vec[2]  = bounced_position
-            u_vec[3:] = 0.0  # zero velocity
-        # Ground impact with no bouncing drop and slip velocity
-        elif u_vec[2] <= 0.0 and not self.bounce and self.slip:
-            u_vec[2]  = 0.0
-        elif u_vec[2] <= 0.0 and not self.bounce and not self.slip:
-            u_vec[2]  = 0.0
-            u_vec[3:] = 0.0  # zero velocity
+        if not self.bottom_impact:
 
-        # Update current values
-        self.liquid_phase.SetValue('position', u_vec[0:3], time)
-        self.liquid_phase.SetValue('velocity', u_vec[3:], time)
-        self.liquid_phase.SetValue('speed', np.linalg.norm(u_vec[3:]), time)
-        self.liquid_phase.SetValue('radial-position', np.linalg.norm(u_vec[0:2]), time)
+            # Ground impact with bouncing drop
+            if u_vec[2] <= 0.0 and self.bounce:
+                position = self.liquid_phase.GetValue('position', self.initial_time)
+                bounced_position = position[2] * np.random.random(1)
+                u_vec[2]  = bounced_position
+                u_vec[3:] = 0.0  # zero velocity
+            # Ground impact with no bouncing drop and slip velocity
+            elif u_vec[2] <= 0.0 and not self.bounce and self.slip:
+                u_vec[2]  = 0.0  # don't bounce
+            # Ground impact with no bouncing drop and no velocity
+            elif u_vec[2] <= 0.0 and not self.bounce and not self.slip:
+                u_vec[2]  = 0.0  # don't bounce
+                u_vec[3:] = 0.0  # zero velocity
+                self.bottom_impact = True
+
+            # Update current values
+            self.liquid_phase.SetValue('position', u_vec[0:3], time)
+            self.liquid_phase.SetValue('velocity', u_vec[3:], time)
+            self.liquid_phase.SetValue('speed', np.linalg.norm(u_vec[3:]), time)
+            self.liquid_phase.SetValue('radial-position', np.linalg.norm(u_vec[0:2]),
+                    time)
 
         return time

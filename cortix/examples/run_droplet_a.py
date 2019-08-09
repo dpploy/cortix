@@ -35,12 +35,12 @@ command line as
 if __name__ == '__main__':
 
     # Configuration Parameters
-    use_mpi  = True # True for MPI; False for Python multiprocessing
+    use_mpi  = True  # True for MPI; False for Python multiprocessing
 
     plot_vortex_profile = False # True may crash the X server.
 
     n_droplets = 5
-    end_time   = 1*const.minute
+    end_time   = 10*const.minute
     time_step  = 0.1
 
     cortix = Cortix(use_mpi=use_mpi, splash=True)

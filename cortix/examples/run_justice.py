@@ -125,4 +125,3 @@ if __name__ == "__main__":
 
     print('total number of unknowns   =', total_num_unknowns)
     print('total number of parameters =', total_num_params)
-
