@@ -3,7 +3,7 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 
-import pickle
+import logging
 
 import numpy as np
 import scipy.constants as const
@@ -27,6 +27,16 @@ class Vortex(Module):
     '''
 
     def __init__(self):
+        '''
+        Attributes
+        ----------
+        initial_time: float
+        end_time: float
+        time_step: float
+        show_time: tuple
+            Two-element tuple, `(bool,float)`, `True` will print to standard
+            output.
+        '''
 
         super().__init__()
 
@@ -36,8 +46,8 @@ class Vortex(Module):
         self.initial_time = 0.0
         self.end_time = 5*const.minute
         self.time_step = 0.1
-
         self.show_time = (False,1*const.minute)
+        self.log = logging.getLogger('cortix')
 
         air = Specie(name='air', formula_name='Air', phase='gas')
         air.massCCUnit = 'g/cc'
@@ -76,7 +86,7 @@ class Vortex(Module):
         while time < self.end_time:
 
             if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
-                print('Vortex::time[min] =',round(time/const.minute,1))
+                self.log.info('Vortex::time[min] = '+str(round(time/const.minute,1)))
 
             # Interactions in all nameless ports (lower level port send/recv used)
             #---------------------------------------------------------------------

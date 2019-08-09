@@ -239,7 +239,7 @@ class Adjudication(Module):
 
         Returns
         -------
-        None
+        time: float
         '''
 
         u_vec_0 = self.population_phase.GetValue('fag', time)
@@ -307,7 +307,7 @@ class Adjudication(Module):
 
     def __zero_ode_parameters(self):
         '''
-        If ports are not connected the corresponding outflows must be zero.
+        Zero the outflows of unconnected ports.
         '''
 
         zeros = np.zeros(self.n_groups)
