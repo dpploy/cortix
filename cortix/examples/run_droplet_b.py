@@ -2,16 +2,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
-
-import scipy.constants as const
-
-from cortix.src.module import Module
-from cortix.src.cortix_main import Cortix
-
-from cortix.examples.dataplot import DataPlot
-from cortix.examples.droplet import Droplet
-from cortix.examples.vortex import Vortex
-
 '''
 This example uses three modules instantiated many times in two different networks.
 Each network configuration uses a different amount of module instances and a different
@@ -55,6 +45,15 @@ command line as
 
     `run_droplet.py`
 '''
+
+import scipy.constants as const
+
+from cortix.src.module import Module
+from cortix.src.cortix_main import Cortix
+
+from cortix.examples.dataplot import DataPlot
+from cortix.examples.droplet import Droplet
+from cortix.examples.vortex import Vortex
 
 if __name__ == '__main__':
 
