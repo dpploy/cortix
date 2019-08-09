@@ -239,7 +239,8 @@ class Droplet(Module):
                                          full_output=True)
 
         assert info_dict['message'] =='Integration successful.', \
-                'At time: %r message: %r'%(time, info_dict['message'])
+                'At time: %r; message: %r; full output: %r'%(round(time,2), \
+                info_dict['message'], info_dict)
 
         u_vec = u_vec_hist[1,:]  # solution vector at final time step
         values = self.liquid_phase.GetRow(time) # values at previous time
