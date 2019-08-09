@@ -4,10 +4,12 @@
 # https://cortix.org
 
 import os
+import sys
 import logging
 import time
 import datetime
 import networkx as nx
+from mpi4py import MPI
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 from multiprocessing import Process, Queue
@@ -19,7 +21,7 @@ class Cortix:
     The typical Cortix workflow:
 
     1. Create the object
-    2. Add and connect modules
+    2. Add and connect Modules
     3. Run the simulation
 
     Attributes
@@ -55,10 +57,12 @@ class Cortix:
         self.size = None
         self.splash = splash
 
+        if not self.use_mpi and MPI.COMM_WORLD.size > 1:
+            sys.exit("ERROR: use_mpi set to false but COMM_WORLD.size > 1")
+
         # Fall back to multiprocessing if mpi4py is not available
         if self.use_mpi:
             try:
-                from mpi4py import MPI
                 self.comm = MPI.COMM_WORLD
                 self.rank = self.comm.Get_rank()
                 self.size = self.comm.size
