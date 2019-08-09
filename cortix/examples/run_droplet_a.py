@@ -2,15 +2,6 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
-
-import scipy.constants as const
-
-from cortix.src.module import Module
-from cortix.src.cortix_main import Cortix
-
-from cortix.examples.droplet import Droplet
-from cortix.examples.vortex import Vortex
-
 '''
 This example uses two modules instantiated many times.
 This example can be executed with MPI (if mpi4py is available) or
@@ -32,15 +23,23 @@ command line as
     `run_droplet.py`
 '''
 
+import scipy.constants as const
+
+from cortix.src.module import Module
+from cortix.src.cortix_main import Cortix
+
+from cortix.examples.droplet import Droplet
+from cortix.examples.vortex import Vortex
+
 if __name__ == '__main__':
 
     # Configuration Parameters
-    use_mpi  = True # True for MPI; False for Python multiprocessing
+    use_mpi  = False # True for MPI; False for Python multiprocessing
 
     plot_vortex_profile = False # True may crash the X server.
 
     n_droplets = 5
-    end_time   = 1*const.minute
+    end_time   = 3*const.minute
     time_step  = 0.1
 
     cortix = Cortix(use_mpi=use_mpi, splash=True)

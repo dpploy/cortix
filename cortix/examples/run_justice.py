@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
+'''
+Crimninal justice example in progress.
+'''
 
 import scipy.constants as const
 
@@ -17,11 +20,7 @@ from cortix.examples.arrested import Arrested
 from cortix.examples.probation import Probation
 from cortix.examples.community import Community
 
-'''
-Crimninal justice example in progress.
-'''
-
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     # Configuration Parameters
     use_mpi = False  # True for MPI; False for Python multiprocessing
@@ -125,4 +124,3 @@ if __name__ == "__main__":
 
     print('total number of unknowns   =', total_num_unknowns)
     print('total number of parameters =', total_num_params)
-

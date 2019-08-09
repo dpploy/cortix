@@ -6,15 +6,33 @@
 from multiprocessing import Queue
 
 class Port:
-    '''
+    '''Provides a method of communication between modules
+
     The Port class provides an interface for creating ports and connecting them to
-    other ports for the purpose of data tranfer. Data exchange takes place by
+    other ports for the purpose of data transfer. Data exchange takes place by
     send and/or receive calls on a given port. The concept of a port is that of a data
     transfer "interaction." This can be one- or two-way with sends and receives.
     A port is connected to only one other port; as two ends of a pipe are connected.
+
+    Attributes
+    ----------
+        id: int
+        name: string
+        use_mpi: bool
+
     '''
 
     def __init__(self, name=None, use_mpi=False):
+        '''Constructs a Port object
+
+        Parameters
+        ----------
+        name: str
+          The name of the Port object
+        use_mpi: bool
+          True for MPI, False for Multiprocessing
+
+        '''
 
         self.id = None
         self.name = name
@@ -25,16 +43,23 @@ class Port:
             self.comm = MPI.COMM_WORLD
             self.rank = None
         else:
-            self.q = Queue()    # only passes picke-able objects
+            self.q = Queue()
 
-        self.connected_port = None # the `other` port connected to `this` port
+        self.connected_port = None
 
     def connect(self, port):
-        '''
-        Connect the port to another port
+        '''Connect this port to another port
 
-        `port`: A Port object that represents the port to connect to.
+        Ports must be connected for data to flow between them.
+
+        Parameters
+        ----------
+        port: Port
+           A Port object to connect to
+
+
         '''
+
         assert isinstance(port, Port), 'Connecting port must be of Port type'
 
         self.connected_port = port
@@ -42,16 +67,17 @@ class Port:
         port.use_mpi = self.use_mpi
 
     def send(self, data, tag=None):
-        '''
-        Send data to the connected port. If the sending port is not connected do nothing.
+        '''Send data to the connected port.
+
+        If the sending port is not connected do nothing.
 
         Parameters
         ----------
-        data: any pickle-able data
+        data: any
+           This data must be pickleable
+        tag: int, optional
+           MPI tag used in sending data
 
-        Returns
-        -------
-        None
         '''
 
         if not tag:
@@ -65,8 +91,16 @@ class Port:
                 self.q.put(data)
 
     def recv(self):
-        '''
-        Returns the data received from the connected port.
+        '''Receive data from the connected port.
+
+        Warning
+        -------
+        This function will block if no data has been sent yet.
+
+        Returns
+        --------
+        data: any
+
         '''
         if self.connected_port:
             if self.use_mpi:
@@ -77,16 +111,12 @@ class Port:
                 return self.connected_port.q.get()
 
     def __eq__(self, other):
-        '''
-        Ports are the same if their names are the same
-        '''
-        if isinstance(other, Port):
-            return self.name == other.name
+        '''Check for port equality'''
+
+        return self.name == other.name
 
     def __repr__(self):
-        '''
-        Port name representation
-        '''
+        '''Port name representation'''
         return self.name
 
 if __name__ == '__main__':

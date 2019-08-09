@@ -14,21 +14,45 @@ from multiprocessing import Process, Queue
 from cortix.src.module import Module
 
 class Cortix:
-    '''
-    The main Cortix class definition:
+    '''Cortix main class definition
+
+    The typical Cortix workflow:
+
     1. Create the object
-    2. Add modules
+    2. Add and connect modules
     3. Run the simulation
+
+    Attributes
+    ----------
+    use_mpi: bool
+        True for MPI, False for multiprocessing
+    splash: bool
+        Show the Cortix splash image
+    comm: mpi4py.MPI.Intracomm
+        MPI.COMM_WORLD (if using MPI else None)
+    rank: int
+        The current MPI rank (if using MPI else None)
+    size: int
+        size of the group associated with MPI.COMM_WORLD
+
     '''
 
     def __init__(self, use_mpi=False, splash=False):
+        '''Construct a Cortix simulation object
+
+        Parameters
+        ----------
+        use_mpi: bool
+            True for MPI, False for multiprocessing
+        splash: bool
+            Show the Cortix splash image
+
+        '''
 
         self.use_mpi = use_mpi
-
         self.comm = None
         self.rank = None
         self.size = None
-
         self.splash = splash
 
         # Fall back to multiprocessing if mpi4py is not available
@@ -66,29 +90,14 @@ class Cortix:
 
         return
 
-    def __del__(self):
-        '''
-        Note: by the time the body of this function is executed, the machinery of
-        variables may have been deleted already. For example, `logging` is no longer
-        there; do the least amount of work here.
-        '''
-
-        if self.rank == 0 or not self.use_mpi:
-
-            if self.splash:
-                print('Destroyed Cortix object on '+self.end_run_date+
-                        self.__get_splash(begin=False))
-            else:
-                print('Destroyed Cortix object on '+self.end_run_date)
-
-            print('Elapsed wall clock time [s]: '+
-                    str(round(self.wall_clock_time_end-self.wall_clock_time_start,2)))
-
     def add_module(self, m):
-        '''
-        Add a module to the Cortix object
+        '''Add a Module object to the Cortix Simulation
 
-        `m`: An instance of a class that inherits from the Module base class
+        Parameters
+        ----------
+        m: Module
+            The Module object to be added
+
         '''
 
         assert isinstance(m, Module), 'm must be a module'
@@ -97,17 +106,27 @@ class Cortix:
             self.modules.append(m)
 
     def get_modules(self):
-        '''
-        Return the list of modules in the root (master) process. If the `run()`
-        method has completed, the list is updated with data from the other processes.
+        '''Return a list of all the Cortix modules from the master process
+
+        If the `run()` method has completed, the list is updated with data
+        from the other processes.
+
+        Returns
+        ----------
+        modules: list(Module)
+            The list of modules in the Cortix simulation
+
         '''
 
         if self.rank == 0 or not self.use_mpi:
             return self.modules
 
     def run(self):
-        '''
-        Run the Cortix simulation with either MPI or Python multiprocessing.
+        '''Run the Cortix simulation
+
+        This function concurrently executes the cortix.src.module.run function
+        for each module in the simulation. Modules are run using either MPI or
+        Multiprocessing, depending on the user configuration.
         '''
 
         # Running under MPI
@@ -193,8 +212,14 @@ class Cortix:
         return
 
     def get_network(self):
-        '''
-        Constructs and returns a networkx graph representation of the module network.
+        '''Constructs and returns a the module network
+
+        Returns a networkx MultiGraph representation of the module network.
+
+        Returns
+        -------
+        g: networkx.classes.multigraph.MultiGraph
+
         '''
         if not self.use_mpi or self.rank == 0:
             if not self.nx_graph:
@@ -215,38 +240,39 @@ class Cortix:
             return self.nx_graph
 
     def draw_network(self, file_name='network.png', dpi=220):
-        '''
-        Draws the networkx Module network graph using matplotlib
+        '''Draws the networkx Module network graph to an image
 
-        `file_name`: The resulting network diagram output file name
-        `dpi`: dpi used for generating the network image
-        '''
-        if self.use_mpi and self.rank != 0:
-            return
+        Parameters
+        ----------
+        file_name: str, optional
+            The resulting network diagram output file name
+        dpi: int, optional
+            dpi used for generating the network image
 
-        g = self.nx_graph if self.nx_graph else self.get_network()
-        colors = ['blue', 'red', 'green', 'pink', 'orange', 'brown', 'cyan']
-        class_map = {}
-        color_map = {}
-        for node in g.nodes():
-            class_name = "_".join(node.split("_")[:-1])
-            if class_name not in class_map:
-                class_map[class_name] = colors[len(class_map) % len(colors)]
-            color_map[node] = class_map[class_name]
-        f = plt.figure()
-        pos = nx.spring_layout(g, k=0.15, iterations=20)
-        nx.draw(g, pos, node_color=[color_map[n] for n in g.nodes], ax=f.add_subplot(111), linewidths=0.01)
-        patches = []
-        for c in class_map:
-            patch = mpatches.Patch(color=class_map[c], label=c)
-            patches.append(patch)
-        plt.legend(handles=patches)
-        f.savefig(file_name, dpi=dpi)
+        '''
+
+        if not self.use_mpi or self.rank == 0:
+            g = self.nx_graph if self.nx_graph else self.get_network()
+            colors = ['blue', 'red', 'green', 'pink', 'orange', 'brown', 'cyan']
+            class_map = {}
+            color_map = {}
+            for node in g.nodes():
+                class_name = "_".join(node.split("_")[:-1])
+                if class_name not in class_map:
+                    class_map[class_name] = colors[len(class_map) % len(colors)]
+                color_map[node] = class_map[class_name]
+            f = plt.figure()
+            pos = nx.spring_layout(g, k=0.15, iterations=20)
+            nx.draw(g, pos, node_color=[color_map[n] for n in g.nodes], ax=f.add_subplot(111), linewidths=0.01)
+            patches = []
+            for c in class_map:
+                patch = mpatches.Patch(color=class_map[c], label=c)
+                patches.append(patch)
+            plt.legend(handles=patches)
+            f.savefig(file_name, dpi=dpi)
 
     def __create_logger(self):
-        '''
-        A helper function to setup the logging facility used in the constructor.
-        '''
+        '''A helper function to setup the logging facility'''
 
         # File removal
         if self.rank == 0 or not self.use_mpi:
@@ -283,6 +309,18 @@ class Cortix:
         self.log.addHandler(console_handler)
 
     def __get_splash(self, begin=True):
+        '''Returns the Cortix splash logo
+
+        Parameters
+        ----------
+        begin: bool
+            True for the beginning message, false for the ending
+
+        Returns
+        -------
+        splash: str
+            The Cortix splash logo
+        '''
 
         splash = \
         '_____________________________________________________________________________\n'+\
@@ -312,6 +350,29 @@ class Cortix:
             '                           T E R M I N A T I N G                             \n'
 
         return message + splash
+
+    def __del__(self):
+        '''Destructs a Cortix simulation object
+
+        Warning
+        -------
+        By the time the body of this function is executed, the machinery of
+        variables may have been deleted already. For example, `logging` is no longer
+        there; do the least amount of work here.
+
+        '''
+
+        if self.rank == 0 or not self.use_mpi:
+
+            if self.splash:
+                print('Destroyed Cortix object on '+self.end_run_date+
+                        self.__get_splash(begin=False))
+            else:
+                print('Destroyed Cortix object on '+self.end_run_date)
+
+            print('Elapsed wall clock time [s]: '+
+                    str(round(self.wall_clock_time_end-self.wall_clock_time_start,2)))
+
 
 if __name__ == '__main__':
     c = Cortix()

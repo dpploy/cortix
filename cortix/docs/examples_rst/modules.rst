@@ -15,6 +15,7 @@ examples
    plot_data
    prison
    probation
-   run_droplet
+   run_droplet_a
+   run_droplet_b
    run_justice
    vortex
