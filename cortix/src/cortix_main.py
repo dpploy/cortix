@@ -14,42 +14,43 @@ from multiprocessing import Process, Queue
 from cortix.src.module import Module
 
 class Cortix:
-    '''Cortix main class definition
+    '''Cortix main class definition.
 
     The typical Cortix workflow:
 
-    1. Create the object
-    2. Add and connect modules
+    1. Create the `Cortix` object
+    2. Add and connect Modules
     3. Run the simulation
 
     Attributes
     ----------
     use_mpi: bool
-        True for MPI, False for multiprocessing
+        True for MPI, False for multiprocessing.
     splash: bool
-        Show the Cortix splash image
+        Show the Cortix splash image.
     comm: mpi4py.MPI.Intracomm
-        MPI.COMM_WORLD (if using MPI else None)
+        MPI.COMM_WORLD (if using MPI else None).
     rank: int
-        The current MPI rank (if using MPI else None)
+        The current MPI rank (if using MPI else None).
     size: int
-        size of the group associated with MPI.COMM_WORLD
-
+        size of the group associated with MPI.COMM_WORLD.
     '''
 
     def __init__(self, use_mpi=False, splash=False):
-        '''Construct a Cortix simulation object
+        '''Construct a Cortix simulation object.
 
         Parameters
         ----------
         use_mpi: bool
-            True for MPI, False for multiprocessing
+            True for MPI, False for multiprocessing.
         splash: bool
-            Show the Cortix splash image
-
+            Show the Cortix splash image.
         '''
 
+        self.use_multiprocessing = True
         self.use_mpi = use_mpi
+        if self.use_mpi:
+            self.use_multiprocessing = False
         self.comm = None
         self.rank = None
         self.size = None
@@ -97,7 +98,6 @@ class Cortix:
         ----------
         m: Module
             The Module object to be added
-
         '''
 
         assert isinstance(m, Module), 'm must be a module'
@@ -106,25 +106,24 @@ class Cortix:
             self.modules.append(m)
 
     def get_modules(self):
-        '''Return a list of all the Cortix modules from the master process
+        '''Return a list of all the Cortix modules from the master process.
 
         If the `run()` method has completed, the list is updated with data
         from the other processes.
 
         Returns
-        ----------
+        -------
         modules: list(Module)
             The list of modules in the Cortix simulation
-
         '''
 
-        if self.rank == 0 or not self.use_mpi:
+        if self.rank == 0 or self.use_multiprocessing:
             return self.modules
 
     def run(self):
-        '''Run the Cortix simulation
+        '''Run the Cortix simulation.
 
-        This function concurrently executes the cortix.src.module.run function
+        This function concurrently executes the `cortix.src.module.run` function
         for each module in the simulation. Modules are run using either MPI or
         Multiprocessing, depending on the user configuration.
         '''
@@ -212,15 +211,15 @@ class Cortix:
         return
 
     def get_network(self):
-        '''Constructs and returns a the module network
+        '''Constructs and returns a the module network.
 
         Returns a networkx MultiGraph representation of the module network.
 
         Returns
         -------
         g: networkx.classes.multigraph.MultiGraph
-
         '''
+
         if not self.use_mpi or self.rank == 0:
             if not self.nx_graph:
                 g = nx.MultiGraph()
@@ -271,11 +270,29 @@ class Cortix:
             plt.legend(handles=patches)
             f.savefig(file_name, dpi=dpi)
 
+    def close(self):
+        '''Closes the cortix object properly before destruction.
+
+        User is advised to call this method at the end of the run file.
+        '''
+
+        if self.rank == 0 or self.use_multiprocessing:
+
+            if self.splash:
+                self.log.info('Closed Cortix object on '+self.end_run_date+
+                        self.__get_splash(end=True))
+            else:
+                self.log.info('Closed Cortix object on '+self.end_run_date)
+
+            self.log.info('Elapsed wall clock time [s]: '+
+                    str(round(self.wall_clock_time_end-self.wall_clock_time_start,2)))
+        return
+
     def __create_logger(self):
-        '''A helper function to setup the logging facility'''
+        '''A helper function to setup the logging facility.'''
 
         # File removal
-        if self.rank == 0 or not self.use_mpi:
+        if self.rank == 0 or self.use_multiprocessing:
             if os.path.isfile('cortix.log'):
                 os.system('rm -rf cortix.log')
 
@@ -308,19 +325,33 @@ class Cortix:
         self.log.addHandler(file_handler)
         self.log.addHandler(console_handler)
 
-    def __get_splash(self, begin=True):
-        '''Returns the Cortix splash logo
+        return
+
+    def __get_splash(self, begin=None, end=None):
+        '''Returns the Cortix splash logo.
+
+        Note
+        ----
+        Call this internal method with one argument only. Either `begin=True` or
+        `end=True`.
 
         Parameters
         ----------
         begin: bool
-            True for the beginning message, false for the ending
+            True for the beginning message, false for the ending.
 
         Returns
         -------
         splash: str
-            The Cortix splash logo
+            The Cortix splash logo.
         '''
+
+        assert begin==None or end==None
+        if begin:
+            end=False
+        elif end:
+            begin=False
+
 
         splash = \
         '_____________________________________________________________________________\n'+\
@@ -352,27 +383,16 @@ class Cortix:
         return message + splash
 
     def __del__(self):
-        '''Destructs a Cortix simulation object
+        '''Destructs a Cortix simulation object.
 
         Warning
         -------
         By the time the body of this function is executed, the machinery of
         variables may have been deleted already. For example, `logging` is no longer
         there; do the least amount of work here.
-
         '''
 
-        if self.rank == 0 or not self.use_mpi:
-
-            if self.splash:
-                print('Destroyed Cortix object on '+self.end_run_date+
-                        self.__get_splash(begin=False))
-            else:
-                print('Destroyed Cortix object on '+self.end_run_date)
-
-            print('Elapsed wall clock time [s]: '+
-                    str(round(self.wall_clock_time_end-self.wall_clock_time_start,2)))
-
+        pass
 
 if __name__ == '__main__':
     c = Cortix()

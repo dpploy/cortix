@@ -3,7 +3,32 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 '''
-Crimninal justice example in progress.
+Crimninal justice network dynamics modeling.
+
+This example uses 7 modules:
+    - Community
+    - Arrested
+    - Adjudication
+    - Jail
+    - Prison
+    - Probation
+    - Parole
+and a population balance model is used to follow the offenders population
+groups between modules.
+
+To run this case using MPI you should compute the number of
+processes as follows:
+
+    `nprocs = 7 + 1 cortix`
+
+then issue the MPI run command as follows (replace `nprocs` with a number):
+
+     `mpiexec -n nprocs run_justice.py`
+
+To run this case with the Python multiprocessing library, just run this file at the
+command line as
+
+    `run_justice.py`
 '''
 
 import scipy.constants as const
@@ -20,14 +45,28 @@ from cortix.examples.arrested import Arrested
 from cortix.examples.probation import Probation
 from cortix.examples.community import Community
 
-if __name__ == '__main__':
+def main():
+    '''Cortix run file for a criminal justice network.
+
+    Attributes
+    ----------
+    n_groups : int
+        Number of population groups being followed. This must be the same for all
+        modules.
+    end_time: float
+        End of the flow time in SI unit.
+    time_step: float
+        Size of the time step between port communications in SI unit.
+    use_mpi: bool
+        If set to `True` use MPI otherwise use Python multiprocessing.
+    '''
 
     # Configuration Parameters
-    use_mpi = False  # True for MPI; False for Python multiprocessing
-
+    n_groups  = 150 # number of population groups
     end_time  = 50 * const.day
     time_step = 0.5 * const.day
-    n_groups  = 150 # number of population groups
+
+    use_mpi = False  # True for MPI; False for Python multiprocessing
 
     cortix = Cortix(use_mpi=use_mpi, splash=True)
 
@@ -124,3 +163,8 @@ if __name__ == '__main__':
 
     print('total number of unknowns   =', total_num_unknowns)
     print('total number of parameters =', total_num_params)
+
+    cortix.close()
+
+if __name__ == '__main__':
+    main()

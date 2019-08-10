@@ -6,12 +6,11 @@
 from cortix.src.port import Port
 
 class Module:
-    '''Cortix module super class
+    '''Cortix module super class.
 
     This class provides facilities for creating modules within the Cortix network.
     Cortix will map one object of this class to either a Multiprocessing or MPI
     process depending on the user's configuration.
-
 
     Note
     ----
