@@ -18,24 +18,6 @@ class Module:
     In order to execute, modules *must* override the `run` method, which will be
     executed during the simulation
 
-    Attributes
-    ----------
-    name: str
-        A name given to the instance. Default is `None`.
-    port_names_expected: list(str), None
-        A list of names of ports expected in the module. This will be compared
-        to port names during runtime to check against the intended use of the
-        module.
-    state: any
-        Any `pickle-able` data structure to be passed in a `multiprocessing.Queue`
-        to the parent process or to be gathered in the root MPI process.
-        Default is `None`.
-    use_mpi: bool
-        `True` for MPI, `False` for Multiprocessing
-    use_multiprocessing: bool
-        `False` for MPI, `True` for Multiprocessing
-    ports: list(Port)
-        A list of ports contained by the module
 
     '''
 
@@ -44,9 +26,29 @@ class Module:
 
         Note
         ----
-        This must be called in the constructor of every Cortix module like so:
+        This constructor must be called explicitly in the constructor of every
+        Cortix module like so:
 
             super().__init__()
+
+        Attributes
+        ----------
+        name: str
+            A name given to the instance. Default is `None`.
+        port_names_expected: list(str), None
+            A list of names of ports expected in the module. This will be compared
+            to port names during runtime to check against the intended use of the
+            module.
+        state: any
+            Any `pickle-able` data structure to be passed in a `multiprocessing.Queue`
+            to the parent process or to be gathered in the root MPI process.
+            Default is `None`.
+        use_mpi: bool
+            `True` for MPI, `False` for Multiprocessing
+        use_multiprocessing: bool
+            `False` for MPI, `True` for Multiprocessing
+        ports: list(Port)
+            A list of ports contained by the module
 
        '''
         self.name = None

@@ -22,20 +22,6 @@ class Cortix:
     2. Add and connect Modules
     3. Run and close `Cortix`
 
-    Attributes
-    ----------
-    use_mpi: bool
-        `True` for MPI, `False` for Multiprocessing.
-    use_multiprocessing: bool
-        `False` for MPI, `True` for Multiprocessing.
-    splash: bool
-        Show the Cortix splash image.
-    comm: mpi4py.MPI.Intracomm
-        MPI.COMM_WORLD (if using MPI else None).
-    rank: int
-        The current MPI rank (if using MPI else None).
-    size: int
-        size of the group associated with MPI.COMM_WORLD.
 
     '''
 
@@ -48,6 +34,21 @@ class Cortix:
             True for MPI, False for multiprocessing.
         splash: bool
             Show the Cortix splash image.
+
+        Attributes
+        ----------
+        use_mpi: bool
+            `True` for MPI, `False` for Multiprocessing.
+        use_multiprocessing: bool
+            `False` for MPI, `True` for Multiprocessing.
+        splash: bool
+            Show the Cortix splash image.
+        comm: mpi4py.MPI.Intracomm
+            MPI.COMM_WORLD (if using MPI else None).
+        rank: int
+            The current MPI rank (if using MPI else None).
+        size: int
+            size of the group associated with MPI.COMM_WORLD.
 
         '''
 
@@ -81,15 +82,15 @@ class Cortix:
         self.modules = list()
 
         # Done
-        if self.rank == 0 or not self.use_mpi:
+        if self.rank == 0 or self.use_multiprocessing:
 
             if self.splash:
                 self.log.info('Created Cortix object %s', self.__get_splash(begin=True))
             else:
                 self.log.info('Created Cortix object')
 
+            # Initialize all date and timings
             self.wall_clock_time_start = time.time()
-
             self.wall_clock_time_end = self.wall_clock_time_start
             self.end_run_date = datetime.datetime.today().strftime('%d%b%y %H:%M:%S')
 
@@ -223,10 +224,10 @@ class Cortix:
             for p in processes:
                 p.join()
 
-        # Record time at the end of the run method
-        if self.rank == 0 or not self.use_mpi:
-            self.end_run_date = datetime.datetime.today().strftime('%d%b%y %H:%M:%S')
+        if self.rank==0 or self.use_multiprocessing:
             self.wall_clock_time_end = time.time()
+            self.log.info('run()::Elapsed wall clock time [s]: '+
+                    str(round(self.wall_clock_time_end-self.wall_clock_time_start,2)))
 
         return
 
@@ -294,19 +295,25 @@ class Cortix:
     def close(self):
         '''Closes the cortix object properly before destruction.
 
-        User is advised to call this method at the end of the run file.
+        User is strongly advised to call this method at the end of the run file otherwise
+        timings will not be recorded.
 
         '''
+
+        # Sync here before close
+        if self.use_mpi:
+            self.comm.Barrier()
 
         if self.rank == 0 or self.use_multiprocessing:
 
             if self.splash:
-                self.log.info('Closed Cortix object on '+self.end_run_date+
-                        self.__get_splash(end=True))
+                self.log.info('Closed Cortix object.'+self.__get_splash(end=True))
             else:
-                self.log.info('Closed Cortix object on '+self.end_run_date)
+                self.log.info('Closed Cortix object.')
 
-            self.log.info('Elapsed wall clock time [s]: '+
+            self.wall_clock_time_end = time.time()
+
+            self.log.info('close()::Elapsed wall clock time [s]: '+
                     str(round(self.wall_clock_time_end-self.wall_clock_time_start,2)))
         return
 
