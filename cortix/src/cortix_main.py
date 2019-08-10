@@ -193,6 +193,9 @@ class Cortix:
                 self.log.info('Launching Module {}'.format(mod))
                 mod.run()
 
+            # Sync here at the end
+            self.comm.Barrier()
+
         # Running under Python multiprocessing
         #-------------------------------------
         else:
