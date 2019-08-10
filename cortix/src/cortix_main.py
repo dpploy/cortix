@@ -298,6 +298,10 @@ class Cortix:
 
         '''
 
+        # Sync here before close
+        if self.use_mpi:
+            self.comm.Barrier()
+
         if self.rank == 0 or self.use_multiprocessing:
 
             if self.splash:
