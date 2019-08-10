@@ -6,19 +6,13 @@
 from multiprocessing import Queue
 
 class Port:
-    '''Provides a method of communication between modules
+    '''Provides a method of communication between modules.
 
     The Port class provides an interface for creating ports and connecting them to
     other ports for the purpose of data transfer. Data exchange takes place by
     send and/or receive calls on a given port. The concept of a port is that of a data
     transfer "interaction." This can be one- or two-way with sends and receives.
     A port is connected to only one other port; as two ends of a pipe are connected.
-
-    Attributes
-    ----------
-        id: int
-        name: string
-        use_mpi: bool
 
     '''
 
@@ -31,6 +25,12 @@ class Port:
           The name of the Port object
         use_mpi: bool
           True for MPI, False for Multiprocessing
+
+        Attributes
+        ----------
+            id: int
+            name: string
+            use_mpi: bool
 
         '''
 
