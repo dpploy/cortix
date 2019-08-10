@@ -4,6 +4,7 @@
 # https://cortix.org
 
 import pickle
+import logging
 
 import numpy as np
 import scipy.constants as const
@@ -53,8 +54,8 @@ class Community(Module):
         self.initial_time = 0.0 * const.day
         self.end_time     = 100 * const.day
         self.time_step    = 0.5 * const.day
-
         self.show_time = (False,10*const.day)
+        self.log = logging.getLogger('cortix')
 
         # Population groups
         self.n_groups = n_groups
@@ -127,7 +128,7 @@ class Community(Module):
         while time < self.end_time:
 
             if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
-                print('Community::time[d] =',round(time,1)/const.day)
+                self.log.info('Community::time[d] = '+str(round(time/const.day,1)))
 
             # Interactions in the jail port
             #--------------------------------

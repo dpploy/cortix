@@ -114,8 +114,11 @@ class Cortix:
     def get_modules(self):
         '''Return a list of all the Cortix modules from the master process.
 
-        If the `run()` method has completed, the list is updated with data
-        from the other processes.
+        Note
+        ----
+        This method has memory overhead when running in MPI since data from all
+        processes are gathered in the root process. In addition, this method must
+        be called by all MPI processes else, it will hang.
 
         Returns
         -------
@@ -124,8 +127,25 @@ class Cortix:
 
         '''
 
-        if self.rank == 0 or self.use_multiprocessing:
-            return self.modules
+        if self.use_mpi:
+
+            # Synchronize before gathering data
+            self.comm.Barrier()
+
+            # TODO: monitor memory usage by the root process
+            # Collect at the root process all state data from modules
+            if self.rank == 0:
+                state = None
+            else:
+                state = self.modules[self.rank-1].state
+
+            modules_state = self.comm.gather( state, root=0 )
+
+            if self.rank == 0:
+                for i in range(self.size-1):
+                    self.modules[i].state = modules_state[i+1]
+
+        return self.modules
 
     def run(self):
         '''Run the Cortix simulation.
@@ -134,6 +154,12 @@ class Cortix:
         for each module in the simulation. Modules are run using either MPI or
         Multiprocessing, depending on the user configuration.
 
+        Note
+        ----
+        When using multiprocessing, data from the modules state are copied to the master
+        process after the `run()` method of the modules is finished. When running in MPI,
+        this is not done here. Only if the `get_modules()` method is called by all
+        processes.
         '''
 
         # Running under MPI
@@ -166,21 +192,6 @@ class Cortix:
                 self.log.info('Launching Module {}'.format(mod))
                 mod.run()
 
-            # Synchronize at the end
-            self.comm.Barrier()
-
-            # Collect at the root process all state data from modules
-            if self.rank == 0:
-                state = None
-            else:
-                state = self.modules[self.rank-1].state
-
-            modules_state = self.comm.gather( state, root=0 )
-
-            if self.rank == 0:
-                for i in range(self.size-1):
-                    self.modules[i].state = modules_state[i+1]
-
         # Running under Python multiprocessing
         #-------------------------------------
         else:
@@ -188,6 +199,7 @@ class Cortix:
             # Parallel run all modules in Python multiprocessing
             processes = list()
 
+            # TODO: verify limit of memory by the master process 
             modules_new_state = Queue() # for sharing data with master process if used
 
             count_mods_status_attr = 0
