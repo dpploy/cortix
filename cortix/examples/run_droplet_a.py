@@ -3,10 +3,9 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 '''
-This example uses two modules instantiated many times.
-This example can be executed with MPI (if mpi4py is available) or
-with the Python multiprocessing library. These choices are made by variables listed
-below in the executable portion of this run file.
+This example uses two modules instantiated many times. It be executed with MPI
+(if `mpi4py` is available) or with the Python multiprocessing library. These choices
+are made by variables listed below in the executable portion of this run file.
 
 To run this case using MPI you should compute the number of
 processes as follows:
@@ -31,16 +30,38 @@ from cortix.src.cortix_main import Cortix
 from cortix.examples.droplet import Droplet
 from cortix.examples.vortex import Vortex
 
-if __name__ == '__main__':
+def main():
+    '''Cortix run file for a `Droplet`-`Vortex` network.
+
+    Attributes
+    ----------
+    n_droplets: int
+        Number of droplets to use (one per process).
+    end_time: float
+        End of the flow time in SI unit.
+    time_step: float
+        Size of the time step between port communications in SI unit.
+    create_plots: bool
+        Create various plots and save to files. (all data collected in the
+        parent process; it may run out of memory).
+    plot_vortex_profile: bool
+        Whether to plot (to a file) the vortex function used.
+    use_mpi: bool
+        If set to `True` use MPI otherwise use Python multiprocessing.
+    '''
 
     # Configuration Parameters
-    use_mpi  = False # True for MPI; False for Python multiprocessing
-
-    plot_vortex_profile = False # True may crash the X server.
-
     n_droplets = 5
     end_time   = 3*const.minute
-    time_step  = 0.1
+    time_step  = 0.2
+
+    if n_droplets <= 1000:
+        create_plots = True
+    else:
+        create_plots = False
+    plot_vortex_profile = False # True may crash the X server.
+
+    use_mpi = False # True for MPI; False for Python multiprocessing
 
     cortix = Cortix(use_mpi=use_mpi, splash=True)
 
@@ -71,9 +92,9 @@ if __name__ == '__main__':
     cortix.run()
 
     # Plot all droplet trajectories
-    modules = cortix.get_modules()
+    if create_plots and (cortix.rank == 0 or cortix.use_multiprocessing):
 
-    if not use_mpi or cortix.rank == 0:
+        modules = cortix.get_modules()
 
         # All droplets' trajectory
 
@@ -129,3 +150,9 @@ if __name__ == '__main__':
 
         plt.grid()
         fig.savefig('radialpos.png', dpi=300)
+
+    # This properly ends the program
+    cortix.close()
+
+if __name__ == '__main__':
+    main()

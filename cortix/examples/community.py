@@ -23,6 +23,7 @@ class Community(Module):
     These are the `port` names available in this module to connect to respective
     modules: `probation`, `adjudication`, `jail`, `prison`, `arrested`, and `parole`.
     See instance attribute `port_names_expected`.
+
     '''
 
     def __init__(self, n_groups=1, maturity_rate=10.0/const.day, offender_pool_size=0.0):
@@ -36,6 +37,7 @@ class Community(Module):
         offender_pool_size: float
             Upperbound on the range of the existing population groups. A random value
             from 0 to the upperbound value will be assigned to each group.
+
         '''
 
         super().__init__()
@@ -248,6 +250,7 @@ class Community(Module):
         Returns
         -------
         None
+
         '''
 
         u_vec_0 = self.population_phase.GetValue('f0g', time)
@@ -294,6 +297,7 @@ class Community(Module):
     def __zero_ode_parameters(self):
         '''
         If ports are not connected the corresponding outflows must be zero.
+
         '''
 
         zeros = np.zeros(self.n_groups)
