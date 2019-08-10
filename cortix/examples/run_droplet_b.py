@@ -138,3 +138,6 @@ if __name__ == '__main__':
     cortix.draw_network('network.png')
 
     cortix.run()
+
+    # This properly ends the program
+    cortix.close()

@@ -20,6 +20,7 @@ To run this case with the Python multiprocessing library, just run this file at 
 command line as
 
     `run_droplet.py`
+
 '''
 
 import scipy.constants as const
@@ -48,6 +49,7 @@ def main():
         Whether to plot (to a file) the vortex function used.
     use_mpi: bool
         If set to `True` use MPI otherwise use Python multiprocessing.
+
     '''
 
     # Configuration Parameters

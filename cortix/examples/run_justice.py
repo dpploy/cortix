@@ -29,6 +29,7 @@ To run this case with the Python multiprocessing library, just run this file at 
 command line as
 
     `run_justice.py`
+
 '''
 
 import scipy.constants as const
@@ -59,6 +60,7 @@ def main():
         Size of the time step between port communications in SI unit.
     use_mpi: bool
         If set to `True` use MPI otherwise use Python multiprocessing.
+
     '''
 
     # Configuration Parameters
@@ -164,6 +166,7 @@ def main():
     print('total number of unknowns   =', total_num_unknowns)
     print('total number of parameters =', total_num_params)
 
+    # Properly shutdow cortix
     cortix.close()
 
 if __name__ == '__main__':
