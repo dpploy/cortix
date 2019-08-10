@@ -16,16 +16,18 @@ from cortix.src.module import Module
 class Cortix:
     '''Cortix main class definition.
 
-    The typical Cortix workflow:
+    The typical Cortix run file workflow:
 
     1. Create the `Cortix` object
     2. Add and connect Modules
-    3. Run the simulation
+    3. Run and close `Cortix`
 
     Attributes
     ----------
     use_mpi: bool
-        True for MPI, False for multiprocessing.
+        `True` for MPI, `False` for Multiprocessing.
+    use_multiprocessing: bool
+        `False` for MPI, `True` for Multiprocessing.
     splash: bool
         Show the Cortix splash image.
     comm: mpi4py.MPI.Intracomm
@@ -34,6 +36,7 @@ class Cortix:
         The current MPI rank (if using MPI else None).
     size: int
         size of the group associated with MPI.COMM_WORLD.
+
     '''
 
     def __init__(self, use_mpi=False, splash=False):
@@ -45,6 +48,7 @@ class Cortix:
             True for MPI, False for multiprocessing.
         splash: bool
             Show the Cortix splash image.
+
         '''
 
         self.use_multiprocessing = True
@@ -98,11 +102,13 @@ class Cortix:
         ----------
         m: Module
             The Module object to be added
+
         '''
 
         assert isinstance(m, Module), 'm must be a module'
         if m not in self.modules:
             m.use_mpi = self.use_mpi
+            m.use_multiprocessing = self.use_multiprocessing
             self.modules.append(m)
 
     def get_modules(self):
@@ -115,6 +121,7 @@ class Cortix:
         -------
         modules: list(Module)
             The list of modules in the Cortix simulation
+
         '''
 
         if self.rank == 0 or self.use_multiprocessing:
@@ -126,6 +133,7 @@ class Cortix:
         This function concurrently executes the `cortix.src.module.run` function
         for each module in the simulation. Modules are run using either MPI or
         Multiprocessing, depending on the user configuration.
+
         '''
 
         # Running under MPI
@@ -218,6 +226,7 @@ class Cortix:
         Returns
         -------
         g: networkx.classes.multigraph.MultiGraph
+
         '''
 
         if not self.use_mpi or self.rank == 0:
@@ -274,6 +283,7 @@ class Cortix:
         '''Closes the cortix object properly before destruction.
 
         User is advised to call this method at the end of the run file.
+
         '''
 
         if self.rank == 0 or self.use_multiprocessing:
@@ -344,6 +354,7 @@ class Cortix:
         -------
         splash: str
             The Cortix splash logo.
+
         '''
 
         assert begin==None or end==None
@@ -390,6 +401,7 @@ class Cortix:
         By the time the body of this function is executed, the machinery of
         variables may have been deleted already. For example, `logging` is no longer
         there; do the least amount of work here.
+
         '''
 
         pass

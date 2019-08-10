@@ -31,18 +31,22 @@ class Module:
         to the parent process or to be gathered in the root MPI process.
         Default is `None`.
     use_mpi: bool
-        True for MPI, false for Multiprocessing
+        `True` for MPI, `False` for Multiprocessing
+    use_multiprocessing: bool
+        `False` for MPI, `True` for Multiprocessing
     ports: list(Port)
         A list of ports contained by the module
 
     '''
 
     def __init__(self):
-        '''Module super class constructor
+        '''Module super class constructor.
 
+        Note
+        ----
         This must be called in the constructor of every Cortix module like so:
 
-        >> super()__init__()
+            super().__init__()
 
        '''
         self.name = None
@@ -133,23 +137,24 @@ class Module:
         return port
 
     def connect(self, port_name_or_module, to_other_port=None):
-        '''Connect two modules using ports corresponding to their name
+        '''Connect two modules using either their ports directly or inferred ports.
 
         Parameters
         ----------
         port_name_or_module: str, Module
             Either a `port` name or a `Module` can be given. In the latter case
             the `name` attribute of the module will be used to get the `port`
-            of the module passed. This port will be connected to the port of the
-            calling object.
+            of the module passed. This port will be connected to the corresponding
+            port of the calling object.
         to_other_port: Port
             A `port` object to connect to. This must be `None` or absent if the
             first argument is a `Module`.
+
         '''
 
         # Infer from types what to do with the intended module
         if isinstance(port_name_or_module, Module):
-            assert to_other_port is None, 'Illegal syntax.'
+            assert to_other_port is None, 'Illegal syntax; only one argument needed.'
             other_module = port_name_or_module
             other_module_name = other_module.name
             if not other_module.name:
@@ -183,7 +188,7 @@ class Module:
         To pass back the state of the module, the user should insert the provided
         index `comm_idx` and the `state` into the queue as follows:
 
-            if not self.use_mpi:
+            if self.use_multiprocessing:
                 try:
                     pickle.dumps(self.state)
                 except pickle.PicklingError:
@@ -191,7 +196,7 @@ class Module:
                 else:
                     args[1].put((arg[0],self.state))
 
-        at the bottom of the user defined run() function.
+        at the bottom of the user defined `run()` function.
 
         Warning
         -------
@@ -199,12 +204,14 @@ class Module:
 
         Parameters
         ----------
-        comm_idx: int
+        arg[0]: int
             Index of the state in the communication queue.
 
-        comm_state: multiprocessing.Queue
+        arg[1]: multiprocessing.Queue
             When using the Python `multiprocessing` library `state_comm` must have
-            the module's `self.state` in it. That is, `state_comm.put((idx_comm,self.state))`
-            must be the last command in the method before `return`. In addition, self.state must be `pickle-able`.
+            the module's `self.state` in it. That is,
+            `state_comm.put((idx_comm,self.state))` must be the last command in the
+            method before `return`. In addition, self.state must be `pickle-able`.
+
         '''
         raise NotImplementedError('Module must implement run()')

@@ -21,6 +21,7 @@ class Parole(Module):
     These are the `port` names available in this module to connect to respective
     modules: `prison` and `community`.
     See instance attribute `port_names_expected`.
+
     '''
 
     def __init__(self, n_groups=1, pool_size=0.0):
@@ -175,6 +176,7 @@ class Parole(Module):
         Returns
         -------
         None
+
         '''
 
         u_vec_0 = self.population_phase.GetValue('feg', time)
@@ -225,6 +227,7 @@ class Parole(Module):
     def __zero_ode_parameters(self):
         '''
         If ports are not connected the corresponding outflows must be zero.
+
         '''
 
         zeros = np.zeros(self.n_groups)

@@ -24,6 +24,7 @@ class Vortex(Module):
     Notes
     -----
     Any `port` name and any number of ports are allowed.
+
     '''
 
     def __init__(self):
@@ -36,6 +37,7 @@ class Vortex(Module):
         show_time: tuple
             Two-element tuple, `(bool,float)`, `True` will print to standard
             output.
+
         '''
 
         super().__init__()
@@ -119,6 +121,7 @@ class Vortex(Module):
         Returns
         -------
         vortex_velocity: numpy.ndarray(3)
+
         '''
         import math
 
@@ -153,6 +156,7 @@ class Vortex(Module):
     def plot_velocity(self, time=None):
         '''
         Plot the vortex velocity as a function of height.
+
         '''
 
         if time is None:

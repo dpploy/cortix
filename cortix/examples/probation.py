@@ -21,6 +21,7 @@ class Probation(Module):
     These are the `port` names available in this module to connect to respective
     modules: `adjudication`, `jail`, `arrested`, and `community`.
     See instance attribute `port_names_expected`.
+
     '''
 
     def __init__(self, n_groups=1, pool_size=0.0):
@@ -32,6 +33,7 @@ class Probation(Module):
         pool_size: float
             Upperbound on the range of the existing population groups. A random value
             from 0 to the upperbound value will be assigned to each group.
+
         '''
 
         super().__init__()
@@ -197,6 +199,7 @@ class Probation(Module):
         Returns
         -------
         None
+
         '''
 
         u_vec_0 = self.population_phase.GetValue('fbg', time)
@@ -247,6 +250,7 @@ class Probation(Module):
     def __zero_ode_parameters(self):
         '''
         If ports are not connected the corresponding outflows must be zero.
+
         '''
 
         zeros = np.zeros(self.n_groups)
