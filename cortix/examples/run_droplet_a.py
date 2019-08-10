@@ -57,10 +57,11 @@ def main():
     end_time   = 3*const.minute
     time_step  = 0.2
 
-    if n_droplets <= 1000:
-        create_plots = True
-    else:
+    create_plots = True
+
+    if n_droplets >= 2000:
         create_plots = False
+
     plot_vortex_profile = False # True may crash the X server.
 
     use_mpi = False # True for MPI; False for Python multiprocessing
@@ -94,64 +95,67 @@ def main():
     cortix.run()
 
     # Plot all droplet trajectories
-    if create_plots and (cortix.rank == 0 or cortix.use_multiprocessing):
+    if create_plots:
 
         modules = cortix.get_modules()
 
-        # All droplets' trajectory
+        if cortix.use_multiprocessing or cortix.rank == 0:
 
-        from mpl_toolkits.mplot3d import Axes3D
-        import matplotlib.pyplot as plt
+            # All droplets' trajectory
 
-        position_histories = list()
-        for m in cortix.modules[1:]:
-            position_histories.append( m.state.get_quantity_history('position')[0].value )
+            from mpl_toolkits.mplot3d import Axes3D
+            import matplotlib.pyplot as plt
 
-        fig = plt.figure(1)
-        ax = fig.add_subplot(111,projection='3d')
-        ax.set_title('Droplet Trajectories')
-        ax.set_xlabel('x')
-        ax.set_ylabel('y')
-        ax.set_zlabel('z')
-        for p in position_histories:
-            x = [u[0] for u in p]
-            y = [u[1] for u in p]
-            z = [u[2] for u in p]
-            ax.plot(x,y,z)
+            position_histories = list()
+            for m in cortix.modules[1:]:
+                position_histories.append(
+                        m.state.get_quantity_history('position')[0].value )
 
-        fig.savefig('trajectories.png', dpi=300)
+            fig = plt.figure(1)
+            ax = fig.add_subplot(111,projection='3d')
+            ax.set_title('Droplet Trajectories')
+            ax.set_xlabel('x')
+            ax.set_ylabel('y')
+            ax.set_zlabel('z')
+            for p in position_histories:
+                x = [u[0] for u in p]
+                y = [u[1] for u in p]
+                z = [u[2] for u in p]
+                ax.plot(x,y,z)
 
-        # All droplets' speed
+            fig.savefig('trajectories.png', dpi=300)
 
-        fig = plt.figure(2)
-        plt.xlabel('Time [min]')
-        plt.ylabel('Speed [m/s]')
-        plt.title('All Droplets')
+            # All droplets' speed
 
-        for m in modules[1:]:
-            speed_series = m.state.get_quantity_history('speed')[0].value
-            x = list(p.index/60)
-            y = list(speed_series[:])
-            plt.plot(x,y)
+            fig = plt.figure(2)
+            plt.xlabel('Time [min]')
+            plt.ylabel('Speed [m/s]')
+            plt.title('All Droplets')
 
-        plt.grid()
-        fig.savefig('speeds.png', dpi=300)
+            for m in modules[1:]:
+                speed_series = m.state.get_quantity_history('speed')[0].value
+                x = list(p.index/60)
+                y = list(speed_series[:])
+                plt.plot(x,y)
 
-        # All droplets' radial position
+            plt.grid()
+            fig.savefig('speeds.png', dpi=300)
 
-        fig = plt.figure(3)
-        plt.xlabel('Time [min]')
-        plt.ylabel('Radial Position [m]')
-        plt.title('All Droplets')
+            # All droplets' radial position
 
-        for m in modules[1:]:
-            speed_series = m.state.get_quantity_history('radial-position')[0].value
-            x = list(p.index/60)[1:]
-            y = list(speed_series[:])[1:]
-            plt.plot(x,y)
+            fig = plt.figure(3)
+            plt.xlabel('Time [min]')
+            plt.ylabel('Radial Position [m]')
+            plt.title('All Droplets')
 
-        plt.grid()
-        fig.savefig('radialpos.png', dpi=300)
+            for m in modules[1:]:
+                speed_series = m.state.get_quantity_history('radial-position')[0].value
+                x = list(p.index/60)[1:]
+                y = list(speed_series[:])[1:]
+                plt.plot(x,y)
+
+            plt.grid()
+            fig.savefig('radialpos.png', dpi=300)
 
     # This properly ends the program
     cortix.close()
