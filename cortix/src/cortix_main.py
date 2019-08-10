@@ -224,6 +224,11 @@ class Cortix:
             for p in processes:
                 p.join()
 
+        if self.rank==0 or self.use_multiprocessing:
+            self.wall_clock_time_end = time.time()
+            self.log.info('run()::Elapsed wall clock time [s]: '+
+                    str(round(self.wall_clock_time_end-self.wall_clock_time_start,2)))
+
         return
 
     def get_network(self):
@@ -308,7 +313,7 @@ class Cortix:
 
             self.wall_clock_time_end = time.time()
 
-            self.log.info('Elapsed wall clock time [s]: '+
+            self.log.info('close()::Elapsed wall clock time [s]: '+
                     str(round(self.wall_clock_time_end-self.wall_clock_time_start,2)))
         return
 
