@@ -31,10 +31,9 @@
             
   <div class="section" id="module-run_droplet_a">
 <span id="run-droplet-a-module"></span><h1>run_droplet_a module<a class="headerlink" href="#module-run_droplet_a" title="Permalink to this headline">¶</a></h1>
-<p>This example uses two modules instantiated many times.
-This example can be executed with MPI (if mpi4py is available) or
-with the Python multiprocessing library. These choices are made by variables listed
-below in the executable portion of this run file.</p>
+<p>This example uses two modules instantiated many times. It be executed with MPI
+(if <cite>mpi4py</cite> is available) or with the Python multiprocessing library. These choices
+are made by variables listed below in the executable portion of this run file.</p>
 <p>To run this case using MPI you should compute the number of
 processes as follows:</p>
 <blockquote>
@@ -46,6 +45,49 @@ processes as follows:</p>
 command line as</p>
 <blockquote>
 <div><cite>run_droplet.py</cite></div></blockquote>
+<dl class="function">
+<dt id="run_droplet_a.main">
+<code class="descclassname">run_droplet_a.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/run_droplet_a.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#run_droplet_a.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cortix run file for a <cite>Droplet</cite>-<cite>Vortex</cite> network.</p>
+<dl class="attribute">
+<dt id="run_droplet_a.n_droplets">
+<code class="descclassname">run_droplet_a.</code><code class="descname">n_droplets</code><a class="headerlink" href="#run_droplet_a.n_droplets" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Number of droplets to use (one per process).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="run_droplet_a.end_time">
+<code class="descclassname">run_droplet_a.</code><code class="descname">end_time</code><a class="headerlink" href="#run_droplet_a.end_time" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> – End of the flow time in SI unit.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="run_droplet_a.time_step">
+<code class="descclassname">run_droplet_a.</code><code class="descname">time_step</code><a class="headerlink" href="#run_droplet_a.time_step" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> – Size of the time step between port communications in SI unit.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="run_droplet_a.create_plots">
+<code class="descclassname">run_droplet_a.</code><code class="descname">create_plots</code><a class="headerlink" href="#run_droplet_a.create_plots" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – Create various plots and save to files. (all data collected in the
+parent process; it may run out of memory).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="run_droplet_a.plot_vortex_profile">
+<code class="descclassname">run_droplet_a.</code><code class="descname">plot_vortex_profile</code><a class="headerlink" href="#run_droplet_a.plot_vortex_profile" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – Whether to plot (to a file) the vortex function used.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="run_droplet_a.use_mpi">
+<code class="descclassname">run_droplet_a.</code><code class="descname">use_mpi</code><a class="headerlink" href="#run_droplet_a.use_mpi" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – If set to <cite>True</cite> use MPI otherwise use Python multiprocessing.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 

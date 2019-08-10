@@ -89,7 +89,7 @@ To pass back the state of the module, the user should insert the provided
 index <cite>comm_idx</cite> and the <cite>state</cite> into the queue as follows:</p>
 <blockquote>
 <div><dl class="docutils">
-<dt>if not self.use_mpi:</dt>
+<dt>if self.use_multiprocessing:</dt>
 <dd><dl class="first last docutils">
 <dt>try:</dt>
 <dd>pickle.dumps(self.state)</dd>
@@ -101,7 +101,7 @@ index <cite>comm_idx</cite> and the <cite>state</cite> into the queue as follows
 </dd>
 </dl>
 </div></blockquote>
-<p class="last">at the bottom of the user defined run() function.</p>
+<p class="last">at the bottom of the user defined <cite>run()</cite> function.</p>
 </div>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
@@ -112,10 +112,11 @@ index <cite>comm_idx</cite> and the <cite>state</cite> into the queue as follows
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>comm_idx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index of the state in the communication queue.</li>
-<li><strong>comm_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v3.7)"><em>multiprocessing.Queue</em></a>) – When using the Python <cite>multiprocessing</cite> library <cite>state_comm</cite> must have
-the module’s <cite>self.state</cite> in it. That is, <cite>state_comm.put((idx_comm,self.state))</cite>
-must be the last command in the method before <cite>return</cite>. In addition, self.state must be <cite>pickle-able</cite>.</li>
+<li><strong>arg</strong><strong>[</strong><strong>0</strong><strong>]</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index of the state in the communication queue.</li>
+<li><strong>arg</strong><strong>[</strong><strong>1</strong><strong>]</strong> (<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v3.7)"><em>multiprocessing.Queue</em></a>) – When using the Python <cite>multiprocessing</cite> library <cite>state_comm</cite> must have
+the module’s <cite>self.state</cite> in it. That is,
+<cite>state_comm.put((idx_comm,self.state))</cite> must be the last command in the
+method before <cite>return</cite>. In addition, self.state must be <cite>pickle-able</cite>.</li>
 </ul>
 </td>
 </tr>

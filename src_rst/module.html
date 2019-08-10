@@ -35,7 +35,7 @@
 <dt id="module.Module">
 <em class="property">class </em><code class="descclassname">module.</code><code class="descname">Module</code><a class="reference internal" href="../_modules/module.html#Module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Cortix module super class</p>
+<p>Cortix module super class.</p>
 <p>This class provides facilities for creating modules within the Cortix network.
 Cortix will map one object of this class to either a Multiprocessing or MPI
 process depending on the user’s configuration.</p>
@@ -70,7 +70,13 @@ Default is <cite>None</cite>.</p>
 <dl class="attribute">
 <dt id="module.Module.use_mpi">
 <code class="descname">use_mpi</code><a class="headerlink" href="#module.Module.use_mpi" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> – True for MPI, false for Multiprocessing</p>
+<dd><p><em>bool</em> – <cite>True</cite> for MPI, <cite>False</cite> for Multiprocessing</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.use_multiprocessing">
+<code class="descname">use_multiprocessing</code><a class="headerlink" href="#module.Module.use_multiprocessing" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – <cite>False</cite> for MPI, <cite>True</cite> for Multiprocessing</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -82,15 +88,19 @@ Default is <cite>None</cite>.</p>
 <dl class="method">
 <dt id="module.Module.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Module super class constructor</p>
+<dd><p>Module super class constructor.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
 <p>This must be called in the constructor of every Cortix module like so:</p>
-<p>&gt;&gt; super()__init__()</p>
+<blockquote class="last">
+<div>super().__init__()</div></blockquote>
+</div>
 </dd></dl>
 
 <dl class="method">
 <dt id="module.Module.connect">
 <code class="descname">connect</code><span class="sig-paren">(</span><em>port_name_or_module</em>, <em>to_other_port=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.connect" title="Permalink to this definition">¶</a></dt>
-<dd><p>Connect two modules using ports corresponding to their name</p>
+<dd><p>Connect two modules using either their ports directly or inferred ports.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -98,8 +108,8 @@ Default is <cite>None</cite>.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>port_name_or_module</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference internal" href="#module.Module" title="module.Module"><em>Module</em></a>) – Either a <cite>port</cite> name or a <cite>Module</cite> can be given. In the latter case
 the <cite>name</cite> attribute of the module will be used to get the <cite>port</cite>
-of the module passed. This port will be connected to the port of the
-calling object.</li>
+of the module passed. This port will be connected to the corresponding
+port of the calling object.</li>
 <li><strong>to_other_port</strong> (<a class="reference internal" href="port.html#port.Port" title="port.Port"><em>Port</em></a>) – A <cite>port</cite> object to connect to. This must be <cite>None</cite> or absent if the
 first argument is a <cite>Module</cite>.</li>
 </ul>
@@ -166,7 +176,7 @@ To pass back the state of the module, the user should insert the provided
 index <cite>comm_idx</cite> and the <cite>state</cite> into the queue as follows:</p>
 <blockquote>
 <div><dl class="docutils">
-<dt>if not self.use_mpi:</dt>
+<dt>if self.use_multiprocessing:</dt>
 <dd><dl class="first last docutils">
 <dt>try:</dt>
 <dd>pickle.dumps(self.state)</dd>
@@ -178,7 +188,7 @@ index <cite>comm_idx</cite> and the <cite>state</cite> into the queue as follows
 </dd>
 </dl>
 </div></blockquote>
-<p class="last">at the bottom of the user defined run() function.</p>
+<p class="last">at the bottom of the user defined <cite>run()</cite> function.</p>
 </div>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
@@ -189,10 +199,11 @@ index <cite>comm_idx</cite> and the <cite>state</cite> into the queue as follows
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>comm_idx</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index of the state in the communication queue.</li>
-<li><strong>comm_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v3.7)"><em>multiprocessing.Queue</em></a>) – When using the Python <cite>multiprocessing</cite> library <cite>state_comm</cite> must have
-the module’s <cite>self.state</cite> in it. That is, <cite>state_comm.put((idx_comm,self.state))</cite>
-must be the last command in the method before <cite>return</cite>. In addition, self.state must be <cite>pickle-able</cite>.</li>
+<li><strong>arg</strong><strong>[</strong><strong>0</strong><strong>]</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index of the state in the communication queue.</li>
+<li><strong>arg</strong><strong>[</strong><strong>1</strong><strong>]</strong> (<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v3.7)"><em>multiprocessing.Queue</em></a>) – When using the Python <cite>multiprocessing</cite> library <cite>state_comm</cite> must have
+the module’s <cite>self.state</cite> in it. That is,
+<cite>state_comm.put((idx_comm,self.state))</cite> must be the last command in the
+method before <cite>return</cite>. In addition, self.state must be <cite>pickle-able</cite>.</li>
 </ul>
 </td>
 </tr>

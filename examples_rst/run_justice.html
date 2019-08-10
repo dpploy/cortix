@@ -31,7 +31,64 @@
             
   <div class="section" id="module-run_justice">
 <span id="run-justice-module"></span><h1>run_justice module<a class="headerlink" href="#module-run_justice" title="Permalink to this headline">¶</a></h1>
-<p>Crimninal justice example in progress.</p>
+<p>Crimninal justice network dynamics modeling.</p>
+<dl class="docutils">
+<dt>This example uses 7 modules:</dt>
+<dd><ul class="first last simple">
+<li>Community</li>
+<li>Arrested</li>
+<li>Adjudication</li>
+<li>Jail</li>
+<li>Prison</li>
+<li>Probation</li>
+<li>Parole</li>
+</ul>
+</dd>
+</dl>
+<p>and a population balance model is used to follow the offenders population
+groups between modules.</p>
+<p>To run this case using MPI you should compute the number of
+processes as follows:</p>
+<blockquote>
+<div><cite>nprocs = 7 + 1 cortix</cite></div></blockquote>
+<p>then issue the MPI run command as follows (replace <cite>nprocs</cite> with a number):</p>
+<blockquote>
+<div><cite>mpiexec -n nprocs run_justice.py</cite></div></blockquote>
+<p>To run this case with the Python multiprocessing library, just run this file at the
+command line as</p>
+<blockquote>
+<div><cite>run_justice.py</cite></div></blockquote>
+<dl class="function">
+<dt id="run_justice.main">
+<code class="descclassname">run_justice.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/run_justice.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#run_justice.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cortix run file for a criminal justice network.</p>
+<dl class="attribute">
+<dt id="run_justice.n_groups">
+<code class="descclassname">run_justice.</code><code class="descname">n_groups</code><a class="headerlink" href="#run_justice.n_groups" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – Number of population groups being followed. This must be the same for all
+modules.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="run_justice.end_time">
+<code class="descclassname">run_justice.</code><code class="descname">end_time</code><a class="headerlink" href="#run_justice.end_time" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> – End of the flow time in SI unit.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="run_justice.time_step">
+<code class="descclassname">run_justice.</code><code class="descname">time_step</code><a class="headerlink" href="#run_justice.time_step" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>float</em> – Size of the time step between port communications in SI unit.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="run_justice.use_mpi">
+<code class="descclassname">run_justice.</code><code class="descname">use_mpi</code><a class="headerlink" href="#run_justice.use_mpi" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – If set to <cite>True</cite> use MPI otherwise use Python multiprocessing.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 

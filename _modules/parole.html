@@ -53,6 +53,7 @@
 <span class="sd">    These are the `port` names available in this module to connect to respective</span>
 <span class="sd">    modules: `prison` and `community`.</span>
 <span class="sd">    See instance attribute `port_names_expected`.</span>
+
 <span class="sd">    &#39;&#39;&#39;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_groups</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pool_size</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
@@ -207,6 +208,7 @@
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        None</span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">u_vec_0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;feg&#39;</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
@@ -257,6 +259,7 @@
     <span class="k">def</span> <span class="nf">__zero_ode_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        If ports are not connected the corresponding outflows must be zero.</span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="n">zeros</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span>

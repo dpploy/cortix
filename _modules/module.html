@@ -38,12 +38,11 @@
 <span class="kn">from</span> <span class="nn">cortix.src.port</span> <span class="k">import</span> <span class="n">Port</span>
 
 <div class="viewcode-block" id="Module"><a class="viewcode-back" href="../src_rst/module.html#module.Module">[docs]</a><span class="k">class</span> <span class="nc">Module</span><span class="p">:</span>
-    <span class="sd">&#39;&#39;&#39;Cortix module super class</span>
+    <span class="sd">&#39;&#39;&#39;Cortix module super class.</span>
 
 <span class="sd">    This class provides facilities for creating modules within the Cortix network.</span>
 <span class="sd">    Cortix will map one object of this class to either a Multiprocessing or MPI</span>
 <span class="sd">    process depending on the user&#39;s configuration.</span>
-
 
 <span class="sd">    Note</span>
 <span class="sd">    ----</span>
@@ -64,18 +63,22 @@
 <span class="sd">        to the parent process or to be gathered in the root MPI process.</span>
 <span class="sd">        Default is `None`.</span>
 <span class="sd">    use_mpi: bool</span>
-<span class="sd">        True for MPI, false for Multiprocessing</span>
+<span class="sd">        `True` for MPI, `False` for Multiprocessing</span>
+<span class="sd">    use_multiprocessing: bool</span>
+<span class="sd">        `False` for MPI, `True` for Multiprocessing</span>
 <span class="sd">    ports: list(Port)</span>
 <span class="sd">        A list of ports contained by the module</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
 
 <div class="viewcode-block" id="Module.__init__"><a class="viewcode-back" href="../src_rst/module.html#module.Module.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Module super class constructor</span>
+        <span class="sd">&#39;&#39;&#39;Module super class constructor.</span>
 
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
 <span class="sd">        This must be called in the constructor of every Cortix module like so:</span>
 
-<span class="sd">        &gt;&gt; super()__init__()</span>
+<span class="sd">            super().__init__()</span>
 
 <span class="sd">       &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
@@ -166,23 +169,24 @@
         <span class="k">return</span> <span class="n">port</span></div>
 
 <div class="viewcode-block" id="Module.connect"><a class="viewcode-back" href="../src_rst/module.html#module.Module.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_name_or_module</span><span class="p">,</span> <span class="n">to_other_port</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Connect two modules using ports corresponding to their name</span>
+        <span class="sd">&#39;&#39;&#39;Connect two modules using either their ports directly or inferred ports.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        port_name_or_module: str, Module</span>
 <span class="sd">            Either a `port` name or a `Module` can be given. In the latter case</span>
 <span class="sd">            the `name` attribute of the module will be used to get the `port`</span>
-<span class="sd">            of the module passed. This port will be connected to the port of the</span>
-<span class="sd">            calling object.</span>
+<span class="sd">            of the module passed. This port will be connected to the corresponding</span>
+<span class="sd">            port of the calling object.</span>
 <span class="sd">        to_other_port: Port</span>
 <span class="sd">            A `port` object to connect to. This must be `None` or absent if the</span>
 <span class="sd">            first argument is a `Module`.</span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="c1"># Infer from types what to do with the intended module</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">port_name_or_module</span><span class="p">,</span> <span class="n">Module</span><span class="p">):</span>
-            <span class="k">assert</span> <span class="n">to_other_port</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;Illegal syntax.&#39;</span>
+            <span class="k">assert</span> <span class="n">to_other_port</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;Illegal syntax; only one argument needed.&#39;</span>
             <span class="n">other_module</span> <span class="o">=</span> <span class="n">port_name_or_module</span>
             <span class="n">other_module_name</span> <span class="o">=</span> <span class="n">other_module</span><span class="o">.</span><span class="n">name</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">other_module</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
@@ -216,7 +220,7 @@
 <span class="sd">        To pass back the state of the module, the user should insert the provided</span>
 <span class="sd">        index `comm_idx` and the `state` into the queue as follows:</span>
 
-<span class="sd">            if not self.use_mpi:</span>
+<span class="sd">            if self.use_multiprocessing:</span>
 <span class="sd">                try:</span>
 <span class="sd">                    pickle.dumps(self.state)</span>
 <span class="sd">                except pickle.PicklingError:</span>
@@ -224,7 +228,7 @@
 <span class="sd">                else:</span>
 <span class="sd">                    args[1].put((arg[0],self.state))</span>
 
-<span class="sd">        at the bottom of the user defined run() function.</span>
+<span class="sd">        at the bottom of the user defined `run()` function.</span>
 
 <span class="sd">        Warning</span>
 <span class="sd">        -------</span>
@@ -232,13 +236,15 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        comm_idx: int</span>
+<span class="sd">        arg[0]: int</span>
 <span class="sd">            Index of the state in the communication queue.</span>
 
-<span class="sd">        comm_state: multiprocessing.Queue</span>
+<span class="sd">        arg[1]: multiprocessing.Queue</span>
 <span class="sd">            When using the Python `multiprocessing` library `state_comm` must have</span>
-<span class="sd">            the module&#39;s `self.state` in it. That is, `state_comm.put((idx_comm,self.state))`</span>
-<span class="sd">            must be the last command in the method before `return`. In addition, self.state must be `pickle-able`.</span>
+<span class="sd">            the module&#39;s `self.state` in it. That is,</span>
+<span class="sd">            `state_comm.put((idx_comm,self.state))` must be the last command in the</span>
+<span class="sd">            method before `return`. In addition, self.state must be `pickle-able`.</span>
+
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;Module must implement run()&#39;</span><span class="p">)</span></div></div>
 </pre></div>
