@@ -111,8 +111,8 @@ class Network:
             if info=='bidirectional':
                 self.gv_edges.append( (str(idx_b),str(idx_a)) )
 
-            port_a = module_a.get_port(module_b_name.lower())
-            port_b = module_b.get_port(module_a_name.lower())
+            port_a = module_a.get_port(module_b.name.lower())
+            port_b = module_b.get_port(module_a.name.lower())
 
             port_a.connect(port_b)
 
@@ -288,3 +288,6 @@ class Network:
             g.edge( e[0], e[1] )
 
         g.render()
+
+        return g
+
