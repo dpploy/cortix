@@ -38,8 +38,6 @@ class Probation(Module):
 
         super().__init__()
 
-        self.name = 'probation'
-
         self.port_names_expected = ['adjudication','jail','arrested','community']
 
         quantities      = list()

@@ -13,10 +13,8 @@ import matplotlib.pyplot as plt
 
 from cortix.src.cortix_main import Cortix
 from cortix.src.network import Network
-from cortix.src.module import Module
 
 # Specific modules
-from cortix.examples.country import Country
 from cortix.examples.state import State
 
 def main():
@@ -24,26 +22,29 @@ def main():
 
     '''
 
-    cortix = Cortix(use_mpi=True)
-
     # Create the top system
-    usa = Module() # or Country()
-    cortix.system(usa) # only allwed one top system
+    usa = Cortix()
 
-    # Create network
-    usa.network = Network(n_modules=2)
+    # Create the top system network
+    usa.network = Network()
 
+    # Create modules for the network
     maine   = State('Maine')
     vermont = State('Vermont')
 
-    usa.network.connect(maine,vermont)
-    usa.network.draw('network.png')
+    # Add modules to the network
+    usa.network.module(maine)
+    usa.network.module(vermont)
+
+    # Connect the modules in the network
+    usa.network.connect(maine,vermont,'bidirectional')
+    usa.network.draw()
 
     # Run system (this will run any nested underlying networks)
-    cortix.run(usa)
+    #usa.run()
 
-    # Properly shutdow cortix
-    cortix.close()
+    # Properly shutdow usa
+    usa.close()
 
 if __name__ == '__main__':
     main()

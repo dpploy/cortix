@@ -46,8 +46,6 @@ class Community(Module):
         self.port_names_expected = ['probation','adjudication','jail','prison',
                                     'arrested', 'parole']
 
-        self.name = 'community'
-
         quantities      = list()
         self.ode_params = dict()
 

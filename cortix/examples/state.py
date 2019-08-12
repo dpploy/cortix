@@ -12,33 +12,19 @@ from cortix.src.module import Module
 from cortix.support.phase import Phase
 from cortix.support.quantity import Quantity
 
-class Arrested(Module):
+class State(Module):
     '''
-    Arrested Cortix module used to model criminal group population in an arrested system.
-
-    Notes
-    -----
-    These are the `port` names available in this module to connect to respective
-    modules: `probation`, `adjudication`, `jail`, and `community`.
-    See instance attribute `port_names_expected`.
 
     '''
 
-    def __init__(self, n_groups=1, pool_size=0.0):
+    def __init__(self, name=None, n_groups=0, pool_size=0.0):
         '''
-        Parameters
-        ----------
-        n_groups: int
-            Number of groups in the population.
-        pool_size: float
-            Upperbound on the range of the existing population groups. A random value
-            from 0 to the upperbound value will be assigned to each group.
 
         '''
 
         super().__init__()
 
-        self.port_names_expected = ['probation','adjudication','jail','community']
+        self.port_names_expected = ['vermont','maine','colorado','florida','utah']
 
         quantities      = list()
         self.ode_params = dict()
