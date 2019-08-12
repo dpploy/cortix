@@ -40,8 +40,6 @@ class Jail(Module):
 
         self.port_names_expected = ['probation','adjudication','arrested','prison',
                                     'community']
-        self.name = 'jail'
-
         quantities      = list()
         self.ode_params = dict()
 

@@ -38,8 +38,6 @@ class Prison(Module):
 
         super().__init__()
 
-        self.name = 'prison'
-
         self.port_names_expected = ['parole','adjudication','jail','community']
 
         quantities      = list()

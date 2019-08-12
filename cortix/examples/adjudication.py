@@ -39,8 +39,6 @@ class Adjudication(Module):
 
         super().__init__()
 
-        self.name = 'adjudication'
-
         self.port_names_expected = ['probation','jail','arrested','prison','community']
 
         quantities      = list()

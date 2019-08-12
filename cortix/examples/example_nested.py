@@ -28,11 +28,8 @@ def main():
 
     '''
 
-    cortix = Cortix(use_mpi=True)
-
-    # Create the top system
-    usa = Module() # or Country()
-    cortix.system(usa) # only allwed one top system
+    # Create the top level system
+    usa = Cortix(use_mpi=True)
 
     # Create network
     usa.network = Network(n_modules=2)

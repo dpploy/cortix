@@ -25,8 +25,8 @@ command line as
 
 import scipy.constants as const
 
-from cortix.src.module import Module
 from cortix.src.cortix_main import Cortix
+from cortix.src.network import Network
 
 from cortix.examples.droplet import Droplet
 from cortix.examples.vortex import Vortex
@@ -66,11 +66,13 @@ def main():
 
     use_mpi = False # True for MPI; False for Python multiprocessing
 
-    cortix = Cortix(use_mpi=use_mpi, splash=True)
+    swirl = Cortix(use_mpi=use_mpi, splash=True)
+
+    swirl.network = Network()
 
     # Vortex module (single).
     vortex = Vortex()
-    cortix.add_module(vortex)
+    swirl.network.module(vortex)
     vortex.show_time = (True,1*const.minute)
     vortex.end_time = end_time
     vortex.time_step = time_step
@@ -81,25 +83,27 @@ def main():
 
         # Droplet modules (multiple).
         droplet = Droplet()
-        cortix.add_module(droplet)
+        swirl.network.module(droplet)
         droplet.end_time = end_time
         droplet.time_step = time_step
         droplet.bounce = False
         droplet.slip = False
 
         # Network port connectivity (connect modules through their ports)
-        droplet.connect('external-flow', vortex.get_port('fluid-flow:{}'.format(i)))
+        swirl.network.connect( [droplet,'external-flow'],
+                               [vortex,vortex.get_port('fluid-flow:{}'.format(i))],
+                               'bidirectional' )
 
-    cortix.draw_network('network.png')
+    swirl.network.draw()
 
-    cortix.run()
+    swirl.run()
 
     # Plot all droplet trajectories
     if create_plots:
 
-        modules = cortix.get_modules()
+        modules = swirl.network.modules
 
-        if cortix.use_multiprocessing or cortix.rank == 0:
+        if swirl.use_multiprocessing or swirl.rank == 0:
 
             # All droplets' trajectory
 
@@ -107,7 +111,7 @@ def main():
             import matplotlib.pyplot as plt
 
             position_histories = list()
-            for m in cortix.modules[1:]:
+            for m in swirl.network.modules[1:]:
                 position_histories.append(
                         m.state.get_quantity_history('position')[0].value )
 
@@ -158,7 +162,7 @@ def main():
             fig.savefig('radialpos.png', dpi=300)
 
     # This properly ends the program
-    cortix.close()
+    swirl.close()
 
 if __name__ == '__main__':
     main()
