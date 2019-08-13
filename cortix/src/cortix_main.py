@@ -107,8 +107,6 @@ class Cortix:
         if m not in self.modules:
             m.use_mpi = self.use_mpi
             m.use_multiprocessing = self.use_multiprocessing
-            for port in m.ports:
-                port.use_mpi = self.use_mpi
             self.modules.append(m)
 
     def get_modules(self):
