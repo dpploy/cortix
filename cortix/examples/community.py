@@ -27,14 +27,15 @@ class Community(Module):
 
     '''
 
-    def __init__(self, n_groups=1, maturity_rate=10.0/const.day, offender_pool_size=0.0):
+    def __init__(self, n_groups=1, non_offender_adult_population=100, 
+                 offender_pool_size=0.0):
         '''
         Parameters
         ----------
         n_groups: int
             Number of groups in the population.
-        maturity_rate: float
-            Rate of individuals reaching the adult age (SI) unit. Default: 10 per day.
+        non_offender_adult_population: float
+            Pool of individuals reaching the adult age (SI) unit. Default: 10 per day.
         offender_pool_size: float
             Upperbound on the range of the existing population groups. A random value
             from 0 to the upperbound value will be assigned to each group.
@@ -66,8 +67,8 @@ class Community(Module):
 
         # Model parameters: commitment coefficients and their modifiers
 
-        # Community general to arrested
-        c00g_0 = np.random.random(self.n_groups) / const.day
+        # Community non-offerders to offenders 
+        c00g_0 = np.random.random(self.n_groups) / (5*const.year)
         c00g = Quantity(name='c00g', formalName='commit-arrested-coeff-grps',
                unit='individual', value=c00g_0)
         self.ode_params['general-commit-to-arrested-coeff-grps'] = c00g_0
@@ -79,8 +80,8 @@ class Community(Module):
         self.ode_params['general-commit-to-arrested-coeff-mod-grps'] = m00g_0
         quantities.append(m00g)
 
-        # Community offenders to arrested
-        c0rg_0 = np.random.random(self.n_groups) / const.day
+        # Community offenders to arrested (recidivism)
+        c0rg_0 = np.random.random(self.n_groups) / (180*const.day)
         c0rg = Quantity(name='c0rg', formalName='commit-arrested-coeff-grps',
                unit='individual', value=c0rg_0)
         self.ode_params['commit-to-arrested-coeff-grps'] = c0rg_0
@@ -92,11 +93,13 @@ class Community(Module):
         self.ode_params['commit-to-arrested-coeff-mod-grps'] = m0rg_0
         quantities.append(m0rg)
 
-        # Death term
-        self.ode_params['death-rates'] = np.zeros(self.n_groups)
+        # Non-offender adult population
+        self.ode_params['non-offender-adult-population'] = np.ones(self.n_groups) * \
+                non_offender_adult_population
 
-        # Maturity source rate term
-        self.ode_params['maturity-rate'] = np.ones(self.n_groups) * maturity_rate
+        # Death term
+        self.ode_params['death-rates-coeff'] = 1.0 * np.random.random(self.n_groups) / \
+                             const.year
 
         # Phase state
         self.population_phase = Phase(self.initial_time, time_unit='s',
@@ -204,7 +207,7 @@ class Community(Module):
 
     def __rhs_fn(self, u_vec, t, params):
 
-        f0g = u_vec  # offender population groups
+        f0g = u_vec  # offender population groups (removed from community)
 
         prison_inflow_rates       = params['prison-inflow-rates']
         parole_inflow_rates       = params['parole-inflow-rates']
@@ -217,19 +220,27 @@ class Community(Module):
                        arrested_inflow_rates + jail_inflow_rates +\
                        adjudication_inflow_rates + probation_inflow_rates
 
+        assert np.all(inflow_rates>=0.0), 'values: %r'%inflow_rates
+
         c0rg = self.ode_params['commit-to-arrested-coeff-grps']
         m0rg = self.ode_params['commit-to-arrested-coeff-mod-grps']
 
         c00g = self.ode_params['general-commit-to-arrested-coeff-grps']
         m00g = self.ode_params['general-commit-to-arrested-coeff-mod-grps']
 
-        maturity_rate = params['maturity-rate']
+        non_offender_adult_population = params['non-offender-adult-population']
 
-        outflow_rates = c0rg * m0rg * f0g + c00g * m00g * maturity_rate
+        # Recidivism + new offenders
+        outflow_rates = c0rg * m0rg * np.abs(f0g) + \
+                c00g * m00g * non_offender_adult_population
 
-        death_rates = params['death-rates']
+        assert np.all(outflow_rates>=0.0), 'values: %r'%outflow_rates
 
-        dt_f0g = inflow_rates - outflow_rates - death_rates
+        death_rates = params['death-rates-coeff'] * np.abs(f0g)
+
+        assert np.all(death_rates>=0.0), 'values: %r'%death_rates
+
+        dt_f0g = inflow_rates - outflow_rates  - death_rates
 
         return dt_f0g
 
@@ -287,11 +298,12 @@ class Community(Module):
             c00g = self.ode_params['general-commit-to-arrested-coeff-grps']
             m00g = self.ode_params['general-commit-to-arrested-coeff-mod-grps']
 
-            f0 = self.ode_params['maturity-rate']
+            f0 = self.ode_params['non-offender-adult-population']
 
-            outflow_rates = c0rg * m0rg * f0g + c00g * m00g * f0
+            # Recidivism
+            outflow_rates = c0rg * m0rg * np.abs(f0g) + c00g * m00g * f0
 
-            return outflow_rates
+        return outflow_rates
 
     def __zero_ode_parameters(self):
         '''

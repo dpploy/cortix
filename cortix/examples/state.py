@@ -4,6 +4,7 @@
 # https://cortix.org
 
 import pickle
+import logging
 
 import numpy as np
 import scipy.constants as const
@@ -14,17 +15,40 @@ from cortix.support.quantity import Quantity
 
 class State(Module):
     '''
+    State Cortix module used to model criminal group population transit from and to
+    a state. This assumes various ports of communication with other states,
+    and an internal port to the internal Community.
+
+    Notes
+    -----
+    These are the `port` names available in this module to connect to respective
+    modules: `a`, `b`.
+    In addition this module takes an internal network to model the community of
+    people. The port used for this connection is `community`.
+    See instance attribute `port_names_expected`.
 
     '''
 
-    def __init__(self, name=None, n_groups=0, pool_size=0.0):
+    def __init__(self, name, n_groups=1, maturity_rate=10.0/const.day, 
+            offender_pool_size=0.0):
         '''
+        Parameters
+        ----------
+        n_groups: int
+            Number of groups in the population.
+        maturity_rate: float
+            Rate of individuals reaching the adult age (SI) unit. Default: 10 per day.
+        offender_pool_size: float
+            Upperbound on the range of the existing population groups. A random value
+            from 0 to the upperbound value will be assigned to each group.
 
         '''
 
         super().__init__()
 
-        self.port_names_expected = ['vermont','maine','colorado','florida','utah']
+        self.name = name
+
+        self.port_names_expected = ['A','B','community']
 
         quantities      = list()
         self.ode_params = dict()
@@ -32,81 +56,55 @@ class State(Module):
         self.initial_time = 0.0 * const.day
         self.end_time     = 100 * const.day
         self.time_step    = 0.5 * const.day
+        self.show_time = (False,10*const.day)
+        self.log = logging.getLogger('cortix')
 
         # Population groups
         self.n_groups = n_groups
 
-        # Arrested population groups
-        frg_0 = np.random.random(self.n_groups) * pool_size
-        frg = Quantity(name='frg', formalName='arrested-pop-grps',
-                unit='individual', value=frg_0)
-        quantities.append(frg)
+        # State population groups
+        fsg_0 = np.random.random(self.n_groups) * offender_pool_size
+        fsg = Quantity(name='fsg', formalName='offender-pop-grps',
+                unit='individual', value=fsg_0)
+        quantities.append(fsg)
 
         # Model parameters: commitment coefficients and their modifiers
 
-        # Arrested to community
-        cr0g_0 = np.random.random(self.n_groups) / const.day
-        cr0g = Quantity(name='cr0g', formalName='commit-community-coeff-grps',
-               unit='individual', value=cr0g_0)
-        self.ode_params['commit-to-community-coeff-grps'] = cr0g_0
-        quantities.append(cr0g)
+        # Community offenders to outside the state
 
-        mr0g_0 = np.random.random(self.n_groups)
-        mr0g = Quantity(name='mr0g', formalName='commit-community-coeff-mod-grps',
-               unit='individual', value=mr0g_0)
-        self.ode_params['commit-to-community-coeff-mod-grps'] = mr0g_0
-        quantities.append(mr0g)
+        outflow_coeff_rates = dict()
+        for p in self.ports:
 
-        # Arrested to probation  
-        crbg_0 = np.random.random(self.n_groups) / const.day
-        crbg = Quantity(name='crbg', formalName='commit-probation-coeff-grps',
-               unit='individual', value=crbg_0)
-        self.ode_params['commit-to-probation-coeff-grps'] = crbg_0
-        quantities.append(crbg)
+            c0g_0 = np.random.random(self.n_groups) / const.day
+            m0g_0 = np.random.random(self.n_groups)
 
-        mrbg_0 = np.random.random(self.n_groups)
-        mrbg = Quantity(name='mrbg', formalName='commit-probation-coeff-mod-grps',
-               unit='individual', value=mrbg_0)
-        self.ode_params['commit-to-probation-coeff-mod-grps'] = mrbg_0
-        quantities.append(mrbg)
+            outflow_coeff_rates[p.name] = (c0g_0
 
-        # Arrested to jail  
-        crjg_0 = np.random.random(self.n_groups) / const.day
-        crjg = Quantity(name='crjg', formalName='commit-jail-coeff-grps',
-               unit='individual', value=crjg_0)
-        self.ode_params['commit-to-jail-coeff-grps'] = crjg_0
-        quantities.append(crjg)
 
-        mrjg_0 = np.random.random(self.n_groups)
-        mrjg = Quantity(name='mrjg', formalName='commit-jail-coeff-mod-grps',
-               unit='individual', value=mrjg_0)
-        self.ode_params['commit-to-jail-coeff-mod-grps'] = mrjg_0
-        quantities.append(mrjg)
-
-        # Arrested to adjudication
-        crag_0 = np.random.random(self.n_groups) / const.day
-        crag = Quantity(name='crag', formalName='commit-adjudication-coeff-grps',
-               unit='individual', value=crag_0)
-        self.ode_params['commit-to-adjudication-coeff-grps'] = crag_0
-        quantities.append(crag)
-
-        mrag_0 = np.random.random(self.n_groups)
-        mrag = Quantity(name='mrag', formalName='commit-adjudication-coeff-mod-grps',
-               unit='individual', value=mrag_0)
-        self.ode_params['commit-to-adjudication-coeff-mod-grps'] = mrag_0
-        quantities.append(mrag)
+        m0rg = Quantity(name='m0rg', formalName='commit-arrested-coeff-mod-grps',
+               unit='individual', value=m0rg_0)
+        self.ode_params['commit-to-arrested-coeff-mod-grps'] = m0rg_0
+        quantities.append(m0rg)
 
         # Death term
         self.ode_params['death-rates'] = np.zeros(self.n_groups)
+
+        # Maturity source rate term
+        self.ode_params['maturity-rate'] = np.ones(self.n_groups) * maturity_rate
 
         # Phase state
         self.population_phase = Phase(self.initial_time, time_unit='s',
                 quantities=quantities)
 
-        self.population_phase.SetValue('frg', frg_0, self.initial_time)
+        self.population_phase.SetValue('f0g', f0g_0, self.initial_time)
 
         # Initialize inflows to zero
-        self.ode_params['community-inflow-rates'] = np.zeros(self.n_groups)
+        self.ode_params['prison-inflow-rates']       = np.zeros(self.n_groups)
+        self.ode_params['parole-inflow-rates']       = np.zeros(self.n_groups)
+        self.ode_params['arrested-inflow-rates']     = np.zeros(self.n_groups)
+        self.ode_params['jail-inflow-rates']         = np.zeros(self.n_groups)
+        self.ode_params['adjudication-inflow-rates'] = np.zeros(self.n_groups)
+        self.ode_params['probation-inflow-rates']    = np.zeros(self.n_groups)
 
         # Set the state to the phase state
         self.state = self.population_phase
@@ -121,47 +119,71 @@ class State(Module):
 
         while time < self.end_time:
 
+            if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
+                self.log.info('Community::time[d] = '+str(round(time/const.day,1)))
+
             # Interactions in the jail port
             #--------------------------------
-            # one way "to" jail
+            # one way "from" jail
 
-            message_time = self.recv('jail')
-            outflow_rates = self.__compute_outflow_rates( message_time, 'jail' )
-            self.send( (message_time, outflow_rates), 'jail' )
+            self.send( time, 'jail' )
+            (check_time, inflow_rates) = self.recv('jail')
+            assert abs(check_time-time) <= 1e-6
+            self.ode_params['jail-inflow-rates'] = inflow_rates
 
             # Interactions in the adjudication port
             #--------------------------------------
-            # one way "to" adjudication
+            # one way "from" adjudication
 
-            message_time = self.recv('adjudication')
-            outflow_rates = self.__compute_outflow_rates( message_time, 'adjudication' )
-            self.send( (message_time, outflow_rates), 'adjudication' )
+            self.send( time, 'adjudication' )
+            (check_time, inflow_rates) = self.recv('adjudication')
+            assert abs(check_time-time) <= 1e-6
+            self.ode_params['adjudication-inflow-rates'] = inflow_rates
 
             # Interactions in the probation port
             #--------------------------------
-            # one way "to" probation
+            # one way "from" probation
 
-            message_time = self.recv('probation')
-            outflow_rates = self.__compute_outflow_rates( message_time, 'probation' )
-            self.send( (message_time, outflow_rates), 'probation' )
-
-            # Interactions in the community port
-            #---------------------------------
-            # two way "from" and "to"
-
-            # from
-            self.send( time, 'community' )
-            (check_time, community_inflow_rates) = self.recv('community')
+            self.send( time, 'probation' )
+            (check_time, inflow_rates) = self.recv('probation')
             assert abs(check_time-time) <= 1e-6
-            self.ode_params['community-inflow-rates'] = community_inflow_rates
+            self.ode_params['probation-inflow-rates'] = inflow_rates
+
+            # Interactions in the prison port
+            #--------------------------------
+            # one way "from" prison
+
+            self.send( time, 'prison' )
+            (check_time, inflow_rates) = self.recv('prison')
+            assert abs(check_time-time) <= 1e-6
+            self.ode_params['prison-inflow-rates'] = inflow_rates
+
+            # Interactions in the parole port
+            #--------------------------------
+            # one way "from" parole
+
+            self.send( time, 'parole' )
+            (check_time, inflow_rates) = self.recv('parole')
+            assert abs(check_time-time) <= 1e-6
+            self.ode_params['parole-inflow-rates'] = inflow_rates
+
+            # Interactions in the arrested port
+            #--------------------------------
+            # two way "to" and "from" arrested
 
             # to
-            message_time = self.recv('community')
-            outflow_rates = self.__compute_outflow_rates( message_time, 'community' )
-            self.send( (message_time, outflow_rates), 'community' )
+            message_time = self.recv('arrested')
+            outflow_rates = self.__compute_outflow_rates( message_time, 'arrested' )
+            self.send( (message_time, outflow_rates), 'arrested' )
 
-            # Evolve arrested group population to the next time stamp
-            #--------------------------------------------------------
+            # from
+            self.send( time, 'arrested' )
+            (check_time, inflow_rates) = self.recv('arrested')
+            assert abs(check_time-time) <= 1e-6
+            self.ode_params['arrested-inflow-rates'] = inflow_rates
+
+            # Evolve offenders group population to the next time stamp
+            #---------------------------------------------------------
 
             time = self.__step( time )
 
@@ -176,31 +198,34 @@ class State(Module):
 
     def __rhs_fn(self, u_vec, t, params):
 
-        frg = u_vec  # arrested population groups
+        f0g = u_vec  # offender population groups
 
-        community_inflow_rates = params['community-inflow-rates']
+        prison_inflow_rates       = params['prison-inflow-rates']
+        parole_inflow_rates       = params['parole-inflow-rates']
+        arrested_inflow_rates     = params['arrested-inflow-rates']
+        jail_inflow_rates         = params['jail-inflow-rates']
+        adjudication_inflow_rates = params['adjudication-inflow-rates']
+        probation_inflow_rates    = params['probation-inflow-rates']
 
-        inflow_rates  = community_inflow_rates
+        inflow_rates = prison_inflow_rates + parole_inflow_rates +\
+                       arrested_inflow_rates + jail_inflow_rates +\
+                       adjudication_inflow_rates + probation_inflow_rates
 
-        cr0g = self.ode_params['commit-to-community-coeff-grps']
-        mr0g = self.ode_params['commit-to-community-coeff-mod-grps']
+        c0rg = self.ode_params['commit-to-arrested-coeff-grps']
+        m0rg = self.ode_params['commit-to-arrested-coeff-mod-grps']
 
-        crbg = self.ode_params['commit-to-probation-coeff-grps']
-        mrbg = self.ode_params['commit-to-probation-coeff-mod-grps']
+        c00g = self.ode_params['general-commit-to-arrested-coeff-grps']
+        m00g = self.ode_params['general-commit-to-arrested-coeff-mod-grps']
 
-        crjg = self.ode_params['commit-to-jail-coeff-grps']
-        mrjg = self.ode_params['commit-to-jail-coeff-mod-grps']
+        maturity_rate = params['maturity-rate']
 
-        crag = self.ode_params['commit-to-adjudication-coeff-grps']
-        mrag = self.ode_params['commit-to-adjudication-coeff-mod-grps']
-
-        outflow_rates = ( cr0g * mr0g + crbg * mrbg + crjg * mrjg + crag * mrag ) * frg
+        outflow_rates = c0rg * m0rg * f0g + c00g * m00g * maturity_rate
 
         death_rates = params['death-rates']
 
-        dt_frg = inflow_rates - outflow_rates - death_rates
+        dt_f0g = inflow_rates - outflow_rates - death_rates
 
-        return dt_frg
+        return dt_f0g
 
     def __step(self, time=0.0):
         r'''
@@ -213,7 +238,7 @@ class State(Module):
         Parameters
         ----------
         time: float
-            Time in SI units.
+            Time in SI unit.
 
         Returns
         -------
@@ -221,7 +246,7 @@ class State(Module):
 
         '''
 
-        u_vec_0 = self.population_phase.GetValue('frg', time)
+        u_vec_0 = self.population_phase.GetValue('f0g', time)
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
         (u_vec_hist, info_dict) = odeint(self.__rhs_fn,
@@ -240,47 +265,25 @@ class State(Module):
         self.population_phase.AddRow(time, values)
 
         # Update current values
-        self.population_phase.SetValue('frg', u_vec, time)
+        self.population_phase.SetValue('f0g', u_vec, time)
 
         return time
 
     def __compute_outflow_rates(self, time, name):
 
-        frg = self.population_phase.GetValue('frg',time)
+        f0g = self.population_phase.GetValue('f0g',time)
 
-        if name == 'probation':
+        if name == 'arrested':
 
-            crbg = self.ode_params['commit-to-probation-coeff-grps']
-            mrbg = self.ode_params['commit-to-probation-coeff-mod-grps']
+            c0rg = self.ode_params['commit-to-arrested-coeff-grps']
+            m0rg = self.ode_params['commit-to-arrested-coeff-mod-grps']
 
-            outflow_rates = crbg * mrbg * frg
+            c00g = self.ode_params['general-commit-to-arrested-coeff-grps']
+            m00g = self.ode_params['general-commit-to-arrested-coeff-mod-grps']
 
-            return outflow_rates
+            f0 = self.ode_params['maturity-rate']
 
-        if name == 'jail':
-
-            crjg = self.ode_params['commit-to-jail-coeff-grps']
-            mrjg = self.ode_params['commit-to-jail-coeff-mod-grps']
-
-            outflow_rates = crjg * mrjg * frg
-
-            return outflow_rates
-
-        if name == 'adjudication':
-
-            crag = self.ode_params['commit-to-adjudication-coeff-grps']
-            mrag = self.ode_params['commit-to-adjudication-coeff-mod-grps']
-
-            outflow_rates = crag * mrag * frg
-
-            return outflow_rates
-
-        if name == 'community':
-
-            cr0g = self.ode_params['commit-to-community-coeff-grps']
-            mr0g = self.ode_params['commit-to-community-coeff-mod-grps']
-
-            outflow_rates = cr0g * mr0g * frg
+            outflow_rates = c0rg * m0rg * f0g + c00g * m00g * f0
 
             return outflow_rates
 
@@ -294,20 +297,11 @@ class State(Module):
 
         p_names = [p.name for p in self.ports]
 
-        if 'community' not in p_names:
-            self.ode_params['commit-to-community-coeff-grps']     = zeros
-            self.ode_params['commit-to-community-coeff-mod-grps'] = zeros
+        if 'arrested' not in p_names:
+            self.ode_params['commit-to-arrested-coeff-grps']     = zeros
+            self.ode_params['commit-to-arrested-coeff-mod-grps'] = zeros
 
-        if 'jail' not in p_names:
-            self.ode_params['commit-to-jail-coeff-grps'] = zeros
-            self.ode_params['commit-to-jail-coeff-mod-grps'] = zeros
-
-        if 'probation' not in p_names:
-            self.ode_params['commit-to-probation-coeff-grps'] = zeros
-            self.ode_params['commit-to-probation-coeff-mod-grps'] = zeros
-
-        if 'adjudication' not in p_names:
-            self.ode_params['commit-to-adjudication-coeff-grps'] = zeros
-            self.ode_params['commit-to-adjudication-coeff-mod-grps'] = zeros
+            self.ode_params['general-commit-to-arrested-coeff-grps']     = zeros
+            self.ode_params['general-commit-to-arrested-coeff-mod-grps'] = zeros
 
         return
