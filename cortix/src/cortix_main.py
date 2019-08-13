@@ -51,11 +51,8 @@ class Cortix:
             size of the group associated with MPI.COMM_WORLD.
 
         '''
-
-        self.use_multiprocessing = True
         self.use_mpi = use_mpi
-        if self.use_mpi:
-            self.use_multiprocessing = False
+        self.use_multiprocessing = not use_mpi
         self.comm = None
         self.rank = None
         self.size = None
