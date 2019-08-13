@@ -336,28 +336,29 @@ class Cortix:
 
         self.log.setLevel(logging.DEBUG)
 
-        file_handler = logging.FileHandler('cortix.log')
-        file_handler.setLevel(logging.DEBUG)
+        if not self.log.HasHandler():
+            file_handler = logging.FileHandler('cortix.log')
+            file_handler.setLevel(logging.DEBUG)
 
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.DEBUG)
+            console_handler = logging.StreamHandler()
+            console_handler.setLevel(logging.DEBUG)
 
-        # Formatter added to handlers
-        if self.use_mpi:
-            fs = '[rank:{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s'.format(self.rank)
-        else:
+            # Formatter added to handlers
+            if self.use_mpi:
+                fs = '[rank:{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s'.format(self.rank)
+            else:
 
-            fs = "[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(os.getpid())
+                fs = "[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(os.getpid())
 
-        formatter = logging.Formatter(fs)
-        file_handler.setFormatter(formatter)
-        console_handler.setFormatter(formatter)
+            formatter = logging.Formatter(fs)
+            file_handler.setFormatter(formatter)
+            console_handler.setFormatter(formatter)
 
-        # Add handlers to logger
-        self.log.addHandler(file_handler)
-        self.log.addHandler(console_handler)
+            # Add handlers to logger
+            self.log.addHandler(file_handler)
+            self.log.addHandler(console_handler)
 
-        return
+            return
 
     def __get_splash(self, begin=None, end=None):
         '''Returns the Cortix splash logo.
