@@ -262,14 +262,14 @@ class Arrested(Module):
 
         frg = self.population_phase.GetValue('frg',time)
 
+        assert np.all(frg>=0.0), 'values: %r'%frg
+
         if name == 'probation':
 
             crbg = self.ode_params['commit-to-probation-coeff-grps']
             mrbg = self.ode_params['commit-to-probation-coeff-mod-grps']
 
             outflow_rates = crbg * mrbg * frg
-
-            return outflow_rates
 
         if name == 'jail':
 
@@ -278,16 +278,12 @@ class Arrested(Module):
 
             outflow_rates = crjg * mrjg * frg
 
-            return outflow_rates
-
         if name == 'adjudication':
 
             crag = self.ode_params['commit-to-adjudication-coeff-grps']
             mrag = self.ode_params['commit-to-adjudication-coeff-mod-grps']
 
             outflow_rates = crag * mrag * frg
-
-            return outflow_rates
 
         if name == 'community':
 
@@ -296,7 +292,7 @@ class Arrested(Module):
 
             outflow_rates = cr0g * mr0g * frg
 
-            return outflow_rates
+        return outflow_rates
 
     def __zero_ode_parameters(self):
         '''

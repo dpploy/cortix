@@ -170,9 +170,7 @@ class Network:
         Note
         ----
         When using multiprocessing, data from the modules state are copied to the master
-        process after the `run()` method of the modules is finished. When running in MPI,
-        this is not done here. Only if the `get_modules()` method is called by all
-        processes.
+        process after the `run()` method of the modules is finished.
 
         '''
         assert len(self.modules) >= 1, 'the network must have a list of modules.'

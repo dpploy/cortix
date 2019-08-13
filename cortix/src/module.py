@@ -17,7 +17,7 @@ class Module:
     ----
     This class is to be inherited by every Cortix module.
     In order to execute, modules *must* override the `run` method, which will be
-    executed during the simulation
+    executed during the simulation.
 
     '''
 
@@ -34,7 +34,7 @@ class Module:
         Attributes
         ----------
         name: str
-            A name given to the instance. Default is `None`.
+            A name given to the instance. Default is the derived class name.
         port_names_expected: list(str), None
             A list of names of ports expected in the module. This will be compared
             to port names during runtime to check against the intended use of the
@@ -49,6 +49,8 @@ class Module:
             `False` for MPI, `True` for Multiprocessing
         ports: list(Port)
             A list of ports contained by the module
+        __network: Network
+            An internal network inherited by the derived module for nested networks.
 
        '''
         self.name = self.__class__.__name__
@@ -58,7 +60,7 @@ class Module:
         self.use_multiprocessing = True
         self.ports = list()
 
-        self.__network = None
+        self._network = None
 
     def send(self, data, port):
         '''Send data through a given port.
@@ -145,10 +147,10 @@ class Module:
         assert isinstance(n,Network)
         n.use_mpi = self.use_mpi
         n.use_multiprocessing = self.use_multiprocessing
-        self.__network = n
+        self._network = n
         return
     def __get_network(self):
-        return self.__network
+        return self._network
     network = property(__get_network, __set_network, None, None)
 
     def run(self, *args):
