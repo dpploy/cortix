@@ -51,11 +51,8 @@ class Cortix:
             size of the group associated with MPI.COMM_WORLD.
 
         '''
-
-        self.use_multiprocessing = True
         self.use_mpi = use_mpi
-        if self.use_mpi:
-            self.use_multiprocessing = False
+        self.use_multiprocessing = not use_mpi
         self.comm = None
         self.rank = None
         self.size = None
@@ -110,6 +107,8 @@ class Cortix:
         if m not in self.modules:
             m.use_mpi = self.use_mpi
             m.use_multiprocessing = self.use_multiprocessing
+            for port in m.ports:
+                port.use_mpi = self.use_mpi
             self.modules.append(m)
 
     def get_modules(self):
@@ -226,6 +225,7 @@ class Cortix:
             # Synchronize at the end
             for p in processes:
                 p.join()
+                p.kill()
 
         if self.rank==0 or self.use_multiprocessing:
             self.wall_clock_time_end = time.time()
