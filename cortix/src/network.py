@@ -69,6 +69,17 @@ class Network:
             m.use_multiprocessing = self.use_multiprocessing
             self.modules.append(m)
 
+        return
+
+    def add_module(self, m):
+        '''Alternative name to `module()`.
+
+        '''
+
+        self.module(m)
+
+        return
+
     def connect(self, module_port_a, module_port_b, info=None):
         '''Connect two modules using either their ports directly or inferred ports.
 
