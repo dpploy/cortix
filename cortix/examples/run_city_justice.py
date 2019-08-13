@@ -82,7 +82,7 @@ def main():
     community.time_step = time_step
     community.show_time = (True,10*const.day)
 
-    prison = Prison(n_groups=n_groups)
+    prison = Prison(n_groups=n_groups,pool_size=0.0)
     city.network.module(prison)
     prison.end_time = end_time
     prison.time_step = time_step

@@ -262,7 +262,7 @@ class Network:
 
         from graphviz import Digraph
 
-        use_graph_attr = {'splines':'true','overlap':'scale','ranksep':'1.5'}
+        use_graph_attr = {'splines':'true','overlap':'scale','ranksep':'2.0'}
         if graph_attr:
             use_graph_attr.update(graph_attr)
 
