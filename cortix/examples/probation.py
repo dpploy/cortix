@@ -38,8 +38,6 @@ class Probation(Module):
 
         super().__init__()
 
-        self.name = 'probation'
-
         self.port_names_expected = ['adjudication','jail','arrested','community']
 
         quantities      = list()
@@ -229,14 +227,14 @@ class Probation(Module):
 
         fbg = self.population_phase.GetValue('fbg',time)
 
+        assert np.all(fbg>=0.0), 'values: %r'%fbg
+
         if name == 'jail':
 
             cbjg = self.ode_params['commit-to-jail-coeff-grps']
             mbjg = self.ode_params['commit-to-jail-coeff-mod-grps']
 
             outflow_rates = cbjg * mbjg * fbg
-
-            return outflow_rates
 
         if name == 'community':
 
@@ -245,7 +243,7 @@ class Probation(Module):
 
             outflow_rates = cb0g * mb0g * fbg
 
-            return outflow_rates
+        return outflow_rates
 
     def __zero_ode_parameters(self):
         '''

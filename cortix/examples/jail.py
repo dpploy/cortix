@@ -40,8 +40,6 @@ class Jail(Module):
 
         self.port_names_expected = ['probation','adjudication','arrested','prison',
                                     'community']
-        self.name = 'jail'
-
         quantities      = list()
         self.ode_params = dict()
 
@@ -239,23 +237,25 @@ class Jail(Module):
 
     def __compute_outflow_rates(self, time, name):
 
-        fjg = self.population_phase.GetValue('fjg',time)
+      fjg = self.population_phase.GetValue('fjg',time)
 
-        if name == 'prison':
+      assert np.all(fjg>=0.0), 'values: %r'%fjg
 
-            cjpg = self.ode_params['commit-to-prison-coeff-grps']
-            mjpg = self.ode_params['commit-to-prison-coeff-mod-grps']
+      if name == 'prison':
 
-            outflow_rates = cjpg * mjpg * fjg
+          cjpg = self.ode_params['commit-to-prison-coeff-grps']
+          mjpg = self.ode_params['commit-to-prison-coeff-mod-grps']
 
-        if name == 'community':
+          outflow_rates = cjpg * mjpg * fjg
 
-            cj0g = self.ode_params['commit-to-community-coeff-grps']
-            mj0g = self.ode_params['commit-to-community-coeff-mod-grps']
+      if name == 'community':
 
-            outflow_rates = cj0g * mj0g * fjg
+          cj0g = self.ode_params['commit-to-community-coeff-grps']
+          mj0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
-        return outflow_rates
+          outflow_rates = cj0g * mj0g * fjg
+
+      return outflow_rates
 
     def __zero_ode_parameters(self):
         '''

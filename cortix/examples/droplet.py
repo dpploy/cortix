@@ -40,6 +40,11 @@ class Droplet(Module):
 
         self.port_names_expected = ['external-flow','visualization']
 
+        self.initial_time = 0.0
+        self.end_time = 100
+        self.time_step = 0.1
+        self.show_time = (False,1*const.minute)
+
         self.bounce = True
         self.slip   = True
 
@@ -48,10 +53,6 @@ class Droplet(Module):
 
         self.ode_params = dict()
 
-        self.initial_time = 0.0
-        self.end_time = 100
-        self.time_step = 0.1
-        self.show_time = (False,1*const.minute)
         self.log = logging.getLogger('cortix')
 
         # Create a drop with random diameter up within 5 and 8 mm.

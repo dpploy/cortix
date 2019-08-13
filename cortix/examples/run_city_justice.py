@@ -37,6 +37,7 @@ import scipy.constants as const
 import matplotlib.pyplot as plt
 
 from cortix.src.cortix_main import Cortix
+from cortix.src.network import Network
 
 from cortix.examples.prison import Prison
 from cortix.examples.parole import Parole
@@ -65,84 +66,76 @@ def main():
 
     # Configuration Parameters
     n_groups  = 150 # number of population groups
-    end_time  = 50 * const.day
+    end_time  =  40 * const.day
     time_step = 0.5 * const.day
 
     use_mpi = False  # True for MPI; False for Python multiprocessing
 
-    cortix = Cortix(use_mpi=use_mpi, splash=True)
+    city = Cortix(use_mpi=use_mpi, splash=True)
 
-    prison = Prison(n_groups=n_groups)
-    cortix.add_module(prison)
-    prison.end_time = end_time
-    prison.time_step = time_step
+    city.network = Network()
 
-    parole = Parole(n_groups=n_groups)
-    cortix.add_module(parole)
-    parole.end_time = end_time
-    parole.time_step = time_step
-
-    adjudication = Adjudication(n_groups=n_groups)
-    cortix.add_module(adjudication)
-    adjudication.end_time = end_time
-    adjudication.time_step = time_step
-
-    jail = Jail(n_groups=n_groups)
-    cortix.add_module(jail)
-    jail.end_time = end_time
-    jail.time_step = time_step
-
-    arrested = Arrested(n_groups=n_groups)
-    cortix.add_module(arrested)
-    arrested.end_time = end_time
-    arrested.time_step = time_step
-
-    probation = Probation(n_groups=n_groups)
-    cortix.add_module(probation)
-    probation.end_time = end_time
-    probation.time_step = time_step
-
-    community = Community(n_groups=n_groups, maturity_rate=100/const.day,
-            offender_pool_size=10)
-    cortix.add_module(community)
+    community = Community(n_groups=n_groups, non_offender_adult_population=100,
+            offender_pool_size=0)
+    city.network.module(community)
     community.end_time = end_time
     community.time_step = time_step
     community.show_time = (True,10*const.day)
 
-    prison.connect( parole )
-    adjudication.connect( prison )
-    jail.connect( prison )
-    jail.connect( adjudication )
-    arrested.connect( jail )
-    arrested.connect( adjudication )
-    probation.connect( arrested )
-    probation.connect( jail )
-    probation.connect( adjudication )
-    community.connect( arrested )
-    community.connect( jail )
-    community.connect( probation )
-    community.connect( adjudication )
-    community.connect( prison )
-    community.connect( parole )
+    prison = Prison(n_groups=n_groups,pool_size=0.0)
+    city.network.module(prison)
+    prison.end_time = end_time
+    prison.time_step = time_step
 
-    cortix.draw_network('network.png')
+    parole = Parole(n_groups=n_groups)
+    city.network.module(parole)
+    parole.end_time = end_time
+    parole.time_step = time_step
 
-    cortix.run()
+    adjudication = Adjudication(n_groups=n_groups)
+    city.network.module(adjudication)
+    adjudication.end_time = end_time
+    adjudication.time_step = time_step
 
-    modules = cortix.get_modules()
+    jail = Jail(n_groups=n_groups)
+    city.network.module(jail)
+    jail.end_time = end_time
+    jail.time_step = time_step
 
-    if cortix.use_multiprocessing or cortix.rank == 0:
+    arrested = Arrested(n_groups=n_groups)
+    city.network.module(arrested)
+    arrested.end_time = end_time
+    arrested.time_step = time_step
 
-        # Attach to data
-        prison      =cortix.modules[0]
-        parole      =cortix.modules[1]
-        adjudication=cortix.modules[2]
-        jail        =cortix.modules[3]
-        arrested    =cortix.modules[4]
-        probation   =cortix.modules[5]
-        community   =cortix.modules[6]
+    probation = Probation(n_groups=n_groups)
+    city.network.module(probation)
+    probation.end_time = end_time
+    probation.time_step = time_step
 
-        total_num_unknowns = n_groups * len(modules)
+    city.network.connect( prison, parole, 'bidirectional' )
+    city.network.connect( adjudication, prison )
+    city.network.connect( jail, prison )
+    city.network.connect( adjudication, jail )
+    city.network.connect( arrested, jail )
+    city.network.connect( arrested, adjudication )
+    city.network.connect( arrested, probation )
+    city.network.connect( probation, jail )
+    city.network.connect( adjudication, probation )
+
+    city.network.connect( arrested, community )
+    city.network.connect( jail, community )
+    city.network.connect( probation, community )
+    city.network.connect( adjudication, community )
+    city.network.connect( prison, community )
+    city.network.connect( parole, community )
+
+    city.network.draw()
+
+    city.run()
+
+    if city.use_multiprocessing or city.rank == 0:
+
+        total_num_unknowns = n_groups * len(city.network.modules)
         total_num_params = 0
 
         # Inspect Data Function
@@ -151,25 +144,28 @@ def main():
             (fxg_quant, time_unit) = population_phase.get_quantity_history(quant_name)
 
             fxg_quant.plot( x_scaling=1/const.day, x_label='Time [day]',
-                    y_label=fxg_quant.name+' ['+fxg_quant.unit+']')
+                    y_label=fxg_quant.name+' ['+fxg_quant.unit+' %]')
 
             # Number of parameters in the prison model
             n_params = (len(population_phase.GetActors())-1)*n_groups
             return n_params
 
-        quant_names = ['fpg','feg','fag','fjg','frg','fbg','f0g']
-        for (m,quant_name) in zip(modules,quant_names):
+        quant_names = {'Prison':'fpg','Parole':'feg','Adjudication':'fag',
+                'Jail':'fjg','Arrested':'frg','Probation':'fbg','Community':'f0g'}
+
+        for m in city.network.modules:
+            quant_name = quant_names[m.name]
             total_num_params += inspect_module_data(m,quant_name)
             plt.grid()
             plt.savefig(m.name+'.png', dpi=300)
 
         # Total number of unknowns and parameters
 
-        print('total number of unknowns   =', total_num_unknowns)
-        print('total number of parameters =', total_num_params)
+        city.log.info('total number of unknowns   ='+str(total_num_unknowns))
+        city.log.info('total number of parameters ='+str(total_num_params))
 
-    # Properly shutdow cortix
-    cortix.close()
+    # Properly shutdow city
+    city.close()
 
 if __name__ == '__main__':
     main()

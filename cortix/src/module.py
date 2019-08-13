@@ -4,6 +4,7 @@
 # https://cortix.org
 
 from cortix.src.port import Port
+#from cortix.src.network import Network
 
 class Module:
     '''Cortix module super class.
@@ -16,8 +17,7 @@ class Module:
     ----
     This class is to be inherited by every Cortix module.
     In order to execute, modules *must* override the `run` method, which will be
-    executed during the simulation
-
+    executed during the simulation.
 
     '''
 
@@ -34,7 +34,7 @@ class Module:
         Attributes
         ----------
         name: str
-            A name given to the instance. Default is `None`.
+            A name given to the instance. Default is the derived class name.
         port_names_expected: list(str), None
             A list of names of ports expected in the module. This will be compared
             to port names during runtime to check against the intended use of the
@@ -49,13 +49,18 @@ class Module:
             `False` for MPI, `True` for Multiprocessing
         ports: list(Port)
             A list of ports contained by the module
+        __network: Network
+            An internal network inherited by the derived module for nested networks.
 
        '''
-        self.name = None
+        self.name = self.__class__.__name__
         self.port_names_expected = None
         self.state = None
         self.use_mpi = False
-        self.ports = []
+        self.use_multiprocessing = True
+        self.ports = list()
+
+        self._network = None
 
     def send(self, data, port):
         '''Send data through a given port.
@@ -138,41 +143,15 @@ class Module:
 
         return port
 
-    def connect(self, port_name_or_module, to_other_port=None):
-        '''Connect two modules using either their ports directly or inferred ports.
-
-        Parameters
-        ----------
-        port_name_or_module: str, Module
-            Either a `port` name or a `Module` can be given. In the latter case
-            the `name` attribute of the module will be used to get the `port`
-            of the module passed. This port will be connected to the corresponding
-            port of the calling object.
-        to_other_port: Port
-            A `port` object to connect to. This must be `None` or absent if the
-            first argument is a `Module`.
-
-        '''
-
-        # Infer from types what to do with the intended module
-        if isinstance(port_name_or_module, Module):
-            assert to_other_port is None, 'Illegal syntax; only one argument needed.'
-            other_module = port_name_or_module
-            other_module_name = other_module.name
-            if not other_module.name:
-                other_module_name = other_module.__class__.__name__.lower()
-            my_port = self.get_port(other_module_name)
-            my_name = self.name
-            if not my_name:
-                my_name = self.__class__.__name__.lower()
-            other_port = other_module.get_port(my_name)
-            my_port.connect(other_port)
-
-        if isinstance(port_name_or_module, str):
-            assert isinstance(to_other_port, Port), 'Other port must be of Port type'
-            port_name = port_name_or_module
-            my_port = self.get_port(port_name)
-            my_port.connect(to_other_port)
+    def __set_network(self, n):
+        assert isinstance(n,Network)
+        n.use_mpi = self.use_mpi
+        n.use_multiprocessing = self.use_multiprocessing
+        self._network = n
+        return
+    def __get_network(self):
+        return self._network
+    network = property(__get_network, __set_network, None, None)
 
     def run(self, *args):
         '''Module run function
