@@ -20,8 +20,11 @@ class Body(Module):
         return [coef * (bod.pos[i] - self.pos[i]) for i in range(3)]
 
     def run(self):
+        print(self.ports)
         for port in self.ports:
             self.send(self.mass, port)
+
+        print("DONE WITH SENDING")
 
         for port in self.ports:
             other_mass = self.recv(port)
