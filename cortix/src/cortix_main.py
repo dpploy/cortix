@@ -225,6 +225,7 @@ class Cortix:
             # Synchronize at the end
             for p in processes:
                 p.join()
+                p.kill()
 
         if self.rank==0 or self.use_multiprocessing:
             self.wall_clock_time_end = time.time()
