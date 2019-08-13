@@ -43,7 +43,7 @@ class Port:
             self.comm = MPI.COMM_WORLD
             self.rank = None
         else:
-            self.q = Queue()
+            self.q = None
 
         self.connected_port = None
 
@@ -65,6 +65,9 @@ class Port:
         self.connected_port = port
         port.connected_port = self
         port.use_mpi = self.use_mpi
+
+        if not port.use_mpi:
+            self.q = port.q = Queue()
 
     def send(self, data, tag=None):
         '''Send data to the connected port.
