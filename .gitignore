@@ -11,6 +11,7 @@ readme_converted.rst
 *.pdf
 *.patch
 *.png
+*.gv
 *.pickle
 *.pkl
 *.gpg
