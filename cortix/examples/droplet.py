@@ -53,8 +53,6 @@ class Droplet(Module):
 
         self.ode_params = dict()
 
-        self.log = logging.getLogger('cortix')
-
         # Create a drop with random diameter up within 5 and 8 mm.
         self.droplet_diameter = (np.random.random(1) * (8 - 5) + 5)[0] * const.milli
         self.ode_params['droplet-diameter'] = self.droplet_diameter

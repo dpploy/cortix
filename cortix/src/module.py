@@ -5,6 +5,7 @@
 
 import os
 import pickle
+import logging
 from cortix.src.port import Port
 #from cortix.src.network import Network
 
@@ -61,6 +62,7 @@ class Module:
         self.use_mpi = False
         self.use_multiprocessing = True
         self.ports = list()
+        self.log = logging.getLogger('cortix')
         self.save = False
 
         self._network = None
@@ -212,6 +214,7 @@ class Module:
             file_name += ".pkl"
 
             self.ports = None
+            self.log = None
             try:
                 with open(file_name, "wb") as f:
                     pickle.dump(self, f)
