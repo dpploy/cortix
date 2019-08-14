@@ -35,7 +35,7 @@ class DataPlot(Module):
 
         self.data = dict()
 
-        self.state = None
+        self.state = self.data
 
     def run(self, *args):
         '''
