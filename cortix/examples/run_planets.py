@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from cortix import Cortix
 from cortix.src.module import Module
+from cortix.src.network import Network
 from cortix.src.port import Port
 from body import Body
 
@@ -9,11 +10,14 @@ def main():
     num_bodies = 10
 
     cortix = Cortix(use_mpi=um)
+    cortix.network = Network()
     for i in range(num_bodies):
-        cortix.add_module(Body())
+        b = Body()
+        b.save = True
+        cortix.network.module(b)
 
-    for x, i in enumerate(cortix.modules):
-        for y, j in enumerate(cortix.modules):
+    for x, i in enumerate(cortix.network.modules):
+        for y, j in enumerate(cortix.network.modules):
             pi = Port("body_{}".format(y), um)
 
             if x != y and pi not in i.ports:
@@ -24,9 +28,8 @@ def main():
 
                 pj.connect(pi)
 
-    for mod in cortix.modules:
-        print(mod.ports)
-    # cortix.run()
+    cortix.run()
+    print(cortix.network.modules)
 
 if __name__ == "__main__":
     main()

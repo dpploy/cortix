@@ -42,6 +42,10 @@ class Body(Module):
             payload = np.array([self.mass, self.pos])
             self.send((self.mass, self.pos), port)
 
+        self.mass = 42
+        self.pos = 32
+        self.rad = 52
+
         # Receive (mass, pos) from every body 
         other_bodies = [self.recv(port) for port in self.ports]
 

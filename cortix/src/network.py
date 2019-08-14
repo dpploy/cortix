@@ -3,6 +3,8 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 
+import os
+import pickle
 import logging
 from multiprocessing import Process, Queue
 
@@ -225,26 +227,10 @@ class Network:
             if self.rank != 0:
                 mod = self.modules[self.rank-1]
                 self.log.info('Launching Module {}'.format(mod))
-                mod.run()
+                mod.run_and_save()
 
             # Sync here at the end
             self.comm.Barrier()
-
-            if len(self.modules) > self.max_n_modules_for_data_copy_on_root:
-                return
-
-            # TODO: monitor memory usage by the root process
-            # Collect at the root process all state data from modules
-            if self.rank == 0:
-                state = None
-            else:
-                state = self.modules[self.rank-1].state
-
-            modules_state = self.comm.gather( state, root=0 )
-
-            if self.rank == 0:
-                for i in range(self.size-1):
-                    self.modules[i].state = modules_state[i+1]
 
         # Running under Python multiprocessing
         #-------------------------------------
@@ -253,32 +239,25 @@ class Network:
             # Parallel run all modules in Python multiprocessing
             processes = list()
 
-            # TODO: verify limit of memory by the master process 
-            modules_new_state = Queue() # for sharing data with master process if used
-
             count_states = 0
             for mod in self.modules:
                 self.log.info('Launching Module {}'.format(mod))
-                if mod.state: # if not None, pass arguments for user: run(self,*args)
-                    p = Process( target=mod.run,
-                            args=( self.modules.index(mod), modules_new_state ) )
-                    count_states += 1
-                else: # if None, pass no arguments for user: run(self)
-                    p = Process( target=mod.run )
+                p = Process( target=mod.run_and_save )
                 processes.append(p)
                 p.start()
-
-            for i in range(count_states):
-                (mod_idx, new_state) = modules_new_state.get()
-                self.modules[mod_idx].state = new_state
-                self.log.info('Module {} getting new state'.format(
-                    self.modules[mod_idx]))
 
             # Synchronize at the end
             for p in processes:
                 p.join()
 
-        return
+        # Reload saved modules
+        for mod in self.modules:
+            self.modules = list()
+            for file_name in os.listdir(".ctx-saved"):
+                if file_name.endswith(".pkl"):
+                    file_name = os.path.join(".ctx-saved", file_name)
+                    with open(file_name, "rb") as f:
+                        self.modules.append(pickle.load(f))
 
     def draw(self, graph_attr=None, node_attr=None, engine=None):
 
