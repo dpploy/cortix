@@ -35,7 +35,7 @@ class DataPlot(Module):
 
         self.data = dict()
 
-        self.state = self.data
+        self.state = None
 
     def run(self, *args):
         '''
@@ -53,15 +53,6 @@ class DataPlot(Module):
             t.join()
 
         self.plot_data()
-
-        # Share state with parent process
-        if not self.use_mpi:
-            try:
-                pickle.dumps(self.state)
-            except pickle.PicklingError:
-                args[1].put((args[0],None))
-            else:
-                args[1].put((args[0],self.state))
 
         return
 

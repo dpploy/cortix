@@ -128,7 +128,7 @@ class Parole(Module):
             time = self.__step( time )
 
         # Share state with parent process
-        if not self.use_mpi:
+        if self.use_multiprocessing:
             try:
                 pickle.dumps(self.state)
             except pickle.PicklingError:

@@ -170,7 +170,7 @@ class Droplet(Module):
         self.send('DONE', 'visualization') # this should not be needed: TODO
 
         # Share state with parent process
-        if not self.use_mpi:
+        if self.use_multiprocessing:
             try:
                 pickle.dumps(self.state)
             except pickle.PicklingError:
