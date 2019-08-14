@@ -84,7 +84,18 @@ class Network:
         '''Connect two modules using either their ports directly or inferred ports.
 
         A connection always opens a channel for data communication in both ways.
-        That is both sends and receives are allowed.
+        That is, both sends and receives are allowed.
+
+        Note
+        ----
+        The simplest form of usage is with arguments: (`module_a`, `module_b`).
+        In this case, a `port` with the name of `module_a` **must** exist in `module_b`,
+        and vice-versa (port names as `str` in lower case). In addition, the connect
+        must not be called again with these same two modules, else the underlying
+        connection will be overriden.
+
+        For more rigorous connection, the user is advised to fully specify the
+        module and the port in each list argument.
 
         Parameters
         ----------
