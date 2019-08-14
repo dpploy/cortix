@@ -76,7 +76,7 @@ class Vortex(Module):
 
         self.state = None
 
-    def run(self):
+    def run(self, *args):
 
         # namedtuple does not pickle into send message; investigate later: vfda TODO
         #Props = namedtuple('Props',['mass_density','dyn_viscosity'])

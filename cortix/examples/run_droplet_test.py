@@ -48,8 +48,8 @@ command line as
 
 import scipy.constants as const
 
-from cortix.src.module import Module
 from cortix.src.cortix_main import Cortix
+from cortix.src.network import Network
 
 from cortix.examples.dataplot import DataPlot
 from cortix.examples.droplet import Droplet
@@ -58,7 +58,7 @@ from cortix.examples.vortex import Vortex
 if __name__ == '__main__':
 
     # Configuration Parameters
-    use_single_plot = True  # True for a single plot output
+    use_single_plot = True   # True for a single plot output
                             # False for multiple plot files and network
     use_mpi         = False # True for MPI; False for Python multiprocessing
 
@@ -69,13 +69,15 @@ if __name__ == '__main__':
     time_step  = 0.2
 
     cortix = Cortix(use_mpi=use_mpi, splash=True)
+    cortix_net = Network()
+    cortix.network = cortix_net
 
     # Network for a single plot case
     if use_single_plot:
 
         # Vortex module (single).
         vortex = Vortex()
-        cortix.add_module(vortex)
+        cortix_net.add_module(vortex)
         vortex.show_time = (True,1*const.minute)
         vortex.end_time = end_time
         vortex.time_step = time_step
@@ -84,7 +86,7 @@ if __name__ == '__main__':
 
         # DataPlot module (single).
         data_plot = DataPlot()
-        cortix.add_module(data_plot)
+        cortix_net.add_module(data_plot)
         data_plot.title = 'Droplet Trajectories'
         data_plot.same_axis = True
         data_plot.dpi = 300
@@ -93,22 +95,25 @@ if __name__ == '__main__':
 
             # Droplet modules (multiple).
             droplet = Droplet()
-            cortix.add_module(droplet)
+            cortix_net.add_module(droplet)
             droplet.end_time = end_time
             droplet.time_step = time_step
             droplet.bounce = False
             droplet.slip = False
 
             # Network port connectivity (connect modules through their ports)
-            droplet.connect('external-flow', vortex.get_port('fluid-flow:{}'.format(i)))
-            droplet.connect('visualization', data_plot.get_port('viz-data:{:05}'.format(i)))
+            cortix_net.connect( [droplet,'external-flow'],
+                                [vortex, vortex.get_port('fluid-flow:{}'.format(i))],
+                               'bidirectional')
+            cortix_net.connect( [droplet,'visualization'],
+                             [data_plot, data_plot.get_port('viz-data:{:05}'.format(i))] )
 
     # Network for a multiple plot case
     if not use_single_plot:
 
         # Vortex module (single).
         vortex = Vortex()
-        cortix.add_module(vortex)
+        cortix_net.add_module(vortex)
         vortex.show_time = (True,100)
         vortex.end_time = end_time
         vortex.time_step = time_step
@@ -119,7 +124,7 @@ if __name__ == '__main__':
 
             # Droplet modules (multiple).
             droplet = Droplet()
-            cortix.add_module(droplet)
+            cortix_net.add_module(droplet)
             droplet.end_time = end_time
             droplet.time_step = time_step
             droplet.bounce = False
@@ -127,15 +132,18 @@ if __name__ == '__main__':
 
             # DataPlot modules (multiple).
             data_plot = DataPlot()
-            cortix.add_module(data_plot)
+            cortix_net.add_module(data_plot)
             data_plot.title = 'Droplet Trajectory '+str(i)
             data_plot.dpi = 300
 
             # Network port connectivity (connect modules through their ports)
-            droplet.connect('external-flow', vortex.get_port('fluid-flow:{}'.format(i)))
-            droplet.connect('visualization', data_plot.get_port('viz-data:{:05}'.format(i)))
+            cortix_net.connect( [droplet,'external-flow'],
+                                [vortex, vortex.get_port('fluid-flow:{}'.format(i))],
+                               'bidirectional')
+            cortix_net.connect( [droplet,'visualization'],
+                             [data_plot, data_plot.get_port('viz-data:{:05}'.format(i))] )
 
-    cortix.draw_network('network.png')
+    cortix_net.draw()
 
     cortix.run()
 

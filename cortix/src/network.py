@@ -259,11 +259,11 @@ class Network:
             count_states = 0
             for mod in self.modules:
                 self.log.info('Launching Module {}'.format(mod))
-                if mod.state: # if not None pass arguments for user: run(self,*args)
+                if mod.state: # if not None, pass arguments for user: run(self,*args)
                     p = Process( target=mod.run,
                             args=( self.modules.index(mod), modules_new_state ) )
                     count_states += 1
-                else: # if None pass no arguments for user: run(self)
+                else: # if None, pass no arguments for user: run(self)
                     p = Process( target=mod.run )
                 processes.append(p)
                 p.start()
