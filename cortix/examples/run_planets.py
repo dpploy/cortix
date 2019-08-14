@@ -26,7 +26,7 @@ def main():
 
     for mod in cortix.modules:
         print(mod.ports)
-    #cortix.run()
+    # cortix.run()
 
 if __name__ == "__main__":
     main()
