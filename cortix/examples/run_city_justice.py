@@ -28,7 +28,7 @@ then issue the MPI run command as follows (replace `nprocs` with a number):
 To run this case with the Python multiprocessing library, just run this file at the
 command line as
 
-    `run_justice.py`
+    `run_city_justice.py`
 
 '''
 
@@ -158,6 +158,10 @@ def main():
             total_num_params += inspect_module_data(m,quant_name)
             plt.grid()
             plt.savefig(m.name+'.png', dpi=300)
+            if m.name=='Community':
+                inspect_module_data(m,'f0g_free')
+                plt.grid()
+                plt.savefig(m.name+'-free.png', dpi=300)
 
         # Total number of unknowns and parameters
 

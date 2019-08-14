@@ -28,17 +28,18 @@ class Community(Module):
     '''
 
     def __init__(self, n_groups=1, non_offender_adult_population=100, 
-                 offender_pool_size=0.0):
+                 offender_pool_size=0.0, free_offender_pool_size=0.0):
         '''
         Parameters
         ----------
         n_groups: int
             Number of groups in the population.
         non_offender_adult_population: float
-            Pool of individuals reaching the adult age (SI) unit. Default: 10 per day.
+            Pool of individuals reaching the adult age (SI) unit. Default: 100.
         offender_pool_size: float
             Upperbound on the range of the existing population groups. A random value
-            from 0 to the upperbound value will be assigned to each group.
+            from 0 to the upperbound value will be assigned to each group. This is
+            typically a small number, say a fraction of a percent.
 
         '''
 
@@ -59,11 +60,17 @@ class Community(Module):
         # Population groups
         self.n_groups = n_groups
 
-        # Community population groups
+        # Community offender population groups removed from circulation
         f0g_0 = np.random.random(self.n_groups) * offender_pool_size
         f0g = Quantity(name='f0g', formalName='offender-pop-grps',
                 unit='individual', value=f0g_0)
         quantities.append(f0g)
+
+        # Community free-offender population groups in freedom
+        f0g_free_0 = np.random.random(self.n_groups) * free_offender_pool_size
+        f0g_free = Quantity(name='f0g_free', formalName='free-offender-pop-grps',
+                unit='individual', value=f0g_free_0)
+        quantities.append(f0g_free)
 
         # Model parameters: commitment coefficients and their modifiers
 
@@ -220,13 +227,15 @@ class Community(Module):
                        arrested_inflow_rates + jail_inflow_rates +\
                        adjudication_inflow_rates + probation_inflow_rates
 
+        params['total-inflow-rates'] = inflow_rates
+
         assert np.all(inflow_rates>=0.0), 'values: %r'%inflow_rates
 
-        c0rg = self.ode_params['commit-to-arrested-coeff-grps']
-        m0rg = self.ode_params['commit-to-arrested-coeff-mod-grps']
+        c0rg = params['commit-to-arrested-coeff-grps']
+        m0rg = params['commit-to-arrested-coeff-mod-grps']
 
-        c00g = self.ode_params['general-commit-to-arrested-coeff-grps']
-        m00g = self.ode_params['general-commit-to-arrested-coeff-mod-grps']
+        c00g = params['general-commit-to-arrested-coeff-grps']
+        m00g = params['general-commit-to-arrested-coeff-mod-grps']
 
         non_offender_adult_population = params['non-offender-adult-population']
 
@@ -266,11 +275,11 @@ class Community(Module):
         u_vec_0 = self.population_phase.GetValue('f0g', time)
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
-        (u_vec_hist, info_dict) = odeint(self.__rhs_fn,
-                                         u_vec_0, t_interval_sec,
-                                         args=( self.ode_params, ),
-                                         rtol=1e-4, atol=1e-8, mxstep=200,
-                                         full_output=True)
+        (u_vec_hist, info_dict) = odeint( self.__rhs_fn,
+                                          u_vec_0, t_interval_sec,
+                                          args=( self.ode_params, ),
+                                          rtol=1e-4, atol=1e-8, mxstep=200,
+                                          full_output=True )
 
         assert info_dict['message'] =='Integration successful.', info_dict['message']
 
@@ -283,6 +292,12 @@ class Community(Module):
 
         # Update current values
         self.population_phase.SetValue('f0g', u_vec, time)
+
+        # Update the population of free offenders returning to community
+        inflow_rates = self.ode_params['total-inflow-rates']
+        f0g_free = inflow_rates * self.time_step
+
+        self.population_phase.SetValue('f0g_free',f0g_free,time)
 
         return time
 

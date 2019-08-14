@@ -15,7 +15,7 @@ from cortix.support.quantity import Quantity
 
 class State(Module):
     '''
-    State Cortix module used to model criminal group population transit from and to
+    State Cortix module used to model non-offender  group population transit from and to
     a state. This assumes various ports of communication with other states,
     and an internal port to the internal Community.
 
@@ -29,18 +29,12 @@ class State(Module):
 
     '''
 
-    def __init__(self, name, n_groups=1, maturity_rate=10.0/const.day, 
-            offender_pool_size=0.0):
+    def __init__(self, name, non_offender_adult_population=100):
         '''
         Parameters
         ----------
-        n_groups: int
-            Number of groups in the population.
-        maturity_rate: float
+        non_offender_adult_population: float
             Rate of individuals reaching the adult age (SI) unit. Default: 10 per day.
-        offender_pool_size: float
-            Upperbound on the range of the existing population groups. A random value
-            from 0 to the upperbound value will be assigned to each group.
 
         '''
 
@@ -48,7 +42,7 @@ class State(Module):
 
         self.name = name
 
-        self.port_names_expected = ['A','B','community']
+        self.port_names_expected = ['a','b','community']
 
         quantities      = list()
         self.ode_params = dict()
