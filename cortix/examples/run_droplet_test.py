@@ -58,7 +58,7 @@ from cortix.examples.vortex import Vortex
 if __name__ == '__main__':
 
     # Configuration Parameters
-    use_single_plot = False  # True for a single plot output
+    use_single_plot = True   # True for a single plot output
                             # False for multiple plot files and network
     use_mpi         = False # True for MPI; False for Python multiprocessing
 
