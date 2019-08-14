@@ -28,8 +28,6 @@ class Parole(Module):
 
         super().__init__()
 
-        self.name = 'parole'
-
         self.port_names_expected = ['prison','community']
 
         quantities      = list()
@@ -130,7 +128,7 @@ class Parole(Module):
             time = self.__step( time )
 
         # Share state with parent process
-        if not self.use_mpi:
+        if self.use_multiprocessing:
             try:
                 pickle.dumps(self.state)
             except pickle.PicklingError:
@@ -204,25 +202,25 @@ class Parole(Module):
 
     def __compute_outflow_rates(self, time, name):
 
-        feg = self.population_phase.GetValue('feg',time)
+      feg = self.population_phase.GetValue('feg',time)
 
-        if name == 'prison':
+      assert np.all(feg>=0.0), 'values: %r'%feg
 
-            cepg = self.ode_params['commit-to-prison-coeff-grps']
-            mepg = self.ode_params['commit-to-prison-coeff-mod-grps']
+      if name == 'prison':
 
-            outflow_rates = cepg * mepg * feg
+          cepg = self.ode_params['commit-to-prison-coeff-grps']
+          mepg = self.ode_params['commit-to-prison-coeff-mod-grps']
 
-            return outflow_rates
+          outflow_rates = cepg * mepg * feg
 
-        if name == 'community':
+      if name == 'community':
 
-            ce0g = self.ode_params['commit-to-community-coeff-grps']
-            me0g = self.ode_params['commit-to-community-coeff-mod-grps']
+          ce0g = self.ode_params['commit-to-community-coeff-grps']
+          me0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
-            outflow_rates = ce0g * me0g * feg
+          outflow_rates = ce0g * me0g * feg
 
-            return outflow_rates
+      return outflow_rates
 
     def __zero_ode_parameters(self):
         '''

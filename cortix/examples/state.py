@@ -13,40 +13,36 @@ from cortix.src.module import Module
 from cortix.support.phase import Phase
 from cortix.support.quantity import Quantity
 
-class Community(Module):
+class State(Module):
     '''
-    Community Cortix module used to model criminal group population in a community system.
-    Community here is the system at large with all possible adult individuals included
-    in a society.
+    State Cortix module used to model non-offender  group population transit from and to
+    a state. This assumes various ports of communication with other states,
+    and an internal port to the internal Community.
 
     Notes
     -----
     These are the `port` names available in this module to connect to respective
-    modules: `probation`, `adjudication`, `jail`, `prison`, `arrested`, and `parole`.
+    modules: `a`, `b`.
+    In addition this module takes an internal network to model the community of
+    people. The port used for this connection is `community`.
     See instance attribute `port_names_expected`.
 
     '''
 
-    def __init__(self, n_groups=1, non_offender_adult_population=100, 
-                 offender_pool_size=0.0, free_offender_pool_size=0.0):
+    def __init__(self, name, non_offender_adult_population=100):
         '''
         Parameters
         ----------
-        n_groups: int
-            Number of groups in the population.
         non_offender_adult_population: float
-            Pool of individuals reaching the adult age (SI) unit. Default: 100.
-        offender_pool_size: float
-            Upperbound on the range of the existing population groups. A random value
-            from 0 to the upperbound value will be assigned to each group. This is
-            typically a small number, say a fraction of a percent.
+            Rate of individuals reaching the adult age (SI) unit. Default: 10 per day.
 
         '''
 
         super().__init__()
 
-        self.port_names_expected = ['probation','adjudication','jail','prison',
-                                    'arrested', 'parole']
+        self.name = name
+
+        self.port_names_expected = ['a','b','community']
 
         quantities      = list()
         self.ode_params = dict()
@@ -60,53 +56,35 @@ class Community(Module):
         # Population groups
         self.n_groups = n_groups
 
-        # Community offender population groups removed from circulation
-        f0g_0 = np.random.random(self.n_groups) * offender_pool_size
-        f0g = Quantity(name='f0g', formalName='offender-pop-grps',
-                unit='individual', value=f0g_0)
-        quantities.append(f0g)
-
-        # Community free-offender population groups in freedom
-        f0g_free_0 = np.random.random(self.n_groups) * free_offender_pool_size
-        f0g_free = Quantity(name='f0g_free', formalName='free-offender-pop-grps',
-                unit='individual', value=f0g_free_0)
-        quantities.append(f0g_free)
+        # State population groups
+        fsg_0 = np.random.random(self.n_groups) * offender_pool_size
+        fsg = Quantity(name='fsg', formalName='offender-pop-grps',
+                unit='individual', value=fsg_0)
+        quantities.append(fsg)
 
         # Model parameters: commitment coefficients and their modifiers
 
-        # Community non-offerders to offenders 
-        c00g_0 = np.random.random(self.n_groups) / (5*const.year)
-        c00g = Quantity(name='c00g', formalName='commit-arrested-coeff-grps',
-               unit='individual', value=c00g_0)
-        self.ode_params['general-commit-to-arrested-coeff-grps'] = c00g_0
-        quantities.append(c00g)
+        # Community offenders to outside the state
 
-        m00g_0 = np.random.random(self.n_groups)
-        m00g = Quantity(name='m00g', formalName='commit-arrested-coeff-mod-grps',
-               unit='individual', value=m00g_0)
-        self.ode_params['general-commit-to-arrested-coeff-mod-grps'] = m00g_0
-        quantities.append(m00g)
+        outflow_coeff_rates = dict()
+        for p in self.ports:
 
-        # Community offenders to arrested (recidivism)
-        c0rg_0 = np.random.random(self.n_groups) / (180*const.day)
-        c0rg = Quantity(name='c0rg', formalName='commit-arrested-coeff-grps',
-               unit='individual', value=c0rg_0)
-        self.ode_params['commit-to-arrested-coeff-grps'] = c0rg_0
-        quantities.append(c0rg)
+            c0g_0 = np.random.random(self.n_groups) / const.day
+            m0g_0 = np.random.random(self.n_groups)
 
-        m0rg_0 = np.random.random(self.n_groups)
+            outflow_coeff_rates[p.name] = (c0g_0
+
+
         m0rg = Quantity(name='m0rg', formalName='commit-arrested-coeff-mod-grps',
                unit='individual', value=m0rg_0)
         self.ode_params['commit-to-arrested-coeff-mod-grps'] = m0rg_0
         quantities.append(m0rg)
 
-        # Non-offender adult population
-        self.ode_params['non-offender-adult-population'] = np.ones(self.n_groups) * \
-                non_offender_adult_population
-
         # Death term
-        self.ode_params['death-rates-coeff'] = 1.0 * np.random.random(self.n_groups) / \
-                             const.year
+        self.ode_params['death-rates'] = np.zeros(self.n_groups)
+
+        # Maturity source rate term
+        self.ode_params['maturity-rate'] = np.ones(self.n_groups) * maturity_rate
 
         # Phase state
         self.population_phase = Phase(self.initial_time, time_unit='s',
@@ -204,7 +182,7 @@ class Community(Module):
             time = self.__step( time )
 
         # Share state with parent process
-        if self.use_multiprocessing:
+        if self.use_processing:
             try:
                 pickle.dumps(self.state)
             except pickle.PicklingError:
@@ -214,7 +192,7 @@ class Community(Module):
 
     def __rhs_fn(self, u_vec, t, params):
 
-        f0g = u_vec  # offender population groups (removed from community)
+        f0g = u_vec  # offender population groups
 
         prison_inflow_rates       = params['prison-inflow-rates']
         parole_inflow_rates       = params['parole-inflow-rates']
@@ -227,29 +205,19 @@ class Community(Module):
                        arrested_inflow_rates + jail_inflow_rates +\
                        adjudication_inflow_rates + probation_inflow_rates
 
-        params['total-inflow-rates'] = inflow_rates
+        c0rg = self.ode_params['commit-to-arrested-coeff-grps']
+        m0rg = self.ode_params['commit-to-arrested-coeff-mod-grps']
 
-        assert np.all(inflow_rates>=0.0), 'values: %r'%inflow_rates
+        c00g = self.ode_params['general-commit-to-arrested-coeff-grps']
+        m00g = self.ode_params['general-commit-to-arrested-coeff-mod-grps']
 
-        c0rg = params['commit-to-arrested-coeff-grps']
-        m0rg = params['commit-to-arrested-coeff-mod-grps']
+        maturity_rate = params['maturity-rate']
 
-        c00g = params['general-commit-to-arrested-coeff-grps']
-        m00g = params['general-commit-to-arrested-coeff-mod-grps']
+        outflow_rates = c0rg * m0rg * f0g + c00g * m00g * maturity_rate
 
-        non_offender_adult_population = params['non-offender-adult-population']
+        death_rates = params['death-rates']
 
-        # Recidivism + new offenders
-        outflow_rates = c0rg * m0rg * np.abs(f0g) + \
-                c00g * m00g * non_offender_adult_population
-
-        assert np.all(outflow_rates>=0.0), 'values: %r'%outflow_rates
-
-        death_rates = params['death-rates-coeff'] * np.abs(f0g)
-
-        assert np.all(death_rates>=0.0), 'values: %r'%death_rates
-
-        dt_f0g = inflow_rates - outflow_rates  - death_rates
+        dt_f0g = inflow_rates - outflow_rates - death_rates
 
         return dt_f0g
 
@@ -275,11 +243,11 @@ class Community(Module):
         u_vec_0 = self.population_phase.GetValue('f0g', time)
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
-        (u_vec_hist, info_dict) = odeint( self.__rhs_fn,
-                                          u_vec_0, t_interval_sec,
-                                          args=( self.ode_params, ),
-                                          rtol=1e-4, atol=1e-8, mxstep=200,
-                                          full_output=True )
+        (u_vec_hist, info_dict) = odeint(self.__rhs_fn,
+                                         u_vec_0, t_interval_sec,
+                                         args=( self.ode_params, ),
+                                         rtol=1e-4, atol=1e-8, mxstep=200,
+                                         full_output=True)
 
         assert info_dict['message'] =='Integration successful.', info_dict['message']
 
@@ -292,12 +260,6 @@ class Community(Module):
 
         # Update current values
         self.population_phase.SetValue('f0g', u_vec, time)
-
-        # Update the population of free offenders returning to community
-        inflow_rates = self.ode_params['total-inflow-rates']
-        f0g_free = inflow_rates * self.time_step
-
-        self.population_phase.SetValue('f0g_free',f0g_free,time)
 
         return time
 
@@ -313,12 +275,11 @@ class Community(Module):
             c00g = self.ode_params['general-commit-to-arrested-coeff-grps']
             m00g = self.ode_params['general-commit-to-arrested-coeff-mod-grps']
 
-            f0 = self.ode_params['non-offender-adult-population']
+            f0 = self.ode_params['maturity-rate']
 
-            # Recidivism
-            outflow_rates = c0rg * m0rg * np.abs(f0g) + c00g * m00g * f0
+            outflow_rates = c0rg * m0rg * f0g + c00g * m00g * f0
 
-        return outflow_rates
+            return outflow_rates
 
     def __zero_ode_parameters(self):
         '''

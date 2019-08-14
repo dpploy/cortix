@@ -39,8 +39,6 @@ class Adjudication(Module):
 
         super().__init__()
 
-        self.name = 'adjudication'
-
         self.port_names_expected = ['probation','jail','arrested','prison','community']
 
         quantities      = list()
@@ -185,7 +183,7 @@ class Adjudication(Module):
             time = self.__step( time )
 
         # Share state with parent process
-        if not self.use_mpi:
+        if self.use_multiprocessing:
             try:
                 pickle.dumps(self.state)
             except pickle.PicklingError:
@@ -202,9 +200,13 @@ class Adjudication(Module):
 
         fag = u_vec  # adjudication population groups
 
+        assert np.all(fag>=0.0), 'values: %r'%fag
+
         arrested_inflow_rates = params['arrested-inflow-rates']
 
-        inflow_rates  = arrested_inflow_rates
+        inflow_rates = arrested_inflow_rates
+
+        assert np.all(inflow_rates>=0.0), 'values: %r'%inflow_rates
 
         ca0g = self.ode_params['commit-to-community-coeff-grps']
         ma0g = self.ode_params['commit-to-community-coeff-mod-grps']
@@ -220,7 +222,11 @@ class Adjudication(Module):
 
         outflow_rates = ( ca0g * ma0g + cajg * majg + cabg * mabg + capg * mapg ) * fag
 
+        assert np.all(outflow_rates>=0.0), 'values: %r'%outflow_rates
+
         death_rates = params['death-rates']
+
+        assert np.all(death_rates>=0.0), 'values: %r'%death_rates
 
         dt_fag = inflow_rates - outflow_rates - death_rates
 
@@ -272,14 +278,14 @@ class Adjudication(Module):
 
         fag = self.population_phase.GetValue('fag',time)
 
+        assert np.all(fag>=0.0), 'values: %r'%fag
+
         if name == 'prison':
 
             capg = self.ode_params['commit-to-prison-coeff-grps']
             mapg = self.ode_params['commit-to-prison-coeff-mod-grps']
 
             outflow_rates = capg * mapg * fag
-
-            return outflow_rates
 
         if name == 'probation':
 
@@ -288,16 +294,12 @@ class Adjudication(Module):
 
             outflow_rates = cabg * mabg * fag
 
-            return outflow_rates
-
         if name == 'jail':
 
             cajg = self.ode_params['commit-to-jail-coeff-grps']
             majg = self.ode_params['commit-to-jail-coeff-mod-grps']
 
             outflow_rates = cajg * majg * fag
-
-            return outflow_rates
 
         if name == 'community':
 
@@ -306,7 +308,7 @@ class Adjudication(Module):
 
             outflow_rates = ca0g * ma0g * fag
 
-            return outflow_rates
+        return outflow_rates
 
     def __zero_ode_parameters(self):
         '''
