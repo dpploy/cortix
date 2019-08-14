@@ -3,7 +3,7 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 
-from multiprocessing import Queue
+from multiprocessing import Pipe
 
 class Port:
     '''Provides a method of communication between modules.
@@ -43,7 +43,7 @@ class Port:
             self.comm = MPI.COMM_WORLD
             self.rank = None
         else:
-            self.q = None
+            self.pipe = None
 
         self.connected_port = None
 
@@ -67,7 +67,7 @@ class Port:
         port.use_mpi = self.use_mpi
 
         if not port.use_mpi:
-            self.q = port.q = Queue()
+            (self.pipe, port.pipe) = Pipe()
 
     def send(self, data, tag=None):
         '''Send data to the connected port.
@@ -91,7 +91,7 @@ class Port:
                 # This is an MPI blocking send
                 self.comm.send(data, dest=self.connected_port.rank, tag=tag)
             else:
-                self.q.put(data)
+                self.pipe.send(data)
 
     def recv(self):
         '''Receive data from the connected port.
@@ -111,7 +111,7 @@ class Port:
                 return self.comm.recv(source=self.connected_port.rank,
                         tag=self.connected_port.id)
             else:
-                return self.connected_port.q.get()
+                return self.pipe.recv()
 
     def __eq__(self, other):
         '''Check for port equality'''
