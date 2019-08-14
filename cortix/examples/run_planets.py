@@ -8,29 +8,25 @@ def main():
     um = False
     num_bodies = 10
 
-    for loop in range(int(10e6)):
-        print("STARTING {}".format(loop))
-        cortix = Cortix(use_mpi=um)
-        for i in range(num_bodies):
-            cortix.add_module(Body())
+    cortix = Cortix(use_mpi=um)
+    for i in range(num_bodies):
+        cortix.add_module(Body())
 
-        for x, i in enumerate(cortix.modules):
-            for y, j in enumerate(cortix.modules):
-                if x != y:
-                    pi = Port("body_{}".format(y), um)
-                    i.ports.append(pi)
+    for x, i in enumerate(cortix.modules):
+        for y, j in enumerate(cortix.modules):
+            pi = Port("body_{}".format(y), um)
 
-                    pj = Port("body_{}".format(x), um)
-                    j.ports.append(pj)
+            if x != y and pi not in i.ports:
+                i.ports.append(pi)
 
-                    pj.connect(pi)
+                pj = Port("body_{}".format(x), um)
+                j.ports.append(pj)
 
-        cortix.run()
-        for mod in cortix.modules:
-            for port in mod.ports:
-                port.q.close()
+                pj.connect(pi)
 
-        del cortix
+    for mod in cortix.modules:
+        print(mod.ports)
+    #cortix.run()
 
 if __name__ == "__main__":
     main()
