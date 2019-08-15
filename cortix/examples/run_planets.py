@@ -29,7 +29,6 @@ def main():
                 pj.connect(pi)
 
     cortix.run()
-    print(cortix.network.modules)
 
 if __name__ == "__main__":
     main()
