@@ -38,19 +38,13 @@
 <span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="k">import</span> <span class="n">Queue</span>
 
 <div class="viewcode-block" id="Port"><a class="viewcode-back" href="../src_rst/port.html#port.Port">[docs]</a><span class="k">class</span> <span class="nc">Port</span><span class="p">:</span>
-    <span class="sd">&#39;&#39;&#39;Provides a method of communication between modules</span>
+    <span class="sd">&#39;&#39;&#39;Provides a method of communication between modules.</span>
 
 <span class="sd">    The Port class provides an interface for creating ports and connecting them to</span>
 <span class="sd">    other ports for the purpose of data transfer. Data exchange takes place by</span>
 <span class="sd">    send and/or receive calls on a given port. The concept of a port is that of a data</span>
 <span class="sd">    transfer &quot;interaction.&quot; This can be one- or two-way with sends and receives.</span>
 <span class="sd">    A port is connected to only one other port; as two ends of a pipe are connected.</span>
-
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">        id: int</span>
-<span class="sd">        name: string</span>
-<span class="sd">        use_mpi: bool</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -63,6 +57,12 @@
 <span class="sd">          The name of the Port object</span>
 <span class="sd">        use_mpi: bool</span>
 <span class="sd">          True for MPI, False for Multiprocessing</span>
+
+<span class="sd">        Attributes</span>
+<span class="sd">        ----------</span>
+<span class="sd">            id: int</span>
+<span class="sd">            name: string</span>
+<span class="sd">            use_mpi: bool</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
 

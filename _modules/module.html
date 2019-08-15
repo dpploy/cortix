@@ -36,6 +36,7 @@
 <span class="c1"># https://cortix.org</span>
 
 <span class="kn">from</span> <span class="nn">cortix.src.port</span> <span class="k">import</span> <span class="n">Port</span>
+<span class="c1">#from cortix.src.network import Network</span>
 
 <div class="viewcode-block" id="Module"><a class="viewcode-back" href="../src_rst/module.html#module.Module">[docs]</a><span class="k">class</span> <span class="nc">Module</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39;Cortix module super class.</span>
@@ -48,26 +49,7 @@
 <span class="sd">    ----</span>
 <span class="sd">    This class is to be inherited by every Cortix module.</span>
 <span class="sd">    In order to execute, modules *must* override the `run` method, which will be</span>
-<span class="sd">    executed during the simulation</span>
-
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    name: str</span>
-<span class="sd">        A name given to the instance. Default is `None`.</span>
-<span class="sd">    port_names_expected: list(str), None</span>
-<span class="sd">        A list of names of ports expected in the module. This will be compared</span>
-<span class="sd">        to port names during runtime to check against the intended use of the</span>
-<span class="sd">        module.</span>
-<span class="sd">    state: any</span>
-<span class="sd">        Any `pickle-able` data structure to be passed in a `multiprocessing.Queue`</span>
-<span class="sd">        to the parent process or to be gathered in the root MPI process.</span>
-<span class="sd">        Default is `None`.</span>
-<span class="sd">    use_mpi: bool</span>
-<span class="sd">        `True` for MPI, `False` for Multiprocessing</span>
-<span class="sd">    use_multiprocessing: bool</span>
-<span class="sd">        `False` for MPI, `True` for Multiprocessing</span>
-<span class="sd">    ports: list(Port)</span>
-<span class="sd">        A list of ports contained by the module</span>
+<span class="sd">    executed during the simulation.</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -76,16 +58,41 @@
 
 <span class="sd">        Note</span>
 <span class="sd">        ----</span>
-<span class="sd">        This must be called in the constructor of every Cortix module like so:</span>
+<span class="sd">        This constructor must be called explicitly in the constructor of every</span>
+<span class="sd">        Cortix module like so:</span>
 
 <span class="sd">            super().__init__()</span>
 
+<span class="sd">        Attributes</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name: str</span>
+<span class="sd">            A name given to the instance. Default is the derived class name.</span>
+<span class="sd">        port_names_expected: list(str), None</span>
+<span class="sd">            A list of names of ports expected in the module. This will be compared</span>
+<span class="sd">            to port names during runtime to check against the intended use of the</span>
+<span class="sd">            module.</span>
+<span class="sd">        state: any</span>
+<span class="sd">            Any `pickle-able` data structure to be passed in a `multiprocessing.Queue`</span>
+<span class="sd">            to the parent process or to be gathered in the root MPI process.</span>
+<span class="sd">            Default is `None`.</span>
+<span class="sd">        use_mpi: bool</span>
+<span class="sd">            `True` for MPI, `False` for Multiprocessing</span>
+<span class="sd">        use_multiprocessing: bool</span>
+<span class="sd">            `False` for MPI, `True` for Multiprocessing</span>
+<span class="sd">        ports: list(Port)</span>
+<span class="sd">            A list of ports contained by the module</span>
+<span class="sd">        __network: Network</span>
+<span class="sd">            An internal network inherited by the derived module for nested networks.</span>
+
 <span class="sd">       &#39;&#39;&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">port_names_expected</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ports</span> <span class="o">=</span> <span class="p">[]</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ports</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_network</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="Module.send"><a class="viewcode-back" href="../src_rst/module.html#module.Module.send">[docs]</a>    <span class="k">def</span> <span class="nf">send</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Send data through a given port.</span>
@@ -168,41 +175,15 @@
 
         <span class="k">return</span> <span class="n">port</span></div>
 
-<div class="viewcode-block" id="Module.connect"><a class="viewcode-back" href="../src_rst/module.html#module.Module.connect">[docs]</a>    <span class="k">def</span> <span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port_name_or_module</span><span class="p">,</span> <span class="n">to_other_port</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Connect two modules using either their ports directly or inferred ports.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        port_name_or_module: str, Module</span>
-<span class="sd">            Either a `port` name or a `Module` can be given. In the latter case</span>
-<span class="sd">            the `name` attribute of the module will be used to get the `port`</span>
-<span class="sd">            of the module passed. This port will be connected to the corresponding</span>
-<span class="sd">            port of the calling object.</span>
-<span class="sd">        to_other_port: Port</span>
-<span class="sd">            A `port` object to connect to. This must be `None` or absent if the</span>
-<span class="sd">            first argument is a `Module`.</span>
-
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="c1"># Infer from types what to do with the intended module</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">port_name_or_module</span><span class="p">,</span> <span class="n">Module</span><span class="p">):</span>
-            <span class="k">assert</span> <span class="n">to_other_port</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;Illegal syntax; only one argument needed.&#39;</span>
-            <span class="n">other_module</span> <span class="o">=</span> <span class="n">port_name_or_module</span>
-            <span class="n">other_module_name</span> <span class="o">=</span> <span class="n">other_module</span><span class="o">.</span><span class="n">name</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">other_module</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
-                <span class="n">other_module_name</span> <span class="o">=</span> <span class="n">other_module</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-            <span class="n">my_port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_port</span><span class="p">(</span><span class="n">other_module_name</span><span class="p">)</span>
-            <span class="n">my_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">my_name</span><span class="p">:</span>
-                <span class="n">my_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-            <span class="n">other_port</span> <span class="o">=</span> <span class="n">other_module</span><span class="o">.</span><span class="n">get_port</span><span class="p">(</span><span class="n">my_name</span><span class="p">)</span>
-            <span class="n">my_port</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">other_port</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">port_name_or_module</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">to_other_port</span><span class="p">,</span> <span class="n">Port</span><span class="p">),</span> <span class="s1">&#39;Other port must be of Port type&#39;</span>
-            <span class="n">port_name</span> <span class="o">=</span> <span class="n">port_name_or_module</span>
-            <span class="n">my_port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_port</span><span class="p">(</span><span class="n">port_name</span><span class="p">)</span>
-            <span class="n">my_port</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">to_other_port</span><span class="p">)</span></div>
+    <span class="k">def</span> <span class="nf">__set_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">Network</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">use_multiprocessing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_network</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="k">return</span>
+    <span class="k">def</span> <span class="nf">__get_network</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_network</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_network</span><span class="p">,</span> <span class="n">__set_network</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Module.run"><a class="viewcode-back" href="../src_rst/module.html#module.Module.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Module run function</span>

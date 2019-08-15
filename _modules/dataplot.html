@@ -86,15 +86,6 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">plot_data</span><span class="p">()</span>
 
-        <span class="c1"># Share state with parent process</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
-            <span class="k">except</span> <span class="n">pickle</span><span class="o">.</span><span class="n">PicklingError</span><span class="p">:</span>
-                <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="kc">None</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span>
-
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="DataPlot.recv_data"><a class="viewcode-back" href="../examples_rst/dataplot.html#dataplot.DataPlot.recv_data">[docs]</a>    <span class="k">def</span> <span class="nf">recv_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">port</span><span class="p">):</span>

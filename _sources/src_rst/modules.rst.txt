@@ -6,4 +6,5 @@ src
 
    cortix_main
    module
+   network
    port

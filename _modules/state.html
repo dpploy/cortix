@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>community &#8212; Cortix 0.1.0 documentation</title>
+    <title>state &#8212; Cortix 0.1.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -29,7 +29,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for community</h1><div class="highlight"><pre>
+  <h1>Source code for state</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># This file is part of the Cortix toolkit environment.</span>
@@ -41,44 +41,41 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.constants</span> <span class="k">as</span> <span class="nn">const</span>
 <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="k">import</span> <span class="n">odeint</span>
+
 <span class="kn">from</span> <span class="nn">cortix.src.module</span> <span class="k">import</span> <span class="n">Module</span>
 <span class="kn">from</span> <span class="nn">cortix.support.phase</span> <span class="k">import</span> <span class="n">Phase</span>
 <span class="kn">from</span> <span class="nn">cortix.support.quantity</span> <span class="k">import</span> <span class="n">Quantity</span>
 
-<div class="viewcode-block" id="Community"><a class="viewcode-back" href="../examples_rst/community.html#community.Community">[docs]</a><span class="k">class</span> <span class="nc">Community</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
+<div class="viewcode-block" id="State"><a class="viewcode-back" href="../examples_rst/state.html#state.State">[docs]</a><span class="k">class</span> <span class="nc">State</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Community Cortix module used to model criminal group population in a community system.</span>
-<span class="sd">    Community here is the system at large with all possible adult individuals included</span>
-<span class="sd">    in a society.</span>
+<span class="sd">    State Cortix module used to model non-offender  group population transit from and to</span>
+<span class="sd">    a state. This assumes various ports of communication with other states,</span>
+<span class="sd">    and an internal port to the internal Community.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    These are the `port` names available in this module to connect to respective</span>
-<span class="sd">    modules: `probation`, `adjudication`, `jail`, `prison`, `arrested`, and `parole`.</span>
+<span class="sd">    These are the `port` names available in this module to connect to other `State`</span>
+<span class="sd">    modules: `inflow:id`, `outflow:id`.</span>
+<span class="sd">    In addition this module takes an internal network to model the free-offenders</span>
+<span class="sd">    community of people. The port used for this connection is `community`.</span>
 <span class="sd">    See instance attribute `port_names_expected`.</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
 
-<div class="viewcode-block" id="Community.__init__"><a class="viewcode-back" href="../examples_rst/community.html#community.Community.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_groups</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">non_offender_adult_population</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> 
-                 <span class="n">offender_pool_size</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">free_offender_pool_size</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+<div class="viewcode-block" id="State.__init__"><a class="viewcode-back" href="../examples_rst/state.html#state.State.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">non_offender_adult_population</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        n_groups: int</span>
-<span class="sd">            Number of groups in the population.</span>
 <span class="sd">        non_offender_adult_population: float</span>
-<span class="sd">            Pool of individuals reaching the adult age (SI) unit. Default: 100.</span>
-<span class="sd">        offender_pool_size: float</span>
-<span class="sd">            Upperbound on the range of the existing population groups. A random value</span>
-<span class="sd">            from 0 to the upperbound value will be assigned to each group. This is</span>
-<span class="sd">            typically a small number, say a fraction of a percent.</span>
+<span class="sd">            Individuals reaching the adult age (SI) unit. Default: 100.</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">port_names_expected</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;probation&#39;</span><span class="p">,</span><span class="s1">&#39;adjudication&#39;</span><span class="p">,</span><span class="s1">&#39;jail&#39;</span><span class="p">,</span><span class="s1">&#39;prison&#39;</span><span class="p">,</span>
-                                    <span class="s1">&#39;arrested&#39;</span><span class="p">,</span> <span class="s1">&#39;parole&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="c1">#self.port_names_expected = [&#39;inflow:&#39;,&#39;outflow:&#39;,&#39;community&#39;]</span>
 
         <span class="n">quantities</span>      <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
@@ -86,80 +83,60 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">initial_time</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">day</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span>     <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">day</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">time_step</span>    <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">day</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">show_time</span> <span class="o">=</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span><span class="mi">10</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show_time</span>    <span class="o">=</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span><span class="mi">10</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;cortix&#39;</span><span class="p">)</span>
 
-        <span class="c1"># Population groups</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span> <span class="o">=</span> <span class="n">n_groups</span>
-
-        <span class="c1"># Community offender population groups removed from circulation</span>
-        <span class="n">f0g_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span> <span class="o">*</span> <span class="n">offender_pool_size</span>
-        <span class="n">f0g</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;f0g&#39;</span><span class="p">,</span> <span class="n">formalName</span><span class="o">=</span><span class="s1">&#39;offender-pop-grps&#39;</span><span class="p">,</span>
-                <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;individual&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">f0g_0</span><span class="p">)</span>
-        <span class="n">quantities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f0g</span><span class="p">)</span>
-
-        <span class="c1"># Community free-offender population groups in freedom</span>
-        <span class="n">f0g_free_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span> <span class="o">*</span> <span class="n">free_offender_pool_size</span>
-        <span class="n">f0g_free</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;f0g_free&#39;</span><span class="p">,</span> <span class="n">formalName</span><span class="o">=</span><span class="s1">&#39;free-offender-pop-grps&#39;</span><span class="p">,</span>
-                <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;individual&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">f0g_free_0</span><span class="p">)</span>
-        <span class="n">quantities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f0g_free</span><span class="p">)</span>
+        <span class="c1"># State population</span>
+        <span class="n">fs_0</span> <span class="o">=</span> <span class="n">non_offender_adult_population</span>
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;fs&#39;</span><span class="p">,</span> <span class="n">formalName</span><span class="o">=</span><span class="s1">&#39;non-offender-pop&#39;</span><span class="p">,</span>
+                <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;individual&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">fs_0</span><span class="p">)</span>
+        <span class="n">quantities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fs</span><span class="p">)</span>
 
         <span class="c1"># Model parameters: commitment coefficients and their modifiers</span>
 
-        <span class="c1"># Community non-offerders to offenders </span>
-        <span class="n">c00g_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">5</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">year</span><span class="p">)</span>
-        <span class="n">c00g</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;c00g&#39;</span><span class="p">,</span> <span class="n">formalName</span><span class="o">=</span><span class="s1">&#39;commit-arrested-coeff-grps&#39;</span><span class="p">,</span>
-               <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;individual&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">c00g_0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;general-commit-to-arrested-coeff-grps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">c00g_0</span>
-        <span class="n">quantities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c00g</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
 
-        <span class="n">m00g_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span>
-        <span class="n">m00g</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;m00g&#39;</span><span class="p">,</span> <span class="n">formalName</span><span class="o">=</span><span class="s1">&#39;commit-arrested-coeff-mod-grps&#39;</span><span class="p">,</span>
-               <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;individual&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">m00g_0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;general-commit-to-arrested-coeff-mod-grps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">m00g_0</span>
-        <span class="n">quantities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m00g</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;outflow&#39;</span><span class="p">:</span>
 
-        <span class="c1"># Community offenders to arrested (recidivism)</span>
-        <span class="n">c0rg_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">180</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
-        <span class="n">c0rg</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;c0rg&#39;</span><span class="p">,</span> <span class="n">formalName</span><span class="o">=</span><span class="s1">&#39;commit-arrested-coeff-grps&#39;</span><span class="p">,</span>
-               <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;individual&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">c0rg_0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;commit-to-arrested-coeff-grps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">c0rg_0</span>
-        <span class="n">quantities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c0rg</span><span class="p">)</span>
+                <span class="c1"># Non-offenders move to outside the state</span>
+                <span class="n">cso_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">60</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+                <span class="n">cso</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;cso-&#39;</span><span class="o">+</span><span class="n">stri</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">formalName</span><span class="o">=</span><span class="s1">&#39;commit-out-coeff-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span>
+                       <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;individual&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">cso_0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;commit-out-coeff-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">cso_0</span>
+                <span class="n">quantities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">c0rg</span><span class="p">)</span>
 
-        <span class="n">m0rg_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span>
-        <span class="n">m0rg</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;m0rg&#39;</span><span class="p">,</span> <span class="n">formalName</span><span class="o">=</span><span class="s1">&#39;commit-arrested-coeff-mod-grps&#39;</span><span class="p">,</span>
-               <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;individual&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">m0rg_0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;commit-to-arrested-coeff-mod-grps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">m0rg_0</span>
-        <span class="n">quantities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m0rg</span><span class="p">)</span>
-
-        <span class="c1"># Non-offender adult population</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;non-offender-adult-population&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span> <span class="o">*</span> \
-                <span class="n">non_offender_adult_population</span>
+                <span class="n">mso</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;mso&#39;</span><span class="p">,</span> <span class="n">formalName</span><span class="o">=</span><span class="s1">&#39;commit-arrested-coeff-mod-grps&#39;</span><span class="p">,</span>
+                   <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;individual&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">m0rg_0</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;commit-to-arrested-coeff-mod-grps&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">m0rg_0</span>
+                <span class="n">quantities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m0rg</span><span class="p">)</span>
 
         <span class="c1"># Death term</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;death-rates-coeff&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span> <span class="o">/</span> \
-                             <span class="n">const</span><span class="o">.</span><span class="n">year</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;death-rates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Maturity source rate term</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;maturity-rate&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># Phase state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span> <span class="o">=</span> <span class="n">Phase</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_time</span><span class="p">,</span> <span class="n">time_unit</span><span class="o">=</span><span class="s1">&#39;s&#39;</span><span class="p">,</span>
                 <span class="n">quantities</span><span class="o">=</span><span class="n">quantities</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;f0g&#39;</span><span class="p">,</span> <span class="n">f0g_0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_time</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">,</span> <span class="n">fs_0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">initial_time</span><span class="p">)</span>
 
         <span class="c1"># Initialize inflows to zero</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;prison-inflow-rates&#39;</span><span class="p">]</span>       <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;parole-inflow-rates&#39;</span><span class="p">]</span>       <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;arrested-inflow-rates&#39;</span><span class="p">]</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;jail-inflow-rates&#39;</span><span class="p">]</span>         <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;adjudication-inflow-rates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;probation-inflow-rates&#39;</span><span class="p">]</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span>
+        <span class="c1">#self.ode_params[&#39;prison-inflow-rates&#39;]       = np.zeros(self.n_groups)</span>
+        <span class="c1">#self.ode_params[&#39;parole-inflow-rates&#39;]       = np.zeros(self.n_groups)</span>
+        <span class="c1">#self.ode_params[&#39;arrested-inflow-rates&#39;]     = np.zeros(self.n_groups)</span>
+        <span class="c1">#self.ode_params[&#39;jail-inflow-rates&#39;]         = np.zeros(self.n_groups)</span>
+        <span class="c1">#self.ode_params[&#39;adjudication-inflow-rates&#39;] = np.zeros(self.n_groups)</span>
+        <span class="c1">#self.ode_params[&#39;probation-inflow-rates&#39;]    = np.zeros(self.n_groups)</span>
 
         <span class="c1"># Set the state to the phase state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span>
 
         <span class="k">return</span></div>
 
-<div class="viewcode-block" id="Community.run"><a class="viewcode-back" href="../examples_rst/community.html#community.Community.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<div class="viewcode-block" id="State.run"><a class="viewcode-back" href="../examples_rst/state.html#state.State.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__zero_ode_parameters</span><span class="p">()</span>
 
@@ -236,7 +213,7 @@
             <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__step</span><span class="p">(</span> <span class="n">time</span> <span class="p">)</span>
 
         <span class="c1"># Share state with parent process</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_processing</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
             <span class="k">except</span> <span class="n">pickle</span><span class="o">.</span><span class="n">PicklingError</span><span class="p">:</span>
@@ -246,7 +223,7 @@
 
     <span class="k">def</span> <span class="nf">__rhs_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u_vec</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
 
-        <span class="n">f0g</span> <span class="o">=</span> <span class="n">u_vec</span>  <span class="c1"># offender population groups (removed from community)</span>
+        <span class="n">f0g</span> <span class="o">=</span> <span class="n">u_vec</span>  <span class="c1"># offender population groups</span>
 
         <span class="n">prison_inflow_rates</span>       <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;prison-inflow-rates&#39;</span><span class="p">]</span>
         <span class="n">parole_inflow_rates</span>       <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;parole-inflow-rates&#39;</span><span class="p">]</span>
@@ -259,29 +236,19 @@
                        <span class="n">arrested_inflow_rates</span> <span class="o">+</span> <span class="n">jail_inflow_rates</span> <span class="o">+</span>\
                        <span class="n">adjudication_inflow_rates</span> <span class="o">+</span> <span class="n">probation_inflow_rates</span>
 
-        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;total-inflow-rates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inflow_rates</span>
+        <span class="n">c0rg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;commit-to-arrested-coeff-grps&#39;</span><span class="p">]</span>
+        <span class="n">m0rg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;commit-to-arrested-coeff-mod-grps&#39;</span><span class="p">]</span>
 
-        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">inflow_rates</span><span class="o">&gt;=</span><span class="mf">0.0</span><span class="p">),</span> <span class="s1">&#39;values: </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">inflow_rates</span>
+        <span class="n">c00g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;general-commit-to-arrested-coeff-grps&#39;</span><span class="p">]</span>
+        <span class="n">m00g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;general-commit-to-arrested-coeff-mod-grps&#39;</span><span class="p">]</span>
 
-        <span class="n">c0rg</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;commit-to-arrested-coeff-grps&#39;</span><span class="p">]</span>
-        <span class="n">m0rg</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;commit-to-arrested-coeff-mod-grps&#39;</span><span class="p">]</span>
+        <span class="n">maturity_rate</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;maturity-rate&#39;</span><span class="p">]</span>
 
-        <span class="n">c00g</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;general-commit-to-arrested-coeff-grps&#39;</span><span class="p">]</span>
-        <span class="n">m00g</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;general-commit-to-arrested-coeff-mod-grps&#39;</span><span class="p">]</span>
+        <span class="n">outflow_rates</span> <span class="o">=</span> <span class="n">c0rg</span> <span class="o">*</span> <span class="n">m0rg</span> <span class="o">*</span> <span class="n">f0g</span> <span class="o">+</span> <span class="n">c00g</span> <span class="o">*</span> <span class="n">m00g</span> <span class="o">*</span> <span class="n">maturity_rate</span>
 
-        <span class="n">non_offender_adult_population</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;non-offender-adult-population&#39;</span><span class="p">]</span>
+        <span class="n">death_rates</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;death-rates&#39;</span><span class="p">]</span>
 
-        <span class="c1"># Recidivism + new offenders</span>
-        <span class="n">outflow_rates</span> <span class="o">=</span> <span class="n">c0rg</span> <span class="o">*</span> <span class="n">m0rg</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">f0g</span><span class="p">)</span> <span class="o">+</span> \
-                <span class="n">c00g</span> <span class="o">*</span> <span class="n">m00g</span> <span class="o">*</span> <span class="n">non_offender_adult_population</span>
-
-        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">outflow_rates</span><span class="o">&gt;=</span><span class="mf">0.0</span><span class="p">),</span> <span class="s1">&#39;values: </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">outflow_rates</span>
-
-        <span class="n">death_rates</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;death-rates-coeff&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">f0g</span><span class="p">)</span>
-
-        <span class="k">assert</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">death_rates</span><span class="o">&gt;=</span><span class="mf">0.0</span><span class="p">),</span> <span class="s1">&#39;values: </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">death_rates</span>
-
-        <span class="n">dt_f0g</span> <span class="o">=</span> <span class="n">inflow_rates</span> <span class="o">-</span> <span class="n">outflow_rates</span>  <span class="o">-</span> <span class="n">death_rates</span>
+        <span class="n">dt_f0g</span> <span class="o">=</span> <span class="n">inflow_rates</span> <span class="o">-</span> <span class="n">outflow_rates</span> <span class="o">-</span> <span class="n">death_rates</span>
 
         <span class="k">return</span> <span class="n">dt_f0g</span>
 
@@ -307,11 +274,11 @@
         <span class="n">u_vec_0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;f0g&#39;</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
         <span class="n">t_interval_sec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
-        <span class="p">(</span><span class="n">u_vec_hist</span><span class="p">,</span> <span class="n">info_dict</span><span class="p">)</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rhs_fn</span><span class="p">,</span>
-                                          <span class="n">u_vec_0</span><span class="p">,</span> <span class="n">t_interval_sec</span><span class="p">,</span>
-                                          <span class="n">args</span><span class="o">=</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">,</span> <span class="p">),</span>
-                                          <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">mxstep</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
-                                          <span class="n">full_output</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
+        <span class="p">(</span><span class="n">u_vec_hist</span><span class="p">,</span> <span class="n">info_dict</span><span class="p">)</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__rhs_fn</span><span class="p">,</span>
+                                         <span class="n">u_vec_0</span><span class="p">,</span> <span class="n">t_interval_sec</span><span class="p">,</span>
+                                         <span class="n">args</span><span class="o">=</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">,</span> <span class="p">),</span>
+                                         <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">mxstep</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+                                         <span class="n">full_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="k">assert</span> <span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;Integration successful.&#39;</span><span class="p">,</span> <span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span>
 
@@ -324,12 +291,6 @@
 
         <span class="c1"># Update current values</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;f0g&#39;</span><span class="p">,</span> <span class="n">u_vec</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
-
-        <span class="c1"># Update the population of free offenders returning to community</span>
-        <span class="n">inflow_rates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;total-inflow-rates&#39;</span><span class="p">]</span>
-        <span class="n">f0g_free</span> <span class="o">=</span> <span class="n">inflow_rates</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;f0g_free&#39;</span><span class="p">,</span><span class="n">f0g_free</span><span class="p">,</span><span class="n">time</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">time</span>
 
@@ -345,12 +306,11 @@
             <span class="n">c00g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;general-commit-to-arrested-coeff-grps&#39;</span><span class="p">]</span>
             <span class="n">m00g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;general-commit-to-arrested-coeff-mod-grps&#39;</span><span class="p">]</span>
 
-            <span class="n">f0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;non-offender-adult-population&#39;</span><span class="p">]</span>
+            <span class="n">f0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;maturity-rate&#39;</span><span class="p">]</span>
 
-            <span class="c1"># Recidivism</span>
-            <span class="n">outflow_rates</span> <span class="o">=</span> <span class="n">c0rg</span> <span class="o">*</span> <span class="n">m0rg</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">f0g</span><span class="p">)</span> <span class="o">+</span> <span class="n">c00g</span> <span class="o">*</span> <span class="n">m00g</span> <span class="o">*</span> <span class="n">f0</span>
+            <span class="n">outflow_rates</span> <span class="o">=</span> <span class="n">c0rg</span> <span class="o">*</span> <span class="n">m0rg</span> <span class="o">*</span> <span class="n">f0g</span> <span class="o">+</span> <span class="n">c00g</span> <span class="o">*</span> <span class="n">m00g</span> <span class="o">*</span> <span class="n">f0</span>
 
-        <span class="k">return</span> <span class="n">outflow_rates</span>
+            <span class="k">return</span> <span class="n">outflow_rates</span>
 
     <span class="k">def</span> <span class="nf">__zero_ode_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>

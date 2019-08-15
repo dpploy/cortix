@@ -6,6 +6,7 @@ examples
 
    adjudication
    arrested
+   body
    community
    dataplot
    droplet
@@ -15,7 +16,10 @@ examples
    plot_data
    prison
    probation
-   run_droplet_a
-   run_droplet_b
-   run_justice
+   run_city_justice
+   run_droplet_swirl
+   run_droplet_test
+   run_planets
+   run_region_justice
+   state
    vortex

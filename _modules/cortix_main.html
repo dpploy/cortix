@@ -39,11 +39,8 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">matplotlib.patches</span> <span class="k">as</span> <span class="nn">mpatches</span>
-<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="k">import</span> <span class="n">Process</span><span class="p">,</span> <span class="n">Queue</span>
-<span class="kn">from</span> <span class="nn">cortix.src.module</span> <span class="k">import</span> <span class="n">Module</span>
+
+<span class="kn">from</span> <span class="nn">cortix.src.network</span> <span class="k">import</span> <span class="n">Network</span>
 
 <div class="viewcode-block" id="Cortix"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix">[docs]</a><span class="k">class</span> <span class="nc">Cortix</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39;Cortix main class definition.</span>
@@ -51,23 +48,8 @@
 <span class="sd">    The typical Cortix run file workflow:</span>
 
 <span class="sd">    1. Create the `Cortix` object</span>
-<span class="sd">    2. Add and connect Modules</span>
+<span class="sd">    2. Create tne (nested) network of modules</span>
 <span class="sd">    3. Run and close `Cortix`</span>
-
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    use_mpi: bool</span>
-<span class="sd">        `True` for MPI, `False` for Multiprocessing.</span>
-<span class="sd">    use_multiprocessing: bool</span>
-<span class="sd">        `False` for MPI, `True` for Multiprocessing.</span>
-<span class="sd">    splash: bool</span>
-<span class="sd">        Show the Cortix splash image.</span>
-<span class="sd">    comm: mpi4py.MPI.Intracomm</span>
-<span class="sd">        MPI.COMM_WORLD (if using MPI else None).</span>
-<span class="sd">    rank: int</span>
-<span class="sd">        The current MPI rank (if using MPI else None).</span>
-<span class="sd">    size: int</span>
-<span class="sd">        size of the group associated with MPI.COMM_WORLD.</span>
 
 <span class="sd">    &#39;&#39;&#39;</span>
 
@@ -81,16 +63,33 @@
 <span class="sd">        splash: bool</span>
 <span class="sd">            Show the Cortix splash image.</span>
 
-<span class="sd">        &#39;&#39;&#39;</span>
+<span class="sd">        Attributes</span>
+<span class="sd">        ----------</span>
+<span class="sd">        network: Network</span>
+<span class="sd">             A network of modules and their connectivity.</span>
+<span class="sd">        use_mpi: bool</span>
+<span class="sd">            `True` for MPI, `False` for Multiprocessing.</span>
+<span class="sd">        use_multiprocessing: bool</span>
+<span class="sd">            `False` for MPI, `True` for Multiprocessing.</span>
+<span class="sd">        splash: bool</span>
+<span class="sd">            Show the Cortix splash image.</span>
+<span class="sd">        comm: mpi4py.MPI.Intracomm</span>
+<span class="sd">            MPI.COMM_WORLD (if using MPI else None).</span>
+<span class="sd">        rank: int</span>
+<span class="sd">            The current MPI rank (if using MPI else None).</span>
+<span class="sd">        size: int</span>
+<span class="sd">            size of the group associated with MPI.COMM_WORLD.</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="sd">        &#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="n">use_mpi</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">use_mpi</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">splash</span> <span class="o">=</span> <span class="n">splash</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__network</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Fall back to multiprocessing if mpi4py is not available</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
@@ -105,228 +104,68 @@
         <span class="c1"># Setup the global logger </span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__create_logger</span><span class="p">()</span>
 
-        <span class="c1"># Setup the network graph</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">nx_graph</span> <span class="o">=</span> <span class="kc">None</span>
-
-        <span class="c1"># Modules storage</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">modules</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-
         <span class="c1"># Done</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span><span class="p">:</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">splash</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Created Cortix object </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_splash</span><span class="p">(</span><span class="n">begin</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Created Cortix object&#39;</span><span class="p">)</span>
 
+            <span class="c1"># Initialize all date and timings</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-
             <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_start</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">end_run_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">%b%y %H:%M:%S&#39;</span><span class="p">)</span>
 
         <span class="k">return</span></div>
 
-<div class="viewcode-block" id="Cortix.add_module"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.add_module">[docs]</a>    <span class="k">def</span> <span class="nf">add_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Add a Module object to the Cortix Simulation</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        m: Module</span>
-<span class="sd">            The Module object to be added</span>
-
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">Module</span><span class="p">),</span> <span class="s1">&#39;m must be a module&#39;</span>
-        <span class="k">if</span> <span class="n">m</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
-            <span class="n">m</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span>
-            <span class="n">m</span><span class="o">.</span><span class="n">use_multiprocessing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Cortix.get_modules"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.get_modules">[docs]</a>    <span class="k">def</span> <span class="nf">get_modules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Return a list of all the Cortix modules from the master process.</span>
-
-<span class="sd">        If the `run()` method has completed, the list is updated with data</span>
-<span class="sd">        from the other processes.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        modules: list(Module)</span>
-<span class="sd">            The list of modules in the Cortix simulation</span>
-
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span></div>
+    <span class="k">def</span> <span class="nf">__set_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">Network</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">use_multiprocessing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__network</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="k">return</span>
+    <span class="k">def</span> <span class="nf">__get_network</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__network</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_network</span><span class="p">,</span> <span class="n">__set_network</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Cortix.run"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Run the Cortix simulation.</span>
-
-<span class="sd">        This function concurrently executes the `cortix.src.module.run` function</span>
-<span class="sd">        for each module in the simulation. Modules are run using either MPI or</span>
-<span class="sd">        Multiprocessing, depending on the user configuration.</span>
+        <span class="sd">&#39;&#39;&#39;Run the Cortix network simulation.</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
 
-        <span class="c1"># Running under MPI</span>
-        <span class="c1">#------------------</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__network</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
 
-            <span class="c1"># Synchronize in the beginning</span>
-            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>\
-                <span class="s1">&#39;Incorrect number of processes (Required </span><span class="si">%r</span><span class="s1">, got </span><span class="si">%r</span><span class="s1">)&#39;</span><span class="o">%</span>\
-                <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
-
-            <span class="c1"># Assign an mpi rank to all ports of a module using the module list index</span>
-            <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
-                <span class="n">rank</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
-                <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
-                    <span class="n">port</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="n">rank</span>
-
-            <span class="c1"># Assign a unique port id to all ports</span>
-            <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
-                    <span class="n">port</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span>
-                    <span class="n">port</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">i</span>
-                    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-
-            <span class="c1"># Parallel run module in MPI</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">mod</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Launching Module </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mod</span><span class="p">))</span>
-                <span class="n">mod</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-
-            <span class="c1"># Synchronize at the end</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
-
-            <span class="c1"># Collect at the root process all state data from modules</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">state</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">state</span>
-
-            <span class="n">modules_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span> <span class="n">state</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="mi">0</span> <span class="p">)</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">modules_state</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
-
-        <span class="c1"># Running under Python multiprocessing</span>
-        <span class="c1">#-------------------------------------</span>
-        <span class="k">else</span><span class="p">:</span>
-
-            <span class="c1"># Parallel run all modules in Python multiprocessing</span>
-            <span class="n">processes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-
-            <span class="n">modules_new_state</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span> <span class="c1"># for sharing data with master process if used</span>
-
-            <span class="n">count_mods_status_attr</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Launching Module </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mod</span><span class="p">))</span>
-                <span class="k">if</span> <span class="n">mod</span><span class="o">.</span><span class="n">state</span><span class="p">:</span> <span class="c1"># if not None pass arguments for user: run(self,*args)</span>
-                    <span class="n">p</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span> <span class="n">target</span><span class="o">=</span><span class="n">mod</span><span class="o">.</span><span class="n">run</span><span class="p">,</span>
-                            <span class="n">args</span><span class="o">=</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mod</span><span class="p">),</span> <span class="n">modules_new_state</span> <span class="p">)</span> <span class="p">)</span>
-                    <span class="n">count_mods_status_attr</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">else</span><span class="p">:</span> <span class="c1"># if None pass no arguments for user: run(self)</span>
-                    <span class="n">p</span> <span class="o">=</span> <span class="n">Process</span><span class="p">(</span> <span class="n">target</span><span class="o">=</span><span class="n">mod</span><span class="o">.</span><span class="n">run</span> <span class="p">)</span>
-                <span class="n">processes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-                <span class="n">p</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count_mods_status_attr</span><span class="p">):</span>
-                <span class="p">(</span><span class="n">mod_idx</span><span class="p">,</span> <span class="n">new_state</span><span class="p">)</span> <span class="o">=</span> <span class="n">modules_new_state</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">mod_idx</span><span class="p">]</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">new_state</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Module </span><span class="si">{}</span><span class="s1"> getting new state&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">[</span><span class="n">mod_idx</span><span class="p">]))</span>
-
-            <span class="c1"># Synchronize at the end</span>
-            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">processes</span><span class="p">:</span>
-                <span class="n">p</span><span class="o">.</span><span class="n">join</span><span class="p">()</span>
-
-        <span class="c1"># Record time at the end of the run method</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">end_run_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">%b%y %H:%M:%S&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="o">==</span><span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-
-        <span class="k">return</span></div>
-
-<div class="viewcode-block" id="Cortix.get_network"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.get_network">[docs]</a>    <span class="k">def</span> <span class="nf">get_network</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Constructs and returns a the module network.</span>
-
-<span class="sd">        Returns a networkx MultiGraph representation of the module network.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        g: networkx.classes.multigraph.MultiGraph</span>
-
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx_graph</span><span class="p">:</span>
-                <span class="n">g</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">()</span>
-                <span class="k">for</span> <span class="n">mod_one</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
-                    <span class="n">class_name</span> <span class="o">=</span> <span class="n">mod_one</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
-                    <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mod_one</span><span class="p">)</span>
-                    <span class="n">mod_one_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">mod_two</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">mod_one</span> <span class="o">!=</span> <span class="n">mod_two</span><span class="p">:</span>
-                            <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">mod_one</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
-                                <span class="k">for</span> <span class="n">p2</span> <span class="ow">in</span> <span class="n">mod_two</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
-                                    <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">port</span><span class="o">.</span><span class="n">connected_port</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">(</span><span class="n">p2</span><span class="p">):</span>
-                                        <span class="n">mod_two_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">mod_two</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">modules</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">mod_two</span><span class="p">))</span>
-                                        <span class="k">if</span> <span class="n">mod_two_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">g</span> <span class="ow">or</span> <span class="n">mod_one_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">mod_two_name</span><span class="p">):</span>
-                                            <span class="n">g</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">mod_one_name</span><span class="p">,</span> <span class="n">mod_two_name</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">nx_graph</span> <span class="o">=</span> <span class="n">g</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx_graph</span></div>
-
-<div class="viewcode-block" id="Cortix.draw_network"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.draw_network">[docs]</a>    <span class="k">def</span> <span class="nf">draw_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="s1">&#39;network.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">220</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39;Draws the networkx Module network graph to an image</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        file_name: str, optional</span>
-<span class="sd">            The resulting network diagram output file name</span>
-<span class="sd">        dpi: int, optional</span>
-<span class="sd">            dpi used for generating the network image</span>
-
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">g</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx_graph</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nx_graph</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_network</span><span class="p">()</span>
-            <span class="n">colors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="s1">&#39;green&#39;</span><span class="p">,</span> <span class="s1">&#39;pink&#39;</span><span class="p">,</span> <span class="s1">&#39;orange&#39;</span><span class="p">,</span> <span class="s1">&#39;brown&#39;</span><span class="p">,</span> <span class="s1">&#39;cyan&#39;</span><span class="p">]</span>
-            <span class="n">class_map</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="n">color_map</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">():</span>
-                <span class="n">class_name</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-                <span class="k">if</span> <span class="n">class_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">class_map</span><span class="p">:</span>
-                    <span class="n">class_map</span><span class="p">[</span><span class="n">class_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">class_map</span><span class="p">)</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">colors</span><span class="p">)]</span>
-                <span class="n">color_map</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="n">class_map</span><span class="p">[</span><span class="n">class_name</span><span class="p">]</span>
-            <span class="n">f</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
-            <span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">iterations</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-            <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="p">[</span><span class="n">color_map</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">],</span> <span class="n">ax</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">),</span> <span class="n">linewidths</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
-            <span class="n">patches</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">class_map</span><span class="p">:</span>
-                <span class="n">patch</span> <span class="o">=</span> <span class="n">mpatches</span><span class="o">.</span><span class="n">Patch</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="n">class_map</span><span class="p">[</span><span class="n">c</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="n">c</span><span class="p">)</span>
-                <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="n">patches</span><span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;run()::Elapsed wall clock time [s]: &#39;</span><span class="o">+</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_end</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_start</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span></div>
 
 <div class="viewcode-block" id="Cortix.close"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Closes the cortix object properly before destruction.</span>
 
-<span class="sd">        User is advised to call this method at the end of the run file.</span>
+<span class="sd">        User is strongly advised to call this method at the end of the run file otherwise</span>
+<span class="sd">        timings will not be recorded.</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># Sync here before close</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span><span class="p">:</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">splash</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Closed Cortix object on &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">end_run_date</span><span class="o">+</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">__get_splash</span><span class="p">(</span><span class="n">end</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Closed Cortix object.&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_splash</span><span class="p">(</span><span class="n">end</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Closed Cortix object on &#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">end_run_date</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Closed Cortix object.&#39;</span><span class="p">)</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Elapsed wall clock time [s]: &#39;</span><span class="o">+</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;close()::Elapsed wall clock time [s]: &#39;</span><span class="o">+</span>
                     <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_end</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_start</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span>
         <span class="k">return</span></div>
 

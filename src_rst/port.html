@@ -35,30 +35,12 @@
 <dt id="port.Port">
 <em class="property">class </em><code class="descclassname">port.</code><code class="descname">Port</code><span class="sig-paren">(</span><em>name=None</em>, <em>use_mpi=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/port.html#Port"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#port.Port" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Provides a method of communication between modules</p>
+<p>Provides a method of communication between modules.</p>
 <p>The Port class provides an interface for creating ports and connecting them to
 other ports for the purpose of data transfer. Data exchange takes place by
 send and/or receive calls on a given port. The concept of a port is that of a data
 transfer “interaction.” This can be one- or two-way with sends and receives.
 A port is connected to only one other port; as two ends of a pipe are connected.</p>
-<dl class="attribute">
-<dt id="port.Port.id">
-<code class="descname">id</code><a class="headerlink" href="#port.Port.id" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em></p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="port.Port.name">
-<code class="descname">name</code><a class="headerlink" href="#port.Port.name" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>string</em></p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="port.Port.use_mpi">
-<code class="descname">use_mpi</code><a class="headerlink" href="#port.Port.use_mpi" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em></p>
-</dd></dl>
-
 <dl class="method">
 <dt id="port.Port.__eq__">
 <code class="descname">__eq__</code><span class="sig-paren">(</span><em>other</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/port.html#Port.__eq__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#port.Port.__eq__" title="Permalink to this definition">¶</a></dt>
@@ -81,6 +63,24 @@ A port is connected to only one other port; as two ends of a pipe are connected.
 </tr>
 </tbody>
 </table>
+<dl class="attribute">
+<dt id="port.Port.id">
+<code class="descname">id</code><a class="headerlink" href="#port.Port.id" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="port.Port.name">
+<code class="descname">name</code><a class="headerlink" href="#port.Port.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>string</em></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="port.Port.use_mpi">
+<code class="descname">use_mpi</code><a class="headerlink" href="#port.Port.use_mpi" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em></p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="method">

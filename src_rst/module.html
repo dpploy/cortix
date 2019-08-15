@@ -43,12 +43,23 @@ process depending on the user’s configuration.</p>
 <p class="first admonition-title">Note</p>
 <p class="last">This class is to be inherited by every Cortix module.
 In order to execute, modules <em>must</em> override the <cite>run</cite> method, which will be
-executed during the simulation</p>
+executed during the simulation.</p>
+</div>
+<dl class="method">
+<dt id="module.Module.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Module super class constructor.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>This constructor must be called explicitly in the constructor of every
+Cortix module like so:</p>
+<blockquote class="last">
+<div>super().__init__()</div></blockquote>
 </div>
 <dl class="attribute">
 <dt id="module.Module.name">
 <code class="descname">name</code><a class="headerlink" href="#module.Module.name" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>str</em> – A name given to the instance. Default is <cite>None</cite>.</p>
+<dd><p><em>str</em> – A name given to the instance. Default is the derived class name.</p>
 </dd></dl>
 
 <dl class="attribute">
@@ -85,38 +96,12 @@ Default is <cite>None</cite>.</p>
 <dd><p><em>list(Port)</em> – A list of ports contained by the module</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="module.Module.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Module super class constructor.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p>This must be called in the constructor of every Cortix module like so:</p>
-<blockquote class="last">
-<div>super().__init__()</div></blockquote>
-</div>
+<dl class="attribute">
+<dt id="module.Module.__network">
+<code class="descname">__network</code><a class="headerlink" href="#module.Module.__network" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Network</em> – An internal network inherited by the derived module for nested networks.</p>
 </dd></dl>
 
-<dl class="method">
-<dt id="module.Module.connect">
-<code class="descname">connect</code><span class="sig-paren">(</span><em>port_name_or_module</em>, <em>to_other_port=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.connect" title="Permalink to this definition">¶</a></dt>
-<dd><p>Connect two modules using either their ports directly or inferred ports.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>port_name_or_module</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><a class="reference internal" href="#module.Module" title="module.Module"><em>Module</em></a>) – Either a <cite>port</cite> name or a <cite>Module</cite> can be given. In the latter case
-the <cite>name</cite> attribute of the module will be used to get the <cite>port</cite>
-of the module passed. This port will be connected to the corresponding
-port of the calling object.</li>
-<li><strong>to_other_port</strong> (<a class="reference internal" href="port.html#port.Port" title="port.Port"><em>Port</em></a>) – A <cite>port</cite> object to connect to. This must be <cite>None</cite> or absent if the
-first argument is a <cite>Module</cite>.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 <dl class="method">
@@ -136,6 +121,11 @@ first argument is a <cite>Module</cite>.</li>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.network">
+<code class="descname">network</code><a class="headerlink" href="#module.Module.network" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="module.Module.recv">

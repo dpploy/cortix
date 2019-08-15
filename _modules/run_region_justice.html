@@ -1,0 +1,267 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>run_region_justice &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for run_region_justice</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># This file is part of the Cortix toolkit environment</span>
+<span class="c1"># https://cortix.org</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Crimninal justice network dynamics modeling.</span>
+
+<span class="sd">This example uses 7 modules:</span>
+<span class="sd">    - Community</span>
+<span class="sd">    - Arrested</span>
+<span class="sd">    - Adjudication</span>
+<span class="sd">    - Jail</span>
+<span class="sd">    - Prison</span>
+<span class="sd">    - Probation</span>
+<span class="sd">    - Parole</span>
+<span class="sd">and a population balance model is used to follow the offenders population</span>
+<span class="sd">groups between modules.</span>
+
+<span class="sd">To run this case using MPI you should compute the number of</span>
+<span class="sd">processes as follows:</span>
+
+<span class="sd">    `nprocs = 7 + 1 cortix`</span>
+
+<span class="sd">then issue the MPI run command as follows (replace `nprocs` with a number):</span>
+
+<span class="sd">     `mpiexec -n nprocs run_justice.py`</span>
+
+<span class="sd">To run this case with the Python multiprocessing library, just run this file at the</span>
+<span class="sd">command line as</span>
+
+<span class="sd">    `run_justice.py`</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">scipy.constants</span> <span class="k">as</span> <span class="nn">const</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">cortix.src.cortix_main</span> <span class="k">import</span> <span class="n">Cortix</span>
+<span class="kn">from</span> <span class="nn">cortix.src.network</span> <span class="k">import</span> <span class="n">Network</span>
+
+<span class="kn">from</span> <span class="nn">cortix.examples.state</span> <span class="k">import</span> <span class="n">State</span>
+
+<span class="kn">from</span> <span class="nn">cortix.examples.prison</span> <span class="k">import</span> <span class="n">Prison</span>
+<span class="kn">from</span> <span class="nn">cortix.examples.parole</span> <span class="k">import</span> <span class="n">Parole</span>
+<span class="kn">from</span> <span class="nn">cortix.examples.adjudication</span> <span class="k">import</span> <span class="n">Adjudication</span>
+<span class="kn">from</span> <span class="nn">cortix.examples.jail</span> <span class="k">import</span> <span class="n">Jail</span>
+<span class="kn">from</span> <span class="nn">cortix.examples.arrested</span> <span class="k">import</span> <span class="n">Arrested</span>
+<span class="kn">from</span> <span class="nn">cortix.examples.probation</span> <span class="k">import</span> <span class="n">Probation</span>
+<span class="kn">from</span> <span class="nn">cortix.examples.community</span> <span class="k">import</span> <span class="n">Community</span>
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../examples_rst/run_region_justice.html#run_region_justice.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;Cortix run file for a criminal justice network.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_groups : int</span>
+<span class="sd">        Number of population groups being followed. This must be the same for all</span>
+<span class="sd">        modules.</span>
+<span class="sd">    end_time: float</span>
+<span class="sd">        End of the flow time in SI unit.</span>
+<span class="sd">    time_step: float</span>
+<span class="sd">        Size of the time step between port communications in SI unit.</span>
+<span class="sd">    use_mpi: bool</span>
+<span class="sd">        If set to `True` use MPI otherwise use Python multiprocessing.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1"># Configuration Parameters</span>
+    <span class="n">n_groups</span>  <span class="o">=</span> <span class="mi">150</span> <span class="c1"># number of population groups</span>
+    <span class="n">end_time</span>  <span class="o">=</span> <span class="mi">50</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">day</span>
+    <span class="n">time_step</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">day</span>
+
+    <span class="n">use_mpi</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># True for MPI; False for Python multiprocessing</span>
+
+    <span class="n">region</span> <span class="o">=</span> <span class="n">Cortix</span><span class="p">(</span><span class="n">use_mpi</span><span class="o">=</span><span class="n">use_mpi</span><span class="p">,</span> <span class="n">splash</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">region</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">Network</span><span class="p">()</span>
+    <span class="n">ne_net</span> <span class="o">=</span> <span class="n">region</span><span class="o">.</span><span class="n">network</span>
+
+    <span class="n">state_1</span> <span class="o">=</span> <span class="n">State</span><span class="p">(</span><span class="s1">&#39;State-1&#39;</span><span class="p">)</span>
+    <span class="n">ne_net</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">state_1</span><span class="p">)</span>
+    <span class="n">state_1</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">end_time</span>
+    <span class="n">state_1</span><span class="o">.</span><span class="n">time_step</span> <span class="o">=</span> <span class="n">time_step</span>
+
+    <span class="n">state_2</span> <span class="o">=</span> <span class="n">State</span><span class="p">(</span><span class="s1">&#39;State-2&#39;</span><span class="p">)</span>
+    <span class="n">ne_net</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">state_2</span><span class="p">)</span>
+    <span class="n">state_2</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">end_time</span>
+    <span class="n">state_2</span><span class="o">.</span><span class="n">time_step</span> <span class="o">=</span> <span class="n">time_step</span>
+
+    <span class="n">ne_net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span> <span class="p">[</span><span class="n">state_1</span><span class="p">,</span><span class="s1">&#39;outflow:1&#39;</span><span class="p">],</span> <span class="p">[</span><span class="n">state_2</span><span class="p">,</span><span class="s1">&#39;inflow:1&#39;</span><span class="p">]</span> <span class="p">)</span>
+    <span class="n">ne_net</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span> <span class="p">[</span><span class="n">state_2</span><span class="p">,</span><span class="s1">&#39;outflow:1&#39;</span><span class="p">],</span> <span class="p">[</span><span class="n">state_1</span><span class="p">,</span><span class="s1">&#39;inflow:1&#39;</span><span class="p">]</span> <span class="p">)</span>
+    <span class="n">ne_net</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    # a_state internal network</span>
+<span class="sd">    a_state.network = Network()</span>
+<span class="sd">    a_state = a_state.network</span>
+
+<span class="sd">    community_me = Community(n_groups=n_groups, maturity_rate=100/const.day,</span>
+<span class="sd">            offender_pool_size=10)</span>
+<span class="sd">    a_state.module(community_me)</span>
+<span class="sd">    community_me.end_time = end_time</span>
+<span class="sd">    community_me.time_step = time_step</span>
+<span class="sd">    community_me.show_time = (True,10*const.day)</span>
+
+<span class="sd">    prison_me = Prison(n_groups=n_groups)</span>
+<span class="sd">    a_state.module(prison_me)</span>
+<span class="sd">    prison_me.end_time = end_time</span>
+<span class="sd">    prison_me.time_step = time_step</span>
+
+<span class="sd">    parole_me = Parole(n_groups=n_groups)</span>
+<span class="sd">    a_state.module(parole_me)</span>
+<span class="sd">    parole_me.end_time = end_time</span>
+<span class="sd">    parole_me.time_step = time_step</span>
+
+<span class="sd">    adjudication_me = Adjudication(n_groups=n_groups)</span>
+<span class="sd">    a_state.module(adjudication_me)</span>
+<span class="sd">    adjudication_me.end_time = end_time</span>
+<span class="sd">    adjudication_me.time_step = time_step</span>
+
+<span class="sd">    jail_me = Jail(n_groups=n_groups)</span>
+<span class="sd">    a_state.module(jail)</span>
+<span class="sd">    jail_me.end_time = end_time</span>
+<span class="sd">    jail_me.time_step = time_step</span>
+
+<span class="sd">    arrested_me = Arrested(n_groups=n_groups)</span>
+<span class="sd">    a_state.module(arrested_me)</span>
+<span class="sd">    arrested_me.end_time = end_time</span>
+<span class="sd">    arrested_me.time_step = time_step</span>
+
+<span class="sd">    probation_me = Probation(n_groups=n_groups)</span>
+<span class="sd">    a_state.module(probation_me)</span>
+<span class="sd">    probation_me.end_time = end_time</span>
+<span class="sd">    probation_me.time_step = time_step</span>
+
+
+<span class="sd">    a_state.connect( prison, parole, &#39;bidirectional&#39; )</span>
+<span class="sd">    a_state.connect( adjudication, prison )</span>
+<span class="sd">    a_state.connect( jail, prison )</span>
+<span class="sd">    a_state.connect( adjudication, jail )</span>
+<span class="sd">    a_state.connect( arrested, jail )</span>
+<span class="sd">    a_state.connect( arrested, adjudication )</span>
+<span class="sd">    a_state.connect( arrested, probation )</span>
+<span class="sd">    a_state.connect( probation, jail )</span>
+<span class="sd">    a_state.connect( adjudication, probation )</span>
+
+<span class="sd">    a_state.connect( arrested, community )</span>
+<span class="sd">    a_state.connect( jail, community )</span>
+<span class="sd">    a_state.connect( probation, community )</span>
+<span class="sd">    a_state.connect( adjudication, community )</span>
+<span class="sd">    a_state.connect( prison, community )</span>
+<span class="sd">    a_state.connect( parole, community )</span>
+
+<span class="sd">    a_state.draw()</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="c1">#region.run()</span>
+
+    <span class="c1"># Properly shutdow region</span>
+    <span class="n">region</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
+<h3>About Cortix</h3>
+<p>
+Cortix is a Python library for network modeling and parallel simulation.
+</p>
+<p>
+Cortix Group <br>
+c/o <a href="https://www.uml.edu/innovation-hub">UMass Innovation Hub</a> <br>
+110 Canal St., 3rd Floor <br>
+Lower, MA 01852
+</p>
+
+</p>
+
+<!---->
+
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul>
+<li><a href="../index.html">Home</a></li>
+<li><a href="../install.html">Install</a></li>
+<li><a href="../contents.html">Documentation</a></li>
+<li><a href="../license.html">License</a></li>
+</ul>
+
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="https://pypi.org/project/cortix/">Cortix @ PyPI</a></li>
+  <li><a href="https://github.com/dpploy/cortix">Cortix @ GitHub</a></li>
+  <li><a href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master">Cortix @ binder</a></li>
+  <li><a href="https://nbviewer.jupyter.org/github/dpploy/cortix-nb/tree/master/">Cortix @ nbviewer</a></li>
+  <li><a href="https://github.com/dpploy/cortix-nb">Cortix Jupyter Notebooks</a></li>
+  <li><a href="https://github.com/dpploy/cortix/issues">Issue Tracker</a></li>
+  <li><a href="https://dpploy.github.io/cortix/Cortix.pdf">PDF Documentation</a></li>
+</ul>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, University of Massachusetts Lowell.
+      
+    </div>
+
+    
+    <a href="https://github.com/dpploy/cortix" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>
