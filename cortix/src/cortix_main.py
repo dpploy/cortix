@@ -58,7 +58,7 @@ class Cortix:
         self.splash = splash
 
         self.__network = None
-
+        self.log_filename = 'cortix'
         # Fall back to multiprocessing if mpi4py is not available
         if self.use_mpi:
             try:
@@ -149,30 +149,30 @@ class Cortix:
         if self.use_mpi:
             self.comm.Barrier()
 
-        self.log = logging.getLogger('cortix')
+        self.log = logging.getLogger(self.log_filename)
 
         self.log.setLevel(logging.DEBUG)
+        if not self.log.hasHandlers():
+            file_handler = logging.FileHandler(self.log_filename+'.log')
+            file_handler.setLevel(logging.DEBUG)
 
-        file_handler = logging.FileHandler('cortix.log')
-        file_handler.setLevel(logging.DEBUG)
+            console_handler = logging.StreamHandler()
+            console_handler.setLevel(logging.DEBUG)
 
-        console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.DEBUG)
+            # Formatter added to handlers
+            if self.use_mpi:
+                fs = '[rank:{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s'.format(self.rank)
+            else:
 
-        # Formatter added to handlers
-        if self.use_mpi:
-            fs = '[rank:{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s'.format(self.rank)
-        else:
+                fs = "[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(os.getpid())
 
-            fs = "[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(os.getpid())
+            formatter = logging.Formatter(fs)
+            file_handler.setFormatter(formatter)
+            console_handler.setFormatter(formatter)
 
-        formatter = logging.Formatter(fs)
-        file_handler.setFormatter(formatter)
-        console_handler.setFormatter(formatter)
-
-        # Add handlers to logger
-        self.log.addHandler(file_handler)
-        self.log.addHandler(console_handler)
+            # Add handlers to logger
+            self.log.addHandler(file_handler)
+            self.log.addHandler(console_handler)
 
         return
 
