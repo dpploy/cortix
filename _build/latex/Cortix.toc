@@ -1,0 +1,48 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}src}{1}{chapter.1}
+\contentsline {section}{\numberline {1.1}cortix\_main}{1}{section.1.1}
+\contentsline {section}{\numberline {1.2}module module}{2}{section.1.2}
+\contentsline {section}{\numberline {1.3}network module}{4}{section.1.3}
+\contentsline {section}{\numberline {1.4}port module}{5}{section.1.4}
+\contentsline {chapter}{\numberline {2}examples}{7}{chapter.2}
+\contentsline {section}{\numberline {2.1}adjudication module}{7}{section.2.1}
+\contentsline {section}{\numberline {2.2}arrested module}{8}{section.2.2}
+\contentsline {section}{\numberline {2.3}body module}{9}{section.2.3}
+\contentsline {section}{\numberline {2.4}community module}{10}{section.2.4}
+\contentsline {section}{\numberline {2.5}dataplot module}{11}{section.2.5}
+\contentsline {section}{\numberline {2.6}droplet module}{11}{section.2.6}
+\contentsline {section}{\numberline {2.7}dummy\_module module}{12}{section.2.7}
+\contentsline {section}{\numberline {2.8}jail module}{13}{section.2.8}
+\contentsline {section}{\numberline {2.9}parole module}{14}{section.2.9}
+\contentsline {section}{\numberline {2.10}plot\_data module}{15}{section.2.10}
+\contentsline {section}{\numberline {2.11}prison module}{16}{section.2.11}
+\contentsline {section}{\numberline {2.12}probation module}{17}{section.2.12}
+\contentsline {section}{\numberline {2.13}run\_city\_justice module}{18}{section.2.13}
+\contentsline {section}{\numberline {2.14}run\_droplet\_swirl module}{19}{section.2.14}
+\contentsline {section}{\numberline {2.15}run\_droplet\_test module}{19}{section.2.15}
+\contentsline {subsection}{\numberline {2.15.1}Single Plot}{19}{subsection.2.15.1}
+\contentsline {subsection}{\numberline {2.15.2}Multiple Plot}{20}{subsection.2.15.2}
+\contentsline {section}{\numberline {2.16}run\_planets module}{20}{section.2.16}
+\contentsline {section}{\numberline {2.17}run\_region\_justice module}{20}{section.2.17}
+\contentsline {section}{\numberline {2.18}state module}{21}{section.2.18}
+\contentsline {section}{\numberline {2.19}vortex module}{22}{section.2.19}
+\contentsline {chapter}{\numberline {3}support}{24}{chapter.3}
+\contentsline {section}{\numberline {3.1}actor}{24}{section.3.1}
+\contentsline {section}{\numberline {3.2}fuel\_bucket}{24}{section.3.2}
+\contentsline {section}{\numberline {3.3}fuel\_bundle}{30}{section.3.3}
+\contentsline {section}{\numberline {3.4}fuel\_segment}{35}{section.3.4}
+\contentsline {section}{\numberline {3.5}fuelsegmentsgroups}{37}{section.3.5}
+\contentsline {section}{\numberline {3.6}fuelslug}{38}{section.3.6}
+\contentsline {subsection}{\numberline {3.6.1}ATTENTION:}{38}{subsection.3.6.1}
+\contentsline {section}{\numberline {3.7}nuclides}{39}{section.3.7}
+\contentsline {section}{\numberline {3.8}periodictable}{40}{section.3.8}
+\contentsline {subsection}{\numberline {3.8.1}Requirements}{40}{subsection.3.8.1}
+\contentsline {paragraph}{References}{40}{paragraph*.255}
+\contentsline {paragraph}{Examples}{40}{paragraph*.256}
+\contentsline {section}{\numberline {3.9}phase}{41}{section.3.9}
+\contentsline {subsection}{\numberline {3.9.1}Background}{41}{subsection.3.9.1}
+\contentsline {section}{\numberline {3.10}quantity}{44}{section.3.10}
+\contentsline {section}{\numberline {3.11}specie}{46}{section.3.11}
+\contentsline {section}{\numberline {3.12}stream}{53}{section.3.12}
+\contentsline {chapter}{Python Module Index}{55}{section*.377}
+\contentsline {chapter}{Index}{56}{section*.378}

@@ -1,0 +1,366 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>cortix_main &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cortix_main</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># This file is part of the Cortix toolkit environment</span>
+<span class="c1"># https://cortix.org</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="kn">from</span> <span class="nn">cortix.src.network</span> <span class="k">import</span> <span class="n">Network</span>
+
+<div class="viewcode-block" id="Cortix"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix">[docs]</a><span class="k">class</span> <span class="nc">Cortix</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;Cortix main class definition.</span>
+
+<span class="sd">    The typical Cortix run file workflow:</span>
+
+<span class="sd">    1. Create the `Cortix` object</span>
+<span class="sd">    2. Create tne (nested) network of modules</span>
+<span class="sd">    3. Run and close `Cortix`</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<div class="viewcode-block" id="Cortix.__init__"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.__init__">[docs]</a>    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_mpi</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">splash</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Construct a Cortix simulation object.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        use_mpi: bool</span>
+<span class="sd">            True for MPI, False for multiprocessing.</span>
+<span class="sd">        splash: bool</span>
+<span class="sd">            Show the Cortix splash image.</span>
+
+<span class="sd">        Attributes</span>
+<span class="sd">        ----------</span>
+<span class="sd">        network: Network</span>
+<span class="sd">             A network of modules and their connectivity.</span>
+<span class="sd">        use_mpi: bool</span>
+<span class="sd">            `True` for MPI, `False` for Multiprocessing.</span>
+<span class="sd">        use_multiprocessing: bool</span>
+<span class="sd">            `False` for MPI, `True` for Multiprocessing.</span>
+<span class="sd">        splash: bool</span>
+<span class="sd">            Show the Cortix splash image.</span>
+<span class="sd">        comm: mpi4py.MPI.Intracomm</span>
+<span class="sd">            MPI.COMM_WORLD (if using MPI else None).</span>
+<span class="sd">        rank: int</span>
+<span class="sd">            The current MPI rank (if using MPI else None).</span>
+<span class="sd">        size: int</span>
+<span class="sd">            size of the group associated with MPI.COMM_WORLD.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="n">use_mpi</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">use_mpi</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">splash</span> <span class="o">=</span> <span class="n">splash</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__network</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Fall back to multiprocessing if mpi4py is not available</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span> <span class="nn">mpi4py</span> <span class="k">import</span> <span class="n">MPI</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="n">MPI</span><span class="o">.</span><span class="n">COMM_WORLD</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Get_rank</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">size</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Setup the global logger </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__create_logger</span><span class="p">()</span>
+
+        <span class="c1"># Done</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">splash</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Created Cortix object </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_splash</span><span class="p">(</span><span class="n">begin</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Created Cortix object&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Initialize all date and timings</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_start</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">end_run_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">%b%y %H:%M:%S&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span></div>
+
+    <span class="k">def</span> <span class="nf">__set_network</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">Network</span><span class="p">)</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">use_mpi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">use_multiprocessing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">rank</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span>
+        <span class="n">n</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__network</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="k">return</span>
+    <span class="k">def</span> <span class="nf">__get_network</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__network</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_network</span><span class="p">,</span> <span class="n">__set_network</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Cortix.run"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Run the Cortix network simulation.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__network</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="o">==</span><span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;run()::Elapsed wall clock time [s]: &#39;</span><span class="o">+</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_end</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_start</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="Cortix.close"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Closes the cortix object properly before destruction.</span>
+
+<span class="sd">        User is strongly advised to call this method at the end of the run file otherwise</span>
+<span class="sd">        timings will not be recorded.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># Sync here before close</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">splash</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Closed Cortix object.&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_splash</span><span class="p">(</span><span class="n">end</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Closed Cortix object.&#39;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_end</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;close()::Elapsed wall clock time [s]: &#39;</span><span class="o">+</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_end</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_start</span><span class="p">,</span><span class="mi">2</span><span class="p">)))</span>
+        <span class="k">return</span></div>
+
+    <span class="k">def</span> <span class="nf">__create_logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;A helper function to setup the logging facility.&#39;&#39;&#39;</span>
+
+        <span class="c1"># File removal</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s1">&#39;cortix.log&#39;</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;rm -rf cortix.log&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Sync here to allow for file removal</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comm</span><span class="o">.</span><span class="n">Barrier</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;cortix&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+        <span class="n">file_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="s1">&#39;cortix.log&#39;</span><span class="p">)</span>
+        <span class="n">file_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+        <span class="n">console_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+        <span class="n">console_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+        <span class="c1"># Formatter added to handlers</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_mpi</span><span class="p">:</span>
+            <span class="n">fs</span> <span class="o">=</span> <span class="s1">&#39;[rank:</span><span class="si">{}</span><span class="s1">] </span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(name)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rank</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="n">fs</span> <span class="o">=</span> <span class="s2">&quot;[</span><span class="si">{}</span><span class="s2">] </span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(name)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">())</span>
+
+        <span class="n">formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">fs</span><span class="p">)</span>
+        <span class="n">file_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+        <span class="n">console_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">formatter</span><span class="p">)</span>
+
+        <span class="c1"># Add handlers to logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">file_handler</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">console_handler</span><span class="p">)</span>
+
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">__get_splash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">begin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns the Cortix splash logo.</span>
+
+<span class="sd">        Note</span>
+<span class="sd">        ----</span>
+<span class="sd">        Call this internal method with one argument only. Either `begin=True` or</span>
+<span class="sd">        `end=True`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        begin: bool</span>
+<span class="sd">            True for the beginning message, false for the ending.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        splash: str</span>
+<span class="sd">            The Cortix splash logo.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">assert</span> <span class="n">begin</span><span class="o">==</span><span class="kc">None</span> <span class="ow">or</span> <span class="n">end</span><span class="o">==</span><span class="kc">None</span>
+        <span class="k">if</span> <span class="n">begin</span><span class="p">:</span>
+            <span class="n">end</span><span class="o">=</span><span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">end</span><span class="p">:</span>
+            <span class="n">begin</span><span class="o">=</span><span class="kc">False</span>
+
+
+        <span class="n">splash</span> <span class="o">=</span> \
+        <span class="s1">&#39;_____________________________________________________________________________</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;      ...                                        s       .     (TAAG Fraktur)</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;   xH88&quot;`~ .x8X                                 :8      @88&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39; :8888   .f&quot;8888Hf        u.      .u    .      .88      %8P      uL   ..</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;:8888&gt;  X8L  ^&quot;&quot;`   ...ue888b   .d88B :@8c    :888ooo    .     .@88b  @88R</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;X8888  X888h        888R Y888r =&quot;8888f8888r -*8888888  .@88u  &quot;&quot;Y888k/&quot;*P</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;88888  !88888.      888R I888&gt;   4888&gt;&quot;88&quot;    8888    &#39;&#39;888E`    Y888L</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;88888   %88888      888R I888&gt;   4888&gt; &quot;      8888      888E      8888</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;88888 `&gt; `8888&gt;     888R I888&gt;   4888&gt;        8888      888E      `888N</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;`8888L %  ?888   ! u8888cJ888   .d888L .+    .8888Lu=   888E   .u./&quot;888&amp;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39; `8888  `-*&quot;&quot;   /   &quot;*888*P&quot;    ^&quot;8888*&quot;     ^%888*     888&amp;  d888&quot; Y888*&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;   &quot;888.      :&quot;      &quot;Y&quot;          &quot;Y&quot;         &quot;Y&quot;      R888&quot; ` &quot;Y   Y&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;     `&quot;&quot;***~&quot;`                                           &quot;&quot;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;                             https://cortix.org                              </span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+        <span class="s1">&#39;_____________________________________________________________________________&#39;</span>
+
+        <span class="k">if</span> <span class="n">begin</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> \
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">_____________________________________________________________________________</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+            <span class="s1">&#39;                             L A U N C H I N G                               </span><span class="se">\n</span><span class="s1">&#39;</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> \
+            <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">_____________________________________________________________________________</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">+</span>\
+            <span class="s1">&#39;                           T E R M I N A T I N G                             </span><span class="se">\n</span><span class="s1">&#39;</span>
+
+        <span class="k">return</span> <span class="n">message</span> <span class="o">+</span> <span class="n">splash</span>
+
+<div class="viewcode-block" id="Cortix.__del__"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.__del__">[docs]</a>    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Destructs a Cortix simulation object.</span>
+
+<span class="sd">        Warning</span>
+<span class="sd">        -------</span>
+<span class="sd">        By the time the body of this function is executed, the machinery of</span>
+<span class="sd">        variables may have been deleted already. For example, `logging` is no longer</span>
+<span class="sd">        there; do the least amount of work here.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">pass</span></div></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">Cortix</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
+<h3>About Cortix</h3>
+<p>
+Cortix is a Python library for network modeling and parallel simulation.
+</p>
+<p>
+Cortix Group <br>
+c/o <a href="https://www.uml.edu/innovation-hub">UMass Innovation Hub</a> <br>
+110 Canal St., 3rd Floor <br>
+Lower, MA 01852
+</p>
+
+<p>
+<a href="https://www.uml.edu/Engineering/Chemical/faculty/de-Almeida-Valmor.aspx">Prof. V. F. de Almeida, Ph.D.</a></br>
+Group Leader <br>
+<a href="https://www.uml.edu/Engineering/Chemical">Dept. of Chemical Engineering (Nuclear)</a></br>
+<a href="https://www.uml.edu/">UMass Lowell</a><br>
+</p>
+
+<!---->
+
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul>
+<li><a href="../index.html">Home</a></li>
+<li><a href="../install.html">Install</a></li>
+<li><a href="../contents.html">Documentation</a></li>
+<li><a href="../license.html">License</a></li>
+</ul>
+
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="https://pypi.org/project/cortix/">Cortix @ PyPI</a></li>
+  <li><a href="https://github.com/dpploy/cortix">Cortix @ GitHub</a></li>
+  <li><a href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master">Cortix @ binder</a></li>
+  <li><a href="https://nbviewer.jupyter.org/github/dpploy/cortix-nb/tree/master/">Cortix @ nbviewer</a></li>
+  <li><a href="https://github.com/dpploy/cortix-nb">Cortix Jupyter Notebooks</a></li>
+  <li><a href="https://github.com/dpploy/cortix/issues">Issue Tracker</a></li>
+  <li><a href="https://dpploy.github.io/cortix/Cortix.pdf">PDF Documentation</a></li>
+</ul>
+
+<h3>HPC Resources</h3>
+<ul>
+  <li><a href="https://hpc.inl.gov/SitePages/Home.aspx">Idaho National Laboratory HPC</a></li>
+  <li><a href="http://wiki.umassrc.org/wiki/index.php/Main_Page">UMass Green HPC Cluster </a></li>
+</ul>
+
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, University of Massachusetts Lowell.
+      
+    </div>
+
+    
+    <a href="https://github.com/dpploy/cortix" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>

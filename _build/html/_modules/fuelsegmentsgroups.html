@@ -1,0 +1,465 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>fuelsegmentsgroups &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for fuelsegmentsgroups</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># This file is part of the Cortix toolkit environment</span>
+<span class="c1"># https://cortix.org</span>
+<span class="c1">#</span>
+<span class="c1"># All rights reserved, see COPYRIGHT for full restrictions.</span>
+<span class="c1"># https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the University of Massachusetts Lowell LICENSE:</span>
+<span class="c1"># https://github.com/dpploy/cortix/blob/master/LICENSE.txt</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Author: Valmor de Almeida dealmeidav@ornl.gov; vfda</span>
+
+<span class="sd">Fuel segment</span>
+
+<span class="sd">VFdALib support classes</span>
+
+<span class="sd">Sat Jun 27 14:46:49 EDT 2015</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="c1">#*********************************************************************************</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="kn">from</span> <span class="nn">cortix.support.fuel_segment</span> <span class="k">import</span> <span class="n">FuelSegment</span>
+<span class="c1">#*********************************************************************************</span>
+
+<div class="viewcode-block" id="FuelSegmentsGroups"><a class="viewcode-back" href="../support_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups">[docs]</a><span class="k">class</span> <span class="nc">FuelSegmentsGroups</span><span class="p">():</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    Creates a dictionary of lists of fuel segment objects, with the keys</span>
+<span class="sd">    typically being timestamps. Each fuel segment object has two data members,</span>
+<span class="sd">    a `Pandas` Series for geometry spec and a panda DataFrame for property</span>
+<span class="sd">    density.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Construction</span>
+<span class="c1">#*********************************************************************************</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">key</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">fuelSegments</span><span class="o">=</span><span class="kc">None</span>
+                 <span class="p">):</span>
+
+        <span class="c1"># constructor</span>
+        <span class="c1"># FuelSegmentsGroups simply encapsulates a dictionary of a list of</span>
+        <span class="c1"># FuelSegment objects. The key is typically a time stamp.</span>
+        <span class="c1"># A FuelSegment object has two data members, a pandas Series for geometry spec</span>
+        <span class="c1"># and a pandas DataFrame for property density.</span>
+
+        <span class="c1"># This is the central member data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">groups</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="k">assert</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">fuelSegments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuelSegments</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuelSegments</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">FuelSegment</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">fuelSegments</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">return</span>
+
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Public Member Functions</span>
+<span class="c1">#*********************************************************************************</span>
+
+<div class="viewcode-block" id="FuelSegmentsGroups.HasGroup"><a class="viewcode-back" href="../support_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups.HasGroup">[docs]</a>    <span class="k">def</span> <span class="nf">HasGroup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Checks if the specified key has a group of fuel segments associated</span>
+<span class="sd">        with it.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key: str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        key: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="FuelSegmentsGroups.AddGroup"><a class="viewcode-back" href="../support_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups.AddGroup">[docs]</a>    <span class="k">def</span> <span class="nf">AddGroup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">fuelSegments</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Appends the dictionary with a new key and associated list of</span>
+<span class="sd">        fuelSegments. If the specified key is already present in the</span>
+<span class="sd">        dictionary, then the specified list of fuel segments will be appended</span>
+<span class="sd">        to the list of fuel segments already associated with the specified key.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key: str</span>
+<span class="sd">        fuelSegments: list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__AddGroup</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">fuelSegments</span><span class="p">)</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="FuelSegmentsGroups.GetAttribute"><a class="viewcode-back" href="../support_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups.GetAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupKey</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attributeName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                     <span class="n">nuclideSymbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nuclideSeries</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the average value of an attribute amongst all elements in a</span>
+<span class="sd">        group (WARNING: keys with no values associated with them will lower</span>
+<span class="sd">        this average!). If groupKey is not specified, the function will return</span>
+<span class="sd">        the average attribute value of every fuel segment element in the</span>
+<span class="sd">        entire dictionary. If attribute is not specified, the function call</span>
+<span class="sd">        will fail. If the key value specified does not match any keys in the</span>
+<span class="sd">        dictionary, the function will return a value of 0.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        groupKey: str</span>
+<span class="sd">        attributeName: str</span>
+<span class="sd">        nuclideSymbol: str</span>
+<span class="sd">        nuclideSeries: str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        groupAttribute: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetGroupAttribute</span><span class="p">(</span>
+            <span class="n">groupKey</span><span class="p">,</span> <span class="n">attributeName</span><span class="p">,</span> <span class="n">nuclideSymbol</span><span class="p">,</span> <span class="n">nuclideSeries</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FuelSegmentsGroups.GetFuelSegments"><a class="viewcode-back" href="../support_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups.GetFuelSegments">[docs]</a>    <span class="k">def</span> <span class="nf">GetFuelSegments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupKey</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a list of fuel segments associated with a specified groupkey.</span>
+<span class="sd">        If no group key is specified, then all elements in the dictionary</span>
+<span class="sd">        will be returned. If the specified group key does not exist, then the</span>
+<span class="sd">        function will return an empty list.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        groupKey: str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fuelSegments: list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetFuelSegments</span><span class="p">(</span><span class="n">groupKey</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FuelSegmentsGroups.RemoveFuelSegment"><a class="viewcode-back" href="../support_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups.RemoveFuelSegment">[docs]</a>    <span class="k">def</span> <span class="nf">RemoveFuelSegment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupKey</span><span class="p">,</span> <span class="n">fuelSegment</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Removes a fuel segment from a list associated with a specified group</span>
+<span class="sd">        key. If the specified group key or fuel segment do not exist, the</span>
+<span class="sd">        function will fail.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        groupKey: str</span>
+<span class="sd">        fuelSegment: str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        empty:</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__RemoveFuelSegment</span><span class="p">(</span><span class="n">groupKey</span><span class="p">,</span> <span class="n">fuelSegment</span><span class="p">)</span></div>
+
+<span class="c1"># def __str__( self ):</span>
+<span class="c1">#     s = &#39; %5s %5s %5s &#39;+&#39; molar mass: %6s &#39;+&#39; molar cc: %6s &#39;+&#39; mass cc: %6s &#39;+&#39; flag: %s &#39;+&#39;# atoms: %s&#39;+&#39; atoms: %s\n&#39;</span>
+<span class="c1">#     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)</span>
+<span class="c1">#</span>
+<span class="c1"># def __repr__( self ):</span>
+<span class="c1">#     s = &#39; %5s %5s %5s &#39;+&#39; molar mass: %6s &#39;+&#39; molar cc: %6s &#39;+&#39; mass cc: %6s &#39;+&#39; flag: %s &#39;+&#39;# atoms: %s&#39;+&#39; atoms: %s\n&#39;</span>
+<span class="c1">#     return s % (self.name, self.formula, self.phase, self.molarMass, self.molarCC, self.massCC, self.flag, self.nAtoms, self.atoms)</span>
+
+<span class="c1">#*********************************************************************************</span>
+<span class="c1"># Private helper functions (internal use: __)</span>
+<span class="c1">#*********************************************************************************</span>
+
+<span class="c1"># If an attibute is not found, Return 0 even if a groupKey is not found</span>
+<span class="c1"># Don&#39;t change this behavior; it will break user&#39;s code.</span>
+
+    <span class="k">def</span> <span class="nf">__GetGroupAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupKey</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                            <span class="n">attributeName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">symbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">series</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns the cumulative or average densities of all fuel segments in all</span>
+<span class="sd">        groups. Use this function with discretion, as groups with no segments</span>
+<span class="sd">        will reduce the average density value.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        groupKey: str</span>
+<span class="sd">        attributeName: str</span>
+<span class="sd">        symbol: str</span>
+<span class="sd">        series: list</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        attribute: float</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">assert</span> <span class="n">attributeName</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;fatal.&#39;</span>
+
+        <span class="n">attribute</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">groupKey</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+
+            <span class="n">attribute</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">fuelSegments</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuelSegments</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="s1">&#39;fail.&#39;</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fuelSegments</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">continue</span>  <span class="c1"># this will reduce the average value</span>
+                <span class="n">groupAttribute</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">fuelSegment</span> <span class="ow">in</span> <span class="n">fuelSegments</span><span class="p">:</span>
+                    <span class="n">groupAttribute</span> <span class="o">+=</span> <span class="n">fuelSegment</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span>
+                        <span class="n">attributeName</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">series</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">attributeName</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;Dens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;CC&#39;</span><span class="p">:</span>
+                    <span class="n">groupAttribute</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fuelSegments</span><span class="p">)</span>
+                <span class="n">attribute</span> <span class="o">+=</span> <span class="n">groupAttribute</span>
+
+            <span class="k">if</span> <span class="n">attribute</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> \
+               <span class="p">(</span><span class="n">attributeName</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;Dens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;CC&#39;</span><span class="p">):</span>
+                <span class="n">attribute</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">)</span>
+
+<span class="c1">#     if attributeName[-4:] == &#39;Dens&#39; or attributeName[-2:] == &#39;CC&#39;:</span>
+<span class="c1">#        print(&#39;HELLO density &#39;+attributeName+&#39; &#39;, attribute)</span>
+
+        <span class="c1"># Get average property in all fuel segments within a groupKey</span>
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">groupKey</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">return</span> <span class="mi">0</span>
+
+            <span class="n">fuelSegments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="n">groupKey</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fuelSegments</span><span class="p">)</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">0</span>
+
+            <span class="n">attribute</span> <span class="o">=</span> <span class="mi">0</span>
+
+            <span class="k">for</span> <span class="n">fuelSegment</span> <span class="ow">in</span> <span class="n">fuelSegments</span><span class="p">:</span>
+                <span class="n">attribute</span> <span class="o">+=</span> <span class="n">fuelSegment</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span>
+                    <span class="n">attributeName</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">series</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">attribute</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> \
+               <span class="p">(</span><span class="n">attributeName</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;Dens&#39;</span> <span class="ow">or</span> <span class="n">attributeName</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">==</span> <span class="s1">&#39;CC&#39;</span><span class="p">):</span>
+                <span class="n">attribute</span> <span class="o">/=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fuelSegments</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">attribute</span>
+
+    <span class="k">def</span> <span class="nf">__GetFuelSegments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupKey</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Returns a list of fuel segments associated with a given group</span>
+<span class="sd">        (if groupKey is specified), or an ordered list of pairs of all</span>
+<span class="sd">        segments in all groups and their keys. [ (timeStamp, fuelSegment),</span>
+<span class="sd">        (timeStamp, fuelSegment), ..]. If the specified groupKey does not</span>
+<span class="sd">        exist, this function will return an empty list.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        groupKey: str</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        sorted_data: type or self.groups[groupKey]: type or list(): list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">groupKey</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># return an ordered list of all fuelSegments</span>
+
+            <span class="n">tmp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="n">timeStamp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">fuelSegments</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">fuelSegments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">tmp</span> <span class="o">+=</span> <span class="n">fuelSegments</span>
+                <span class="c1"># all fuel segments in the group have</span>
+                <span class="n">timeStamp</span> <span class="o">+=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">fuelSegments</span><span class="p">]</span>
+                <span class="c1"># the same time stamp</span>
+
+            <span class="c1"># sort fuelSegments in order of their keys</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">timeStamp</span><span class="p">,</span> <span class="n">tmp</span><span class="p">)</span>  <span class="c1"># this is a list of pairs</span>
+            <span class="n">sorted_data</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                <span class="n">data</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">entry</span><span class="p">:</span> <span class="n">entry</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="c1">#tmp = [ y for (x,y) in sorted_data ]  # oldest first</span>
+            <span class="k">return</span> <span class="n">sorted_data</span>
+
+        <span class="k">else</span><span class="p">:</span>
+
+            <span class="k">if</span> <span class="n">groupKey</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">return</span> <span class="nb">list</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="n">groupKey</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__AddGroup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupKey</span><span class="p">,</span> <span class="n">fuelSegments</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        If a list of fuel segments and a group key is specified, the</span>
+<span class="sd">        fuelSegment list is appended to the specified groupKey. If the groupKey</span>
+<span class="sd">        specified does not already exist, a new one is created and the</span>
+<span class="sd">        fuelSegments list is appended to it. fuelSegments is ALWAYS a list,</span>
+<span class="sd">        and may be empty. A group will ALWAYS have a  fuelSegments list.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        groupKey: str</span>
+<span class="sd">        fuelSegments: list</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">if</span> <span class="n">fuelSegments</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fuelSegments</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fuelSegments</span><span class="p">,</span> <span class="nb">list</span><span class="p">),</span> <span class="s1">&#39;fail.&#39;</span>
+
+        <span class="k">if</span> <span class="n">groupKey</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="n">groupKey</span><span class="p">]</span> <span class="o">+=</span> <span class="n">fuelSegments</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="n">groupKey</span><span class="p">]</span> <span class="o">=</span> <span class="n">fuelSegments</span>
+
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">__RemoveFuelSegment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupKey</span><span class="p">,</span> <span class="n">fuelSegment_remove</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Removes a fuel segment from a list associated with a specified group</span>
+<span class="sd">        key. If the specified group key or fuel segment do not exist, the</span>
+<span class="sd">        function will fail.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        groupKey: str</span>
+<span class="sd">        fuelSegment: str</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="k">assert</span> <span class="n">groupKey</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="s1">&#39;fail.&#39;</span>
+
+        <span class="n">fuelSegments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="n">groupKey</span><span class="p">]</span>
+        <span class="n">nSegments</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fuelSegments</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">fuelSegment</span> <span class="ow">in</span> <span class="n">fuelSegments</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">fuelSegment</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span>
+                    <span class="s1">&#39;segmentId&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="n">fuelSegment_remove</span><span class="o">.</span><span class="n">get_attribute</span><span class="p">(</span><span class="s1">&#39;segmentId&#39;</span><span class="p">):</span>
+                <span class="n">fuelSegments</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fuelSegment</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="p">[</span><span class="n">groupKey</span><span class="p">])</span> <span class="o">==</span> <span class="n">nSegments</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;fatal.&#39;</span>
+
+        <span class="k">return</span></div>
+
+<span class="c1">#========================= end class FuelSegmentsGroups ==========================</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
+<h3>About Cortix</h3>
+<p>
+Cortix is a Python library for network modeling and parallel simulation.
+</p>
+<p>
+Cortix Group <br>
+c/o <a href="https://www.uml.edu/innovation-hub">UMass Innovation Hub</a> <br>
+110 Canal St., 3rd Floor <br>
+Lower, MA 01852
+</p>
+
+<p>
+<a href="https://www.uml.edu/Engineering/Chemical/faculty/de-Almeida-Valmor.aspx">Prof. V. F. de Almeida, Ph.D.</a></br>
+Group Leader <br>
+<a href="https://www.uml.edu/Engineering/Chemical">Dept. of Chemical Engineering (Nuclear)</a></br>
+<a href="https://www.uml.edu/">UMass Lowell</a><br>
+</p>
+
+<!---->
+
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul>
+<li><a href="../index.html">Home</a></li>
+<li><a href="../install.html">Install</a></li>
+<li><a href="../contents.html">Documentation</a></li>
+<li><a href="../license.html">License</a></li>
+</ul>
+
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="https://pypi.org/project/cortix/">Cortix @ PyPI</a></li>
+  <li><a href="https://github.com/dpploy/cortix">Cortix @ GitHub</a></li>
+  <li><a href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master">Cortix @ binder</a></li>
+  <li><a href="https://nbviewer.jupyter.org/github/dpploy/cortix-nb/tree/master/">Cortix @ nbviewer</a></li>
+  <li><a href="https://github.com/dpploy/cortix-nb">Cortix Jupyter Notebooks</a></li>
+  <li><a href="https://github.com/dpploy/cortix/issues">Issue Tracker</a></li>
+  <li><a href="https://dpploy.github.io/cortix/Cortix.pdf">PDF Documentation</a></li>
+</ul>
+
+<h3>HPC Resources</h3>
+<ul>
+  <li><a href="https://hpc.inl.gov/SitePages/Home.aspx">Idaho National Laboratory HPC</a></li>
+  <li><a href="http://wiki.umassrc.org/wiki/index.php/Main_Page">UMass Green HPC Cluster </a></li>
+</ul>
+
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, University of Massachusetts Lowell.
+      
+    </div>
+
+    
+    <a href="https://github.com/dpploy/cortix" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,312 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>module module &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-module">
+<span id="module-module"></span><h1>module module<a class="headerlink" href="#module-module" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="module.Module">
+<em class="property">class </em><code class="descclassname">module.</code><code class="descname">Module</code><a class="reference internal" href="../_modules/module.html#Module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Cortix module super class.</p>
+<p>This class provides facilities for creating modules within the Cortix network.
+Cortix will map one object of this class to either a Multiprocessing or MPI
+process depending on the user’s configuration.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This class is to be inherited by every Cortix module.
+In order to execute, modules <em>must</em> override the <cite>run</cite> method, which will be
+executed during the simulation.</p>
+</div>
+<dl class="method">
+<dt id="module.Module.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Module super class constructor.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>This constructor must be called explicitly in the constructor of every
+Cortix module like so:</p>
+<blockquote class="last">
+<div>super().__init__()</div></blockquote>
+</div>
+<dl class="attribute">
+<dt id="module.Module.name">
+<code class="descname">name</code><a class="headerlink" href="#module.Module.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – A name given to the instance. Default is the derived class name.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.port_names_expected">
+<code class="descname">port_names_expected</code><a class="headerlink" href="#module.Module.port_names_expected" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list(str), None</em> – A list of names of ports expected in the module. This will be compared
+to port names during runtime to check against the intended use of the
+module.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.state">
+<code class="descname">state</code><a class="headerlink" href="#module.Module.state" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>any</em> – Any <cite>pickle-able</cite> data structure to be passed in a <cite>multiprocessing.Queue</cite>
+to the parent process or to be gathered in the root MPI process.
+Default is <cite>None</cite>.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.use_mpi">
+<code class="descname">use_mpi</code><a class="headerlink" href="#module.Module.use_mpi" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – <cite>True</cite> for MPI, <cite>False</cite> for Multiprocessing</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.use_multiprocessing">
+<code class="descname">use_multiprocessing</code><a class="headerlink" href="#module.Module.use_multiprocessing" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>bool</em> – <cite>False</cite> for MPI, <cite>True</cite> for Multiprocessing</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.ports">
+<code class="descname">ports</code><a class="headerlink" href="#module.Module.ports" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list(Port)</em> – A list of ports contained by the module</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.__network">
+<code class="descname">__network</code><a class="headerlink" href="#module.Module.__network" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Network</em> – An internal network inherited by the derived module for nested networks.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="method">
+<dt id="module.Module.get_port">
+<code class="descname">get_port</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.get_port"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.get_port" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get port by name; if it does not exist, create one.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The name of the port to get</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>port</strong> – The port object with the corresponding name</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="port.html#port.Port" title="port.Port">Port</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="module.Module.network">
+<code class="descname">network</code><a class="headerlink" href="#module.Module.network" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="module.Module.recv">
+<code class="descname">recv</code><span class="sig-paren">(</span><em>port</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.recv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.recv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive data from a given port</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This function will block until data is available</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>port</strong> (<a class="reference internal" href="port.html#port.Port" title="port.Port"><em>Port</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A Port object to send the data through, or its string name</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>data</strong> – The data received through the port</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">any</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="module.Module.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Module run function</p>
+<p>Run method with an option to pass data back to the parent process when running
+in Python multiprocessing mode. If the user does not want to share data with
+the parent process, this function can be overriden with <cite>run(self)</cite>
+or <cite>run(self, *args)</cite> as long as <cite>self.state = None</cite>.
+If <cite>self.state</cite> points to anything but <cite>None</cite>, the user must use
+<a href="#id1"><span class="problematic" id="id2">`</span></a>run(self, <a href="#id3"><span class="problematic" id="id4">*</span></a>args).</p>
+<div class="admonition-notes admonition">
+<p class="first admonition-title">Notes</p>
+<p>When in multiprocessing, <cite>*args</cite> has two elements: <cite>comm_idx</cite> and <cite>comm_state</cite>.
+To pass back the state of the module, the user should insert the provided
+index <cite>comm_idx</cite> and the <cite>state</cite> into the queue as follows:</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>if self.use_multiprocessing:</dt>
+<dd><dl class="first last docutils">
+<dt>try:</dt>
+<dd>pickle.dumps(self.state)</dd>
+<dt>except pickle.PicklingError:</dt>
+<dd>args[1].put((arg[0],None))</dd>
+<dt>else:</dt>
+<dd>args[1].put((arg[0],self.state))</dd>
+</dl>
+</dd>
+</dl>
+</div></blockquote>
+<p class="last">at the bottom of the user defined <cite>run()</cite> function.</p>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This function must be overridden by all Cortix modules</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>arg</strong><strong>[</strong><strong>0</strong><strong>]</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index of the state in the communication queue.</li>
+<li><strong>arg</strong><strong>[</strong><strong>1</strong><strong>]</strong> (<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v3.7)"><em>multiprocessing.Queue</em></a>) – When using the Python <cite>multiprocessing</cite> library <cite>state_comm</cite> must have
+the module’s <cite>self.state</cite> in it. That is,
+<cite>state_comm.put((idx_comm,self.state))</cite> must be the last command in the
+method before <cite>return</cite>. In addition, self.state must be <cite>pickle-able</cite>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="module.Module.send">
+<code class="descname">send</code><span class="sig-paren">(</span><em>data</em>, <em>port</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.send"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send data through a given port.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> (<em>any</em>) – The data being sent out - must be pickleable</li>
+<li><strong>port</strong> (<a class="reference internal" href="port.html#port.Port" title="port.Port"><em>Port</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A Port object to send the data through, or its string name</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
+<h3>About Cortix</h3>
+<p>
+Cortix is a Python library for network modeling and parallel simulation.
+</p>
+<p>
+Cortix Group <br>
+c/o <a href="https://www.uml.edu/innovation-hub">UMass Innovation Hub</a> <br>
+110 Canal St., 3rd Floor <br>
+Lower, MA 01852
+</p>
+
+<p>
+<a href="https://www.uml.edu/Engineering/Chemical/faculty/de-Almeida-Valmor.aspx">Prof. V. F. de Almeida, Ph.D.</a></br>
+Group Leader <br>
+<a href="https://www.uml.edu/Engineering/Chemical">Dept. of Chemical Engineering (Nuclear)</a></br>
+<a href="https://www.uml.edu/">UMass Lowell</a><br>
+</p>
+
+<!---->
+
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul>
+<li><a href="../index.html">Home</a></li>
+<li><a href="../install.html">Install</a></li>
+<li><a href="../contents.html">Documentation</a></li>
+<li><a href="../license.html">License</a></li>
+</ul>
+
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="https://pypi.org/project/cortix/">Cortix @ PyPI</a></li>
+  <li><a href="https://github.com/dpploy/cortix">Cortix @ GitHub</a></li>
+  <li><a href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master">Cortix @ binder</a></li>
+  <li><a href="https://nbviewer.jupyter.org/github/dpploy/cortix-nb/tree/master/">Cortix @ nbviewer</a></li>
+  <li><a href="https://github.com/dpploy/cortix-nb">Cortix Jupyter Notebooks</a></li>
+  <li><a href="https://github.com/dpploy/cortix/issues">Issue Tracker</a></li>
+  <li><a href="https://dpploy.github.io/cortix/Cortix.pdf">PDF Documentation</a></li>
+</ul>
+
+<h3>HPC Resources</h3>
+<ul>
+  <li><a href="https://hpc.inl.gov/SitePages/Home.aspx">Idaho National Laboratory HPC</a></li>
+  <li><a href="http://wiki.umassrc.org/wiki/index.php/Main_Page">UMass Green HPC Cluster </a></li>
+</ul>
+
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, University of Massachusetts Lowell.
+      
+      |
+      <a href="../_sources/src_rst/module.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+    <a href="https://github.com/dpploy/cortix" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>

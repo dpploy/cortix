@@ -1,0 +1,1116 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>specie &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-specie">
+<span id="specie"></span><h1>specie<a class="headerlink" href="#module-specie" title="Permalink to this headline">¶</a></h1>
+<p>Author: Valmor de Almeida <a class="reference external" href="mailto:dealmeidav&#37;&#52;&#48;ornl&#46;gov">dealmeidav<span>&#64;</span>ornl<span>&#46;</span>gov</a>; vfda</p>
+<p>This Specie class is to be used with other classes in plant-level process modules.</p>
+<dl class="docutils">
+<dt>NB: Species is always used either in singular or plural cases, the class</dt>
+<dd>named here reflects one species. If many species are used in an external
+context, the species object name can be used without conflict.</dd>
+<dt>For unit testing do at the linux command prompt:</dt>
+<dd>python specie.py</dd>
+<dt>NB: The Specie() class encapsulates either the molecular or empirical chemical</dt>
+<dd><p class="first">formula of a compound.
+This is done as follows. Say MAO2 is either a molecular or empirical chemical
+formula of a ficticious compound denoting minor actinides dioxide. The list
+of atoms is given as follows:</p>
+<p>[‘0.49*Np-237’, ‘0.42*Am-241’, ‘0.08*Am-243’, ‘0.01*Cm-244’, ‘2.0*O-16’]</p>
+<p>note the MA forming nuclides add to 1 = 0.49 + 0.42 + 0.08 + 0.01. Therefore
+the number of atoms in this compound is 3. 1 MA “atom” and 2 O.
+Note that the total number of “atoms” is obtained by summing all multipliers:
+0.49 + 0.42 + 0.08 + 0.01 + 2.0.
+The nuclide is indicated by the element symbol followed by a dash and the
+atomic mass number. Here the number of nuclide types is 5 (self._nNuclideTypes).</p>
+<p>The numbers preceeding the nuclide symbol before the * will be referred to as
+multipliers. The sum of the multipliers will add to the number of “atoms” in
+the formula. WARNING: a multiplier could be in the format 0.00e-00. In this
+case a hiphen may appear twice, e.g.: 1.549e-09*U-233</p>
+<p>Other forms can be used for common true species</p>
+<p>[‘Np-237’, ‘2.0*O-16’] or [‘Np-237’, ‘O-16’, ‘O-16’] or [ ‘2*H’, ‘O’ ] or
+[ ‘H’, ‘O’, ‘H’ ]  etc…</p>
+<p class="last">This code will calculate the molar mass of any species with a given valid
+atom list using a provided periodic table of chemical elements. The user
+can also reset the value of the molar mass with a setter method.</p>
+</dd>
+</dl>
+<p>Sat May  9 21:40:48 EDT 2015 created; vfda</p>
+<dl class="class">
+<dt id="specie.Specie">
+<em class="property">class </em><code class="descclassname">specie.</code><code class="descname">Specie</code><span class="sig-paren">(</span><em>name='null'</em>, <em>formula_name='null'</em>, <em>phase='null'</em>, <em>atoms=[]</em>, <em>molarCC=0.0</em>, <em>massCC=0.0</em>, <em>flag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="docutils">
+<dt>todo: phase should not be here; concentrations should not be here</dt>
+<dd>only molar quantities should be here
+see the Phase container</dd>
+</dl>
+<dl class="method">
+<dt id="specie.Specie.GetAtoms">
+<code class="descname">GetAtoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetAtoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetAtoms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetFlag">
+<code class="descname">GetFlag</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetFlag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetFlag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the flag associated with the species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>flag</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetFormula">
+<code class="descname">GetFormula</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetFormula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetFormula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the molecular or empirical formula of the species. It is
+usually a list, for example, of the form [‘2*H’, ‘O’].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>formula</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetFormulaName">
+<code class="descname">GetFormulaName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetFormulaName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetFormulaName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the formulaic name of the compound. For example, “Dihydrogen
+monoxide”.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>self.__formula_name</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetMassCC">
+<code class="descname">GetMassCC</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetMassCC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetMassCC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the numerical value of the mass density of the species
+(mass/volume).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>massCC</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetMassCCUnit">
+<code class="descname">GetMassCCUnit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetMassCCUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetMassCCUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the unit used to measure the mass density of the species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>massCCUnit</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetMolarCC">
+<code class="descname">GetMolarCC</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetMolarCC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetMolarCC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the numerical value for the number (molar) density of the
+species (moles/volume).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarCC</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetMolarCCUnit">
+<code class="descname">GetMolarCCUnit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetMolarCCUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetMolarCCUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the unit used to measure molar density of the species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarCCUnit</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetMolarGammaPwr">
+<code class="descname">GetMolarGammaPwr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetMolarGammaPwr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetMolarGammaPwr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the amount of gamma radiation produced per mole of this species
+(measured in units of power).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarGammaPwr</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetMolarGammaPwrUnit">
+<code class="descname">GetMolarGammaPwrUnit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetMolarGammaPwrUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetMolarGammaPwrUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the unit used to measure the amount of gamma radiation produced
+per mole of this species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarGammaPwrUnit</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetMolarHeatPwr">
+<code class="descname">GetMolarHeatPwr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetMolarHeatPwr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetMolarHeatPwr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the amount of heat generated per mole of this species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarHeatPwr</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetMolarHeatPwrUnit">
+<code class="descname">GetMolarHeatPwrUnit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetMolarHeatPwrUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetMolarHeatPwrUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the unit used to measure the amount of heat generated per mole
+of this species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarHeatPwrUnit</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetMolarMass">
+<code class="descname">GetMolarMass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetMolarMass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetMolarMass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the numerical value for the molar mass of the species. Units
+are given by molarMassUnit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarMass</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetMolarMassUnit">
+<code class="descname">GetMolarMassUnit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetMolarMassUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetMolarMassUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the unit used to measure the molar mass of the species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarMassUnit</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetMolarRadioactivity">
+<code class="descname">GetMolarRadioactivity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetMolarRadioactivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetMolarRadioactivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the numerical value for molar radioactivity of the species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarRadioactivity</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetMolarRadioactivityFractions">
+<code class="descname">GetMolarRadioactivityFractions</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetMolarRadioactivityFractions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetMolarRadioactivityFractions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of numbers that speciefies the % of molar reactivity
+that comes from each type of atom in the species. For example, a
+molarRadioactivityFraction of [0.65, 0.35] for water means that 65%
+of the molar radioactivity comes from the hydrogen atoms and 35% comes
+from the oxygen atom.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarRadioactivityFractions</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetMolarRadioactivityUnit">
+<code class="descname">GetMolarRadioactivityUnit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetMolarRadioactivityUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetMolarRadioactivityUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the unit used to measure molar radioactivity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarRadioactivityUnit</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetNAtoms">
+<code class="descname">GetNAtoms</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetNAtoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetNAtoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the total number of atoms comprising the species. For example,
+water is comprised of three atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>nAtoms</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetNNuclideTypes">
+<code class="descname">GetNNuclideTypes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetNNuclideTypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetNNuclideTypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of different types of atoms comprising the species.
+For example, water is composed of two different types of atoms,
+hydrogen and oxygen.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>nNuclideTypes</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetName">
+<code class="descname">GetName</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the empirical name of the species. For example, “water”.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>name</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.GetPhase">
+<code class="descname">GetPhase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.GetPhase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.GetPhase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the phase history of the species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>phase</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetAtoms">
+<code class="descname">SetAtoms</code><span class="sig-paren">(</span><em>atoms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetAtoms"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetAtoms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetFlag">
+<code class="descname">SetFlag</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetFlag"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetFlag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the flag associated with the species to f.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>f</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetFormula">
+<code class="descname">SetFormula</code><span class="sig-paren">(</span><em>atoms</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetFormula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetFormula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the species’ formula equal to atoms. Will automatically update
+the molar mass of the species, and will also fail if atoms is not a
+list of strings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>atoms</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetFormulaName">
+<code class="descname">SetFormulaName</code><span class="sig-paren">(</span><em>f</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetFormulaName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetFormulaName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the formulaic name to f.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>self.__formula_name</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetMassCC">
+<code class="descname">SetMassCC</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetMassCC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetMassCC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the numerical value of the mass density equal to v.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetMassCCUnit">
+<code class="descname">SetMassCCUnit</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetMassCCUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetMassCCUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the units used to measure mass density to v.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetMolarCC">
+<code class="descname">SetMolarCC</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetMolarCC"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetMolarCC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the numerical value for the molar density of the species to v.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetMolarCCUnit">
+<code class="descname">SetMolarCCUnit</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetMolarCCUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetMolarCCUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the unit used to measure the molar density of the species to v.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetMolarGammaPwr">
+<code class="descname">SetMolarGammaPwr</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetMolarGammaPwr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetMolarGammaPwr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the amount of gamma radiation produced per mole of this species to
+v.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetMolarGammaPwrUnit">
+<code class="descname">SetMolarGammaPwrUnit</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetMolarGammaPwrUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetMolarGammaPwrUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the unit used to measure the amount of gamma radiation produced
+per mole of this species to v.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetMolarHeatPwr">
+<code class="descname">SetMolarHeatPwr</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetMolarHeatPwr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetMolarHeatPwr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the amount of heat generated per mole of this species to v.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetMolarHeatPwrUnit">
+<code class="descname">SetMolarHeatPwrUnit</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetMolarHeatPwrUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetMolarHeatPwrUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the unit used to measure the amount of heat generated per mole of
+this species to v.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetMolarMass">
+<code class="descname">SetMolarMass</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetMolarMass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetMolarMass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the molar mass of the species equal to v.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetMolarMassUnit">
+<code class="descname">SetMolarMassUnit</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetMolarMassUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetMolarMassUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the unit used to measure the molar mass of the species to v.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetMolarRadioactivity">
+<code class="descname">SetMolarRadioactivity</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetMolarRadioactivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetMolarRadioactivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the molar radioactivity of the species equal to v.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetMolarRadioactivityFractions">
+<code class="descname">SetMolarRadioactivityFractions</code><span class="sig-paren">(</span><em>fracs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetMolarRadioactivityFractions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetMolarRadioactivityFractions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets molarRadioactivityFractions equal to fracs. Fracs must be a list
+of floatswith the same length as there are different atoms in the
+species, or the function call will fail. (e.g. self._atoms and fracs
+must be of the same length). Take care to ensure that the elements of
+fracs match with the elements of self._atoms! (65% is in the same
+position in fracs as hydrogen is in self._atoms, following the above
+example).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fracs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetMolarRadioactivityUnit">
+<code class="descname">SetMolarRadioactivityUnit</code><span class="sig-paren">(</span><em>v</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetMolarRadioactivityUnit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetMolarRadioactivityUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the unit used to measure molar radioactivity to v.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetName">
+<code class="descname">SetName</code><span class="sig-paren">(</span><em>n</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetName"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetName" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the empirical  name of the species to n.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="specie.Specie.SetPhase">
+<code class="descname">SetPhase</code><span class="sig-paren">(</span><em>p</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/specie.html#Specie.SetPhase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#specie.Specie.SetPhase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the phase history to p.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>p</strong> (<em>dataFrame</em>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.atoms">
+<code class="descname">atoms</code><a class="headerlink" href="#specie.Specie.atoms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.flag">
+<code class="descname">flag</code><a class="headerlink" href="#specie.Specie.flag" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the flag associated with the species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>flag</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.formula">
+<code class="descname">formula</code><a class="headerlink" href="#specie.Specie.formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the molecular or empirical formula of the species. It is
+usually a list, for example, of the form [‘2*H’, ‘O’].</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>formula</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.formula_name">
+<code class="descname">formula_name</code><a class="headerlink" href="#specie.Specie.formula_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the formulaic name of the compound. For example, “Dihydrogen
+monoxide”.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>self.__formula_name</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.massCC">
+<code class="descname">massCC</code><a class="headerlink" href="#specie.Specie.massCC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the numerical value of the mass density of the species
+(mass/volume).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>massCC</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.massCCUnit">
+<code class="descname">massCCUnit</code><a class="headerlink" href="#specie.Specie.massCCUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the unit used to measure the mass density of the species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>massCCUnit</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.molarCC">
+<code class="descname">molarCC</code><a class="headerlink" href="#specie.Specie.molarCC" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the numerical value for the number (molar) density of the
+species (moles/volume).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarCC</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.molarCCUnit">
+<code class="descname">molarCCUnit</code><a class="headerlink" href="#specie.Specie.molarCCUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the unit used to measure molar density of the species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarCCUnit</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.molarGammaPwr">
+<code class="descname">molarGammaPwr</code><a class="headerlink" href="#specie.Specie.molarGammaPwr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the amount of gamma radiation produced per mole of this species
+(measured in units of power).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarGammaPwr</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.molarGammaPwrUnit">
+<code class="descname">molarGammaPwrUnit</code><a class="headerlink" href="#specie.Specie.molarGammaPwrUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the unit used to measure the amount of gamma radiation produced
+per mole of this species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarGammaPwrUnit</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.molarHeatPwr">
+<code class="descname">molarHeatPwr</code><a class="headerlink" href="#specie.Specie.molarHeatPwr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the amount of heat generated per mole of this species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarHeatPwr</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.molarHeatPwrUnit">
+<code class="descname">molarHeatPwrUnit</code><a class="headerlink" href="#specie.Specie.molarHeatPwrUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the unit used to measure the amount of heat generated per mole
+of this species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarHeatPwrUnit</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.molarMass">
+<code class="descname">molarMass</code><a class="headerlink" href="#specie.Specie.molarMass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the numerical value for the molar mass of the species. Units
+are given by molarMassUnit.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarMass</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.molarMassUnit">
+<code class="descname">molarMassUnit</code><a class="headerlink" href="#specie.Specie.molarMassUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the unit used to measure the molar mass of the species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarMassUnit</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.molarRadioactivity">
+<code class="descname">molarRadioactivity</code><a class="headerlink" href="#specie.Specie.molarRadioactivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the numerical value for molar radioactivity of the species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarRadioactivity</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.molarRadioactivityFractions">
+<code class="descname">molarRadioactivityFractions</code><a class="headerlink" href="#specie.Specie.molarRadioactivityFractions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of numbers that speciefies the % of molar reactivity
+that comes from each type of atom in the species. For example, a
+molarRadioactivityFraction of [0.65, 0.35] for water means that 65%
+of the molar radioactivity comes from the hydrogen atoms and 35% comes
+from the oxygen atom.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarRadioactivityFractions</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.molarRadioactivityUnit">
+<code class="descname">molarRadioactivityUnit</code><a class="headerlink" href="#specie.Specie.molarRadioactivityUnit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the unit used to measure molar radioactivity.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>molarRadioactivityUnit</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.nAtoms">
+<code class="descname">nAtoms</code><a class="headerlink" href="#specie.Specie.nAtoms" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the total number of atoms comprising the species. For example,
+water is comprised of three atoms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>nAtoms</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.nNuclideTypes">
+<code class="descname">nNuclideTypes</code><a class="headerlink" href="#specie.Specie.nNuclideTypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the number of different types of atoms comprising the species.
+For example, water is composed of two different types of atoms,
+hydrogen and oxygen.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>nNuclideTypes</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.name">
+<code class="descname">name</code><a class="headerlink" href="#specie.Specie.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the empirical name of the species. For example, “water”.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>name</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="specie.Specie.phase">
+<code class="descname">phase</code><a class="headerlink" href="#specie.Specie.phase" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the phase history of the species.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>phase</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dataFrame</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<img src="https://cortix.org/logo.jpg" alt="Cortix">
+<h3>About Cortix</h3>
+<p>
+Cortix is a Python library for network modeling and parallel simulation.
+</p>
+<p>
+Cortix Group <br>
+c/o <a href="https://www.uml.edu/innovation-hub">UMass Innovation Hub</a> <br>
+110 Canal St., 3rd Floor <br>
+Lower, MA 01852
+</p>
+
+<p>
+<a href="https://www.uml.edu/Engineering/Chemical/faculty/de-Almeida-Valmor.aspx">Prof. V. F. de Almeida, Ph.D.</a></br>
+Group Leader <br>
+<a href="https://www.uml.edu/Engineering/Chemical">Dept. of Chemical Engineering (Nuclear)</a></br>
+<a href="https://www.uml.edu/">UMass Lowell</a><br>
+</p>
+
+<!---->
+
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul>
+<li><a href="../index.html">Home</a></li>
+<li><a href="../install.html">Install</a></li>
+<li><a href="../contents.html">Documentation</a></li>
+<li><a href="../license.html">License</a></li>
+</ul>
+
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="https://pypi.org/project/cortix/">Cortix @ PyPI</a></li>
+  <li><a href="https://github.com/dpploy/cortix">Cortix @ GitHub</a></li>
+  <li><a href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master">Cortix @ binder</a></li>
+  <li><a href="https://nbviewer.jupyter.org/github/dpploy/cortix-nb/tree/master/">Cortix @ nbviewer</a></li>
+  <li><a href="https://github.com/dpploy/cortix-nb">Cortix Jupyter Notebooks</a></li>
+  <li><a href="https://github.com/dpploy/cortix/issues">Issue Tracker</a></li>
+  <li><a href="https://dpploy.github.io/cortix/Cortix.pdf">PDF Documentation</a></li>
+</ul>
+
+<h3>HPC Resources</h3>
+<ul>
+  <li><a href="https://hpc.inl.gov/SitePages/Home.aspx">Idaho National Laboratory HPC</a></li>
+  <li><a href="http://wiki.umassrc.org/wiki/index.php/Main_Page">UMass Green HPC Cluster </a></li>
+</ul>
+
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, University of Massachusetts Lowell.
+      
+      |
+      <a href="../_sources/support_rst/specie.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+    <a href="https://github.com/dpploy/cortix" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>
