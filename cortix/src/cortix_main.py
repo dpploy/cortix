@@ -21,7 +21,7 @@ class Cortix:
 
     '''
 
-    def __init__(self, use_mpi=False, splash=False):
+    def __init__(self, use_mpi=False, splash=False, log_filename='cortix'):
         '''Construct a Cortix simulation object.
 
         Parameters
@@ -58,7 +58,7 @@ class Cortix:
         self.splash = splash
 
         self.__network = None
-        self.log_filename = 'cortix'
+        self.log_filename = log_filename
         # Fall back to multiprocessing if mpi4py is not available
         if self.use_mpi:
             try:
