@@ -1,6 +1,5 @@
-from cortix.src.module import Module
-from cortix.src.port import Port
-
+from cortix import Module
+from cortix import Port
 import numpy as np
 
 class Body(Module):
