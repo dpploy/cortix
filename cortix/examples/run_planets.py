@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 from cortix import Cortix
-from cortix.src.module import Module
-from cortix.src.network import Network
-from cortix.src.port import Port
+from cortix import Module
+from cortix import Network
+from cortix import Port
 from body import Body
 
 def main():
