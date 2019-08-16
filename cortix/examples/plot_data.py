@@ -1,7 +1,8 @@
-from cortix.src.module import Module
-from cortix.src.port import Port
+from cortix import Module
+from cortix import Port
+from cortix import Cortix
+
 from cortix.examples.dataplot import DataPlot
-from cortix.src.cortix_main import Cortix
 
 class PlotData(Module):
     def __init__(self):

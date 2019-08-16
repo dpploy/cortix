@@ -8,9 +8,10 @@ import pickle
 import numpy as np
 import scipy.constants as const
 from scipy.integrate import odeint
-from cortix.src.module import Module
-from cortix.support.phase import Phase
-from cortix.support.quantity import Quantity
+
+from cortix import Module
+from cortix import Phase
+from cortix import Quantity
 
 class Prison(Module):
     '''
