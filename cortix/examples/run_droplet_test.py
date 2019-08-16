@@ -48,8 +48,8 @@ command line as
 
 import scipy.constants as const
 
-from cortix.src.cortix_main import Cortix
-from cortix.src.network import Network
+from cortix import Cortix
+from cortix import Network
 
 from cortix.examples.dataplot import DataPlot
 from cortix.examples.droplet import Droplet
