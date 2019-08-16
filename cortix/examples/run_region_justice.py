@@ -78,17 +78,18 @@ def main():
     region.network = Network()
     ne_net = region.network
 
-    a_state = State('A')
-    ne_net.module(a_state)
-    a_state.end_time = end_time
-    a_state.time_step = time_step
+    state_1 = State('State-1')
+    ne_net.module(state_1)
+    state_1.end_time = end_time
+    state_1.time_step = time_step
 
-    b_state = State('B')
-    ne_net.module(b_state)
-    b_state.end_time = end_time
-    b_state.time_step = time_step
+    state_2 = State('State-2')
+    ne_net.module(state_2)
+    state_2.end_time = end_time
+    state_2.time_step = time_step
 
-    ne_net.connect(a_state,b_state)
+    ne_net.connect( [state_1,'outflow:1'], [state_2,'inflow:1'] )
+    ne_net.connect( [state_2,'outflow:1'], [state_1,'inflow:1'] )
     ne_net.draw()
 
     '''

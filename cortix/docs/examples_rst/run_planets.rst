@@ -1,7 +1,7 @@
-run\_justice module
+run\_planets module
 ===================
 
-.. automodule:: run_justice
+.. automodule:: run_planets
     :members:
     :undoc-members:
     :show-inheritance:
