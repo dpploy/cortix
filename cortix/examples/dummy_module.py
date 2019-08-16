@@ -1,5 +1,5 @@
-from cortix.src.module import Module
-from cortix.src.port import Port
+from cortix import Module
+from cortix import Port
 from time import sleep
 
 class DummyModule(Module):
