@@ -8,3 +8,6 @@ from .src.cortix_main import Cortix
 from .src.module import Module
 from .src.network import Network
 from .src.port import Port
+
+from .support.phase import Phase
+from .support.quantity import Quantity
