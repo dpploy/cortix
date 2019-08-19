@@ -1,5 +1,4 @@
-    A Python library for system-level module coupling, execution, and
-    analysis.
+A Python library for network dynamics modeling and HPC simulation.
 
 | |Website|
 | |Build Status|
