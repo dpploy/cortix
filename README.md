@@ -1,5 +1,5 @@
 # Cortix
-> A Python library for system-level module coupling, execution, and analysis.
+A Python library for network dynamics modeling and HPC simulation.
 
 ![Website](https://img.shields.io/website/https/github.com/dpploy/cortix.svg)
 [![Build Status](https://travis-ci.org/dpploy/cortix.svg?branch=master)](https://travis-ci.org/dpploy/cortix)
