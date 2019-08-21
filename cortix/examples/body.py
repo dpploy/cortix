@@ -1,27 +1,29 @@
 from cortix import Module
 from cortix import Port
 import numpy as np
+from numpy.random import rand
 
 class Body(Module):
-    def __init__(self, mass=0, rad=0, pos=np.array([0.0, 0.0, 0.0]),
-            vel=np.array([0.0,0.0,0.0]), ts=10):
+    def __init__(self, mass=1, rad=1, pos=None, vel=None, ts=10):
         super().__init__()
 
         self.G = 6.67408e-11
         self.mass = mass
         self.rad = rad
-        self.pos = pos
-        self.vel = vel
-        self.acc = None
+
+        self.pos = pos if pos else np.array([i*5 for i in rand(3)])
+        self.vel = vel if vel else np.array([i*10 for i in rand(3)])
+        self.acc = np.zeros(3)
         self.other_bodies = None
         self.time_steps = ts
 
     def acceleration(self):
+        ep = 1e-7
         self.acc = np.array([0.0, 0.0, 0.0])
         for (mass, pos) in self.other_bodies:
             r = np.linalg.norm(self.pos - pos)
-            coef = self.G * mass / r**3
-            self.acc += coef * (pos - self.pos)
+            coef = self.G * self.mass / r**3
+            self.acc += (coef * (pos - self.pos)) + ep
         return self.acc
 
     def position(self):
@@ -33,6 +35,7 @@ class Body(Module):
         return self.vel
 
     def step(self):
+
         self.acceleration()
         self.position()
         self.velocity()
@@ -58,11 +61,10 @@ class Body(Module):
 
         for t in range(self.time_steps):
             self.step()
-            print(self)
             self.broadcast_data()
             self.gather_data()
-            print("Time step: {}".format(t))
-            print(self.other_bodies)
+
+        print(self)
 
     def __repr__(self):
         return "{}".format([self.mass, self.rad, self.vel, self.acc])
