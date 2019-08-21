@@ -1,5 +1,5 @@
-quantity
-========
+quantity module
+===============
 
 .. automodule:: quantity
     :members:

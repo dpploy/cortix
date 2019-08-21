@@ -41,13 +41,13 @@ from cortix.src.network import Network
 
 from cortix.examples.state import State
 
-from cortix.examples.prison import Prison
-from cortix.examples.parole import Parole
-from cortix.examples.adjudication import Adjudication
-from cortix.examples.jail import Jail
-from cortix.examples.arrested import Arrested
-from cortix.examples.probation import Probation
-from cortix.examples.community import Community
+from cortix.examples.city_justice.prison import Prison
+from cortix.examples.city_justice.parole import Parole
+from cortix.examples.city_justice.adjudication import Adjudication
+from cortix.examples.city_justice.jail import Jail
+from cortix.examples.city_justice.arrested import Arrested
+from cortix.examples.city_justice.probation import Probation
+from cortix.examples.city_justice.community import Community
 
 def main():
     '''Cortix run file for a criminal justice network.

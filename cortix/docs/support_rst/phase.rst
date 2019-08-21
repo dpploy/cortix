@@ -1,5 +1,5 @@
-phase
-=====
+phase module
+============
 
 .. automodule:: phase
     :members:

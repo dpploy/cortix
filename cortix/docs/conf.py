@@ -22,7 +22,10 @@ import sys
 # sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../src'))
 sys.path.insert(0, os.path.abspath('../support'))
+sys.path.insert(0, os.path.abspath('../support/nuclear'))
 sys.path.insert(0, os.path.abspath('../examples'))
+sys.path.insert(0, os.path.abspath('../examples/city_justice'))
+sys.path.insert(0, os.path.abspath('../examples/droplet_swirl'))
 # sys.path.insert(0, os.path.abspath('../examples/notebook_run'))
 
 # -- General configuration ------------------------------------------------
