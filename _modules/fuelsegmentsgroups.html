@@ -58,10 +58,10 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">random</span>
 
-<span class="kn">from</span> <span class="nn">cortix.support.fuel_segment</span> <span class="k">import</span> <span class="n">FuelSegment</span>
+<span class="kn">from</span> <span class="nn">cortix.support.nuclear.fuel_segment</span> <span class="k">import</span> <span class="n">FuelSegment</span>
 <span class="c1">#*********************************************************************************</span>
 
-<div class="viewcode-block" id="FuelSegmentsGroups"><a class="viewcode-back" href="../support_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups">[docs]</a><span class="k">class</span> <span class="nc">FuelSegmentsGroups</span><span class="p">():</span>
+<div class="viewcode-block" id="FuelSegmentsGroups"><a class="viewcode-back" href="../support_rst/nuclear_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups">[docs]</a><span class="k">class</span> <span class="nc">FuelSegmentsGroups</span><span class="p">():</span>
     <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">    Creates a dictionary of lists of fuel segment objects, with the keys</span>
 <span class="sd">    typically being timestamps. Each fuel segment object has two data members,</span>
@@ -102,7 +102,7 @@
 <span class="c1"># Public Member Functions</span>
 <span class="c1">#*********************************************************************************</span>
 
-<div class="viewcode-block" id="FuelSegmentsGroups.HasGroup"><a class="viewcode-back" href="../support_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups.HasGroup">[docs]</a>    <span class="k">def</span> <span class="nf">HasGroup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<div class="viewcode-block" id="FuelSegmentsGroups.HasGroup"><a class="viewcode-back" href="../support_rst/nuclear_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups.HasGroup">[docs]</a>    <span class="k">def</span> <span class="nf">HasGroup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Checks if the specified key has a group of fuel segments associated</span>
 <span class="sd">        with it.</span>
@@ -118,7 +118,7 @@
 
         <span class="k">return</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">groups</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="FuelSegmentsGroups.AddGroup"><a class="viewcode-back" href="../support_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups.AddGroup">[docs]</a>    <span class="k">def</span> <span class="nf">AddGroup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">fuelSegments</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="FuelSegmentsGroups.AddGroup"><a class="viewcode-back" href="../support_rst/nuclear_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups.AddGroup">[docs]</a>    <span class="k">def</span> <span class="nf">AddGroup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">fuelSegments</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Appends the dictionary with a new key and associated list of</span>
 <span class="sd">        fuelSegments. If the specified key is already present in the</span>
@@ -135,7 +135,7 @@
 
         <span class="k">return</span></div>
 
-<div class="viewcode-block" id="FuelSegmentsGroups.GetAttribute"><a class="viewcode-back" href="../support_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups.GetAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupKey</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attributeName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="FuelSegmentsGroups.GetAttribute"><a class="viewcode-back" href="../support_rst/nuclear_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups.GetAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupKey</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attributeName</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                      <span class="n">nuclideSymbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nuclideSeries</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the average value of an attribute amongst all elements in a</span>
@@ -161,7 +161,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetGroupAttribute</span><span class="p">(</span>
             <span class="n">groupKey</span><span class="p">,</span> <span class="n">attributeName</span><span class="p">,</span> <span class="n">nuclideSymbol</span><span class="p">,</span> <span class="n">nuclideSeries</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FuelSegmentsGroups.GetFuelSegments"><a class="viewcode-back" href="../support_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups.GetFuelSegments">[docs]</a>    <span class="k">def</span> <span class="nf">GetFuelSegments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupKey</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="FuelSegmentsGroups.GetFuelSegments"><a class="viewcode-back" href="../support_rst/nuclear_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups.GetFuelSegments">[docs]</a>    <span class="k">def</span> <span class="nf">GetFuelSegments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupKey</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns a list of fuel segments associated with a specified groupkey.</span>
 <span class="sd">        If no group key is specified, then all elements in the dictionary</span>
@@ -179,7 +179,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetFuelSegments</span><span class="p">(</span><span class="n">groupKey</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FuelSegmentsGroups.RemoveFuelSegment"><a class="viewcode-back" href="../support_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups.RemoveFuelSegment">[docs]</a>    <span class="k">def</span> <span class="nf">RemoveFuelSegment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupKey</span><span class="p">,</span> <span class="n">fuelSegment</span><span class="p">):</span>
+<div class="viewcode-block" id="FuelSegmentsGroups.RemoveFuelSegment"><a class="viewcode-back" href="../support_rst/nuclear_rst/fuelsegmentsgroups.html#fuelsegmentsgroups.FuelSegmentsGroups.RemoveFuelSegment">[docs]</a>    <span class="k">def</span> <span class="nf">RemoveFuelSegment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">groupKey</span><span class="p">,</span> <span class="n">fuelSegment</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Removes a fuel segment from a list associated with a specified group</span>
 <span class="sd">        key. If the specified group key or fuel segment do not exist, the</span>

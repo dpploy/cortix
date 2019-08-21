@@ -73,7 +73,7 @@
 <span class="kn">from</span> <span class="nn">cortix.support.phase</span> <span class="k">import</span> <span class="n">Phase</span>
 <span class="c1"># *******************************************************************************</span>
 
-<div class="viewcode-block" id="FuelSlug"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug">[docs]</a><span class="k">class</span> <span class="nc">FuelSlug</span><span class="p">:</span>
+<div class="viewcode-block" id="FuelSlug"><a class="viewcode-back" href="../support_rst/nuclear_rst/fuelslug.html#fuelslug.FuelSlug">[docs]</a><span class="k">class</span> <span class="nc">FuelSlug</span><span class="p">:</span>
 
 <span class="c1">#*********************************************************************************</span>
 <span class="c1"># Construction</span>
@@ -153,7 +153,7 @@
 <span class="c1"># Public Member Functions</span>
 <span class="c1">#*********************************************************************************</span>
 
-<div class="viewcode-block" id="FuelSlug.GetSpecs"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.GetSpecs">[docs]</a>    <span class="k">def</span> <span class="nf">GetSpecs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FuelSlug.GetSpecs"><a class="viewcode-back" href="../support_rst/nuclear_rst/fuelslug.html#fuelslug.FuelSlug.GetSpecs">[docs]</a>    <span class="k">def</span> <span class="nf">GetSpecs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the species associated with this fuel slug.</span>
 
@@ -165,7 +165,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_specs</span></div>
     <span class="n">specs</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetSpecs</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FuelSlug.GetFuelPhase"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.GetFuelPhase">[docs]</a>    <span class="k">def</span> <span class="nf">GetFuelPhase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FuelSlug.GetFuelPhase"><a class="viewcode-back" href="../support_rst/nuclear_rst/fuelslug.html#fuelslug.FuelSlug.GetFuelPhase">[docs]</a>    <span class="k">def</span> <span class="nf">GetFuelPhase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the phase history of the solid fuel.</span>
 
@@ -177,7 +177,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuelPhase</span></div>
     <span class="n">fuelPhase</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetFuelPhase</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FuelSlug.GetCladdingPhase"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.GetCladdingPhase">[docs]</a>    <span class="k">def</span> <span class="nf">GetCladdingPhase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="FuelSlug.GetCladdingPhase"><a class="viewcode-back" href="../support_rst/nuclear_rst/fuelslug.html#fuelslug.FuelSlug.GetCladdingPhase">[docs]</a>    <span class="k">def</span> <span class="nf">GetCladdingPhase</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the phase history of the cladding.</span>
 
@@ -189,7 +189,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_claddingPhase</span></div>
     <span class="n">claddingPhase</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">GetCladdingPhase</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<div class="viewcode-block" id="FuelSlug.GetAttribute"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.GetAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">symbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">series</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="FuelSlug.GetAttribute"><a class="viewcode-back" href="../support_rst/nuclear_rst/fuelslug.html#fuelslug.FuelSlug.GetAttribute">[docs]</a>    <span class="k">def</span> <span class="nf">GetAttribute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">phase</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">symbol</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">series</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Returns the value of the specified attribute. Any attribute that is</span>
 <span class="sd">        specified in class construction can be retrieved using this function.</span>
@@ -210,7 +210,7 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GetAttribute</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">,</span> <span class="n">series</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FuelSlug.ReduceCladdingVolume"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.ReduceCladdingVolume">[docs]</a>    <span class="k">def</span> <span class="nf">ReduceCladdingVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dissolvedVolume</span><span class="p">):</span>
+<div class="viewcode-block" id="FuelSlug.ReduceCladdingVolume"><a class="viewcode-back" href="../support_rst/nuclear_rst/fuelslug.html#fuelslug.FuelSlug.ReduceCladdingVolume">[docs]</a>    <span class="k">def</span> <span class="nf">ReduceCladdingVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dissolvedVolume</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Reduces the amount of cladding in the slug by dissolvedvolume.</span>
 <span class="sd">        This will also update the dimensions of the cladding walls and</span>
@@ -224,7 +224,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__ReduceCladdingVolume</span><span class="p">(</span><span class="n">dissolvedVolume</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="FuelSlug.ReduceFuelVolume"><a class="viewcode-back" href="../support_rst/fuelslug.html#fuelslug.FuelSlug.ReduceFuelVolume">[docs]</a>    <span class="k">def</span> <span class="nf">ReduceFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dissolvedVolume</span><span class="p">):</span>
+<div class="viewcode-block" id="FuelSlug.ReduceFuelVolume"><a class="viewcode-back" href="../support_rst/nuclear_rst/fuelslug.html#fuelslug.FuelSlug.ReduceFuelVolume">[docs]</a>    <span class="k">def</span> <span class="nf">ReduceFuelVolume</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dissolvedVolume</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Reduces the amount of fuel in the slug by dissolvedVolume. This</span>
 <span class="sd">        will also update the dimensions of the fuel slug, mainly the thickness</span>

@@ -1,5 +1,5 @@
-stream
-======
+stream module
+=============
 
 .. automodule:: stream
     :members:
