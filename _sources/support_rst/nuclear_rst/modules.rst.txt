@@ -11,5 +11,3 @@ nuclear
    fuelsegmentsgroups
    fuelslug
    nuclides
-   periodictable
-   specie
