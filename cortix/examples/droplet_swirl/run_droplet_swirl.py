@@ -25,10 +25,12 @@ command line as
 
 import scipy.constants as const
 
+
 from cortix import Cortix
 from cortix import Network
-from cortix.examples.droplet import Droplet
-from cortix.examples.vortex import Vortex
+from cortix.examples.droplet_swirl.droplet import Droplet
+from cortix.examples.droplet_swirl.vortex import Vortex
+
 
 def main():
     '''Cortix run file for a `Droplet`-`Vortex` network.

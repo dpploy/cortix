@@ -24,7 +24,7 @@ What is Cortix?
 Features
 --------
 * Module parent class for module development and coupling.
-* Massively parallel execution with `mpi4py <https://mpi4py.readthedocs.io/en/stable/>`
+* Massively parallel execution with `mpi4py <https://mpi4py.readthedocs.io/en/stable/>`_.
 * Support classes for building applications and modules.
 * Examples of applications using Cortix.
 
@@ -42,7 +42,10 @@ Please use the `GitHub issue tracker <https://github.com/dpploy/cortix/issues>`_
    .. toctree::
       src_rst/modules
       examples_rst/modules
+      examples_rst/droplet_swirl_rst/modules
+      examples_rst/city_justice_rst/modules
       support_rst/modules
+      support_rst/nuclear_rst/modules
       :maxdepth: 2
 
 ..

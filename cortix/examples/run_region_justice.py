@@ -40,13 +40,13 @@ from cortix import Cortix
 from cortix import Network
 
 from cortix.examples.state import State
-from cortix.examples.prison import Prison
-from cortix.examples.parole import Parole
-from cortix.examples.adjudication import Adjudication
-from cortix.examples.jail import Jail
-from cortix.examples.arrested import Arrested
-from cortix.examples.probation import Probation
-from cortix.examples.community import Community
+from cortix.examples.city_justice.prison import Prison
+from cortix.examples.city_justice.parole import Parole
+from cortix.examples.city_justice.adjudication import Adjudication
+from cortix.examples.city_justice.jail import Jail
+from cortix.examples.city_justice.arrested import Arrested
+from cortix.examples.city_justice.probation import Probation
+from cortix.examples.city_justice.community import Community
 
 def main():
     '''Cortix run file for a criminal justice network.
@@ -77,17 +77,18 @@ def main():
     region.network = Network()
     ne_net = region.network
 
-    a_state = State('A')
-    ne_net.module(a_state)
-    a_state.end_time = end_time
-    a_state.time_step = time_step
+    state_1 = State('State-1')
+    ne_net.module(state_1)
+    state_1.end_time = end_time
+    state_1.time_step = time_step
 
-    b_state = State('B')
-    ne_net.module(b_state)
-    b_state.end_time = end_time
-    b_state.time_step = time_step
+    state_2 = State('State-2')
+    ne_net.module(state_2)
+    state_2.end_time = end_time
+    state_2.time_step = time_step
 
-    ne_net.connect(a_state,b_state)
+    ne_net.connect( [state_1,'outflow:1'], [state_2,'inflow:1'] )
+    ne_net.connect( [state_2,'outflow:1'], [state_1,'inflow:1'] )
     ne_net.draw()
 
     '''

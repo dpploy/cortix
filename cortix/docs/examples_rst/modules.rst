@@ -4,18 +4,10 @@ examples
 .. toctree::
    :maxdepth: 4
 
-   adjudication
-   arrested
-   community
+   body
    dataplot
-   droplet
    dummy_module
-   jail
-   parole
    plot_data
-   prison
-   probation
-   run_droplet_a
-   run_droplet_b
-   run_justice
-   vortex
+   run_planets
+   run_region_justice
+   state

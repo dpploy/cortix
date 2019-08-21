@@ -1,7 +1,7 @@
-nuclides
-========
+body module
+===========
 
-.. automodule:: nuclides
+.. automodule:: body
     :members:
     :undoc-members:
     :show-inheritance:

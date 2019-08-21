@@ -9,6 +9,7 @@ import logging
 import numpy as np
 import scipy.constants as const
 from scipy.integrate import odeint
+
 from cortix import Module
 from cortix import Phase
 from cortix import Quantity
@@ -21,10 +22,10 @@ class State(Module):
 
     Notes
     -----
-    These are the `port` names available in this module to connect to respective
-    modules: `a`, `b`.
-    In addition this module takes an internal network to model the community of
-    people. The port used for this connection is `community`.
+    These are the `port` names available in this module to connect to other `State`
+    modules: `inflow:id`, `outflow:id`.
+    In addition this module takes an internal network to model the free-offenders
+    community of people. The port used for this connection is `community`.
     See instance attribute `port_names_expected`.
 
     '''
@@ -34,7 +35,7 @@ class State(Module):
         Parameters
         ----------
         non_offender_adult_population: float
-            Rate of individuals reaching the adult age (SI) unit. Default: 10 per day.
+            Individuals reaching the adult age (SI) unit. Default: 100.
 
         '''
 
@@ -42,7 +43,7 @@ class State(Module):
 
         self.name = name
 
-        self.port_names_expected = ['a','b','community']
+        #self.port_names_expected = ['inflow:','outflow:','community']
 
         quantities      = list()
         self.ode_params = dict()
@@ -50,55 +51,53 @@ class State(Module):
         self.initial_time = 0.0 * const.day
         self.end_time     = 100 * const.day
         self.time_step    = 0.5 * const.day
-        self.show_time = (False,10*const.day)
+        self.show_time    = (False,10*const.day)
         self.log = logging.getLogger('cortix')
 
-        # Population groups
-        self.n_groups = n_groups
-
-        # State population groups
-        fsg_0 = np.random.random(self.n_groups) * offender_pool_size
-        fsg = Quantity(name='fsg', formalName='offender-pop-grps',
-                unit='individual', value=fsg_0)
-        quantities.append(fsg)
+        # State population
+        fs_0 = non_offender_adult_population
+        fs = Quantity(name='fs', formalName='non-offender-pop',
+                unit='individual', value=fs_0)
+        quantities.append(fs)
 
         # Model parameters: commitment coefficients and their modifiers
 
-        # Community offenders to outside the state
-
-        outflow_coeff_rates = dict()
+        i = 1
         for p in self.ports:
 
-            c0g_0 = np.random.random(self.n_groups) / const.day
-            m0g_0 = np.random.random(self.n_groups)
+            if p.name.strip().split(':')[0] == 'outflow':
 
-            outflow_coeff_rates[p.name] = (c0g_0
+                # Non-offenders move to outside the state
+                cso_0 = np.random.random(1) / (60*const.day)
+                cso = Quantity(name='cso-'+stri(i), formalName='commit-out-coeff-'+str(i),
+                       unit='individual', value=cso_0)
+                self.ode_params['commit-out-coeff-'+str(i)] = cso_0
+                quantities.append(c0rg)
 
-
-        m0rg = Quantity(name='m0rg', formalName='commit-arrested-coeff-mod-grps',
-               unit='individual', value=m0rg_0)
-        self.ode_params['commit-to-arrested-coeff-mod-grps'] = m0rg_0
-        quantities.append(m0rg)
+                mso = Quantity(name='mso', formalName='commit-arrested-coeff-mod-grps',
+                   unit='individual', value=m0rg_0)
+                self.ode_params['commit-to-arrested-coeff-mod-grps'] = m0rg_0
+                quantities.append(m0rg)
 
         # Death term
-        self.ode_params['death-rates'] = np.zeros(self.n_groups)
+        self.ode_params['death-rates'] = np.zeros(1)
 
         # Maturity source rate term
-        self.ode_params['maturity-rate'] = np.ones(self.n_groups) * maturity_rate
+        self.ode_params['maturity-rate'] = np.ones(1)
 
         # Phase state
         self.population_phase = Phase(self.initial_time, time_unit='s',
                 quantities=quantities)
 
-        self.population_phase.SetValue('f0g', f0g_0, self.initial_time)
+        self.population_phase.SetValue('fs', fs_0, self.initial_time)
 
         # Initialize inflows to zero
-        self.ode_params['prison-inflow-rates']       = np.zeros(self.n_groups)
-        self.ode_params['parole-inflow-rates']       = np.zeros(self.n_groups)
-        self.ode_params['arrested-inflow-rates']     = np.zeros(self.n_groups)
-        self.ode_params['jail-inflow-rates']         = np.zeros(self.n_groups)
-        self.ode_params['adjudication-inflow-rates'] = np.zeros(self.n_groups)
-        self.ode_params['probation-inflow-rates']    = np.zeros(self.n_groups)
+        #self.ode_params['prison-inflow-rates']       = np.zeros(self.n_groups)
+        #self.ode_params['parole-inflow-rates']       = np.zeros(self.n_groups)
+        #self.ode_params['arrested-inflow-rates']     = np.zeros(self.n_groups)
+        #self.ode_params['jail-inflow-rates']         = np.zeros(self.n_groups)
+        #self.ode_params['adjudication-inflow-rates'] = np.zeros(self.n_groups)
+        #self.ode_params['probation-inflow-rates']    = np.zeros(self.n_groups)
 
         # Set the state to the phase state
         self.state = self.population_phase

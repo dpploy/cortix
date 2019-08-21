@@ -1,7 +1,7 @@
-run\_justice module
+fuel\_bucket module
 ===================
 
-.. automodule:: run_justice
+.. automodule:: fuel_bucket
     :members:
     :undoc-members:
     :show-inheritance:

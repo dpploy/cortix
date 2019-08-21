@@ -1,7 +1,7 @@
-fuelslug
-========
+state module
+============
 
-.. automodule:: fuelslug
+.. automodule:: state
     :members:
     :undoc-members:
     :show-inheritance:

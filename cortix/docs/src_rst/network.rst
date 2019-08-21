@@ -1,7 +1,7 @@
-specie module
-=============
+network module
+==============
 
-.. automodule:: specie
+.. automodule:: network
     :members:
     :undoc-members:
     :show-inheritance:

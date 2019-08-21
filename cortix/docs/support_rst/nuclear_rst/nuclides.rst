@@ -1,7 +1,7 @@
-fuel\_bucket
-============
+nuclides module
+===============
 
-.. automodule:: fuel_bucket
+.. automodule:: nuclides
     :members:
     :undoc-members:
     :show-inheritance:
