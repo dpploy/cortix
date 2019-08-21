@@ -1,9 +1,9 @@
 A Python library for network dynamics modeling and HPC simulation.
 
 | |Website|
+| |Repo Size|
 | |Build Status|
 | |PyPI version|
-| |Repo Size|
 | |PyPI - Python Version|
 
 |image5|
@@ -115,12 +115,12 @@ c/o `UMass Innovation Hub <https://www.uml.edu/Innovation-Hub/>`__
 Lowell, MA 01852
 
 .. |Website| image:: https://img.shields.io/website/https/github.com/dpploy/cortix.svg
+.. |Repo Size| image:: https://img.shields.io/github/repo-size/dpploy/cortix.svg?style=flat
+   :target: https://cortix.org
 .. |Build Status| image:: https://travis-ci.org/dpploy/cortix.svg?branch=master
    :target: https://travis-ci.org/dpploy/cortix
 .. |PyPI version| image:: https://badge.fury.io/py/cortix.svg
    :target: https://badge.fury.io/py/cortix
-.. |Repo Size| image:: https://img.shields.io/github/repo-size/dpploy/cortix.svg?style=flat
-   :target: https://cortix.org
 .. |PyPI - Python Version| image:: https://img.shields.io/pypi/pyversions/Django.svg
    :target: https://badge.fury.io/py/cortix
 .. |image5| image:: cortix-cover.png
