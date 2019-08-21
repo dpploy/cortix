@@ -1,7 +1,7 @@
-fuelslug
-========
+nuclides module
+===============
 
-.. automodule:: fuelslug
+.. automodule:: nuclides
     :members:
     :undoc-members:
     :show-inheritance:

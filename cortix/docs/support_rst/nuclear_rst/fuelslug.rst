@@ -1,7 +1,7 @@
-fuel\_bucket
-============
+fuelslug module
+===============
 
-.. automodule:: fuel_bucket
+.. automodule:: fuelslug
     :members:
     :undoc-members:
     :show-inheritance:

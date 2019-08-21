@@ -26,7 +26,7 @@ import datetime
 import math
 import random
 
-from cortix.support.fuel_segment import FuelSegment
+from cortix.support.nuclear.fuel_segment import FuelSegment
 #*********************************************************************************
 
 class FuelSegmentsGroups():

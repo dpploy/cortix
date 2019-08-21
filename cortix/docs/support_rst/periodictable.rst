@@ -1,5 +1,5 @@
-periodictable
-=============
+periodictable module
+====================
 
 .. automodule:: periodictable
     :members:

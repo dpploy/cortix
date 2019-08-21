@@ -21,12 +21,12 @@ sphinx-apidoc -o src_rst ../src
 
 # Build docs for support directory
 sphinx-apidoc -o support_rst ../support
+sphinx-apidoc -o support_rst/nuclear_rst ../support/nuclear
 
 # Build docs for examples directory
 sphinx-apidoc -o examples_rst ../examples
-
-# Build docs for vortex subdirectory
-#sphinx-apidoc -o examples_rst/modulib_rst/vortex_rst ../examples/modulib/vortex
+sphinx-apidoc -o examples_rst/city_justice_rst ../examples/city_justice
+sphinx-apidoc -o examples_rst/droplet_swirl_rst ../examples/droplet_swirl
 
 # Make documentation
 make clean
