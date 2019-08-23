@@ -124,9 +124,6 @@ class Adjudication(Module):
         # Initialize inflows to zero
         self.ode_params['arrested-inflow-rates'] = np.zeros(self.n_groups)
 
-        # Set the state to the phase state
-        self.state = self.population_phase
-
         return
 
     def run(self, *args):
@@ -182,15 +179,6 @@ class Adjudication(Module):
             #------------------------------------------------------
 
             time = self.__step( time )
-
-        # Share state with parent process
-        if self.use_multiprocessing:
-            try:
-                pickle.dumps(self.state)
-            except pickle.PicklingError:
-                args[1].put((args[0],None))
-            else:
-                args[1].put((args[0],self.state))
 
         return
 

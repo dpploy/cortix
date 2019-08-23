@@ -123,9 +123,6 @@ class Community(Module):
         self.ode_params['adjudication-inflow-rates'] = np.zeros(self.n_groups)
         self.ode_params['probation-inflow-rates']    = np.zeros(self.n_groups)
 
-        # Set the state to the phase state
-        self.state = self.population_phase
-
         return
 
     def run(self, *args):
@@ -203,15 +200,6 @@ class Community(Module):
             #---------------------------------------------------------
 
             time = self.__step( time )
-
-        # Share state with parent process
-        if self.use_multiprocessing:
-            try:
-                pickle.dumps(self.state)
-            except pickle.PicklingError:
-                args[1].put((args[0],None))
-            else:
-                args[1].put((args[0],self.state))
 
     def __rhs_fn(self, u_vec, t, params):
 
