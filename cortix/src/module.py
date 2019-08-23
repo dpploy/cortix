@@ -64,6 +64,7 @@ class Module:
         self.ports = list()
         self.log = logging.getLogger('cortix')
         self.save = False
+        self.id = 0
 
         self._network = None
 

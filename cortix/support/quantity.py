@@ -177,9 +177,9 @@ class Quantity:
         each element in its own axis.
         '''
 
-        plt.clf()
-        plt.cla()
-        plt.close()
+#        plt.clf()
+#        plt.cla()
+#        plt.close()
 
         if not isinstance(self.__value, pandas.core.series.Series):
             return
@@ -201,7 +201,7 @@ class Quantity:
         else:
            n_dim = len(self.__value[0])
 
-        x = self.__value.index
+        x = [i*x_scaling for i in self.__value.index]
 
         if same_axis:
             fig = plt.figure(self.__formal_name)
@@ -214,7 +214,7 @@ class Quantity:
             plt.xlabel(x_label)
             plt.ylabel(y_label)
             plt.title(title)
-            plt.plot(x*x_scaling, y)
+            plt.plot(x, y)
             if not same_axis and file_name:
                 plt.savefig(file_name+str(i)+'.png',dpi=dpi)
         if same_axis and file_name:

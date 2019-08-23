@@ -146,7 +146,7 @@ def main():
         total_num_params = 0
 
         # Inspect Data Function
-        def inspect_module_data(module,quant_name):
+        def inspect_module_data(module, quant_name):
             population_phase = module.population_phase
             (fxg_quant, time_unit) = population_phase.get_quantity_history(quant_name)
 
