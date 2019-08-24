@@ -122,8 +122,6 @@ class Droplet(Module):
         medium_dyn_viscosity = 1.81e-5 # kg/(m s)
         self.ode_params['medium-dyn-viscosity'] = medium_dyn_viscosity
 
-        self.state = self.liquid_phase
-
     def run(self, *args):
 
         time = self.initial_time
@@ -166,16 +164,6 @@ class Droplet(Module):
             time = self.__step( time )
 
         self.send('DONE', 'visualization') # this should not be needed: TODO
-
-        # Share state with parent process
-        if self.use_multiprocessing:
-            try:
-                pickle.dumps(self.state)
-            except pickle.PicklingError:
-                args[1].put((args[0],None))
-            else:
-                args[1].put((args[0],self.state))
-
         return
 
     def __rhs_fn(self, u_vec, t, params):
