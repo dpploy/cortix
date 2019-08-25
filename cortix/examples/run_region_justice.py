@@ -36,11 +36,10 @@ import scipy.constants as const
 
 import matplotlib.pyplot as plt
 
-from cortix.src.cortix_main import Cortix
-from cortix.src.network import Network
+from cortix import Cortix
+from cortix import Network
 
 from cortix.examples.state import State
-
 from cortix.examples.city_justice.prison import Prison
 from cortix.examples.city_justice.parole import Parole
 from cortix.examples.city_justice.adjudication import Adjudication
