@@ -8,8 +8,8 @@ import pickle
 import logging
 from multiprocessing import Process, Queue
 
-from cortix import Module
-from cortix import Port
+from cortix.src.module import Module
+from cortix.src.port import Port
 
 class Network:
     '''Cortix network.

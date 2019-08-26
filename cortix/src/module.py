@@ -7,7 +7,6 @@ import os
 import pickle
 import logging
 from cortix.src.port import Port
-#from cortix.src.network import Network
 
 class Module:
     '''Cortix module super class.
