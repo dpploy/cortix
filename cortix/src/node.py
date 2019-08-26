@@ -1,5 +1,5 @@
 import networkx as nx
-from cortix import Module
+from cortix.src.module import Module
 
 class Graph:
     def __init__(self):
