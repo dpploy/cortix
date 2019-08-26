@@ -36,8 +36,8 @@ import scipy.constants as const
 
 import matplotlib.pyplot as plt
 
-from cortix.src.cortix_main import Cortix
-from cortix.src.network import Network
+from cortix import Cortix
+from cortix import Network
 
 from cortix.examples.city_justice.prison import Prison
 from cortix.examples.city_justice.parole import Parole
@@ -81,36 +81,43 @@ def main():
     community.end_time = end_time
     community.time_step = time_step
     community.show_time = (True,10*const.day)
+    community.save = True
 
     prison = Prison(n_groups=n_groups,pool_size=0.0)
     city.network.module(prison)
     prison.end_time = end_time
     prison.time_step = time_step
+    prison.save = True
 
     parole = Parole(n_groups=n_groups)
     city.network.module(parole)
     parole.end_time = end_time
     parole.time_step = time_step
+    parole.save = True
 
     adjudication = Adjudication(n_groups=n_groups)
     city.network.module(adjudication)
     adjudication.end_time = end_time
     adjudication.time_step = time_step
+    adjudication.save = True
 
     jail = Jail(n_groups=n_groups)
     city.network.module(jail)
     jail.end_time = end_time
     jail.time_step = time_step
+    jail.save = True
 
     arrested = Arrested(n_groups=n_groups)
     city.network.module(arrested)
     arrested.end_time = end_time
     arrested.time_step = time_step
+    arrested.save = True
 
     probation = Probation(n_groups=n_groups)
     city.network.module(probation)
     probation.end_time = end_time
     probation.time_step = time_step
+    probation.save = True
 
     city.network.connect( prison, parole, 'bidirectional' )
     city.network.connect( adjudication, prison )
@@ -139,8 +146,8 @@ def main():
         total_num_params = 0
 
         # Inspect Data Function
-        def inspect_module_data(module,quant_name):
-            population_phase = module.state
+        def inspect_module_data(module, quant_name):
+            population_phase = module.population_phase
             (fxg_quant, time_unit) = population_phase.get_quantity_history(quant_name)
 
             fxg_quant.plot( x_scaling=1/const.day, x_label='Time [day]',

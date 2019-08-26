@@ -8,9 +8,10 @@ import pickle
 import numpy as np
 import scipy.constants as const
 from scipy.integrate import odeint
-from cortix.src.module import Module
-from cortix.support.phase import Phase
-from cortix.support.quantity import Quantity
+
+from cortix import Module
+from cortix import Phase
+from cortix import Quantity
 
 class Probation(Module):
     '''
@@ -97,9 +98,6 @@ class Probation(Module):
 
         self.population_phase.SetValue('fbg', fbg_0, self.initial_time)
 
-        # Set the state to the phase state
-        self.state = self.population_phase
-
         return
 
     def run(self, *args):
@@ -148,15 +146,6 @@ class Probation(Module):
             #---------------------------------------------------------
 
             time = self.__step( time )
-
-        # Share state with parent process
-        if self.use_multiprocessing:
-            try:
-                pickle.dumps(self.state)
-            except pickle.PicklingError:
-                args[1].put((args[0],None))
-            else:
-                args[1].put((args[0],self.state))
 
     def __rhs_fn(self, u_vec, t, params):
 

@@ -13,7 +13,7 @@ import matplotlib
 matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
 
-from cortix.src.module import Module
+from cortix import Module
 
 class DataPlot(Module):
 

@@ -10,9 +10,9 @@ import numpy as np
 import scipy.constants as const
 from scipy.integrate import odeint
 
-from cortix.src.module import Module
-from cortix.support.phase import Phase
-from cortix.support.quantity import Quantity
+from cortix import Module
+from cortix import Phase
+from cortix import Quantity
 
 class Community(Module):
     '''
@@ -122,9 +122,6 @@ class Community(Module):
         self.ode_params['jail-inflow-rates']         = np.zeros(self.n_groups)
         self.ode_params['adjudication-inflow-rates'] = np.zeros(self.n_groups)
         self.ode_params['probation-inflow-rates']    = np.zeros(self.n_groups)
-
-        # Set the state to the phase state
-        self.state = self.population_phase
 
         return
 
