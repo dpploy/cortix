@@ -238,7 +238,7 @@ class Cortix:
         pass
         """
         for mod in self.modules:
-            if mod.save_data == 
+            if mod.save_data ==
         """
     def __del__(self):
         '''Destructs a Cortix simulation object.
