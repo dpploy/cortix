@@ -252,12 +252,11 @@ class Network:
 
         # Reload saved modules
         old_mods = list()
-        for mod in self.modules:
-            for file_name in os.listdir(".ctx-saved"):
-                if file_name.endswith(".pkl"):
-                    file_name = os.path.join(".ctx-saved", file_name)
-                    with open(file_name, "rb") as f:
-                        old_mods.append(pickle.load(f))
+        for file_name in os.listdir(".ctx-saved"):
+            if file_name.endswith(".pkl"):
+                file_name = os.path.join(".ctx-saved", file_name)
+                with open(file_name, "rb") as f:
+                    old_mods.append(pickle.load(f))
         self.modules = old_mods
 
     def draw(self, graph_attr=None, node_attr=None, engine=None):
