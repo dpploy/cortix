@@ -149,9 +149,9 @@ class Quantity:
         each element in its own axis.
         '''
 
-#        plt.clf()
-#        plt.cla()
-#        plt.close()
+        plt.clf()
+        plt.cla()
+        plt.close()
 
         if not isinstance(self.__value, pandas.core.series.Series):
             return
@@ -174,6 +174,7 @@ class Quantity:
            n_dim = len(self.__value[0])
 
         x = [i*x_scaling for i in self.__value.index]
+        #x = self.__value.index # potential bug in matplotlib
 
         if same_axis:
             fig = plt.figure(self.__formal_name)
