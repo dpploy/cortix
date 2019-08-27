@@ -25,11 +25,12 @@ command line as
 
 import scipy.constants as const
 
-from cortix.src.cortix_main import Cortix
-from cortix.src.network import Network
 
-from cortix.examples.droplet import Droplet
-from cortix.examples.vortex import Vortex
+from cortix import Cortix
+from cortix import Network
+from cortix.examples.droplet_swirl.droplet import Droplet
+from cortix.examples.droplet_swirl.vortex import Vortex
+
 
 def main():
     '''Cortix run file for a `Droplet`-`Vortex` network.
@@ -88,6 +89,7 @@ def main():
         droplet.time_step = time_step
         droplet.bounce = False
         droplet.slip = False
+        droplet.save = True
 
         # Network port connectivity (connect modules through their ports)
         swirl.network.connect( [droplet,'external-flow'],
@@ -110,10 +112,9 @@ def main():
             from mpl_toolkits.mplot3d import Axes3D
             import matplotlib.pyplot as plt
 
-            position_histories = list()
+            positions = list()
             for m in swirl.network.modules[1:]:
-                position_histories.append(
-                        m.state.get_quantity_history('position')[0].value )
+                positions.append(m.liquid_phase.get_quantity_history('position')[0].value)
 
             fig = plt.figure(1)
             ax = fig.add_subplot(111,projection='3d')
@@ -121,42 +122,35 @@ def main():
             ax.set_xlabel('x')
             ax.set_ylabel('y')
             ax.set_zlabel('z')
-            for p in position_histories:
-                x = [u[0] for u in p]
-                y = [u[1] for u in p]
-                z = [u[2] for u in p]
-                ax.plot(x,y,z)
-
+            for pos in positions:
+                x = [i[0] for i in pos]
+                y = [i[1] for i in pos]
+                z = [i[2] for i in pos]
+                ax.plot(x, y, z)
             fig.savefig('trajectories.png', dpi=300)
 
             # All droplets' speed
-
             fig = plt.figure(2)
             plt.xlabel('Time [min]')
             plt.ylabel('Speed [m/s]')
             plt.title('All Droplets')
 
             for m in modules[1:]:
-                speed_series = m.state.get_quantity_history('speed')[0].value
-                x = list(p.index/60)
-                y = list(speed_series[:])
-                plt.plot(x,y)
+                speed = m.liquid_phase.get_quantity_history('speed')[0].value
+                plt.plot(list(speed.index/60), speed.tolist())
 
             plt.grid()
             fig.savefig('speeds.png', dpi=300)
 
             # All droplets' radial position
-
             fig = plt.figure(3)
             plt.xlabel('Time [min]')
             plt.ylabel('Radial Position [m]')
             plt.title('All Droplets')
 
             for m in modules[1:]:
-                speed_series = m.state.get_quantity_history('radial-position')[0].value
-                x = list(p.index/60)[1:]
-                y = list(speed_series[:])[1:]
-                plt.plot(x,y)
+                radial_pos = m.liquid_phase.get_quantity_history('radial-position')[0].value
+                plt.plot(list(radial_pos.index/60)[1:], radial_pos.tolist()[1:])
 
             plt.grid()
             fig.savefig('radialpos.png', dpi=300)

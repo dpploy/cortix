@@ -1,5 +1,5 @@
-fuelsegmentsgroups
-==================
+fuelsegmentsgroups module
+=========================
 
 .. automodule:: fuelsegmentsgroups
     :members:

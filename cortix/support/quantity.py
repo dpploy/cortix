@@ -2,57 +2,33 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
-#
-# All rights reserved, see COPYRIGHT for full restrictions.
-# https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
-#
-# Licensed under the University of Massachusetts Lowell LICENSE:
-# https://github.com/dpploy/cortix/blob/master/LICENSE.txt
-'''
-Author: Valmor de Almeida dealmeidav@ornl.gov; vfda
-
-This Quantity class is to be used with other classes in plant-level process modules.
-
-For unit testing do at the linux command prompt:
-    python quantity.py
-
-Sat Sep  5 12:51:34 EDT 2015
-'''
-#*********************************************************************************
-import os
-import sys
-
 import pandas
 import matplotlib
 matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
-#*********************************************************************************
 
 class Quantity:
     '''
-    todo: this probably should not have a "value" for the same reason as Specie.
+    todo: this probably should not have a "value" for the same reason as Species.
           this needs some thinking.
     well not so fast. This can be used to build a quantity with anything as a
     value. For instance a history of the quantity as a time series.
+
     '''
-
-#*********************************************************************************
-# Construction
-#*********************************************************************************
-
     def __init__(self,
-                 name       = 'null-quantity',
-                 formalName = 'null-quantity',
+                 name       = 'null-quantity-name',
+                 formalName = 'null-quantity-formal-name', # deprecated
+                 formal_name = 'null-quantity-formal-name',
                  value      = float(0.0),      # this can be any type
-                 unit       = 'null-unit'
+                 unit       = 'null-quantity-unit'
                 ):
 
         assert isinstance(name, str), 'not a string.'
         self.__name = name
 
         assert isinstance(formalName, str), 'not a string.'
-        self.__formalName = formalName
-        self.__formal_name = formalName
+        self.__formalName = formalName  # deprecated
+        self.__formal_name = formal_name
 
         self.__value = value
 
@@ -64,10 +40,6 @@ class Quantity:
         self.__unit = unit
 
         return
-
-#*********************************************************************************
-# Public member functions
-#*********************************************************************************
 
     def SetName(self, n):
         '''
@@ -201,7 +173,8 @@ class Quantity:
         else:
            n_dim = len(self.__value[0])
 
-        x = self.__value.index
+        x = [i*x_scaling for i in self.__value.index]
+        #x = self.__value.index # potential bug in matplotlib
 
         if same_axis:
             fig = plt.figure(self.__formal_name)
@@ -214,17 +187,13 @@ class Quantity:
             plt.xlabel(x_label)
             plt.ylabel(y_label)
             plt.title(title)
-            plt.plot(x*x_scaling, y)
+            plt.plot(x, y)
             if not same_axis and file_name:
                 plt.savefig(file_name+str(i)+'.png',dpi=dpi)
         if same_axis and file_name:
             plt.savefig(file_name+'.png',dpi=dpi)
 
         return
-
-#*********************************************************************************
-# Private helper functions (internal use: __)
-#*********************************************************************************
 
     def __str__(self):
         '''
@@ -251,5 +220,3 @@ class Quantity:
 
         s = '\n\t Quantity(): \n\t name=%s; formal name=%s; value=%s[%s]'
         return s % (self.name, self.formalName, self.value, self.unit)
-
-#======================= end class Quantity ======================================

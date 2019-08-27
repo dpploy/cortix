@@ -37,3 +37,6 @@ cortix/docs/_build
 
 # Jupyter Notebook
 .ipynb_checkpoints
+
+# Cortix save directory
+.ctx-saved/

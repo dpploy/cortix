@@ -84,6 +84,7 @@ class Cortix:
             self.wall_clock_time_start = time.time()
             self.wall_clock_time_end = self.wall_clock_time_start
             self.end_run_date = datetime.datetime.today().strftime('%d%b%y %H:%M:%S')
+            os.system("rm -rf .ctx-saved && mkdir .ctx-saved")
 
         return
 
@@ -96,11 +97,12 @@ class Cortix:
         n.comm = self.comm
         self.__network = n
         return
+
     def __get_network(self):
         return self.__network
     network = property(__get_network, __set_network, None, None)
 
-    def run(self):
+    def run(self, save=False):
         '''Run the Cortix network simulation.
 
         '''
@@ -232,6 +234,12 @@ class Cortix:
 
         return message + splash
 
+    def save_data(self):
+        pass
+        """
+        for mod in self.modules:
+            if mod.save_data ==
+        """
     def __del__(self):
         '''Destructs a Cortix simulation object.
 

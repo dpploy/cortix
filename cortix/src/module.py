@@ -3,8 +3,10 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 
+import os
+import pickle
+import logging
 from cortix.src.port import Port
-#from cortix.src.network import Network
 
 class Module:
     '''Cortix module super class.
@@ -59,6 +61,9 @@ class Module:
         self.use_mpi = False
         self.use_multiprocessing = True
         self.ports = list()
+        self.log = logging.getLogger('cortix')
+        self.save = False
+        self.id = 0
 
         self._network = None
 
@@ -196,3 +201,22 @@ class Module:
 
         '''
         raise NotImplementedError('Module must implement run()')
+
+    def run_and_save(self):
+        self.run()
+        if self.save:
+            file_name = os.path.join(".ctx-saved", "{}_".format(self.__class__.__name__))
+            if self.use_mpi:
+                from mpi4py import MPI
+                file_name += str(MPI.COMM_WORLD.rank)
+            else:
+                file_name += str(os.getpid())
+            file_name += ".pkl"
+
+            self.ports = None
+            self.log = None
+            try:
+                with open(file_name, "wb") as f:
+                    pickle.dump(self, f)
+            except pickle.PicklingError:
+                print("Unable to pickle {}!".format(file_name))

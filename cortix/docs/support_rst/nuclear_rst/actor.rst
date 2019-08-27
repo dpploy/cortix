@@ -1,7 +1,7 @@
-fuel\_bundle
+actor module
 ============
 
-.. automodule:: fuel_bundle
+.. automodule:: actor
     :members:
     :undoc-members:
     :show-inheritance:
