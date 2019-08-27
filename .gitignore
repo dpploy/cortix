@@ -40,3 +40,6 @@ cortix/docs/_build
 
 # Cortix save directory
 .ctx-saved/
+
+# Coverage files
+.coverage
