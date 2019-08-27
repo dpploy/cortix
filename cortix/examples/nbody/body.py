@@ -11,8 +11,8 @@ class Body(Module):
         self.mass = mass
         self.rad = rad
 
-        self.pos = pos if pos else np.array([i*5 for i in rand(3)])
-        self.vel = vel if vel else np.array([i*10 for i in rand(3)])
+        self.pos = pos if pos else rand() * np.ones(3)
+        self.vel = vel if vel else rand() * np.ones(3)
         self.acc = np.zeros(3)
         self.other_bodies = None
         self.time_steps = ts

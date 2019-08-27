@@ -5,6 +5,9 @@ from cortix import Network
 from cortix import Port
 from body import Body
 
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+
 def main():
     um = False
     num_bodies = 10
@@ -30,9 +33,17 @@ def main():
 
     cortix.run()
 
+    fig = plt.figure(1)
+    ax = fig.add_subplot(111, projection='3d')
     trajectories = [b.trajectory for b in cortix.network.modules]
 
+    for t in trajectories:
+        x = [i[0] for i in t]
+        y = [i[1] for i in t]
+        z = [i[2] for i in t]
+        ax.plot(x, y, z)
 
+    plt.savefig("planets.png")
 
 
 if __name__ == "__main__":
