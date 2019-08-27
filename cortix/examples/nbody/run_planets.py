@@ -30,5 +30,10 @@ def main():
 
     cortix.run()
 
+    trajectories = [b.trajectory for b in cortix.network.modules]
+
+
+
+
 if __name__ == "__main__":
     main()

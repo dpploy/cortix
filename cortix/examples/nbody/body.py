@@ -16,6 +16,7 @@ class Body(Module):
         self.acc = np.zeros(3)
         self.other_bodies = None
         self.time_steps = ts
+        self.trajectory = []
 
     def acceleration(self):
         ep = 1e-7
@@ -35,7 +36,6 @@ class Body(Module):
         return self.vel
 
     def step(self):
-
         self.acceleration()
         self.position()
         self.velocity()
@@ -47,6 +47,7 @@ class Body(Module):
             self.send((self.mass, self.pos), port)
 
     def gather_data(self):
+        # Get (mass, pos) from every other body
         self.other_bodies = [self.recv(port) for port in self.ports]
 
     def run(self):
@@ -61,8 +62,10 @@ class Body(Module):
 
         for t in range(self.time_steps):
             self.step()
+            self.trajectory.append(self.pos)
             self.broadcast_data()
             self.gather_data()
+
 
         print(self)
 
