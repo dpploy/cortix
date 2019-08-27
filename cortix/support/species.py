@@ -81,7 +81,8 @@ class Species:
 
         '''
 
-        molar_mass_const = const.physical_constants['molar mass constant']
+        molar_mass_const = const.physical_constants['molar mass constant'][0]
+        molar_mass_const_unit = const.physical_constants['molar mass constant'][1]
 
         for entry in self.atoms:
             assert isinstance(entry, str)
