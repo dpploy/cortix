@@ -42,4 +42,4 @@ cortix/docs/_build
 .ctx-saved/
 
 # Coverage files
-.coverage
+.coverage*
