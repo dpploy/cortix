@@ -16,4 +16,3 @@ from cortix.examples.city_justice.arrested import Arrested
 from cortix.examples.city_justice.probation import Probation
 from cortix.examples.city_justice.community import Community
 
-from cortix.examples.nbody.body import Body
