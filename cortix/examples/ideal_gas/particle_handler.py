@@ -32,12 +32,13 @@ class Particle_Handler(Module):
         
     def run(self):
         t = self.t_step
+        self.flock = {}
         for i in range(self.balls):
             ball = Particle(shape=self.shape,color=self.color,r=self.r)
             ball.t_step = self.t_step
             self.local_balls.append(ball)
             self.local_messengers.append(ball.messenger)
-        
+            self.flock[ball.name] = ball
         its = round(self.runtime/self.t_step)
 
         ball_list = []
@@ -56,16 +57,17 @@ class Particle_Handler(Module):
         
         for i in range(its):
             self.elapsed += t
-            for c,ball in enumerate(self.local_balls):
-                messenger = ball.run(ball_list)
-                self.local_messengers[c] = messenger
+            self.local_messengers = []
+            for c,ball in enumerate(ball_list):
+                if ball.name in self.flock:
+                    messenger = self.flock[ball.name].run(ball_list)
+                    ball_list[c] = messenger
+                    self.local_messengers.append(messenger)
+            ball_list = [f for f in self.local_messengers]
             for i in self.ports: #Send and receive messages for each timestep
                 self.send(self.local_messengers,i)
                 if 'plot' in str(i):
-                    check = self.recv(i)
-            ball_list = [f for f in self.local_messengers]   
-            for i in self.ports:
-                if 'plot' in str(i): #Not receiving messages from plotting
+                    _ = self.recv(i)
                     continue
                 messengerlis = self.recv(i)
                 for messenger in messengerlis:

@@ -1,20 +1,11 @@
-import os, time, datetime, threading, random, sys, string
+import os, time, datetime, threading, random, sys, string, math
 import numpy as np
-from cortix.src.module import Module
-from cortix.src.network import Network
-from cortix.src.cortix_main import Cortix
-import shapely.geometry as geo
-import shapely.ops
-import matplotlib.pyplot as plt
-import matplotlib
-##matplotlib.use("Agg")
-import matplotlib.image as mpimg
-import matplotlib.animation as animation
-import pandas as pd
+from cortix import Module
+from cortix import Network
+from cortix import Cortix
 
 class Messenger:
     def __init__(self, circle=None, collision = [], timestamp='0'):
-##        self.collision = [dict(name='',v0=[0.0,0.0],p0=[0.0,0.0])] #format
         self.collision = []
         self.timestamp = timestamp
         self.m = 1
@@ -27,34 +18,23 @@ class Messenger:
         self.elapsed = 0
 
 class Particle:
-    def __init__(self,shape,bn=None,color='b',r=1):
+    def __init__(self,shape,bn=[0,0,20,20],color='b',r=1):
         super().__init__()
-        self.shape = shape
+        coords = shape
         self.bndry = []
-        coords = list(self.shape.exterior.coords)
-        self.bndic = dict()
         self.t_step = 0.01
-        #Parse the box(LineRing) to create a list of line obstacles
         for c,f in enumerate(coords):
-            try:
-                cr = geo.LineString([coords[c],coords[c+1]])
-                self.bndic[str(cr)] = geo.LineString([coords[c],coords[c+1]])
-            except IndexError:
-                cr = geo.LineString([coords[c],coords[-1]])
-                self.bndic[str(cr)] = geo.LineString([coords[c],coords[-1]])
-                           
-                break
             
+            try:
+                cr = (coords[c],coords[c+1])
+            except IndexError:
+                cr = (coords[c],coords[-1])
+##            
             self.bndry.append(cr)
-        if bn==None:
-            bn = self.shape.bounds
         self.r=r
         for i in range(100): #Attempt to spawn ball within boundary
             self.p0 = [random.uniform(bn[0],bn[2]),random.uniform(bn[1],bn[3])]
-            self.pnt = geo.point.Point(self.p0[0],self.p0[1])
-            self.circle = self.pnt.buffer(self.r)
-            if self.shape.contains(self.circle):
-                break
+            break
         if i>85:
             print('Warning, ball took:',i,'attempts to spawn')
         self.v0 = [random.uniform(-50,50),random.uniform(-30,30)]
@@ -86,18 +66,14 @@ class Particle:
         for ball in self.ball_list: #Detects collision with other objects
             #Reacts to intersection between this object and another
             for c,line in enumerate(ball.collision): #Undetected Collisions received as a message
-                pnt = geo.point.Point(line['p0'])
-                shape = pnt.buffer(ball.r)
-##                print(line, self.mycollisions)
                 if self.name == line['name'] and line not in self.mycollisions:
-##                    print('messenger:', self.name,line['name'],[f['name'] for f in self.mycollisions])
-##                    print('Check!!!!')
                     p0,v0 = line['p0'],line['v0']
+                    dif = np.subtract(self.p0,p0)
+                    dis = math.sqrt(dif[0]**2 + dif[1]**2)
                     self.ball_collision(ball,p0,v0)
-                    if self.circle.crosses(shape) or self.circle.touches(shape) or self.circle.intersects(shape):
-                        self.ball_shift(shape)
+                    if dis <= self.r + ball.r:
+                        self.ball_shift(ball,p0,v0)
                     del ball.collision[c]
-##                    print(ball.collision)
                 for d, col in enumerate(self.mycollisions):
                     if line == col and col!= []:
                         del self.mycollisions[d]
@@ -108,69 +84,70 @@ class Particle:
         self.p0[0] = 0.5*self.a[0]*t**2+self.v0[0]*t+self.p0[0]
         self.v0[1] = self.a[1]*t + self.v0[1]
         self.v0[0] = self.a[0]*t + self.v0[0]
-        #Update position and velocity variables
-        self.pnt = geo.point.Point(self.p0[0],self.p0[1])
-        self.circle = self.pnt.buffer(self.r)
-        self.messenger.v = self.v0
         
         
         for ball in self.ball_list: #Detects collision with other objects
             if self.name==ball.name:
                 continue
             #ball is Messenger class object
-            pnt = geo.point.Point(ball.p)
-            shape = pnt.buffer(ball .r)
-            name = ball.name
+##            pnp = np.array(ball.p)
+            dif = np.subtract(self.p0,ball.p)
+            dis = math.sqrt(dif[0]**2 + dif[1]**2)
             
-            if self.circle.crosses(shape) or self.circle.touches(shape) or self.circle.intersects(shape):
+##            pnt = geo.point.Point(ball.p)
+##            shape = pnt.buffer(ball.r)
+            name = ball.name
+            if dis <= self.r + ball.r:# self.circle.crosses(shape) or self.circle.touches(shape) or self.circle.intersects(shape):
                 coldic = dict(name=ball.name,v0=self.v0,p0=self.p0,elapsed=self.messenger.elapsed)
                 self.mycollisions.append(coldic)
                 self.messenger.collision.append(coldic)
                 self.ball_collision(ball,ball.p,ball.v)
 ##                print(self.name,ball.name)
-                self.ball_shift(shape)
+                self.ball_shift(ball,ball.p,ball.v)
+                coldic['p0'] = self.p0
                 
         
-        for shape in self.bndry: #Detects collision with boundary
-            if self.circle.crosses(shape) or self.circle.touches(shape) or self.circle.intersects(shape):
-                self.wall_collision(shape)            
+        for (c1,c2) in self.bndry: #Detects collision with boundary
+            dif = np.subtract(self.p0,c1)
+            dis = math.sqrt(dif[0]**2 + dif[1]**2)
+            clen = np.subtract(c1,c2)
+            clen = math.sqrt(clen[0]**2 + clen[1]**2)
+            angle = math.atan2(self.p0[1]-c1[1], self.p0[0]-c1[0]) - math.atan2(c2[1]-c1[1], c2[0]-c1[0])
+            wall_distance = math.sin(angle)*dis
+            closest_dis = math.cos(angle)*dis
+            if abs(wall_distance) <= self.r and abs(closest_dis)<clen:
+                self.ke = 0.5*self.m*((self.v0[0]**2+self.v0[1]**2)**0.5)**2
+                print(self.name,'wall collision. Kinetic Energy: ',self.ke)
+                self.wall_collision(c1,c2,wall_distance)
+        self.messenger.v = self.v0
         self.messenger.p = self.p0
         self.ke = 0.5*self.m*((self.v0[0]**2+self.v0[1]**2)**0.5)**2
         self.messenger.ke = self.ke
         return self.messenger
 
-    def wall_collision(self,shape):
-        
-        p1,p2 = shapely.ops.nearest_points(self.pnt,shape)
-        angle3 = np.arctan2(p2.y - p1.y, p2.x - p1.x)
-        d = shape.distance(self.pnt)
-        self.p0 = [self.p0[0]-(self.r-d)*np.cos(angle3), self.p0[1]-(self.r-d)*np.sin(angle3)]
-        self.pnt = geo.point.Point(self.p0[0],self.p0[1])
-        self.circle = self.pnt.buffer(self.r)
-        
+    def wall_collision(self,c1,c2,d):
+        angle3 = np.arctan2(c2[1] - c1[1], c2[0] - c1[0])+np.pi/2
+        self.p0 = [self.p0[0]-(self.r+d)*np.cos(angle3), self.p0[1]-(self.r+d)*np.sin(angle3)]
         angle2 = np.arctan2(self.v0[1], self.v0[0])
         v = (self.v0[0]**2+self.v0[1]**2)**0.5
-        theta = angle2-angle3
-        vbi, vbj = v*np.sin(theta), v*np.cos(theta)
+        theta = np.pi - (angle2+angle3)
+        vbi, vbj = v*np.cos(theta), v*np.sin(theta)
         vbj = -vbj *self.cor
         v = (vbi**2+vbj**2)**0.5
         angle4 = np.arctan2(vbj, vbi)
-        angle1 = angle4 - angle3
+        angle1 = theta-angle3
         self.collisions+=1
-        self.v0 = [np.sin(angle1)*v, np.cos(angle1)*v]
+        self.v0 = [np.cos(angle1)*v, np.sin(angle1)*v]
 
         
-    def ball_shift(self,shape):
-        p1,p2 = shapely.ops.nearest_points(self.pnt,shape)
-        angle = np.arctan2(p2.y - p1.y, p2.x - p1.x)
-        d = shape.distance(self.pnt)
-        self.p0 = [self.p0[0]-(self.r*1.01-d)*np.cos(angle),self.p0[1]-(self.r*1.01-d)*np.sin(angle)]
-        self.pnt = geo.point.Point(self.p0[0],self.p0[1])
-        self.circle = self.pnt.buffer(self.r)
+    def ball_shift(self,ball,p,v):
+        angle = np.arctan2(p[1] - self.p0[1], p[0] - self.p0[0])
+        pnp = np.array(p)
+        dif = np.subtract(self.p0,p)
+        d = math.sqrt(dif[0]**2 + dif[1]**2)
+        self.p0 = [self.p0[0]-(self.r+ball.r-d)*np.cos(angle),self.p0[1]-(self.r+ball.r-d)*np.sin(angle)]
         
     def ball_collision(self,messenger,p0,v0):
-##        pnt = geo.point.Point(p0[0],p0[1])
-##        shape = pnt.buffer(messenger.r)
         v2,m = v0,messenger.m
         v3 = (v2[0]**2+v2[1]**2)**0.5
         phi = np.arctan2(v2[1],v2[0])
