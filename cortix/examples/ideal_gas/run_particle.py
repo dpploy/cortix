@@ -60,12 +60,13 @@ class Simulation:
 
 if __name__ == '__main__':
     sim = Simulation()
-    sim.runtime = 20
+    sim.runtime = int(input('How many seconds do you want the simulation?: '))
     sim.r = 1
     sim.fps = 100
-    sim.shape = [(-10, -10), (-10, 30), (30, 30),(30,-10),(-10, -10)]
+    sim.shape = [(-30, -30), (-30, 70), (70, 70),(70,-30),(-30, -30)]
     sim.t_step = 0.01
-    sim.procs = 4
-    sim.n_list = [10]
+    sim.procs = int(input("How many processes would you like to use?: "))
+    sim.n_list = int(input("How many particles would you like to simulate?: "))
+    sim.n_list = [sim.n_list,]
     sim.run()
 
