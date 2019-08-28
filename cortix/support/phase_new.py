@@ -28,11 +28,19 @@ Sat Sep  5 01:26:53 EDT 2015
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
 '''
-import os
-import sys
+import os, io
 from copy import deepcopy
-import numpy as npy
+import time
+import datetime
+
+import numpy as np
 import pandas
+
+import matplotlib
+matplotlib.use('Agg', warn=False)
+import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
+from matplotlib.ticker import MultipleLocator
 
 from cortix.support.species   import Species
 from cortix.support.quantity import Quantity
@@ -163,7 +171,7 @@ class PhaseNew:
         return list(self.__phase.index)  # return all time stamps
     time_stamps = property(__get_time_stamps, None, None, None)
 
-    def get_species_list(self):
+    def __get_species_list(self):
         '''
         Returns every single species in the phase history.
 
@@ -173,7 +181,7 @@ class PhaseNew:
         '''
 
         return self.__species
-    species = property(get_species_list, None, None, None)
+    species = property(__get_species_list, None, None, None)
 
     def GetQuantities(self):
         '''
@@ -475,7 +483,7 @@ class PhaseNew:
         '''
         if value is not None:
            assert isinstance(value, int) or isinstance(value, float) or \
-                  isinstance(value, npy.ndarray)
+                  isinstance(value, np.ndarray)
 
         if try_time_stamp is not None:
            assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float)
@@ -645,6 +653,368 @@ class PhaseNew:
                 return None
             else:
                 return  self.__phase.index[loc]
+
+    def plot(self,time_unit='second',plot_name='null-phase-plot-name',
+             nrows=2, ncols=2):
+
+        num_var = len(self.__phase.columns)
+        if num_var == 0:
+            return
+
+        today = datetime.datetime.today().strftime("%d%b%y %H:%M:%S")
+
+        fig_num = None
+
+        # Loop over variables and assign to the dashboards
+        i_dash = 0
+        for i_var in range(num_var):
+            # if multiple of nrows*ncols start new dashboard
+            if i_var % (nrows*ncols) == 0:
+
+                if i_var != 0:  # flush any current figure
+                    fig_name = self.name+'-phase-plot-' + str(i_dash).zfill(2)
+                    fig.savefig(fig_name+'.png', dpi=200, fomat='png')
+                    plt.close(fig_num)
+
+                    #pickle.dump( fig, open(fig_name+'.pickle','wb') )
+
+                    i_dash += 1
+
+                fig_num = str(np.random.random()) + '.' + str(i_dash)
+                fig = plt.figure(num=fig_num)
+
+                gs = gridspec.GridSpec(nrows, ncols)
+#                gs.update(left=0.08, right=0.98, wspace=0.4, hspace=0.4)
+                gs.update(left=0.11, right=0.98, wspace=0.4, hspace=0.5)
+
+                axlst = list()
+
+                nPlotsNeeded = num_var - i_var
+                count = 0
+                for i in range(nrows):
+                    for j in range(ncols):
+                        axlst.append(fig.add_subplot(gs[i, j]))
+                        count += 1
+                        if count == nPlotsNeeded:
+                            break
+                    if count == nPlotsNeeded:
+                        break
+
+                axes = np.array(axlst)
+
+                text = today + ': Cortix.Phase.Plot'
+                fig.text(.5, .95, text, horizontalalignment='center', fontsize=14)
+
+                axs = axes.flat
+
+                axId = 0
+
+            # end of: if i_var % nrows*ncols == 0: # if a multiple of nrows*ncols
+            # start a new dashboard
+
+            ax = axs[axId]
+            axId += 1
+
+            col_name = self.__phase.columns[i_var]
+
+            species = self.get_species(col_name)
+            if species:
+                varName = species.formula_name
+            else:
+                quant = self.get_quantity()
+                varName = quant.formal_name
+            quantity = self.get_species(col_name)
+
+            if i_var <= len(self.__species):
+                varName = self.__species[i_var].formula_name
+                # sanity check
+                assert self.__species[i_var].name == self.__phase.columns[i_var]
+            else:
+                varName = self.__quantities[i_var].formula_name
+            varUnit = ''
+
+            '''
+            if varUnit == 'gram':
+                varUnit = 'g'
+            if varUnit == 'gram/min':
+                varUnit = 'g/min'
+            if varUnit == 'gram/s':
+                varUnit = 'g/s'
+            if varUnit == 'gram/m3':
+                varUnit = 'g/m3'
+            if varUnit == 'gram/L':
+                varUnit = 'g/L'
+            if varUnit == 'sec':
+                varUnit = 's'
+            '''
+
+            varLegend = 'var-legend'
+            varScale  = 'linear-linear'
+            assert varScale == 'log' or varScale == 'linear' or varScale == 'log-linear' \
+                or varScale == 'linear-log' or varScale == 'linear-linear' or \
+                varScale == 'log-log'
+
+            if time_unit == 'minute':
+                time_unit = 'min'
+
+            data = np.array(self.__phase[col_name])  # convert to numpy ndarray
+
+            x = np.array(self.__phase.index)
+
+            if (varScale == 'linear' or varScale == 'linear-linear' or \
+                varScale == 'linear-log') and x.max() >= 120.0:
+                x /= 60.0
+                if time_unit == 'min':
+                    time_unit = 'h'
+
+            y = np.array(self.__phase[col_name])  # convert to numpy ndarray
+
+            '''
+            if (y.max() >= 1e3 or y.min() <= -1e3) and varScale != 'linear-log' and \
+                    varScale != 'log-log' and varScale != 'log':
+                y /= 1e3
+                if varUnit == 'gram' or varUnit == 'g':
+                    varUnit = 'kg'
+                if varUnit == 'L':
+                    varUnit = 'kL'
+                if varUnit == 'cc':
+                    varUnit = 'L'
+                if varUnit == 'Ci':
+                    varUnit = 'kCi'
+                if varUnit == 'W':
+                    varUnit = 'kW'
+                if varUnit == 'gram/min' or varUnit == 'g/min':
+                    varUnit = 'kg/min'
+                if varUnit == 'gram/s' or varUnit == 'g/s':
+                    varUnit = 'kg/s'
+                if varUnit == 'gram/m3' or varUnit == 'g/m3':
+                    varUnit = 'kg/m3'
+                if varUnit == 'gram/L' or varUnit == 'g/L':
+                    varUnit = 'kg/L'
+                if varUnit == 'W/L':
+                    varUnit = 'kW/L'
+                if varUnit == 'Ci/L':
+                    varUnit = 'kCi/L'
+                if varUnit == '':
+                    varUnit = 'x1e3'
+                if varUnit == 'L/min':
+                    varUnit = 'kL/min'
+                if varUnit == 'Pa':
+                    varUnit = 'kPa'
+                if varUnit == 's':
+                    varUnit = 'ks'
+                if varUnit == 'm':
+                    varUnit = 'km'
+                if varUnit == 'm/s':
+                    varUnit = 'km/s'
+
+            if (y.max() < 1e-6 and y.min() > -1e-6) and varScale != 'linear-log' and \
+                    varScale != 'log-log' and varScale != 'log':
+                y *= 1e9
+                if varUnit == 'gram' or varUnit == 'g':
+                    varUnit = 'ng'
+                if varUnit == 'cc':
+                    varUnit = 'n-cc'
+                if varUnit == 'L':
+                    varUnit = 'nL'
+                if varUnit == 'W':
+                    varUnit = 'nW'
+                if varUnit == 'Ci':
+                    varUnit = 'nCi'
+                if varUnit == 'gram/min' or varUnit == 'g/min':
+                    varUnit = 'ng/min'
+                if varUnit == 'gram/s' or varUnit == 'g/s':
+                    varUnit = 'ng/s'
+                if varUnit == 'gram/m3' or varUnit == 'g/m3':
+                    varUnit = 'ng/m3'
+                if varUnit == 'gram/L' or varUnit == 'g/L':
+                    varUnit = 'ng/L'
+                if varUnit == 'W/L':
+                    varUnit = 'nW/L'
+                if varUnit == 'Ci/L':
+                    varUnit = 'nCi/L'
+                if varUnit == 'L/min':
+                    varUnit = 'nL/min'
+                if varUnit == 'Pa':
+                    varUnit = 'nPa'
+                if varUnit == 's':
+                    varUnit = 'ns'
+                if varUnit == 'm/s':
+                    varUnit = 'nm/s'
+
+            if (y.max() >= 1e-6 and y.max()  <  1e-3) or \
+               (y.min() > -1e-3 and y.min() <= -1e-6) and varScale != 'linear-log' and \
+                    varScale != 'log-log' and varScale != 'log':
+                y *= 1e6
+                if varUnit == 'gram' or varUnit == 'g':
+                    varUnit = 'ug'
+                if varUnit == 'cc':
+                    varUnit = 'u-cc'
+                if varUnit == 'L':
+                    varUnit = 'uL'
+                if varUnit == 'W':
+                    varUnit = 'uW'
+                if varUnit == 'Ci':
+                    varUnit = 'uCi'
+                if varUnit == 'gram/min' or varUnit == 'g/min':
+                    varUnit = 'ug/min'
+                if varUnit == 'gram/s' or varUnit == 'g/s':
+                    varUnit = 'ug/s'
+                if varUnit == 'gram/m3' or varUnit == 'g/m3':
+                    varUnit = 'ug/m3'
+                if varUnit == 'gram/L' or varUnit == 'g/L':
+                    varUnit = 'ug/L'
+                if varUnit == 'W/L':
+                    varUnit = 'uW/L'
+                if varUnit == 'Ci/L':
+                    varUnit = 'uCi/L'
+                if varUnit == 'L/min':
+                    varUnit = 'uL/min'
+                if varUnit == 'Pa':
+                    varUnit = 'uPa'
+                if varUnit == 's':
+                    varUnit = 'us'
+                if varUnit == 'm/s':
+                    varUnit = 'um/s'
+
+            if (y.max() >= 1e-3 and y.max()  < 1e-1) or \
+               (y.min() <= -1e-3 and y.min() > -1e-1) and varScale != 'linear-log' and \
+                    varScale != 'log-log' and varScale != 'log':
+                y *= 1e3
+                if varUnit == 'gram' or varUnit == 'g':
+                    varUnit = 'mg'
+                if varUnit == 'cc':
+                    varUnit = 'm-cc'
+                if varUnit == 'L':
+                    varUnit = 'mL'
+                if varUnit == 'W':
+                    varUnit = 'mW'
+                if varUnit == 'Ci':
+                    varUnit = 'mCi'
+                if varUnit == 'gram/min' or varUnit == 'g/min':
+                    varUnit = 'mg/min'
+                if varUnit == 'gram/s' or varUnit == 'g/s':
+                    varUnit = 'mg/s'
+                if varUnit == 'gram/m3' or varUnit == 'g/m3':
+                    varUnit = 'mg/m3'
+                if varUnit == 'gram/L' or varUnit == 'g/L':
+                    varUnit = 'mg/L'
+                if varUnit == 'W/L':
+                    varUnit = 'mW/L'
+                if varUnit == 'Ci/L':
+                    varUnit = 'mCi/L'
+                if varUnit == 'L/min':
+                    varUnit = 'mL/min'
+                if varUnit == 'Pa':
+                    varUnit = 'mPa'
+                if varUnit == 's':
+                    varUnit = 'ms'
+                if varUnit == 'm/s':
+                    varUnit = 'mm/s'
+            '''
+
+            ax.set_xlabel('Time [' + time_unit + ']', fontsize=9)
+            ax.set_ylabel(varName + ' [' + varUnit + ']', fontsize=9)
+
+            ymax = y.max()
+            dy = ymax * .1
+            ymax += dy
+            ymin = y.min()
+            ymin -= dy
+
+            if abs(ymin - ymax) <= 1.e-4:
+                ymin = -1.0
+                ymax = 1.0
+
+            ax.set_ylim(ymin, ymax)
+
+            if ncols >= 4:
+                for l in ax.get_xticklabels():
+                    l.set_fontsize(8)
+            else:
+                for l in ax.get_xticklabels():
+                    l.set_fontsize(10)
+            for l in ax.get_yticklabels():
+                l.set_fontsize(10)
+
+            if time_unit == 'h' and x.max() - x.min() <= 5.0:
+                majorLocator = MultipleLocator(1.0)
+                minorLocator = MultipleLocator(0.5)
+
+                ax.xaxis.set_major_locator(majorLocator)
+                ax.xaxis.set_minor_locator(minorLocator)
+
+            if varScale == 'log' or varScale == 'log-log':
+                ax.set_xscale('log')
+                ax.set_yscale('log')
+                positiveX = x > 0.0
+                x = np.extract(positiveX, x)
+                y = np.extract(positiveX, y)
+                positiveY = y > 0.0
+                x = np.extract(positiveY, x)
+                y = np.extract(positiveY, y)
+                if y.size > 0:
+                    if y.min() > 0.0 and y.max() > y.min():
+                        ymax = y.max()
+                        dy = ymax * .1
+                        ymax += dy
+                        ymin = y.min()
+                        ymin -= dy
+                        if ymin < 0.0 or ymin > ymax / 1000.0:
+                            ymin = ymax / 1000.0
+                        ax.set_ylim(ymin, ymax)
+                    else:
+                        ax.set_ylim(1.0, 10.0)
+                else:
+                    ax.set_ylim(1.0, 10.0)
+
+            if varScale == 'log-linear':
+                ax.set_xscale('log')
+                positiveX = x > 0.0 # True if > 0.0
+                x = np.extract(positiveX, x)
+                y = np.extract(positiveX, y)
+
+            if varScale == 'linear-log':
+                ax.set_yscale('log')
+                positiveY = y > 0.0 # True if > 0.0
+                x = np.extract(positiveY, x)
+                y = np.extract(positiveY, y)
+#      assert x.size == y.size, 'size error; stop.'
+                if y.size > 0:
+                    if y.min() > 0.0 and y.max() > y.min():
+                        ymax = y.max()
+                        dy = ymax * .1
+                        ymax += dy
+                        ymin = y.min()
+                        ymin -= dy
+                        if ymin < 0.0 or ymin > ymax / 1000.0:
+                            ymin = ymax / 1000.0
+                        ax.set_ylim(y.min(), ymax)
+                    else:
+                        ax.set_ylim(1.0, 10.0)
+                else:
+                    ax.set_ylim(1.0, 10.0)
+
+        # ...................
+        # make the plot here
+
+            ax.plot(x, y, 's-', color='black', linewidth=0.5, markersize=2,
+                    markeredgecolor='black', label=varLegend)
+
+        # ...................
+
+            ax.legend(loc='best', prop={'size': 7})
+
+
+    # end of: for i_var in range(num_var):
+
+        fig_name = self.name+'-phase-plot-' + str(i_dash).zfill(2)
+        fig.savefig(fig_name+'.png', dpi=200, fomat='png')
+        plt.close(fig_num)
+
+        #pickle.dump( fig, open(fig_name+'.pickle','wb') )
+
+        return
 
 if __name__ == '__main__':
     tbp_org = Species( name='TBP', formula_name='(C4H9O)_3PO(o)',
