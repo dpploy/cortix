@@ -51,10 +51,8 @@ class Body(Module):
             self.broadcast_data()
             self.gather_data()
             self.step()
-            self.trajectory.append(self.rad)
+            self.trajectory.append(tuple(self.rad.flatten()))
             t += self.dt
-
-        print(self)
 
     def dump(self, file_name="body.csv"):
         pass
