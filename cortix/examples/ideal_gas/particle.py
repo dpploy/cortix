@@ -16,6 +16,7 @@ class Messenger:
         self.ke = 0
         self.color = 'b'
         self.elapsed = 0
+        self.total_collisions = 0
 
 class Particle:
     def __init__(self,shape,bn=[0,0,20,20],color='b',r=1):
@@ -115,6 +116,7 @@ class Particle:
             angle = math.atan2(self.p0[1]-c1[1], self.p0[0]-c1[0]) - math.atan2(c2[1]-c1[1], c2[0]-c1[0])
             wall_distance = math.sin(angle)*dis
             closest_dis = math.cos(angle)*dis
+            #Wall detection: https://stackoverflow.com/questions/1073336/circle-line-segment-collision-detection-algorithm
             if abs(wall_distance) <= self.r and abs(closest_dis)<clen:
                 self.ke = 0.5*self.m*((self.v0[0]**2+self.v0[1]**2)**0.5)**2
                 print(self.name,'wall collision. Kinetic Energy: ',self.ke)
@@ -138,7 +140,7 @@ class Particle:
         angle1 = theta-angle3
         self.collisions+=1
         self.v0 = [np.cos(angle1)*v, np.sin(angle1)*v]
-
+        self.messenger.total_collisions += 1
         
     def ball_shift(self,ball,p,v):
         angle = np.arctan2(p[1] - self.p0[1], p[0] - self.p0[0])

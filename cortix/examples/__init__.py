@@ -6,6 +6,7 @@
 from cortix.examples.ideal_gas.particle_plotting import Particle_Plot
 from cortix.examples.ideal_gas.particle import Particle
 from cortix.examples.ideal_gas.particle_handler import Particle_Handler
+from cortix.examples.ideal_gas.run_particle import Run_Particle
 
 
 from cortix.examples.city_justice.prison import Prison

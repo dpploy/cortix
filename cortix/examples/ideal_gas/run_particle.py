@@ -6,7 +6,7 @@ from cortix import Cortix
 from cortix.examples import Particle_Plot
 from cortix.examples import Particle_Handler
 
-class Simulation:
+class Run_Particle:
     def __init__(self):
         self.n_list = [15,]
 
@@ -21,17 +21,19 @@ class Simulation:
         self.fps = 60
 
     def run(self):
+        if not isinstance(self.n_list, list):
+            self.n_list=[self.n_list,]
         for c,i in enumerate(self.n_list):
             self.cortix = Cortix(use_mpi=False)
             self.net = Network()
             self.cortix.network = self.net
-            self.plot = Particle_Plot(self.shape,modules=self.procs,runtime=self.runtime)
+            self.plot = Particle_Plot(self.shape,balls=i,modules=self.procs,runtime=self.runtime)
             self.plot.fps = self.fps
             self.net.add_module(self.plot)
             print(c+1,'iterations')
             self.balls = i
             self.balleach = int(self.balls/self.procs)
-            remainder = self.balls/self.procs
+            remainder = self.balls % self.procs
             self.mod_list = []
             for i in range(self.procs):
                 balls = self.balleach
@@ -59,7 +61,7 @@ class Simulation:
 
 
 if __name__ == '__main__':
-    sim = Simulation()
+    sim = Run_Particle()
     sim.runtime = int(input('How many seconds do you want the simulation?: '))
     sim.r = 1
     sim.fps = 100
