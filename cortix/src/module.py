@@ -21,7 +21,12 @@ class Module:
     In order to execute, modules *must* override the `run` method, which will be
     executed during the simulation.
 
+    num_modules: int
+        Number of instances of this class.
+
     '''
+
+    num_modules = 0
 
     def __init__(self):
         '''Module super class constructor.
@@ -63,7 +68,10 @@ class Module:
         self.ports = list()
         self.log = logging.getLogger('cortix')
         self.save = False
-        self.id = 0
+
+        self.id = Module.num_modules
+
+        Module.num_modules += 1
 
         self._network = None
 
@@ -203,7 +211,9 @@ class Module:
         raise NotImplementedError('Module must implement run()')
 
     def run_and_save(self):
+
         self.run()
+
         if self.save:
             file_name = os.path.join(".ctx-saved", "{}_".format(self.__class__.__name__))
             if self.use_mpi:
@@ -215,8 +225,9 @@ class Module:
 
             self.ports = None
             self.log = None
+
             try:
                 with open(file_name, "wb") as f:
-                    pickle.dump(self, f)
+                    pickle.dump( (self.id,self), f )
             except pickle.PicklingError:
                 print("Unable to pickle {}!".format(file_name))

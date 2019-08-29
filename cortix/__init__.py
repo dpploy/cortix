@@ -11,3 +11,4 @@ from .src.port import Port
 
 from .support.phase import Phase
 from .support.quantity import Quantity
+from .support.species import Species
