@@ -6,7 +6,7 @@
 import os
 import pickle
 import logging
-from multiprocessing import Process, Queue
+from multiprocessing import Process
 
 from cortix.src.module import Module
 from cortix.src.port import Port
@@ -17,12 +17,12 @@ class Network:
     Attributes
     ----------
 
-    n_networks: int
+    num_networks: int
         Number of instances of this class.
 
     '''
 
-    n_networks = 0
+    num_networks = 0
 
     def __init__(self):
         '''Module super class constructor.
@@ -37,7 +37,7 @@ class Network:
 
        '''
 
-        self.id = Network.n_networks
+        self.id = Network.num_networks
 
         self.name = 'network-'+str(self.id)
         self.log = logging.getLogger('cortix')
@@ -51,7 +51,7 @@ class Network:
         self.use_mpi = None
         self.use_multiprocessing = None
 
-        Network.n_networks += 1
+        Network.num_networks += 1
 
         return
 
@@ -251,13 +251,15 @@ class Network:
                 p.join()
 
         # Reload saved modules
-        old_mods = list()
+        #old_mods = list()
         for file_name in os.listdir(".ctx-saved"):
             if file_name.endswith(".pkl"):
                 file_name = os.path.join(".ctx-saved", file_name)
                 with open(file_name, "rb") as f:
-                    old_mods.append(pickle.load(f))
-        self.modules = old_mods
+                    #old_mods.append(pickle.load(f))
+                    (mod_id, module) = pickle.load(f)
+                    self.modules[mod_id] = module
+        #self.modules = old_mods
 
     def draw(self, graph_attr=None, node_attr=None, engine=None):
 

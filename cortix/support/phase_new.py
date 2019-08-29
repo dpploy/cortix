@@ -198,7 +198,7 @@ class PhaseNew:
         return self.__quantities
     quantities = property(GetQuantities, None, None, None)
 
-    def get_actors(self):
+    def __get_actors(self):
         '''
         Returns a list of names of all the actors in the phase history.
 
@@ -209,7 +209,7 @@ class PhaseNew:
         '''
 
         return list(self.__phase.columns)  # return all names in order
-    actors = property(get_actors, None, None, None)
+    actors = property(__get_actors, None, None, None)
 
     def get_species(self, name):
         '''
@@ -654,8 +654,7 @@ class PhaseNew:
             else:
                 return  self.__phase.index[loc]
 
-    def plot(self,time_unit='second',plot_name='null-phase-plot-name',
-             nrows=2, ncols=2):
+    def plot(self,name='user-name',time_unit='second',nrows=2, ncols=2):
 
         num_var = len(self.__phase.columns)
         if num_var == 0:
@@ -672,7 +671,7 @@ class PhaseNew:
             if i_var % (nrows*ncols) == 0:
 
                 if i_var != 0:  # flush any current figure
-                    fig_name = self.name+'-phase-plot-' + str(i_dash).zfill(2)
+                    fig_name = name+'-'+self.name+'-phase-plot-' + str(i_dash).zfill(2)
                     fig.savefig(fig_name+'.png', dpi=200, fomat='png')
                     plt.close(fig_num)
 
@@ -1008,7 +1007,7 @@ class PhaseNew:
 
     # end of: for i_var in range(num_var):
 
-        fig_name = self.name+'-phase-plot-' + str(i_dash).zfill(2)
+        fig_name = name+'-'+self.name+'-phase-plot-' + str(i_dash).zfill(2)
         fig.savefig(fig_name+'.png', dpi=200, fomat='png')
         plt.close(fig_num)
 
