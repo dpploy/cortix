@@ -68,17 +68,10 @@ def main():
     ax = fig.add_subplot(111, projection='3d')
     trajectories = [b.trajectory for b in cortix.network.modules]
 
-    import pickle
-    with open("traj.pkl", "wb") as f:
-        pickle.dump(trajectories, f)
-
     for t in trajectories:
-        t = t[1]
-        x = [0 if np.isnan(i[0]) else i[0] for i in t]
-        y = [0 if np.isnan(i[1]) else i[1] for i in t]
-        z = [0 if np.isnan(i[2]) else i[2] for i in t]
-        print(t)
-        ax.autoscale = False
+        x = [i[0] for i in t]
+        y = [i[1] for i in t]
+        z = [i[2] for i in t]
         ax.plot(x, y, z)
 
     plt.savefig("planets.png")
