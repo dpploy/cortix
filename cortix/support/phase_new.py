@@ -41,6 +41,7 @@ matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MultipleLocator
+from matplotlib.ticker import ScalarFormatter
 
 from cortix.support.species   import Species
 from cortix.support.quantity import Quantity
@@ -53,7 +54,7 @@ class PhaseNew:
     '''
 
     def __init__(self,
-                 name = 'null-phase-name',
+                 name = None,
                  time_stamp = None,
                  time_unit  = None,
                  species    = None,
@@ -71,7 +72,10 @@ class PhaseNew:
         in Phase that are not in sync.
         '''
 
-        self.name = name
+        if not name:
+            self.name = self.__class__.__name__
+        else:
+            self.name = name
 
         if time_stamp is None:
             time_stamp = 0.0 # default type is float
@@ -115,18 +119,18 @@ class PhaseNew:
                                      # todo: eliminate them from Quantity in the future
 
         # Table data phase without data type assigned; this is left to the user
-        # Time stamps will always be float or int
-        self.__phase = pandas.DataFrame( index=[float(time_stamp)], columns=names )
+        # Time stamps will always be float
+        self.__df = pandas.DataFrame( index=[float(time_stamp)], columns=names )
 
         # This is meant to be the value of species concentration; a float type
         if species is not None:
             for each_species in species:
-                self.__phase.loc[time_stamp, each_species.name] = 0.0
+                self.__df.loc[time_stamp, each_species.name] = 0.0
 
         if quantities is not None:
             for quant in quantities:
-                self.__phase.loc[time_stamp, quant.name] = quant.value
-                #self.__phase.fillna( 0.0, inplace=True )  # dtype defaults to float
+                self.__df.loc[time_stamp, quant.name] = quant.value
+                #self.__df.fillna( 0.0, inplace=True )  # dtype defaults to float
 
         return
 
@@ -168,7 +172,7 @@ class PhaseNew:
         time_stamps: list
         '''
 
-        return list(self.__phase.index)  # return all time stamps
+        return list(self.__df.index)  # return all time stamps
     time_stamps = property(__get_time_stamps, None, None, None)
 
     def __get_species_list(self):
@@ -204,12 +208,19 @@ class PhaseNew:
 
         Returns
         -------
-        list(self.__phase.colums): list
+        list(self.__df.colums): list
 
         '''
 
-        return list(self.__phase.columns)  # return all names in order
+        return list(self.__df.columns)  # return all names in order
     actors = property(__get_actors, None, None, None)
+
+    def __get_df(self):
+        '''
+        Die hard access.
+        '''
+        return self.__df
+    df = property(__get_df,None,None,None)
 
     def get_species(self, name):
         '''
@@ -280,14 +291,14 @@ class PhaseNew:
         quant.value: float or int or other
         '''
 
-        assert name in self.__phase.columns, 'name %r not in %r'%\
-                (name,self.__phase.columns)
+        assert name in self.__df.columns, 'name %r not in %r'%\
+                (name,self.__df.columns)
 
         time_stamp = self.__get_time_stamp( try_time_stamp )
 
         for quant in self.__quantities:
             if quant.name == name:
-                quant.value = self.__phase.loc[time_stamp, name] # labels' access mode
+                quant.value = self.__df.loc[time_stamp, name] # labels' access mode
                 return quant  # return quantity syncronized with the phase
 
     def get_quantity_history(self, name):
@@ -308,13 +319,13 @@ class PhaseNew:
         quant_history: tuple(Quantity,str)
         '''
 
-        assert name in self.__phase.columns, 'name %r not in %r'%\
-                (name,self.__phase.columns)
+        assert name in self.__df.columns, 'name %r not in %r'%\
+                (name,self.__df.columns)
 
         for quant in self.__quantities:
             if quant.name == name:
                 quant_history = deepcopy(quant)
-                quant_history.value = self.__phase[name] # whole data frame index series
+                quant_history.value = self.__df[name] # whole data frame index series
                 return (quant_history,self.__time_unit) # return tuple
 
     def add_single_species(self, new_species):
@@ -328,17 +339,17 @@ class PhaseNew:
         '''
 
         assert isinstance(new_species, Species)
-        assert new_species.name not in list(self.__phase.columns), \
+        assert new_species.name not in list(self.__df.columns), \
                'new_species: %r exists. Current names: %r' % \
-               (new_species, self.__phase.columns)
+               (new_species, self.__df.columns)
         species_formulae = [specie.formula_name for specie in self.__species]
         assert new_species.formula_name not in species_formulae
         self.__species.append(new_species)
         new_name = new_species.name
-        col = pandas.DataFrame( index=list(self.__phase.index), columns=[new_name] )
-        tmp = self.__phase
+        col = pandas.DataFrame( index=list(self.__df.index), columns=[new_name] )
+        tmp = self.__df
         df = tmp.join(col, how='outer')
-        self.__phase = df.fillna(0.0)   # for species have float as default
+        self.__df = df.fillna(0.0)   # for species have float as default
 
     def add_quantity(self, new_quant):
         '''
@@ -351,20 +362,20 @@ class PhaseNew:
         '''
 
         assert isinstance(new_quant, Quantity)
-        assert new_quant.name not in list(self.__phase.columns), \
+        assert new_quant.name not in list(self.__df.columns), \
                'quantity: %r exists. Current names: %r' % \
-               (new_quant, self.__phase.columns)
+               (new_quant, self.__df.columns)
         quant_formal_names = [quant.formal_name for quant in self.__quantities]
         assert new_quant.formal_name not in quant_formal_names
         self.__quantities.append(new_quant)
         new_name = new_quant.name
 
         # create a col with object data type; user must fill out column
-        col = pandas.DataFrame( index=list( self.__phase.index), columns=[new_name],
+        col = pandas.DataFrame( index=list( self.__df.index), columns=[new_name],
                                 dtype=object )
-        tmp = self.__phase
+        tmp = self.__df
         df  = tmp.join(col, how='outer')
-        #self.__phase = df.fillna(new_quant.value)
+        #self.__df = df.fillna(new_quant.value)
 
     def add_row(self, try_time_stamp, row_values):
         '''
@@ -378,7 +389,7 @@ class PhaseNew:
         row_values: list
 
         '''
-        assert try_time_stamp not in self.__phase.index, 'already used time_stamp: %r'%\
+        assert try_time_stamp not in self.__df.index, 'already used time_stamp: %r'%\
                 (try_time_stamp)
         assert isinstance(row_values, list)
 
@@ -386,17 +397,17 @@ class PhaseNew:
         assert time_stamp is None, 'already used time_stamp: %r'%(try_time_stamp)
         time_stamp = try_time_stamp
 
-        assert len(row_values) == self.__phase.columns.size
+        assert len(row_values) == self.__df.columns.size
 
         # create a row with object data type; users row_values data define data type
         row = pandas.DataFrame( index=[time_stamp],
-                                columns=list( self.__phase.columns ), dtype=object )
+                                columns=list( self.__df.columns ), dtype=object )
 
         for (col,v) in zip(row.columns, row_values):
             row.loc[time_stamp,col] = v
 
-        frames = [self.__phase, row]
-        self.__phase = pandas.concat(frames)
+        frames = [self.__df, row]
+        self.__df = pandas.concat(frames)
         return
 
     def get_row(self, try_time_stamp=None):
@@ -410,14 +421,14 @@ class PhaseNew:
 
         Returns
         -------
-        list(self.__phase.loc[time_stamp, :]): list
+        list(self.__df.loc[time_stamp, :]): list
 
         '''
         time_stamp = self.__get_time_stamp( try_time_stamp )
         assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
-        return list(self.__phase.loc[time_stamp, :])
+        return list(self.__df.loc[time_stamp, :])
 
-    def GetColumn(self, actor):
+    def get_column(self, actor):
         '''
         Returns an entire column of data. A column is the entire history
         of data associated with a specific actor.
@@ -428,13 +439,13 @@ class PhaseNew:
 
         Returns
         -------
-        list(self.__phase.loc[:, actor]): list
+        list(self.__df.loc[:, actor]): list
 
         '''
         assert isinstance(actor, str)
-        assert actor in self.__phase.columns, 'actor %r not in %r'% \
-                   (actor,self.__phase.columns)
-        return list(self.__phase.loc[:, actor])
+        assert actor in self.__df.columns, 'actor %r not in %r'% \
+                   (actor,self.__df.columns)
+        return list(self.__df.loc[:, actor])
 
     def ScaleRow(self, try_time_stamp, value):
         '''
@@ -451,7 +462,7 @@ class PhaseNew:
         time_stamp = self.__get_time_stamp( try_time_stamp )
         assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
         assert isinstance(value, int) or isinstance(value, float)
-        self.__phase.loc[time_stamp, :] *= value
+        self.__df.loc[time_stamp, :] *= value
         return
 
     def ClearHistory(self, value=0.0):
@@ -465,7 +476,7 @@ class PhaseNew:
 
         '''
         assert isinstance(value, int) or isinstance(value, float)
-        self.__phase.loc[:, :] = value
+        self.__df.loc[:, :] = value
 
         return
 
@@ -493,18 +504,18 @@ class PhaseNew:
 
         values = self.GetRow(time_stamp)  # save values
 
-        columns = list(self.__phase.columns)
+        columns = list(self.__df.columns)
         assert len(columns) == len(values), 'FATAL: oops internal error.'
 
-        self.__phase = pandas.DataFrame( index=[time_stamp], columns=columns )
-        self.__phase.fillna( 0.0, inplace=True )
+        self.__df = pandas.DataFrame( index=[time_stamp], columns=columns )
+        self.__df.fillna( 0.0, inplace=True )
 
         if value is None:
             for v in values:
                 idx = values.index(v)
-                self.__phase.loc[time_stamp, columns[idx]] = v  # restore values
+                self.__df.loc[time_stamp, columns[idx]] = v  # restore values
         else:
-            self.__phase.loc[time_stamp, :] = value   # set user-given value
+            self.__df.loc[time_stamp, :] = value   # set user-given value
 
         return
 
@@ -520,12 +531,12 @@ class PhaseNew:
 
         Returns
         -------
-        self.__phase.loc[time_stamp, actor]: any
+        self.__df.loc[time_stamp, actor]: any
 
         '''
         assert isinstance(actor, str)
-        assert actor in self.__phase.columns, 'actor %r not in %r'% \
-                   (actor,self.__phase.columns)
+        assert actor in self.__df.columns, 'actor %r not in %r'% \
+                   (actor,self.__df.columns)
 
         if try_time_stamp is not None:
            assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float)
@@ -533,14 +544,14 @@ class PhaseNew:
         time_stamp = self.__get_time_stamp( try_time_stamp )
         assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
 
-        return self.__phase.loc[time_stamp, actor]
+        return self.__df.loc[time_stamp, actor]
 
     def set_value(self, actor, value, try_time_stamp=None):
         '''
 
         '''
         assert isinstance(actor, str)
-        assert actor in self.__phase.columns
+        assert actor in self.__df.columns
 
         if try_time_stamp is not None:
            assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float)
@@ -550,7 +561,7 @@ class PhaseNew:
 
         # Note: user value could have a different type than other column values.
         # If there is a type change, this will not be checked; user has been advised.
-        self.__phase.loc[time_stamp, actor] = value
+        self.__df.loc[time_stamp, actor] = value
 
         return
 
@@ -564,7 +575,7 @@ class PhaseNew:
 
         '''
         assert isinstance(fileName, str)
-        tmp = pandas.DataFrame(self.__phase)
+        tmp = pandas.DataFrame(self.__df)
         column_names = tmp.columns
         species_names = [species.name for species in self.__species]
         quantity_names = [quantity.name for quantity in self.__quantities]
@@ -597,9 +608,9 @@ class PhaseNew:
                 self.__time_unit,
                 self.__quantities,
                 self.__species,
-                len(self.__phase.index),
-                self.__phase.index[-1],
-                self.__phase.loc[self.__phase.index[-1], :] )
+                len(self.__df.index),
+                self.__df.index[-1],
+                self.__df.loc[self.__df.index[-1], :] )
 
     def __repr__(self):
         s = '\n\t **Phase()**: name=%s;' + \
@@ -613,9 +624,9 @@ class PhaseNew:
                 self.__time_unit,
                 self.__quantities,
                 self.__species,
-                len(self.__phase.index),
-                self.__phase.index[-1],
-                self.__phase.loc[self.__phase.index[-1], :] )
+                len(self.__df.index),
+                self.__df.index[-1],
+                self.__df.loc[self.__df.index[-1], :] )
 
     def __get_time_stamp(self, try_time_stamp=None):
         '''
@@ -632,7 +643,7 @@ class PhaseNew:
 
         Returns
         -------
-        self.__phase.index[loc]: float or None
+        self.__df.index[loc]: float or None
             Will return None if no time stamp within tolerance is found.
 
         '''
@@ -641,26 +652,29 @@ class PhaseNew:
         tol = 1.0e-3
 
         if try_time_stamp is None:
-            return self.__phase.index[-1]
+            return self.__df.index[-1]
         else:
-            time_stamps = np.array(self.__phase.index)
+            time_stamps = np.array(self.__df.index)
             if time_stamps.size >= 2:
                tol = 1.0e-3 * np.diff(time_stamps).mean() # 1e-3 * the mean delta t
             try: # abs(index_value - try_time_stamp) <= tolerance
-                loc = self.__phase.index.get_loc( try_time_stamp, method='nearest',
+                loc = self.__df.index.get_loc( try_time_stamp, method='nearest',
                         tolerance=tol )
             except KeyError: # no value found withing tol
                 return None
             else:
-                return  self.__phase.index[loc]
+                return  self.__df.index[loc]
 
-    def plot(self,name='user-name',time_unit='second',nrows=2, ncols=2):
+    def plot( self, name='phase-plot-name', time_unit='second', nrows=2, ncols=2,
+              dpi=200):
 
-        num_var = len(self.__phase.columns)
+        num_var = len(self.__df.columns)
         if num_var == 0:
             return
 
         today = datetime.datetime.today().strftime("%d%b%y %H:%M:%S")
+
+        lead_name = name
 
         fig_num = None
 
@@ -671,8 +685,9 @@ class PhaseNew:
             if i_var % (nrows*ncols) == 0:
 
                 if i_var != 0:  # flush any current figure
-                    fig_name = name+'-'+self.name+'-phase-plot-' + str(i_dash).zfill(2)
-                    fig.savefig(fig_name+'.png', dpi=200, fomat='png')
+                    fig_name = lead_name+'-'+self.name+'-phase-plot-' + \
+                            str(i_dash).zfill(2)
+                    fig.savefig(fig_name+'.png', dpi=dpi, fomat='png')
                     plt.close(fig_num)
 
                     #pickle.dump( fig, open(fig_name+'.pickle','wb') )
@@ -714,22 +729,21 @@ class PhaseNew:
             ax = axs[axId]
             axId += 1
 
-            col_name = self.__phase.columns[i_var]
+            col_name = self.__df.columns[i_var]
 
             species = self.get_species(col_name)
             if species:
                 varName = species.formula_name
             else:
-                quant = self.get_quantity()
+                quant = self.get_quantity(col_name)
                 varName = quant.formal_name
-            quantity = self.get_species(col_name)
 
+            # sanity check
             if i_var <= len(self.__species):
-                varName = self.__species[i_var].formula_name
-                # sanity check
-                assert self.__species[i_var].name == self.__phase.columns[i_var]
+                assert self.__species[i_var].name == self.__df.columns[i_var]
             else:
-                varName = self.__quantities[i_var].formula_name
+                assert self.__quantities[i_var].name == self.__df.columns[i_var]
+
             varUnit = ''
 
             '''
@@ -749,6 +763,7 @@ class PhaseNew:
 
             varLegend = 'var-legend'
             varScale  = 'linear-linear'
+
             assert varScale == 'log' or varScale == 'linear' or varScale == 'log-linear' \
                 or varScale == 'linear-log' or varScale == 'linear-linear' or \
                 varScale == 'log-log'
@@ -756,9 +771,7 @@ class PhaseNew:
             if time_unit == 'minute':
                 time_unit = 'min'
 
-            data = np.array(self.__phase[col_name])  # convert to numpy ndarray
-
-            x = np.array(self.__phase.index)
+            x = np.array(self.__df.index)
 
             if (varScale == 'linear' or varScale == 'linear-linear' or \
                 varScale == 'linear-log') and x.max() >= 120.0:
@@ -766,7 +779,7 @@ class PhaseNew:
                 if time_unit == 'min':
                     time_unit = 'h'
 
-            y = np.array(self.__phase[col_name])  # convert to numpy ndarray
+            y = np.array( self.__df[col_name] )  # convert to numpy ndarray
 
             '''
             if (y.max() >= 1e3 or y.min() <= -1e3) and varScale != 'linear-log' and \
@@ -915,6 +928,7 @@ class PhaseNew:
             ax.set_xlabel('Time [' + time_unit + ']', fontsize=9)
             ax.set_ylabel(varName + ' [' + varUnit + ']', fontsize=9)
 
+            '''
             ymax = y.max()
             dy = ymax * .1
             ymax += dy
@@ -926,6 +940,7 @@ class PhaseNew:
                 ymax = 1.0
 
             ax.set_ylim(ymin, ymax)
+            '''
 
             if ncols >= 4:
                 for l in ax.get_xticklabels():
@@ -978,7 +993,7 @@ class PhaseNew:
                 positiveY = y > 0.0 # True if > 0.0
                 x = np.extract(positiveY, x)
                 y = np.extract(positiveY, y)
-#      assert x.size == y.size, 'size error; stop.'
+                #assert x.size == y.size, 'size error; stop.'
                 if y.size > 0:
                     if y.min() > 0.0 and y.max() > y.min():
                         ymax = y.max()
@@ -994,21 +1009,25 @@ class PhaseNew:
                 else:
                     ax.set_ylim(1.0, 10.0)
 
-        # ...................
-        # make the plot here
+            # ...................
+            # make the plot here
+
+            yformatter = ScalarFormatter(useMathText=True,useOffset=True)
+            yformatter.set_powerlimits((15, 5))
+            ax.yaxis.set_major_formatter(yformatter)
 
             ax.plot(x, y, 's-', color='black', linewidth=0.5, markersize=2,
                     markeredgecolor='black', label=varLegend)
 
-        # ...................
+            # ...................
 
             ax.legend(loc='best', prop={'size': 7})
 
 
-    # end of: for i_var in range(num_var):
+        # end of: for i_var in range(num_var):
 
         fig_name = name+'-'+self.name+'-phase-plot-' + str(i_dash).zfill(2)
-        fig.savefig(fig_name+'.png', dpi=200, fomat='png')
+        fig.savefig(fig_name+'.png', dpi=dpi, fomat='png')
         plt.close(fig_num)
 
         #pickle.dump( fig, open(fig_name+'.pickle','wb') )
