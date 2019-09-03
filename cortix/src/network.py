@@ -268,8 +268,10 @@ class Network:
                 file_name = os.path.join(".ctx-saved", file_name)
                 with open(file_name, "rb") as f:
                     module = pickle.load(f)
+                    # reintroduce logging
+                    module.log = logging.getLogger('cortix')
                     self.modules[module.id] = module
-        assert num_files == len(self.modules)
+        assert num_files == len(self.modules),'file/module mismatch; bailing out.'
 
     def draw(self, graph_attr=None, node_attr=None, engine=None):
 

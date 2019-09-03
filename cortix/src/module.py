@@ -220,7 +220,7 @@ class Module:
                 file_name += str(os.getpid())
             file_name += ".pkl"
 
-            self.ports = None
+            self.ports = list() # reset ports since they can't be pickled
             self.log = None
 
             try:
