@@ -70,6 +70,7 @@ class Network:
             m.use_mpi = self.use_mpi
             m.use_multiprocessing = self.use_multiprocessing
             self.modules.append(m)
+            m.id = len(self.modules)-1  # see module doc for module id
 
         return
 
@@ -199,6 +200,10 @@ class Network:
         '''
         assert len(self.modules) >= 1, 'the network must have a list of modules.'
 
+        # Remove the scratch file save directory
+        if self.rank == 0 or self.use_multiprocessing:
+            os.system('rm -rf .ctx-saved && mkdir .ctx-saved')
+
         # Running under MPI
         #------------------
         if self.use_mpi:
@@ -210,18 +215,22 @@ class Network:
             self.comm.Barrier()
 
             # Assign an mpi rank to all ports of a module using the module list index
+            # If a port has rank assignment from a previous run; leave it alone
             for m in self.modules:
                 rank = self.modules.index(m)+1
                 for port in m.ports:
-                    port.rank = rank
+                    if port.rank is None:
+                        port.rank = rank
 
             # Assign a unique port id to all ports
+            # If a port has id assignment from a previous run; leave it alone
             i = 0
             for mod in self.modules:
                 for port in mod.ports:
                     port.use_mpi = self.use_mpi
-                    port.id = i
-                    i += 1
+                    if port.id is None:
+                        port.id = i
+                        i += 1
 
             # Parallel run module in MPI
             if self.rank != 0:
@@ -251,15 +260,16 @@ class Network:
                 p.join()
 
         # Reload saved modules
-        #old_mods = list()
+        #---------------------
+        num_files = 0
         for file_name in os.listdir(".ctx-saved"):
             if file_name.endswith(".pkl"):
+                num_files += 1
                 file_name = os.path.join(".ctx-saved", file_name)
                 with open(file_name, "rb") as f:
-                    #old_mods.append(pickle.load(f))
-                    (mod_id, module) = pickle.load(f)
-                    self.modules[mod_id] = module
-        #self.modules = old_mods
+                    module = pickle.load(f)
+                    self.modules[module.id] = module
+        assert num_files == len(self.modules)
 
     def draw(self, graph_attr=None, node_attr=None, engine=None):
 

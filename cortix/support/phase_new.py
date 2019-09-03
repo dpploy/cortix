@@ -665,7 +665,7 @@ class PhaseNew:
             else:
                 return  self.__df.index[loc]
 
-    def plot( self, name='phase-plot-name', time_unit='second', nrows=2, ncols=2,
+    def plot( self, name='phase-plot-name', time_unit='s', nrows=2, ncols=2,
               dpi=200):
 
         num_var = len(self.__df.columns)
@@ -744,7 +744,7 @@ class PhaseNew:
             else:
                 assert self.__quantities[i_var].name == self.__df.columns[i_var]
 
-            varUnit = ''
+            varUnit = 'g/L'
 
             '''
             if varUnit == 'gram':
@@ -768,16 +768,20 @@ class PhaseNew:
                 or varScale == 'linear-log' or varScale == 'linear-linear' or \
                 varScale == 'log-log'
 
+            time_unit = 's'
+
             if time_unit == 'minute':
                 time_unit = 'min'
 
-            x = np.array(self.__df.index)
+            x = np.array( [i for i in self.__df.index] )
 
             if (varScale == 'linear' or varScale == 'linear-linear' or \
-                varScale == 'linear-log') and x.max() >= 120.0:
+                varScale == 'linear-log') and x.max() >= 60.0:
                 x /= 60.0
                 if time_unit == 'min':
                     time_unit = 'h'
+                if time_unit == 'second' or time_unit=='s':
+                    time_unit = 'min'
 
             y = np.array( self.__df[col_name] )  # convert to numpy ndarray
 
@@ -1022,6 +1026,7 @@ class PhaseNew:
             # ...................
 
             ax.legend(loc='best', prop={'size': 7})
+            ax.grid()
 
 
         # end of: for i_var in range(num_var):

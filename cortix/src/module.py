@@ -21,12 +21,7 @@ class Module:
     In order to execute, modules *must* override the `run` method, which will be
     executed during the simulation.
 
-    num_modules: int
-        Number of instances of this class.
-
     '''
-
-    num_modules = 0
 
     def __init__(self):
         '''Module super class constructor.
@@ -56,6 +51,10 @@ class Module:
             `False` for MPI, `True` for Multiprocessing
         ports: list(Port)
             A list of ports contained by the module
+        id: int
+            An integer set by the external network once a module is added to it.
+            The `id` is the position of the module in the network list.
+            Default: None.
         __network: Network
             An internal network inherited by the derived module for nested networks.
 
@@ -69,9 +68,7 @@ class Module:
         self.log = logging.getLogger('cortix')
         self.save = False
 
-        self.id = Module.num_modules
-
-        Module.num_modules += 1
+        self.id = None
 
         self._network = None
 
@@ -228,6 +225,6 @@ class Module:
 
             try:
                 with open(file_name, "wb") as f:
-                    pickle.dump( (self.id,self), f )
+                    pickle.dump( self, f )
             except pickle.PicklingError:
                 print("Unable to pickle {}!".format(file_name))
