@@ -278,6 +278,12 @@ class Network:
         if num_files and num_files != len(self.modules):
             self.log.warn('Network::run(): not all modules reloaded from disk.')
 
+        if self.use_mpi:
+            # Make double sure all are in sync here before going forward
+            # this solves the problem of processes running behind reading files
+            # that do not exist anymore
+            self.comm.Barrier()
+
     def draw(self, graph_attr=None, node_attr=None, engine=None):
 
         from graphviz import Digraph
