@@ -261,6 +261,10 @@ class Network:
 
         # Reload saved modules
         #---------------------
+        if self.use_mpi:
+            # make double sure all are in sync here before reading files from disk
+            self.comm.Barrier()
+
         num_files = 0
         for file_name in os.listdir(".ctx-saved"):
             if file_name.endswith(".pkl"):
