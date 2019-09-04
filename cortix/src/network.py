@@ -271,7 +271,8 @@ class Network:
                     # reintroduce logging
                     module.log = logging.getLogger('cortix')
                     self.modules[module.id] = module
-        assert num_files == len(self.modules),'file/module mismatch; bailing out.'
+        if num_files and num_files != len(self.modules):
+            self.log.warn('Network::run(): not all modules reloaded from disk.')
 
     def draw(self, graph_attr=None, node_attr=None, engine=None):
 

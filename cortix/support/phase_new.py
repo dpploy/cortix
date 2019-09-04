@@ -1028,7 +1028,6 @@ class PhaseNew:
             ax.legend(loc='best', prop={'size': 7})
             ax.grid()
 
-
         # end of: for i_var in range(num_var):
 
         fig_name = name+'-'+self.name+'-phase-plot-' + str(i_dash).zfill(2)
