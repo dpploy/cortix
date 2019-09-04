@@ -136,6 +136,15 @@ class Community(Module):
             if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
                 self.log.info('Community::time[d] = '+str(round(time/const.day,1)))
 
+            self.__call_ports(time)
+
+            # Evolve offenders group population to the next time stamp
+            #---------------------------------------------------------
+
+            time = self.__step( time )
+
+    def __call_ports(self, time):
+
             # Interactions in the jail port
             #--------------------------------
             # one way "from" jail
@@ -196,10 +205,56 @@ class Community(Module):
             assert abs(check_time-time) <= 1e-6
             self.ode_params['arrested-inflow-rates'] = inflow_rates
 
-            # Evolve offenders group population to the next time stamp
-            #---------------------------------------------------------
+    def __step(self, time=0.0):
+        r'''
+        ODE IVP problem:
+        Given the initial data at :math:`t=0`,
+        :math:`u = (u_1(0),u_2(0),\ldots)`
+        solve :math:`\frac{\text{d}u}{\text{d}t} = f(u)` in the interval
+        :math:`0\le t \le t_f`.
 
-            time = self.__step( time )
+        Parameters
+        ----------
+        time: float
+            Time in SI unit.
+
+        Returns
+        -------
+        None
+
+        '''
+
+        # Get state values
+        u_0 = self.population_phase.GetValue('f0g', time)
+
+        t_interval_sec = np.linspace(0.0, self.time_step, num=2)
+
+        (u_vec_hist, info_dict) = odeint( self.__rhs_fn,
+                                          u_0, t_interval_sec,
+                                          args=( self.ode_params, ),
+                                          rtol=1e-4, atol=1e-8, mxstep=200,
+                                          full_output=True )
+
+        assert info_dict['message'] =='Integration successful.', info_dict['message']
+
+        u_vec = u_vec_hist[1,:]  # solution vector at final time step
+
+
+        time += self.time_step
+
+        # Update state variables
+        values = self.population_phase.GetRow() # values existing values
+        self.population_phase.AddRow(time, values) # copy on new time for convenience
+
+        self.population_phase.SetValue('f0g', u_vec, time) # insert new values
+
+        # Update the population of free offenders returning to community
+        inflow_rates = self.ode_params['total-inflow-rates']
+        f0g_free = inflow_rates * self.time_step
+
+        self.population_phase.SetValue('f0g_free',f0g_free,time)
+
+        return time
 
     def __rhs_fn(self, u_vec, t, params):
 
@@ -242,53 +297,6 @@ class Community(Module):
 
         return dt_f0g
 
-    def __step(self, time=0.0):
-        r'''
-        ODE IVP problem:
-        Given the initial data at :math:`t=0`,
-        :math:`u = (u_1(0),u_2(0),\ldots)`
-        solve :math:`\frac{\text{d}u}{\text{d}t} = f(u)` in the interval
-        :math:`0\le t \le t_f`.
-
-        Parameters
-        ----------
-        time: float
-            Time in SI unit.
-
-        Returns
-        -------
-        None
-
-        '''
-
-        u_vec_0 = self.population_phase.GetValue('f0g', time)
-        t_interval_sec = np.linspace(0.0, self.time_step, num=2)
-
-        (u_vec_hist, info_dict) = odeint( self.__rhs_fn,
-                                          u_vec_0, t_interval_sec,
-                                          args=( self.ode_params, ),
-                                          rtol=1e-4, atol=1e-8, mxstep=200,
-                                          full_output=True )
-
-        assert info_dict['message'] =='Integration successful.', info_dict['message']
-
-        u_vec = u_vec_hist[1,:]  # solution vector at final time step
-        values = self.population_phase.GetRow(time) # values at previous time
-
-        time += self.time_step
-
-        self.population_phase.AddRow(time, values)
-
-        # Update current values
-        self.population_phase.SetValue('f0g', u_vec, time)
-
-        # Update the population of free offenders returning to community
-        inflow_rates = self.ode_params['total-inflow-rates']
-        f0g_free = inflow_rates * self.time_step
-
-        self.population_phase.SetValue('f0g_free',f0g_free,time)
-
-        return time
 
     def __compute_outflow_rates(self, time, name):
 
