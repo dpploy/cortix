@@ -266,3 +266,6 @@ if __name__ == '__main__':
     tbp_org = Species( name='TBP', formula_name='(C4H9O)_3PO(o)',
               atoms=['12*C','27*H','4*O','P'] )
     print(tbp_org)
+    no3Minus_aqu = Species( name='NO3-', formula_name='NO3-(a)',
+                   atoms=['N','3*O'] )
+    print(no3Minus_aqu)
