@@ -261,6 +261,10 @@ class Network:
 
         # Reload saved modules
         #---------------------
+        if self.use_mpi:
+            # make double sure all are in sync here before reading files from disk
+            self.comm.Barrier()
+
         num_files = 0
         for file_name in os.listdir(".ctx-saved"):
             if file_name.endswith(".pkl"):
@@ -273,6 +277,12 @@ class Network:
                     self.modules[module.id] = module
         if num_files and num_files != len(self.modules):
             self.log.warn('Network::run(): not all modules reloaded from disk.')
+
+        if self.use_mpi:
+            # Make double sure all are in sync here before going forward
+            # this solves the problem of processes running behind reading files
+            # that do not exist anymore
+            self.comm.Barrier()
 
     def draw(self, graph_attr=None, node_attr=None, engine=None):
 
