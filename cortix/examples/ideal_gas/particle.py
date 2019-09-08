@@ -63,7 +63,22 @@ class Particle:
         self.collisions=0
         t = self.t_step
         self.messenger.elapsed += t
-
+        for ball in self.ball_list: #Detects collision with other objects
+            if self.name==ball.name:
+                continue
+            #ball is Messenger class object
+            dif = np.subtract(self.p0,ball.p)
+            dis = math.sqrt(dif[0]**2 + dif[1]**2)
+            
+            name = ball.name
+            if dis <= self.r + ball.r:# self.circle.crosses(shape) or self.circle.touches(shape) or self.circle.intersects(shape):
+                coldic = dict(name=ball.name,v0=self.v0,p0=self.p0,elapsed=self.messenger.elapsed)
+                self.mycollisions.append(coldic)
+                self.messenger.collision.append(coldic)
+                self.ball_collision(ball,ball.p,ball.v)
+                self.ball_shift(ball,ball.p,ball.v)
+                coldic['p0'] = self.p0
+        
         for ball in self.ball_list: #Detects collision with other objects
             #Reacts to intersection between this object and another
             for c,line in enumerate(ball.collision): #Undetected Collisions received as a message
@@ -71,6 +86,7 @@ class Particle:
                     p0,v0 = line['p0'],line['v0']
                     dif = np.subtract(self.p0,p0)
                     dis = math.sqrt(dif[0]**2 + dif[1]**2)
+##                    print('Collision%', self.name,dis)
                     self.ball_collision(ball,p0,v0)
                     if dis <= self.r + ball.r:
                         self.ball_shift(ball,p0,v0)
@@ -79,7 +95,8 @@ class Particle:
                     if line == col and col!= []:
                         del self.mycollisions[d]
                         del ball.collision[c]
-                        
+        
+                
         #Gravity calculations for timestep
         self.p0[1] = 0.5*self.a[1]*t**2+self.v0[1]*t+self.p0[1]
         self.p0[0] = 0.5*self.a[0]*t**2+self.v0[0]*t+self.p0[0]
@@ -87,25 +104,7 @@ class Particle:
         self.v0[0] = self.a[0]*t + self.v0[0]
         
         
-        for ball in self.ball_list: #Detects collision with other objects
-            if self.name==ball.name:
-                continue
-            #ball is Messenger class object
-##            pnp = np.array(ball.p)
-            dif = np.subtract(self.p0,ball.p)
-            dis = math.sqrt(dif[0]**2 + dif[1]**2)
-            
-##            pnt = geo.point.Point(ball.p)
-##            shape = pnt.buffer(ball.r)
-            name = ball.name
-            if dis <= self.r + ball.r:# self.circle.crosses(shape) or self.circle.touches(shape) or self.circle.intersects(shape):
-                coldic = dict(name=ball.name,v0=self.v0,p0=self.p0,elapsed=self.messenger.elapsed)
-                self.mycollisions.append(coldic)
-                self.messenger.collision.append(coldic)
-                self.ball_collision(ball,ball.p,ball.v)
-##                print(self.name,ball.name)
-                self.ball_shift(ball,ball.p,ball.v)
-                coldic['p0'] = self.p0
+        
                 
         
         for (c1,c2) in self.bndry: #Detects collision with boundary
@@ -119,7 +118,7 @@ class Particle:
             #Wall detection: https://stackoverflow.com/questions/1073336/circle-line-segment-collision-detection-algorithm
             if abs(wall_distance) <= self.r and abs(closest_dis)<clen:
                 self.ke = 0.5*self.m*((self.v0[0]**2+self.v0[1]**2)**0.5)**2
-                print(self.name,'wall collision. Kinetic Energy: ',self.ke)
+##                print(self.name,'wall collision. Kinetic Energy: ',self.ke)
                 self.wall_collision(c1,c2,wall_distance)
         self.messenger.v = self.v0
         self.messenger.p = self.p0
@@ -132,14 +131,14 @@ class Particle:
         self.p0 = [self.p0[0]-(self.r+d)*np.cos(angle3), self.p0[1]-(self.r+d)*np.sin(angle3)]
         angle2 = np.arctan2(self.v0[1], self.v0[0])
         v = (self.v0[0]**2+self.v0[1]**2)**0.5
-        theta = np.pi - (angle2+angle3)
-        vbi, vbj = v*np.cos(theta), v*np.sin(theta)
+        theta = (angle2-angle3)
+        vbi, vbj = v*np.sin(theta), v*np.cos(theta)
         vbj = -vbj *self.cor
         v = (vbi**2+vbj**2)**0.5
         angle4 = np.arctan2(vbj, vbi)
-        angle1 = theta-angle3
+        angle1 = angle4-angle3
         self.collisions+=1
-        self.v0 = [np.cos(angle1)*v, np.sin(angle1)*v]
+        self.v0 = [np.sin(angle1)*v, np.cos(angle1)*v]
         self.messenger.total_collisions += 1
         
     def ball_shift(self,ball,p,v):

@@ -65,7 +65,7 @@ if __name__ == '__main__':
     sim.runtime = int(input('How many seconds do you want the simulation?: '))
     sim.r = 1
     sim.fps = 100
-    sim.shape = [(-30, -30), (-30, 70), (70, 70),(70,-30),(-30, -30)]
+    sim.shape = [(-40, -50), (-40, 90), (90, 60),(60,-30),(-40, -50)]
     sim.t_step = 0.01
     sim.procs = int(input("How many processes would you like to use?: "))
     sim.n_list = int(input("How many particles would you like to simulate?: "))
