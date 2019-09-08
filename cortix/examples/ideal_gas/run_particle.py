@@ -63,7 +63,7 @@ class Run_Particle:
 if __name__ == '__main__':
     sim = Run_Particle()
     sim.runtime = int(input('How many seconds do you want the simulation?: '))
-    sim.r = 1
+    sim.r = 2
     sim.fps = 100
     sim.shape = [(-40, -50), (-40, 90), (90, 60),(60,-30),(-40, -50)]
     sim.t_step = 0.01

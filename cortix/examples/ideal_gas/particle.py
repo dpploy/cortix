@@ -120,6 +120,8 @@ class Particle:
                 self.ke = 0.5*self.m*((self.v0[0]**2+self.v0[1]**2)**0.5)**2
 ##                print(self.name,'wall collision. Kinetic Energy: ',self.ke)
                 self.wall_collision(c1,c2,wall_distance)
+##                if self.ke != 0.5*self.m*((self.v0[0]**2+self.v0[1]**2)**0.5)**2:
+##                    print("ENERGY CHANGED!!!",self.ke - 0.5*self.m*((self.v0[0]**2+self.v0[1]**2)**0.5)**2)
         self.messenger.v = self.v0
         self.messenger.p = self.p0
         self.ke = 0.5*self.m*((self.v0[0]**2+self.v0[1]**2)**0.5)**2
