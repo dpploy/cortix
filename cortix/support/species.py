@@ -44,7 +44,8 @@ class Species:
                   name='null-species-name',
                   formula_name='null-species-formula-name',
                   atoms=list(),
-                  flag='null-species-flag' ):
+                  flag='null-species-flag',
+                  info='null-text'):
 
         assert isinstance(name, str)
         self.name = name
@@ -56,6 +57,8 @@ class Species:
         self.atoms = atoms
 
         self.flag = flag  # flag can be any type
+
+        self.info = info # info text such as technical name or other properties info
 
         self.molar_mass = 0.0      # kg/mol
         self.molar_heat_pwr = 0.0
@@ -213,11 +216,13 @@ class Species:
         return atoms2
 
     def __str__(self):
-        s = '\n\t Species(): name=%s;' + \
+        s = '\n\t ' + \
+            '\n\t Species(): name=%s;' + \
             ' formula_name=%s;' + \
             '\n\t formula=%s;' + \
             '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + \
             '\n\t flag=%s;' + \
+            '\n\t info=%s;' + \
             '\n\t molar radioactivity=%9.3e[%s];' + \
             '\n\t molar heat pwr=%9.3e[%s];' + \
             '\n\t molar gamma pwr=%9.3e[%s];' + \
@@ -229,11 +234,10 @@ class Species:
                 self.num_atoms, self.num_nuclide_types, self.molar_mass, \
                         self.molar_mass_unit,
                 self.flag,
+                self.info,
                 self.molar_radioactivity, self.molar_radioactivity_unit,
-                self.molar_radioactivity *
                 self.molar_heat_pwr, self.molar_heat_pwr_unit,
-                self.molar_gamma_pwr,
-                self.molar_gamma_pwr_unit,
+                self.molar_gamma_pwr, self.molar_gamma_pwr_unit,
                 [i.split('*')[-1] for i in self.atoms],
                 ['%9.3e' % i for i in self.molar_radioactivity_fractions])
 
@@ -255,10 +259,8 @@ class Species:
                         self.molar_mass_unit,
                 self.flag,
                 self.molar_radioactivity, self.molar_radioactivity_unit,
-                self.molar_radioactivity *
                 self.molar_heat_pwr, self.molar_heat_pwr_unit,
-                self.molar_gamma_pwr,
-                self.molar_gamma_pwr_unit,
+                self.molar_gamma_pwr, self.molar_gamma_pwr_unit,
                 [i.split('*')[-1] for i in self.atoms],
                 ['%9.3e' % i for i in self.molar_radioactivity_fractions])
 

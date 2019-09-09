@@ -665,15 +665,15 @@ class PhaseNew:
             else:
                 return  self.__df.index[loc]
 
-    def plot_species(self, name, scaling=[1,1] , xlabel='Time [s]', ylabel='y',
+    def plot_species(self, name, scaling=[1.0,1.0] , xlabel='Time [s]', ylabel='y',
             legend='no-legend',
             figsize=[6,5], dpi=100 ):
 
         fig,ax=plt.subplots(1,figsize=figsize)
         x = np.array( [t for t in self.__df.index] )
-        x *= scaling[0]
-        y = np.array( self.get_column(name) )
-        y *= scaling[1]
+        x *= float(scaling[0])
+        y = np.array( self.get_column(name),dtype=np.float64 )
+        y *= float(scaling[1])
 
         yformatter = ScalarFormatter(useMathText=True,useOffset=True)
         yformatter.set_powerlimits((15, 5))
