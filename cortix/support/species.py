@@ -45,7 +45,7 @@ class Species:
                   formula_name='null-species-formula-name',
                   atoms=list(),
                   flag='null-species-flag',
-                  info='null-text'):
+                  info=None):
 
         assert isinstance(name, str)
         self.name = name
