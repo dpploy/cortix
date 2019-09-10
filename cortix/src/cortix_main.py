@@ -234,15 +234,6 @@ class Cortix:
 
         return message + splash
 
-<<<<<<< HEAD
-=======
-    def save_data(self):
-        pass
-        """
-        for mod in self.modules:
-            if mod.save_data ==
-        """
->>>>>>> master
     def __del__(self):
         '''Destructs a Cortix simulation object.
 

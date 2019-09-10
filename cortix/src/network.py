@@ -6,6 +6,7 @@
 import os
 import pickle
 import logging
+from graphviz import Digraph
 from multiprocessing import Process
 
 from cortix.src.module import Module
@@ -284,32 +285,20 @@ class Network:
             # that do not exist anymore
             self.comm.Barrier()
 
-    def draw(self, graph_attr=None, node_attr=None, engine=None):
+    def draw(self, graph_attr=None, node_attr=None, engine="twopi", ports=False):
 
-        from graphviz import Digraph
+        graph_attr = graph_attr if graph_attr else {'splines':'true','overlap':'scale','ranksep':'2.0'}
+        node_attr = node_attr if node_attr else {'shape':'hexagon','style':'filled'}
+        g = Digraph(name=self.name, comment='Network::graphviz',format='png',
+                       graph_attr=graph_attr,node_attr=node_attr,
+                       engine=engine )
 
-        use_graph_attr = {'splines':'true','overlap':'scale','ranksep':'2.0'}
-        if graph_attr:
-            use_graph_attr.update(graph_attr)
 
-        use_node_attr = {'shape':'hexagon','style':'filled'}
-        if node_attr:
-            use_node_attr.update(node_attr)
-
-        use_engine = 'twopi'
-        if engine:
-            use_engine = engine
-
-        g = Digraph( name=self.name,comment='Network::graphviz',format='png',
-                       graph_attr=use_graph_attr,node_attr=use_node_attr,
-                       engine=use_engine )
-
-        for m in self.modules:
-            idx = self.modules.index(m)
-            g.node(str(idx), m.name)
+        for id, m in enumerate(self.modules):
+            g.node(str(id), m.name)
 
         for e in self.gv_edges:
-            g.edge( e[0], e[1] )
+            g.edge(e[0], e[1])
 
         g.render()
 
