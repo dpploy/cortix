@@ -285,14 +285,16 @@ class Network:
             # that do not exist anymore
             self.comm.Barrier()
 
-    def draw(self, graph_attr=None, node_attr=None, engine="twopi", ports=False):
-
+    def draw(self, graph_attr=None, node_attr=None, engine="twopi", lr=False, ports=False, node_shape="hexagon"):
         graph_attr = graph_attr if graph_attr else {'splines':'true','overlap':'scale','ranksep':'2.0'}
         node_attr = node_attr if node_attr else {'shape':'hexagon','style':'filled'}
-        g = Digraph(name=self.name, comment='Network::graphviz',format='png',
-                       graph_attr=graph_attr,node_attr=node_attr,
-                       engine=engine )
 
+        g = Digraph(name=self.name, comment='Network::graphviz',format='png',
+                    graph_attr=graph_attr,node_attr=node_attr, engine=engine)
+
+        if lr: g.attr(rankdir='LR')
+
+        g.attr("node", shape=node_shape)
 
         for id, m in enumerate(self.modules):
             g.node(str(id), m.name)
