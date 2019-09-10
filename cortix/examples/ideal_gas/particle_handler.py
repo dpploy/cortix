@@ -3,14 +3,6 @@ import numpy as np
 from cortix.src.module import Module
 from cortix.src.network import Network
 from cortix.src.cortix_main import Cortix
-import shapely.geometry as geo
-import shapely.ops
-import matplotlib.pyplot as plt
-import matplotlib
-##matplotlib.use("Agg")
-import matplotlib.image as mpimg
-import matplotlib.animation as animation
-import pandas as pd
 from cortix.examples import Particle
 
 class Particle_Handler(Module):
