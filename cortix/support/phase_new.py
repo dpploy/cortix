@@ -447,7 +447,7 @@ class PhaseNew:
                    (actor,self.__df.columns)
         return list(self.__df.loc[:, actor])
 
-    def ScaleRow(self, try_time_stamp, value):
+    def scale_row(self, try_time_stamp, value):
         '''
         Multiplies all of the data in a row (except time stamp) by a scalar
         value.
@@ -461,7 +461,7 @@ class PhaseNew:
         assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float)
         time_stamp = self.__get_time_stamp( try_time_stamp )
         assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
-        assert isinstance(value, int) or isinstance(value, float)
+        #assert isinstance(value, int) or isinstance(value, float)
         self.__df.loc[time_stamp, :] *= value
         return
 
@@ -665,8 +665,38 @@ class PhaseNew:
             else:
                 return  self.__df.index[loc]
 
-    def plot( self, name='phase-plot-name', time_unit='s', nrows=2, ncols=2,
-              dpi=200):
+    def plot_species(self, name, scaling=[1.0,1.0] , title=None, xlabel='Time [s]', 
+            ylabel='y', legend='no-legend', figsize=[6,5], dpi=100 ):
+
+        fig,ax=plt.subplots(1,figsize=figsize)
+        x = np.array( [t for t in self.__df.index] )
+        x *= float(scaling[0])
+        y = np.array( self.get_column(name),dtype=np.float64 )
+        y *= float(scaling[1])
+
+        yformatter = ScalarFormatter(useMathText=True,useOffset=True)
+        yformatter.set_powerlimits((15, 5))
+        ax.yaxis.set_major_formatter(yformatter)
+
+        ax.plot(x, y, 'b-', label=legend)
+
+        ax.set_xlabel(r''+xlabel,fontsize=16)
+        ax.set_ylabel(r''+ylabel,fontsize=16,color='black')
+        ax.tick_params(axis='y',labelsize=14)
+        ax.tick_params(axis='x',labelsize=14)
+        ax.legend(loc='best',fontsize=12)
+        if title:
+            ax.set_title(title)
+        elif self.get_species(name).info:
+            ax.set_title(self.get_species(name).info,fontsize=14)
+        ax.grid(True)
+        fig_name = name+'-'+self.name+'-phase-plot-'
+        fig.savefig(fig_name+'.png', dpi=dpi, fomat='png')
+        plt.close(fig)
+        return
+
+    def plot( self, name='phase-plot-name', time_unit='s', legend=None, 
+            nrows=2, ncols=2, dpi=200):
 
         num_var = len(self.__df.columns)
         if num_var == 0:
@@ -761,7 +791,7 @@ class PhaseNew:
                 varUnit = 's'
             '''
 
-            varLegend = 'var-legend'
+            varLegend = legend
             varScale  = 'linear-linear'
 
             assert varScale == 'log' or varScale == 'linear' or varScale == 'log-linear' \
@@ -1020,12 +1050,21 @@ class PhaseNew:
             yformatter.set_powerlimits((15, 5))
             ax.yaxis.set_major_formatter(yformatter)
 
-            ax.plot(x, y, 's-', color='black', linewidth=0.5, markersize=2,
-                    markeredgecolor='black', label=varLegend)
+            if varLegend:
+
+                ax.plot(x, y, 's-', color='black', linewidth=0.5, markersize=2,
+                        markeredgecolor='black', label=varLegend)
+            else:
+
+                ax.plot(x, y, 's-', color='black', linewidth=0.5, markersize=2,
+                        markeredgecolor='black')
 
             # ...................
 
-            ax.legend(loc='best', prop={'size': 7})
+            if species.info:
+                ax.set_title(species.info,fontsize=8)
+            if varLegend:
+                ax.legend(loc='best', prop={'size': 7})
             ax.grid()
 
         # end of: for i_var in range(num_var):
@@ -1044,4 +1083,3 @@ if __name__ == '__main__':
     quant = Quantity( name='volume' )
     phase = PhaseNew(name='solvent',species=[tbp_org],quantities=[quant])
     print(phase)
-
