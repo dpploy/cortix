@@ -1,5 +1,7 @@
 # Cortix
 A Python library for network dynamics modeling and HPC simulation.
+  + [Cortix on Jupyter notebook examples](https://github.com/dpploy/cortix-nb)
+  + [Documentation on the web](https://cortix.org)
 
 ![Website](https://img.shields.io/website/https/github.com/dpploy/cortix.svg)
 [![Repo Size](https://img.shields.io/github/repo-size/dpploy/cortix.svg?style=flat)](https://cortix.org)

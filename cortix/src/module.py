@@ -51,6 +51,10 @@ class Module:
             `False` for MPI, `True` for Multiprocessing
         ports: list(Port)
             A list of ports contained by the module
+        id: int
+            An integer set by the external network once a module is added to it.
+            The `id` is the position of the module in the network list.
+            Default: None.
         __network: Network
             An internal network inherited by the derived module for nested networks.
 
@@ -63,7 +67,8 @@ class Module:
         self.ports = list()
         self.log = logging.getLogger('cortix')
         self.save = False
-        self.id = 0
+
+        self.id = None
 
         self._network = None
 
@@ -203,7 +208,9 @@ class Module:
         raise NotImplementedError('Module must implement run()')
 
     def run_and_save(self):
+
         self.run()
+
         if self.save:
             file_name = os.path.join(".ctx-saved", "{}_".format(self.__class__.__name__))
             if self.use_mpi:
@@ -213,10 +220,11 @@ class Module:
                 file_name += str(os.getpid())
             file_name += ".pkl"
 
-            self.ports = None
+            self.ports = list() # reset ports since they can't be pickled
             self.log = None
+
             try:
                 with open(file_name, "wb") as f:
-                    pickle.dump(self, f)
+                    pickle.dump( self, f )
             except pickle.PicklingError:
                 print("Unable to pickle {}!".format(file_name))

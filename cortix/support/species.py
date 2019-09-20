@@ -3,10 +3,13 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 
+import scipy.constants as const
 from cortix.support.periodictable import ELEMENTS
 
 class Species:
     '''
+    All SI units (kg,s,K,Pa,J,W).
+
     The Specie() class encapsulates either the molecular or empirical chemical
     formula of a compound.
     This is done as follows. Say MAO2 is either a molecular or empirical chemical
@@ -40,9 +43,9 @@ class Species:
     def __init__( self,
                   name='null-species-name',
                   formula_name='null-species-formula-name',
-                  phase_name='null-species-phase-name',
                   atoms=list(),
-                  flag='null-species-flag' ):
+                  flag='null-species-flag',
+                  info=None):
 
         assert isinstance(name, str)
         self.name = name
@@ -50,20 +53,19 @@ class Species:
         assert isinstance(formula_name, str)
         self.formula_name = formula_name
 
-        assert isinstance(phase_name, str)
-        self.phase_name = phase_name
-
         assert isinstance(atoms, list)
         self.atoms = atoms
 
         self.flag = flag  # flag can be any type
 
-        self.molar_mass = 0.0
+        self.info = info # info text such as technical name or other properties info
+
+        self.molar_mass = 0.0      # kg/mol
         self.molar_heat_pwr = 0.0
         self.molar_gamma_pwr = 0.0
         self.molar_radioactivity = 0.0
 
-        self.molar_mass_unit = 'g/mol'
+        self.molar_mass_unit = 'kg/mol'
 
         self.molar_heat_pwr_unit = 'W/mol'
         self.molar_gamma_pwr_unit = 'W/mol'
@@ -81,6 +83,9 @@ class Species:
         been changed.
 
         '''
+
+        molar_mass_const = const.physical_constants['molar mass constant'][0]
+        molar_mass_const_unit = const.physical_constants['molar mass constant'][1]
 
         for entry in self.atoms:
             assert isinstance(entry, str)
@@ -118,18 +123,19 @@ class Species:
                 tmp = nuclide.split('-')
                 if len(tmp) == 1:
                     element = ELEMENTS[tmp[0]]
-                    molarMass = element.exactmass  # from isotopic composition
-                    if molarMass == 0.0:
-                        molarMass = element.mass
+                    rel_atomic_mass = element.exactmass  # from isotopic composition
+                    if rel_atomic_mass == 0.0:
+                        rel_atomic_mass = element.mass
+                    molar_mass = rel_atomic_mass * molar_mass_const
                 elif len(tmp) == 2:
                     element = ELEMENTS[tmp[0]].isotopes[int(tmp[1].strip('m'))]
-                    molarMass = element.mass
+                    molar_mass = element.mass * molar_mass_const
                 else:
                     assert False
             except KeyError:
                 summ += multiple * 0.0
             else:
-                summ += multiple * molarMass
+                summ += multiple * molar_mass
 
         self.molar_mass = summ
 
@@ -210,12 +216,13 @@ class Species:
         return atoms2
 
     def __str__(self):
-        s = '\n\t Species(): name=%s;' + \
+        s = '\n\t ' + \
+            '\n\t Species(): name=%s;' + \
             ' formula_name=%s;' + \
-            ' phase_name=%s;' + \
             '\n\t formula=%s;' + \
             '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + \
             '\n\t flag=%s;' + \
+            '\n\t info=%s;' + \
             '\n\t molar radioactivity=%9.3e[%s];' + \
             '\n\t molar heat pwr=%9.3e[%s];' + \
             '\n\t molar gamma pwr=%9.3e[%s];' + \
@@ -223,23 +230,20 @@ class Species:
             '\n\t molar radioactivity fractions=%s'
         return s % (self.name,
                 self.formula_name,
-                self.phase_name,
                 self.reorder_formula(),
                 self.num_atoms, self.num_nuclide_types, self.molar_mass, \
                         self.molar_mass_unit,
                 self.flag,
+                self.info,
                 self.molar_radioactivity, self.molar_radioactivity_unit,
-                self.molar_radioactivity *
                 self.molar_heat_pwr, self.molar_heat_pwr_unit,
-                self.molar_gamma_pwr,
-                self.molar_gamma_pwr_unit,
+                self.molar_gamma_pwr, self.molar_gamma_pwr_unit,
                 [i.split('*')[-1] for i in self.atoms],
                 ['%9.3e' % i for i in self.molar_radioactivity_fractions])
 
     def __repr__(self):
         s = '\n\t Species(): name=%s;' + \
             ' formula_name=%s;' + \
-            ' phase_name=%s;' + \
             '\n\t formula=%s;' + \
             '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + \
             '\n\t flag=%s;' + \
@@ -250,20 +254,20 @@ class Species:
             '\n\t molar radioactivity fractions=%s'
         return s % (self.name,
                 self.formula_name,
-                self.phase_name,
                 self.reorder_formula(),
                 self.num_atoms, self.num_nuclide_types, self.molar_mass, \
                         self.molar_mass_unit,
                 self.flag,
                 self.molar_radioactivity, self.molar_radioactivity_unit,
-                self.molar_radioactivity *
                 self.molar_heat_pwr, self.molar_heat_pwr_unit,
-                self.molar_gamma_pwr,
-                self.molar_gamma_pwr_unit,
+                self.molar_gamma_pwr, self.molar_gamma_pwr_unit,
                 [i.split('*')[-1] for i in self.atoms],
                 ['%9.3e' % i for i in self.molar_radioactivity_fractions])
 
 if __name__ == '__main__':
     tbp_org = Species( name='TBP', formula_name='(C4H9O)_3PO(o)',
-              phase_name='organic', atoms=['12*C','27*H','4*O','P'] )
+              atoms=['12*C','27*H','4*O','P'] )
     print(tbp_org)
+    no3Minus_aqu = Species( name='NO3-', formula_name='NO3-(a)',
+                   atoms=['N','3*O'] )
+    print(no3Minus_aqu)
