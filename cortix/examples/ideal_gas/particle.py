@@ -39,8 +39,8 @@ class Particle:
         if i>85:
             print('Warning, ball took:',i,'attempts to spawn')
         self.v0 = [random.uniform(-50,50),random.uniform(-30,30)]
-        self.cor = 1.0
-        self.a = (0,0)
+        self.cor = 0.60
+        self.a = (4,-20)
         self.m = 1
         self.ke = 0.5*self.m*((self.v0[0]**2+self.v0[1]**2)**0.5)**2
         self.timestamp=str(datetime.datetime.now())
@@ -115,8 +115,10 @@ class Particle:
             angle = math.atan2(self.p0[1]-c1[1], self.p0[0]-c1[0]) - math.atan2(c2[1]-c1[1], c2[0]-c1[0])
             wall_distance = math.sin(angle)*dis
             closest_dis = math.cos(angle)*dis
+            
             #Wall detection: https://stackoverflow.com/questions/1073336/circle-line-segment-collision-detection-algorithm
-            if abs(wall_distance) <= self.r and abs(closest_dis)<clen:
+            if abs(wall_distance) <= self.r and 0<closest_dis <clen:
+##                print(closest_dis,clen)
                 self.ke = 0.5*self.m*((self.v0[0]**2+self.v0[1]**2)**0.5)**2
 ##                print(self.name,'wall collision. Kinetic Energy: ',self.ke)
                 self.wall_collision(c1,c2,wall_distance)
@@ -151,6 +153,7 @@ class Particle:
         self.p0 = [self.p0[0]-(self.r+ball.r-d)*np.cos(angle),self.p0[1]-(self.r+ball.r-d)*np.sin(angle)]
         
     def ball_collision(self,messenger,p0,v0):
+##        print('A ball collision',self.name,messenger.name)
         v2,m = v0,messenger.m
         v3 = (v2[0]**2+v2[1]**2)**0.5
         phi = np.arctan2(v2[1],v2[0])

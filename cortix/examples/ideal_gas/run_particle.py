@@ -63,9 +63,13 @@ class Run_Particle:
 if __name__ == '__main__':
     sim = Run_Particle()
     sim.runtime = int(input('How many seconds do you want the simulation?: '))
-    sim.r = 2
+    sim.r = 1
     sim.fps = 100
-    sim.shape = [(-40, -50), (-40, 90), (90, 60),(60,-30),(-40, -50)]
+    sim.shape = [(-40, -50), (-40, 90), (90, 60),(60,-30),(30,-50),(-40, -50)]
+##    sim.shape = [(0, 0), (0, 30), (30, 30),(30,25),
+##                                  (65,25),(65,-20),(85,-20),(85,-40),
+##                                  (45,-40),(45,-20),(49,-20),(49,15),
+##                                  (30,15),(30,0),(0,0)]
     sim.t_step = 0.01
     sim.procs = int(input("How many processes would you like to use?: "))
     sim.n_list = int(input("How many particles would you like to simulate?: "))
