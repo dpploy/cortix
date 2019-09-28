@@ -528,6 +528,7 @@ class PhaseNew:
         ----------
         actor: str
         try_time_stamp: float
+            Default is None which returns the last time stamp.
 
         Returns
         -------
@@ -666,7 +667,7 @@ class PhaseNew:
                 return  self.__df.index[loc]
 
     def plot_species(self, name, scaling=[1.0,1.0] , title=None, xlabel='Time [s]', 
-            ylabel='y', legend='no-legend', figsize=[6,5], dpi=100 ):
+            ylabel='y', legend='no-legend', filename_tag=None, figsize=[6,5], dpi=100 ):
 
         fig,ax=plt.subplots(1,figsize=figsize)
         x = np.array( [t for t in self.__df.index] )
@@ -691,6 +692,8 @@ class PhaseNew:
             ax.set_title(self.get_species(name).info,fontsize=14)
         ax.grid(True)
         fig_name = name+'-'+self.name+'-phase-plot-'
+        if filename_tag:
+            fig_name += filename_tag
         fig.savefig(fig_name+'.png', dpi=dpi, fomat='png')
         plt.close(fig)
         return
