@@ -53,8 +53,7 @@ class PhaseNew:
     material phase.
     '''
 
-    def __init__(self,
-                 name = None,
+    def __init__(self, name = None,
                  time_stamp = None,
                  time_unit  = None,
                  species    = None,
@@ -670,8 +669,10 @@ class PhaseNew:
             ylabel='y', legend='no-legend', filename_tag=None, figsize=[6,5], dpi=100 ):
 
         fig,ax=plt.subplots(1,figsize=figsize)
+
         x = np.array( [t for t in self.__df.index] )
         x *= float(scaling[0])
+
         y = np.array( self.get_column(name),dtype=np.float64 )
         y *= float(scaling[1])
 
@@ -686,16 +687,22 @@ class PhaseNew:
         ax.tick_params(axis='y',labelsize=14)
         ax.tick_params(axis='x',labelsize=14)
         ax.legend(loc='best',fontsize=12)
+
         if title:
             ax.set_title(title)
         elif self.get_species(name).info:
             ax.set_title(self.get_species(name).info,fontsize=14)
+
         ax.grid(True)
+
         fig_name = name+'-'+self.name+'-phase-plot-'
+
         if filename_tag:
             fig_name += filename_tag
+
         fig.savefig(fig_name+'.png', dpi=dpi, fomat='png')
         plt.close(fig)
+
         return
 
     def plot( self, name='phase-plot-name', time_unit='s', legend=None, 
