@@ -1,70 +1,72 @@
 from cortix import Module
 from cortix import Port
 import numpy as np
-from numpy.random import rand
 
 class Body(Module):
-    def __init__(self, mass=1, rad=1, pos=None, vel=None, ts=10):
+    def __init__(self, mass=1, rad=(0, 0, 0), vel=(0, 0, 0), time=100, dt=0.01):
         super().__init__()
 
         self.G = 6.67408e-11
+        self.ep = 1e-20
+
         self.mass = mass
         self.rad = rad
 
-        self.pos = pos if pos else np.array([i*5 for i in rand(3)])
-        self.vel = vel if vel else np.array([i*10 for i in rand(3)])
+        self.vel = vel
         self.acc = np.zeros(3)
+
         self.other_bodies = None
-        self.time_steps = ts
+        self.dt = dt
+        self.time = time
 
-    def acceleration(self):
-        ep = 1e-7
-        self.acc = np.array([0.0, 0.0, 0.0])
-        for (mass, pos) in self.other_bodies:
-            r = np.linalg.norm(self.pos - pos)
-            coef = self.G * self.mass / r**3
-            self.acc += (coef * (pos - self.pos)) + ep
-        return self.acc
+        self.trajectory = []
 
-    def position(self):
-        self.pos += (self.vel + (self.acc / 2))
-        return self.pos
 
-    def velocity(self):
-        self.vel += self.acc
-        return self.vel
+    def force_from(self, other_mass, other_rad):
+        delta = np.linalg.norm(other_rad - self.rad)
+        if delta == 0:
+            print("Collision!")
+            exit(1)
+        return (self.G * self.mass * other_mass) / (delta ** 2)
 
     def step(self):
+        self.acc = np.zeros(3)
+        total_force = np.zeros(3)
 
-        self.acceleration()
-        self.position()
-        self.velocity()
+        for (body_mass, body_rad) in self.other_bodies:
+            total_force += self.force_from(body_mass, body_rad)
+
+        acc = total_force / self.mass
+        self.acc = self.acc + acc
+        self.vel = self.vel + acc * self.dt
+        self.rad = self.rad + self.vel * self.dt
 
     def broadcast_data(self):
         # Broadcast (mass, pos) to every body
         for port in self.ports:
-            payload = np.array([self.mass, self.pos])
-            self.send((self.mass, self.pos), port)
+            self.send((self.mass, self.rad), port)
 
     def gather_data(self):
+        # Get (mass, pos) from every other body
         self.other_bodies = [self.recv(port) for port in self.ports]
 
     def run(self):
-        self.broadcast_data()
-
-        self.mass = 42
-        self.pos = 32
-        self.rad = 52
-
-        # Receive (mass, pos) from every body 
-        self.gather_data()
-
-        for t in range(self.time_steps):
-            self.step()
+        t = 0.0
+        while t < self.time:
             self.broadcast_data()
             self.gather_data()
+            self.step()
+            self.trajectory.append(tuple(self.rad.flatten()))
+            t += self.dt
+            print(t)
+        self.dump()
 
-        print(self)
+    def dump(self, file_name=None):
+        if file_name is None:
+            file_name = "body_{}.csv".format(id(self))
+        with open(file_name, "w") as f:
+            for (x, y, z) in self.trajectory:
+                f.write("{}, {}, {}\n".format(x, y, z))
 
     def __repr__(self):
         return "{}".format([self.mass, self.rad, self.vel, self.acc])
