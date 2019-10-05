@@ -6,7 +6,6 @@
 import os
 import pickle
 import logging
-from graphviz import Digraph
 from multiprocessing import Process
 
 from cortix.src.module import Module
@@ -287,15 +286,18 @@ class Network:
             self.comm.Barrier()
 
     def draw( self, graph_attr=None, node_attr=None, engine='twopi', lr=False, 
-              ports=False, node_shape='hexagon'):
+              ports=False, node_shape='hexagon' ):
+
+        # Import here to avoid broken dependency. Only this method needs this.
+        from graphviz import Digraph
 
         graph_attr = graph_attr if graph_attr else {'splines':'true','overlap':'scale',
                 'ranksep':'2.0'}
 
         node_attr = node_attr if node_attr else {'shape':'hexagon','style':'filled'}
 
-        g = Digraph(name=self.name, comment='Network::graphviz',format='png',
-                    graph_attr=graph_attr,node_attr=node_attr, engine=engine)
+        g = Digraph( name=self.name, comment='Network::graphviz',format='png',
+                     graph_attr=graph_attr,node_attr=node_attr, engine=engine )
 
         if lr: g.attr(rankdir='LR')
 
