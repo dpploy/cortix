@@ -6,7 +6,6 @@
 import os
 import pickle
 import logging
-from graphviz import Digraph
 from multiprocessing import Process
 
 from cortix.src.module import Module
@@ -267,15 +266,16 @@ class Network:
             self.comm.Barrier()
 
         num_files = 0
-        for file_name in os.listdir(".ctx-saved"):
-            if file_name.endswith(".pkl"):
+        for file_name in os.listdir('.ctx-saved'):
+            if file_name.endswith('.pkl'):
                 num_files += 1
-                file_name = os.path.join(".ctx-saved", file_name)
-                with open(file_name, "rb") as f:
+                file_name = os.path.join('.ctx-saved', file_name)
+                with open(file_name, 'rb') as f:
                     module = pickle.load(f)
                     # reintroduce logging
                     module.log = logging.getLogger('cortix')
                     self.modules[module.id] = module
+
         if num_files and num_files != len(self.modules):
             self.log.warn('Network::run(): not all modules reloaded from disk.')
 
@@ -285,16 +285,23 @@ class Network:
             # that do not exist anymore
             self.comm.Barrier()
 
-    def draw(self, graph_attr=None, node_attr=None, engine="twopi", lr=False, ports=False, node_shape="hexagon"):
-        graph_attr = graph_attr if graph_attr else {'splines':'true','overlap':'scale','ranksep':'2.0'}
+    def draw( self, graph_attr=None, node_attr=None, engine='twopi', lr=False, 
+              ports=False, node_shape='hexagon' ):
+
+        # Import here to avoid broken dependency. Only this method needs this.
+        from graphviz import Digraph
+
+        graph_attr = graph_attr if graph_attr else {'splines':'true','overlap':'scale',
+                'ranksep':'2.0'}
+
         node_attr = node_attr if node_attr else {'shape':'hexagon','style':'filled'}
 
-        g = Digraph(name=self.name, comment='Network::graphviz',format='png',
-                    graph_attr=graph_attr,node_attr=node_attr, engine=engine)
+        g = Digraph( name=self.name, comment='Network::graphviz',format='png',
+                     graph_attr=graph_attr,node_attr=node_attr, engine=engine )
 
         if lr: g.attr(rankdir='LR')
 
-        g.attr("node", shape=node_shape)
+        g.attr('node', shape=node_shape)
 
         for id, m in enumerate(self.modules):
             g.node(str(id), m.name)
@@ -305,4 +312,3 @@ class Network:
         g.render()
 
         return g
-
