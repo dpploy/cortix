@@ -266,15 +266,16 @@ class Network:
             self.comm.Barrier()
 
         num_files = 0
-        for file_name in os.listdir(".ctx-saved"):
-            if file_name.endswith(".pkl"):
+        for file_name in os.listdir('.ctx-saved'):
+            if file_name.endswith('.pkl'):
                 num_files += 1
-                file_name = os.path.join(".ctx-saved", file_name)
-                with open(file_name, "rb") as f:
+                file_name = os.path.join('.ctx-saved', file_name)
+                with open(file_name, 'rb') as f:
                     module = pickle.load(f)
                     # reintroduce logging
                     module.log = logging.getLogger('cortix')
                     self.modules[module.id] = module
+
         if num_files and num_files != len(self.modules):
             self.log.warn('Network::run(): not all modules reloaded from disk.')
 
@@ -284,34 +285,30 @@ class Network:
             # that do not exist anymore
             self.comm.Barrier()
 
-    def draw(self, graph_attr=None, node_attr=None, engine=None):
+    def draw( self, graph_attr=None, node_attr=None, engine='twopi', lr=False, 
+              ports=False, node_shape='hexagon' ):
 
+        # Import here to avoid broken dependency. Only this method needs this.
         from graphviz import Digraph
 
-        use_graph_attr = {'splines':'true','overlap':'scale','ranksep':'2.0'}
-        if graph_attr:
-            use_graph_attr.update(graph_attr)
+        graph_attr = graph_attr if graph_attr else {'splines':'true','overlap':'scale',
+                'ranksep':'2.0'}
 
-        use_node_attr = {'shape':'hexagon','style':'filled'}
-        if node_attr:
-            use_node_attr.update(node_attr)
+        node_attr = node_attr if node_attr else {'shape':'hexagon','style':'filled'}
 
-        use_engine = 'twopi'
-        if engine:
-            use_engine = engine
+        g = Digraph( name=self.name, comment='Network::graphviz',format='png',
+                     graph_attr=graph_attr,node_attr=node_attr, engine=engine )
 
-        g = Digraph( name=self.name,comment='Network::graphviz',format='png',
-                       graph_attr=use_graph_attr,node_attr=use_node_attr,
-                       engine=use_engine )
+        if lr: g.attr(rankdir='LR')
 
-        for m in self.modules:
-            idx = self.modules.index(m)
-            g.node(str(idx), m.name)
+        g.attr('node', shape=node_shape)
+
+        for id, m in enumerate(self.modules):
+            g.node(str(id), m.name)
 
         for e in self.gv_edges:
-            g.edge( e[0], e[1] )
+            g.edge(e[0], e[1])
 
         g.render()
 
         return g
-
