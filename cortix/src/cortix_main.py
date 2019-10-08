@@ -154,6 +154,7 @@ class Cortix:
         self.log = logging.getLogger(self.log_filename)
 
         self.log.setLevel(logging.DEBUG)
+        #10/8/19 Added check to see if log hander exsists before creating new ones
         if not self.log.hasHandlers():
             file_handler = logging.FileHandler(self.log_filename+'.log')
             file_handler.setLevel(logging.DEBUG)
