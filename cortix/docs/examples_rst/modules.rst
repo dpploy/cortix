@@ -1,3 +1,4 @@
+.. edit by gea: Fri Oct 11 18:22:22 EDT 2019
 examples
 ========
 
@@ -5,10 +6,6 @@ examples
    :maxdepth: 4
 
    city_justice_rst/modules
-   dataplot
    droplet_swirl_rst/modules
-   dummy_module
    nbody_rst/modules
-   plot_data
-   run_region_justice
-   state
+
