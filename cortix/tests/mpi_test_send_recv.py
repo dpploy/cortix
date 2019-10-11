@@ -1,8 +1,8 @@
 from cortix.src.cortix_main import Cortix
 from cortix.src.network import Network
 
-from cortix.examples.dummy_module import DummyModule
-from cortix.examples.dummy_module import DummyModule2
+from cortix.tests.dummy_module import DummyModule
+from cortix.tests.dummy_module import DummyModule2
 
 def mpi_send_recv():
 

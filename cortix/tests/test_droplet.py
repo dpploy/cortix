@@ -51,7 +51,7 @@ import scipy.constants as const
 from cortix import Cortix
 from cortix import Network
 
-from cortix.examples.dataplot import DataPlot
+from cortix.tests.dataplot import DataPlot
 from cortix.examples.droplet_swirl.droplet import Droplet
 from cortix.examples.droplet_swirl.vortex import Vortex
 
