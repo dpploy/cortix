@@ -1,7 +1,7 @@
-state module
-============
+species module
+==============
 
-.. automodule:: state
+.. automodule:: species
     :members:
     :undoc-members:
     :show-inheritance:

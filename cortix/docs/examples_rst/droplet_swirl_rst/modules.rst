@@ -6,5 +6,4 @@ droplet_swirl
 
    droplet
    run_droplet_swirl
-   run_droplet_test
    vortex
