@@ -40,9 +40,10 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.constants</span> <span class="k">as</span> <span class="nn">const</span>
 <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="k">import</span> <span class="n">odeint</span>
-<span class="kn">from</span> <span class="nn">cortix.src.module</span> <span class="k">import</span> <span class="n">Module</span>
-<span class="kn">from</span> <span class="nn">cortix.support.phase</span> <span class="k">import</span> <span class="n">Phase</span>
-<span class="kn">from</span> <span class="nn">cortix.support.quantity</span> <span class="k">import</span> <span class="n">Quantity</span>
+
+<span class="kn">from</span> <span class="nn">cortix</span> <span class="k">import</span> <span class="n">Module</span>
+<span class="kn">from</span> <span class="nn">cortix</span> <span class="k">import</span> <span class="n">Phase</span>
+<span class="kn">from</span> <span class="nn">cortix</span> <span class="k">import</span> <span class="n">Quantity</span>
 
 <div class="viewcode-block" id="Parole"><a class="viewcode-back" href="../examples_rst/city_justice_rst/parole.html#parole.Parole">[docs]</a><span class="k">class</span> <span class="nc">Parole</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
@@ -118,9 +119,6 @@
         <span class="c1"># Initialize inflows to zero</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;prison-inflow-rates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span>
 
-        <span class="c1"># Set the state to the phase state</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span>
-
         <span class="k">return</span>
 
 <div class="viewcode-block" id="Parole.run"><a class="viewcode-back" href="../examples_rst/city_justice_rst/parole.html#parole.Parole.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -157,16 +155,7 @@
             <span class="c1"># Evolve parole group population to the next time stamp</span>
             <span class="c1">#------------------------------------------------------</span>
 
-            <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__step</span><span class="p">(</span> <span class="n">time</span> <span class="p">)</span>
-
-        <span class="c1"># Share state with parent process</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
-            <span class="k">except</span> <span class="n">pickle</span><span class="o">.</span><span class="n">PicklingError</span><span class="p">:</span>
-                <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="kc">None</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span></div>
+            <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__step</span><span class="p">(</span> <span class="n">time</span> <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__rhs_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u_vec</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
 

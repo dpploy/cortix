@@ -41,9 +41,10 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">scipy.constants</span> <span class="k">as</span> <span class="nn">const</span>
 <span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="k">import</span> <span class="n">odeint</span>
-<span class="kn">from</span> <span class="nn">cortix.src.module</span> <span class="k">import</span> <span class="n">Module</span>
-<span class="kn">from</span> <span class="nn">cortix.support.phase</span> <span class="k">import</span> <span class="n">Phase</span>
-<span class="kn">from</span> <span class="nn">cortix.support.quantity</span> <span class="k">import</span> <span class="n">Quantity</span>
+
+<span class="kn">from</span> <span class="nn">cortix</span> <span class="k">import</span> <span class="n">Module</span>
+<span class="kn">from</span> <span class="nn">cortix</span> <span class="k">import</span> <span class="n">Phase</span>
+<span class="kn">from</span> <span class="nn">cortix</span> <span class="k">import</span> <span class="n">Quantity</span>
 
 <div class="viewcode-block" id="Community"><a class="viewcode-back" href="../examples_rst/city_justice_rst/community.html#community.Community">[docs]</a><span class="k">class</span> <span class="nc">Community</span><span class="p">(</span><span class="n">Module</span><span class="p">):</span>
     <span class="sd">&#39;&#39;&#39;</span>
@@ -154,9 +155,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;adjudication-inflow-rates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;probation-inflow-rates&#39;</span><span class="p">]</span>    <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n_groups</span><span class="p">)</span>
 
-        <span class="c1"># Set the state to the phase state</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span>
-
         <span class="k">return</span></div>
 
 <div class="viewcode-block" id="Community.run"><a class="viewcode-back" href="../examples_rst/city_justice_rst/community.html#community.Community.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -169,6 +167,15 @@
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">time</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">show_time</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mf">0.0</span><span class="p">)</span><span class="o">&lt;=</span><span class="mf">1.e-1</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Community::time[d] = &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="o">/</span><span class="n">const</span><span class="o">.</span><span class="n">day</span><span class="p">,</span><span class="mi">1</span><span class="p">)))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">__call_ports</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+            <span class="c1"># Evolve offenders group population to the next time stamp</span>
+            <span class="c1">#---------------------------------------------------------</span>
+
+            <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__step</span><span class="p">(</span> <span class="n">time</span> <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__call_ports</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">):</span>
 
             <span class="c1"># Interactions in the jail port</span>
             <span class="c1">#--------------------------------</span>
@@ -230,19 +237,56 @@
             <span class="k">assert</span> <span class="nb">abs</span><span class="p">(</span><span class="n">check_time</span><span class="o">-</span><span class="n">time</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">1e-6</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;arrested-inflow-rates&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">inflow_rates</span>
 
-            <span class="c1"># Evolve offenders group population to the next time stamp</span>
-            <span class="c1">#---------------------------------------------------------</span>
+    <span class="k">def</span> <span class="nf">__step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        ODE IVP problem:</span>
+<span class="sd">        Given the initial data at :math:`t=0`,</span>
+<span class="sd">        :math:`u = (u_1(0),u_2(0),\ldots)`</span>
+<span class="sd">        solve :math:`\frac{\text{d}u}{\text{d}t} = f(u)` in the interval</span>
+<span class="sd">        :math:`0\le t \le t_f`.</span>
 
-            <span class="n">time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__step</span><span class="p">(</span> <span class="n">time</span> <span class="p">)</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        time: float</span>
+<span class="sd">            Time in SI unit.</span>
 
-        <span class="c1"># Share state with parent process</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_multiprocessing</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">pickle</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
-            <span class="k">except</span> <span class="n">pickle</span><span class="o">.</span><span class="n">PicklingError</span><span class="p">:</span>
-                <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="kc">None</span><span class="p">))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">))</span></div>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># Get state values</span>
+        <span class="n">u_0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;f0g&#39;</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
+
+        <span class="n">t_interval_sec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="p">(</span><span class="n">u_vec_hist</span><span class="p">,</span> <span class="n">info_dict</span><span class="p">)</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rhs_fn</span><span class="p">,</span>
+                                          <span class="n">u_0</span><span class="p">,</span> <span class="n">t_interval_sec</span><span class="p">,</span>
+                                          <span class="n">args</span><span class="o">=</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">,</span> <span class="p">),</span>
+                                          <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">mxstep</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+                                          <span class="n">full_output</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
+
+        <span class="k">assert</span> <span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;Integration successful.&#39;</span><span class="p">,</span> <span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span>
+
+        <span class="n">u_vec</span> <span class="o">=</span> <span class="n">u_vec_hist</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span>  <span class="c1"># solution vector at final time step</span>
+
+
+        <span class="n">time</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step</span>
+
+        <span class="c1"># Update state variables</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">GetRow</span><span class="p">()</span> <span class="c1"># values existing values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">AddRow</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span> <span class="c1"># copy on new time for convenience</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;f0g&#39;</span><span class="p">,</span> <span class="n">u_vec</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span> <span class="c1"># insert new values</span>
+
+        <span class="c1"># Update the population of free offenders returning to community</span>
+        <span class="n">inflow_rates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;total-inflow-rates&#39;</span><span class="p">]</span>
+        <span class="n">f0g_free</span> <span class="o">=</span> <span class="n">inflow_rates</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;f0g_free&#39;</span><span class="p">,</span><span class="n">f0g_free</span><span class="p">,</span><span class="n">time</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">time</span>
 
     <span class="k">def</span> <span class="nf">__rhs_fn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">u_vec</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
 
@@ -285,53 +329,6 @@
 
         <span class="k">return</span> <span class="n">dt_f0g</span>
 
-    <span class="k">def</span> <span class="nf">__step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
-        <span class="sa">r</span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">        ODE IVP problem:</span>
-<span class="sd">        Given the initial data at :math:`t=0`,</span>
-<span class="sd">        :math:`u = (u_1(0),u_2(0),\ldots)`</span>
-<span class="sd">        solve :math:`\frac{\text{d}u}{\text{d}t} = f(u)` in the interval</span>
-<span class="sd">        :math:`0\le t \le t_f`.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        time: float</span>
-<span class="sd">            Time in SI unit.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        None</span>
-
-<span class="sd">        &#39;&#39;&#39;</span>
-
-        <span class="n">u_vec_0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">GetValue</span><span class="p">(</span><span class="s1">&#39;f0g&#39;</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
-        <span class="n">t_interval_sec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-        <span class="p">(</span><span class="n">u_vec_hist</span><span class="p">,</span> <span class="n">info_dict</span><span class="p">)</span> <span class="o">=</span> <span class="n">odeint</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rhs_fn</span><span class="p">,</span>
-                                          <span class="n">u_vec_0</span><span class="p">,</span> <span class="n">t_interval_sec</span><span class="p">,</span>
-                                          <span class="n">args</span><span class="o">=</span><span class="p">(</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">,</span> <span class="p">),</span>
-                                          <span class="n">rtol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span> <span class="n">mxstep</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
-                                          <span class="n">full_output</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
-
-        <span class="k">assert</span> <span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span> <span class="o">==</span><span class="s1">&#39;Integration successful.&#39;</span><span class="p">,</span> <span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;message&#39;</span><span class="p">]</span>
-
-        <span class="n">u_vec</span> <span class="o">=</span> <span class="n">u_vec_hist</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span>  <span class="c1"># solution vector at final time step</span>
-        <span class="n">values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">GetRow</span><span class="p">(</span><span class="n">time</span><span class="p">)</span> <span class="c1"># values at previous time</span>
-
-        <span class="n">time</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">AddRow</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
-
-        <span class="c1"># Update current values</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;f0g&#39;</span><span class="p">,</span> <span class="n">u_vec</span><span class="p">,</span> <span class="n">time</span><span class="p">)</span>
-
-        <span class="c1"># Update the population of free offenders returning to community</span>
-        <span class="n">inflow_rates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ode_params</span><span class="p">[</span><span class="s1">&#39;total-inflow-rates&#39;</span><span class="p">]</span>
-        <span class="n">f0g_free</span> <span class="o">=</span> <span class="n">inflow_rates</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_step</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">population_phase</span><span class="o">.</span><span class="n">SetValue</span><span class="p">(</span><span class="s1">&#39;f0g_free&#39;</span><span class="p">,</span><span class="n">f0g_free</span><span class="p">,</span><span class="n">time</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">time</span>
 
     <span class="k">def</span> <span class="nf">__compute_outflow_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
 

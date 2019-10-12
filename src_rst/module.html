@@ -97,6 +97,14 @@ Default is <cite>None</cite>.</p>
 </dd></dl>
 
 <dl class="attribute">
+<dt id="module.Module.id">
+<code class="descname">id</code><a class="headerlink" href="#module.Module.id" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>int</em> – An integer set by the external network once a module is added to it.
+The <cite>id</cite> is the position of the module in the network list.
+Default: None.</p>
+</dd></dl>
+
+<dl class="attribute">
 <dt id="module.Module.__network">
 <code class="descname">__network</code><a class="headerlink" href="#module.Module.__network" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>Network</em> – An internal network inherited by the derived module for nested networks.</p>
@@ -200,6 +208,11 @@ method before <cite>return</cite>. In addition, self.state must be <cite>pickle-
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="method">
+<dt id="module.Module.run_and_save">
+<code class="descname">run_and_save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/module.html#Module.run_and_save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#module.Module.run_and_save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="module.Module.send">

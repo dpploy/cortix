@@ -32,40 +32,123 @@
   <h1>Source code for run_planets</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
 <span class="kn">from</span> <span class="nn">cortix</span> <span class="k">import</span> <span class="n">Cortix</span>
-<span class="kn">from</span> <span class="nn">cortix.src.module</span> <span class="k">import</span> <span class="n">Module</span>
-<span class="kn">from</span> <span class="nn">cortix.src.port</span> <span class="k">import</span> <span class="n">Port</span>
+<span class="kn">from</span> <span class="nn">cortix</span> <span class="k">import</span> <span class="n">Module</span>
+<span class="kn">from</span> <span class="nn">cortix</span> <span class="k">import</span> <span class="n">Network</span>
+<span class="kn">from</span> <span class="nn">cortix</span> <span class="k">import</span> <span class="n">Port</span>
 <span class="kn">from</span> <span class="nn">body</span> <span class="k">import</span> <span class="n">Body</span>
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../examples_rst/run_planets.html#run_planets.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.mplot3d</span> <span class="k">import</span> <span class="n">Axes3D</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="k">import</span> <span class="n">Patch</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../examples_rst/nbody_rst/run_planets.html#run_planets.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">um</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="n">num_bodies</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">sim_time</span> <span class="o">=</span> <span class="mi">365</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">3600</span> <span class="c1">#157788000.0 * 10</span>
+    <span class="n">time_step</span> <span class="o">=</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">3600</span> <span class="c1">#25000.0</span>
 
-    <span class="k">for</span> <span class="n">loop</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mf">10e6</span><span class="p">)):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;STARTING </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">loop</span><span class="p">))</span>
-        <span class="n">cortix</span> <span class="o">=</span> <span class="n">Cortix</span><span class="p">(</span><span class="n">use_mpi</span><span class="o">=</span><span class="n">um</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_bodies</span><span class="p">):</span>
-            <span class="n">cortix</span><span class="o">.</span><span class="n">add_module</span><span class="p">(</span><span class="n">Body</span><span class="p">())</span>
+    <span class="n">universe_rad</span> <span class="o">=</span> <span class="mf">2.5e11</span>
 
-        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cortix</span><span class="o">.</span><span class="n">modules</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cortix</span><span class="o">.</span><span class="n">modules</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="n">y</span><span class="p">:</span>
-                    <span class="n">pi</span> <span class="o">=</span> <span class="n">Port</span><span class="p">(</span><span class="s2">&quot;body_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">um</span><span class="p">)</span>
-                    <span class="n">i</span><span class="o">.</span><span class="n">ports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">cortix</span> <span class="o">=</span> <span class="n">Cortix</span><span class="p">(</span><span class="n">use_mpi</span><span class="o">=</span><span class="n">um</span><span class="p">)</span>
+    <span class="n">cortix</span><span class="o">.</span><span class="n">network</span> <span class="o">=</span> <span class="n">Network</span><span class="p">()</span>
 
-                    <span class="n">pj</span> <span class="o">=</span> <span class="n">Port</span><span class="p">(</span><span class="s2">&quot;body_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">um</span><span class="p">)</span>
-                    <span class="n">j</span><span class="o">.</span><span class="n">ports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pj</span><span class="p">)</span>
+    <span class="n">earth_mass</span> <span class="o">=</span> <span class="mf">5.9740e+24</span>
+    <span class="n">earth_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.4960e+11</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+    <span class="n">earth_vel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.9800e+04</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)])</span>
+    <span class="n">earth</span> <span class="o">=</span> <span class="n">Body</span><span class="p">(</span><span class="n">earth_mass</span><span class="p">,</span> <span class="n">earth_pos</span><span class="p">,</span> <span class="n">earth_vel</span><span class="p">)</span>
+    <span class="n">earth</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;earth&quot;</span>
+    <span class="n">cortix</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">earth</span><span class="p">)</span>
 
-                    <span class="n">pj</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">mars_mass</span> <span class="o">=</span> <span class="mf">6.4190e+23</span>
+    <span class="n">mars_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.2790e+11</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+    <span class="n">mars_vel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">2.4100e+04</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+    <span class="n">mars</span> <span class="o">=</span> <span class="n">Body</span><span class="p">(</span><span class="n">mars_mass</span><span class="p">,</span> <span class="n">mars_pos</span><span class="p">,</span> <span class="n">mars_vel</span><span class="p">)</span>
+    <span class="n">mars</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;mars&quot;</span>
+    <span class="n">cortix</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">mars</span><span class="p">)</span>
 
-        <span class="n">cortix</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">mod</span> <span class="ow">in</span> <span class="n">cortix</span><span class="o">.</span><span class="n">modules</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">port</span> <span class="ow">in</span> <span class="n">mod</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
-                <span class="n">port</span><span class="o">.</span><span class="n">q</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">mercury_mass</span> <span class="o">=</span> <span class="mf">3.3020e+23</span>
+    <span class="n">mercury_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">5.7900e+10</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+    <span class="n">mercury_vel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">4.7900e+04</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+    <span class="n">mercury</span> <span class="o">=</span> <span class="n">Body</span><span class="p">(</span><span class="n">mercury_mass</span><span class="p">,</span> <span class="n">mercury_pos</span><span class="p">,</span> <span class="n">mercury_vel</span><span class="p">)</span>
+    <span class="n">mercury</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;mercury&quot;</span>
+    <span class="n">cortix</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">mercury</span><span class="p">)</span>
 
-        <span class="k">del</span> <span class="n">cortix</span></div>
+    <span class="n">venus_mass</span> <span class="o">=</span> <span class="mf">4.8690e+24</span>
+    <span class="n">venus_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0820e+11</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+    <span class="n">venus_vel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">3.5000e+04</span> <span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+    <span class="n">venus</span> <span class="o">=</span> <span class="n">Body</span><span class="p">(</span><span class="n">venus_mass</span><span class="p">,</span> <span class="n">venus_pos</span><span class="p">,</span> <span class="n">venus_vel</span><span class="p">)</span>
+    <span class="n">venus</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;venus&quot;</span>
+    <span class="n">cortix</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">venus</span><span class="p">)</span>
+
+    <span class="n">sun_mass</span> <span class="o">=</span> <span class="mf">1.9890e+30</span>
+    <span class="n">sun_pos</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+    <span class="n">sun_vel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])</span>
+    <span class="n">sun</span> <span class="o">=</span> <span class="n">Body</span><span class="p">(</span><span class="n">sun_mass</span><span class="p">,</span> <span class="n">sun_pos</span><span class="p">,</span> <span class="n">sun_vel</span><span class="p">)</span>
+    <span class="n">sun</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;sun&quot;</span>
+    <span class="n">cortix</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">sun</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cortix</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">modules</span><span class="p">):</span>
+        <span class="n">i</span><span class="o">.</span><span class="n">save</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">i</span><span class="o">.</span><span class="n">dt</span> <span class="o">=</span> <span class="n">time_step</span>
+        <span class="n">i</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">sim_time</span>
+        <span class="k">for</span> <span class="n">y</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cortix</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">modules</span><span class="p">):</span>
+            <span class="n">pi</span> <span class="o">=</span> <span class="n">Port</span><span class="p">(</span><span class="s2">&quot;body_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">um</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="n">y</span> <span class="ow">and</span> <span class="n">pi</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">ports</span><span class="p">:</span>
+                <span class="n">i</span><span class="o">.</span><span class="n">ports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pi</span><span class="p">)</span>
+
+                <span class="n">pj</span> <span class="o">=</span> <span class="n">Port</span><span class="p">(</span><span class="s2">&quot;body_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">um</span><span class="p">)</span>
+                <span class="n">j</span><span class="o">.</span><span class="n">ports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pj</span><span class="p">)</span>
+
+                <span class="n">pj</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">pi</span><span class="p">)</span>
+                <span class="n">cortix</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">gv_edges</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">)))</span>
+
+    <span class="n">cortix</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+    <span class="n">cortix</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="p">[(</span><span class="n">b</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">trajectory</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">cortix</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">modules</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="plot_trajectories"><a class="viewcode-back" href="../examples_rst/nbody_rst/run_planets.html#run_planets.plot_trajectories">[docs]</a><span class="k">def</span> <span class="nf">plot_trajectories</span><span class="p">(</span><span class="n">traj</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">au</span> <span class="o">=</span> <span class="p">(</span><span class="mf">149.6e6</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="mi">250</span> <span class="o">/</span> <span class="n">au</span>
+
+    <span class="k">if</span> <span class="n">traj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">traj</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.csv&quot;</span><span class="p">):</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">l</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+                    <span class="n">name</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">lines</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                    <span class="n">t</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+                    <span class="n">traj</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span>
+
+
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">gca</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">)</span>
+    <span class="n">patches</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="o">.</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="p">[</span><span class="n">Patch</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="ow">in</span> <span class="n">traj</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="ow">in</span> <span class="n">traj</span><span class="p">:</span>
+        <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">t</span><span class="p">]</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">t</span><span class="p">]</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">t</span><span class="p">]</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;planets.png&quot;</span><span class="p">)</span></div>
+
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">main</span><span class="p">()</span>
+    <span class="n">trajectories</span> <span class="o">=</span> <span class="n">main</span><span class="p">()</span>
+    <span class="kn">import</span> <span class="nn">matplotlib</span>
+    <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;GTK3Agg&quot;</span><span class="p">)</span>
+    <span class="n">plot_trajectories</span><span class="p">(</span><span class="n">trajectories</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </pre></div>
 
           </div>

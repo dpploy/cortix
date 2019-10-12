@@ -1,12 +1,18 @@
 A Python library for network dynamics modeling and HPC simulation.
 
+-  `Cortix on Jupyter notebook
+   examples <https://github.com/dpploy/cortix-nb>`__
+-  `Documentation on the web <https://cortix.org>`__
+
 | |Website|
 | |Repo Size|
 | |Build Status|
 | |PyPI version|
 | |PyPI - Python Version|
 
-|image5|
+|codecov|
+
+|image6|
 
 What is Cortix?
 ---------------
@@ -123,5 +129,7 @@ Lowell, MA 01852
    :target: https://badge.fury.io/py/cortix
 .. |PyPI - Python Version| image:: https://img.shields.io/pypi/pyversions/Django.svg
    :target: https://badge.fury.io/py/cortix
-.. |image5| image:: cortix-cover.png
+.. |codecov| image:: https://codecov.io/gh/dpploy/cortix/branch/master/graph/badge.svg
+   :target: https://codecov.io/gh/dpploy/cortix
+.. |image6| image:: cortix-cover.png
 

@@ -37,8 +37,8 @@
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Cortix network.</p>
 <dl class="attribute">
-<dt id="network.Network.n_networks">
-<code class="descname">n_networks</code><a class="headerlink" href="#network.Network.n_networks" title="Permalink to this definition">¶</a></dt>
+<dt id="network.Network.num_networks">
+<code class="descname">num_networks</code><a class="headerlink" href="#network.Network.num_networks" title="Permalink to this definition">¶</a></dt>
 <dd><p><em>int</em> – Number of instances of this class.</p>
 </dd></dl>
 
@@ -99,7 +99,7 @@ to <cite>bidiretional</cite>, will create a double headed arrow in the graph fig
 
 <dl class="method">
 <dt id="network.Network.draw">
-<code class="descname">draw</code><span class="sig-paren">(</span><em>graph_attr=None</em>, <em>node_attr=None</em>, <em>engine=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/network.html#Network.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#network.Network.draw" title="Permalink to this definition">¶</a></dt>
+<code class="descname">draw</code><span class="sig-paren">(</span><em>graph_attr=None</em>, <em>node_attr=None</em>, <em>engine='twopi'</em>, <em>lr=False</em>, <em>ports=False</em>, <em>node_shape='hexagon'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/network.html#Network.draw"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#network.Network.draw" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -110,7 +110,7 @@ to <cite>bidiretional</cite>, will create a double headed arrow in the graph fig
 
 <dl class="attribute">
 <dt>
-<code class="descname">n_networks</code><em class="property"> = 0</em></dt>
+<code class="descname">num_networks</code><em class="property"> = 0</em></dt>
 <dd></dd></dl>
 
 <dl class="method">

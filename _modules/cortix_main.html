@@ -116,6 +116,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wall_clock_time_start</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">end_run_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%d</span><span class="s1">%b%y %H:%M:%S&#39;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s2">&quot;rm -rf .ctx-saved &amp;&amp; mkdir .ctx-saved&quot;</span><span class="p">)</span>
 
         <span class="k">return</span></div>
 
@@ -128,11 +129,12 @@
         <span class="n">n</span><span class="o">.</span><span class="n">comm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">comm</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__network</span> <span class="o">=</span> <span class="n">n</span>
         <span class="k">return</span>
+
     <span class="k">def</span> <span class="nf">__get_network</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__network</span>
     <span class="n">network</span> <span class="o">=</span> <span class="nb">property</span><span class="p">(</span><span class="n">__get_network</span><span class="p">,</span> <span class="n">__set_network</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Cortix.run"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Cortix.run"><a class="viewcode-back" href="../src_rst/cortix_main.html#cortix_main.Cortix.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">save</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;Run the Cortix network simulation.</span>
 
 <span class="sd">        &#39;&#39;&#39;</span>

@@ -1,0 +1,390 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>species &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for species</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="c1"># This file is part of the Cortix toolkit environment</span>
+<span class="c1"># https://cortix.org</span>
+
+<span class="kn">import</span> <span class="nn">scipy.constants</span> <span class="k">as</span> <span class="nn">const</span>
+<span class="kn">from</span> <span class="nn">cortix.support.periodictable</span> <span class="k">import</span> <span class="n">ELEMENTS</span>
+
+<div class="viewcode-block" id="Species"><a class="viewcode-back" href="../support_rst/species.html#species.Species">[docs]</a><span class="k">class</span> <span class="nc">Species</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    All SI units (kg,s,K,Pa,J,W).</span>
+
+<span class="sd">    The Specie() class encapsulates either the molecular or empirical chemical</span>
+<span class="sd">    formula of a compound.</span>
+<span class="sd">    This is done as follows. Say MAO2 is either a molecular or empirical chemical</span>
+<span class="sd">    formula of a ficticious compound denoting minor actinides dioxide. The list</span>
+<span class="sd">    of atoms is given as follows:</span>
+
+<span class="sd">    [&#39;0.49*Np-237&#39;, &#39;0.42*Am-241&#39;, &#39;0.08*Am-243&#39;, &#39;0.01*Cm-244&#39;, &#39;2.0*O-16&#39;]</span>
+
+<span class="sd">    note the MA forming nuclides add to 1 = 0.49 + 0.42 + 0.08 + 0.01. Therefore</span>
+<span class="sd">    the number of atoms in this compound is 3. 1 MA &quot;ficticious&quot; atom and 2 O.</span>
+<span class="sd">    Note that the total number of &quot;atoms&quot; is obtained by summing all multipliers:</span>
+<span class="sd">    0.49 + 0.42 + 0.08 + 0.01 + 2.0.</span>
+<span class="sd">    The nuclide is indicated by the element symbol followed by a dash and the</span>
+<span class="sd">    atomic mass number. Here the number of nuclide types is 5 (self.num_nuclide_types).</span>
+
+<span class="sd">    The numbers preceeding the nuclide symbol before the * will be referred to as</span>
+<span class="sd">    multipliers. The sum of the multipliers will add to the number of &quot;atoms&quot; in</span>
+<span class="sd">    the formula. WARNING: a multiplier could be in the format 0.00e-00. In this</span>
+<span class="sd">    case a hiphen may appear twice, e.g.: 1.549e-09*U-233</span>
+
+<span class="sd">    Other forms can be used for common true species</span>
+
+<span class="sd">    [&#39;Np-237&#39;, &#39;2.0*O-16&#39;] or [&#39;Np-237&#39;, &#39;O-16&#39;, &#39;O-16&#39;] or [ &#39;2*H&#39;, &#39;O&#39; ] or</span>
+<span class="sd">    [ &#39;H&#39;, &#39;O&#39;, &#39;H&#39; ]  etc...</span>
+
+<span class="sd">    This code will calculate the molar mass of any species with a given valid</span>
+<span class="sd">    atom list using a provided periodic table of chemical elements. The user</span>
+<span class="sd">    can also reset the value of the molar mass with a setter method.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span>
+                  <span class="n">name</span><span class="o">=</span><span class="s1">&#39;null-species-name&#39;</span><span class="p">,</span>
+                  <span class="n">formula_name</span><span class="o">=</span><span class="s1">&#39;null-species-formula-name&#39;</span><span class="p">,</span>
+                  <span class="n">atoms</span><span class="o">=</span><span class="nb">list</span><span class="p">(),</span>
+                  <span class="n">flag</span><span class="o">=</span><span class="s1">&#39;null-species-flag&#39;</span><span class="p">,</span>
+                  <span class="n">info</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">formula_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">formula_name</span> <span class="o">=</span> <span class="n">formula_name</span>
+
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="n">atoms</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">flag</span> <span class="o">=</span> <span class="n">flag</span>  <span class="c1"># flag can be any type</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">info</span> <span class="c1"># info text such as technical name or other properties info</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span> <span class="o">=</span> <span class="mf">0.0</span>      <span class="c1"># kg/mol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">molar_heat_pwr</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">molar_gamma_pwr</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">molar_radioactivity</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass_unit</span> <span class="o">=</span> <span class="s1">&#39;kg/mol&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">molar_heat_pwr_unit</span> <span class="o">=</span> <span class="s1">&#39;W/mol&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">molar_gamma_pwr_unit</span> <span class="o">=</span> <span class="s1">&#39;W/mol&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">molar_radioactivity_unit</span> <span class="o">=</span> <span class="s1">&#39;Ci/mol&#39;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">molar_radioactivity_fractions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_molar_mass</span><span class="p">()</span>
+
+        <span class="k">return</span>
+
+<div class="viewcode-block" id="Species.update_molar_mass"><a class="viewcode-back" href="../support_rst/species.html#species.Species.update_molar_mass">[docs]</a>    <span class="k">def</span> <span class="nf">update_molar_mass</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Updates the molar mass of the species after the molecular formula has</span>
+<span class="sd">        been changed.</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">molar_mass_const</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">physical_constants</span><span class="p">[</span><span class="s1">&#39;molar mass constant&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">molar_mass_const_unit</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">physical_constants</span><span class="p">[</span><span class="s1">&#39;molar mass constant&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+            <span class="n">nuclide</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">element</span> <span class="o">=</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">assert</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">ELEMENTS</span><span class="p">,</span> <span class="s1">&#39;element = </span><span class="si">%r</span><span class="s1">&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_atoms</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_nuclide_types</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">nuclides</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="n">num_atoms</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">summ</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+            <span class="c1"># format example:  3.2*O-18, or 3*O or O or O-16</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+            <span class="n">multiple</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="c1"># single nuclide</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">nuclide</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># multiple nuclide</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">multiple</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">nuclide</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="kc">False</span>
+
+            <span class="n">nuclides</span><span class="p">[</span><span class="n">nuclide</span><span class="p">]</span> <span class="o">=</span> <span class="n">multiple</span>
+            <span class="n">num_atoms</span> <span class="o">+=</span> <span class="n">multiple</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">nuclide</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">element</span> <span class="o">=</span> <span class="n">ELEMENTS</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                    <span class="n">rel_atomic_mass</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">exactmass</span>  <span class="c1"># from isotopic composition</span>
+                    <span class="k">if</span> <span class="n">rel_atomic_mass</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+                        <span class="n">rel_atomic_mass</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">mass</span>
+                    <span class="n">molar_mass</span> <span class="o">=</span> <span class="n">rel_atomic_mass</span> <span class="o">*</span> <span class="n">molar_mass_const</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">element</span> <span class="o">=</span> <span class="n">ELEMENTS</span><span class="p">[</span><span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">isotopes</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;m&#39;</span><span class="p">))]</span>
+                    <span class="n">molar_mass</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">mass</span> <span class="o">*</span> <span class="n">molar_mass_const</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="kc">False</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="n">summ</span> <span class="o">+=</span> <span class="n">multiple</span> <span class="o">*</span> <span class="mf">0.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">summ</span> <span class="o">+=</span> <span class="n">multiple</span> <span class="o">*</span> <span class="n">molar_mass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span> <span class="o">=</span> <span class="n">summ</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_atoms</span> <span class="o">=</span> <span class="n">num_atoms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_nuclide_types</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">nuclides</span><span class="p">)</span>
+
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="Species.reorder_formula"><a class="viewcode-back" href="../support_rst/species.html#species.Species.reorder_formula">[docs]</a>    <span class="k">def</span> <span class="nf">reorder_formula</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Takes a list of atoms for a molecular or empirical formula and places</span>
+<span class="sd">        it in order of decreasing magnitude of stoichiometric coefficient. For</span>
+<span class="sd">        example, [O, 2*H] will be returned as [2*H, O]. This is used for</span>
+<span class="sd">        printing purposes. The internal order will not change.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        atoms2: list</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">atoms1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[:]</span>  <span class="c1"># shallow copy</span>
+        <span class="n">atoms2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">atoms1</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+
+            <span class="c1"># save the multiplier value as a string type of scientific notation</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">:</span>
+
+                <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+
+                <span class="c1"># format example:  3.2*O-18, or 3*O or O or O-16</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+
+                <span class="n">nuclide</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="n">multiplier</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">multiplier</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">multiplier</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="kc">False</span>
+
+                <span class="k">assert</span> <span class="n">multiplier</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;multiplier = </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">multiplier</span><span class="p">)</span>
+
+                <span class="n">multiplier</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{0:9.3e}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">multiplier</span><span class="p">)</span>
+
+                <span class="n">atoms1</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">entry</span><span class="p">)]</span> <span class="o">=</span> <span class="n">multiplier</span> <span class="o">+</span> <span class="s1">&#39;*&#39;</span> <span class="o">+</span> <span class="n">nuclide</span>
+
+            <span class="c1"># order in decreasing order of multiplier magnitude</span>
+            <span class="n">multipliers_lst</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">atoms1</span><span class="p">:</span>
+
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)</span>
+
+                <span class="n">multiplier</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">multiplier</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">assert</span> <span class="kc">False</span>
+
+                <span class="n">multipliers_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">multiplier</span><span class="p">))</span>
+
+            <span class="n">sorted_atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">multipliers_lst</span><span class="p">,</span> <span class="n">atoms1</span><span class="p">),</span>
+                <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">pair</span><span class="p">:</span> <span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+
+            <span class="n">atoms2</span> <span class="o">=</span> <span class="n">sorted_atoms</span>
+
+        <span class="k">return</span> <span class="n">atoms2</span></div>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> &#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> Species(): name=</span><span class="si">%s</span><span class="s1">;&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39; formula_name=</span><span class="si">%s</span><span class="s1">;&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> formula=</span><span class="si">%s</span><span class="s1">;&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> # atoms=</span><span class="si">%s</span><span class="s1">;&#39;</span> <span class="o">+</span> <span class="s1">&#39; # nuclide types=</span><span class="si">%s</span><span class="s1">;&#39;</span> <span class="o">+</span> <span class="s1">&#39; molar mass=</span><span class="si">%9.3e</span><span class="s1">[</span><span class="si">%s</span><span class="s1">];&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> flag=</span><span class="si">%s</span><span class="s1">;&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> info=</span><span class="si">%s</span><span class="s1">;&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> molar radioactivity=</span><span class="si">%9.3e</span><span class="s1">[</span><span class="si">%s</span><span class="s1">];&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> molar heat pwr=</span><span class="si">%9.3e</span><span class="s1">[</span><span class="si">%s</span><span class="s1">];&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> molar gamma pwr=</span><span class="si">%9.3e</span><span class="s1">[</span><span class="si">%s</span><span class="s1">];&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> atoms=</span><span class="si">%s</span><span class="s1">;&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> molar radioactivity fractions=</span><span class="si">%s</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">formula_name</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reorder_formula</span><span class="p">(),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nuclide_types</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span> \
+                        <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass_unit</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">molar_radioactivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_radioactivity_unit</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">molar_heat_pwr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_heat_pwr_unit</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">molar_gamma_pwr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_gamma_pwr_unit</span><span class="p">,</span>
+                <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">],</span>
+                <span class="p">[</span><span class="s1">&#39;</span><span class="si">%9.3e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_radioactivity_fractions</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> Species(): name=</span><span class="si">%s</span><span class="s1">;&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39; formula_name=</span><span class="si">%s</span><span class="s1">;&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> formula=</span><span class="si">%s</span><span class="s1">;&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> # atoms=</span><span class="si">%s</span><span class="s1">;&#39;</span> <span class="o">+</span> <span class="s1">&#39; # nuclide types=</span><span class="si">%s</span><span class="s1">;&#39;</span> <span class="o">+</span> <span class="s1">&#39; molar mass=</span><span class="si">%9.3e</span><span class="s1">[</span><span class="si">%s</span><span class="s1">];&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> flag=</span><span class="si">%s</span><span class="s1">;&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> molar radioactivity=</span><span class="si">%9.3e</span><span class="s1">[</span><span class="si">%s</span><span class="s1">];&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> molar heat pwr=</span><span class="si">%9.3e</span><span class="s1">[</span><span class="si">%s</span><span class="s1">];&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> molar gamma pwr=</span><span class="si">%9.3e</span><span class="s1">[</span><span class="si">%s</span><span class="s1">];&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> atoms=</span><span class="si">%s</span><span class="s1">;&#39;</span> <span class="o">+</span> \
+            <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> molar radioactivity fractions=</span><span class="si">%s</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">formula_name</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">reorder_formula</span><span class="p">(),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">num_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_nuclide_types</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass</span><span class="p">,</span> \
+                        <span class="bp">self</span><span class="o">.</span><span class="n">molar_mass_unit</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">flag</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">molar_radioactivity</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_radioactivity_unit</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">molar_heat_pwr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_heat_pwr_unit</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">molar_gamma_pwr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_gamma_pwr_unit</span><span class="p">,</span>
+                <span class="p">[</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">],</span>
+                <span class="p">[</span><span class="s1">&#39;</span><span class="si">%9.3e</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">molar_radioactivity_fractions</span><span class="p">])</span></div>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">tbp_org</span> <span class="o">=</span> <span class="n">Species</span><span class="p">(</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;TBP&#39;</span><span class="p">,</span> <span class="n">formula_name</span><span class="o">=</span><span class="s1">&#39;(C4H9O)_3PO(o)&#39;</span><span class="p">,</span>
+              <span class="n">atoms</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;12*C&#39;</span><span class="p">,</span><span class="s1">&#39;27*H&#39;</span><span class="p">,</span><span class="s1">&#39;4*O&#39;</span><span class="p">,</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">tbp_org</span><span class="p">)</span>
+    <span class="n">no3Minus_aqu</span> <span class="o">=</span> <span class="n">Species</span><span class="p">(</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;NO3-&#39;</span><span class="p">,</span> <span class="n">formula_name</span><span class="o">=</span><span class="s1">&#39;NO3-(a)&#39;</span><span class="p">,</span>
+                   <span class="n">atoms</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">,</span><span class="s1">&#39;3*O&#39;</span><span class="p">]</span> <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">no3Minus_aqu</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<a href="https://github.com/dpploy/cortix"><img src="https://cortix.org/logo.jpg" alt="Cortix" style="border:none;"></a>
+<h3>About Cortix</h3>
+<p>
+Cortix is a Python library for network modeling and HPC simulation.
+</p>
+<p>
+Cortix Group <br>
+c/o <a href="https://www.uml.edu/innovation-hub">UMass Innovation Hub</a> <br>
+110 Canal St., 3rd Floor <br>
+Lower, MA 01852
+</p>
+
+<p>
+<a href="https://www.uml.edu/Engineering/Chemical/faculty/de-Almeida-Valmor.aspx">Prof. V. F. de Almeida, Ph.D.</a></br>
+Group Leader <br>
+<a href="https://www.uml.edu/Engineering/Chemical">Dept. of Chemical Engineering (Nuclear Program)</a></br>
+<a href="https://www.uml.edu/">UMass Lowell</a><br>
+</p>
+
+<!---->
+
+<h3><a href="../index.html">Table of Contents</a></h3>
+<ul>
+<li><a href="../index.html">Home</a></li>
+<li><a href="../install.html">Install</a></li>
+<li><a href="../contents.html">Documentation</a></li>
+<li><a href="../license.html">License</a></li>
+</ul>
+
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="https://pypi.org/project/cortix/">Cortix @ PyPI</a></li>
+  <li><a href="https://github.com/dpploy/cortix">Cortix @ GitHub</a></li>
+  <li><a href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master">Cortix @ binder</a></li>
+  <li><a href="https://nbviewer.jupyter.org/github/dpploy/cortix-nb/tree/master/">Cortix @ nbviewer</a></li>
+  <li><a href="https://github.com/dpploy/cortix-nb">Cortix Jupyter Notebooks</a></li>
+  <li><a href="https://github.com/dpploy/cortix/issues">Issue Tracker</a></li>
+  <li><a href="https://dpploy.github.io/cortix/Cortix.pdf">PDF Documentation</a></li>
+</ul>
+
+<h3>HPC Resources</h3>
+<ul>
+  <li><a href="https://hpc.inl.gov/SitePages/Home.aspx">Idaho National Laboratory HPC</a></li>
+  <li><a href="http://wiki.umassrc.org/wiki/index.php/Main_Page">UMass Green HPC Cluster </a></li>
+</ul>
+
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, University of Massachusetts Lowell.
+      
+    </div>
+
+    
+    <a href="https://github.com/dpploy/cortix" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>

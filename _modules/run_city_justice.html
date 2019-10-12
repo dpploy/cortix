@@ -68,8 +68,8 @@
 
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 
-<span class="kn">from</span> <span class="nn">cortix.src.cortix_main</span> <span class="k">import</span> <span class="n">Cortix</span>
-<span class="kn">from</span> <span class="nn">cortix.src.network</span> <span class="k">import</span> <span class="n">Network</span>
+<span class="kn">from</span> <span class="nn">cortix</span> <span class="k">import</span> <span class="n">Cortix</span>
+<span class="kn">from</span> <span class="nn">cortix</span> <span class="k">import</span> <span class="n">Network</span>
 
 <span class="kn">from</span> <span class="nn">cortix.examples.city_justice.prison</span> <span class="k">import</span> <span class="n">Prison</span>
 <span class="kn">from</span> <span class="nn">cortix.examples.city_justice.parole</span> <span class="k">import</span> <span class="n">Parole</span>
@@ -113,36 +113,43 @@
     <span class="n">community</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">end_time</span>
     <span class="n">community</span><span class="o">.</span><span class="n">time_step</span> <span class="o">=</span> <span class="n">time_step</span>
     <span class="n">community</span><span class="o">.</span><span class="n">show_time</span> <span class="o">=</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span><span class="mi">10</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">day</span><span class="p">)</span>
+    <span class="n">community</span><span class="o">.</span><span class="n">save</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="n">prison</span> <span class="o">=</span> <span class="n">Prison</span><span class="p">(</span><span class="n">n_groups</span><span class="o">=</span><span class="n">n_groups</span><span class="p">,</span><span class="n">pool_size</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
     <span class="n">city</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">prison</span><span class="p">)</span>
     <span class="n">prison</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">end_time</span>
     <span class="n">prison</span><span class="o">.</span><span class="n">time_step</span> <span class="o">=</span> <span class="n">time_step</span>
+    <span class="n">prison</span><span class="o">.</span><span class="n">save</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="n">parole</span> <span class="o">=</span> <span class="n">Parole</span><span class="p">(</span><span class="n">n_groups</span><span class="o">=</span><span class="n">n_groups</span><span class="p">)</span>
     <span class="n">city</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">parole</span><span class="p">)</span>
     <span class="n">parole</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">end_time</span>
     <span class="n">parole</span><span class="o">.</span><span class="n">time_step</span> <span class="o">=</span> <span class="n">time_step</span>
+    <span class="n">parole</span><span class="o">.</span><span class="n">save</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="n">adjudication</span> <span class="o">=</span> <span class="n">Adjudication</span><span class="p">(</span><span class="n">n_groups</span><span class="o">=</span><span class="n">n_groups</span><span class="p">)</span>
     <span class="n">city</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">adjudication</span><span class="p">)</span>
     <span class="n">adjudication</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">end_time</span>
     <span class="n">adjudication</span><span class="o">.</span><span class="n">time_step</span> <span class="o">=</span> <span class="n">time_step</span>
+    <span class="n">adjudication</span><span class="o">.</span><span class="n">save</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="n">jail</span> <span class="o">=</span> <span class="n">Jail</span><span class="p">(</span><span class="n">n_groups</span><span class="o">=</span><span class="n">n_groups</span><span class="p">)</span>
     <span class="n">city</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">jail</span><span class="p">)</span>
     <span class="n">jail</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">end_time</span>
     <span class="n">jail</span><span class="o">.</span><span class="n">time_step</span> <span class="o">=</span> <span class="n">time_step</span>
+    <span class="n">jail</span><span class="o">.</span><span class="n">save</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="n">arrested</span> <span class="o">=</span> <span class="n">Arrested</span><span class="p">(</span><span class="n">n_groups</span><span class="o">=</span><span class="n">n_groups</span><span class="p">)</span>
     <span class="n">city</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">arrested</span><span class="p">)</span>
     <span class="n">arrested</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">end_time</span>
     <span class="n">arrested</span><span class="o">.</span><span class="n">time_step</span> <span class="o">=</span> <span class="n">time_step</span>
+    <span class="n">arrested</span><span class="o">.</span><span class="n">save</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="n">probation</span> <span class="o">=</span> <span class="n">Probation</span><span class="p">(</span><span class="n">n_groups</span><span class="o">=</span><span class="n">n_groups</span><span class="p">)</span>
     <span class="n">city</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">module</span><span class="p">(</span><span class="n">probation</span><span class="p">)</span>
     <span class="n">probation</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">end_time</span>
     <span class="n">probation</span><span class="o">.</span><span class="n">time_step</span> <span class="o">=</span> <span class="n">time_step</span>
+    <span class="n">probation</span><span class="o">.</span><span class="n">save</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="n">city</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span> <span class="n">prison</span><span class="p">,</span> <span class="n">parole</span><span class="p">,</span> <span class="s1">&#39;bidirectional&#39;</span> <span class="p">)</span>
     <span class="n">city</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span> <span class="n">adjudication</span><span class="p">,</span> <span class="n">prison</span> <span class="p">)</span>
@@ -171,8 +178,8 @@
         <span class="n">total_num_params</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="c1"># Inspect Data Function</span>
-        <span class="k">def</span> <span class="nf">inspect_module_data</span><span class="p">(</span><span class="n">module</span><span class="p">,</span><span class="n">quant_name</span><span class="p">):</span>
-            <span class="n">population_phase</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">state</span>
+        <span class="k">def</span> <span class="nf">inspect_module_data</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">quant_name</span><span class="p">):</span>
+            <span class="n">population_phase</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">population_phase</span>
             <span class="p">(</span><span class="n">fxg_quant</span><span class="p">,</span> <span class="n">time_unit</span><span class="p">)</span> <span class="o">=</span> <span class="n">population_phase</span><span class="o">.</span><span class="n">get_quantity_history</span><span class="p">(</span><span class="n">quant_name</span><span class="p">)</span>
 
             <span class="n">fxg_quant</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span> <span class="n">x_scaling</span><span class="o">=</span><span class="mi">1</span><span class="o">/</span><span class="n">const</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">x_label</span><span class="o">=</span><span class="s1">&#39;Time [day]&#39;</span><span class="p">,</span>

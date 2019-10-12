@@ -1,0 +1,177 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>species module &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-species">
+<span id="species-module"></span><h1>species module<a class="headerlink" href="#module-species" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="species.Species">
+<em class="property">class </em><code class="descclassname">species.</code><code class="descname">Species</code><span class="sig-paren">(</span><em>name='null-species-name'</em>, <em>formula_name='null-species-formula-name'</em>, <em>atoms=[]</em>, <em>flag='null-species-flag'</em>, <em>info=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/species.html#Species"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#species.Species" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>All SI units (kg,s,K,Pa,J,W).</p>
+<p>The Specie() class encapsulates either the molecular or empirical chemical
+formula of a compound.
+This is done as follows. Say MAO2 is either a molecular or empirical chemical
+formula of a ficticious compound denoting minor actinides dioxide. The list
+of atoms is given as follows:</p>
+<p>[‘0.49*Np-237’, ‘0.42*Am-241’, ‘0.08*Am-243’, ‘0.01*Cm-244’, ‘2.0*O-16’]</p>
+<p>note the MA forming nuclides add to 1 = 0.49 + 0.42 + 0.08 + 0.01. Therefore
+the number of atoms in this compound is 3. 1 MA “ficticious” atom and 2 O.
+Note that the total number of “atoms” is obtained by summing all multipliers:
+0.49 + 0.42 + 0.08 + 0.01 + 2.0.
+The nuclide is indicated by the element symbol followed by a dash and the
+atomic mass number. Here the number of nuclide types is 5 (self.num_nuclide_types).</p>
+<p>The numbers preceeding the nuclide symbol before the * will be referred to as
+multipliers. The sum of the multipliers will add to the number of “atoms” in
+the formula. WARNING: a multiplier could be in the format 0.00e-00. In this
+case a hiphen may appear twice, e.g.: 1.549e-09*U-233</p>
+<p>Other forms can be used for common true species</p>
+<p>[‘Np-237’, ‘2.0*O-16’] or [‘Np-237’, ‘O-16’, ‘O-16’] or [ ‘2*H’, ‘O’ ] or
+[ ‘H’, ‘O’, ‘H’ ]  etc…</p>
+<p>This code will calculate the molar mass of any species with a given valid
+atom list using a provided periodic table of chemical elements. The user
+can also reset the value of the molar mass with a setter method.</p>
+<dl class="method">
+<dt id="species.Species.reorder_formula">
+<code class="descname">reorder_formula</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/species.html#Species.reorder_formula"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#species.Species.reorder_formula" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes a list of atoms for a molecular or empirical formula and places
+it in order of decreasing magnitude of stoichiometric coefficient. For
+example, [O, 2*H] will be returned as [2*H, O]. This is used for
+printing purposes. The internal order will not change.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>atoms2</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="species.Species.update_molar_mass">
+<code class="descname">update_molar_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/species.html#Species.update_molar_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#species.Species.update_molar_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates the molar mass of the species after the molecular formula has
+been changed.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<a href="https://github.com/dpploy/cortix"><img src="https://cortix.org/logo.jpg" alt="Cortix" style="border:none;"></a>
+<h3>About Cortix</h3>
+<p>
+Cortix is a Python library for network modeling and HPC simulation.
+</p>
+<p>
+Cortix Group <br>
+c/o <a href="https://www.uml.edu/innovation-hub">UMass Innovation Hub</a> <br>
+110 Canal St., 3rd Floor <br>
+Lower, MA 01852
+</p>
+
+<p>
+<a href="https://www.uml.edu/Engineering/Chemical/faculty/de-Almeida-Valmor.aspx">Prof. V. F. de Almeida, Ph.D.</a></br>
+Group Leader <br>
+<a href="https://www.uml.edu/Engineering/Chemical">Dept. of Chemical Engineering (Nuclear Program)</a></br>
+<a href="https://www.uml.edu/">UMass Lowell</a><br>
+</p>
+
+<!---->
+
+<h3><a href="../index.html">Table of Contents</a></h3>
+<ul>
+<li><a href="../index.html">Home</a></li>
+<li><a href="../install.html">Install</a></li>
+<li><a href="../contents.html">Documentation</a></li>
+<li><a href="../license.html">License</a></li>
+</ul>
+
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="https://pypi.org/project/cortix/">Cortix @ PyPI</a></li>
+  <li><a href="https://github.com/dpploy/cortix">Cortix @ GitHub</a></li>
+  <li><a href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master">Cortix @ binder</a></li>
+  <li><a href="https://nbviewer.jupyter.org/github/dpploy/cortix-nb/tree/master/">Cortix @ nbviewer</a></li>
+  <li><a href="https://github.com/dpploy/cortix-nb">Cortix Jupyter Notebooks</a></li>
+  <li><a href="https://github.com/dpploy/cortix/issues">Issue Tracker</a></li>
+  <li><a href="https://dpploy.github.io/cortix/Cortix.pdf">PDF Documentation</a></li>
+</ul>
+
+<h3>HPC Resources</h3>
+<ul>
+  <li><a href="https://hpc.inl.gov/SitePages/Home.aspx">Idaho National Laboratory HPC</a></li>
+  <li><a href="http://wiki.umassrc.org/wiki/index.php/Main_Page">UMass Green HPC Cluster </a></li>
+</ul>
+
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, University of Massachusetts Lowell.
+      
+      |
+      <a href="../_sources/support_rst/species.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+    <a href="https://github.com/dpploy/cortix" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>

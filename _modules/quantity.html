@@ -34,57 +34,33 @@
 <span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># This file is part of the Cortix toolkit environment</span>
 <span class="c1"># https://cortix.org</span>
-<span class="c1">#</span>
-<span class="c1"># All rights reserved, see COPYRIGHT for full restrictions.</span>
-<span class="c1"># https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt</span>
-<span class="c1">#</span>
-<span class="c1"># Licensed under the University of Massachusetts Lowell LICENSE:</span>
-<span class="c1"># https://github.com/dpploy/cortix/blob/master/LICENSE.txt</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">Author: Valmor de Almeida dealmeidav@ornl.gov; vfda</span>
-
-<span class="sd">This Quantity class is to be used with other classes in plant-level process modules.</span>
-
-<span class="sd">For unit testing do at the linux command prompt:</span>
-<span class="sd">    python quantity.py</span>
-
-<span class="sd">Sat Sep  5 12:51:34 EDT 2015</span>
-<span class="sd">&#39;&#39;&#39;</span>
-<span class="c1">#*********************************************************************************</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-
 <span class="kn">import</span> <span class="nn">pandas</span>
 <span class="kn">import</span> <span class="nn">matplotlib</span>
 <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">,</span> <span class="n">warn</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="Quantity"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity">[docs]</a><span class="k">class</span> <span class="nc">Quantity</span><span class="p">:</span>
     <span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    todo: this probably should not have a &quot;value&quot; for the same reason as Specie.</span>
+<span class="sd">    todo: this probably should not have a &quot;value&quot; for the same reason as Species.</span>
 <span class="sd">          this needs some thinking.</span>
 <span class="sd">    well not so fast. This can be used to build a quantity with anything as a</span>
 <span class="sd">    value. For instance a history of the quantity as a time series.</span>
+
 <span class="sd">    &#39;&#39;&#39;</span>
-
-<span class="c1">#*********************************************************************************</span>
-<span class="c1"># Construction</span>
-<span class="c1">#*********************************************************************************</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">name</span>       <span class="o">=</span> <span class="s1">&#39;null-quantity&#39;</span><span class="p">,</span>
-                 <span class="n">formalName</span> <span class="o">=</span> <span class="s1">&#39;null-quantity&#39;</span><span class="p">,</span>
+                 <span class="n">name</span>       <span class="o">=</span> <span class="s1">&#39;null-quantity-name&#39;</span><span class="p">,</span>
+                 <span class="n">formalName</span> <span class="o">=</span> <span class="s1">&#39;null-quantity-formal-name&#39;</span><span class="p">,</span> <span class="c1"># deprecated</span>
+                 <span class="n">formal_name</span> <span class="o">=</span> <span class="s1">&#39;null-quantity-formal-name&#39;</span><span class="p">,</span>
                  <span class="n">value</span>      <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">),</span>      <span class="c1"># this can be any type</span>
-                 <span class="n">unit</span>       <span class="o">=</span> <span class="s1">&#39;null-unit&#39;</span>
+                 <span class="n">unit</span>       <span class="o">=</span> <span class="s1">&#39;null-quantity-unit&#39;</span>
                 <span class="p">):</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;not a string.&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">name</span>
 
         <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">formalName</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="s1">&#39;not a string.&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__formalName</span> <span class="o">=</span> <span class="n">formalName</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__formal_name</span> <span class="o">=</span> <span class="n">formalName</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__formalName</span> <span class="o">=</span> <span class="n">formalName</span>  <span class="c1"># deprecated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__formal_name</span> <span class="o">=</span> <span class="n">formal_name</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">value</span>
 
@@ -96,10 +72,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__unit</span> <span class="o">=</span> <span class="n">unit</span>
 
         <span class="k">return</span>
-
-<span class="c1">#*********************************************************************************</span>
-<span class="c1"># Public member functions</span>
-<span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="Quantity.SetName"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.SetName">[docs]</a>    <span class="k">def</span> <span class="nf">SetName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -233,7 +205,8 @@
         <span class="k">else</span><span class="p">:</span>
            <span class="n">n_dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="n">x_scaling</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+        <span class="c1">#x = self.__value.index # potential bug in matplotlib</span>
 
         <span class="k">if</span> <span class="n">same_axis</span><span class="p">:</span>
             <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__formal_name</span><span class="p">)</span>
@@ -246,17 +219,13 @@
             <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">x_label</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">y_label</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">*</span><span class="n">x_scaling</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">same_axis</span> <span class="ow">and</span> <span class="n">file_name</span><span class="p">:</span>
                 <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">file_name</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">same_axis</span> <span class="ow">and</span> <span class="n">file_name</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">file_name</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
 
         <span class="k">return</span></div>
-
-<span class="c1">#*********************************************************************************</span>
-<span class="c1"># Private helper functions (internal use: __)</span>
-<span class="c1">#*********************************************************************************</span>
 
 <div class="viewcode-block" id="Quantity.__str__"><a class="viewcode-back" href="../support_rst/quantity.html#quantity.Quantity.__str__">[docs]</a>    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
@@ -283,8 +252,6 @@
 
         <span class="n">s</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n\t</span><span class="s1"> Quantity(): </span><span class="se">\n\t</span><span class="s1"> name=</span><span class="si">%s</span><span class="s1">; formal name=</span><span class="si">%s</span><span class="s1">; value=</span><span class="si">%s</span><span class="s1">[</span><span class="si">%s</span><span class="s1">]&#39;</span>
         <span class="k">return</span> <span class="n">s</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">formalName</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="p">)</span></div></div>
-
-<span class="c1">#======================= end class Quantity ======================================</span>
 </pre></div>
 
           </div>

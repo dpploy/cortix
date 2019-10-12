@@ -1,0 +1,590 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>phase_new module &#8212; Cortix 0.1.0 documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-phase_new">
+<span id="phase-new-module"></span><h1>phase_new module<a class="headerlink" href="#module-phase_new" title="Permalink to this headline">¶</a></h1>
+<p>Phase <em>history</em> container. When you think of a phase value, think of that value at
+a specific point in time. This container holds the historic data of a phase;
+its species and quantities. This implementation treats access of time stamps within
+a tolerance. All searches for time stamped values are subjected to an approximation
+of the time stamp to avoid storing values too close to each other in time, and/or to
+return the closest value in time searched or no value if none can be found according
+to the tolerance.</p>
+<div class="section" id="background">
+<h2>Background<a class="headerlink" href="#background" title="Permalink to this headline">¶</a></h2>
+<p>TODO: ATTENTION:
+The species (list of Species) AND quantities (list of Quantity) data members
+have ARBITRARY density values either at an arbitrary point in the history or at
+no point in the history. This needs to be removed in the future to avoid confusion.</p>
+<p>To obtain history values, associated to the phase, at a particular point in time,
+use the GetValue() method to access the history data frame (pandas) via columns and
+rows. ALERT: The corresponding values in species and quantities are OVERRIDEN and NOT to
+be used through the phase interface.</p>
+<p>Author: Valmor F. de Almeida <a class="reference external" href="mailto:dealmeidav&#37;&#52;&#48;ornl&#46;gov">dealmeidav<span>&#64;</span>ornl<span>&#46;</span>gov</a>; vfda
+Sat Sep  5 01:26:53 EDT 2015</p>
+<p>Cortix: a program for system-level modules coupling, execution, and analysis.</p>
+<dl class="class">
+<dt id="phase_new.PhaseNew">
+<em class="property">class </em><code class="descclassname">phase_new.</code><code class="descname">PhaseNew</code><span class="sig-paren">(</span><em>name=None</em>, <em>time_stamp=None</em>, <em>time_unit=None</em>, <em>species=None</em>, <em>quantities=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Phase <cite>history</cite> container. A <cite>Phase</cite> consists of <cite>Species</cite> and <cite>Quantities</cite>
+varying with time. This container is meant to reproduce the basic idea of a
+material phase.</p>
+<dl class="method">
+<dt id="phase_new.PhaseNew.ClearHistory">
+<code class="descname">ClearHistory</code><span class="sig-paren">(</span><em>value=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.ClearHistory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.ClearHistory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set species and quantities of history to a given value
+(default to zero value), all time stamps are preserved.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.GetQuantities">
+<code class="descname">GetQuantities</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.GetQuantities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.GetQuantities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the list of <cite>Quantities</cite>. The values in each <cite>Quantity</cite> are
+synchronized with the <cite>Phase</cite> data frame.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>quantities</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.ResetHistory">
+<code class="descname">ResetHistory</code><span class="sig-paren">(</span><em>try_time_stamp=None</em>, <em>value=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.ResetHistory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.ResetHistory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set species and quantities of history to a given value
+(default to zero value) only one time stamp is preserved (default to
+last time stamp).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>try_time_stamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+<li><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>name=None</em>, <em>time_stamp=None</em>, <em>time_unit=None</em>, <em>species=None</em>, <em>quantities=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sometimes an empty Phase object is created by user code. This case needs
+adequate logic for None types.
+Note on usage: when passing quantities, do set the value argument explicitly
+to help define the type and avoid set_value() errors with Pandas. This is
+to be investigated later. Also, the usage of a DataFrame needs to be re-evaluated.
+Maybe better to use a Quantity object and a Species object with a Pandas Series
+history as a value to avoid the existance of a value in Quantity and a value
+in Phase that are not in sync.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="phase_new.PhaseNew.actors">
+<code class="descname">actors</code><a class="headerlink" href="#phase_new.PhaseNew.actors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of names of all the actors in the phase history.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>list(self.__df.colums)</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.add_quantity">
+<code class="descname">add_quantity</code><span class="sig-paren">(</span><em>new_quant</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.add_quantity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.add_quantity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new quantity object to the dataframe. See quantity.py for more
+details on the quantity class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new_quant</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.add_row">
+<code class="descname">add_row</code><span class="sig-paren">(</span><em>try_time_stamp</em>, <em>row_values</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.add_row"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.add_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a row to the <cite>DataFrame</cite>, with a <cite>timestamp</cite> equal to <cite>try_time_stamp</cite> and
+row values equal to <cite>row_values</cite>. The length of <cite>row_values</cite> must match the
+number of columns in the data frame.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>try_time_stamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+<li><strong>row_values</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.add_single_species">
+<code class="descname">add_single_species</code><span class="sig-paren">(</span><em>new_species</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.add_single_species"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.add_single_species" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds a new specie object to the phase history. See species.py for
+more details on the Species class.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new_species</strong> (<em>obj</em>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="phase_new.PhaseNew.df">
+<code class="descname">df</code><a class="headerlink" href="#phase_new.PhaseNew.df" title="Permalink to this definition">¶</a></dt>
+<dd><p>Die hard access.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.get_column">
+<code class="descname">get_column</code><span class="sig-paren">(</span><em>actor</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.get_column"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.get_column" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an entire column of data. A column is the entire history
+of data associated with a specific actor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>actor</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>list(self.__df.loc[</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">, actor]): list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.get_quantity">
+<code class="descname">get_quantity</code><span class="sig-paren">(</span><em>name</em>, <em>try_time_stamp=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.get_quantity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.get_quantity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the quantity <cite>name</cite> at a point in time closest to
+<cite>try_time_stamp</cite> up to a tolerance. If no time stamp is passed,
+the value at the last time stamp is returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </li>
+<li><strong>try_time_stamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a>) – Time stamp of desired quantity value. Default: None, returns the
+value at the last time stamp.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>quant.value</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a> or <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a> or other</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.get_quantity_history">
+<code class="descname">get_quantity_history</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.get_quantity_history"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.get_quantity_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Quantity <cite>name</cite> history. This will create a fully qualified
+Quantity object and return to the caller. The function is typically
+needed for data output to a file through <cite>pickle</cite>. Since the value
+attribute of a quantity can be any data structure, a time-series is
+built on the fly and stored in the value attribute. In addition the
+time unit is added to the final return value as a tuple.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>quant_history</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.7)">tuple</a>(<a class="reference internal" href="quantity.html#quantity.Quantity" title="quantity.Quantity">Quantity</a>,<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.get_row">
+<code class="descname">get_row</code><span class="sig-paren">(</span><em>try_time_stamp=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.get_row"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.get_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an entire row of the phase dataframe. A row is a series of
+values that are all at the same time stamp.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>try_time_stamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>list(self.__df.loc[time_stamp,</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">]): list</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.get_species">
+<code class="descname">get_species</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.get_species"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.get_species" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the species specified by name if it exists,
+or None if it doesn’t.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>specie</strong></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.get_species_concentration">
+<code class="descname">get_species_concentration</code><span class="sig-paren">(</span><em>name</em>, <em>try_time_stamp=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.get_species_concentration"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.get_species_concentration" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the species concentration at <cite>try_time_stamp</cite>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </li>
+<li><strong>try_time_time_stamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>concentration</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.get_value">
+<code class="descname">get_value</code><span class="sig-paren">(</span><em>actor</em>, <em>try_time_stamp=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value associated with a specified actor at a specified
+time stamp.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>actor</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </li>
+<li><strong>try_time_stamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Default is None which returns the last time stamp.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>self.__df.loc[time_stamp, actor]</strong></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">any</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.has_time_stamp">
+<code class="descname">has_time_stamp</code><span class="sig-paren">(</span><em>try_time_stamp</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.has_time_stamp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.has_time_stamp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks to see if try_time_stamp exists in the phase history.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>try_time_stamp</strong> – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.plot">
+<code class="descname">plot</code><span class="sig-paren">(</span><em>name='phase-plot-name'</em>, <em>time_unit='s'</em>, <em>legend=None</em>, <em>nrows=2</em>, <em>ncols=2</em>, <em>dpi=200</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.plot" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.plot_species">
+<code class="descname">plot_species</code><span class="sig-paren">(</span><em>name, scaling=[1.0, 1.0], title=None, xlabel='Time [s]', ylabel='y', legend='no-legend', filename_tag=None, figsize=[6, 5], dpi=100</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.plot_species"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.plot_species" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="phase_new.PhaseNew.quantities">
+<code class="descname">quantities</code><a class="headerlink" href="#phase_new.PhaseNew.quantities" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the list of <cite>Quantities</cite>. The values in each <cite>Quantity</cite> are
+synchronized with the <cite>Phase</cite> data frame.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>quantities</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.scale_row">
+<code class="descname">scale_row</code><span class="sig-paren">(</span><em>try_time_stamp</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.scale_row"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.scale_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Multiplies all of the data in a row (except time stamp) by a scalar
+value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>try_time_stamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+<li><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.set_species_id">
+<code class="descname">set_species_id</code><span class="sig-paren">(</span><em>name</em>, <em>val</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.set_species_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.set_species_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the flag of a species “name” equal to val.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </li>
+<li><strong>val</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.set_value">
+<code class="descname">set_value</code><span class="sig-paren">(</span><em>actor</em>, <em>value</em>, <em>try_time_stamp=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.set_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.set_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="phase_new.PhaseNew.species">
+<code class="descname">species</code><a class="headerlink" href="#phase_new.PhaseNew.species" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns every single species in the phase history.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>species</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="phase_new.PhaseNew.time_stamps">
+<code class="descname">time_stamps</code><a class="headerlink" href="#phase_new.PhaseNew.time_stamps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all time stamps in the index of the data frame.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>time_stamps</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="phase_new.PhaseNew.time_unit">
+<code class="descname">time_unit</code><a class="headerlink" href="#phase_new.PhaseNew.time_unit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the time unit of the <cite>Phase.</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>time_unit</strong></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="phase_new.PhaseNew.write_html">
+<code class="descname">write_html</code><span class="sig-paren">(</span><em>fileName</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/phase_new.html#PhaseNew.write_html"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#phase_new.PhaseNew.write_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert the <cite>Phase</cite> container into an HTML file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>fileName</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><!--Edit this file for customizing the side bar of the front page-->
+<a href="https://github.com/dpploy/cortix"><img src="https://cortix.org/logo.jpg" alt="Cortix" style="border:none;"></a>
+<h3>About Cortix</h3>
+<p>
+Cortix is a Python library for network modeling and HPC simulation.
+</p>
+<p>
+Cortix Group <br>
+c/o <a href="https://www.uml.edu/innovation-hub">UMass Innovation Hub</a> <br>
+110 Canal St., 3rd Floor <br>
+Lower, MA 01852
+</p>
+
+<p>
+<a href="https://www.uml.edu/Engineering/Chemical/faculty/de-Almeida-Valmor.aspx">Prof. V. F. de Almeida, Ph.D.</a></br>
+Group Leader <br>
+<a href="https://www.uml.edu/Engineering/Chemical">Dept. of Chemical Engineering (Nuclear Program)</a></br>
+<a href="https://www.uml.edu/">UMass Lowell</a><br>
+</p>
+
+<!---->
+
+<h3><a href="../index.html">Table of Contents</a></h3>
+<ul>
+<li><a href="../index.html">Home</a></li>
+<li><a href="../install.html">Install</a></li>
+<li><a href="../contents.html">Documentation</a></li>
+<li><a href="../license.html">License</a></li>
+</ul>
+
+<h3>Useful Links</h3>
+<ul>
+  <li><a href="https://pypi.org/project/cortix/">Cortix @ PyPI</a></li>
+  <li><a href="https://github.com/dpploy/cortix">Cortix @ GitHub</a></li>
+  <li><a href="https://mybinder.org/v2/gh/dpploy/cortix-nb/master">Cortix @ binder</a></li>
+  <li><a href="https://nbviewer.jupyter.org/github/dpploy/cortix-nb/tree/master/">Cortix @ nbviewer</a></li>
+  <li><a href="https://github.com/dpploy/cortix-nb">Cortix Jupyter Notebooks</a></li>
+  <li><a href="https://github.com/dpploy/cortix/issues">Issue Tracker</a></li>
+  <li><a href="https://dpploy.github.io/cortix/Cortix.pdf">PDF Documentation</a></li>
+</ul>
+
+<h3>HPC Resources</h3>
+<ul>
+  <li><a href="https://hpc.inl.gov/SitePages/Home.aspx">Idaho National Laboratory HPC</a></li>
+  <li><a href="http://wiki.umassrc.org/wiki/index.php/Main_Page">UMass Green HPC Cluster </a></li>
+</ul>
+
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2019, University of Massachusetts Lowell.
+      
+      |
+      <a href="../_sources/support_rst/phase_new.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+    <a href="https://github.com/dpploy/cortix" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>
