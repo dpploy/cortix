@@ -3,7 +3,6 @@
 # This file is part of the Cortix toolkit environment.
 # https://cortix.org
 
-import pickle
 import logging
 
 import numpy as np

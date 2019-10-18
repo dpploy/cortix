@@ -3,8 +3,6 @@
 # This file is part of the Cortix toolkit environment.
 # https://cortix.org
 
-import pickle
-
 import numpy as np
 import scipy.constants as const
 from scipy.integrate import odeint
