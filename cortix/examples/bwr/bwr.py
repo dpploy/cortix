@@ -13,11 +13,9 @@ from cortix import Module
 from cortix import Phase
 from cortix import Quantity
 
-class Community(Module):
+class BWR(Module):
     '''
-    Community Cortix module used to model criminal group population in a community system.
-    Community here is the system at large with all possible adult individuals included
-    in a society.
+    Boiling water reactor single-point reactor.
 
     Notes
     -----
@@ -27,26 +25,18 @@ class Community(Module):
 
     '''
 
-    def __init__(self, n_groups=1, non_offender_adult_population=100, 
-                 offender_pool_size=0.0, free_offender_pool_size=0.0):
+    def __init__(self, params):
         '''
         Parameters
         ----------
-        n_groups: int
-            Number of groups in the population.
-        non_offender_adult_population: float
-            Pool of individuals reaching the adult age (SI) unit. Default: 100.
-        offender_pool_size: float
-            Upperbound on the range of the existing population groups. A random value
-            from 0 to the upperbound value will be assigned to each group. This is
-            typically a small number, say a fraction of a percent.
+        params: dict
+            All parameters for the module in the form of a dictionary or string-value.
 
         '''
 
         super().__init__()
 
-        self.port_names_expected = ['probation','adjudication','jail','prison',
-                                    'arrested', 'parole']
+        self.port_names_expected = ['coolant-inflow','coolant-outflow']
 
         quantities      = list()
         self.ode_params = dict()
@@ -55,10 +45,8 @@ class Community(Module):
         self.end_time     = 100 * const.day
         self.time_step    = 0.5 * const.day
         self.show_time = (False,10*const.day)
-        self.log = logging.getLogger('cortix')
 
-        # Population groups
-        self.n_groups = n_groups
+        self.log = logging.getLogger('cortix')
 
         # Community offender population groups removed from circulation
         f0g_0 = np.random.random(self.n_groups) * offender_pool_size
@@ -66,47 +54,7 @@ class Community(Module):
                 unit='individual', value=f0g_0)
         quantities.append(f0g)
 
-        # Community free-offender population groups in freedom
-        f0g_free_0 = np.random.random(self.n_groups) * free_offender_pool_size
-        f0g_free = Quantity(name='f0g_free', formalName='free-offender-pop-grps',
-                unit='individual', value=f0g_free_0)
-        quantities.append(f0g_free)
-
         # Model parameters: commitment coefficients and their modifiers
-
-        # Community non-offerders to offenders 
-        c00g_0 = np.random.random(self.n_groups) / (5*const.year)
-        c00g = Quantity(name='c00g', formalName='commit-arrested-coeff-grps',
-               unit='individual', value=c00g_0)
-        self.ode_params['general-commit-to-arrested-coeff-grps'] = c00g_0
-        quantities.append(c00g)
-
-        m00g_0 = np.random.random(self.n_groups)
-        m00g = Quantity(name='m00g', formalName='commit-arrested-coeff-mod-grps',
-               unit='individual', value=m00g_0)
-        self.ode_params['general-commit-to-arrested-coeff-mod-grps'] = m00g_0
-        quantities.append(m00g)
-
-        # Community offenders to arrested (recidivism)
-        c0rg_0 = np.random.random(self.n_groups) / (180*const.day)
-        c0rg = Quantity(name='c0rg', formalName='commit-arrested-coeff-grps',
-               unit='individual', value=c0rg_0)
-        self.ode_params['commit-to-arrested-coeff-grps'] = c0rg_0
-        quantities.append(c0rg)
-
-        m0rg_0 = np.random.random(self.n_groups)
-        m0rg = Quantity(name='m0rg', formalName='commit-arrested-coeff-mod-grps',
-               unit='individual', value=m0rg_0)
-        self.ode_params['commit-to-arrested-coeff-mod-grps'] = m0rg_0
-        quantities.append(m0rg)
-
-        # Non-offender adult population
-        self.ode_params['non-offender-adult-population'] = np.ones(self.n_groups) * \
-                non_offender_adult_population
-
-        # Death term
-        self.ode_params['death-rates-coeff'] = 1.0 * np.random.random(self.n_groups) / \
-                             const.year
 
         # Phase state
         self.population_phase = Phase(self.initial_time, time_unit='s',
