@@ -8,13 +8,14 @@ with open("requirements.txt", "r") as fh:
 
 setuptools.setup(
     name="cortix",
-    version="1.0.2",
+    version="1.1.5",
     author="Cortix Computing",
     author_email="tazzaoui@cs.uml.edu",
-    description="Cortix is a Python library for system-level\
-                module coupling, execution, and analysis.",
+    description="Cortix is a Python library for network dynamics\
+            modeling and HPC simulation.",
     long_description=long_description,
     long_description_content_type="text/markdown",
+    setup_requires=['wheel'],
     include_package_data=True,
     install_requires=req,
     url="https://cortix.org",
