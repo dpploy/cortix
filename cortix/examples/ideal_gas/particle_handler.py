@@ -17,6 +17,8 @@ class Particle_Handler(Module):
         self.local_messengers = []
         self.collisions = 0
         self.r = 1
+        self.a = (0,0)
+        self.cor = 1
         self.t_step = 0.01
         self.timestamp=str(datetime.datetime.now())
         self.elapsed, self.oe = 0,0
@@ -28,6 +30,8 @@ class Particle_Handler(Module):
         for i in range(self.balls):
             ball = Particle(shape=self.shape,color=self.color,r=self.r)
             ball.t_step = self.t_step
+            ball.a = self.a
+            ball.cor=self.cor
             self.local_balls.append(ball)
             self.local_messengers.append(ball.messenger)
             self.flock[ball.name] = ball

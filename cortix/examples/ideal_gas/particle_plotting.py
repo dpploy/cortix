@@ -62,7 +62,7 @@ class Particle_Plot(Module):
                         fig = plt.figure()
                         plt.plot(self.elapsed,self.ke)
                         plt.title("Total Kinetic Energy vs Time")
-                        plt.savefig('energy_vs_time.png'.format(self.filetime))
+                        plt.savefig('energy_vs_time.png'.format(self.filetime),dpi=400)
 ##                        fig = plt.figure()
 ##                        plt.plot(self.elapsed,self.t_collisions)
 ##                        plt.title("Collisions with wall vs time")
@@ -89,9 +89,9 @@ class Particle_Plot(Module):
                     self.oe=round(elapsed,1)
                 if modcount >= self.length:
                     self.ke.append(self.tke)
-                    if self.tke!=oldtke and abs(self.tke-oldtke)>1:
-                        print("Total KE:", self.tke,'Difference:', self.tke-oldtke)
-                        oldtke=self.tke
+##                    if self.tke!=oldtke and abs(self.tke-oldtke)>1:
+##                        print("Total KE:", self.tke,'Difference:', self.tke-oldtke)
+##                        oldtke=self.tke
 ##                    self.t_collisions.append(collisions)
                     self.elapsed.append(elapsed)
                     self.tke=0

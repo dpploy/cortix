@@ -17,7 +17,8 @@ class Run_Particle:
         self.r=1
         self.mod_list = []
         self.shape = [(0, 0), (0, 100), (100, 100),(100,0),(0, 0)]
-
+        self.a = (0,0)
+        self.cor = 1
         self.fps = 60
 
     def run(self):
@@ -42,6 +43,8 @@ class Run_Particle:
                     remainder -= 1
                 app = Particle_Handler(self.shape, balls=balls,runtime = self.runtime)
                 app.r=self.r
+                app.a=self.a
+                app.cor = self.cor
                 app.t_step = 0.01
                 self.mod_list.append(app)
                 self.net.add_module(app)
@@ -71,6 +74,8 @@ if __name__ == '__main__':
 ##                                  (45,-40),(45,-20),(49,-20),(49,15),
 ##                                  (30,15),(30,0),(0,0)]
     sim.t_step = 0.01
+    sim.a = (50,50)
+    sim.cor = 1
     sim.procs = int(input("How many processes would you like to use?: "))
     sim.n_list = int(input("How many particles would you like to simulate?: "))
     sim.n_list = [sim.n_list,]
