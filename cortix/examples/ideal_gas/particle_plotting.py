@@ -62,7 +62,7 @@ class Particle_Plot(Module):
                         fig = plt.figure()
                         plt.plot(self.elapsed,self.ke)
                         plt.title("Total Kinetic Energy vs Time")
-                        plt.savefig('energy_vs_time.png'.format(self.filetime),dpi=400)
+                        plt.savefig('energy_vs_time.png'.format(self.filetime),dpi=180)
 ##                        fig = plt.figure()
 ##                        plt.plot(self.elapsed,self.t_collisions)
 ##                        plt.title("Collisions with wall vs time")

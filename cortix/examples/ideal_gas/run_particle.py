@@ -74,7 +74,7 @@ if __name__ == '__main__':
 ##                                  (45,-40),(45,-20),(49,-20),(49,15),
 ##                                  (30,15),(30,0),(0,0)]
     sim.t_step = 0.01
-    sim.a = (50,50)
+    sim.a = (0,0)
     sim.cor = 1
     sim.procs = int(input("How many processes would you like to use?: "))
     sim.n_list = int(input("How many particles would you like to simulate?: "))
