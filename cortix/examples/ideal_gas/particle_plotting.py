@@ -26,7 +26,7 @@ class Particle_Plot(Module):
         self.dic = {}
         c = 0
         
-        writer = animation.FFMpegFileWriter(fps=self.fps)
+        writer = animation.FFMpegWriter(fps=self.fps)
         fig = plt.figure()
         ax = fig.add_subplot(111)
         x,y = [f[0] for f in self.shape],[f[1] for f in self.shape]
