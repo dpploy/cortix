@@ -16,7 +16,7 @@ class Run_Particle:
         
         self.r=1
         self.mod_list = []
-        self.shape = [(0, 0), (0, 100), (100, 100),(100,0),(0, 0)]
+        self.shape = [(-40, -50), (-40, 90), (90, 60),(60,-30),(30,-50),(-40, -50)]
         self.a = (0,0)
         self.cor = 1
         self.fps = 60
