@@ -8,7 +8,7 @@ with open("requirements.txt", "r") as fh:
 
 setuptools.setup(
     name="cortix",
-    version="1.1.5",
+    version="1.1.6",
     author="Cortix Computing",
     author_email="tazzaoui@cs.uml.edu",
     description="Cortix is a Python library for network dynamics\
