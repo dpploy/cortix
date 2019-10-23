@@ -40,7 +40,7 @@ class Particle:
             print('Warning, ball took:',i,'attempts to spawn')
         self.v0 = [random.uniform(-50,50),random.uniform(-30,30)]
         self.cor = 0.60
-        self.a = (4,-20)
+        self.a = (0,0)
         self.m = 1
         self.ke = 0.5*self.m*((self.v0[0]**2+self.v0[1]**2)**0.5)**2
         self.timestamp=str(datetime.datetime.now())
@@ -118,7 +118,8 @@ class Particle:
             
             #Wall detection: https://stackoverflow.com/questions/1073336/circle-line-segment-collision-detection-algorithm
             if abs(wall_distance) <= self.r and 0<closest_dis <clen:
-##                print(closest_dis,clen)
+##                print('Wall Collision',(c1,c2))
+    
                 self.ke = 0.5*self.m*((self.v0[0]**2+self.v0[1]**2)**0.5)**2
 ##                print(self.name,'wall collision. Kinetic Energy: ',self.ke)
                 self.wall_collision(c1,c2,wall_distance)
