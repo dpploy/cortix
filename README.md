@@ -8,9 +8,9 @@ A Python library for network dynamics modeling and HPC simulation.
 [![Build Status](https://travis-ci.org/dpploy/cortix.svg?branch=master)](https://travis-ci.org/dpploy/cortix)
 [![PyPI version](https://badge.fury.io/py/cortix.svg)](https://badge.fury.io/py/cortix)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/Django.svg)](https://badge.fury.io/py/cortix)
-
-
 [![codecov](https://codecov.io/gh/dpploy/cortix/branch/master/graph/badge.svg)](https://codecov.io/gh/dpploy/cortix)
+
+
 ![](https://cortix.org/cortix-cover.png)
 
 ## What is Cortix?
