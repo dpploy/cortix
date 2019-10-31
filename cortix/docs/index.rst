@@ -24,7 +24,7 @@ What is Cortix?
 Features
 --------
 * Module parent class for module development and coupling.
-* Massively parallel execution with `mpi4py <https://mpi4py.readthedocs.io/en/stable/>`
+* Massively parallel execution with `mpi4py <https://mpi4py.readthedocs.io/en/stable/>`_.
 * Support classes for building applications and modules.
 * Examples of applications using Cortix.
 

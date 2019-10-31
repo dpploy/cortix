@@ -133,13 +133,8 @@ class Specie:
 #*********************************************************************************
 
     def GetName(self):
-
         '''
         Returns the empirical name of the species. For example, "water".
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -150,52 +145,35 @@ class Specie:
         return self._name
 
     def SetName(self, n):
-
         '''
         Sets the empirical  name of the species to n.
 
         Parameters
         ----------
         n: str
-
-        Returns
-        -------
-        empty
         '''
 
         self._name = n
     name = property(GetName, SetName, None, None)
 
     def GetFormulaName(self):
-
         '''
         Returns the formulaic name of the compound. For example, "Dihydrogen
         monoxide".
 
-        Parameters
-        ----------
-        empty
-
         Returns
         -------
         self.__formula_name: str
-
         '''
 
         return self.__formula_name
 
     def SetFormulaName(self, f):
-
         '''
         Sets the formulaic name to f.
 
-        Parameters
-        ----------
-        empty
-
         Returns
         -------
-        empty
         self.__formula_name: str
         '''
 
@@ -203,13 +181,8 @@ class Specie:
     formula_name = property(GetFormulaName, SetFormulaName, None, None)
 
     def GetPhase(self):
-
         '''
         Returns the phase that the specie is in.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -219,31 +192,21 @@ class Specie:
         return self._phase
 
     def SetPhase(self, p):
-
         '''
         Sets the phase history to p.
 
         Parameters
         ----------
-        p: str
-
-        Returns
-        -------
-        empty
+        p: dataFrame
         '''
 
         self._mass = p
     phase = property(GetPhase, SetPhase, None, None)
 
     def GetMolarMass(self):
-
         '''
         Returns the numerical value for the molar mass of the species. Units
         are given by molarMassUnit.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -253,30 +216,20 @@ class Specie:
         return self._molarMass
 
     def SetMolarMass(self, v):
-
         '''
         Sets the molar mass of the species equal to v.
 
         Parameters
         ----------
         v: float
-
-        Returns
-        -------
-        empty
         '''
 
         self._molarMass = v
     molarMass = property(GetMolarMass, SetMolarMass, None, None)
 
     def GetMolarMassUnit(self):
-
         '''
         Returns the unit used to measure the molar mass of the species.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -286,30 +239,20 @@ class Specie:
         return self._molarMassUnit
 
     def SetMolarMassUnit(self, v):
-
         '''
         Sets the unit used to measure the molar mass of the species to v.
 
         Parameters
         ----------
         v: str
-
-        Returns
-        -------
-        empty
         '''
 
         self._molarMassUnit = v
     molarMassUnit = property(GetMolarMassUnit, SetMolarMassUnit, None, None)
 
     def GetMolarRadioactivity(self):
-
         '''
         Returns the numerical value for molar radioactivity of the species.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -319,17 +262,12 @@ class Specie:
         return self._molarRadioactivity
 
     def SetMolarRadioactivity(self, v):
-
         '''
         Sets the molar radioactivity of the species equal to v.
 
         Parameters
         ----------
         v: float
-
-        Returns
-        -------
-        empty
         '''
 
         self._molarRadioactivity = v
@@ -337,17 +275,12 @@ class Specie:
             None, None)
 
     def GetMolarRadioactivityFractions(self):
-
         '''
         Returns a list of numbers that speciefies the % of molar reactivity
         that comes from each type of atom in the species. For example, a
         molarRadioactivityFraction of [0.65, 0.35] for water means that 65%
         of the molar radioactivity comes from the hydrogen atoms and 35% comes
         from the oxygen atom.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -357,7 +290,6 @@ class Specie:
         return self._molarRadioactivityFractions
 
     def SetMolarRadioactivityFractions(self, fracs):
-
         '''
         Sets molarRadioactivityFractions equal to fracs. Fracs must be a list
         of floats with the same length as there are different atoms in the
@@ -370,10 +302,6 @@ class Specie:
         Parameters
         ----------
         fracs: list
-
-        Returns
-        -------
-        empty
         '''
 
         assert isinstance(fracs, list), 'oops not list.'
@@ -386,13 +314,8 @@ class Specie:
             SetMolarRadioactivityFractions, None, None)
 
     def GetMolarRadioactivityUnit(self):
-
         '''
         Returns the unit used to measure molar radioactivity.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -402,17 +325,12 @@ class Specie:
         return self._molarRadioactivityUnit
 
     def SetMolarRadioactivityUnit(self, v):
-
         '''
         Sets the unit used to measure molar radioactivity to v.
 
         Parameters
         ----------
         v: str
-
-        Returns
-        -------
-        empty
         '''
 
         self._molarRadioactivityUnit = v
@@ -420,13 +338,8 @@ class Specie:
             SetMolarRadioactivityUnit, None, None)
 
     def GetMolarHeatPwr(self):
-
         '''
         Returns the amount of heat generated per mole of this species.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -436,31 +349,21 @@ class Specie:
         return self._molarHeatPwr
 
     def SetMolarHeatPwr(self, v):
-
         '''
         Sets the amount of heat generated per mole of this species to v.
 
         Parameters
         ----------
         v: float
-
-        Returns
-        -------
-        empty
         '''
 
         self._molarHeatPwr = v
     molarHeatPwr = property(GetMolarHeatPwr, SetMolarHeatPwr, None, None)
 
     def GetMolarHeatPwrUnit(self):
-
         '''
         Returns the unit used to measure the amount of heat generated per mole
         of this species.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -470,7 +373,6 @@ class Specie:
         return self._molarHeatPwrUnit
 
     def SetMolarHeatPwrUnit(self, v):
-
         '''
         Sets the unit used to measure the amount of heat generated per mole of
         this species to v.
@@ -478,10 +380,6 @@ class Specie:
         Parameters
         ----------
         v: str
-
-        Returns
-        -------
-        empty
         '''
 
         self._molarHeatPwrUnit = v
@@ -489,14 +387,9 @@ class Specie:
             None)
 
     def GetMolarGammaPwr(self):
-
         '''
         Returns the amount of gamma radiation produced per mole of this species
         (measured in units of power).
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -506,7 +399,6 @@ class Specie:
         return self._molarGammaPwr
 
     def SetMolarGammaPwr(self, v):
-
         '''
         Sets the amount of gamma radiation produced per mole of this species to
         v.
@@ -514,24 +406,15 @@ class Specie:
         Parameters
         ----------
         v: float
-
-        Returns
-        -------
-        empty
         '''
 
         self._molarGammaPwr = v
     molarGammaPwr = property(GetMolarGammaPwr, SetMolarGammaPwr, None, None)
 
     def GetMolarGammaPwrUnit(self):
-
         '''
         Returns the unit used to measure the amount of gamma radiation produced
         per mole of this species.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -541,7 +424,6 @@ class Specie:
         return self._molarGammaPwrUnit
 
     def SetMolarGammaPwrUnit(self, v):
-
         '''
         Sets the unit used to measure the amount of gamma radiation produced
         per mole of this species to v.
@@ -549,10 +431,6 @@ class Specie:
         Parameters
         ----------
         v: str
-
-        Returns
-        -------
-        empty
         '''
 
         self._molarGammaPwrUnit = v
@@ -574,13 +452,9 @@ class Specie:
 
     # New interface
     def GetFormula(self):
-
         '''
         Returns the molecular or empirical formula of the species. It is
         usually a list, for example, of the form ['2*H', 'O'].
-
-        Parameters
-        ----------
 
         Returns
         -------
@@ -590,7 +464,6 @@ class Specie:
         return self._atoms
 
     def SetFormula(self, atoms):
-
         '''
         Sets the species' formula equal to atoms. Will automatically update
         the molar mass of the species, and will also fail if atoms is not a
@@ -599,10 +472,6 @@ class Specie:
         Parameters
         ----------
         atoms: list
-
-        Returns
-        -------
-        empty
         '''
 
         assert isinstance(atoms, list), 'oops not list.'
@@ -613,14 +482,9 @@ class Specie:
     formula = property(GetFormula, SetFormula, None, None)
 
     def GetNAtoms(self):  # number of ficticious atoms in the species (see NB above)
-
         '''
         Returns the total number of atoms comprising the species. For example,
         water is comprised of three atoms.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -632,15 +496,10 @@ class Specie:
 
     # number of nuclide types involved in the species definition
     def GetNNuclideTypes(self):
-
         '''
         Returns the number of different types of atoms comprising the species.
         For example, water is composed of two different types of atoms,
         hydrogen and oxygen.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -651,29 +510,19 @@ class Specie:
     nNuclideTypes = property(GetNNuclideTypes, None, None, None)
 
     def SetFlag(self, f):
-
         '''
         Sets the flag associated with the species to f.
 
         Parameters
         ----------
         f: str
-
-        Returns
-        -------
-        empty
         '''
 
         self._flag = f
 
     def GetFlag(self):
-
         '''
         Returns the flag associated with the species.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -684,14 +533,9 @@ class Specie:
     flag = property(GetFlag, SetFlag, None, None)
 
     def GetMolarCC(self):
-
         '''
         Returns the numerical value for the number (molar) density of the
         species (moles/volume).
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -701,17 +545,12 @@ class Specie:
         return self._molarCC
 
     def SetMolarCC(self, v):
-
         '''
         Sets the numerical value for the molar density of the species to v.
 
         Parameters
         ----------
         v: float
-
-        Returns
-        -------
-        empty
         '''
 
         self._molarCC = v
@@ -719,13 +558,8 @@ class Specie:
     molarCC = property(GetMolarCC, SetMolarCC, None, None)
 
     def GetMolarCCUnit(self):
-
         '''
         Returns the unit used to measure molar density of the species.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -735,31 +569,21 @@ class Specie:
         return self._molarCCUnit
 
     def SetMolarCCUnit(self, v):
-
         '''
         Sets the unit used to measure the molar density of the species to v.
 
         Parameters
         ----------
         v: str
-
-        Returns
-        -------
-        empty
         '''
 
         self._molarCCUnit = v
     molarCCUnit = property(GetMolarCCUnit, SetMolarCCUnit, None, None)
 
     def GetMassCC(self):
-
         '''
         Returns the numerical value of the mass density of the species
         (mass/volume).
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -769,17 +593,12 @@ class Specie:
         return self._massCC
 
     def SetMassCC(self, v):
-
         '''
         Sets the numerical value of the mass density equal to v.
 
         Parameters
         ----------
         v: float
-
-        Returns
-        -------
-        empty
         '''
 
         self._massCC = v
@@ -790,13 +609,8 @@ class Specie:
     massCC = property(GetMassCC, SetMassCC, None, None)
 
     def GetMassCCUnit(self):
-
         '''
         Returns the unit used to measure the mass density of the species.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -806,17 +620,12 @@ class Specie:
         return self._massCCUnit
 
     def SetMassCCUnit(self, v):
-
         '''
         Sets the units used to measure mass density to v.
 
         Parameters
         ----------
         v: str
-
-        Returns
-        -------
-        empty
         '''
 
         self._massCCUnit = v
@@ -846,14 +655,6 @@ class Specie:
         '''
         Updates the molar mass of the species after the molecular formula has
         been changed.
-
-        Parameters
-        ----------
-        empty
-
-        Returns
-        -------
-        empty
         '''
 
         #if len(self._atoms) == 0:
@@ -917,15 +718,10 @@ class Specie:
         return
 
     def __ReorderFormula(self):
-
         '''
         Takes a list of atoms for a molecular or empirical formula and places
         it in order of decreasing magnitude of stoichiometric coefficient. For
         example, [O, 2*H] will be returned as [2*H, O].
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------

@@ -114,7 +114,7 @@ class Phase:
         if quantities is not None:
             for quant in self.__quantities:
                 names.append(quant.name)
-                quant.value = 0.0    # clear these values 
+                quant.value = 0.0    # clear these values
                                      # todo: eliminate them from Quantity in the future
 
         # Table data phase without data type assigned; this is left to the user
@@ -137,17 +137,12 @@ class Phase:
 #*********************************************************************************
 
     def has_time_stamp(self, try_time_stamp):
-
         '''
         Checks to see if try_time_stamp exists in the phase history.
 
         Parameters
         ----------
         try_time_stamp:
-
-        Returns
-        -------
-
         '''
 
 
@@ -162,10 +157,6 @@ class Phase:
         '''
         Returns the time unit of the `Phase.`
 
-        Parameters
-        ----------
-        empty
-
         Returns
         -------
         time_unit: str
@@ -175,13 +166,8 @@ class Phase:
     time_unit = property(__get_time_unit,None,None,None)
 
     def GetTimeStamps(self):
-
         '''
         Returns a list of all the time stamps in the phase history.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -192,13 +178,8 @@ class Phase:
     timeStamps = property(GetTimeStamps, None, None, None)
 
     def __get_time_stamps(self):
-
         '''
         Get all time stamps in the index of the data frame.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -209,13 +190,8 @@ class Phase:
     time_stamps = property(__get_time_stamps, None, None, None)
 
     def GetSpecies(self):
-
         '''
         Returns every single species in the phase history.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -228,14 +204,9 @@ class Phase:
     species = property(GetSpecies, None, None, None)
 
     def GetQuantities(self):
-
         '''
         Returns the list of `Quantities`. The values in each `Quantity` are
         synchronized with the `Phase` data frame.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -248,13 +219,8 @@ class Phase:
     quantities = property(GetQuantities, None, None, None)
 
     def GetActors(self):
-
         '''
         Returns a list of all the actors in the phase history.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -294,11 +260,6 @@ class Phase:
         ----------
         name: str
         val: int
-
-        Returns
-        -------
-        empty
-
         '''
 
         for specie in self.__species:
@@ -307,7 +268,6 @@ class Phase:
                 return
 
     def GetQuantity(self, name):
-
         '''
         Returns the quantity evaluated at the last time step of the phase
         history. This also updates the value of the quantity object. If the
@@ -316,10 +276,6 @@ class Phase:
         Parameters
         ----------
         name: str
-
-        Returns
-        -------
-        empty
         '''
 
         for quant in self.__quantities:
@@ -333,7 +289,6 @@ class Phase:
         return None
 
     def get_quantity(self, name, try_time_stamp=None):
-
         '''
         New version.
         Get the quantity `name` at a point in time closest to
@@ -343,7 +298,6 @@ class Phase:
         Parameters
         ----------
         name: str
-
         try_time_stamp: float, int or None
             Time stamp of desired quantity value. Default: None returns the
             whole quantity history.
@@ -364,7 +318,6 @@ class Phase:
                 return quant  # return quantity syncronized with the phase
 
     def get_quantity_history(self, name):
-
         '''
         Create a Quantity `name` history. This will create a fully qualified
         Quantity object and return to the caller. The function is typically
@@ -392,7 +345,6 @@ class Phase:
                 return (quant_history,self.__time_unit) # return tuple
 
     def AddSpecie(self, new_specie):
-
         '''
         Adds a new specie object to the phase history. See species.py for
         more details on the specie class.
@@ -400,10 +352,6 @@ class Phase:
         Parameters
         ----------
         new_specie: obj
-
-        Returns
-        -------
-        empty
         '''
 
         assert isinstance(new_specie, Specie)
@@ -420,7 +368,6 @@ class Phase:
         self.__phase = df.fillna(0.0)   # for species have float as default
 
     def AddQuantity(self, newQuant):
-
         '''
         Adds a new quantity object to the dataframe. See quantity.py for more
         details on the quantity class.
@@ -428,10 +375,6 @@ class Phase:
         Parameters
         ----------
         newQuant: object
-
-        Returns
-        -------
-        empty
         '''
 
         assert isinstance(newQuant, Quantity)
@@ -443,7 +386,7 @@ class Phase:
         self.__quantities.append(newQuant)
         newName = newQuant.name
 
-        # create a col with object data type; user must fill out column 
+        # create a col with object data type; user must fill out column
         col = pandas.DataFrame( index=list( self.__phase.index), columns=[newName],
                                 dtype=object )
         tmp = self.__phase
@@ -451,8 +394,6 @@ class Phase:
         #self.__phase = df.fillna(newQuant.value)
 
     def AddRow(self, try_time_stamp, row_values):
-
-
         '''
         Adds a row to the dataframe, with a timestamp of try_time_stamp and
         row values equal to row_values. Take care that the dimensions and order
@@ -462,10 +403,6 @@ class Phase:
         ----------
         try_time_stamp: float
         row_values: list
-
-        Returns
-        -------
-        empty
         '''
 
         assert try_time_stamp not in self.__phase.index, 'already used time_stamp: %r'%\
@@ -490,7 +427,6 @@ class Phase:
         return
 
     def GetRow(self, try_time_stamp=None):
-
         '''
         Returns an entire row of the phase dataframe. A row is a series of
         values that are all at the same time stamp.
@@ -509,7 +445,6 @@ class Phase:
         return list(self.__phase.loc[time_stamp, :])
 
     def GetColumn(self, actor):
-
         '''
         Returns an entire column of data. A column is the entire history
         of data associated with a specific actor.
@@ -529,7 +464,6 @@ class Phase:
         return list(self.__phase.loc[:, actor])
 
     def ScaleRow(self, try_time_stamp, value):
-
         '''
         Multiplies all of the data in a row (except time stamp) by a scalar
         value.
@@ -538,10 +472,6 @@ class Phase:
         ----------
         try_time_stamp: float
         value: float
-
-        Returns
-        -------
-        empty
         '''
 
         assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float)
@@ -552,7 +482,6 @@ class Phase:
         return
 
     def ClearHistory(self, value=0.0):
-
         '''
         Set species and quantities of history to a given value
         (default to zero value), all time stamps are preserved.
@@ -560,10 +489,6 @@ class Phase:
         Parameters
         ----------
         value: float
-
-        Returns
-        -------
-        empty
         '''
 
         assert isinstance(value, int) or isinstance(value, float)
@@ -572,7 +497,6 @@ class Phase:
         return
 
     def ResetHistory(self, try_time_stamp=None, value=None):
-
         '''
         Set species and quantities of history to a given value
         (default to zero value) only one time stamp is preserved (default to
@@ -582,10 +506,6 @@ class Phase:
         ----------
         try_time_stamp: float
         value: float
-
-        Returns
-        -------
-        empty
         '''
 
         if value is not None:
@@ -616,7 +536,6 @@ class Phase:
         return
 
     def GetValue(self, actor, try_time_stamp=None):
-
         '''
         Deprecated: use get_value()
         '''
@@ -634,7 +553,6 @@ class Phase:
         return self.__phase.loc[time_stamp, actor]
 
     def get_value(self, actor, try_time_stamp=None):
-
         '''
         Returns the value associated with a specified actor at a specified
         time stamp.
@@ -662,7 +580,6 @@ class Phase:
         return self.__phase.loc[time_stamp, actor]
 
     def SetValue(self, actor, value, try_time_stamp=None):
-
         '''
         For the record: old def SetValue(self, time_stamp, actor, value):
 
@@ -671,10 +588,6 @@ class Phase:
         actor: str
         value: float
         try_time_stamp: float
-
-        Returns
-        -------
-        empty
         '''
 
         assert isinstance(actor, str)
@@ -729,17 +642,12 @@ class Phase:
         return
 
     def WriteHTML(self, fileName):
-
         '''
         Convert the `Phase` container into an HTML file.
 
         Parameters
         ---------
         fileName: str
-
-        Returns
-        -------
-        empty
         '''
 
         assert isinstance(fileName, str)
@@ -779,7 +687,6 @@ class Phase:
 #*********************************************************************************
 
     def __get_time_stamp(self, try_time_stamp=None):
-
         '''
         Helper method for finding the closest time stamp to `try_time_stamp`
         in the phase history. The pandas index container used for storing
@@ -796,7 +703,6 @@ class Phase:
         -------
         self.__phase.index[loc]: float or None
             Will return None if no time stamp within tolerance is found.
-
         '''
 
         import numpy as np

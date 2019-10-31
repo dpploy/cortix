@@ -8,3 +8,5 @@ install:
 script:
     - export PYTHONPATH=$PYTHONPATH:$(pwd)
     - cd cortix/tests && py.test *.py
+after_success:
+    - bash <(curl -s https://codecov.io/bash)

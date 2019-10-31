@@ -1,3 +1,4 @@
+:orphan:
 .. _toc:
 
 Cortix Documentation

@@ -89,13 +89,8 @@ class Stream:
 #*********************************************************************************
 
     def GetTimeStamp(self):
-
         '''
         Returns the time stamp of the stream.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -105,13 +100,8 @@ class Stream:
         return self.timeStamp
 
     def GetActors(self):
-
         '''
         Returns the actors present in the stream of data.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -121,7 +111,6 @@ class Stream:
         return list(self.stream.columns)
 
     def GetSpecie(self, name):
-
         '''
         Returns a specie named "name" from the stream.
 
@@ -140,13 +129,8 @@ class Stream:
         return None
 
     def GetSpecies(self):
-
         '''
         Returns a list of all species in the stream.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -156,13 +140,8 @@ class Stream:
         return self.species
 
     def GetQuantities(self):
-
         '''
         Returns all the quantities given by the stream.
-
-        Parameters
-        ----------
-        empty
 
         Returns
         -------
@@ -172,7 +151,6 @@ class Stream:
         return self.quantities
 
     def SetSpecieId(self, name, val):
-
         '''
         Sets the numerical id of the specie of name "name" to val.
 
@@ -180,10 +158,6 @@ class Stream:
         ----------
         name: str
         val: int
-
-        Returns
-        -------
-        empty
         '''
 
         for specie in self.species:
@@ -192,7 +166,6 @@ class Stream:
                 return
 
     def GetQuantity(self, name):
-
         '''
         Returns the specified quantity called "name" from the stream, or none
         if the specified name does not exist.
@@ -212,7 +185,6 @@ class Stream:
         return None
 
     def GetRow(self, timeStamp=None):
-
         '''
         Returns an entire row of data from the stream. A row of data is all
         the data in a dataframe at a specified time stamp, given by timeStamp.
@@ -237,7 +209,6 @@ class Stream:
             return list(self.stream.loc[timeStamp, :])
 
     def GetValue(self, actor, timeStamp=None):
-
         '''
         Returns the value associated with a specified "actor" at a specified
         "timeStamp". If no timeStamp is specified, then the function will
@@ -263,7 +234,6 @@ class Stream:
             return self.stream.loc[timeStamp, actor]
 
     def SetValue(self, actor, value=None, timeStamp=None):
-
         '''
         Sets the value associated with a specified actor at a specified
         timeStamp to "value". If no value is specified, the value will default
@@ -275,10 +245,6 @@ class Stream:
         actor: str
         value: float
         timeStamp: float
-
-        Returns
-        -------
-        empty
         '''
 
         assert actor in self.stream.columns

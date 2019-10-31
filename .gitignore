@@ -1,6 +1,7 @@
 *~
 *.log
 
+.eggs
 #.xml
 .DS_Store
 __pycache__
@@ -11,6 +12,7 @@ readme_converted.rst
 *.pdf
 *.patch
 *.png
+*.gv
 *.pickle
 *.pkl
 *.gpg
@@ -36,3 +38,10 @@ cortix/docs/_build
 
 # Jupyter Notebook
 .ipynb_checkpoints
+
+# Cortix save directory
+.ctx-saved/
+
+# Coverage files
+.coverage
+coverage.xml

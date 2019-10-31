@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-from cortix.src.module import Module
-from cortix.examples.dummy_module import DummyModule
+from cortix.tests.dummy_module import DummyModule
 
 def test_module_init():
     # Initialize the module

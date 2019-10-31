@@ -2,17 +2,13 @@ support
 =======
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
-   actor
-   fuel_bucket
-   fuel_bundle
-   fuel_segment
-   fuelsegmentsgroups
-   fuelslug
-   nuclides
+   nuclear_rst/modules
    periodictable
    phase
+   phase_new
    quantity
    specie
+   species
    stream
