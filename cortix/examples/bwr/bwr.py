@@ -10,7 +10,7 @@ import scipy.constants as const
 from scipy.integrate import odeint
 
 from cortix import Module
-from cortix import Phase
+from cortix.support.phase_new import PhaseNew as Phase
 from cortix import Quantity
 
 class BWR(Module):
@@ -20,7 +20,7 @@ class BWR(Module):
     Notes
     -----
     These are the `port` names available in this module to connect to respective
-    modules: `probation`, `adjudication`, `jail`, `prison`, `arrested`, and `parole`.
+    modules: `turbine`, and `pump`.
     See instance attribute `port_names_expected`.
 
     '''
@@ -30,7 +30,7 @@ class BWR(Module):
         Parameters
         ----------
         params: dict
-            All parameters for the module in the form of a dictionary or string-value.
+            All parameters for the module in the form of a dictionary.
 
         '''
 
@@ -44,7 +44,7 @@ class BWR(Module):
         self.initial_time = 0.0 * const.day
         self.end_time     = 100 * const.day
         self.time_step    = 0.5 * const.day
-        self.show_time = (False,10*const.day)
+        self.show_time    = (False,10*const.day)
 
         self.log = logging.getLogger('cortix')
 
@@ -54,21 +54,76 @@ class BWR(Module):
                 unit='individual', value=f0g_0)
         quantities.append(f0g)
 
-        # Model parameters: commitment coefficients and their modifiers
+        # Coolant inflow phase history
+        quantities = list()
 
-        # Phase state
-        self.population_phase = Phase(self.initial_time, time_unit='s',
+        flowrate = Quantitiy(name='inflow-cool-flowrate',
+                   formalName='Inflow Cool. Flowrate',
+                   unit='kg/s', value=0.0)
+        quantities.append(flowrate)
+
+        temp = Quantitiy(name='inflow-cool-temp', formalName='Inflow Cool. Temperature',
+               unit='K', value=0.0)
+        quantities.append(temp)
+
+        press = Quantitiy(name='inflow-cool-press',formalName='Inflow Cool. Pressure',
+                unit='Pa', value=0.0)
+        quantities.append(press)
+
+        self.coolant_inflow_phase = Phase(self.initial_time, time_unit='s',
                 quantities=quantities)
 
-        self.population_phase.SetValue('f0g', f0g_0, self.initial_time)
+        # Coolant outflow phase history
+        quantities = list()
+
+        flowrate = Quantitiy(name='outflow-cool-flowrate',
+                   formalName='Outflow Cool. Flowrate',
+                   unit='kg/s', value=0.0)
+        quantities.append(flowrate)
+
+        temp = Quantitiy(name='outflow-cool-temp',
+                   formalName='Outflow Cool. Temperature',
+                   unit='K', value=0.0)
+        quantities.append(temp)
+
+        press = Quantitiy(name='outflow-cool-press',formalName='Outflow Cool. Pressure',
+                   unit='Pa', value=0.0)
+        quantities.append(press)
+
+        quality = Quantitiy(name='steam-quality',formalName='Steam Quality',
+                   unit='', value=0.0)
+        quantities.append(quality)
+
+        self.coolant_outflow_phase = Phase(self.initial_time, time_unit='s',
+                quantities=quantities)
+
+        # Neutron phase history
+        quantities = list()
+
+        neutron_dens = Quantitiy(name='neutron-dens',
+                   formalName='Neutron Dens.',
+                   unit='1/m^3', value=0.0)
+        quantities.append(neutron_dens)
+
+        delayed_neutrons_0 = np.zeros(6)
+
+        delayed_neutron_cc = Quantitiy(name='delayed-neutrons-cc',
+                   formalName='Delayed Neutrons',
+                   unit='1/m^3', value=delayed_neutrons_0)
+        quantities.append(delayed_neutron_cc)
+
+        self.neutron_phase = Phase(self.initial_time, time_unit='s',
+                quantities=quantities)
+
+        #self.population_phase.SetValue('f0g', f0g_0, self.initial_time)
 
         # Initialize inflows to zero
-        self.ode_params['prison-inflow-rates']       = np.zeros(self.n_groups)
-        self.ode_params['parole-inflow-rates']       = np.zeros(self.n_groups)
-        self.ode_params['arrested-inflow-rates']     = np.zeros(self.n_groups)
-        self.ode_params['jail-inflow-rates']         = np.zeros(self.n_groups)
-        self.ode_params['adjudication-inflow-rates'] = np.zeros(self.n_groups)
-        self.ode_params['probation-inflow-rates']    = np.zeros(self.n_groups)
+        #self.ode_params['prison-inflow-rates']       = np.zeros(self.n_groups)
+        #self.ode_params['parole-inflow-rates']       = np.zeros(self.n_groups)
+        #self.ode_params['arrested-inflow-rates']     = np.zeros(self.n_groups)
+        #self.ode_params['jail-inflow-rates']         = np.zeros(self.n_groups)
+        #self.ode_params['adjudication-inflow-rates'] = np.zeros(self.n_groups)
+        #self.ode_params['probation-inflow-rates']    = np.zeros(self.n_groups)
 
         return
 
@@ -83,74 +138,36 @@ class BWR(Module):
             if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
                 self.log.info('Community::time[d] = '+str(round(time/const.day,1)))
 
+            # Communicate information
+            #------------------------
+
             self.__call_ports(time)
 
-            # Evolve offenders group population to the next time stamp
-            #---------------------------------------------------------
+            # Evolve one time step
+            #---------------------
 
             time = self.__step( time )
 
     def __call_ports(self, time):
 
-            # Interactions in the jail port
-            #--------------------------------
-            # one way "from" jail
-
-            self.send( time, 'jail' )
-            (check_time, inflow_rates) = self.recv('jail')
-            assert abs(check_time-time) <= 1e-6
-            self.ode_params['jail-inflow-rates'] = inflow_rates
-
-            # Interactions in the adjudication port
-            #--------------------------------------
-            # one way "from" adjudication
-
-            self.send( time, 'adjudication' )
-            (check_time, inflow_rates) = self.recv('adjudication')
-            assert abs(check_time-time) <= 1e-6
-            self.ode_params['adjudication-inflow-rates'] = inflow_rates
-
-            # Interactions in the probation port
-            #--------------------------------
-            # one way "from" probation
-
-            self.send( time, 'probation' )
-            (check_time, inflow_rates) = self.recv('probation')
-            assert abs(check_time-time) <= 1e-6
-            self.ode_params['probation-inflow-rates'] = inflow_rates
-
-            # Interactions in the prison port
-            #--------------------------------
-            # one way "from" prison
-
-            self.send( time, 'prison' )
-            (check_time, inflow_rates) = self.recv('prison')
-            assert abs(check_time-time) <= 1e-6
-            self.ode_params['prison-inflow-rates'] = inflow_rates
-
-            # Interactions in the parole port
-            #--------------------------------
-            # one way "from" parole
-
-            self.send( time, 'parole' )
-            (check_time, inflow_rates) = self.recv('parole')
-            assert abs(check_time-time) <= 1e-6
-            self.ode_params['parole-inflow-rates'] = inflow_rates
-
-            # Interactions in the arrested port
-            #--------------------------------
-            # two way "to" and "from" arrested
-
-            # to
-            message_time = self.recv('arrested')
-            outflow_rates = self.__compute_outflow_rates( message_time, 'arrested' )
-            self.send( (message_time, outflow_rates), 'arrested' )
+            # Interactions in the coolant-inflow port
+            #----------------------------------------
+            # one way "from" coolant-inflow
 
             # from
-            self.send( time, 'arrested' )
-            (check_time, inflow_rates) = self.recv('arrested')
+            self.send( time, 'coolant-inflow' )
+            (check_time, inflow_state) = self.recv('coolant-inflow')
             assert abs(check_time-time) <= 1e-6
-            self.ode_params['arrested-inflow-rates'] = inflow_rates
+            self.ode_params['inflow-state'] = inflow_state
+
+            # Interactions in the coolant-outflow port
+            #-----------------------------------------
+            # one way "to" coolant-outflow
+
+            # to
+            message_time = self.recv('coolant-outflow')
+            outflow_state = self.__compute_outflow_state( message_time )
+            self.send( (message_time, outflow_state), 'coolant-outflow' )
 
     def __step(self, time=0.0):
         r'''
@@ -172,7 +189,7 @@ class BWR(Module):
         '''
 
         # Get state values
-        u_0 = self.population_phase.GetValue('f0g', time)
+        u_0 = self.__get_state_vector( time )
 
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
@@ -202,6 +219,58 @@ class BWR(Module):
         self.population_phase.SetValue('f0g_free',f0g_free,time)
 
         return time
+
+    def __get_state_vector(self, time):
+        '''
+        Return a numpy array of all unknowns ordered as below:
+            neutron density (1), delayed neutron emmiter concentrations (6),
+            termperature of fuel (1), temperature of coolant (1).
+        '''
+
+        u_list = list()
+
+        u_vec = np.empty(0,dtype=np.float64)
+
+        neutron_dens = self.neutron_phase.get_value('neutron-dens',time)
+        u_vec = np.append( u_vec, neutron_dens )
+
+        delayed_neutrons_cc = self.neutron_phase.get_value('delayed-neutrons-cc',time)
+        u_vec = np.append( u_vec, delayed_neutrons_cc )
+
+        fuel_temp = self.neutron_phase.get_value('delayed-neutrons-cc',time)
+        u_vec = np.append( u_vec, delayed_neutrons_cc )
+
+
+        for spc in self.aqueous_phase.species:
+            #mass_cc = self.aqueous_phase.get_species_concentration(spc.name,time)
+            mass_cc = self.aqueous_phase.get_species_concentration(spc.name)
+            assert mass_cc is not None
+            u_list.append( mass_cc )
+            spc.flag = idx # the global id of the species
+            idx += 1
+
+        for spc in self.organic_phase.species:
+            #mass_cc = self.organic_phase.get_species_concentration(spc.name,time)
+            mass_cc = self.organic_phase.get_species_concentration(spc.name)
+            assert mass_cc is not None
+            u_list.append( mass_cc )
+            spc.flag = idx # the global id of the species
+            idx += 1
+
+        for spc in self.vapor_phase.species:
+            #mass_cc = self.vapor_phase.get_species_concentration(spc.name,time)
+            mass_cc = self.vapor_phase.get_species_concentration(spc.name)
+            assert mass_cc is not None
+            u_list.append( mass_cc )
+            spc.flag = idx # the global id of the species
+            idx += 1
+
+        u_vec = np.array( u_list, dtype=np.float64 )
+
+        # sanity check
+        assert not u_vec[u_vec<0.0],'%r'%u_vec
+
+        return u_vec
 
     def __rhs_fn(self, u_vec, t, params):
 
@@ -243,7 +312,6 @@ class BWR(Module):
         dt_f0g = inflow_rates - outflow_rates  - death_rates
 
         return dt_f0g
-
 
     def __compute_outflow_rates(self, time, name):
 
