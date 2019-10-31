@@ -1,4 +1,6 @@
 *~
+*.log
+
 #.xml
 .DS_Store
 __pycache__
@@ -10,6 +12,7 @@ readme_converted.rst
 *.patch
 *.png
 *.pickle
+*.pkl
 *.gpg
 *.tar
 *.gz

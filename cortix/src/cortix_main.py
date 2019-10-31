@@ -2,209 +2,291 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
-#
-# All rights reserved, see COPYRIGHT for full restrictions.
-# https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
-#
-# Licensed under the University of Massachusetts Lowell LICENSE:
-# https://github.com/dpploy/cortix/blob/master/LICENSE.txt
-'''
-The Cortix class definition.
 
-Cortix: a program for system-level modules coupling, execution, and analysis.
-'''
-#*********************************************************************************
 import os
 import logging
-from cortix.src.simulation import Simulation
-from cortix.src.utils.xmltree import XMLTree
-from cortix.src.utils.set_logger_level import set_logger_level
-#*********************************************************************************
+import time
+import datetime
+import networkx as nx
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+from multiprocessing import Process, Queue
+from cortix.src.module import Module
 
-class Cortix():
+class Cortix:
     '''
-    The main Cortix class definition. This class encapsulates the
-    concepts of simulations, tasks, and modules, for a given application providing
-    the user with an interface to the simulations.
+    The main Cortix class definition:
+    1. Create the object
+    2. Add modules
+    3. Run the simulation
     '''
 
-#*********************************************************************************
-# Construction 
-#*********************************************************************************
+    def __init__(self, use_mpi=False, splash=False):
 
-    def __init__(self, name, config_xml_file='cortix-config.xml'):
+        self.use_mpi = use_mpi
 
-        assert isinstance(name,str), 'must give Cortix object a name'
+        self.comm = None
+        self.rank = None
+        self.size = None
 
-        assert isinstance(config_xml_file, str), '-> config_xml_file not a str.'
+        self.splash = splash
 
-        # Create the configuration XML tree
-        config_xml_tree = XMLTree( xml_tree_file=config_xml_file )
+        # Fall back to multiprocessing if mpi4py is not available
+        if self.use_mpi:
+            try:
+                from mpi4py import MPI
+                self.comm = MPI.COMM_WORLD
+                self.rank = self.comm.Get_rank()
+                self.size = self.comm.size
+            except ImportError:
+                self.use_mpi = False
 
-        assert config_xml_tree.tag == 'cortix_config'
+        # Setup the global logger 
+        self.__create_logger()
 
-        # Read the cortix config element (tag) name <name></name>
-        node = config_xml_tree.get_sub_node('name') # get sub_node w/ tag: name 
+        # Setup the network graph
+        if self.rank == 0 or not self.use_mpi:
+            self.nx_graph = None
 
-        # Set the Cortix configuration name
-        self.__name = node.get_node_content()  # name is now, say, 'droplet-fall'
+        # Modules storage
+        self.modules = list()
 
-        # Consistency check
-        assert self.__name == name,\
-            'Runtime Cortix object name %r conflicts with cortix-config.xml %r' \
-            % (self.__name, name)
+        # Done
+        if self.rank == 0 or not self.use_mpi:
 
-        # Read the work directory name
-        node = config_xml_tree.get_sub_node('work_dir')
-        work_dir = node.get_node_content()
-        if work_dir[-1] != '/':
-            work_dir += '/'
+            if self.splash:
+                self.log.info('Created Cortix object %s', self.__get_splash(begin=True))
+            else:
+                self.log.info('Created Cortix object')
 
-        self.__work_dir = work_dir + self.__name + '-wrk/'
+            self.wall_clock_time_start = time.time()
 
-        # Create the work directory
-        if os.path.isdir(self.__work_dir):
-            os.system('rm -rf ' + self.__work_dir)
-
-        os.system('mkdir -p ' + self.__work_dir)
-
-        # Create the logging facility for each object
-        self.__create_logging( config_xml_tree )
-
-        self.__log.info('Created Cortix work directory: %s', self.__work_dir)
-
-
-        #==================
-        # Setup simulations (one or more as specified in the config file)
-        #==================
-        self.__setup_simulations( config_xml_tree )
-
-        self.__log.info('Created Cortix object %s %s', \
-                self.__name, self.__get_splash(begin=True))
+            self.wall_clock_time_end = self.wall_clock_time_start
+            self.end_run_date = datetime.datetime.today().strftime('%d%b%y %H:%M:%S')
 
         return
 
     def __del__(self):
+        '''
+        Note: by the time the body of this function is executed, the machinery of
+        variables may have been deleted already. For example, `logging` is no longer
+        there; do the least amount of work here.
+        '''
 
-        self.__log.info("Destroyed Cortix object: %s %s", self.__name,
-                self.__get_splash(begin=False))
+        if self.rank == 0 or not self.use_mpi:
+
+            if self.splash:
+                print('Destroyed Cortix object on '+self.end_run_date+
+                        self.__get_splash(begin=False))
+            else:
+                print('Destroyed Cortix object on '+self.end_run_date)
+
+            print('Elapsed wall clock time [s]: '+
+                    str(round(self.wall_clock_time_end-self.wall_clock_time_start,2)))
+
+    def add_module(self, m):
+        '''
+        Add a module to the Cortix object
+
+        `m`: An instance of a class that inherits from the Module base class
+        '''
+
+        assert isinstance(m, Module), 'm must be a module'
+        if m not in self.modules:
+            m.use_mpi = self.use_mpi
+            self.modules.append(m)
+
+    def get_modules(self):
+        '''
+        Return the list of modules in the root (master) process. If the `run()`
+        method has completed, the list is updated with data from the other processes.
+        '''
+
+        if self.rank == 0 or not self.use_mpi:
+            return self.modules
+
+    def run(self):
+        '''
+        Run the Cortix simulation with either MPI or Python multiprocessing.
+        '''
+
+        # Running under MPI
+        #------------------
+        if self.use_mpi:
+
+            # Synchronize in the beginning
+            assert self.size == len(self.modules) + 1,\
+                'Incorrect number of processes (Required %r, got %r)'%\
+                (len(self.modules) + 1, self.size)
+            self.comm.Barrier()
+
+            # Assign an mpi rank to all ports of a module using the module list index
+            for m in self.modules:
+                rank = self.modules.index(m)+1
+                for port in m.ports:
+                    port.rank = rank
+
+            # Assign a unique port id to all ports
+            i = 0
+            for mod in self.modules:
+                for port in mod.ports:
+                    port.use_mpi = self.use_mpi
+                    port.id = i
+                    i += 1
+
+            # Parallel run module in MPI
+            if self.rank != 0:
+                mod = self.modules[self.rank-1]
+                self.log.info('Launching Module {}'.format(mod))
+                mod.run()
+
+            # Synchronize at the end
+            self.comm.Barrier()
+
+            # Collect at the root process all state data from modules
+            if self.rank == 0:
+                state = None
+            else:
+                state = self.modules[self.rank-1].state
+
+            modules_state = self.comm.gather( state, root=0 )
+
+            if self.rank == 0:
+                for i in range(self.size-1):
+                    self.modules[i].state = modules_state[i+1]
+
+        # Running under Python multiprocessing
+        #-------------------------------------
+        else:
+
+            # Parallel run all modules in Python multiprocessing
+            processes = list()
+
+            modules_new_state = Queue() # for sharing data with master process if used
+
+            count_mods_status_attr = 0
+            for mod in self.modules:
+                self.log.info('Launching Module {}'.format(mod))
+                if mod.state: # if not None pass arguments for user: run(self,*args)
+                    p = Process( target=mod.run,
+                            args=( self.modules.index(mod), modules_new_state ) )
+                    count_mods_status_attr += 1
+                else: # if None pass no arguments for user: run(self)
+                    p = Process( target=mod.run )
+                processes.append(p)
+                p.start()
+
+            for i in range(count_mods_status_attr):
+                (mod_idx, new_state) = modules_new_state.get()
+                self.modules[mod_idx].state = new_state
+                self.log.info('Module {} getting new state'.format(self.modules[mod_idx]))
+
+            # Synchronize at the end
+            for p in processes:
+                p.join()
+
+        # Record time at the end of the run method
+        if self.rank == 0 or not self.use_mpi:
+            self.end_run_date = datetime.datetime.today().strftime('%d%b%y %H:%M:%S')
+            self.wall_clock_time_end = time.time()
 
         return
 
-#*********************************************************************************
-# Public member functions
-#*********************************************************************************
-
-    def __get_simulations(self):
+    def get_network(self):
         '''
-        Get all simulations.
+        Constructs and returns a networkx graph representation of the module network.
+        '''
+        if not self.use_mpi or self.rank == 0:
+            if not self.nx_graph:
+                g = nx.MultiGraph()
+                for mod_one in self.modules:
+                    class_name = mod_one.__class__.__name__
+                    index = self.modules.index(mod_one)
+                    mod_one_name = "{}_{}".format(class_name, index)
+                    for mod_two in self.modules:
+                        if mod_one != mod_two:
+                            for port in mod_one.ports:
+                                for p2 in mod_two.ports:
+                                    if id(port.connected_port) == id(p2):
+                                        mod_two_name = "{}_{}".format(mod_two.__class__.__name__, self.modules.index(mod_two))
+                                        if mod_two_name not in g or mod_one_name not in g.neighbors(mod_two_name):
+                                            g.add_edge(mod_one_name, mod_two_name)
+                self.nx_graph = g
+            return self.nx_graph
 
-        Parameters
-        ----------
-        empty
+    def draw_network(self, file_name='network.png', dpi=220):
+        '''
+        Draws the networkx Module network graph using matplotlib
 
-        Returns
-        -------
-        self.__simulations: list(Simulation)
+        `file_name`: The resulting network diagram output file name
+        `dpi`: dpi used for generating the network image
+        '''
+        if self.use_mpi and self.rank != 0:
+            return
+
+        g = self.nx_graph if self.nx_graph else self.get_network()
+        colors = ['blue', 'red', 'green', 'pink', 'orange', 'brown', 'cyan']
+        class_map = {}
+        color_map = {}
+        for node in g.nodes():
+            class_name = "_".join(node.split("_")[:-1])
+            if class_name not in class_map:
+                class_map[class_name] = colors[len(class_map) % len(colors)]
+            color_map[node] = class_map[class_name]
+        f = plt.figure()
+        pos = nx.spring_layout(g, k=0.15, iterations=20)
+        nx.draw(g, pos, node_color=[color_map[n] for n in g.nodes], ax=f.add_subplot(111), linewidths=0.01)
+        patches = []
+        for c in class_map:
+            patch = mpatches.Patch(color=class_map[c], label=c)
+            patches.append(patch)
+        plt.legend(handles=patches)
+        f.savefig(file_name, dpi=dpi)
+
+    def __create_logger(self):
+        '''
+        A helper function to setup the logging facility used in the constructor.
         '''
 
-        return self.__simulations
+        # File removal
+        if self.rank == 0 or not self.use_mpi:
+            if os.path.isfile('cortix.log'):
+                os.system('rm -rf cortix.log')
 
-    simulations = property(__get_simulations,None,None,None)
+        # Sync here to allow for file removal
+        if self.use_mpi:
+            self.comm.Barrier()
 
-    def run_simulations(self, task_name=None):
-        '''
-        This method runs every simulation defined by the Cortix object. At the
-        moment this is done one simulation at a time.
-        '''
+        self.log = logging.getLogger('cortix')
 
-        for sim in self.__simulations:
+        self.log.setLevel(logging.DEBUG)
 
-            sim.execute( task_name )
-
-        return
-
-#*********************************************************************************
-# Private helper functions (internal use: __)
-#*********************************************************************************
-
-    def __create_logging(self, config_xml_tree):
-        '''
-        A helper function to setup the logging facility used in self.__init__()
-        '''
-
-        logger_name = self.__name
-
-        self.__log = logging.getLogger(logger_name)
-        self.__log.setLevel(logging.NOTSET)
-
-        node = config_xml_tree.get_sub_node('logger') # tag name is logger
-
-        logger_level = node.get_attribute('level')
-        self.__log = set_logger_level(self.__log, logger_name, logger_level)
-
-        file_handler = logging.FileHandler(self.__work_dir + 'cortix.log')
-        file_handler.setLevel(logging.NOTSET)
-        file_handler_level = None
+        file_handler = logging.FileHandler('cortix.log')
+        file_handler.setLevel(logging.DEBUG)
 
         console_handler = logging.StreamHandler()
-        console_handler.setLevel(logging.NOTSET)
-        console_handler_level = None
-
-        for child in node.children:
-            (elem,tag,attributes,text) = child
-            elem = XMLTree( elem ) # fixme: remove wrapping
-            if tag == 'file_handler':
-                file_handler_level = elem.get_attribute('level')
-                file_handler = set_logger_level(file_handler, logger_name,
-                                                file_handler_level)
-            if tag == 'console_handler':
-                console_handler_level = elem.get_attribute('level')
-                console_handler = set_logger_level(console_handler, logger_name,
-                                                   console_handler_level)
+        console_handler.setLevel(logging.DEBUG)
 
         # Formatter added to handlers
-        formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        if self.use_mpi:
+            fs = '[rank:{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s'.format(self.rank)
+        else:
+
+            fs = "[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(os.getpid())
+
+        formatter = logging.Formatter(fs)
         file_handler.setFormatter(formatter)
         console_handler.setFormatter(formatter)
 
-        # add handlers to logger
-        self.__log.addHandler(file_handler)
-        self.__log.addHandler(console_handler)
-        self.__log.info('Created Cortix logger: %s', self.__name)
-        self.__log.debug('Logger level: %s', logger_level)
-        self.__log.debug('Logger file handler level: %s', file_handler_level)
-        self.__log.debug('Logger console handler level: %s', console_handler_level)
-
-        return
-
-    def __setup_simulations(self, config_xml_tree):
-        '''
-        This method is a helper function for the Cortix constructor whose purpose is 
-        to set up the simulations defined by the Cortix configuration.
-        '''
-
-        self.__simulations = list()
-
-        for sim_config_xml_node in config_xml_tree.get_all_sub_nodes('simulation'):
-
-            assert sim_config_xml_node.tag == 'simulation'
-
-            self.__log.debug('__setup_simulations(): simulation name: %s',
-                    sim_config_xml_node.get_attribute('name'))
-
-            simulation = Simulation( self.__work_dir, sim_config_xml_node )
-
-            self.__simulations.append(simulation)
-
-        return
+        # Add handlers to logger
+        self.log.addHandler(file_handler)
+        self.log.addHandler(console_handler)
 
     def __get_splash(self, begin=True):
 
         splash = \
         '_____________________________________________________________________________\n'+\
-        '      ...                                        s       .\n'+\
+        '      ...                                        s       .     (TAAG Fraktur)\n'+\
         '   xH88"`~ .x8X                                 :8      @88>\n'+\
         ' :8888   .f"8888Hf        u.      .u    .      .88      %8P      uL   ..\n'+\
         ':8888>  X8L  ^""`   ...ue888b   .d88B :@8c    :888ooo    .     .@88b  @88R\n'+\
@@ -216,10 +298,10 @@ class Cortix():
         ' `8888  `-*""   /   "*888*P"    ^"8888*"     ^%888*     888&  d888" Y888*"\n'+\
         '   "888.      :"      "Y"          "Y"         "Y"      R888" ` "Y   Y"\n'+\
         '     `""***~"`                                           ""\n'+\
-        '                             https://cortix.org                (TAAG Fraktur)\n'+\
+        '                             https://cortix.org                              \n'+\
         '_____________________________________________________________________________'
 
-        if begin == True:
+        if begin:
             message = \
             '\n_____________________________________________________________________________\n'+\
             '                             L A U N C H I N G                               \n'
@@ -229,8 +311,7 @@ class Cortix():
             '\n_____________________________________________________________________________\n'+\
             '                           T E R M I N A T I N G                             \n'
 
-        return message+splash
+        return message + splash
 
-        return
-
-#======================= end class Cortix: =======================================
+if __name__ == '__main__':
+    c = Cortix()

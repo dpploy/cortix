@@ -1,7 +1,7 @@
-module module
-=============
+droplet module
+==============
 
-.. automodule:: module
+.. automodule:: droplet
     :members:
     :undoc-members:
     :show-inheritance:

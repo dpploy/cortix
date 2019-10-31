@@ -1,7 +1,7 @@
-module module
-=============
+jail module
+===========
 
-.. automodule:: module
+.. automodule:: jail
     :members:
     :undoc-members:
     :show-inheritance:

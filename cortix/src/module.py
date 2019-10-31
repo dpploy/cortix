@@ -2,341 +2,168 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
-#
-# All rights reserved, see COPYRIGHT for full restrictions.
-# https://github.com/dpploy/cortix/blob/master/COPYRIGHT.txt
-#
-# Licensed under the University of Massachusetts Lowell LICENSE:
-# https://github.com/dpploy/cortix/blob/master/LICENSE.txt
-'''
-Cortix Module class defintion.
 
-Cortix: a program for system-level modules coupling, execution, and analysis.
-'''
-#**********************************************************************************
-import os
-import logging
-
-from cortix.src.utils.xmltree import XMLTree
-from cortix.src.launcher import Launcher
-#**********************************************************************************
+from cortix.src.port import Port
 
 class Module:
     '''
-    The Module class encapsulates a computational module of some scientific domain.
+    The representation of a Cortix module.
+    This class is to be inherited by every Cortix module.
+    It provides facilities for creating modules within the Cortix network.
+    In addition Cortix will map one object of this class to a Python
+    multiprocessing child process, or one executable object of this class to
+    one MPI process.
     '''
 
-#*********************************************************************************
-# Construction 
-#*********************************************************************************
-
-    def __init__( self, logger, library_home_dir, config_xml_tree ):
-
-        assert isinstance(logger, logging.Logger),'ctx::mod: logger is invalid.'
-        assert isinstance(library_home_dir, str),'ctx:mod: library_home is invalid.'
-
-        assert isinstance(config_xml_tree, XMLTree),'ctx:mod: config_xml_tree is invalid.'
-        assert config_xml_tree.tag == 'module','ctx:mod:invalid module xml tree.'
-        # Read the module name and type
-        self.__mod_name = config_xml_tree.get_attribute('name') # e.g. wind
-
-        # Specify module library with upstream information
-        self.__library_home_dir = library_home_dir
-
-        self.__input_file_name = 'null-input_file_name'
-        self.__input_file_path = 'null-input_file_path'
-
-        # Get config data  
-        for child in config_xml_tree.children:
-
-            (elem, tag, attributes, text) = child
-            text = text.strip()
-
-            if tag == 'input_file_name':
-                self.__input_file_name = text
-
-            if tag == 'input_file_path':
-                if text[-1] != '/':
-                    text += '/'
-                self.__input_file_path = text
-
-            if tag == 'library':
-                assert len(attributes) == 0, 'no attributes allowed.'
-
-                node = XMLTree( elem ) # fixme: remove this wrapper
-                sub_node = node.get_sub_node('home_dir')
-
-                # override home_dir
-                # fixme: no root node needed
-                self.__library_home_dir = sub_node.get_root_node().text.strip()
-
-                if self.__library_home_dir[-1] == '/':
-                    self.__library_home_dir.strip('/')
-
-        logger.debug(self.__mod_name+': read module config info')
-
-        # Take care of a few full path issue
-        cortix_path = os.path.abspath(os.path.join(__file__, '../../..'))
-
-        self.__manifesto_full_path_file_name = self.__library_home_dir + '/' + \
-                self.__mod_name + '/manifesto.xml'
-
-        if '$CORTIX' in self.__input_file_path:
-            self.__input_file_path = \
-                    self.__input_file_path.replace('$CORTIX', cortix_path)
-
-        if '$CORTIX' in self.__manifesto_full_path_file_name:
-            self.__manifesto_full_path_file_name = \
-                    self.__manifesto_full_path_file_name.replace('$CORTIX', cortix_path)
-
-        # Read the module's manifesto
-        self.__read_manifesto()
-
-        logger.debug(self.__mod_name+': read manifesto ports\n %s'%self.__diagram)
-
-        return
-
-#*********************************************************************************
-# Public member functions
-#*********************************************************************************
-
-    def __get_name(self):
+    def __init__(self):
         '''
-        `str`:Module name
+        Attributes
+        ----------
+        name: str
+            A name given to the instance. Default is `None`.
+        port_names_expected: list(str) or None
+            A list of names of ports expected in the module. This will be compared
+            to port names during runtime to check against the intended use of the
+            module.
+        state: any
+            Any `pickle-able` data structure to be passed in a `multiprocessing.Queue`
+            to the parent process or to be gathered in the root MPI process.
+            Default is `None`.
         '''
 
-        return self.__mod_name
+        self.name = None
 
-    name = property(__get_name, None, None, None)
+        self.port_names_expected = None  # list of expected port names
 
-    def __get_library_home_dir(self):
+        self.state = None  # state data passed to parent process if any
+
+        self.use_mpi = False
+
+        self.ports = []
+
+    def send(self, data, port):
         '''
-        `str`:Library home directory
-        '''
-
-        return self.__library_home_dir
-
-    library_home_dir = property(__get_library_home_dir, None, None, None)
-
-    def __get_ports(self):
-        '''
-       `list(tuple)`: Module's ports
+        Send data through a given port.
         '''
 
-        return self.__ports
+        if isinstance(port, str):
+            port = self.get_port(port)
+        elif isinstance(port, Port):
+            assert port in self.ports, "Unknown port!"
+        else:
+            raise TypeError("port must be of Port or String type")
 
-    ports = property(__get_ports, None, None, None)
+        port.send(data)
 
-    def __get_port_names(self):
+    def recv(self, port):
         '''
-        `list(tuple)`:List of names of module's ports
-        '''
-
-        port_names = list()
-        for port in self.__ports:
-            port_names.append(port[0])
-        return port_names
-
-    port_names = property(__get_port_names, None, None, None)
-
-    def __get_diagram(self):
-        '''
-        Return the diagram string from the module manifesto or a null place holder.
+        Receive data from a given port
         '''
 
-        return self.__diagram
+        if isinstance(port, str):
+            port = self.get_port(port)
+        elif isinstance(port, Port):
+            assert port in self.ports, "Unknown port!"
+        else:
+            raise TypeError("port must be of Port or String type")
 
-    diagram = property(__get_diagram, None, None, None)
+        return port.recv()
 
-    def get_port_type(self, port_name):
+    def get_port(self, name):
         '''
-        Returns the port type specified by `port_name`.
+        Get port by name; if it does not exist, create one.
+        '''
+
+        assert isinstance(name, str), 'port name must be of type str'
+        port = None
+
+        for p in self.ports:
+            if p.name == name:
+                port = p
+                break
+
+        if port is None:
+            if self.port_names_expected:
+                assert name in self.port_names_expected,\
+                        'port name: {}, not expected by module: {}'.format(name,self)
+            port = Port(name,self.use_mpi)
+            self.ports.append(port)
+
+        return port
+
+    def connect(self, port_name_or_module, to_other_port=None):
+        '''
+        A simpler interface (as compared to direct `port` connection) to create
+        module connectivity. Connect the module `port` (or `module`) to a given
+        `to_other_port` port.
 
         Parameters
         ----------
-        port_name: str
-
-        Returns
-        -------
-        port_type: str or None
-            Types are: 'use' or 'provide'. None if port name does not exist.
-
+        port_name_or_module: str or Module
+            Either a `port` name or a `Module` can be given. In the latter case
+            the `name` attribute of the module will be used to get the `port`
+            of the module passed. This port will be connected to the port of the
+            calling object.
+        to_other_port: Port
+            A `port` object to connect to. This must be `None` or absent if the
+            first argument is a `Module`.
         '''
 
-        port_type = None
+        # Infer from types what to do with the intended module
+        if isinstance(port_name_or_module, Module):
+            assert to_other_port is None, 'Illegal syntax.'
+            other_module = port_name_or_module
+            other_module_name = other_module.name
+            if not other_module.name:
+                other_module_name = other_module.__class__.__name__.lower()
+            my_port = self.get_port(other_module_name)
+            my_name = self.name
+            if not my_name:
+                my_name = self.__class__.__name__.lower()
+            other_port = other_module.get_port(my_name)
+            my_port.connect(other_port)
 
-        for port in self.__ports:
-            if port[0] == port_name:
-                port_type = port[1]
+        if isinstance(port_name_or_module, str):
+            assert isinstance(to_other_port, Port), 'Other port must be of Port type'
+            port_name = port_name_or_module
+            my_port = self.get_port(port_name)
+            my_port.connect(to_other_port)
 
-        return port_type
-
-    def get_port_mode(self, port_name):
+    #def run(self, state_comm=None, idx_comm=None):
+    def run(self, *args):
         '''
-        Returns the port mode specified by port_name
+        Run method with an option to pass data back to the parent process when running
+        in Python multiprocessing mode. If the user does not want to share data with
+        the parent process, this function can be overriden with `run(self)`
+        or `run(self, *args)` as long as `self.state = None`.
+        If `self.state` points to anything but `None`, the user must use
+        `run(self, *args).
+
+        Notes
+        -----
+        When in multiprocessing, `*args` has two elements: `comm_idx` and `comm_state`.
+        To pass back the state of the module, the user should insert the provided
+        index `comm_idx` and the `state` into the queue as follows:
+
+            if not self.use_mpi:
+                try:
+                    pickle.dumps(self.state)
+                except pickle.PicklingError:
+                    args[1].put((arg[0],None))
+                else:
+                    args[1].put((arg[0],self.state))
+
+        at the bottom of the user defined run() function.
+
+        Parameters
+        ----------
+        comm_idx: int
+            Index of the state in the communication queue.
+
+        comm_state: multiprocessing.Queue
+            When using the Python `multiprocessing` library `state_comm` must have
+            the module's `self.state` in it. That is,
+            `state_comm.put((idx_comm,self.state))` must be the last command in the
+            method before `return`. In addition, self.state must be `pickle-able`.
         '''
-
-        port_mode = None
-        for port in self.__ports:
-            if port[0] == port_name:
-                port_mode = port[2]
-
-        return port_mode
-
-    def has_port_name(self, port_name):
-        '''
-        Returns true if a port with the name
-        `port_name` is available in the module.
-        '''
-
-        for port in self.__ports:
-            if port[0] == port_name:
-                return True
-
-        return False
-
-    def execute( self, slot_id,
-                 runtime_cortix_param_file,
-                 runtime_cortix_comm_file    ):
-        '''
-        Spawns a worker process to execute the module.
-        '''
-
-        assert runtime_cortix_param_file[-1] is not '/'
-        assert runtime_cortix_comm_file[-1] is not '/'
-
-        module_input = self.__input_file_path + self.__input_file_name
-        param = runtime_cortix_param_file
-        comm  = runtime_cortix_comm_file
-
-        full_path_comm_dir = comm[:comm.rfind('/')] + '/' # extract directory name
-        runtime_module_status_file = full_path_comm_dir + 'runtime-status.xml'
-
-        status = runtime_module_status_file
-
-        library_home_dir = self.__library_home_dir
-        mod_name     = self.__mod_name
-
-        # provide a wrk/ for each modules for additional work IO data
-        assert os.path.isdir(full_path_comm_dir), \
-               'module directory %r not available.' % full_path_comm_dir
-
-        mod_work_dir = full_path_comm_dir + 'wrk/'
-
-        os.system('mkdir -p ' + mod_work_dir)
-
-        assert os.path.isdir(mod_work_dir), \
-               'module work directory %r not available.' % mod_work_dir
-
-        manifesto_name = self.__manifesto_full_path_file_name
-
-        # the laucher "loads" the module dynamically and provides the method for
-        # threading
-        launch = Launcher( library_home_dir, mod_name,
-                           slot_id,
-                           module_input,
-                           manifesto_name,
-                           mod_work_dir,
-                           param, comm, status )
-
-        # run module on its own process (file IO communication will take place
-        # between modules)
-        launch.start() # this start a thread and runs the run() method of launch
-
-        return runtime_module_status_file
-
-    def __str__(self):
-        '''
-        Module to string conversion used in a print statement.
-        '''
-
-        s = 'Module data members:\n name=%s\n lib home dir=%s\n input file name=%s\n input file path%s\n ports=%s'
-        return s % (self.__mod_name, self.__library_home_dir, self.__input_file_name,
-                    self.__input_file_path, self.__ports)
-
-    def __repr__(self):
-        '''
-        Module to string conversion.
-        '''
-
-        s = 'Module data members:\n name=%s\n lib home dir=%s\n input file name=%s\n input file path%s\n ports=%s'
-        return s % (self.__mod_name, self.__library_home_dir, self.__input_file_name,
-                    self.__input_file_path, self.__ports)
-
-#*********************************************************************************
-# Private helper functions (internal use: __)
-#*********************************************************************************
-
-    def __read_manifesto( self ):
-        '''
-        Get ports
-        '''
-
-        assert isinstance(self.__manifesto_full_path_file_name, str)
-
-        # Read the manifesto 
-        xml_tree = XMLTree( xml_tree_file=self.__manifesto_full_path_file_name )
-
-        assert xml_tree.tag == 'module_manifesto'
-
-        assert xml_tree.get_attribute('name') == self.__mod_name,\
-                "xml_tree.get_attribute('name') is %r and self.__mod_name is %r"%\
-                (xml_tree.get_attribute('name'),self.__mod_name)
-
-        # List of (port_name, port_type, port_mode, port_multiplicity)
-        self.__ports = list()
-
-        self.__diagram = 'null-module-diagram'
-
-        # Get config data  
-        for child in xml_tree.children:
-            (elem, tag, attributes, text) = child
-
-            if tag == 'port':
-
-                text = text.strip()
-
-                assert len(attributes) == 3, "only <= 3 attributes allowed."
-
-                tmp = dict()  # store port name and three attributes
-
-                for attribute in attributes:
-                    key = attribute[0].strip()
-                    val = attribute[1].strip()
-
-                    if key == 'type':
-                        assert val == 'use' or val == 'provide',\
-                                'port attribute value %r invalid in module %r manifesto'%\
-                                (val,self.__mod_name)
-                        tmp['port_name'] = text  # port_name
-                        tmp['port_type'] = val   # port_type
-                    elif key == 'mode':
-                        file_value = val.split('.')[0]
-                        assert file_value == 'file' or file_value == 'directory' or\
-                                file_value == 'hardware', 'port attribute value invalid.'
-                        tmp['port_mode'] = val
-                    elif key == 'multiplicity':
-                        tmp['port_multiplicity'] = int(val)  # port_multiplicity
-                    else:
-                        assert False, 'invalid port attribute: %r=%r. fatal.'%\
-                                (key,val)
-
-                assert len(tmp) == 4
-                store = (tmp['port_name'], tmp['port_type'], tmp['port_mode'],
-                         tmp['port_multiplicity'])
-
-                # (port_name, port_type, port_mode, port_multiplicity)
-                self.__ports.append(store)
-
-                # clear
-                tmp   = None
-                store = None
-
-            if tag == 'diagram':
-
-                self.__diagram = text
-
-
-        return
-
-#======================= end class Module: =======================================
+        raise NotImplementedError('Module must implement run()')

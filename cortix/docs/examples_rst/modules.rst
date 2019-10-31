@@ -2,8 +2,19 @@ examples
 ========
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
-   console_run_rst/modules
-   input_rst/modules
-   modulib_rst/modules
+   adjudication
+   arrested
+   community
+   dataplot
+   droplet
+   dummy_module
+   jail
+   parole
+   plot_data
+   prison
+   probation
+   run_droplet
+   run_justice
+   vortex

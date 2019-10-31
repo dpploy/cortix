@@ -1,7 +1,7 @@
-module module
-=============
+arrested module
+===============
 
-.. automodule:: module
+.. automodule:: arrested
     :members:
     :undoc-members:
     :show-inheritance:

@@ -1,7 +1,7 @@
-module module
-=============
+port module
+===========
 
-.. automodule:: module
+.. automodule:: port
     :members:
     :undoc-members:
     :show-inheritance:

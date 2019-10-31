@@ -21,13 +21,19 @@ Sat Sep  5 12:51:34 EDT 2015
 #*********************************************************************************
 import os
 import sys
-import numpy as npy
+
+import pandas
+import matplotlib
+matplotlib.use('Agg', warn=False)
+import matplotlib.pyplot as plt
 #*********************************************************************************
 
 class Quantity:
     '''
     todo: this probably should not have a "value" for the same reason as Specie.
           this needs some thinking.
+    well not so fast. This can be used to build a quantity with anything as a
+    value. For instance a history of the quantity as a time series.
     '''
 
 #*********************************************************************************
@@ -37,24 +43,23 @@ class Quantity:
     def __init__(self,
                  name       = 'null-quantity',
                  formalName = 'null-quantity',
-                 value      = float(0.0),  # this can be any type
+                 value      = float(0.0),      # this can be any type
                  unit       = 'null-unit'
                 ):
 
-        # Sanity tests here
-        assert isinstance(name, str), 'oops not string.'
-        self._name = name
+        assert isinstance(name, str), 'not a string.'
+        self.__name = name
 
-        assert isinstance(formalName, str), 'oops not string.'
-        self._formalName = formalName
+        assert isinstance(formalName, str), 'not a string.'
+        self.__formalName = formalName
+        self.__formal_name = formalName
 
         self.__value = value
 
-        assert isinstance(name, str), 'oops not string.'
+        assert isinstance(name, str), 'not a string.'
         self.__unit = unit
 
         self.__name = name
-        self._formalName = formalName
         self.__value = value
         self.__unit = unit
 
@@ -123,7 +128,7 @@ class Quantity:
 
         Returns
         -------
-        value: float
+        value: any type
         '''
 
         return self.__value
@@ -143,7 +148,8 @@ class Quantity:
         empty
         '''
 
-        self._formalName = fn
+        self.__formalName = fn
+        self.__formal_name = fn
 
     def GetFormalName(self):
 
@@ -159,7 +165,7 @@ class Quantity:
         formalName: str
         '''
 
-        return self._formalName
+        return self.__formalName
     formalName = property(GetFormalName, SetFormalName, None, None)
     formal_name = property(GetFormalName, SetFormalName, None, None)
 
@@ -196,6 +202,66 @@ class Quantity:
 
         return self.__unit
     unit = property(GetUnit, SetUnit, None, None)
+
+    def plot(self, x_scaling=1, y_scaling=1, title=None, x_label='x', y_label=None,
+            file_name=None, same_axis=True, dpi=300):
+        '''
+        This will support a few possibities for data storage in the self.__value
+        member.
+
+        Pandas Series. If self.__value is a Pandas Series, plot against the index.
+        However the type stored in the Series matter. Suppose it is a series
+        of a `numpy` array. This must be of the same rank for every entry.
+        This plot method assumes it is an iterable type of the same length for every
+        entry in the series. A plot of all elements in the type against the index of
+        the series will be made. The plot may have all elements in one axis or
+        each element in its own axis.
+        '''
+
+        plt.clf()
+        plt.cla()
+        plt.close()
+
+        if not isinstance(self.__value, pandas.core.series.Series):
+            return
+        if len(self.__value) == 1:
+            return
+
+        if not title:
+            title = self.formal_name
+        if not y_label:
+            y_label = self.name
+
+        if isinstance(self.__value[0],float) or isinstance(self.__value[0],int) \
+                or isinstance(self.__value[0],bool):
+            n_dim = 1
+            # Turn series of values into a series of a list of one value to allow for
+            # the indexing below
+            for i in range (len(self.__value[:])):
+                self.__value.iat[i] = [ self.__value.iat[i] ]  # list of one element
+        else:
+           n_dim = len(self.__value[0])
+
+        x = self.__value.index
+
+        if same_axis:
+            fig = plt.figure(self.__formal_name)
+        for i in range(n_dim):
+            if not same_axis:
+                fig = plt.figure(self.__formal_name+str(i))
+            y = list()
+            for j in range(len(x)):
+                y.append( self.__value.iat[j][i] ) # must use iat()
+            plt.xlabel(x_label)
+            plt.ylabel(y_label)
+            plt.title(title)
+            plt.plot(x*x_scaling, y)
+            if not same_axis and file_name:
+                plt.savefig(file_name+str(i)+'.png',dpi=dpi)
+        if same_axis and file_name:
+            plt.savefig(file_name+'.png',dpi=dpi)
+
+        return
 
 #*********************************************************************************
 # Private helper functions (internal use: __)

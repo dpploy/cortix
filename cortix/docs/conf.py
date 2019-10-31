@@ -21,17 +21,9 @@ import os
 import sys
 # sys.path.insert(0, os.path.abspath('.'))
 sys.path.insert(0, os.path.abspath('../src'))
-sys.path.insert(0, os.path.abspath('../src/utils'))
 sys.path.insert(0, os.path.abspath('../support'))
 sys.path.insert(0, os.path.abspath('../examples'))
-sys.path.insert(0, os.path.abspath('../examples/console_run'))
-sys.path.insert(0, os.path.abspath('../examples/input'))
-sys.path.insert(0, os.path.abspath('../examples/modulib'))
-sys.path.insert(0, os.path.abspath('../examples/modulib/droplet'))
-sys.path.insert(0, os.path.abspath('../examples/modulib/wind'))
 # sys.path.insert(0, os.path.abspath('../examples/notebook_run'))
-sys.path.insert(0, os.path.abspath('../modulib'))
-sys.path.insert(0, os.path.abspath('../modulib/pyplot'))
 
 # -- General configuration ------------------------------------------------
 
@@ -57,13 +49,23 @@ imgmath_image_format = 'svg'
 #
 todo_include_todos=True
 #
+# vfda Thu 01 Aug 2019 07:14:56 PM EDT
+#
+# For docstrings to be semi-automatically used, the docstrings must of course be written 
+# in correct reStructuredText. You can then use all of the usual Sphinx markup in the 
+# docstrings, and it will end up correctly in the documentation.
+#
+#If you prefer NumPy or Google style docstrings over reStructuredText, you can also 
+# enable the napoleon extension. napoleon is a preprocessor that converts your 
+# docstrings to correct reStructuredText before autodoc processes them.
+#
 napoleon_google_docstring = False
 napoleon_numpy_docstring = True
-napoleon_include_init_with_doc = False
-napoleon_include_private_with_doc = False
+napoleon_include_init_with_doc = True
+napoleon_include_private_with_doc = False # include private functions "_func_name()"
 napoleon_include_special_with_doc = True
 napoleon_use_admonition_for_examples = False
-napoleon_use_admonition_for_notes = False
+napoleon_use_admonition_for_notes = True
 napoleon_use_admonition_for_references = False
 napoleon_use_ivar = False
 napoleon_use_param = True

@@ -1,7 +1,7 @@
-module module
+prison module
 =============
 
-.. automodule:: module
+.. automodule:: prison
     :members:
     :undoc-members:
     :show-inheritance:
