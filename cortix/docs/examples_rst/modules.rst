@@ -1,13 +1,11 @@
+.. edit by gea: Fri Oct 11 18:22:22 EDT 2019
 examples
 ========
 
 .. toctree::
    :maxdepth: 4
 
-   body
-   dataplot
-   dummy_module
-   plot_data
-   run_planets
-   run_region_justice
-   state
+   city_justice_rst/modules
+   droplet_swirl_rst/modules
+   nbody_rst/modules
+

@@ -27,6 +27,7 @@ sphinx-apidoc -o support_rst/nuclear_rst ../support/nuclear
 sphinx-apidoc -o examples_rst ../examples
 sphinx-apidoc -o examples_rst/city_justice_rst ../examples/city_justice
 sphinx-apidoc -o examples_rst/droplet_swirl_rst ../examples/droplet_swirl
+sphinx-apidoc -o examples_rst/nbody_rst ../examples/nbody
 
 # Make documentation
 make clean

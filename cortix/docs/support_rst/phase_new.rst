@@ -1,7 +1,7 @@
-plot\_data module
+phase\_new module
 =================
 
-.. automodule:: plot_data
+.. automodule:: phase_new
     :members:
     :undoc-members:
     :show-inheritance:

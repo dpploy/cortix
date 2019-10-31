@@ -1,7 +1,7 @@
-dataplot module
-===============
+node module
+===========
 
-.. automodule:: dataplot
+.. automodule:: node
     :members:
     :undoc-members:
     :show-inheritance:

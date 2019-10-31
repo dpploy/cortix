@@ -4,7 +4,7 @@ from cortix.src.cortix_main import Cortix
 from cortix.src.module import Module
 from cortix.src.network import Network
 
-from cortix.examples.dummy_module import DummyModule
+from cortix.tests.dummy_module import DummyModule
 
 def test_cortix_add_module():
     # Init the Cortix object
