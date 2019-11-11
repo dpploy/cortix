@@ -10,7 +10,7 @@ are made by variables listed below in the executable portion of this run file.
 To run this case using MPI you should compute the number of
 processes as follows:
 
-    `nprocs = n_droplets + 1 vortex + 1 cortix`
+    `nprocs = 2 * n_droplets + 1 cortix`
 
 then issue the MPI run command as follows (replace `nprocs` with a number):
 
