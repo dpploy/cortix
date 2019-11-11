@@ -174,7 +174,7 @@ class BWR(Module):
         #-----------------------------------------
         # one way "to" coolant-outflow
 
-        # to
+        # to be, or not to be?
         message_time = self.recv('coolant-outflow')
         outflow_state = self.__compute_outflow_state( message_time )
         self.send( (message_time, outflow_state), 'coolant-outflow' )
@@ -197,6 +197,7 @@ class BWR(Module):
         None
 
         '''
+        import iapws.iapws97 as steam
 
         # Get state values
         u_0 = self.__get_state_vector( time )
@@ -213,6 +214,20 @@ class BWR(Module):
 
         u_vec = u_vec_hist[1,:]  # solution vector at final time step
 
+        n_dens = u_vec[0]
+        c_vec = u_vec[1:5]
+        fuel_temp = u_vec[6]
+        cool_temp = u_vec[7]
+
+        #compute the ending flow quality
+        initial_temp = u_0[7]
+        initial_pressure = coolant_inflow_phase.get_value('inflow-cool-pressure', time)/const.mega #mPa
+
+        initial_enthalpy = steam._Region2(initial_temp, initial_pressure)
+        final_pressure = steam._PSat_T(cool_temp)
+        sat_liq_enthalpy = steam._Region4(final_pressure, 0)
+        sat_vap_enthalpy = steam._Region4(final_pressure, 1)
+        x_final = 43
 
         time += self.time_step
 
@@ -225,8 +240,6 @@ class BWR(Module):
         # Update the population of free offenders returning to community
         inflow_rates = self.ode_params['total-inflow-rates']
         f0g_free = inflow_rates * self.time_step
-
-        self.populatio
 
         return time
 
