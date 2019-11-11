@@ -111,6 +111,19 @@ class BWR(Module):
 
         #self.population_phase.SetValue('f0g', f0g_0, self.initial_time)
 
+        #reactor paramaters
+        quantities = list()
+
+        fuel_temp = Quantity(name='fuel-temp', formalName='Fuel Temp.', unit='k', value=273.15)
+
+        quantities.append(fuel_temp)
+
+        reg_rod_position = Quantity(name='reg-rod-position', formalName='Regulating Rod Position', unit='m', value=0.0)
+
+        quantities.append(reg_rod_position)
+
+        self.reactor_phase = Phase(self.initial_time, time_unit='s', quantities=quantities)
+
         self.ode_params = ode_params
 
         # Initialize inflows to zero
@@ -144,26 +157,27 @@ class BWR(Module):
 
             time = self.__step( time )
 
-    def __call_ports(self, time):
+    def __call_input_ports(self, time):
 
-            # Interactions in the coolant-inflow port
-            #----------------------------------------
-            # one way "from" coolant-inflow
+        # Interactions in the coolant-inflow port
+        #----------------------------------------
+        # one way "from" coolant-inflow
 
-            # from
-            self.send( time, 'coolant-inflow' )
-            (check_time, inflow_state) = self.recv('coolant-inflow')
-            assert abs(check_time-time) <= 1e-6
-            self.ode_params['inflow-state'] = inflow_state
+        # from
+        self.send( time, 'coolant-inflow' )
+        (check_time, inflow_state) = self.recv('coolant-inflow')
+        assert abs(check_time-time) <= 1e-6
+        self.ode_params['inflow-state'] = inflow_state
 
-            # Interactions in the coolant-outflow port
-            #-----------------------------------------
-            # one way "to" coolant-outflow
+    def __call_output_ports(self, time):
+        # Interactions in the coolant-outflow port
+        #-----------------------------------------
+        # one way "to" coolant-outflow
 
-            # to
-            message_time = self.recv('coolant-outflow')
-            outflow_state = self.__compute_outflow_state( message_time )
-            self.send( (message_time, outflow_state), 'coolant-outflow' )
+        # to
+        message_time = self.recv('coolant-outflow')
+        outflow_state = self.__compute_outflow_state( message_time )
+        self.send( (message_time, outflow_state), 'coolant-outflow' )
 
     def __step(self, time=0.0):
         r'''
