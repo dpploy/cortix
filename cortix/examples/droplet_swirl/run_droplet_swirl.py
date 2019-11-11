@@ -70,10 +70,10 @@ def main():
     swirl.network = Network()
 
     for i in range(n_droplets):
-        # Vortex module 1-to-1 
+        # Vortex module 1-to-1
         vortex = Vortex()
         swirl.network.module(vortex)
-        vortex.show_time = (True,1*const.minute)
+        vortex.show_time = (True, 1*const.minute)
         vortex.end_time = end_time
         vortex.time_step = time_step
         if plot_vortex_profile:
@@ -90,16 +90,14 @@ def main():
 
         # Network port connectivity (connect modules through their ports)
         swirl.network.connect( [droplet,'external-flow'],
-                               [vortex,vortex.get_port('fluid-flow:{}'.format(i))],
+                               [vortex, vortex.get_port('fluid-flow:{}'.format(i))],
                                'bidirectional' )
-
     swirl.network.draw()
 
     swirl.run()
 
     # Plot all droplet trajectories
     if create_plots:
-
         modules = swirl.network.modules
 
         if swirl.use_multiprocessing or swirl.rank == 0:
@@ -111,7 +109,8 @@ def main():
 
             positions = list()
             for m in swirl.network.modules[1:]:
-                positions.append(m.liquid_phase.get_quantity_history('position')[0].value)
+                if type(m) is not Vortex:
+                    positions.append(m.liquid_phase.get_quantity_history('position')[0].value)
 
             fig = plt.figure(1)
             ax = fig.add_subplot(111,projection='3d')
@@ -133,8 +132,9 @@ def main():
             plt.title('All Droplets')
 
             for m in modules[1:]:
-                speed = m.liquid_phase.get_quantity_history('speed')[0].value
-                plt.plot(list(speed.index/60), speed.tolist())
+                if type(m) is not Vortex:
+                    speed = m.liquid_phase.get_quantity_history('speed')[0].value
+                    plt.plot(list(speed.index/60), speed.tolist())
 
             plt.grid()
             fig.savefig('speeds.png', dpi=300)
@@ -146,8 +146,9 @@ def main():
             plt.title('All Droplets')
 
             for m in modules[1:]:
-                radial_pos = m.liquid_phase.get_quantity_history('radial-position')[0].value
-                plt.plot(list(radial_pos.index/60)[1:], radial_pos.tolist()[1:])
+                if type(m) is not Vortex:
+                    radial_pos = m.liquid_phase.get_quantity_history('radial-position')[0].value
+                    plt.plot(list(radial_pos.index / 60)[1:], radial_pos.tolist()[1:])
 
             plt.grid()
             fig.savefig('radialpos.png', dpi=300)
