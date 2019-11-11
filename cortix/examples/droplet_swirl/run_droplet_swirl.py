@@ -25,12 +25,10 @@ command line as
 
 import scipy.constants as const
 
-
 from cortix import Cortix
 from cortix import Network
 from cortix.examples.droplet_swirl.droplet import Droplet
 from cortix.examples.droplet_swirl.vortex import Vortex
-
 
 def main():
     '''Cortix run file for a `Droplet`-`Vortex` network.
@@ -55,7 +53,7 @@ def main():
 
     # Configuration Parameters
     n_droplets = 5
-    end_time   = 3*const.minute
+    end_time   = 3 * const.minute
     time_step  = 0.2
 
     create_plots = True
@@ -71,18 +69,17 @@ def main():
 
     swirl.network = Network()
 
-    # Vortex module (single).
-    vortex = Vortex()
-    swirl.network.module(vortex)
-    vortex.show_time = (True,1*const.minute)
-    vortex.end_time = end_time
-    vortex.time_step = time_step
-    if plot_vortex_profile:
-        vortex.plot_velocity()
-
     for i in range(n_droplets):
+        # Vortex module 1-to-1 
+        vortex = Vortex()
+        swirl.network.module(vortex)
+        vortex.show_time = (True,1*const.minute)
+        vortex.end_time = end_time
+        vortex.time_step = time_step
+        if plot_vortex_profile:
+            vortex.plot_velocity()
 
-        # Droplet modules (multiple).
+        # Droplet modules (multiple)
         droplet = Droplet()
         swirl.network.module(droplet)
         droplet.end_time = end_time
