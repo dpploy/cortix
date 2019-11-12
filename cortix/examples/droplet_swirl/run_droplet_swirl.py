@@ -56,7 +56,7 @@ def main():
     end_time   = 3 * const.minute
     time_step  = 0.2
 
-    create_plots = True
+    create_plots = False
 
     if n_droplets >= 2000:
         create_plots = False
