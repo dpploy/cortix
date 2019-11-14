@@ -167,7 +167,10 @@ class BWR(Module):
         self.send( time, 'coolant-inflow' )
         (check_time, inflow_state) = self.recv('coolant-inflow')
         assert abs(check_time-time) <= 1e-6
-        self.ode_params['inflow-state'] = inflow_state
+
+        inflow = self.coolant_inlet_phase.GetRow(time)
+        self.coolant_inlet_phase.AddRow(time, inflow)
+        self.coolant_inlet_phase.SetValue('inflow-cool-temp', inflow_state['inflow-cool-temp'], time)
 
     def __call_output_ports(self, time):
         # Interactions in the coolant-outflow port
@@ -176,7 +179,10 @@ class BWR(Module):
 
         # to be, or not to be?
         message_time = self.recv('coolant-outflow')
-        outflow_state = self.__compute_outflow_state( message_time )
+        outflow_state = dict()
+        outflow_cool_temp = self.coolant_outflow_phase.GetValue('outflow-cool-temp', time)
+
+        outflow_state['outflow-cool-temp'] = outflow_cool_temp
         self.send( (message_time, outflow_state), 'coolant-outflow' )
 
     def __step(self, time=0.0):
@@ -219,27 +225,23 @@ class BWR(Module):
         fuel_temp = u_vec[6]
         cool_temp = u_vec[7]
 
-        #compute the ending flow quality
-        initial_temp = u_0[7]
-        initial_pressure = coolant_inflow_phase.get_value('inflow-cool-pressure', time)/const.mega #mPa
+        time += self.time_step
 
-        initial_enthalpy = steam._Region2(initial_temp, initial_pressure)
-        final_pressure = steam._PSat_T(cool_temp)
-        sat_liq_enthalpy = steam._Region4(final_pressure, 0)
-        sat_vap_enthalpy = steam._Region4(final_pressure, 1)
-        x_final = 43
+        #update state variables
+        outflow = self.coolant_outflow_phase.GetRow(time)
+        neutrons = self.neutron_phase.GetRow(time)
+        reactor = self.reactor_phase.GetRow(time)
 
         time += self.time_step
 
-        # Update state variables
-        values = self.population_phase.GetRow() # values existing values
-        self.population_phase.AddRow(time, values) # copy on new time for convenience
+        self.coolant_outflow_phase.AddRow(time, outflow)
+        self.neutron_phase.AddRow(time, neutrons)
+        self.reactor_phase.AddRow(time, reactor)
 
-        self.population_phase.SetValue('f0g', u_vec, time) # insert new values
-
-        # Update the population of free offenders returning to community
-        inflow_rates = self.ode_params['total-inflow-rates']
-        f0g_free = inflow_rates * self.time_step
+        self.coolant_outflow_phase.SetValue('outflow-cool-temp', cool_temp, time)
+        self.neutron_phase.SetValue('neutron-dens', n_dens, time)
+        self.neutron_phase.SetValue('delayed-neutrons-cc', c_vec, time)
+        self.reactor_phase.SetValue('fuel-temp', fuel_temp, time)
 
         return time
 
@@ -254,39 +256,39 @@ class BWR(Module):
 
         u_vec = np.empty(0,dtype=np.float64)
 
-        neutron_dens = self.neutron_phase.get_value('neutron-dens',time)
+        neutron_dens = self.neutron_phase.get_value('neutron-dens',time)/(const.centi)**3
         u_vec = np.append( u_vec, neutron_dens )
 
-        delayed_neutrons_cc = self.neutron_phase.get_value('delayed-neutrons-cc',time)
+        delayed_neutrons_cc = self.neutron_phase.get_value('delayed-neutrons-cc',time)/(const.centi)**3
         u_vec = np.append( u_vec, delayed_neutrons_cc )
 
-        fuel_temp = self.neutron_phase.get_value('delayed-neutrons-cc',time)
-        u_vec = np.append( u_vec, delayed_neutrons_cc )
+        fuel_temp = self.reactor_phase.GetValue('fuel-temp',time)
+        u_vec = np.append( u_vec, fuel_temp)
 
 
-        for spc in self.aqueous_phase.species:
+       # for spc in self.aqueous_phase.species:
             #mass_cc = self.aqueous_phase.get_species_concentration(spc.name,time)
-            mass_cc = self.aqueous_phase.get_species_concentration(spc.name)
-            assert mass_cc is not None
-            u_list.append( mass_cc )
-            spc.flag = idx # the global id of the species
-            idx += 1
+           # mass_cc = self.aqueous_phase.get_species_concentration(spc.name)
+           # assert mass_cc is not None
+           # u_list.append( mass_cc )
+           # spc.flag = idx # the global id of the species
+           # idx += 1
 
-        for spc in self.organic_phase.species:
+       # for spc in self.organic_phase.species:
             #mass_cc = self.organic_phase.get_species_concentration(spc.name,time)
-            mass_cc = self.organic_phase.get_species_concentration(spc.name)
-            assert mass_cc is not None
-            u_list.append( mass_cc )
-            spc.flag = idx # the global id of the species
-            idx += 1
+           # mass_cc = self.organic_phase.get_species_concentration(spc.name)
+           # assert mass_cc is not None
+           # u_list.append( mass_cc )
+          #  spc.flag = idx # the global id of the species
+         #   idx += 1
 
-        for spc in self.vapor_phase.species:
+       # for spc in self.vapor_phase.species:
             #mass_cc = self.vapor_phase.get_species_concentration(spc.name,time)
-            mass_cc = self.vapor_phase.get_species_concentration(spc.name)
-            assert mass_cc is not None
-            u_list.append( mass_cc )
-            spc.flag = idx # the global id of the species
-            idx += 1
+           # mass_cc = self.vapor_phase.get_species_concentration(spc.name)
+           # assert mass_cc is not None
+           # u_list.append( mass_cc )
+           # spc.flag = idx # the global id of the species
+           # idx += 1
 
         u_vec = np.array( u_list, dtype=np.float64 )
 
