@@ -50,8 +50,13 @@ def main():
     params['runoff-pressure'] = params['turbine-runoff-pressure']
 
     reactor   = BWR(params)
+    plant_net.module(reactor)
+
     turbine   = Turbine(params)
+    plant_net.module(turbine)
+
     condenser = Condenser(params)
+    plant_net.module(condenser)
 
     plant_net.connect( [reactor,'coolant-outflow'], [turbine,'steam-inflow'] )
     plant_net.connect( [turbine,'runoff'], [condenser,'inflow'] )
