@@ -45,7 +45,7 @@ def main():
     show_time = (True,20)
 
     params = dict()
-
+    params['turbine-runoff-pressure'] = 1
     reactor = BWR(params)
     turbine = Turbine(params)
 
