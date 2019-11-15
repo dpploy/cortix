@@ -34,7 +34,7 @@ class BWR(Module):
 
         '''
 
-        super().__init__(ode_params, self):
+        super().__init__()
 
         self.port_names_expected = ['coolant-inflow','coolant-outflow']
 
