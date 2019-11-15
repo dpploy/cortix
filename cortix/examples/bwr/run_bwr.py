@@ -13,6 +13,7 @@ from cortix import Cortix
 from cortix import Network
 
 from bwr import BWR
+from turbine import Turbine
 
 def main():
     '''Cortix run file for a solvent extraction network.
@@ -46,6 +47,7 @@ def main():
     params = dict()
 
     reactor = BWR(params)
+    turbine = Turbine(params)
 
 if __name__ == '__main__':
     main()
