@@ -28,7 +28,7 @@ class Condenser(Module):
 
     '''
 
-    def __init__(self, params):
+    def __init__(self, ode_params):
         '''
         Parameters
         ----------

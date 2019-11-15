@@ -35,7 +35,7 @@ class turbine(Module):
 
         '''
 
-        super().__init__(ode_params, self):
+        super().__init__(params, self):
         self.params = params
         self.port_names_expected = ['coolant-outflow','turbine-runoff']
 
@@ -65,7 +65,7 @@ class turbine(Module):
 
         quantities.append(temp)
 
-        press = Quantity(name='turbine-runoff-press', formalName = 'Turbine Runoff Pressure', unit = 'Pa', value = 0.0)
+        press = Quantity(name='turbine-runoff-press', formalName = 'Turbine Runoff Pressure', unit = 'Pa', value = params['turbine-runoff-pressure'])
 
         quantities.append(press)
 
@@ -91,7 +91,6 @@ self.turbine_work_phase = Phase(self.initial_time, time_unit = 's', quantities =
         #self.ode_params['jail-inflow-rates']         = np.zeros(self.n_groups)
         #self.ode_params['adjudication-inflow-rates'] = np.zeros(self.n_groups)
         #self.ode_params['probation-inflow-rates']    = np.zeros(self.n_groups)
-
         return
 
     def run(self, *args):
@@ -168,6 +167,27 @@ self.turbine_work_phase = Phase(self.initial_time, time_unit = 's', quantities =
 
         '''
         import iapws.iapws97 as steam
+        temp_in = self.coolant_inflow_phase('coolant-inflow-temp', time)
+
+        output = self.__turbine(time, temp_in, self.params)
+
+        t_runoff = output[0]
+        x_runoff = output[2]
+        w_turbine = output[1]
+
+        twork =  self.turbine_work_phase.GetRow(time)
+        c_out = self.turbine_runoff_phase.GetRow(time)
+
+        self.turbine_work_phase.AddRow(twork, time)
+
+        time += self.time_step
+
+        self.turbine_runoff_phase.AddRow(time)
+        self.turbine_work_phase.SetValue('turbine-power', w_turbine, time)
+
+        self.turbine_runoff_phase.AddRow(time)
+        self.turbine_runoff_phase.SetValue('turbine-runoff-quality', x_runoff, time)
+        self.turbine_runoff_phase.SetValue('turbine-runoff-temp', t_runoff, time)
 
         # Get state values
 
@@ -238,20 +258,3 @@ self.turbine_work_phase = Phase(self.initial_time, time_unit = 's', quantities =
         #w_real = heat_removed
         return (t_runoff, w_real, x_runoff)
 
-        #update state variables
-        outflow = self.coolant_outflow_phase.GetRow(time)
-        neutrons = self.neutron_phase.GetRow(time)
-        reactor = self.reactor_phase.GetRow(time)
-
-        time += self.time_step
-
-        self.coolant_outflow_phase.AddRow(time, outflow)
-        self.neutron_phase.AddRow(time, neutrons)
-        self.reactor_phase.AddRow(time, reactor)
-
-        self.coolant_outflow_phase.SetValue('outflow-cool-temp', cool_temp, time)
-        self.neutron_phase.SetValue('neutron-dens', n_dens, time)
-        self.neutron_phase.SetValue('delayed-neutrons-cc', c_vec, time)
-        self.reactor_phase.SetValue('fuel-temp', fuel_temp, time)
-
-        return time

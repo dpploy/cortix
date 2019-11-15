@@ -229,8 +229,6 @@ class BWR(Module):
         fuel_temp = u_vec[6]
         cool_temp = u_vec[7]
 
-        time += self.time_step
-
         #update state variables
         outflow = self.coolant_outflow_phase.GetRow(time)
         neutrons = self.neutron_phase.GetRow(time)
