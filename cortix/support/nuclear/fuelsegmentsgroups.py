@@ -71,6 +71,7 @@ class FuelSegmentsGroups():
 #*********************************************************************************
 
     def HasGroup(self, key):
+
         '''
         Checks if the specified key has a group of fuel segments associated
         with it.
@@ -87,6 +88,7 @@ class FuelSegmentsGroups():
         return key in self.groups.keys()
 
     def AddGroup(self, key, fuelSegments=None):
+
         '''
         Appends the dictionary with a new key and associated list of
         fuelSegments. If the specified key is already present in the
@@ -105,6 +107,7 @@ class FuelSegmentsGroups():
 
     def GetAttribute(self, groupKey=None, attributeName=None,
                      nuclideSymbol=None, nuclideSeries=None):
+
         '''
         Returns the average value of an attribute amongst all elements in a
         group (WARNING: keys with no values associated with them will lower
@@ -130,6 +133,7 @@ class FuelSegmentsGroups():
             groupKey, attributeName, nuclideSymbol, nuclideSeries)
 
     def GetFuelSegments(self, groupKey=None):
+
         '''
         Returns a list of fuel segments associated with a specified groupkey.
         If no group key is specified, then all elements in the dictionary
@@ -148,6 +152,7 @@ class FuelSegmentsGroups():
         return self.__GetFuelSegments(groupKey)
 
     def RemoveFuelSegment(self, groupKey, fuelSegment):
+
         '''
         Removes a fuel segment from a list associated with a specified group
         key. If the specified group key or fuel segment do not exist, the
@@ -182,6 +187,7 @@ class FuelSegmentsGroups():
 
     def __GetGroupAttribute(self, groupKey=None,
                             attributeName=None, symbol=None, series=None):
+
         '''
         Returns the cumulative or average densities of all fuel segments in all
         groups. Use this function with discretion, as groups with no segments
@@ -251,6 +257,7 @@ class FuelSegmentsGroups():
         return attribute
 
     def __GetFuelSegments(self, groupKey=None):
+
         '''
         Returns a list of fuel segments associated with a given group
         (if groupKey is specified), or an ordered list of pairs of all
@@ -294,6 +301,7 @@ class FuelSegmentsGroups():
             return self.groups[groupKey]
 
     def __AddGroup(self, groupKey, fuelSegments=None):
+
         '''
         If a list of fuel segments and a group key is specified, the
         fuelSegment list is appended to the specified groupKey. If the groupKey
@@ -320,6 +328,7 @@ class FuelSegmentsGroups():
         return
 
     def __RemoveFuelSegment(self, groupKey, fuelSegment_remove):
+
         '''
         Removes a fuel segment from a list associated with a specified group
         key. If the specified group key or fuel segment do not exist, the

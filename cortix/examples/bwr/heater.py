@@ -150,16 +150,13 @@ class BWR(Module):
             # Communicate information
             #------------------------
 
-            self.__call_input_ports(time)
+            self.__call_ports(time)
 
             # Evolve one time step
             #---------------------
 
             time = self.__step( time )
 
-            self.__call_output_ports(self, time)
-
-            self.__call_output_ports(time)
     def __call_input_ports(self, time):
 
         # Interactions in the coolant-inflow port
@@ -228,6 +225,8 @@ class BWR(Module):
         c_vec = u_vec[1:5]
         fuel_temp = u_vec[6]
         cool_temp = u_vec[7]
+
+        time += self.time_step
 
         #update state variables
         outflow = self.coolant_outflow_phase.GetRow(time)
