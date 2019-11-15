@@ -53,16 +53,16 @@ class BWR(Module):
         # Coolant inflow phase history
         quantities = list()
 
-        flowrate = Quantitiy(name='inflow-cool-flowrate',
+        flowrate = Quantity(name='inflow-cool-flowrate',
                    formalName='Inflow Cool. Flowrate',
                    unit='kg/s', value=0.0)
         quantities.append(flowrate)
 
-        temp = Quantitiy(name='inflow-cool-temp', formalName='Inflow Cool. Temperature',
+        temp = Quantity(name='inflow-cool-temp', formalName='Inflow Cool. Temperature',
                unit='K', value=0.0)
         quantities.append(temp)
 
-        press = Quantitiy(name='inflow-cool-press',formalName='Inflow Cool. Pressure',
+        press = Quantity(name='inflow-cool-press',formalName='Inflow Cool. Pressure',
                 unit='Pa', value=0.0)
         quantities.append(press)
 
@@ -72,21 +72,21 @@ class BWR(Module):
         # Coolant outflow phase history
         quantities = list()
 
-        flowrate = Quantitiy(name='outflow-cool-flowrate',
+        flowrate = Quantity(name='outflow-cool-flowrate',
                    formalName='Outflow Cool. Flowrate',
                    unit='kg/s', value=0.0)
         quantities.append(flowrate)
 
-        temp = Quantitiy(name='outflow-cool-temp',
+        temp = Quantity(name='outflow-cool-temp',
                    formalName='Outflow Cool. Temperature',
                    unit='K', value=0.0)
         quantities.append(temp)
 
-        press = Quantitiy(name='outflow-cool-press',formalName='Outflow Cool. Pressure',
+        press = Quantity(name='outflow-cool-press',formalName='Outflow Cool. Pressure',
                    unit='Pa', value=0.0)
         quantities.append(press)
 
-        quality = Quantitiy(name='steam-quality',formalName='Steam Quality',
+        quality = Quantity(name='steam-quality',formalName='Steam Quality',
                    unit='', value=0.0)
         quantities.append(quality)
 
@@ -96,14 +96,14 @@ class BWR(Module):
         # Neutron phase history
         quantities = list()
 
-        neutron_dens = Quantitiy(name='neutron-dens',
+        neutron_dens = Quantity(name='neutron-dens',
                    formalName='Neutron Dens.',
                    unit='1/m^3', value=0.0)
         quantities.append(neutron_dens)
 
         delayed_neutrons_0 = np.zeros(6)
 
-        delayed_neutron_cc = Quantitiy(name='delayed-neutrons-cc',
+        delayed_neutron_cc = Quantity(name='delayed-neutrons-cc',
                    formalName='Delayed Neutrons',
                    unit='1/m^3', value=delayed_neutrons_0)
         quantities.append(delayed_neutron_cc)
@@ -126,7 +126,7 @@ class BWR(Module):
 
         self.reactor_phase = Phase(self.initial_time, time_unit='s', quantities=quantities)
 
-        self.ode_params = ode_params
+        #self.ode_params = ode_params
 
         # Initialize inflows to zero
         #self.ode_params['prison-inflow-rates']       = np.zeros(self.n_groups)
