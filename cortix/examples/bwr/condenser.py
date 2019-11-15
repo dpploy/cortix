@@ -39,7 +39,7 @@ class Condenser(Module):
 
         super().__init__(ode_params, self):
 
-        self.port_names_expected = ['turbine-runoff', 'condenser-runoff']
+        self.port_names_expected = ['turbine-runoff', 'coolant-inflow']
 
         quantities      = list()
         self.ode_params = dict()
@@ -151,8 +151,8 @@ class Condenser(Module):
         outflow_state = dict()
         outflow_cool_temp = self.condenser_runoff_phase.GetValue('condenser-runoff-temp', time)
 
-        condenser_runoff['condenser-runoff-temp'] = outflow_cool_temp
-        self.send( (message_time, condenser_runoff), 'condenser-runoff' )
+        condenser_runoff['coolant-inflow-temp'] = outflow_cool_temp
+        self.send( (message_time, condenser_runoff), 'coolant-inflow' )
 
     def __step(self, time=0.0):
 
