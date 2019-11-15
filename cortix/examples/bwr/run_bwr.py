@@ -47,6 +47,7 @@ def main():
 
     params = dict()
     params['turbine-runoff-pressure'] = 1
+    params['runoff-pressure'] = params['turbine-runoff-pressure']
 
     reactor   = BWR(params)
     turbine   = Turbine(params)
