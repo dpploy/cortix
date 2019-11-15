@@ -64,5 +64,7 @@ def main():
 
     plant_net.draw()
 
+    plant.run()
+
 if __name__ == '__main__':
     main()
