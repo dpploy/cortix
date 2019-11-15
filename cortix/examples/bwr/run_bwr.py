@@ -14,6 +14,7 @@ from cortix import Network
 
 from bwr import BWR
 from turbine import Turbine
+from condenser import Condenser
 
 def main():
     '''Cortix run file for a solvent extraction network.
@@ -46,8 +47,16 @@ def main():
 
     params = dict()
     params['turbine-runoff-pressure'] = 1
-    reactor = BWR(params)
-    turbine = Turbine(params)
+
+    reactor   = BWR(params)
+    turbine   = Turbine(params)
+    condenser = Condenser(params)
+
+    plant_net.connect( [reactor,'coolant-outflow'], [turbine,'steam-inflow'] )
+    plant_net.connect( [turbine,'runoff'], [condenser,'inflow'] )
+    plant_net.connect( [condenser,'outflow'], [reactor,'coolant-inflow'] )
+
+    plant_net.draw()
 
 if __name__ == '__main__':
     main()

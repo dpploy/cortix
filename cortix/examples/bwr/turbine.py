@@ -38,7 +38,7 @@ class Turbine(Module):
 
         super().__init__()
         self.params = params
-        self.port_names_expected = ['coolant-outflow','turbine-runoff']
+        self.port_names_expected = ['steam-inflow','runoff']
 
         quantities      = list()
         self.ode_params = dict()
@@ -62,15 +62,15 @@ class Turbine(Module):
         # Outflow phase history
         quantities = list()
 
-        temp = Quantity(name='turbine-runoff-temp', formalName = 'Turbine Runoff Temp.', unit = 'k', value=0.0)
+        temp = Quantity(name='runoff-temp', formalName = 'Turbine Runoff Temp.', unit = 'k', value=0.0)
 
         quantities.append(temp)
 
-        press = Quantity(name='turbine-runoff-press', formalName = 'Turbine Runoff Pressure', unit = 'Pa', value = params['turbine-runoff-pressure'])
+        press = Quantity(name='runoff-press', formalName = 'Turbine Runoff Pressure', unit = 'Pa', value = params['runoff-pressure'])
 
         quantities.append(press)
 
-        x = Quantity(name='turbine-runoff-quality', formalName = 'Turbine Runoff Quality', unit = '%', value = 0.0)
+        x = Quantity(name='runoff-quality', formalName = 'Turbine Runoff Quality', unit = '%', value = 0.0)
 
         quantities.append(x)
 
@@ -125,8 +125,8 @@ class Turbine(Module):
         # one way "from" coolant-inflow
 
         # from
-        self.send( time, 'coolant-outflow' )
-        (check_time, inflow_state) = self.recv('coolant-outflow')
+        self.send( time, 'steam-inflow' )
+        (check_time, inflow_state) = self.recv('steam-inflow')
         assert abs(check_time-time) <= 1e-6
 
         inflow = self.coolant_inflow_phase.GetRow(time)
@@ -134,21 +134,21 @@ class Turbine(Module):
         self.coolant_inflow_phase.SetValue('reactor-runoff-temp', inflow_state['outflow-cool-temp'], time)
 
     def __call_output_ports(self, time):
-        # Interactions in the coolant-outflow port
+        # Interactions in the steam-inflow port
         #-----------------------------------------
-        # one way "to" coolant-outflow
+        # one way "to" steam-inflow
 
         # to be, or not to be?
-        message_time = self.recv('turbine-runoff')
+        message_time = self.recv('runoff')
         outflow_state = dict()
-        outflow_cool_temp = self.turbine_runoff_phase.GetValue('turbine-runoff-temp', time)
-        outflow_cool_quality = self.turbine_runoff_phase.GetValue('turbine-runoff-quality', time)
-        outflow_cool_press = self.turbine_runoff_phase.GetValue('turbine-runoff-press', time)
+        outflow_cool_temp = self.turbine_runoff_phase.GetValue('runoff-temp', time)
+        outflow_cool_quality = self.turbine_runoff_phase.GetValue('runoff-quality', time)
+        outflow_cool_press = self.turbine_runoff_phase.GetValue('runoff-press', time)
 
-        outflow_state['turbine-runoff-temp'] = outflow_cool_temp
-        outflow_state['turbine-runoff-quality'] = outflow_cool_quality
-        outflow_state['turbine-runoff-press'] = outflow_cool_pressure
-        self.send( (message_time, outflow_state), 'turbine-runoff' )
+        outflow_state['runoff-temp'] = outflow_cool_temp
+        outflow_state['runoff-quality'] = outflow_cool_quality
+        outflow_state['runoff-press'] = outflow_cool_pressure
+        self.send( (message_time, outflow_state), 'runoff' )
 
     def __step(self, time=0.0):
         r'''
@@ -188,8 +188,8 @@ class Turbine(Module):
         self.turbine_work_phase.SetValue('turbine-power', w_turbine, time)
 
         self.turbine_runoff_phase.AddRow(time)
-        self.turbine_runoff_phase.SetValue('turbine-runoff-quality', x_runoff, time)
-        self.turbine_runoff_phase.SetValue('turbine-runoff-temp', t_runoff, time)
+        self.turbine_runoff_phase.SetValue('runoff-quality', x_runoff, time)
+        self.turbine_runoff_phase.SetValue('runoff-temp', t_runoff, time)
 
         # Get state values
 
