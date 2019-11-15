@@ -10,11 +10,12 @@ import scipy.constants as const
 from scipy.integrate import odeint
 import scipy.constants as sc
 import iapws.iapws97 as steam_table
+
 from cortix import Module
 from cortix.support.phase_new import PhaseNew as Phase
 from cortix import Quantity
 
-class turbine(Module):
+class Turbine(Module):
     '''
     Boiling water reactor single-point reactor.
 
@@ -35,7 +36,7 @@ class turbine(Module):
 
         '''
 
-        super().__init__(params, self):
+        super().__init__()
         self.params = params
         self.port_names_expected = ['coolant-outflow','turbine-runoff']
 
@@ -82,7 +83,7 @@ class turbine(Module):
         work = Quantity(name='turbine-power', formalName = 'Turbine Power', unit = 'w', value = 0.0)
         quantities.append(work)
 
-self.turbine_work_phase = Phase(self.initial_time, time_unit = 's', quantities = quantities)
+        self.turbine_work_phase = Phase(self.initial_time, time_unit = 's', quantities = quantities)
 
         # Initialize inflows to zero
         #self.ode_params['prison-inflow-rates']       = np.zeros(self.n_groups)
@@ -91,6 +92,7 @@ self.turbine_work_phase = Phase(self.initial_time, time_unit = 's', quantities =
         #self.ode_params['jail-inflow-rates']         = np.zeros(self.n_groups)
         #self.ode_params['adjudication-inflow-rates'] = np.zeros(self.n_groups)
         #self.ode_params['probation-inflow-rates']    = np.zeros(self.n_groups)
+
         return
 
     def run(self, *args):
