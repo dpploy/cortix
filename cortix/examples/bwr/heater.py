@@ -150,16 +150,13 @@ class BWR(Module):
             # Communicate information
             #------------------------
 
-            self.__call_input_ports(time)
+            self.__call_ports(time)
 
             # Evolve one time step
             #---------------------
 
             time = self.__step( time )
 
-            self.__call_output_ports(self, time)
-
-            self.__call_output_ports(time)
     def __call_input_ports(self, time):
 
         # Interactions in the coolant-inflow port
