@@ -41,6 +41,8 @@ class BWR(Module):
         quantities      = list()
         self.ode_params = dict()
 
+        const.second = 1.0
+
         self.initial_time = 0.0 * const.day
         self.end_time     = 4 * const.hour
         self.time_step    = 10 * const.second

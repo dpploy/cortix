@@ -35,13 +35,17 @@ def main():
 
     use_mpi = False  # True for MPI; False for Python multiprocessing
 
-    bwr = Cortix( use_mpi=use_mpi, splash=True )
+    plant = Cortix( use_mpi=use_mpi, splash=True )
 
-    bwr_net = bwr.network = Network()
+    plant_net = plant.network = Network()
 
     # General parameters
 
-    show_time = (True,10)
+    show_time = (True,20)
+
+    params = dict()
+
+    reactor = BWR(params)
 
 if __name__ == '__main__':
     main()
