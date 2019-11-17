@@ -36,8 +36,7 @@ class Body(Module):
         return total_force
 
     def step(self):
-        total_force = self.total_force()
-        accel = total_force / self.mass
+        accel = self.total_force() / self.mass
         self.vel = self.vel + accel * self.dt
         self.pos = self.vel * self.dt
 
