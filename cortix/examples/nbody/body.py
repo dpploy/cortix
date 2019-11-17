@@ -12,14 +12,7 @@ class Body(Module):
         self.pos = pos
         self.rad = rad
 
-        self.G = 6.67408e-11
         self.ep = 1e-20
-
-        self.mass = mass
-        self.rad = rad
-
-        self.vel = vel
-        self.acc = [0, 0, 0]
 
         self.other_bodies = None
         self.dt = dt
@@ -27,41 +20,31 @@ class Body(Module):
 
         self.trajectory = []
 
-    def force_from(self, other_mass, other_rad):
-        rad = np.linalg.norm(other_rad - self.rad)
+    def force(self, mass, pos):
+        G = 6.67408e-11
+        force = G * self.mass * mass * (pos - self.pos)
+        rad = np.linalg.norm(pos - self.pos)
         if rad == 0:
             print("Collision!")
             exit(1)
-        return (self.G * self.mass * other_mass) / (rad ** 2)
+        return force / rad
+
+    def total_force(self):
+        total_force = 0
+        for (mass, pos) in self.other_bodies:
+            total_force += self.force(mass, pos)
+        return total_force
 
     def step(self):
-        self.acc = np.zeros(3)
-        total_force = np.zeros(3)
-
-        for (body_mass, body_rad) in self.other_bodies:
-            x = self.force_from(body_mass, body_rad)
-            print("Printing now!")
-            print(total_force)
-            total_force += x
-            print(total_force)
-
-
-        self.acc = total_force / self.mass
-        self.vel = self.vel + self.acc * self.dt
-        print(self.vel)
-
-        
-
-        print(type(self.vel[0] * self.dt))
-        print(self.rad[0])
-        print(type(self.rad[0]))
-        self.rad[0] += self.vel[0] * self.dt
-        self.rad[1] -= self.vel[1] * self.dt
+        total_force = self.total_force()
+        accel = total_force / self.mass
+        self.vel += accel * self.dt
+        self.pos = self.vel * self.dt
 
     def broadcast_data(self):
         # Broadcast (mass, pos) to every body
         for port in self.ports:
-            self.send((self.mass, self.rad), port)
+            self.send((self.mass, self.pos), port)
 
     def gather_data(self):
         # Get (mass, pos) from every other body
@@ -73,7 +56,7 @@ class Body(Module):
             self.broadcast_data()
             self.gather_data()
             self.step()
-            self.trajectory.append(tuple(self.rad.flatten()))
+            self.trajectory.append(self.pos)
             t += self.dt
         self.dump()
 
@@ -85,4 +68,4 @@ class Body(Module):
                 f.write("{}, {}\n".format(x, y))
 
     def __repr__(self):
-        return "{}".format([self.mass, self.rad, self.vel, self.acc])
+        return "{}".format([self.mass, self.pos, self.vel, self.acc])
