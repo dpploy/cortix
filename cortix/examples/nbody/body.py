@@ -4,13 +4,13 @@ import numpy as np
 
 
 class Body(Module):
-    def __init__(self, mass, rad, pos, vel, time, dt):
+    def __init__(self, mass, pos, vel, time, dt, name=None):
         super().__init__()
 
+        self.name = name if name else "body_{}.csv".format(id(self))
         self.mass = mass
         self.vel = vel
         self.pos = pos
-        self.rad = rad
 
         self.ep = 1e-20
 
@@ -38,11 +38,12 @@ class Body(Module):
     def step(self):
         total_force = self.total_force()
         accel = total_force / self.mass
-        self.vel += accel * self.dt
+        self.vel = self.vel + accel * self.dt
         self.pos = self.vel * self.dt
 
     def broadcast_data(self):
         # Broadcast (mass, pos) to every body
+        print((self.mass, self.pos))
         for port in self.ports:
             self.send((self.mass, self.pos), port)
 
@@ -61,11 +62,11 @@ class Body(Module):
         self.dump()
 
     def dump(self, file_name=None):
-        if file_name is None:
-            file_name = "body_{}.csv".format(id(self))
+        file_name = file_name if file_name else self.name + ".csv"
         with open(file_name, "w") as f:
-            for (x, y, z) in self.trajectory:
-                f.write("{}, {}\n".format(x, y))
+            for traj in self.trajectory:
+                (x, y, z) = traj.flatten()
+                f.write("{}, {}, {}\n".format(x, y, z))
 
     def __repr__(self):
-        return "{}".format([self.mass, self.pos, self.vel, self.acc])
+        return "{}".format([self.mass, self.pos, self.vel])
