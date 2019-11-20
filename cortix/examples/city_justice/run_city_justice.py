@@ -129,7 +129,7 @@ def main():
     city.network.connect( probation, jail )
     city.network.connect( adjudication, probation )
 
-    city.network.connect( arrested, community )
+    city.network.connect( arrested, community, 'bidirectional' )
     city.network.connect( jail, community )
     city.network.connect( probation, community )
     city.network.connect( adjudication, community )
