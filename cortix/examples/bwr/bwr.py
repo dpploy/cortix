@@ -152,32 +152,15 @@ class BWR(Module):
             # Communicate information
             #------------------------
 
-            self.__call_input_ports(time)
+            self.__call_ports(time)
 
             # Evolve one time step
             #---------------------
 
             time = self.__step( time )
 
-            self.__call_output_ports(self, time)
+    def __call_ports(self, time):
 
-            self.__call_output_ports(time)
-    def __call_input_ports(self, time):
-
-        # Interactions in the coolant-inflow port
-        #----------------------------------------
-        # one way "from" coolant-inflow
-
-        # from
-        self.send( time, 'coolant-inflow' )
-        (check_time, inflow_state) = self.recv('coolant-inflow')
-        assert abs(check_time-time) <= 1e-6
-
-        inflow = self.coolant_inlet_phase.GetRow(time)
-        self.coolant_inlet_phase.AddRow(time, inflow)
-        self.coolant_inlet_phase.SetValue('inflow-cool-temp', inflow_state['inflow-cool-temp'], time)
-
-    def __call_output_ports(self, time):
         # Interactions in the coolant-outflow port
         #-----------------------------------------
         # one way "to" coolant-outflow
@@ -190,6 +173,20 @@ class BWR(Module):
         outflow_state['outflow-cool-temp'] = outflow_cool_temp
         self.send( (message_time, outflow_state), 'coolant-outflow' )
         self.send( (message_time, outflow_state), 'coolant-inflow')
+
+        # Interactions in the coolant-inflow port
+        #----------------------------------------
+        # one way "from" coolant-inflow
+
+        # from
+        self.send( time, 'coolant-inflow' )
+        (check_time, inflow_state) = self.recv('coolant-inflow')
+        assert abs(check_time-time) <= 1e-6
+        print('bwr functioning properly')
+        inflow = self.coolant_inlet_phase.GetRow(time)
+        self.coolant_inlet_phase.AddRow(time, inflow)
+        self.coolant_inlet_phase.SetValue('inflow-cool-temp', inflow_state['inflow-cool-temp'], time)
+
 
     def __step(self, time=0.0):
         r'''

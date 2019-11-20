@@ -100,7 +100,6 @@ class Turbine(Module):
        # self.__zero_ode_parameters()
 
         time = self.initial_time
-
         while time < self.end_time:
 
             if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
@@ -109,31 +108,15 @@ class Turbine(Module):
             # Communicate information
             #------------------------
 
-            self.__call_input_ports(time)
+            self.__call_ports(time)
 
             # Evolve one time step
             #---------------------
 
             time = self.__step( time )
 
-            self.__call_output_ports(time)
+    def __call_ports(self, time):
 
-    def __call_input_ports(self, time):
-
-        # Interactions in the coolant-inflow port
-        #----------------------------------------
-        # one way "from" coolant-inflow
-
-        # from
-        self.send( time, 'steam-inflow' )
-        (check_time, inflow_state) = self.recv('steam-inflow')
-        assert abs(check_time-time) <= 1e-6
-
-        inflow = self.coolant_inflow_phase.GetRow(time)
-        self.coolant_inflow_phase.AddRow(time, inflow)
-        self.coolant_inflow_phase.SetValue('reactor-runoff-temp', inflow_state['outflow-cool-temp'], time)
-
-    def __call_output_ports(self, time):
         # Interactions in the steam-inflow port
         #-----------------------------------------
         # one way "to" steam-inflow
@@ -149,6 +132,19 @@ class Turbine(Module):
         outflow_state['runoff-quality'] = outflow_cool_quality
         outflow_state['runoff-press'] = outflow_cool_pressure
         self.send( (message_time, outflow_state), 'runoff' )
+
+        # Interactions in the coolant-inflow port
+        #----------------------------------------
+        # one way "from" coolant-inflow
+
+        # from
+        self.send( time, 'steam-inflow' )
+        (check_time, inflow_state) = self.recv('steam-inflow')
+        assert abs(check_time-time) <= 1e-6
+
+        inflow = self.coolant_inflow_phase.GetRow(time)
+        self.coolant_inflow_phase.AddRow(time, inflow)
+        self.coolant_inflow_phase.SetValue('reactor-runoff-temp', inflow_state['outflow-cool-temp'], time)
 
     def __step(self, time=0.0):
         r'''

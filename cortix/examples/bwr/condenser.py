@@ -107,7 +107,6 @@ class Condenser(Module):
        # self.__zero_ode_parameters()
 
         time = self.initial_time
-
         while time < self.end_time:
 
             if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
@@ -115,17 +114,26 @@ class Condenser(Module):
 
             # Communicate information
             #------------------------
-
-            self.__call_input_ports(time)
+            self.__call_ports(time)
 
             # Evolve one time step
             #---------------------
-
             time = self.__step( time )
 
-            self.__call_output_ports(time)
+    def __call_ports(self, time):
 
-    def __call_input_ports(self, time):
+
+        # Interactions in the coolant-outflow port
+        #-----------------------------------------
+        # one way "to" coolant-outflow
+
+        # to be, or not to be?
+        message_time = self.recv('outflow')
+        outflow_state = dict()
+        outflow_cool_temp = self.condenser_runoff_phase.GetValue('condenser-runoff-temp', time)
+
+        condenser_runoff['outflow-temp'] = outflow_cool_temp
+        self.send( (message_time, condenser_runoff), 'outflow' )
 
         # Interactions in the outflow port
         #----------------------------------------
@@ -140,19 +148,6 @@ class Condenser(Module):
         self.turbine_runoff_phase.AddRow(time, inflow)
         self.turbine_runoff_phase.SetValue('inflow-temp', inflow_state['inflow-temp'], time)
         self.turbine_runoff_phase.SetValue('inflow-quality', inflow_state['inflow-quality'], time)
-
-    def __call_output_ports(self, time):
-        # Interactions in the coolant-outflow port
-        #-----------------------------------------
-        # one way "to" coolant-outflow
-
-        # to be, or not to be?
-        message_time = self.recv('condenser-runoff')
-        outflow_state = dict()
-        outflow_cool_temp = self.condenser_runoff_phase.GetValue('condenser-runoff-temp', time)
-
-        condenser_runoff['outflow-temp'] = outflow_cool_temp
-        self.send( (message_time, condenser_runoff), 'outflow' )
 
     def __step(self, time=0.0):
 
