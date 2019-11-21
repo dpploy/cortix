@@ -84,7 +84,7 @@ def parse_trajectory(file_name):
         lines = [l.strip().split(",") for l in f.readlines()]
         for line in lines:
             traj.append([float(i) for i in line])
-    return trajectories
+    return traj
 
 def plot_trajectories(trajectories):
     au = (149.6e6 * 1000)
@@ -105,13 +105,16 @@ def plot_trajectories(trajectories):
 
 
 if __name__ == "__main__":
-    #main()
     import matplotlib
     matplotlib.use("GTK3Agg")
+
+    main()
 
     trajectories = []
     for file in os.listdir("."):
         if file.endswith(".csv"):
             trajectories.append(parse_trajectory(file))
+
+
     plot_trajectories(trajectories)
     plt.show()
