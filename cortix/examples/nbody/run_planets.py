@@ -78,16 +78,12 @@ def main():
 
     return [(b.name, b.trajectory) for b in cortix.network.modules]
 
-def parse_trajectories():
-    trajectories = []
-    for file in os.listdir("."):
-        if file.endswith(".csv"):
-            with open(file, "r") as f:
-                traj = []
-                lines = [l.strip().split(",") for l in f.readlines()]
-                for line in lines:
-                    traj.append([float(i) for i in line])
-                trajectories.append(traj)
+def parse_trajectory(file_name):
+    traj = []
+    with open(file_name, "r") as f:
+        lines = [l.strip().split(",") for l in f.readlines()]
+        for line in lines:
+            traj.append([float(i) for i in line])
     return trajectories
 
 def plot_trajectories(trajectories):
@@ -109,10 +105,13 @@ def plot_trajectories(trajectories):
 
 
 if __name__ == "__main__":
-    #trajectories = main()
+    #main()
     import matplotlib
     matplotlib.use("GTK3Agg")
-    trajectories = parse_trajectories()
-    print(trajectories)
+
+    trajectories = []
+    for file in os.listdir("."):
+        if file.endswith(".csv"):
+            trajectories.append(parse_trajectory(file))
     plot_trajectories(trajectories)
     plt.show()
