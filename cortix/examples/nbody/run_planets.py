@@ -90,25 +90,20 @@ def parse_trajectories():
                 trajectories.append(traj)
     return trajectories
 
-def plot_trajectories(traj=None):
+def plot_trajectories(trajectories):
     au = (149.6e6 * 1000)
     scale = 250 / au
-
-    if traj is None:
-        traj = []
 
     fig = plt.figure(1)
     ax = fig.gca(projection='3d')
     patches = []
     plt.draw()
     plt.pause(.1)
-    plt.legend(handles=[Patch(label=name) for (name, t) in traj])
 
-    for (name, t) in traj:
-        patches.append(name)
-        x = [i.flatten()[0] * scale for i in t]
-        y = [i.flatten()[1] * scale for i in t]
-        z = [i.flatten()[2] * scale for i in t]
+    for t in trajectories:
+        x = [i[0] * scale for i in t]
+        y = [i[1] * scale for i in t]
+        z = [i[2] * scale for i in t]
         ax.plot(x, y, z)
     plt.savefig("planets.png")
 
@@ -119,5 +114,5 @@ if __name__ == "__main__":
     matplotlib.use("GTK3Agg")
     trajectories = parse_trajectories()
     print(trajectories)
-    #plot_trajectories(None)
+    plot_trajectories(trajectories)
     plt.show()
