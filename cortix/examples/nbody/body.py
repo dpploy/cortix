@@ -2,7 +2,6 @@ from cortix import Module
 from cortix import Port
 import numpy as np
 
-
 class Body(Module):
     def __init__(self, mass, pos, vel, time, dt, name=None):
         super().__init__()
@@ -22,12 +21,15 @@ class Body(Module):
 
     def force(self, mass, pos):
         G = 6.67408e-11
-        force = G * self.mass * mass * (pos - self.pos)
-        rad = np.linalg.norm(pos - self.pos)
-        if rad == 0:
-            print("Collision!")
-            exit(1)
-        return force / rad
+        delta = [i - j for i, j in zip(self.pos, pos)]
+
+        r = np.sqrt(delta[0] ** 2 + delta[1] ** 2 + delta[2]**2)
+        sin_theta = [d/r for d in delta]
+        force = (G * self.mass * mass) / r**2
+
+        res = [force * s for s in sin_theta]
+
+        return res
 
     def total_force(self):
         total_force = 0
@@ -63,8 +65,7 @@ class Body(Module):
     def dump(self, file_name=None):
         file_name = file_name if file_name else self.name + ".csv"
         with open(file_name, "w") as f:
-            for traj in self.trajectory:
-                (x, y, z) = traj.flatten()
+            for (x, y, z) in self.trajectory:
                 f.write("{}, {}, {}\n".format(x, y, z))
 
     def __repr__(self):
