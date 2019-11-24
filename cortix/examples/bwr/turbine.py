@@ -124,13 +124,13 @@ class Turbine(Module):
         # to be, or not to be?
         message_time = self.recv('runoff')
         outflow_state = dict()
-        outflow_cool_temp = self.turbine_runoff_phase.GetValue('runoff-temp', time)
-        outflow_cool_quality = self.turbine_runoff_phase.GetValue('runoff-quality', time)
-        outflow_cool_press = self.turbine_runoff_phase.GetValue('runoff-press', time)
+        outflow_cool_temp = self.turbine_runoff_phase.get_value('runoff-temp', time)
+        outflow_cool_quality = self.turbine_runoff_phase.get_value('runoff-quality', time)
+        outflow_cool_press = self.turbine_runoff_phase.get_value('runoff-press', time)
 
         outflow_state['runoff-temp'] = outflow_cool_temp
         outflow_state['runoff-quality'] = outflow_cool_quality
-        outflow_state['runoff-press'] = outflow_cool_pressure
+        outflow_state['runoff-press'] = outflow_cool_press
         self.send( (message_time, outflow_state), 'runoff' )
 
         # Interactions in the coolant-inflow port
@@ -142,9 +142,9 @@ class Turbine(Module):
         (check_time, inflow_state) = self.recv('steam-inflow')
         assert abs(check_time-time) <= 1e-6
 
-        inflow = self.coolant_inflow_phase.GetRow(time)
-        self.coolant_inflow_phase.AddRow(time, inflow)
-        self.coolant_inflow_phase.SetValue('reactor-runoff-temp', inflow_state['outflow-cool-temp'], time)
+        inflow = self.coolant_inflow_phase.get_row(time)
+        self.coolant_inflow_phase.add_row(time, inflow)
+        self.coolant_inflow_phase.set_value('reactor-runoff-temp', inflow_state['outflow-cool-temp'], time)
 
     def __step(self, time=0.0):
         r'''
@@ -173,19 +173,19 @@ class Turbine(Module):
         x_runoff = output[2]
         w_turbine = output[1]
 
-        twork =  self.turbine_work_phase.GetRow(time)
-        c_out = self.turbine_runoff_phase.GetRow(time)
+        twork =  self.turbine_work_phase.get_row(time)
+        c_out = self.turbine_runoff_phase.get_row(time)
 
-        self.turbine_work_phase.AddRow(twork, time)
+        self.turbine_work_phase.add_row(twork, time)
 
         time += self.time_step
 
-        self.turbine_runoff_phase.AddRow(time)
-        self.turbine_work_phase.SetValue('turbine-power', w_turbine, time)
+        self.turbine_runoff_phase.add_row(time)
+        self.turbine_work_phase.set_value('turbine-power', w_turbine, time)
 
-        self.turbine_runoff_phase.AddRow(time)
-        self.turbine_runoff_phase.SetValue('runoff-quality', x_runoff, time)
-        self.turbine_runoff_phase.SetValue('runoff-temp', t_runoff, time)
+        self.turbine_runoff_phase.add_row(time)
+        self.turbine_runoff_phase.set_value('runoff-quality', x_runoff, time)
+        self.turbine_runoff_phase.set_value('runoff-temp', t_runoff, time)
 
         # Get state values
 

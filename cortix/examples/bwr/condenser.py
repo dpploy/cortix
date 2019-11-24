@@ -71,7 +71,7 @@ class Condenser(Module):
 
         quality = Quantity(name='inflow-quality', formalName='Turbine Runoff Quality', unit='%', value=0.0)
 
-        self.turbine_runoff__phase = Phase(self.initial_time, time_unit='s',
+        self.turbine_runoff_phase = Phase(self.initial_time, time_unit='s',
                 quantities=quantities)
 
         # Condenser runoff phase history
@@ -121,20 +121,6 @@ class Condenser(Module):
             time = self.__step( time )
 
     def __call_ports(self, time):
-
-
-        # Interactions in the coolant-outflow port
-        #-----------------------------------------
-        # one way "to" coolant-outflow
-
-        # to be, or not to be?
-        message_time = self.recv('outflow')
-        outflow_state = dict()
-        outflow_cool_temp = self.condenser_runoff_phase.GetValue('condenser-runoff-temp', time)
-
-        condenser_runoff['outflow-temp'] = outflow_cool_temp
-        self.send( (message_time, condenser_runoff), 'outflow' )
-
         # Interactions in the outflow port
         #----------------------------------------
         # one way "from" outflow
@@ -144,24 +130,39 @@ class Condenser(Module):
         (check_time, inflow_state) = self.recv('inflow')
         assert abs(check_time-time) <= 1e-6
 
-        inflow = self.turbine_runoff_phase.GetRow(time)
-        self.turbine_runoff_phase.AddRow(time, inflow)
-        self.turbine_runoff_phase.SetValue('inflow-temp', inflow_state['inflow-temp'], time)
-        self.turbine_runoff_phase.SetValue('inflow-quality', inflow_state['inflow-quality'], time)
+        inflow = self.turbine_runoff_phase.get_row(time)
+        self.turbine_runoff_phase.add_row(time, inflow)
+        self.turbine_runoff_phase.set_value('inflow-temp', inflow_state['inflow-temp'], time)
+        self.turbine_runoff_phase.set_value('inflow-quality', inflow_state['inflow-quality'], time)
+
+
+
+        # Interactions in the coolant-outflow port
+        #-----------------------------------------
+        # one way "to" coolant-outflow
+
+        # to be, or not to be?
+        message_time = self.recv('outflow')
+        outflow_state = dict()
+        outflow_cool_temp = self.condenser_runoff_phase.get_value('condenser-runoff-temp', time)
+
+        condenser_runoff['outflow-temp'] = outflow_cool_temp
+        self.send( (message_time, condenser_runoff), 'outflow' )
+
 
     def __step(self, time=0.0):
 
         import iapws.iapws97 as steam
-        temp_in = self.turbine_runoff_phase.GetValue('inflow-temp', time)
-        x_in = self.turbine_runoff_phase.GetValue('inflow-temp', time)
+        temp_in = self.turbine_runoff_phase.get_value('inflow-temp', time)
+        x_in = self.turbine_runoff_phase.get_value('inflow-temp', time)
         temp_c = 0
         t_out = self.__condenser(time, temp_in, x_in, temp_c, self.params)
 
-        condenser_runoff = self.condenser_runoff_phase.GetRow(time)
+        condenser_runoff = self.condenser_runoff_phase.get_row(time)
 
         time += self.time_step
-        self.condenser_runoff_phase.AddRow(time, condenser_runoff)
-        self.condenser_runoff_phase.Setvalue('condenser-runoff-temp', t_out)
+        self.condenser_runoff_phase.add_row(time, condenser_runoff)
+        self.condenser_runoff_phase.set_value('condenser-runoff-temp', t_out)
 
     def __condenser(time, temp_in, x_in, temp_c, params):
         critical_temp = steam_table._TSat_P(0.005)
