@@ -44,11 +44,10 @@ class Condenser(Module):
         quantities      = list()
         self.ode_params = dict()
 
-        self.initial_time = 0.0 * const.day
-        self.end_time     = 4 * const.hour
-        self.time_step    = 10 * const.second
-        self.show_time    = (False,10*const.second)
-
+        self.initial_time = 0.0
+        self.end_time     = 4.0 * const.hour
+        self.show_time    = (False,10.0)
+        self.time_step = 10.0
         self.log = logging.getLogger('cortix')
         self.params = self.ode_params
 
@@ -129,11 +128,11 @@ class Condenser(Module):
         self.send( time, 'inflow' )
         (check_time, inflow_state) = self.recv('inflow')
         assert abs(check_time-time) <= 1e-6
-
-        inflow = self.turbine_runoff_phase.get_row(time)
-        self.turbine_runoff_phase.add_row(time, inflow)
-        self.turbine_runoff_phase.set_value('inflow-temp', inflow_state['inflow-temp'], time)
-        self.turbine_runoff_phase.set_value('inflow-quality', inflow_state['inflow-quality'], time)
+        if time != 0:
+            inflow = self.turbine_runoff_phase.get_row(time)
+            self.turbine_runoff_phase.add_row(time, inflow)
+            self.turbine_runoff_phase.set_value('inflow-temp', inflow_state['inflow-temp'], time)
+            self.turbine_runoff_phase.set_value('inflow-quality', inflow_state['inflow-quality'], time)
 
 
 
@@ -145,7 +144,7 @@ class Condenser(Module):
         message_time = self.recv('outflow')
         outflow_state = dict()
         outflow_cool_temp = self.condenser_runoff_phase.get_value('condenser-runoff-temp', time)
-
+        condenser_runoff = dict()
         condenser_runoff['outflow-temp'] = outflow_cool_temp
         self.send( (message_time, condenser_runoff), 'outflow' )
 
@@ -164,9 +163,10 @@ class Condenser(Module):
         self.condenser_runoff_phase.add_row(time, condenser_runoff)
         self.condenser_runoff_phase.set_value('condenser-runoff-temp', t_out)
 
-    def __condenser(time, temp_in, x_in, temp_c, params):
+    def __condenser(self, time, temp_in, x_in, temp_c, params):
         critical_temp = steam_table._TSat_P(0.005)
         condenser_runoff = critical_temp
+        x = x_in
         if x == -1 and temp_in > critical_temp: #superheated vapor inlet; deprecated
             pressure = 0.005
             h_steam = steam_table._Region2(temp_in, pressure)['h']

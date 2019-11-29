@@ -39,14 +39,13 @@ class Turbine(Module):
         super().__init__()
         self.params = params
         self.port_names_expected = ['steam-inflow','runoff']
-
         quantities      = list()
         self.ode_params = dict()
 
         self.initial_time = 0.0 * const.day
         self.end_time     = 4 * const.hour
-        self.time_step    = 10 * const.second
-        self.show_time    = (False,10*const.second)
+        self.time_step    = 10.0
+        self.show_time    = (False,10.0)
 
         self.log = logging.getLogger('cortix')
 
@@ -142,9 +141,10 @@ class Turbine(Module):
         (check_time, inflow_state) = self.recv('steam-inflow')
         assert abs(check_time-time) <= 1e-6
 
-        inflow = self.coolant_inflow_phase.get_row(time)
-        self.coolant_inflow_phase.add_row(time, inflow)
-        self.coolant_inflow_phase.set_value('reactor-runoff-temp', inflow_state['outflow-cool-temp'], time)
+        if time != 0:
+            inflow = self.coolant_inflow_phase.get_row(time)
+            self.coolant_inflow_phase.add_row(time, inflow)
+            self.coolant_inflow_phase.set_value('reactor-runoff-temp', inflow_state['outflow-cool-temp'], time)
 
     def __step(self, time=0.0):
         r'''
@@ -165,7 +165,7 @@ class Turbine(Module):
 
         '''
         import iapws.iapws97 as steam
-        temp_in = self.coolant_inflow_phase('coolant-inflow-temp', time)
+        temp_in = self.coolant_inflow_phase.get_value('reactor-runoff-temp', time)
 
         output = self.__turbine(time, temp_in, self.params)
 
@@ -189,7 +189,7 @@ class Turbine(Module):
 
         # Get state values
 
-    def turbine(time, temp_in, params):
+    def __turbine(self, time, temp_in, params):
         #expand the entering steam from whatever temperature and pressure it enters at to 0.035 kpa, with 80% efficiency.
         #pressure of steam when it enters the turbine equals the current reactor operating pressure
 
