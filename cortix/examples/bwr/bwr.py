@@ -40,13 +40,12 @@ class BWR(Module):
 
         quantities      = list()
         self.ode_params = dict()
-
-        const.second = 1.0
+        self.time_step = 10.0
 
         self.initial_time = 0.0 * const.day
         self.end_time     = 4 * const.hour
-        self.time_step    = 10 * const.second
-        self.show_time    = (False,10*const.second)
+        self.time_step    = 10.0
+        self.show_time    = (False,10.0)
 
         self.log = logging.getLogger('cortix')
 
@@ -111,7 +110,7 @@ class BWR(Module):
         self.neutron_phase = Phase(self.initial_time, time_unit='s',
                 quantities=quantities)
 
-        #self.population_phase.SetValue('f0g', f0g_0, self.initial_time)
+        #self.population_phase.set_value('f0g', f0g_0, self.initial_time)
 
         #reactor paramaters
         quantities = list()
@@ -152,17 +151,27 @@ class BWR(Module):
             # Communicate information
             #------------------------
 
-            self.__call_input_ports(time)
+            self.__call_ports(time)
 
             # Evolve one time step
             #---------------------
 
             time = self.__step( time )
 
-            self.__call_output_ports(self, time)
+    def __call_ports(self, time):
 
-            self.__call_output_ports(time)
-    def __call_input_ports(self, time):
+        # Interactions in the coolant-outflow port
+        #-----------------------------------------
+        # one way "to" coolant-outflow
+
+        # to be, or not to be?
+        message_time = self.recv('coolant-outflow')
+        outflow_state = dict()
+        outflow_cool_temp = self.coolant_outflow_phase.get_value('outflow-cool-temp', time)
+
+        outflow_state['outflow-cool-temp'] = outflow_cool_temp
+        self.send( (message_time, outflow_state), 'coolant-outflow' )
+        self.send( (message_time, outflow_state), 'coolant-inflow')
 
         # Interactions in the coolant-inflow port
         #----------------------------------------
@@ -172,24 +181,11 @@ class BWR(Module):
         self.send( time, 'coolant-inflow' )
         (check_time, inflow_state) = self.recv('coolant-inflow')
         assert abs(check_time-time) <= 1e-6
+        print('bwr functioning properly')
+        inflow = self.coolant_inlet_phase.get_row(time)
+        self.coolant_inlet_phase.add_row(time, inflow)
+        self.coolant_inlet_phase.set_value('inflow-cool-temp', inflow_state['inflow-cool-temp'], time)
 
-        inflow = self.coolant_inlet_phase.GetRow(time)
-        self.coolant_inlet_phase.AddRow(time, inflow)
-        self.coolant_inlet_phase.SetValue('inflow-cool-temp', inflow_state['inflow-cool-temp'], time)
-
-    def __call_output_ports(self, time):
-        # Interactions in the coolant-outflow port
-        #-----------------------------------------
-        # one way "to" coolant-outflow
-
-        # to be, or not to be?
-        message_time = self.recv('coolant-outflow')
-        outflow_state = dict()
-        outflow_cool_temp = self.coolant_outflow_phase.GetValue('outflow-cool-temp', time)
-
-        outflow_state['outflow-cool-temp'] = outflow_cool_temp
-        self.send( (message_time, outflow_state), 'coolant-outflow' )
-        self.send( (message_time, outflow_state), 'coolant-inflow')
 
     def __step(self, time=0.0):
         r'''
@@ -232,20 +228,20 @@ class BWR(Module):
         cool_temp = u_vec[7]
 
         #update state variables
-        outflow = self.coolant_outflow_phase.GetRow(time)
-        neutrons = self.neutron_phase.GetRow(time)
-        reactor = self.reactor_phase.GetRow(time)
+        outflow = self.coolant_outflow_phase.get_row(time)
+        neutrons = self.neutron_phase.get_row(time)
+        reactor = self.reactor_phase.get_row(time)
 
         time += self.time_step
 
-        self.coolant_outflow_phase.AddRow(time, outflow)
-        self.neutron_phase.AddRow(time, neutrons)
-        self.reactor_phase.AddRow(time, reactor)
+        self.coolant_outflow_phase.add_row(time, outflow)
+        self.neutron_phase.add_row(time, neutrons)
+        self.reactor_phase.add_row(time, reactor)
 
-        self.coolant_outflow_phase.SetValue('outflow-cool-temp', cool_temp, time)
-        self.neutron_phase.SetValue('neutron-dens', n_dens, time)
-        self.neutron_phase.SetValue('delayed-neutrons-cc', c_vec, time)
-        self.reactor_phase.SetValue('fuel-temp', fuel_temp, time)
+        self.coolant_outflow_phase.set_value('outflow-cool-temp', cool_temp, time)
+        self.neutron_phase.set_value('neutron-dens', n_dens, time)
+        self.neutron_phase.set_value('delayed-neutrons-cc', c_vec, time)
+        self.reactor_phase.set_value('fuel-temp', fuel_temp, time)
 
         return time
 
@@ -266,7 +262,7 @@ class BWR(Module):
         delayed_neutrons_cc = self.neutron_phase.get_value('delayed-neutrons-cc',time)/(const.centi)**3
         u_vec = np.append( u_vec, delayed_neutrons_cc )
 
-        fuel_temp = self.reactor_phase.GetValue('fuel-temp',time)
+        fuel_temp = self.reactor_phase.get_value('fuel-temp',time)
         u_vec = np.append( u_vec, fuel_temp)
 
 
@@ -589,7 +585,7 @@ class BWR(Module):
 
     def __compute_outflow_rates(self, time, name):
 
-        f0g = self.population_phase.GetValue('f0g',time)
+        f0g = self.population_phase.get_value('f0g',time)
 
         if name == 'arrested':
 
