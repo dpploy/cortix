@@ -4,7 +4,7 @@
 # https://cortix.org
 
 import numpy as np
-import scipy.constants as const
+import scipy.constants as unit
 from scipy.integrate import odeint
 
 from cortix import Module
@@ -43,75 +43,66 @@ class Adjudication(Module):
         quantities      = list()
         self.ode_params = dict()
 
-        self.initial_time = 0.0 * const.day
-        self.end_time     = 100 * const.day
-        self.time_step    = 0.5 * const.day
+        self.initial_time = 0.0 * unit.day
+        self.end_time     = 100 * unit.day
+        self.time_step    = 0.5 * unit.day
+
+        unit.percent = 1/100
+        unit.month = 30*unit.day
 
         # Population groups
         self.n_groups = n_groups
 
         # Adjudication population groups
         fag_0 = np.random.random(self.n_groups) * pool_size
-        fag = Quantity(name='fag', formalName='adjudication-pop-grps',
-                unit='individual', value=fag_0)
+        fag = Quantity(name='fag', formal_name='adjudication-pop-grps',
+                latex_name = '$n_a^{(g)}$',
+                unit='# offenders', value=fag_0, info='Adjudication Population Groups')
         quantities.append(fag)
 
-        # Model parameters: commitment coefficients and their modifiers
+        # Model parameters: commitment coefficients
 
         # Adjudication to community
-        ca0g_0 = np.random.random(self.n_groups) / const.day
-        ca0g = Quantity(name='ca0g', formalName='commit-community-coeff-grps',
-               unit='individual', value=ca0g_0)
+        a = 10*unit.percent/unit.year * np.ones(self.n_groups)
+        b = 15*unit.percent/unit.year * np.ones(self.n_groups)
+        ca0g_0 = (a + (b-a)*np.random.random(self.n_groups)) / self.n_groups
+        ca0g = Quantity(name='ca0g', formal_name='commit-community-coeff-grps',
+               unit='1/s', value=ca0g_0)
         self.ode_params['commit-to-community-coeff-grps'] = ca0g_0
         quantities.append(ca0g)
 
-        ma0g_0 = np.random.random(self.n_groups)
-        ma0g = Quantity(name='ma0g', formalName='commit-community-coeff-mod-grps',
-               unit='individual', value=ma0g_0)
-        self.ode_params['commit-to-community-coeff-mod-grps'] = ma0g_0
-        quantities.append(ma0g)
-
-        # Adjudication to jail    
-        cajg_0 = np.random.random(self.n_groups) / const.day
-        cajg = Quantity(name='cajg', formalName='commit-parole-coeff-grps',
-               unit='individual', value=cajg_0)
-        self.ode_params['commit-to-jail-coeff-grps'] = cajg_0
-        quantities.append(cajg)
-
-        majg_0 = np.random.random(self.n_groups)
-        majg = Quantity(name='majg', formalName='commit-parole-coeff-mod-grps',
-               unit='individual', value=majg_0)
-        self.ode_params['commit-to-jail-coeff-mod-grps'] = majg_0
-        quantities.append(majg)
-
         # Adjudication to probation
-        cabg_0 = np.random.random(self.n_groups) / const.day
-        cabg = Quantity(name='cabg', formalName='commit-probation-coeff-grps',
-               unit='individual', value=cabg_0)
+        a = 20*unit.percent/unit.year * np.ones(self.n_groups)
+        b = 30*unit.percent/unit.year * np.ones(self.n_groups)
+        cabg_0 = (a + (b-a)*np.random.random(self.n_groups)) / self.n_groups
+        cabg = Quantity(name='cabg', formal_name='commit-probation-coeff-grps',
+               unit='1/s', value=cabg_0)
         self.ode_params['commit-to-probation-coeff-grps'] = cabg_0
         quantities.append(cabg)
 
-        mabg_0 = np.random.random(self.n_groups)
-        mabg = Quantity(name='mabg', formalName='commit-probation-coeff-mod-grps',
-               unit='individual', value=mabg_0)
-        self.ode_params['commit-to-probation-coeff-mod-grps'] = mabg_0
-        quantities.append(mabg)
+        # Adjudication to jail    
+        a = 15*unit.percent/unit.year * np.ones(self.n_groups)
+        b = 25*unit.percent/unit.year * np.ones(self.n_groups)
+        cajg_0 = (a + (b-a)*np.random.random(self.n_groups)) / self.n_groups
+        cajg = Quantity(name='cajg', formal_name='commit-parole-coeff-grps',
+               unit='1/s', value=cajg_0)
+        self.ode_params['commit-to-jail-coeff-grps'] = cajg_0
+        quantities.append(cajg)
 
         # Adjudication to prison    
-        capg_0 = np.random.random(self.n_groups) / const.day
-        capg = Quantity(name='capg', formalName='commit-prison-coeff-grps',
-               unit='individual', value=capg_0)
+        a = 40*unit.percent/unit.year * np.ones(self.n_groups)
+        b = 50*unit.percent/unit.year * np.ones(self.n_groups)
+        capg_0 = (a + (b-a)*np.random.random(self.n_groups)) / self.n_groups
+        capg = Quantity(name='capg', formal_name='commit-prison-coeff-grps',
+               unit='1/s', value=capg_0)
         self.ode_params['commit-to-prison-coeff-grps'] = capg_0
         quantities.append(capg)
 
-        mapg_0 = np.random.random(self.n_groups)
-        mapg = Quantity(name='mapg', formalName='commit-prison-coeff-mod-grps',
-               unit='individual', value=mapg_0)
-        self.ode_params['commit-to-prison-coeff-mod-grps'] = mapg_0
-        quantities.append(mapg)
-
         # Death term
-        self.ode_params['death-rates'] = np.zeros(self.n_groups)
+        a = 0.2*unit.percent/unit.year * np.ones(self.n_groups)
+        b = 0.3*unit.percent/unit.year * np.ones(self.n_groups)
+        dag_0 = (a + (b-a)*np.random.random(self.n_groups)) / self.n_groups
+        self.ode_params['death-rates-coeff'] = dag_0
 
         # Phase state
         self.population_phase = Phase(self.initial_time, time_unit='s',
@@ -196,22 +187,20 @@ class Adjudication(Module):
         assert np.all(inflow_rates>=0.0), 'values: %r'%inflow_rates
 
         ca0g = self.ode_params['commit-to-community-coeff-grps']
-        ma0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
         cajg = self.ode_params['commit-to-jail-coeff-grps']
-        majg = self.ode_params['commit-to-jail-coeff-mod-grps']
 
         cabg = self.ode_params['commit-to-probation-coeff-grps']
-        mabg = self.ode_params['commit-to-probation-coeff-mod-grps']
 
         capg = self.ode_params['commit-to-prison-coeff-grps']
-        mapg = self.ode_params['commit-to-prison-coeff-mod-grps']
 
-        outflow_rates = ( ca0g * ma0g + cajg * majg + cabg * mabg + capg * mapg ) * fag
+        outflow_rates = ( ca0g + cajg + cabg + capg ) * fag
 
         assert np.all(outflow_rates>=0.0), 'values: %r'%outflow_rates
 
-        death_rates = params['death-rates']
+        death_rates_coeff = params['death-rates-coeff']
+
+        death_rates = death_rates_coeff * fag
 
         assert np.all(death_rates>=0.0), 'values: %r'%death_rates
 
@@ -270,30 +259,26 @@ class Adjudication(Module):
         if name == 'prison':
 
             capg = self.ode_params['commit-to-prison-coeff-grps']
-            mapg = self.ode_params['commit-to-prison-coeff-mod-grps']
 
-            outflow_rates = capg * mapg * fag
+            outflow_rates = capg * fag
 
         if name == 'probation':
 
             cabg = self.ode_params['commit-to-probation-coeff-grps']
-            mabg = self.ode_params['commit-to-probation-coeff-mod-grps']
 
-            outflow_rates = cabg * mabg * fag
+            outflow_rates = cabg * fag
 
         if name == 'jail':
 
             cajg = self.ode_params['commit-to-jail-coeff-grps']
-            majg = self.ode_params['commit-to-jail-coeff-mod-grps']
 
-            outflow_rates = cajg * majg * fag
+            outflow_rates = cajg * fag
 
         if name == 'community':
 
             ca0g = self.ode_params['commit-to-community-coeff-grps']
-            ma0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
-            outflow_rates = ca0g * ma0g * fag
+            outflow_rates = ca0g * fag
 
         return outflow_rates
 
@@ -309,18 +294,14 @@ class Adjudication(Module):
 
         if 'community' not in p_names:
             self.ode_params['commit-to-community-coeff-grps']     = zeros
-            self.ode_params['commit-to-community-coeff-mod-grps'] = zeros
 
         if 'jail' not in p_names:
             self.ode_params['commit-to-jail-coeff-grps'] = zeros
-            self.ode_params['commit-to-jail-coeff-mod-grps'] = zeros
 
         if 'probation' not in p_names:
             self.ode_params['commit-to-probation-coeff-grps'] = zeros
-            self.ode_params['commit-to-probation-coeff-mod-grps'] = zeros
 
         if 'prison' not in p_names:
             self.ode_params['commit-to-prison-coeff-grps'] = zeros
-            self.ode_params['commit-to-prison-coeff-mod-grps'] = zeros
 
         return

@@ -196,6 +196,7 @@ class FuelBundle():
     fuel_pin_volume = property(get_fuel_pin_volume, None, None, None)
 
     def get_fuel_volume(self):
+
         '''
         Returns the total volume of fuel in the bundle, in cm^3.
 
@@ -372,6 +373,7 @@ class FuelBundle():
         return float(self.__specs.loc['Enrichment [U-235 wt%]', 1])
 
     def __get_fresh_u_mass(self):
+
         '''
         Returns the mass of fuel in the bundle.
 
@@ -458,6 +460,7 @@ class FuelBundle():
         return fuel_pin_length * math.pi * fuel_pin_radius ** 2
 
     def __get_fuel_volume(self):
+
         '''
         Returns the volume of fuel in the bundle, in cm^3.
 
