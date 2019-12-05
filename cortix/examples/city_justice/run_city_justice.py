@@ -32,7 +32,7 @@ command line as
 
 '''
 
-import scipy.constants as const
+import scipy.constants as unit
 
 import matplotlib.pyplot as plt
 
@@ -65,9 +65,9 @@ def main():
     '''
 
     # Configuration Parameters
-    n_groups  = 150 # number of population groups
-    end_time  =  40 * const.day
-    time_step = 0.5 * const.day
+    n_groups  =  10 # number of population groups
+    end_time  =  30* unit.year
+    time_step = 1.0 * unit.day
 
     use_mpi = False  # True for MPI; False for Python multiprocessing
 
@@ -75,12 +75,12 @@ def main():
 
     city.network = Network()
 
-    community = Community(n_groups=n_groups, non_offender_adult_population=100,
+    community = Community(n_groups=n_groups, non_offender_adult_population=100000,
             offender_pool_size=0)
     city.network.module(community)
     community.end_time = end_time
     community.time_step = time_step
-    community.show_time = (True,10*const.day)
+    community.show_time = (True,30*unit.day)
     community.save = True
 
     prison = Prison(n_groups=n_groups,pool_size=0.0)
@@ -150,14 +150,14 @@ def main():
             population_phase = module.population_phase
             (fxg_quant, time_unit) = population_phase.get_quantity_history(quant_name)
 
-            fxg_quant.plot( x_scaling=1/const.day, x_label='Time [day]',
-                    y_label=fxg_quant.name+' ['+fxg_quant.unit+' %]')
+            fxg_quant.plot( x_scaling=1/unit.year, x_label='Time [y]',
+                    y_label=fxg_quant.latex_name+' ['+fxg_quant.unit+']')
 
             # Number of parameters in the prison model
             n_params = (len(population_phase.GetActors())-1)*n_groups
             return n_params
 
-        quant_names = {'Prison':'fpg','Parole':'feg','Adjudication':'fag',
+        quant_names = {'Prison':'npg','Parole':'feg','Adjudication':'fag',
                 'Jail':'fjg','Arrested':'frg','Probation':'fbg','Community':'f0g'}
 
         for m in city.network.modules:
@@ -166,9 +166,9 @@ def main():
             plt.grid()
             plt.savefig(m.name+'.png', dpi=300)
             if m.name=='Community':
-                inspect_module_data(m,'f0g_free')
+                inspect_module_data(m,'n0')
                 plt.grid()
-                plt.savefig(m.name+'-free.png', dpi=300)
+                plt.savefig(m.name+'-n0.png', dpi=300)
 
         # Total number of unknowns and parameters
 

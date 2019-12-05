@@ -16,11 +16,13 @@ class Quantity:
 
     '''
     def __init__(self,
-                 name       = 'null-quantity-name',
-                 formalName = 'null-quantity-formal-name', # deprecated
+                 name        = 'null-quantity-name',
+                 formalName  = 'null-quantity-formal-name', # deprecated
                  formal_name = 'null-quantity-formal-name',
+                 latex_name = 'null-quantity-latex-name',
                  value      = float(0.0),      # this can be any type
-                 unit       = 'null-quantity-unit'
+                 unit       = 'null-quantity-unit',
+                 info       = 'null-quantity-info'
                 ):
 
         assert isinstance(name, str), 'not a string.'
@@ -28,7 +30,11 @@ class Quantity:
 
         assert isinstance(formalName, str), 'not a string.'
         self.__formalName = formalName  # deprecated
+        assert isinstance(formal_name, str), 'not a string.'
         self.__formal_name = formal_name
+
+        assert isinstance(latex_name, str), 'not a string.'
+        self.__latex_name = latex_name
 
         self.__value = value
 
@@ -38,6 +44,8 @@ class Quantity:
         self.__name = name
         self.__value = value
         self.__unit = unit
+
+        self.__info = info # info text such as technical name or other properties info
 
         return
 
@@ -107,9 +115,58 @@ class Quantity:
         formalName: str
         '''
 
-        return self.__formalName
+        #return self.__formalName
+        return self.__formal_name
     formalName = property(GetFormalName, SetFormalName, None, None)
     formal_name = property(GetFormalName, SetFormalName, None, None)
+
+    def set_latex_name(self, ln):
+
+        '''
+        Sets the LaTeX name of the property to ln.
+
+        Parameters
+        ----------
+        ln: str
+        '''
+
+        self.__latex_name = ln
+
+    def get_latex_name(self):
+        '''
+        Returns the formal name of the quantity.
+
+        Returns
+        -------
+        formalName: str
+        '''
+
+        return self.__latex_name
+    latex_name = property(get_latex_name, set_latex_name, None, None)
+
+    def set_info(self, ln):
+
+        '''
+        Sets the LaTeX name of the property to ln.
+
+        Parameters
+        ----------
+        ln: str
+        '''
+
+        self.__latex_name = ln
+
+    def get_info(self):
+        '''
+        Returns the formal name of the quantity.
+
+        Returns
+        -------
+        formalName: str
+        '''
+
+        return self.__info
+    info = property(get_info, set_info, None, None)
 
     def SetUnit(self, f):
         '''
@@ -160,7 +217,7 @@ class Quantity:
             return
 
         if not title:
-            title = self.formal_name
+            title = self.info
         if not y_label:
             y_label = self.name
 
@@ -206,8 +263,8 @@ class Quantity:
         s: str
         '''
 
-        s = '\n\t Quantity(): \n\t name=%s; formal name=%s; value=%s[%s]'
-        return s % (self.name, self.formalName, self.value, self.unit)
+        s = '\n\t Quantity(): \n\t name=%s; formal name=%s; latex name=%s; info=%s; value=%s[%s]'
+        return s % (self.name, self.formal_name, self.latex_name, self.info, self.value, self.unit)
 
     def __repr__(self):
         '''
@@ -219,5 +276,5 @@ class Quantity:
         s: str
         '''
 
-        s = '\n\t Quantity(): \n\t name=%s; formal name=%s; value=%s[%s]'
-        return s % (self.name, self.formalName, self.value, self.unit)
+        s = '\n\t Quantity(): \n\t name=%s; formal name=%s; latex name=%s; info=%s; value=%s[%s]'
+        return s % (self.name, self.formal_name, self.latex_name, self.info, self.value, self.unit)
