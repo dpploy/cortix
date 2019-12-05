@@ -33,7 +33,7 @@ class BWR(Module):
             All parameters for the module in the form of a dictionary.
 
         '''
-
+        self.params = params
         super().__init__()
 
         self.port_names_expected = ['coolant-inflow','coolant-outflow']
@@ -180,11 +180,11 @@ class BWR(Module):
         # from
         self.send( time, 'coolant-inflow' )
         (check_time, inflow_state) = self.recv('coolant-inflow')
-        assert abs(check_time-time) <= 1e-6
-        print('bwr functioning properly')
-        inflow = self.coolant_inlet_phase.get_row(time)
-        self.coolant_inlet_phase.add_row(time, inflow)
-        self.coolant_inlet_phase.set_value('inflow-cool-temp', inflow_state['inflow-cool-temp'], time)
+        assert abs(check_time[0] -time) <= 1e-6
+        if self.coolant_inflow_phase.has_time_stamp(time) == False:
+            inflow = self.coolant_inflow_phase.get_row(time)
+            self.coolant_inflow_phase.add_row(time, inflow)
+            self.coolant_inflow_phase.set_value('inflow-cool-temp', inflow_state['inflow-cool-temp'], time)
 
 
     def __step(self, time=0.0):
@@ -209,7 +209,6 @@ class BWR(Module):
 
         # Get state values
         u_0 = self.__get_state_vector( time )
-
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
         (u_vec_hist, info_dict) = odeint( self.__f_vec,
@@ -252,45 +251,18 @@ class BWR(Module):
             termperature of fuel (1), temperature of coolant (1).
         '''
 
-        u_list = list()
-
         u_vec = np.empty(0,dtype=np.float64)
 
         neutron_dens = self.neutron_phase.get_value('neutron-dens',time)/(const.centi)**3
+        print(time, 'time')
+        print(neutron_dens, 'n_dens')
         u_vec = np.append( u_vec, neutron_dens )
-
+        print(u_vec, 'u_vec')
         delayed_neutrons_cc = self.neutron_phase.get_value('delayed-neutrons-cc',time)/(const.centi)**3
         u_vec = np.append( u_vec, delayed_neutrons_cc )
 
         fuel_temp = self.reactor_phase.get_value('fuel-temp',time)
         u_vec = np.append( u_vec, fuel_temp)
-
-
-       # for spc in self.aqueous_phase.species:
-            #mass_cc = self.aqueous_phase.get_species_concentration(spc.name,time)
-           # mass_cc = self.aqueous_phase.get_species_concentration(spc.name)
-           # assert mass_cc is not None
-           # u_list.append( mass_cc )
-           # spc.flag = idx # the global id of the species
-           # idx += 1
-
-       # for spc in self.organic_phase.species:
-            #mass_cc = self.organic_phase.get_species_concentration(spc.name,time)
-           # mass_cc = self.organic_phase.get_species_concentration(spc.name)
-           # assert mass_cc is not None
-           # u_list.append( mass_cc )
-          #  spc.flag = idx # the global id of the species
-         #   idx += 1
-
-       # for spc in self.vapor_phase.species:
-            #mass_cc = self.vapor_phase.get_species_concentration(spc.name,time)
-           # mass_cc = self.vapor_phase.get_species_concentration(spc.name)
-           # assert mass_cc is not None
-           # u_list.append( mass_cc )
-           # spc.flag = idx # the global id of the species
-           # idx += 1
-
-        u_vec = np.array( u_list, dtype=np.float64 )
 
         # sanity check
         assert not u_vec[u_vec<0.0],'%r'%u_vec
@@ -502,7 +474,7 @@ class BWR(Module):
             assert np.max(abs(u_vec[u_vec < 0])) <= 1e-8, 'u_vec = %r'%u_vec
         #assert np.all(u_vec >= 0.0), 'u_vec = %r'%u_vec
 
-        q_source_t = self__.q_source(time, self.params)
+        q_source_t = self.__q_source(time, self.params)
 
         n_dens = u_vec[0] # get neutron dens
 

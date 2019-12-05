@@ -140,8 +140,7 @@ class Turbine(Module):
         self.send( time, 'steam-inflow' )
         (check_time, inflow_state) = self.recv('steam-inflow')
         assert abs(check_time-time) <= 1e-6
-
-        if time != 0:
+        if self.coolant_inflow_phase.has_time_stamp(time) == False:
             inflow = self.coolant_inflow_phase.get_row(time)
             self.coolant_inflow_phase.add_row(time, inflow)
             self.coolant_inflow_phase.set_value('reactor-runoff-temp', inflow_state['outflow-cool-temp'], time)
@@ -187,6 +186,7 @@ class Turbine(Module):
         self.turbine_runoff_phase.set_value('runoff-quality', x_runoff, time)
         self.turbine_runoff_phase.set_value('runoff-temp', t_runoff, time)
 
+        return(time)
         # Get state values
 
     def __turbine(self, time, temp_in, params):

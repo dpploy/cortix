@@ -106,8 +106,10 @@ class Condenser(Module):
        # self.__zero_ode_parameters()
 
         time = self.initial_time
-        while time < self.end_time:
+        end_time = self.end_time
 
+        while time <  end_time:
+            print('condenser looped')
             if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
                 self.log.info('time = '+str(round(time/const.minute,1)))
 
@@ -128,13 +130,11 @@ class Condenser(Module):
         self.send( time, 'inflow' )
         (check_time, inflow_state) = self.recv('inflow')
         assert abs(check_time-time) <= 1e-6
-        if time != 0:
+        if self.turbine_runoff_phase.has_time_stamp(time) == False:
             inflow = self.turbine_runoff_phase.get_row(time)
             self.turbine_runoff_phase.add_row(time, inflow)
             self.turbine_runoff_phase.set_value('inflow-temp', inflow_state['inflow-temp'], time)
             self.turbine_runoff_phase.set_value('inflow-quality', inflow_state['inflow-quality'], time)
-
-
 
         # Interactions in the coolant-outflow port
         #-----------------------------------------
@@ -149,7 +149,7 @@ class Condenser(Module):
         self.send( (message_time, condenser_runoff), 'outflow' )
 
 
-    def __step(self, time=0.0):
+    def __step(self, time):
 
         import iapws.iapws97 as steam
         temp_in = self.turbine_runoff_phase.get_value('inflow-temp', time)
@@ -159,9 +159,10 @@ class Condenser(Module):
 
         condenser_runoff = self.condenser_runoff_phase.get_row(time)
 
-        time += self.time_step
+        time = time + self.time_step
         self.condenser_runoff_phase.add_row(time, condenser_runoff)
         self.condenser_runoff_phase.set_value('condenser-runoff-temp', t_out)
+        return(time)
 
     def __condenser(self, time, temp_in, x_in, temp_c, params):
         critical_temp = steam_table._TSat_P(0.005)
