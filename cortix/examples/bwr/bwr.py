@@ -151,7 +151,8 @@ class BWR(Module):
             # Communicate information
             #------------------------
 
-            self.__call_ports(time)
+            if self.ports:
+                self.__call_ports(time)
 
             # Evolve one time step
             #---------------------
@@ -164,20 +165,22 @@ class BWR(Module):
         #-----------------------------------------
         # one way "to" coolant-outflow
 
-        # to be, or not to be?
+        # send to 
         message_time = self.recv('coolant-outflow')
-        outflow_state = dict()
+
         outflow_cool_temp = self.coolant_outflow_phase.get_value('outflow-cool-temp', time)
 
+        outflow_state = dict()
         outflow_state['outflow-cool-temp'] = outflow_cool_temp
         self.send( (message_time, outflow_state), 'coolant-outflow' )
+
         self.send( (message_time, outflow_state), 'coolant-inflow')
 
         # Interactions in the coolant-inflow port
         #----------------------------------------
         # one way "from" coolant-inflow
 
-        # from
+        # receive from
         self.send( time, 'coolant-inflow' )
         (check_time, inflow_state) = self.recv('coolant-inflow')
         assert abs(check_time[0] -time) <= 1e-6
@@ -185,7 +188,6 @@ class BWR(Module):
             inflow = self.coolant_inflow_phase.get_row(time)
             self.coolant_inflow_phase.add_row(time, inflow)
             self.coolant_inflow_phase.set_value('inflow-cool-temp', inflow_state['inflow-cool-temp'], time)
-
 
     def __step(self, time=0.0):
         r'''
