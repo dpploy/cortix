@@ -253,23 +253,24 @@ class BWR(Module):
 
         u_vec = np.empty(0,dtype=np.float64)
 
-        neutron_dens = self.neutron_phase.get_value('neutron-dens',time)/(const.centi)**3
+        neutron_dens = self.neutron_phase.get_value('neutron-dens',time)
         print(time, 'time')
         print(neutron_dens, 'n_dens')
         u_vec = np.append( u_vec, neutron_dens )
         print(u_vec, 'u_vec')
-        delayed_neutrons_cc = self.neutron_phase.get_value('delayed-neutrons-cc',time)/(const.centi)**3
-        u_vec = np.append( u_vec, delayed_neutrons_cc )
+        delayed_neutrons_cc = self.neutron_phase.get_value('delayed-neutrons-cc',time)
 
         fuel_temp = self.reactor_phase.get_value('fuel-temp',time)
         u_vec = np.append( u_vec, fuel_temp)
+
+        mod_temp = self.coolant_inflow_phase.get_value('inflow-cool-temp', time)
 
         # sanity check
         assert not u_vec[u_vec<0.0],'%r'%u_vec
 
         return u_vec
 
-    def __alpha_tn_func(temp, params, self):
+    def __alpha_tn_func(self, temp, params):
         import math
         import scipy.misc as diff
         import scipy.constants as sc
@@ -334,7 +335,7 @@ class BWR(Module):
         alpha_tn = alpha_tn/3
         return alpha_tn
 
-    def __rho_func( t, n_dens, temp, params, self ):
+    def __rho_func(self, t, n_dens, temp, params, ):
         '''
         Reactivity function.
 
@@ -430,7 +431,7 @@ class BWR(Module):
 
         return(sigma_f)
 
-    def __nuclear_pwr_dens_func( time, temp, n_dens, params, self ):
+    def __nuclear_pwr_dens_func(self, time, temp, n_dens, params ):
         '''
         Place holder for implementation
         '''
@@ -459,7 +460,7 @@ class BWR(Module):
 
         return q3prime
 
-    def __heat_sink_rate( time, temp_f, temp_c, params, self):
+    def __heat_sink_rate(self, time, temp_f, temp_c, params):
 
         ht_coeff = params['ht_coeff']
 
@@ -473,7 +474,7 @@ class BWR(Module):
         if num_negatives.any() < 0:
             assert np.max(abs(u_vec[u_vec < 0])) <= 1e-8, 'u_vec = %r'%u_vec
         #assert np.all(u_vec >= 0.0), 'u_vec = %r'%u_vec
-
+        print('u_vec', u_vec)
         q_source_t = self.__q_source(time, self.params)
 
         n_dens = u_vec[0] # get neutron dens
@@ -488,6 +489,7 @@ class BWR(Module):
         species_decay = params['species_decay']
         lambda_vec = np.array(species_decay)
         n_species  = len(lambda_vec)
+        print('n_species', n_species)
 
         f_tmp = np.zeros(1+n_species+2,dtype=np.float64) # vector for f_vec return
 
