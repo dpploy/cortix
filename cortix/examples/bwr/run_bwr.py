@@ -51,6 +51,7 @@ def main():
     import iapws.iapws97 as steam_table
     params = dict()
 
+    params['steam flowrate'] = 1820 #kg/s
     #Data pertaining to one-group energy neutron balance
     params['gen_time']     = 1.0e-4  # s
     params['beta']         = 6.5e-3  # 

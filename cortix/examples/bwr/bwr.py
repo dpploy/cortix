@@ -8,6 +8,7 @@ import logging
 import numpy as np
 import scipy.constants as const
 from scipy.integrate import odeint
+import math
 
 from cortix import Module
 from cortix.support.phase_new import PhaseNew as Phase
@@ -58,7 +59,7 @@ class BWR(Module):
         quantities.append(flowrate)
 
         temp = Quantity(name='inflow-cool-temp', formalName='Inflow Cool. Temperature',
-               unit='K', value=0.0)
+               unit='K', value=273.15)
         quantities.append(temp)
 
         press = Quantity(name='inflow-cool-press',formalName='Inflow Cool. Pressure',
@@ -78,7 +79,7 @@ class BWR(Module):
 
         temp = Quantity(name='outflow-cool-temp',
                    formalName='Outflow Cool. Temperature',
-                   unit='K', value=0.0)
+                   unit='K', value=273.15)
         quantities.append(temp)
 
         press = Quantity(name='outflow-cool-press',formalName='Outflow Cool. Pressure',
@@ -179,12 +180,14 @@ class BWR(Module):
 
         # from
         self.send( time, 'coolant-inflow' )
-        (check_time, inflow_state) = self.recv('coolant-inflow')
-        assert abs(check_time[0] -time) <= 1e-6
+        check_time = self.recv('coolant-inflow')
+        print(check_time, 'check time')
+        check = check_time
+        assert abs(check[0] -time) <= 1e-6
         if self.coolant_inflow_phase.has_time_stamp(time) == False:
             inflow = self.coolant_inflow_phase.get_row(time)
             self.coolant_inflow_phase.add_row(time, inflow)
-            self.coolant_inflow_phase.set_value('inflow-cool-temp', inflow_state['inflow-cool-temp'], time)
+            self.coolant_inflow_phase.set_value('inflow-cool-temp', check[0], time)
 
 
     def __step(self, time=0.0):
@@ -210,6 +213,8 @@ class BWR(Module):
         # Get state values
         u_0 = self.__get_state_vector( time )
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
+        self.params['reactor runoff'] = self.coolant_outflow_phase.get_value('outflow-cool-temp', time)
+        self.params['condenser runoff'] = self.coolant_inflow_phase.get_value('inflow-cool-temp', time)
 
         (u_vec_hist, info_dict) = odeint( self.__f_vec,
                                           u_0, t_interval_sec,
@@ -259,12 +264,12 @@ class BWR(Module):
         u_vec = np.append( u_vec, neutron_dens )
         print(u_vec, 'u_vec')
         delayed_neutrons_cc = self.neutron_phase.get_value('delayed-neutrons-cc',time)
-
+        u_vec = np.append(u_vec, delayed_neutrons_cc)
         fuel_temp = self.reactor_phase.get_value('fuel-temp',time)
         u_vec = np.append( u_vec, fuel_temp)
 
         mod_temp = self.coolant_inflow_phase.get_value('inflow-cool-temp', time)
-
+        u_vec = np.append(u_vec, mod_temp)
         # sanity check
         assert not u_vec[u_vec<0.0],'%r'%u_vec
 
@@ -422,11 +427,10 @@ class BWR(Module):
 
         return q
 
-    def __sigma_fis_func( temp, params, self ):
+    def __sigma_fis_func(self, temp, params):
         '''
         Place holder for implementation
         '''
-
         sigma_f = params['sigma_f_o']  * math.sqrt(298/temp) * math.sqrt(math.pi) * 0.5
 
         return(sigma_f)
@@ -474,7 +478,6 @@ class BWR(Module):
         if num_negatives.any() < 0:
             assert np.max(abs(u_vec[u_vec < 0])) <= 1e-8, 'u_vec = %r'%u_vec
         #assert np.all(u_vec >= 0.0), 'u_vec = %r'%u_vec
-        print('u_vec', u_vec)
         q_source_t = self.__q_source(time, self.params)
 
         n_dens = u_vec[0] # get neutron dens
@@ -489,7 +492,6 @@ class BWR(Module):
         species_decay = params['species_decay']
         lambda_vec = np.array(species_decay)
         n_species  = len(lambda_vec)
-        print('n_species', n_species)
 
         f_tmp = np.zeros(1+n_species+2,dtype=np.float64) # vector for f_vec return
 
@@ -537,12 +539,8 @@ class BWR(Module):
         vol_cool = params['coolant_volume']
 
         # subcooled liquid
-        turbine_calcs = turbine(time, temp_c,  params)
-        t_runoff = turbine_calcs[0]
-        x_runoff = turbine_calcs[2] #run the turbine, take the runoff and pass to condenser
-        condenser_out = condenser(time, t_runoff, x_runoff, temp_c, params) #run the condenser, pass runoff to the pump
-        pump_out = pump(time, condenser_out, temp_c, params) #run the pump, runoff returns to reactor as temp_in
-        #print("time is ", time, "and inlet temperature is", temp_in, "\n")
+        t_runoff = params['reactor runoff']
+        pump_out = params['condenser runoff']
 
         tau = params['tau_fake']
 

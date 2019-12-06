@@ -52,7 +52,7 @@ class Turbine(Module):
         # Coolant outflow phase history
         quantities = list()
 
-        temp = Quantity(name='reactor-runoff-temp', formalName = 'Temp. in', unit = 'k', value = 0.0)
+        temp = Quantity(name='reactor-runoff-temp', formalName = 'Temp. in', unit = 'k', value = 273.15)
 
         quantities.append(temp)
 
@@ -61,7 +61,7 @@ class Turbine(Module):
         # Outflow phase history
         quantities = list()
 
-        temp = Quantity(name='runoff-temp', formalName = 'Turbine Runoff Temp.', unit = 'k', value=0.0)
+        temp = Quantity(name='runoff-temp', formalName = 'Turbine Runoff Temp.', unit = 'k', value=273.15)
 
         quantities.append(temp)
 

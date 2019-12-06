@@ -9,7 +9,7 @@ import numpy as np
 import scipy.constants as const
 import scipy.constants as sc
 import iapws.iapws97 as steam_table
-
+import math
 from scipy.integrate import odeint
 
 from cortix import Module
@@ -43,13 +43,12 @@ class Condenser(Module):
 
         quantities      = list()
         self.ode_params = dict()
-
+        self.params = ode_params
         self.initial_time = 0.0
         self.end_time     = 4.0 * const.hour
         self.show_time    = (False,10.0)
         self.time_step = 10.0
         self.log = logging.getLogger('cortix')
-        self.params = self.ode_params
 
         # Runoff in phase history
 
@@ -61,7 +60,7 @@ class Condenser(Module):
         quantities.append(flowrate)
 
         temp = Quantity(name='inflow-temp', formalName='Turbine Runoff Temp.',
-               unit='K', value=0.0)
+               unit='K', value=273.15)
         quantities.append(temp)
 
         press = Quantity(name='inflow-pressure',formalName='Turbine Runoff Pressure',
@@ -69,6 +68,7 @@ class Condenser(Module):
         quantities.append(press)
 
         quality = Quantity(name='inflow-quality', formalName='Turbine Runoff Quality', unit='%', value=0.0)
+        quantities.append(quality)
 
         self.turbine_runoff_phase = Phase(self.initial_time, time_unit='s',
                 quantities=quantities)
@@ -83,7 +83,7 @@ class Condenser(Module):
 
         temp = Quantity(name='condenser-runoff-temp',
                    formalName='Condenser Runoff Temp.',
-                   unit='K', value=0.0)
+                   unit='K', value=273.15)
         quantities.append(temp)
 
         self.condenser_runoff_phase = Phase(self.initial_time, time_unit='s',
@@ -153,7 +153,7 @@ class Condenser(Module):
 
         import iapws.iapws97 as steam
         temp_in = self.turbine_runoff_phase.get_value('inflow-temp', time)
-        x_in = self.turbine_runoff_phase.get_value('inflow-temp', time)
+        x_in = self.turbine_runoff_phase.get_value('inflow-quality', time)
         temp_c = 0
         t_out = self.__condenser(time, temp_in, x_in, temp_c, self.params)
 
