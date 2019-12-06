@@ -165,15 +165,17 @@ def main():
     plant_net.module(reactor)
 
     turbine   = Turbine(params)
-    plant_net.module(turbine)
+#    plant_net.module(turbine)
 
     condenser = Condenser(params)
-    plant_net.module(condenser)
-    plant_net.connect( [reactor,'coolant-outflow'], [turbine,'steam-inflow'] )
-    plant_net.connect( [turbine,'runoff'], [condenser,'inflow'] )
-    plant_net.connect( [condenser,'outflow'], [reactor,'coolant-inflow'] )
+#    plant_net.module(condenser)
+
+#    plant_net.connect( [reactor,'coolant-outflow'], [turbine,'steam-inflow'] )
+#    plant_net.connect( [turbine,'runoff'], [condenser,'inflow'] )
+#    plant_net.connect( [condenser,'outflow'], [reactor,'coolant-inflow'] )
 
     plant_net.draw()
     plant_net.run()
+
 if __name__ == '__main__':
     main()
