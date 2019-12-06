@@ -392,7 +392,7 @@ class BWR(Module):
 
         return (rho_t, alpha_n, alpha_tn * (temp - temp_ref))
 
-    def __q_source( t, params, self ):
+    def __q_source(self, t, params):
         '''
         Neutron source delta function.
 
@@ -467,7 +467,7 @@ class BWR(Module):
         #print(q_f)
         return q_f
 
-    def __f_vec(time, u_vec, params, self):
+    def __f_vec(self, u_vec, time, params):
 
         num_negatives = u_vec[u_vec < 0]
         if num_negatives.any() < 0:

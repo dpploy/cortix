@@ -131,7 +131,7 @@ class Condenser(Module):
         (check_time, inflow_state) = self.recv('inflow')
         assert abs(check_time-time) <= 1e-6
         if self.turbine_runoff_phase.has_time_stamp(time) == False:
-            inflow = self.turbine_runoff_phase.get_row(time)
+            inflow = self.turbine_runoff_phase.get_row(time - self.time_step)
             self.turbine_runoff_phase.add_row(time, inflow)
             self.turbine_runoff_phase.set_value('inflow-temp', inflow_state['inflow-temp'], time)
             self.turbine_runoff_phase.set_value('inflow-quality', inflow_state['inflow-quality'], time)

@@ -127,9 +127,9 @@ class Turbine(Module):
         outflow_cool_quality = self.turbine_runoff_phase.get_value('runoff-quality', time)
         outflow_cool_press = self.turbine_runoff_phase.get_value('runoff-press', time)
 
-        outflow_state['runoff-temp'] = outflow_cool_temp
-        outflow_state['runoff-quality'] = outflow_cool_quality
-        outflow_state['runoff-press'] = outflow_cool_press
+        outflow_state['inflow-temp'] = outflow_cool_temp
+        outflow_state['inflow-quality'] = outflow_cool_quality
+        outflow_state['inflow-press'] = outflow_cool_press
         self.send( (message_time, outflow_state), 'runoff' )
 
         # Interactions in the coolant-inflow port
@@ -167,22 +167,19 @@ class Turbine(Module):
         temp_in = self.coolant_inflow_phase.get_value('reactor-runoff-temp', time)
 
         output = self.__turbine(time, temp_in, self.params)
-
+        time = time + self.time_step
         t_runoff = output[0]
         x_runoff = output[2]
         w_turbine = output[1]
 
-        twork =  self.turbine_work_phase.get_row(time)
-        c_out = self.turbine_runoff_phase.get_row(time)
+        if self.turbine_work_phase.has_time_stamp(time) == False:
+            work = list()
+            work.append(w_turbine)
+            self.turbine_work_phase.add_row(time, work)
+            runoff = self.turbine_runoff_phase.get_row(time - self.time_step)
+            self.turbine_runoff_phase.add_row(time, runoff)
 
-        self.turbine_work_phase.add_row(twork, time)
-
-        time += self.time_step
-
-        self.turbine_runoff_phase.add_row(time)
         self.turbine_work_phase.set_value('turbine-power', w_turbine, time)
-
-        self.turbine_runoff_phase.add_row(time)
         self.turbine_runoff_phase.set_value('runoff-quality', x_runoff, time)
         self.turbine_runoff_phase.set_value('runoff-temp', t_runoff, time)
 
