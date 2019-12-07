@@ -152,8 +152,7 @@ class BWR(Module):
             # Communicate information
             #------------------------
 
-            if self.ports:
-                self.__call_ports(time)
+            self.__call_ports(time)
 
             # Evolve one time step
             #---------------------
@@ -167,30 +166,35 @@ class BWR(Module):
         # one way "to" coolant-outflow
 
         # send to 
-        message_time = self.recv('coolant-outflow')
+        if self.get_port('coolant-outflow').connected_port:
 
-        outflow_cool_temp = self.coolant_outflow_phase.get_value('outflow-cool-temp', time)
+            message_time = self.recv('coolant-outflow')
 
-        outflow_state = dict()
-        outflow_state['outflow-cool-temp'] = outflow_cool_temp
-        self.send( (message_time, outflow_state), 'coolant-outflow' )
+            outflow_cool_temp = self.coolant_outflow_phase.get_value('outflow-cool-temp', time)
 
-        self.send( (message_time, outflow_state), 'coolant-inflow')
+            outflow_state = dict()
+            outflow_state['outflow-cool-temp'] = outflow_cool_temp
+            self.send( (message_time, outflow_state), 'coolant-outflow' )
 
         # Interactions in the coolant-inflow port
         #----------------------------------------
         # one way "from" coolant-inflow
 
+        #self.send( time, 'coolant-inflow' )
+
         # receive from
-        self.send( time, 'coolant-inflow' )
-        check_time = self.recv('coolant-inflow')
-        print(check_time, 'check time')
-        check = check_time
-        assert abs(check[0] -time) <= 1e-6
-        if self.coolant_inflow_phase.has_time_stamp(time) == False:
-            inflow = self.coolant_inflow_phase.get_row(time)
-            self.coolant_inflow_phase.add_row(time, inflow)
-            self.coolant_inflow_phase.set_value('inflow-cool-temp', check[0], time)
+        if self.get_port('coolant-inflow').connected_port:
+
+           check_time = self.recv('coolant-inflow')
+           print(check_time, 'check time')
+           check = check_time
+           assert abs(check[0] -time) <= 1e-6
+           if self.coolant_inflow_phase.has_time_stamp(time) == False:
+               inflow = self.coolant_inflow_phase.get_row(time)
+               self.coolant_inflow_phase.add_row(time, inflow)
+               self.coolant_inflow_phase.set_value('inflow-cool-temp', check[0], time)
+
+        self.send( (message_time, outflow_state), 'coolant-inflow')
 
     def __step(self, time=0.0):
         r'''
