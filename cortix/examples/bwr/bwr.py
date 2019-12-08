@@ -34,13 +34,15 @@ class BWR(Module):
             All parameters for the module in the form of a dictionary.
 
         '''
-        self.params = params
+
         super().__init__()
 
-        self.port_names_expected = ['coolant-inflow','coolant-outflow']
+        self.port_names_expected = ['coolant-inflow', 'coolant-outflow',
+                                     'signal-out', 'signal-in']
 
-        quantities      = list()
+        self.params = params
         self.ode_params = dict()
+
         self.time_step = 10.0
 
         self.initial_time = 0.0 * const.day
@@ -129,6 +131,8 @@ class BWR(Module):
         #self.ode_params = ode_params
 
         # Initialize inflows to zero
+        self.ode_params['inflow-cool-temp'] = 273.15
+
         #self.ode_params['prison-inflow-rates']       = np.zeros(self.n_groups)
         #self.ode_params['parole-inflow-rates']       = np.zeros(self.n_groups)
         #self.ode_params['arrested-inflow-rates']     = np.zeros(self.n_groups)
@@ -170,11 +174,9 @@ class BWR(Module):
 
             message_time = self.recv('coolant-outflow')
 
-            outflow_cool_temp = self.coolant_outflow_phase.get_value('outflow-cool-temp', time)
+            coolant_outflow = self.__get_coolant_outflow( message_timeo )
 
-            outflow_state = dict()
-            outflow_state['outflow-cool-temp'] = outflow_cool_temp
-            self.send( (message_time, outflow_state), 'coolant-outflow' )
+            self.send( (message_time, coolant_outflow), 'coolant-outflow' )
 
         # Interactions in the coolant-inflow port
         #----------------------------------------
@@ -185,16 +187,25 @@ class BWR(Module):
         # receive from
         if self.get_port('coolant-inflow').connected_port:
 
-           check_time = self.recv('coolant-inflow')
-           print(check_time, 'check time')
-           check = check_time
-           assert abs(check[0] -time) <= 1e-6
-           if self.coolant_inflow_phase.has_time_stamp(time) == False:
-               inflow = self.coolant_inflow_phase.get_row(time)
-               self.coolant_inflow_phase.add_row(time, inflow)
-               self.coolant_inflow_phase.set_value('inflow-cool-temp', check[0], time)
+            self.send( time, 'coolant-inflow' )
+            (check_time, inflow_cool_temp) = self.recv('coolant-inflow')
 
-        self.send( (message_time, outflow_state), 'coolant-inflow')
+            assert abs(check_time-time) <= 1e-6
+            self.ode_params['inflow-cool-temp'] = inflow_cool_temp
+
+        # Interactions in the signal-out port
+        #-----------------------------------------
+        # one way "to" signal-out 
+
+        # send to 
+        if self.get_port('signal-out').connected_port:
+
+            message_time = self.recv('signal-out')
+
+            signal_out = self.__get_signal_out(time)
+
+            self.send( (message_time, signal_out), 'signal-out' )
+
 
     def __step(self, time=0.0):
         r'''
@@ -254,6 +265,46 @@ class BWR(Module):
         self.reactor_phase.set_value('fuel-temp', fuel_temp, time)
 
         return time
+
+    def __signal_out(self, time=0.0):
+        '''
+        Send reactor signals to anyone requesting it.
+
+        Parameters
+        ----------
+        time: float
+            Time in SI unit.
+
+        Returns
+        -------
+        None
+
+        '''
+
+        signals = dict()
+
+        return signals
+
+    def __get_coolant_outflow(self, time=0.0):
+        '''
+        Get the coolant outflow stream.
+
+        Parameters
+        ----------
+        time: float
+            Time in SI unit.
+
+        Returns
+        -------
+        None
+
+        '''
+
+        coolant_outflow_stream = dict()
+
+        outflow_cool_temp = self.coolant_outflow_phase.get_value('outflow-cool-temp', time)
+
+        return coolant_outflow_stream
 
     def __get_state_vector(self, time):
         '''
