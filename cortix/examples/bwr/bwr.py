@@ -164,8 +164,8 @@ class BWR(Module):
 
             message_time = self.recv('coolant-outflow')
 
-            coolant_outflow = self.__get_coolant_outflow( message_timeo )
-
+            coolant_outflow = self.__get_coolant_outflow( message_time )
+            outflow_params = dict()
             self.send( (message_time, coolant_outflow), 'coolant-outflow' )
 
         # Interactions in the coolant-inflow port
@@ -195,6 +195,11 @@ class BWR(Module):
             signal_out = self.__get_signal_out(time)
 
             self.send( (message_time, signal_out), 'signal-out' )
+
+    def __get_coolant_outflow(message_time):
+
+        outflow = self.params['coolant-outflow']
+        return(outflow)
 
     def __step(self, time=0.0):
         r'''
@@ -240,7 +245,7 @@ class BWR(Module):
         outflow  = self.coolant_outflow_phase.get_row(time)
         neutrons = self.neutron_phase.get_row(time)
         reactor  = self.reactor_phase.get_row(time)
-
+        self.params['outflow temp'] = cool_temp
         time += self.time_step
 
         self.coolant_outflow_phase.add_row(time, outflow)
@@ -290,8 +295,9 @@ class BWR(Module):
 
         coolant_outflow_stream = dict()
 
-        outflow_cool_temp = self.coolant_outflow_phase.get_value('outflow-cool-temp', time)
+        outflow_cool_temp = self.coolant_outflow_phase.get_value('temp', time)
 
+        coolant_outflow_stream['outflow-cool-temp'] = outflow_cool_temp
         return coolant_outflow_stream
 
     def __get_state_vector(self, time):

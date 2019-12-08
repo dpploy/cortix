@@ -99,16 +99,14 @@ class Turbine(Module):
        # self.__zero_ode_parameters()
 
         time = self.initial_time
-        while time < self.end_time:
+        while time < self.end_time + self.time_step:
 
             if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
                 self.log.info('time = '+str(round(time/const.minute,1)))
 
             # Communicate information
             #------------------------
-
             self.__call_ports(time)
-
             # Evolve one time step
             #---------------------
 
@@ -121,30 +119,32 @@ class Turbine(Module):
         # one way "to" steam-inflow
 
         # to be, or not to be?
-        message_time = self.recv('runoff')
-        outflow_state = dict()
-        outflow_cool_temp = self.turbine_runoff_phase.get_value('runoff-temp', time)
-        outflow_cool_quality = self.turbine_runoff_phase.get_value('runoff-quality', time)
-        outflow_cool_press = self.turbine_runoff_phase.get_value('runoff-press', time)
+        if self.get_port('runoff').connected_port:
+            message_time = self.recv('runoff')
+            print('message time', message_time)
+            outflow_state = dict()
+            outflow_cool_temp = self.turbine_runoff_phase.get_value('runoff-temp', time)
+            outflow_cool_quality = self.turbine_runoff_phase.get_value('runoff-quality', time)
+            outflow_cool_press = self.turbine_runoff_phase.get_value('runoff-press', time)
 
-        outflow_state['inflow-temp'] = outflow_cool_temp
-        outflow_state['inflow-quality'] = outflow_cool_quality
-        outflow_state['inflow-press'] = outflow_cool_press
-        self.send( (message_time, outflow_state), 'runoff' )
+            outflow_state['inflow-temp'] = outflow_cool_temp
+            outflow_state['inflow-quality'] = outflow_cool_quality
+            outflow_state['inflow-press'] = outflow_cool_press
+            self.send( (message_time, outflow_state), 'runoff' )
 
         # Interactions in the coolant-inflow port
         #----------------------------------------
         # one way "from" coolant-inflow
 
         # from
-        self.send( time, 'steam-inflow' )
-        (check_time, inflow_state) = self.recv('steam-inflow')
-        assert abs(check_time-time) <= 1e-6
-        if self.coolant_inflow_phase.has_time_stamp(time) == False:
-            inflow = self.coolant_inflow_phase.get_row(time)
-            self.coolant_inflow_phase.add_row(time, inflow)
-            self.coolant_inflow_phase.set_value('reactor-runoff-temp', inflow_state['outflow-cool-temp'], time)
-
+        if self.get_port('steam-inflow').connected_port:
+            self.send( time, 'steam-inflow' )
+            (check_time, inflow_state) = self.recv('steam-inflow')
+            assert abs(check_time-time) <= 1e-6
+            if self.coolant_inflow_phase.has_time_stamp(time) == False:
+                inflow = self.coolant_inflow_phase.get_row(time - self.time_step)
+                self.coolant_inflow_phase.add_row(time, inflow)
+                self.coolant_inflow_phase.set_value('reactor-runoff-temp', inflow_state['outflow-cool-temp'], time)
     def __step(self, time=0.0):
         r'''
         ODE IVP problem:
@@ -170,6 +170,9 @@ class Turbine(Module):
         time = time + self.time_step
         t_runoff = output[0]
         x_runoff = output[2]
+        if x_runoff < 0 and x_runoff != -1:
+            x_runoff = 0
+        x_runoff = x_runoff * 100
         w_turbine = output[1]
 
         if self.turbine_work_phase.has_time_stamp(time) == False:

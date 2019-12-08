@@ -171,13 +171,18 @@ def main():
 
     #*****************************************************************************
     turbine   = Turbine(params)
-#    plant_net.module(turbine)
+    turbine.name = 'High Pressure Turbine'
+    turbine.save = True
+    turbine.time_step = time_step
+    turbine.end_time = end_time
+    turbine.show_time = show_time
+    plant_net.module(turbine)
 
     #*****************************************************************************
     condenser = Condenser(params)
 #    plant_net.module(condenser)
 
-#    plant_net.connect( [reactor,'coolant-outflow'], [turbine,'steam-inflow'] )
+    plant_net.connect( [reactor,'coolant-outflow'], [turbine,'steam-inflow'] )
 #    plant_net.connect( [turbine,'runoff'], [condenser,'inflow'] )
 #    plant_net.connect( [condenser,'outflow'], [reactor,'coolant-inflow'] )
 
@@ -188,6 +193,7 @@ def main():
 
     if plant.use_multiprocessing or plant.rank == 0:
 
+        #reactor graphs
         reactor = plant_net.modules[0]
 
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('neutron-dens')
@@ -216,6 +222,23 @@ def main():
                     y_label=quant.name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig(reactor.reactor_phase.get_quantity('fuel-temp').name+'.png',
+                dpi=300)
+    #turbin graphs
+        turbine = plant_net.modules[1]
+
+        (quant, time_unit) = turbine.turbine_work_phase.get_quantity_history('turbine-power')
+
+        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
+                    y_label=quant.name+' ['+quant.unit+']')
+        plt.grid()
+        plt.savefig(turbine.turbine_work_phase.get_quantity('turbine-power').name+'.png',
+                dpi=300)
+
+        (quant, time_unit) = turbine.turbine_runoff_phase.get_quantity_history('runoff-temp')
+        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
+                    y_label=quant.name+' ['+quant.unit+']')
+        plt.grid()
+        plt.savefig(turbine.turbine_runoff_phase.get_quantity('runoff-temp').name+'.png',
                 dpi=300)
 
     # Properly shutdow plant
