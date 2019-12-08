@@ -211,6 +211,13 @@ def main():
         plt.savefig(reactor.coolant_outflow_phase.get_quantity('temp').name+'.png',
                 dpi=300)
 
+        (quant, time_unit) = reactor.reactor_phase.get_quantity_history('fuel-temp')
+        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
+                    y_label=quant.name+' ['+quant.unit+']')
+        plt.grid()
+        plt.savefig(reactor.reactor_phase.get_quantity('fuel-temp').name+'.png',
+                dpi=300)
+
     # Properly shutdow plant
     plant.close()
 
