@@ -42,8 +42,6 @@ class BWR(Module):
 
         self.params = params
 
-        self.time_step = 10.0
-
         self.initial_time = 0.0 * const.day
         self.end_time     = 4 * const.hour
         self.time_step    = 10.0
@@ -76,16 +74,15 @@ class BWR(Module):
         # Neutron phase history
         quantities = list()
 
-        neutron_dens = Quantity(name='neutron-dens',
-                   formalName='Neutron Dens.',
+        neutron_dens = Quantity(name='neutron-dens', formalName='Neutron Dens.',
                    unit='1/m^3', value=0.0)
         quantities.append(neutron_dens)
 
         delayed_neutrons_0 = np.zeros(6)
 
         delayed_neutron_cc = Quantity(name='delayed-neutrons-cc',
-                   formalName='Delayed Neutrons',
-                   unit='1/m^3', value=delayed_neutrons_0)
+                             formalName='Delayed Neutrons',
+                             unit='1/m^3', value=delayed_neutrons_0)
         quantities.append(delayed_neutron_cc)
 
         self.neutron_phase = Phase(self.initial_time, time_unit='s',
@@ -119,8 +116,6 @@ class BWR(Module):
         return
 
     def run(self, *args):
-
-       # self.__zero_ode_parameters()
 
         time = self.initial_time
 
@@ -167,7 +162,7 @@ class BWR(Module):
             (check_time, inflow_cool_temp) = self.recv('coolant-inflow')
 
             assert abs(check_time-time) <= 1e-6
-            self.ode_params['inflow-cool-temp'] = inflow_cool_temp
+            self.params['inflow-cool-temp'] = inflow_cool_temp
 
         # Interactions in the signal-out port
         #-----------------------------------------
@@ -181,7 +176,6 @@ class BWR(Module):
             signal_out = self.__get_signal_out(time)
 
             self.send( (message_time, signal_out), 'signal-out' )
-
 
     def __step(self, time=0.0):
         r'''
@@ -218,15 +212,15 @@ class BWR(Module):
 
         u_vec = u_vec_hist[1,:]  # solution vector at final time step
 
-        n_dens = u_vec[0]
-        c_vec = u_vec[1:5]
+        n_dens    = u_vec[0]
+        c_vec     = u_vec[1:6]
         fuel_temp = u_vec[6]
         cool_temp = u_vec[7]
 
         #update state variables
-        outflow = self.coolant_outflow_phase.get_row(time)
+        outflow  = self.coolant_outflow_phase.get_row(time)
         neutrons = self.neutron_phase.get_row(time)
-        reactor = self.reactor_phase.get_row(time)
+        reactor  = self.reactor_phase.get_row(time)
 
         time += self.time_step
 
@@ -507,8 +501,10 @@ class BWR(Module):
     def __f_vec(self, u_vec, time, params):
 
         num_negatives = u_vec[u_vec < 0]
+
         if num_negatives.any() < 0:
             assert np.max(abs(u_vec[u_vec < 0])) <= 1e-8, 'u_vec = %r'%u_vec
+
         #assert np.all(u_vec >= 0.0), 'u_vec = %r'%u_vec
         q_source_t = self.__q_source(time, self.params)
 
@@ -535,34 +531,42 @@ class BWR(Module):
         beta = params['beta']
         gen_time = params['gen_time']
 
-        species_rel_yield = params['species_rel_yield']
-        beta_vec = np.array(species_rel_yield) * beta
 
-        assert len(lambda_vec)==len(beta_vec)
+        print('time=',time)
+        print(len(lambda_vec))
+        print(len(c_vec))
+
+        assert len(lambda_vec)==len(c_vec)
 
         f_tmp[0] = (rho_t - beta)/gen_time * n_dens + lambda_vec @ c_vec + q_source_t
-        #if f_tmp[0] < 0 and time < params['shutdown time'] and n_dens < 1:
-            #f_tmp[0] = 0
 
         #-----------------------------------
         # n species balances (implicit loop)
         #-----------------------------------
+
+        species_rel_yield = params['species_rel_yield']
+        beta_vec = np.array(species_rel_yield) * beta
+
+        assert len(lambda_vec)==len(c_vec)
+        assert len(beta_vec)==len(c_vec)
+
         f_tmp[1:-2] = beta_vec/gen_time * n_dens - lambda_vec * c_vec
 
         #--------------------
         # fuel energy balance
         #--------------------
-        rho_f = params['fuel_dens']
-        cp_f = params['cp_fuel']
+        rho_f    = params['fuel_dens']
+        cp_f     = params['cp_fuel']
         vol_fuel = params['fuel_volume']
 
-        pwr_dens = self.__nuclear_pwr_dens_func( time, (temp_f+temp_c)/2, n_dens, self.params)
+        pwr_dens  = self.__nuclear_pwr_dens_func( time, (temp_f+temp_c)/2, n_dens, self.params)
 
         heat_sink = self.__heat_sink_rate( time, temp_f, temp_c, self.params)
 
         #assert heat_sink <= 0.0,'heat_sink = %r'%heat_sink
 
         f_tmp[-2] =  -1/rho_f/cp_f * ( pwr_dens - heat_sink/vol_fuel )
+
         #-----------------------
         # coolant energy balance
         #-----------------------
@@ -585,41 +589,3 @@ class BWR(Module):
         #print(time)
         #print(u_vec)
         return f_tmp
-
-    def __compute_outflow_rates(self, time, name):
-
-        f0g = self.population_phase.get_value('f0g',time)
-
-        if name == 'arrested':
-
-            c0rg = self.ode_params['commit-to-arrested-coeff-grps']
-            m0rg = self.ode_params['commit-to-arrested-coeff-mod-grps']
-
-            c00g = self.ode_params['general-commit-to-arrested-coeff-grps']
-            m00g = self.ode_params['general-commit-to-arrested-coeff-mod-grps']
-
-            f0 = self.ode_params['non-offender-adult-population']
-
-            # Recidivism
-            outflow_rates = c0rg * m0rg * np.abs(f0g) + c00g * m00g * f0
-
-        return outflow_rates
-
-    def __zero_ode_parameters(self):
-        '''
-        If ports are not connected the corresponding outflows must be zero.
-
-        '''
-
-        zeros = np.zeros(self.n_groups)
-
-        p_names = [p.name for p in self.ports]
-
-        if 'arrested' not in p_names:
-            self.ode_params['commit-to-arrested-coeff-grps']     = zeros
-            self.ode_params['commit-to-arrested-coeff-mod-grps'] = zeros
-
-            self.ode_params['general-commit-to-arrested-coeff-grps']     = zeros
-            self.ode_params['general-commit-to-arrested-coeff-mod-grps'] = zeros
-
-        return
