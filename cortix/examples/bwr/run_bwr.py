@@ -8,6 +8,7 @@
 
 import logging
 import scipy.constants as unit
+import matplotlib.pyplot as plt
 
 from cortix import Cortix
 from cortix import Network
@@ -32,9 +33,9 @@ def main():
 
     # Simulation time and stepping input
 
-    end_time  = 10.0 * unit.minute
+    end_time  = 15.0 * unit.minute
     time_step = 1.0 * unit.minute
-    show_time = (True,5*unit.minute)
+    show_time = (True,3*unit.minute)
 
     use_mpi = False  # True for MPI; False for Python multiprocessing
 
@@ -157,7 +158,6 @@ def main():
     params['turbine-runoff-pressure'] = 1
     params['runoff-pressure'] = params['turbine-runoff-pressure']
 
-
     #*****************************************************************************
     reactor = BWR(params)
 
@@ -185,6 +185,24 @@ def main():
     plant_net.draw()
 
     plant_net.run()
+
+    if plant.use_multiprocessing or plant.rank == 0:
+
+        reactor = plant_net.modules[0]
+
+        (quant, time_unit) = reactor.neutron_phase.get_quantity_history('neutron-dens')
+        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
+                    y_label=quant.name+' ['+quant.unit+']')
+        plt.grid()
+        plt.savefig(reactor.neutron_phase.get_quantity('neutron-dens').formal_name+'.png',
+                dpi=300)
+
+        (quant, time_unit) = reactor.neutron_phase.get_quantity_history('delayed-neutrons-cc')
+        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
+                    y_label=quant.name+' ['+quant.unit+']')
+        plt.grid()
+        plt.savefig(reactor.neutron_phase.get_quantity('delayed-neutrons-cc').formal_name+'.png',
+                dpi=300)
 
     # Properly shutdow plant
     plant.close()
