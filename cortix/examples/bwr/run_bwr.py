@@ -194,14 +194,14 @@ def main():
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
                     y_label=quant.name+' ['+quant.unit+']')
         plt.grid()
-        plt.savefig(reactor.neutron_phase.get_quantity('neutron-dens').formal_name+'.png',
+        plt.savefig(reactor.neutron_phase.get_quantity('neutron-dens').name+'.png',
                 dpi=300)
 
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('delayed-neutrons-cc')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
                     y_label=quant.name+' ['+quant.unit+']')
         plt.grid()
-        plt.savefig(reactor.neutron_phase.get_quantity('delayed-neutrons-cc').formal_name+'.png',
+        plt.savefig(reactor.neutron_phase.get_quantity('delayed-neutrons-cc').name+'.png',
                 dpi=300)
 
     # Properly shutdow plant
