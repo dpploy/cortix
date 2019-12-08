@@ -41,7 +41,6 @@ class BWR(Module):
                                      'signal-out', 'signal-in']
 
         self.params = params
-        self.ode_params = dict()
 
         self.time_step = 10.0
 
@@ -52,39 +51,18 @@ class BWR(Module):
 
         self.log = logging.getLogger('cortix')
 
-        # Coolant inflow phase history
-        quantities = list()
-
-        flowrate = Quantity(name='inflow-cool-flowrate',
-                   formalName='Inflow Cool. Flowrate',
-                   unit='kg/s', value=0.0)
-        quantities.append(flowrate)
-
-        temp = Quantity(name='inflow-cool-temp', formalName='Inflow Cool. Temperature',
-               unit='K', value=273.15)
-        quantities.append(temp)
-
-        press = Quantity(name='inflow-cool-press',formalName='Inflow Cool. Pressure',
-                unit='Pa', value=0.0)
-        quantities.append(press)
-
-        self.coolant_inflow_phase = Phase(self.initial_time, time_unit='s',
-                quantities=quantities)
-
         # Coolant outflow phase history
         quantities = list()
 
-        flowrate = Quantity(name='outflow-cool-flowrate',
-                   formalName='Outflow Cool. Flowrate',
+        flowrate = Quantity(name='flowrate', formalName='Outflow Cool. Flowrate',
                    unit='kg/s', value=0.0)
         quantities.append(flowrate)
 
-        temp = Quantity(name='outflow-cool-temp',
-                   formalName='Outflow Cool. Temperature',
+        temp = Quantity(name='temp', formalName='Outflow Cool. Temperature',
                    unit='K', value=273.15)
         quantities.append(temp)
 
-        press = Quantity(name='outflow-cool-press',formalName='Outflow Cool. Pressure',
+        press = Quantity(name='pressure',formalName='Outflow Cool. Pressure',
                    unit='Pa', value=0.0)
         quantities.append(press)
 
@@ -131,7 +109,7 @@ class BWR(Module):
         #self.ode_params = ode_params
 
         # Initialize inflows to zero
-        self.ode_params['inflow-cool-temp'] = 273.15
+        self.params['inflow-cool-temp'] = 273.15
 
         #self.ode_params['prison-inflow-rates']       = np.zeros(self.n_groups)
         #self.ode_params['parole-inflow-rates']       = np.zeros(self.n_groups)
@@ -229,6 +207,7 @@ class BWR(Module):
 
         # Get state values
         u_0 = self.__get_state_vector( time )
+
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
         self.params['reactor runoff'] = self.coolant_outflow_phase.get_value('outflow-cool-temp', time)
         self.params['condenser runoff'] = self.coolant_inflow_phase.get_value('inflow-cool-temp', time)
@@ -318,15 +297,19 @@ class BWR(Module):
         neutron_dens = self.neutron_phase.get_value('neutron-dens',time)
         print(time, 'time')
         print(neutron_dens, 'n_dens')
+
         u_vec = np.append( u_vec, neutron_dens )
         print(u_vec, 'u_vec')
+
         delayed_neutrons_cc = self.neutron_phase.get_value('delayed-neutrons-cc',time)
         u_vec = np.append(u_vec, delayed_neutrons_cc)
+
         fuel_temp = self.reactor_phase.get_value('fuel-temp',time)
         u_vec = np.append( u_vec, fuel_temp)
 
-        mod_temp = self.coolant_inflow_phase.get_value('inflow-cool-temp', time)
-        u_vec = np.append(u_vec, mod_temp)
+        temp = self.coolant_outflow_phase.get_value('temp',time)
+        u_vec = np.append(u_vec, temp)
+
         # sanity check
         assert not u_vec[u_vec<0.0],'%r'%u_vec
 
