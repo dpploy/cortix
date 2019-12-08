@@ -106,8 +106,6 @@ class BWR(Module):
 
         self.reactor_phase = Phase(self.initial_time, time_unit='s', quantities=quantities)
 
-        #self.ode_params = ode_params
-
         # Initialize inflows to zero
         self.params['inflow-cool-temp'] = 273.15
 
@@ -209,8 +207,6 @@ class BWR(Module):
         u_0 = self.__get_state_vector( time )
 
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
-        self.params['reactor runoff'] = self.coolant_outflow_phase.get_value('outflow-cool-temp', time)
-        self.params['condenser runoff'] = self.coolant_inflow_phase.get_value('inflow-cool-temp', time)
 
         (u_vec_hist, info_dict) = odeint( self.__f_vec,
                                           u_0, t_interval_sec,
@@ -238,7 +234,7 @@ class BWR(Module):
         self.neutron_phase.add_row(time, neutrons)
         self.reactor_phase.add_row(time, reactor)
 
-        self.coolant_outflow_phase.set_value('outflow-cool-temp', cool_temp, time)
+        self.coolant_outflow_phase.set_value('temp', cool_temp, time)
         self.neutron_phase.set_value('neutron-dens', n_dens, time)
         self.neutron_phase.set_value('delayed-neutrons-cc', c_vec, time)
         self.reactor_phase.set_value('fuel-temp', fuel_temp, time)
@@ -295,11 +291,7 @@ class BWR(Module):
         u_vec = np.empty(0,dtype=np.float64)
 
         neutron_dens = self.neutron_phase.get_value('neutron-dens',time)
-        print(time, 'time')
-        print(neutron_dens, 'n_dens')
-
         u_vec = np.append( u_vec, neutron_dens )
-        print(u_vec, 'u_vec')
 
         delayed_neutrons_cc = self.neutron_phase.get_value('delayed-neutrons-cc',time)
         u_vec = np.append(u_vec, delayed_neutrons_cc)
@@ -579,8 +571,7 @@ class BWR(Module):
         vol_cool = params['coolant_volume']
 
         # subcooled liquid
-        t_runoff = params['reactor runoff']
-        pump_out = params['condenser runoff']
+        pump_out = params['inflow-cool-temp']
 
         tau = params['tau_fake']
 
