@@ -7,7 +7,7 @@
 '''
 
 import logging
-import scipy.constants as const
+import scipy.constants as unit
 
 from cortix import Cortix
 from cortix import Network
@@ -32,8 +32,9 @@ def main():
 
     # Simulation time and stepping input
 
-    end_time  = 4.0 * const.hour
-    time_step = 1.0 * const.minute
+    end_time  = 10.0 * unit.minute
+    time_step = 1.0 * unit.minute
+    show_time = (True,5*unit.minute)
 
     use_mpi = False  # True for MPI; False for Python multiprocessing
 
@@ -41,15 +42,10 @@ def main():
 
     plant_net = plant.network = Network()
 
-    # General parameters
-
-    show_time = (True,20)
     #params
     params = dict()
     import math
-    import scipy.constants as sc
     import iapws.iapws97 as steam_table
-    params = dict()
 
     params['steam flowrate'] = 1820 #kg/s
     #Data pertaining to one-group energy neutron balance
@@ -59,12 +55,12 @@ def main():
     params['buckling'] = (math.pi/237.5)**2.0 + (2.405/410)**2.0 # geometric buckling; B = (pi/R)^2 + (2.405/H)^2
     params['q_0'] = 0.1
     params['fuel macro a'] = 1.34226126162 #fuel macroscopic absorption cross section, cm^-1
-    params['mod micro a'] = 0.332 * sc.zepto * sc.milli #moderator microscopic absorption cross section, cm^2
+    params['mod micro a'] = 0.332 * unit.zepto * unit.milli #moderator microscopic absorption cross section, cm^2
     params['n fuel'] = 1.9577906e+21 #number density of the fuel, atoms/cm^3
-    params['I'] = 40.9870483 * sc.zepto * sc.milli  #resonance integral, I (dimensionless)
-    params['mod micro s'] = 20 * sc.zepto * sc.milli # moderator microscopic scattering cross section, cm^2
+    params['I'] = 40.9870483 * unit.zepto * unit.milli  #resonance integral, I (dimensionless)
+    params['mod micro s'] = 20 * unit.zepto * unit.milli # moderator microscopic scattering cross section, cm^2
     params['xi'] = 1 # average logarithmic energy decrement for light water
-    params['E0'] = 2 * sc.mega # energy of a neutron produced by fissioning, in electron volts
+    params['E0'] = 2 * unit.mega # energy of a neutron produced by fissioning, in electron volts
     params['mod mu0'] = 0.71 # migration and diffusion area constants
     params['eta'] = 1.03 # fast fission factor
     params['epsilon'] = 2.05 # neutron multiplecation factor
@@ -117,9 +113,9 @@ def main():
     params['shutdown temp reached'] = False
     params['q_source_status'] = 'in' # is q_source inserted (in) or withdrawn (out)
 
-    params['malfunction start'] = 999 * sc.hour
-    params['malfunction end'] = 999 * sc.hour
-    params['shutdown time'] = 9999 * sc.hour
+    params['malfunction start'] = 999 * unit.hour
+    params['malfunction end'] = 999 * unit.hour
+    params['shutdown time'] = 9999 * unit.hour
 
     gen_time = params['gen_time'] # retrieve neutron generation time
     params['q_0'] = 0.1
@@ -161,12 +157,23 @@ def main():
     params['turbine-runoff-pressure'] = 1
     params['runoff-pressure'] = params['turbine-runoff-pressure']
 
-    reactor   = BWR(params)
+
+    #*****************************************************************************
+    reactor = BWR(params)
+
+    reactor.name      = 'BWR'
+    reactor.save      = True
+    reactor.time_step = time_step
+    reactor.end_time  = end_time
+    reactor.show_time = show_time
+
     plant_net.module(reactor)
 
+    #*****************************************************************************
     turbine   = Turbine(params)
 #    plant_net.module(turbine)
 
+    #*****************************************************************************
     condenser = Condenser(params)
 #    plant_net.module(condenser)
 
@@ -174,8 +181,13 @@ def main():
 #    plant_net.connect( [turbine,'runoff'], [condenser,'inflow'] )
 #    plant_net.connect( [condenser,'outflow'], [reactor,'coolant-inflow'] )
 
+    #*****************************************************************************
     plant_net.draw()
+
     plant_net.run()
+
+    # Properly shutdow plant
+    plant.close()
 
 if __name__ == '__main__':
     main()

@@ -6,7 +6,7 @@
 import logging
 
 import numpy as np
-import scipy.constants as const
+import scipy.constants as unit
 from scipy.integrate import odeint
 import math
 
@@ -42,8 +42,8 @@ class BWR(Module):
 
         self.params = params
 
-        self.initial_time = 0.0 * const.day
-        self.end_time     = 4 * const.hour
+        self.initial_time = 0.0 * unit.day
+        self.end_time     = 4 * unit.hour
         self.time_step    = 10.0
         self.show_time    = (False,10.0)
 
@@ -117,12 +117,31 @@ class BWR(Module):
 
     def run(self, *args):
 
+        # Some logic for logging time stamps
+        if self.initial_time + self.time_step > self.end_time:
+            self.end_time = self.initial_time + self.time_step
+
         time = self.initial_time
 
-        while time < self.end_time:
+        print_time = self.initial_time
+        print_time_step = self.show_time[1]
+        if print_time_step < self.time_step:
+            print_time_step = self.time_step
 
-            if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
-                self.log.info('time = '+str(round(time/const.minute,1)))
+        while time <= self.end_time:
+
+            last_time_stamp = time - self.time_step
+
+            if self.show_time[0] and time>=print_time and \
+                    time<print_time+print_time_step:
+
+                self.log.info(self.name+'::run():time[s]='+ str(round(time,1)))
+
+                self.__logit = True
+                print_time += self.show_time[1]
+
+            else:
+                self.__logit = False
 
             # Communicate information
             #------------------------
@@ -213,9 +232,9 @@ class BWR(Module):
         u_vec = u_vec_hist[1,:]  # solution vector at final time step
 
         n_dens    = u_vec[0]
-        c_vec     = u_vec[1:6]
-        fuel_temp = u_vec[6]
-        cool_temp = u_vec[7]
+        c_vec     = u_vec[1:7]
+        fuel_temp = u_vec[7]
+        cool_temp = u_vec[8]
 
         #update state variables
         outflow  = self.coolant_outflow_phase.get_row(time)
@@ -304,7 +323,7 @@ class BWR(Module):
     def __alpha_tn_func(self, temp, params):
         import math
         import scipy.misc as diff
-        import scipy.constants as sc
+        import scipy.constants as unit
         import iapws.iapws97 as steam
         import iapws.iapws95 as steam2
 
@@ -316,9 +335,9 @@ class BWR(Module):
 
         rho = 1 / steam._Region4(pressure, 0)['v'] # mass density, kg/m3
 
-        Nm = ((rho * sc.kilo)/params['mod molar mass']) * sc.N_A * (sc.centi)**3 # number density of the moderator
-        d_Nm =  ((d_rho * sc.kilo)/params['mod molar mass']) * sc.N_A * (sc.centi)**3 #dNm/dTm
-        d_Nm = d_Nm * sc.zepto * sc.milli
+        Nm = ((rho * unit.kilo)/params['mod molar mass']) * unit.N_A * (unit.centi)**3 # number density of the moderator
+        d_Nm =  ((d_rho * unit.kilo)/params['mod molar mass']) * unit.N_A * (unit.centi)**3 #dNm/dTm
+        d_Nm = d_Nm * unit.zepto * unit.milli
 
         mod_macro_a = params['mod micro a'] * Nm # macroscopic absorption cross section of the moderator
         mod_macro_s = params['mod micro s'] * Nm # macroscopic scattering cross section of the moderator
@@ -330,7 +349,7 @@ class BWR(Module):
         # Resonance escape integral, P
         P = math.exp((-1 * params['n fuel'] * (params['fuel_volume']) * params['I'])/(mod_macro_s * 3000))
         #dP/dTm
-        d_P = P * (-1 * params['n fuel'] * params['fuel_volume'] * sc.centi**3 * params['mod micro s'] * d_Nm)/(mod_macro_s * 3000 * sc.centi**3)**2
+        d_P = P * (-1 * params['n fuel'] * params['fuel_volume'] * unit.centi**3 * params['mod micro s'] * d_Nm)/(mod_macro_s * 3000 * unit.centi**3)**2
 
         Eth = 0.0862 * temp # convert temperature to energy in MeV
         E1 = mod_macro_s/math.log(params['E0']/Eth) # neutron thermalization macroscopic cross section
@@ -342,7 +361,7 @@ class BWR(Module):
 
         L = math.sqrt(1/(3 * mod_macro_s * mod_macro_a * (1 - params['mod mu0']))) # diffusion length L
         # dL/dTm
-        d_L = 1/(2 * math.sqrt((-2 * d_Nm * sc.zepto * sc.milli)/(3 * params['mod micro s'] * params['mod micro a'] * (Nm * sc.zepto * sc.milli)**3 * (1 - params['mod mu0']))))
+        d_L = 1/(2 * math.sqrt((-2 * d_Nm * unit.zepto * unit.milli)/(3 * params['mod micro s'] * params['mod micro a'] * (Nm * unit.zepto * unit.milli)**3 * (1 - params['mod mu0']))))
 
         # left term of the numerator of the moderator temperature feedback coefficient, alpha
         left_1st_term = d_tau * (params['buckling']**2 + L**2 * params['buckling']**4) #holding L as constant
@@ -510,7 +529,7 @@ class BWR(Module):
 
         n_dens = u_vec[0] # get neutron dens
 
-        c_vec = u_vec[1:-2] # get delayed neutron emitter concentration
+        c_vec  = u_vec[1:-2] # get delayed neutron emitter concentration
 
         temp_f = u_vec[-2] # get temperature of fuel
 
@@ -530,11 +549,6 @@ class BWR(Module):
 
         beta = params['beta']
         gen_time = params['gen_time']
-
-
-        print('time=',time)
-        print(len(lambda_vec))
-        print(len(c_vec))
 
         assert len(lambda_vec)==len(c_vec)
 
