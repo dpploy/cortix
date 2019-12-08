@@ -180,11 +180,16 @@ def main():
 
     #*****************************************************************************
     condenser = Condenser(params)
-#    plant_net.module(condenser)
+    condenser.name = 'Condenser'
+    condenser.save = True
+    condenser.time_step = time_step
+    condenser.end_time = end_time
+    condenser.show_time = show_time
+    plant_net.module(condenser)
 
     plant_net.connect( [reactor,'coolant-outflow'], [turbine,'steam-inflow'] )
-#    plant_net.connect( [turbine,'runoff'], [condenser,'inflow'] )
-#    plant_net.connect( [condenser,'outflow'], [reactor,'coolant-inflow'] )
+    plant_net.connect( [turbine,'runoff'], [condenser,'inflow'] )
+    plant_net.connect( [condenser,'outflow'], [reactor,'coolant-inflow'] )
 
     #*****************************************************************************
     plant_net.draw()

@@ -108,7 +108,7 @@ class Condenser(Module):
         time = self.initial_time
         end_time = self.end_time
 
-        while time <  end_time:
+        while time <  end_time + self.time_step:
             print('condenser looped')
             if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
                 self.log.info('time = '+str(round(time/const.minute,1)))
@@ -146,7 +146,7 @@ class Condenser(Module):
         outflow_cool_temp = self.condenser_runoff_phase.get_value('condenser-runoff-temp', time)
         condenser_runoff = dict()
         condenser_runoff['outflow-temp'] = outflow_cool_temp
-        self.send( (message_time, condenser_runoff), 'outflow' )
+        self.send( (message_time, outflow_cool_temp), 'outflow' )
 
 
     def __step(self, time):
