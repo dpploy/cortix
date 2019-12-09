@@ -52,19 +52,23 @@ class BWR(Module):
         # Coolant outflow phase history
         quantities = list()
 
-        flowrate = Quantity(name='flowrate', formalName='Outflow Cool. Flowrate',
+        flowrate = Quantity(name='flowrate', formal_name='q_c', latex_name='$q_c#',
+                   info='Outflow Coolant Flowrate',
                    unit='kg/s', value=0.0)
         quantities.append(flowrate)
 
-        temp = Quantity(name='temp', formalName='Outflow Cool. Temperature',
+        temp = Quantity(name='temp', formal_name='T_c', latex_name='$T_c$',
+                   info='Outflow Coolant Temperature',
                    unit='K', value=273.15)
         quantities.append(temp)
 
-        press = Quantity(name='pressure',formalName='Outflow Cool. Pressure',
+        press = Quantity(name='pressure', formal_name='P_c', latex_name='$P_c$',
+                   info='Outflow Cool. Pressure',
                    unit='Pa', value=0.0)
         quantities.append(press)
 
-        quality = Quantity(name='steam-quality',formalName='Steam Quality',
+        quality = Quantity(name='steam-quality', formal_name='chi_s', latex_name='$\chi$',
+                   info='Steam Quality',
                    unit='', value=0.0)
         quantities.append(quality)
 
@@ -74,30 +78,36 @@ class BWR(Module):
         # Neutron phase history
         quantities = list()
 
-        neutron_dens = Quantity(name='neutron-dens', formalName='Neutron Dens.',
-                   unit='10^22/cm^3', value=0.0)
+        neutron_dens = Quantity(name='neutron-dens', formal_name='n', latex_name='$n$',
+                   info='Neutron Density',
+                   unit='1/m^3', value=0.0)
+
         quantities.append(neutron_dens)
 
         delayed_neutrons_0 = np.zeros(6)
 
-        delayed_neutron_cc = Quantity(name='delayed-neutrons-cc',
-                             formalName='Delayed Neutrons',
-                             unit='10^22/cm^3', value=delayed_neutrons_0)
+        delayed_neutron_cc = Quantity(name='delayed-neutrons-cc', formal_name='c_i',
+                             latex_name='$c_i$',
+                             info='Delayed Neutron Precursors',
+                             unit='1/m^3', value=delayed_neutrons_0)
+
         quantities.append(delayed_neutron_cc)
 
         self.neutron_phase = Phase(self.initial_time, time_unit='s',
                 quantities=quantities)
 
-        #self.population_phase.set_value('f0g', f0g_0, self.initial_time)
-
         #reactor paramaters
         quantities = list()
 
-        fuel_temp = Quantity(name='fuel-temp', formalName='Fuel Temp.', unit='k', value=273.15)
+        fuel_temp = Quantity( name='fuel-temp', formalName='T_f', latex_name='$T_f$',
+                info='Nuclear Fuel Temperature',
+                unit='k', value=273.15)
 
         quantities.append(fuel_temp)
 
-        reg_rod_position = Quantity(name='reg-rod-position', formalName='Regulating Rod Position', unit='cm', value=0.0)
+        reg_rod_position = Quantity(name='reg-rod-position', formal_name='x_p',
+                info='Regulating Rod Position',
+                unit='m', value=0.0)
 
         quantities.append(reg_rod_position)
 

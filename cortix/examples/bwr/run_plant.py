@@ -198,53 +198,48 @@ def main():
 
     if plant.use_multiprocessing or plant.rank == 0:
 
-        #reactor graphs
+        # Reactor graphs
         reactor = plant_net.modules[0]
 
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('neutron-dens')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.name+' ['+quant.unit+']')
+                    y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
-        plt.savefig(reactor.neutron_phase.get_quantity('neutron-dens').name+'.png',
-                dpi=300)
+        plt.savefig('neutron-dens.png', dpi=300)
 
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('delayed-neutrons-cc')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.name+' ['+quant.unit+']')
+                    y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
-        plt.savefig(reactor.neutron_phase.get_quantity('delayed-neutrons-cc').name+'.png',
-                dpi=300)
+        plt.savefig('delayed-neutrons-cc.png', dpi=300)
 
         (quant, time_unit) = reactor.coolant_outflow_phase.get_quantity_history('temp')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.name+' ['+quant.unit+']')
+                    y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
-        plt.savefig(reactor.coolant_outflow_phase.get_quantity('temp').name+'.png',
-                dpi=300)
+        plt.savefig('coolant-outflow-temp.png', dpi=300)
 
         (quant, time_unit) = reactor.reactor_phase.get_quantity_history('fuel-temp')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.name+' ['+quant.unit+']')
+                    y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
-        plt.savefig(reactor.reactor_phase.get_quantity('fuel-temp').name+'.png',
-                dpi=300)
-    #turbin graphs
+        plt.savefig('fuel-temp.png', dpi=300)
+
+        # Turbine graphs
         turbine = plant_net.modules[1]
 
         (quant, time_unit) = turbine.turbine_work_phase.get_quantity_history('turbine-power')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.name+' ['+quant.unit+']')
+                    y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
-        plt.savefig(turbine.turbine_work_phase.get_quantity('turbine-power').name+'.png',
-                dpi=300)
+        plt.savefig('turbine-power.png', dpi=300)
 
         (quant, time_unit) = turbine.turbine_runoff_phase.get_quantity_history('runoff-temp')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.name+' ['+quant.unit+']')
+                    y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
-        plt.savefig(turbine.turbine_runoff_phase.get_quantity('runoff-temp').name+'.png',
-                dpi=300)
+        plt.savefig('runoff-temp.png', dpi=300)
 
     # Properly shutdow plant
     plant.close()
