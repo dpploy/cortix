@@ -123,7 +123,7 @@ class Turbine(Module):
         # to be, or not to be?
         if self.get_port('runoff').connected_port:
             message_time = self.recv('runoff')
-            print('message time', message_time)
+            #print('message time', message_time)
             outflow_state = dict()
             outflow_cool_temp = self.turbine_runoff_phase.get_value('runoff-temp', time)
             outflow_cool_quality = self.turbine_runoff_phase.get_value('runoff-quality', time)

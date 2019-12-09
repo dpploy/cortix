@@ -33,9 +33,9 @@ def main():
 
     # Simulation time and stepping input
 
-    end_time  = 15.0 * unit.minute
-    time_step = 1.0 * unit.minute
-    show_time = (True,3*unit.minute)
+    end_time  = 1.0 * unit.hour
+    time_step = 0.5 * unit.minute
+    show_time = (True,15*unit.minute)
 
     use_mpi = False  # True for MPI; False for Python multiprocessing
 
