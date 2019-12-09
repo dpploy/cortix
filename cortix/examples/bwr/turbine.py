@@ -39,8 +39,6 @@ class Turbine(Module):
         super().__init__()
         self.params = params
         self.port_names_expected = ['steam-inflow','runoff']
-        quantities      = list()
-        self.ode_params = dict()
 
         self.initial_time = 0.0 * const.day
         self.end_time     = 4 * const.hour
@@ -52,7 +50,10 @@ class Turbine(Module):
         # Coolant outflow phase history
         quantities = list()
 
-        temp = Quantity(name='reactor-runoff-temp', formalName = 'Temp. in', unit = 'k', value = 273.15)
+        temp = Quantity(name='reactor-runoff-temp', formal_name = 'T_in',
+                latex_name='$T_{in}$',
+                info='Inlet Temperature',
+                unit = 'k', value = 273.15)
 
         quantities.append(temp)
 
@@ -61,36 +62,37 @@ class Turbine(Module):
         # Outflow phase history
         quantities = list()
 
-        temp = Quantity(name='runoff-temp', formalName = 'Turbine Runoff Temp.', unit = 'k', value=273.15)
+        temp = Quantity(name='runoff-temp', formal_name='T_o', latex_name='$T_o$',
+                info = 'Turbine Runoff Temperature',
+                unit = 'k', value=273.15)
 
         quantities.append(temp)
 
-        press = Quantity(name='runoff-press', formalName = 'Turbine Runoff Pressure', unit = 'Pa', value = params['runoff-pressure'])
+        press = Quantity(name='runoff-press', formal_name='P_t',
+                latex_name='$P_o$',
+                info = 'Turbine Runoff Pressure',
+                unit = 'Pa', value = params['runoff-pressure'])
 
         quantities.append(press)
 
-        x = Quantity(name='runoff-quality', formalName = 'Turbine Runoff Quality', unit = '%', value = 0.0)
+        x = Quantity(name='runoff-quality', formal_name='chi_t',
+                latex_name='\chi_o',
+                formalName = 'Turbine Runoff Quality', unit = '%', value = 0.0)
 
         quantities.append(x)
 
         self.turbine_runoff_phase = Phase(self.initial_time, time_unit = 's', quantities = quantities)
 
-        #turbine params history
-
+        # Turbine params history
         quantities = list()
 
-        work = Quantity(name='turbine-power', formalName = 'Turbine Power', unit = 'w', value = 0.0)
+        work = Quantity(name='turbine-power', formal_name='P_t',
+                latex_name='$P_t$',
+                info = 'Turbine Power',
+                unit = 'w', value = 0.0)
         quantities.append(work)
 
         self.turbine_work_phase = Phase(self.initial_time, time_unit = 's', quantities = quantities)
-
-        # Initialize inflows to zero
-        #self.ode_params['prison-inflow-rates']       = np.zeros(self.n_groups)
-        #self.ode_params['parole-inflow-rates']       = np.zeros(self.n_groups)
-        #self.ode_params['arrested-inflow-rates']     = np.zeros(self.n_groups)
-        #self.ode_params['jail-inflow-rates']         = np.zeros(self.n_groups)
-        #self.ode_params['adjudication-inflow-rates'] = np.zeros(self.n_groups)
-        #self.ode_params['probation-inflow-rates']    = np.zeros(self.n_groups)
 
         return
 
