@@ -81,6 +81,7 @@ class BWR(Module):
         neutron_dens = Quantity(name='neutron-dens', formal_name='n', latex_name='$n$',
                    info='Neutron Density',
                    unit='1/m^3', value=0.0)
+
         quantities.append(neutron_dens)
 
         delayed_neutrons_0 = np.zeros(6)
@@ -89,6 +90,7 @@ class BWR(Module):
                              latex_name='$c_i$',
                              info='Delayed Neutron Precursors',
                              unit='1/m^3', value=delayed_neutrons_0)
+
         quantities.append(delayed_neutron_cc)
 
         self.neutron_phase = Phase(self.initial_time, time_unit='s',
