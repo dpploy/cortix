@@ -75,14 +75,14 @@ class BWR(Module):
         quantities = list()
 
         neutron_dens = Quantity(name='neutron-dens', formalName='Neutron Dens.',
-                   unit='1/m^3', value=0.0)
+                   unit='10^22/cm^3', value=0.0)
         quantities.append(neutron_dens)
 
         delayed_neutrons_0 = np.zeros(6)
 
         delayed_neutron_cc = Quantity(name='delayed-neutrons-cc',
                              formalName='Delayed Neutrons',
-                             unit='1/m^3', value=delayed_neutrons_0)
+                             unit='10^22/cm^3', value=delayed_neutrons_0)
         quantities.append(delayed_neutron_cc)
 
         self.neutron_phase = Phase(self.initial_time, time_unit='s',
@@ -97,7 +97,7 @@ class BWR(Module):
 
         quantities.append(fuel_temp)
 
-        reg_rod_position = Quantity(name='reg-rod-position', formalName='Regulating Rod Position', unit='m', value=0.0)
+        reg_rod_position = Quantity(name='reg-rod-position', formalName='Regulating Rod Position', unit='cm', value=0.0)
 
         quantities.append(reg_rod_position)
 
