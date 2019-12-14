@@ -241,6 +241,7 @@ class Condenser(Module):
             steam = steam_table.IAPWS97(T=critical_temp+1, P=pressure)
             steam_rho = steam.rho
             steam_viscosity = steam.mu
+            print(x)
             xtt = ((1 -x)/x)**1.8 * (steam_rho/liquid_rho) * (liquid_viscosity/steam_viscosity)**0.5
             xtt = math.sqrt(xtt)
 

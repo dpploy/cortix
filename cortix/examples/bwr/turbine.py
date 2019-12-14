@@ -51,8 +51,6 @@ class Turbine(Module):
         quantities = list()
 
         temp = Quantity(name='reactor-runoff-temp', formal_name = 'T_in',
-                latex_name='$T_{in}$',
-                info='Inlet Temperature',
                 unit = 'k', value = 273.15)
 
         quantities.append(temp)
@@ -62,21 +60,17 @@ class Turbine(Module):
         # Outflow phase history
         quantities = list()
 
-        temp = Quantity(name='runoff-temp', formal_name='T_o', latex_name='$T_o$',
-                info = 'Turbine Runoff Temperature',
+        temp = Quantity(name='runoff-temp', formal_name='T_o',
                 unit = 'k', value=273.15)
 
         quantities.append(temp)
 
         press = Quantity(name='runoff-press', formal_name='P_t',
-                latex_name='$P_o$',
-                info = 'Turbine Runoff Pressure',
                 unit = 'Pa', value = params['runoff-pressure'])
 
         quantities.append(press)
 
         x = Quantity(name='runoff-quality', formal_name='chi_t',
-                latex_name='\chi_o',
                 formalName = 'Turbine Runoff Quality', unit = '%', value = 0.0)
 
         quantities.append(x)
@@ -87,8 +81,6 @@ class Turbine(Module):
         quantities = list()
 
         work = Quantity(name='turbine-power', formal_name='P_t',
-                latex_name='$P_t$',
-                info = 'Turbine Power',
                 unit = 'w', value = 0.0)
         quantities.append(work)
 
@@ -143,10 +135,9 @@ class Turbine(Module):
             self.send( time, 'steam-inflow' )
             (check_time, inflow_state) = self.recv('steam-inflow')
             assert abs(check_time-time) <= 1e-6
-            if self.coolant_inflow_phase.has_time_stamp(time) == False:
-                inflow = self.coolant_inflow_phase.get_row(time - self.time_step)
-                self.coolant_inflow_phase.add_row(time, inflow)
-                self.coolant_inflow_phase.set_value('reactor-runoff-temp', inflow_state['outflow-cool-temp'], time)
+            self.temp = inflow_state['inflow-temp']
+            self.x = inflow_state['inflow-quality']
+
     def __step(self, time=0.0):
         r'''
         ODE IVP problem:
@@ -166,15 +157,12 @@ class Turbine(Module):
 
         '''
         import iapws.iapws97 as steam
-        temp_in = self.coolant_inflow_phase.get_value('reactor-runoff-temp', time)
-
-        output = self.__turbine(time, temp_in, self.params)
+        output = self.__turbine(time, self.temp, self.x, self.params)
         time = time + self.time_step
         t_runoff = output[0]
         x_runoff = output[2]
         if x_runoff < 0 and x_runoff != -1:
             x_runoff = 0
-        x_runoff = x_runoff * 100
         w_turbine = output[1]
 
         if self.turbine_work_phase.has_time_stamp(time) == False:
@@ -191,31 +179,35 @@ class Turbine(Module):
         return(time)
         # Get state values
 
-    def __turbine(self, time, temp_in, params):
+    def __turbine(self, time, temp_in, x,  params):
         #expand the entering steam from whatever temperature and pressure it enters at to 0.035 kpa, with 80% efficiency.
         #pressure of steam when it enters the turbine equals the current reactor operating pressure
+        if self.params['high_pressure_turbine'] == True:
+            p_in = steam_table._PSat_T(temp_in)
+        else:
+            p_in = self.params['turbine_inlet_pressure']
 
-        if temp_in <= 273.15: # if temp is below this the turbine will not work
+        p_out = self.params['turbine_outlet_pressure']
+        if temp_in <= 273.15 or p_in <= p_out: # if temp is below this the turbine will not work
             t_runoff = temp_in
             w_real = 0
             x = 0
             return(t_runoff, w_real, x)
         if temp_in < 373.15:
-            t_runoff = steam_table._TSat_P(0.005)
+            t_runoff = steam_table._TSat_P(p_out)
             w_real = 0
             x = -3
             return(t_runoff, w_real, x)
 
         #properties of the inlet steam
-        pressure = steam_table._PSat_T(temp_in)
 
-        inlet_parameters = steam_table._Region4(pressure, 0.7)
+        inlet_parameters = steam_table._Region4(p_in, x)
         inlet_entropy = inlet_parameters['s']
         inlet_enthalpy = inlet_parameters['h']
 
         #bubble and dewpoint properties at turbine outlet
-        bubl = steam_table._Region4(0.005, 0)
-        dew = steam_table._Region4(0.005, 1)
+        bubl = steam_table._Region4(p_out, 0)
+        dew = steam_table._Region4(p_out, 1)
         bubl_entropy = bubl['s']
         dew_entropy = dew['s']
         bubl_enthalpy = bubl['h']
@@ -224,12 +216,12 @@ class Turbine(Module):
         #if the ideal runoff is two-phase mixture:
         if inlet_entropy < dew_entropy and inlet_entropy > bubl_entropy:
             x_ideal = (inlet_entropy - bubl_entropy)/(dew_entropy - bubl_entropy)
-            h_ideal = steam_table._Region4(0.005, x_ideal)['h']
+            h_ideal = steam_table._Region4(p_out, x_ideal)['h']
 
         #if the ideal runoff is a superheated steam
         elif inlet_entropy > dew_entropy:
-            t_ideal = steam_table._Backward2_T_Ps(0.005, inlet_entropy)
-            h_ideal = steam_table._Region2(t_ideal, 0.005)['h']
+            t_ideal = steam_table._Backward2_T_Ps(p_out, inlet_entropy)
+            h_ideal = steam_table._Region2(t_ideal, p_out)['h']
 
         #calculate the real runoff enthalpy
         w_ideal = inlet_enthalpy - h_ideal #on a per mass basis
@@ -240,18 +232,18 @@ class Turbine(Module):
 
         # if the real runoff is a superheated steam
         if h_real > dew_enthalpy:
-            t_runoff = steam_table._Backward2_T_Ph(0.005, h_real)
+            t_runoff = steam_table._Backward2_T_Ph(p_out, h_real)
             x_runoff = -1 # superheated steam
 
         #if the real runoff is a subcooled liquid
         elif h_real < bubl_enthalpy:
-            t_runoff = steam_table._Backward1_T_Ph(0.005, h_real)
+            t_runoff = steam_table._Backward1_T_Ph(p_out, h_real)
             x_runoff = 2 # subcooled liquid
 
         #if the real runoff is a two-phase mixture    
         else:
             x_runoff = (h_real - bubl_enthalpy)/(dew_enthalpy - bubl_enthalpy) # saturated vapor
-            t_runoff = steam_table._TSat_P(0.005)
+            t_runoff = steam_table._TSat_P(p_out)
 
         w_real = w_real * params['steam flowrate'] * sc.kilo
 

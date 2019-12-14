@@ -170,6 +170,9 @@ def main():
     plant_net.module(reactor)
 
     #*****************************************************************************
+    params['turbine_inlet_pressure'] = 2
+    params['turbine_outlet_pressure'] = 0.5
+    params['high_pressure_turbine'] = True
     turbine   = Turbine(params)
     turbine.name = 'High Pressure Turbine'
     turbine.save = True
@@ -178,7 +181,31 @@ def main():
     turbine.show_time = show_time
     plant_net.module(turbine)
 
+    params['turbine_inlet_pressure'] = 0.5
+    params['turbine_outlet_pressure'] = 0.005
+    params['high_pressure_turbine'] = False
+    params['steam flowrate'] = params['steam flowrate']/2
+    turbine2   = Turbine(params)
+    turbine2.name = 'Low Pressure Turbine 1'
+    turbine2.save = True
+    turbine2.time_step = time_step
+    turbine2.end_time = end_time
+    turbine2.show_time = show_time
+    plant_net.module(turbine2)
+
+    params['turbine_inlet_pressure'] = 0.5
+    params['turbine_outlet_pressure'] = 0.005
+    params['high_pressure_turbine'] = True
+    turbine3   = Turbine(params)
+    turbine3.name = 'High Pressure Turbine'
+    turbine3.save = True
+    turbine3.time_step = time_step
+    turbine3.end_time = end_time
+    turbine3.show_time = show_time
+    plant_net.module(turbine3)
+
     #*****************************************************************************
+    params['steam flowrate'] = params['steam flowrate'] * 2
     condenser = Condenser(params)
     condenser.name = 'Condenser'
     condenser.save = True
@@ -188,7 +215,9 @@ def main():
     plant_net.module(condenser)
 
     plant_net.connect( [reactor,'coolant-outflow'], [turbine,'steam-inflow'] )
-    plant_net.connect( [turbine,'runoff'], [condenser,'inflow'] )
+    plant_net.connect( [turbine,'runoff'], [turbine2,'steam-inflow'] )
+    plant_net.connect( [turbine, 'runoff'], [turbine3, 'steam-inflow'])
+    plant_net.connect( [turbine2, 'runoff'], [condenser, 'inflow'])
     plant_net.connect( [condenser,'outflow'], [reactor,'coolant-inflow'] )
 
     #*****************************************************************************
@@ -203,25 +232,25 @@ def main():
 
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('neutron-dens')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']')
+                    y_label='neutrons')
         plt.grid()
         plt.savefig('neutron-dens.png', dpi=300)
 
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('delayed-neutrons-cc')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']')
+                    y_label='delayed neutrons')
         plt.grid()
         plt.savefig('delayed-neutrons-cc.png', dpi=300)
 
         (quant, time_unit) = reactor.coolant_outflow_phase.get_quantity_history('temp')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']')
+                    y_label='coolant temp')
         plt.grid()
         plt.savefig('coolant-outflow-temp.png', dpi=300)
 
         (quant, time_unit) = reactor.reactor_phase.get_quantity_history('fuel-temp')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']')
+                    y_label = 'fuel temp')
         plt.grid()
         plt.savefig('fuel-temp.png', dpi=300)
 
@@ -231,13 +260,13 @@ def main():
         (quant, time_unit) = turbine.turbine_work_phase.get_quantity_history('turbine-power')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']')
+                    y_label='power')
         plt.grid()
         plt.savefig('turbine-power.png', dpi=300)
 
         (quant, time_unit) = turbine.turbine_runoff_phase.get_quantity_history('runoff-temp')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']')
+                    y_label='runoff temp')
         plt.grid()
         plt.savefig('runoff-temp.png', dpi=300)
 
