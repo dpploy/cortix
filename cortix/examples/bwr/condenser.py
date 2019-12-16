@@ -54,14 +54,14 @@ class Condenser(Module):
         quantities = list()
 
         flowrate = Quantity(name='condenser-runoff-flowrate',
-                   formal_name='Condenser Runoff Flowrate',
+                   formal_name='Condenser Runoff Flowrate', latex_name='$Q$',
                    unit='kg/s', value=0.0,
                    info='Condenser Outflow Flowrate')
 
         quantities.append(flowrate)
 
-        temp = Quantity(name='temp',
-                   formal_name='Condenser Runoff Temp.',
+        temp = Quantity(name='temp', formal_name='Condenser Runoff Temp.',
+                   latex_name='$T_o$',
                    unit='K', value=273.15,
                    info='Condenser Outflow Temperature')
 
