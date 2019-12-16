@@ -213,7 +213,9 @@ def main():
     turbine3.end_time = end_time
     turbine3.show_time = show_time
     plant_net.module(turbine3)
+
     print('turb2', turbine1.params['high_pressure_turbine'])
+
     #*****************************************************************************
     params['steam flowrate'] = params['steam flowrate'] * 2
 

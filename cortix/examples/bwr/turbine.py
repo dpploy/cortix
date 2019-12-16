@@ -4,11 +4,13 @@
 # https://cortix.org
 
 import logging
+from copy import deepcopy
 
 import numpy as np
 import scipy.constants as const
 from scipy.integrate import odeint
 import scipy.constants as sc
+
 import iapws.iapws97 as steam_table
 
 from cortix import Module
@@ -37,7 +39,9 @@ class Turbine(Module):
         '''
 
         super().__init__()
-        self.params = params
+
+        self.params = deepcopy(params)
+
         self.port_names_expected = ['inflow','outflow-1','outflow-2']
 
         self.initial_time = 0.0 * const.day
@@ -214,9 +218,9 @@ class Turbine(Module):
         #pressure of steam when it enters the turbine equals the current reactor operating pressure
         if self.params['high_pressure_turbine'] == True:
             p_in = steam_table._PSat_T(temp_in)
-            print('not evaluated')
+            #print('not evaluated')
         else:
-            print('evaluated')
+            #print('evaluated')
             p_in = self.params['turbine_inlet_pressure']
 
         p_out = self.params['turbine_outlet_pressure']
