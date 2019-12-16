@@ -90,8 +90,6 @@ class Turbine(Module):
 
     def run(self, *args):
 
-       # self.__zero_ode_parameters()
-
         time = self.initial_time
         while time < self.end_time + self.time_step:
 
@@ -101,6 +99,7 @@ class Turbine(Module):
             # Communicate information
             #------------------------
             self.__call_ports(time)
+
             # Evolve one time step
             #---------------------
 
@@ -112,7 +111,7 @@ class Turbine(Module):
         #-----------------------------------------
         # one way "to" steam-inflow
 
-        # to be, or not to be?
+        # to 
         if self.get_port('runoff').connected_port:
             message_time = self.recv('runoff')
             #print('message time', message_time)

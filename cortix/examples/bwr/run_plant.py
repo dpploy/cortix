@@ -173,6 +173,7 @@ def main():
     params['turbine_inlet_pressure'] = 2
     params['turbine_outlet_pressure'] = 0.5
     params['high_pressure_turbine'] = True
+
     turbine   = Turbine(params)
     turbine.name = 'High Pressure Turbine'
     turbine.save = True
@@ -185,6 +186,7 @@ def main():
     params['turbine_outlet_pressure'] = 0.005
     params['high_pressure_turbine'] = False
     params['steam flowrate'] = params['steam flowrate']/2
+
     turbine2   = Turbine(params)
     turbine2.name = 'Low Pressure Turbine 1'
     turbine2.save = True
@@ -196,8 +198,9 @@ def main():
     params['turbine_inlet_pressure'] = 0.5
     params['turbine_outlet_pressure'] = 0.005
     params['high_pressure_turbine'] = True
+
     turbine3   = Turbine(params)
-    turbine3.name = 'High Pressure Turbine'
+    turbine3.name = 'Low Pressure Turbine 2'
     turbine3.save = True
     turbine3.time_step = time_step
     turbine3.end_time = end_time
@@ -206,6 +209,7 @@ def main():
 
     #*****************************************************************************
     params['steam flowrate'] = params['steam flowrate'] * 2
+
     condenser = Condenser(params)
     condenser.name = 'Condenser'
     condenser.save = True
