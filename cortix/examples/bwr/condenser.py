@@ -54,13 +54,17 @@ class Condenser(Module):
         quantities = list()
 
         flowrate = Quantity(name='condenser-runoff-flowrate',
-                   formalName='Condenser Runoff Flowrate',
-                   unit='kg/s', value=0.0)
+                   formal_name='Condenser Runoff Flowrate',
+                   unit='kg/s', value=0.0,
+                   info='Condenser Outflow Flowrate')
+
         quantities.append(flowrate)
 
-        temp = Quantity(name='condenser-runoff-temp',
-                   formalName='Condenser Runoff Temp.',
-                   unit='K', value=273.15)
+        temp = Quantity(name='temp',
+                   formal_name='Condenser Runoff Temp.',
+                   unit='K', value=273.15,
+                   info='Condenser Outflow Temperature')
+
         quantities.append(temp)
 
         self.outflow_phase = Phase(self.initial_time, time_unit='s',
@@ -123,7 +127,7 @@ class Condenser(Module):
         # to 
         message_time = self.recv('outflow')
         outflow_state = dict()
-        outflow_cool_temp = self.outflow_phase.get_value('condenser-runoff-temp', time)
+        outflow_cool_temp = self.outflow_phase.get_value('temp', time)
         condenser_runoff = dict()
         condenser_runoff['outflow-temp'] = outflow_cool_temp
         self.send( (message_time, outflow_cool_temp), 'outflow' )
@@ -146,7 +150,7 @@ class Condenser(Module):
         time = time + self.time_step
 
         self.outflow_phase.add_row(time, condenser_runoff)
-        self.outflow_phase.set_value('condenser-runoff-temp', t_out)
+        self.outflow_phase.set_value('temp', t_out)
 
         return time
 

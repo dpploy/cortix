@@ -175,6 +175,7 @@ def main():
     params['high_pressure_turbine'] = True
 
     turbine1   = Turbine(params)
+
     turbine1.name = 'High Pressure Turbine'
     turbine1.save = True
     turbine1.time_step = time_step
@@ -182,12 +183,14 @@ def main():
     turbine1.show_time = show_time
     plant_net.module(turbine1)
 
+    #*****************************************************************************
     params['turbine_inlet_pressure'] = 0.5
     params['turbine_outlet_pressure'] = 0.005
     params['high_pressure_turbine'] = False
     params['steam flowrate'] = params['steam flowrate']/2
 
     turbine2   = Turbine(params)
+
     turbine2.name = 'Low Pressure Turbine 1'
     turbine2.save = True
     turbine2.time_step = time_step
@@ -195,11 +198,13 @@ def main():
     turbine2.show_time = show_time
     plant_net.module(turbine2)
 
+    #*****************************************************************************
     params['turbine_inlet_pressure'] = 0.5
     params['turbine_outlet_pressure'] = 0.005
     params['high_pressure_turbine'] = True
 
     turbine3   = Turbine(params)
+
     turbine3.name = 'Low Pressure Turbine 2'
     turbine3.save = True
     turbine3.time_step = time_step
@@ -211,6 +216,7 @@ def main():
     params['steam flowrate'] = params['steam flowrate'] * 2
 
     condenser = Condenser(params)
+
     condenser.name = 'Condenser'
     condenser.save = True
     condenser.time_step = time_step
@@ -218,6 +224,7 @@ def main():
     condenser.show_time = show_time
     plant_net.module(condenser)
 
+    #*****************************************************************************
     plant_net.connect( [reactor, 'coolant-outflow'], [turbine1,'inflow'] )
     plant_net.connect( [turbine1, 'outflow-1'], [turbine2,'inflow'] )
     plant_net.connect( [turbine1, 'outflow-2'], [turbine3, 'inflow'])
@@ -270,14 +277,24 @@ def main():
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
                     y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
-        plt.savefig('turbine-power.png', dpi=300)
+        plt.savefig('turbine1-power.png', dpi=300)
 
         (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('temp')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
                     y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
-        plt.savefig('runoff-temp.png', dpi=300)
+        plt.savefig('turbine1-outflow-temp.png', dpi=300)
+
+        # Condenser graphs
+        condenser = plant_net.modules[-1]
+
+        (quant, time_unit) = condenser.outflow_phase.get_quantity_history('temp')
+
+        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
+                    y_label=quant.latex_name+' ['+quant.unit+']')
+        plt.grid()
+        plt.savefig('condenser-outflow-temp.png', dpi=300)
 
     # Properly shutdow plant
     plant.close()
