@@ -236,25 +236,25 @@ def main():
 
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('neutron-dens')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label='neutrons')
+                    y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('neutron-dens.png', dpi=300)
 
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('delayed-neutrons-cc')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label='delayed neutrons')
+                    y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('delayed-neutrons-cc.png', dpi=300)
 
         (quant, time_unit) = reactor.coolant_outflow_phase.get_quantity_history('temp')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label='coolant temp')
+                    y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('coolant-outflow-temp.png', dpi=300)
 
         (quant, time_unit) = reactor.reactor_phase.get_quantity_history('fuel-temp')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label = 'fuel temp')
+                    y_label =quant.latex_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('fuel-temp.png', dpi=300)
 
@@ -264,13 +264,13 @@ def main():
         (quant, time_unit) = turbine.outflow_phase.get_quantity_history('power')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label='power')
+                    y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('turbine-power.png', dpi=300)
 
         (quant, time_unit) = turbine.outflow_phase.get_quantity_history('temp')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label='runoff temp')
+                    y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('runoff-temp.png', dpi=300)
 

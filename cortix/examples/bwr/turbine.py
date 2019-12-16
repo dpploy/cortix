@@ -50,7 +50,7 @@ class Turbine(Module):
         # Inflow phase history
         quantities = list()
 
-        temp = Quantity(name='temp', formal_name = 'T_in',
+        temp = Quantity(name='temp', formal_name = 'T_in', latex_name='$T_i$',
                 unit = 'k', value = 273.15,
                 info='Turbine Steam Inflow Temperature')
 
@@ -62,26 +62,26 @@ class Turbine(Module):
         # Outflow phase history
         quantities = list()
 
-        temp = Quantity(name='temp', formal_name='T_o',
+        temp = Quantity(name='temp', formal_name='T_o', latex_name='$T_o$',
                 unit = 'k', value=273.15,
                 info='Turbine Steam Outflow Temperature')
 
         quantities.append(temp)
 
-        press = Quantity(name='pressure', formal_name='P_t',
+        press = Quantity(name='pressure', formal_name='P_t', latex_name='$P_t$',
                 unit = 'Pa', value = params['runoff-pressure'],
                 info='Turbine Steam Outflow Pressure')
 
         quantities.append(press)
 
-        x = Quantity(name='quality', formal_name='chi_t',
+        x = Quantity(name='quality', formal_name='chi_t', latex_name='$\chi_t$',
                 unit = '%', value = 0.0,
                 info='Turbine Steam Outflow Quality')
 
         quantities.append(x)
 
-        work = Quantity(name='power', formal_name='P_t',
-                unit = 'w', value = 0.0,
+        work = Quantity(name='power', formal_name='P_t', latex_name='$W_t$',
+                unit = 'W', value = 0.0,
                 info='Turbine Power')
 
         quantities.append(work)
@@ -93,6 +93,7 @@ class Turbine(Module):
     def run(self, *args):
 
         time = self.initial_time
+
         while time < self.end_time + self.time_step:
 
             if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
@@ -106,6 +107,8 @@ class Turbine(Module):
             #---------------------
 
             time = self.__step( time )
+
+        return
 
     def __call_ports(self, time):
 
@@ -142,10 +145,10 @@ class Turbine(Module):
             (check_time, inflow_state) = self.recv('inflow')
             assert abs(check_time-time) <= 1e-6
 
-            #print(inflow_state)
-
             self.temp = inflow_state['temp']
             self.chi  = inflow_state['quality']
+
+        return
 
     def __step(self, time=0.0):
         r'''
@@ -183,7 +186,7 @@ class Turbine(Module):
         self.outflow_phase.set_value('quality', x_runoff, time)
         self.outflow_phase.set_value('temp', t_runoff, time)
 
-        return(time)
+        return time
 
     def __turbine(self, time, temp_in, x,  params):
         #expand the entering steam from whatever temperature and pressure it enters at to 0.035 kpa, with 80% efficiency.
@@ -194,16 +197,18 @@ class Turbine(Module):
             p_in = self.params['turbine_inlet_pressure']
 
         p_out = self.params['turbine_outlet_pressure']
+
         if temp_in <= 273.15 or p_in <= p_out: # if temp is below this the turbine will not work
             t_runoff = temp_in
             w_real = 0
             x = 0
-            return(t_runoff, w_real, x)
+            return (t_runoff, w_real, x)
+
         if temp_in < 373.15:
             t_runoff = steam_table._TSat_P(p_out)
             w_real = 0
             x = -3
-            return(t_runoff, w_real, x)
+            return (t_runoff, w_real, x)
 
         #properties of the inlet steam
 

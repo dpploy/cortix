@@ -52,20 +52,27 @@ class BWR(Module):
         # Coolant outflow phase history
         quantities = list()
 
-        flowrate = Quantity(name='flowrate', formal_name='q_c',
-                   unit='kg/s', value=0.0)
+        flowrate = Quantity(name='flowrate', formal_name='q_c', latex_name='$q_c$',
+                   unit='kg/s', value=0.0,
+                   info='Outflow Coolant Flowrate')
+
         quantities.append(flowrate)
 
-        temp = Quantity(name='temp', formal_name='T_c',
-                   unit='K', value=273.15)
+        temp = Quantity(name='temp', formal_name='T_c', latex_name='$T_c$',
+                   unit='K', value=273.15,
+                   info='Outflow Coolant Temperature')
         quantities.append(temp)
 
-        press = Quantity(name='pressure', formal_name='P_c',
-                   unit='Pa', value=0.0)
+        press = Quantity(name='pressure', formal_name='P_c', latex_name='$P_c$',
+                   unit='Pa', value=0.0,
+                   info='Outflow Coolant Pressure')
+
         quantities.append(press)
 
-        quality = Quantity(name='steam-quality', formal_name='chi_s',
-                   unit='', value=0.0)
+        quality = Quantity(name='steam-quality', formal_name='chi_s', latex_name='$\chi$',
+                   unit='', value=0.0,
+                   info='Steam Quality')
+
         quantities.append(quality)
 
         self.coolant_outflow_phase = Phase(self.initial_time, time_unit='s',
@@ -74,15 +81,18 @@ class BWR(Module):
         # Neutron phase history
         quantities = list()
 
-        neutron_dens = Quantity(name='neutron-dens', formal_name='n',
-                   unit='1/m^3', value=0.0)
+        neutron_dens = Quantity(name='neutron-dens', formal_name='n', latex_name='$n$',
+                   unit='1/m^3', value=0.0,
+                   info='Neutron Density')
 
         quantities.append(neutron_dens)
 
         delayed_neutrons_0 = np.zeros(6)
 
         delayed_neutron_cc = Quantity(name='delayed-neutrons-cc', formal_name='c_i',
-                             unit='1/m^3', value=delayed_neutrons_0)
+                             latex_name='$c_i$',
+                             unit='1/m^3', value=delayed_neutrons_0,
+                             info='Delayed Neutron Precursors')
 
         quantities.append(delayed_neutron_cc)
 
@@ -92,27 +102,23 @@ class BWR(Module):
         #reactor paramaters
         quantities = list()
 
-        fuel_temp = Quantity( name='fuel-temp', formalName='T_f',
-                unit='k', value=273.15)
+        fuel_temp = Quantity( name='fuel-temp', formalName='T_f', latex_name='$T_f$',
+                unit='k', value=273.15,
+                info='Nuclear Fuel Temperature')
 
         quantities.append(fuel_temp)
 
-        reg_rod_position = Quantity(name='reg-rod-position', formal_name = 'reg rod position',
-                unit='m', value=0.0)
+        reg_rod_position = Quantity(name='reg-rod-position',
+                formal_name = 'reg rod position', latex_name='$x_p$',
+                unit='m', value=0.0,
+                info='Regulating Rod Position')
 
         quantities.append(reg_rod_position)
 
         self.reactor_phase = Phase(self.initial_time, time_unit='s', quantities=quantities)
 
-        # Initialize inflows to zero
+        # Initialize inflow
         self.params['inflow-cool-temp'] = 273.15
-
-        #self.ode_params['prison-inflow-rates']       = np.zeros(self.n_groups)
-        #self.ode_params['parole-inflow-rates']       = np.zeros(self.n_groups)
-        #self.ode_params['arrested-inflow-rates']     = np.zeros(self.n_groups)
-        #self.ode_params['jail-inflow-rates']         = np.zeros(self.n_groups)
-        #self.ode_params['adjudication-inflow-rates'] = np.zeros(self.n_groups)
-        #self.ode_params['probation-inflow-rates']    = np.zeros(self.n_groups)
 
         return
 

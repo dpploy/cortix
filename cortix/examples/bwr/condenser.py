@@ -50,30 +50,7 @@ class Condenser(Module):
         self.time_step = 10.0
         self.log = logging.getLogger('cortix')
 
-        # Runoff in phase history
-
-        quantities = list()
-
-        flowrate = Quantity(name='inflow-flowrate',
-                   formalName='Turbine Runoff Flowrate',
-                   unit='kg/s', value=0.0)
-        quantities.append(flowrate)
-
-        temp = Quantity(name='inflow-temp', formalName='Turbine Runoff Temp.',
-               unit='K', value=273.15)
-        quantities.append(temp)
-
-        press = Quantity(name='inflow-pressure',formalName='Turbine Runoff Pressure',
-                unit='Pa', value=0.0)
-        quantities.append(press)
-
-        quality = Quantity(name='inflow-quality', formalName='Turbine Runoff Quality', unit='%', value=0.0)
-        quantities.append(quality)
-
-        self.turbine_runoff_phase = Phase(self.initial_time, time_unit='s',
-                quantities=quantities)
-
-        # Condenser runoff phase history
+        # Condenser outflow phase history
         quantities = list()
 
         flowrate = Quantity(name='condenser-runoff-flowrate',
@@ -86,18 +63,8 @@ class Condenser(Module):
                    unit='K', value=273.15)
         quantities.append(temp)
 
-        self.condenser_runoff_phase = Phase(self.initial_time, time_unit='s',
+        self.outflow_phase = Phase(self.initial_time, time_unit='s',
                 quantities=quantities)
-
-        # Neutron phase history
-
-        # Initialize inflows to zero
-        #self.ode_params['prison-inflow-rates']       = np.zeros(self.n_groups)
-        #self.ode_params['parole-inflow-rates']       = np.zeros(self.n_groups)
-        #self.ode_params['arrested-inflow-rates']     = np.zeros(self.n_groups)
-        #self.ode_params['jail-inflow-rates']         = np.zeros(self.n_groups)
-        #self.ode_params['adjudication-inflow-rates'] = np.zeros(self.n_groups)
-        #self.ode_params['probation-inflow-rates']    = np.zeros(self.n_groups)
 
         return
 
@@ -121,57 +88,62 @@ class Condenser(Module):
             #---------------------
             time = self.__step( time )
 
+        return
+
     def __call_ports(self, time):
         # Interactions in the outflow port
         #----------------------------------------
-        # one way "from" outflow
+        # one way "from" inflow
 
         # from
         self.send( time, 'inflow' )
         (check_time, inflow_state) = self.recv('inflow')
         assert abs(check_time-time) <= 1e-6
 
-        if self.turbine_runoff_phase.has_time_stamp(time) == False:
-            inflow = self.turbine_runoff_phase.get_row(time - self.time_step)
-            self.turbine_runoff_phase.add_row(time, inflow)
-            self.turbine_runoff_phase.set_value('inflow-temp', inflow_state['temp'], time)
-            self.turbine_runoff_phase.set_value('inflow-quality', inflow_state['quality'], time)
+        self.inflow_state = inflow_state
+        self.inflow_state['time'] = time
 
         # Interactions in the coolant-outflow port
         #-----------------------------------------
-        # one way "to" coolant-outflow
+        # one way "to" outflow
 
-        # to be, or not to be?
+        # to 
         message_time = self.recv('outflow')
         outflow_state = dict()
-        outflow_cool_temp = self.condenser_runoff_phase.get_value('condenser-runoff-temp', time)
+        outflow_cool_temp = self.outflow_phase.get_value('condenser-runoff-temp', time)
         condenser_runoff = dict()
         condenser_runoff['outflow-temp'] = outflow_cool_temp
         self.send( (message_time, outflow_cool_temp), 'outflow' )
 
+        return
 
     def __step(self, time):
 
         import iapws.iapws97 as steam
 
-        temp_in = self.turbine_runoff_phase.get_value('inflow-temp', time)
-        x_in = self.turbine_runoff_phase.get_value('inflow-quality', time)
+        assert abs( time-self.inflow_state['time'] ) <= 1e-6
 
-        temp_c = 0
+        temp_in = self.inflow_state['temp']
+        x_in    = self.inflow_state['quality']
 
-        t_out = self.__condenser(time, temp_in, x_in, temp_c, self.params)
+        t_out = self.__condenser(time, temp_in, x_in, self.params)
 
-        condenser_runoff = self.condenser_runoff_phase.get_row(time)
+        condenser_runoff = self.outflow_phase.get_row(time)
 
         time = time + self.time_step
-        self.condenser_runoff_phase.add_row(time, condenser_runoff)
-        self.condenser_runoff_phase.set_value('condenser-runoff-temp', t_out)
-        return(time)
 
-    def __condenser(self, time, temp_in, x_in, temp_c, params):
+        self.outflow_phase.add_row(time, condenser_runoff)
+        self.outflow_phase.set_value('condenser-runoff-temp', t_out)
+
+        return time
+
+    def __condenser(self, time, temp_in, x_in, params):
+
         critical_temp = steam_table._TSat_P(0.005)
         condenser_runoff = critical_temp
+
         x = x_in
+
         if x == -1 and temp_in > critical_temp: #superheated vapor inlet; deprecated
             pressure = 0.005
             h_steam = steam_table._Region2(temp_in, pressure)['h']
@@ -345,4 +317,4 @@ class Condenser(Module):
 
                 condenser_runoff = final_runoff_temperature_guess
 
-        return(condenser_runoff)
+        return condenser_runoff
