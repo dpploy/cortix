@@ -199,13 +199,13 @@ def main():
     params['turbine_outlet_pressure'] = 0.005
     params['high_pressure_turbine'] = True
 
-    #turbine3   = Turbine(params)
-    #turbine3.name = 'Low Pressure Turbine 2'
-    #turbine3.save = True
-    #turbine3.time_step = time_step
-    #turbine3.end_time = end_time
-    #turbine3.show_time = show_time
-    #plant_net.module(turbine3)
+    turbine3   = Turbine(params)
+    turbine3.name = 'Low Pressure Turbine 2'
+    turbine3.save = True
+    turbine3.time_step = time_step
+    turbine3.end_time = end_time
+    turbine3.show_time = show_time
+    plant_net.module(turbine3)
 
     #*****************************************************************************
     params['steam flowrate'] = params['steam flowrate'] * 2
@@ -218,10 +218,11 @@ def main():
     condenser.show_time = show_time
     plant_net.module(condenser)
 
-    plant_net.connect( [reactor,'coolant-outflow'], [turbine1,'inflow'] )
-    plant_net.connect( [turbine1,'outflow'], [turbine2,'inflow'] )
-    #plant_net.connect( [turbine1, 'outflow'], [turbine3, 'inflow'])
-    plant_net.connect( [turbine2, 'outflow'], [condenser, 'inflow'])
+    plant_net.connect( [reactor, 'coolant-outflow'], [turbine1,'inflow'] )
+    plant_net.connect( [turbine1, 'outflow-1'], [turbine2,'inflow'] )
+    plant_net.connect( [turbine1, 'outflow-2'], [turbine3, 'inflow'])
+    plant_net.connect( [turbine2, 'outflow-1'], [condenser, 'inflow-1'])
+    plant_net.connect( [turbine3, 'outflow-1'], [condenser, 'inflow-2'])
     plant_net.connect( [condenser,'outflow'], [reactor,'coolant-inflow'] )
 
     #*****************************************************************************
@@ -235,6 +236,7 @@ def main():
         reactor = plant_net.modules[0]
 
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('neutron-dens')
+
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
                     y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
@@ -247,28 +249,31 @@ def main():
         plt.savefig('delayed-neutrons-cc.png', dpi=300)
 
         (quant, time_unit) = reactor.coolant_outflow_phase.get_quantity_history('temp')
+
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
                     y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('coolant-outflow-temp.png', dpi=300)
 
         (quant, time_unit) = reactor.reactor_phase.get_quantity_history('fuel-temp')
+
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
                     y_label =quant.latex_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('fuel-temp.png', dpi=300)
 
         # Turbine graphs
-        turbine = plant_net.modules[1]
+        turbine1 = plant_net.modules[1]
 
-        (quant, time_unit) = turbine.outflow_phase.get_quantity_history('power')
+        (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('power')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
                     y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('turbine-power.png', dpi=300)
 
-        (quant, time_unit) = turbine.outflow_phase.get_quantity_history('temp')
+        (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('temp')
+
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
                     y_label=quant.latex_name+' ['+quant.unit+']')
         plt.grid()

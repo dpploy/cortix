@@ -38,7 +38,7 @@ class Turbine(Module):
 
         super().__init__()
         self.params = params
-        self.port_names_expected = ['inflow','outflow']
+        self.port_names_expected = ['inflow','outflow-1','outflow-2']
 
         self.initial_time = 0.0 * const.day
         self.end_time     = 4 * const.hour
@@ -112,14 +112,14 @@ class Turbine(Module):
 
     def __call_ports(self, time):
 
-        # Interactions in the steam-outflow port
+        # Interactions in the steam-outflow-1 port
         #-----------------------------------------
-        # one way "to" outflow
+        # one way "to" outflow-1
 
         # to 
-        if self.get_port('outflow').connected_port:
+        if self.get_port('outflow-1').connected_port:
 
-            message_time = self.recv('outflow')
+            message_time = self.recv('outflow-1')
 
             outflow_state = dict()
 
@@ -131,7 +131,28 @@ class Turbine(Module):
             outflow_state['quality'] = steam_quality
             outflow_state['press'] = steam_press
 
-            self.send( (message_time, outflow_state), 'outflow' )
+            self.send( (message_time, outflow_state), 'outflow-1' )
+
+        # Interactions in the steam-outflow-2 port
+        #-----------------------------------------
+        # one way "to" outflow-2
+
+        # to 
+        if self.get_port('outflow-2').connected_port:
+
+            message_time = self.recv('outflow-2')
+
+            outflow_state = dict()
+
+            steam_temp = self.outflow_phase.get_value('temp', time)
+            steam_quality = self.outflow_phase.get_value('quality', time)
+            steam_press = self.outflow_phase.get_value('pressure', time)
+
+            outflow_state['temp'] = steam_temp
+            outflow_state['quality'] = steam_quality
+            outflow_state['press'] = steam_press
+
+            self.send( (message_time, outflow_state), 'outflow-2' )
 
         # Interactions in the steam-inflow port
         #----------------------------------------

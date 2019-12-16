@@ -39,7 +39,7 @@ class Condenser(Module):
 
         super().__init__()
 
-        self.port_names_expected = ['inflow', 'outflow']
+        self.port_names_expected = ['inflow-1', 'inflow-2', 'outflow']
 
         quantities      = list()
         self.ode_params = dict()
@@ -91,19 +91,32 @@ class Condenser(Module):
         return
 
     def __call_ports(self, time):
-        # Interactions in the outflow port
+
+        # Interactions in the inflow port
         #----------------------------------------
-        # one way "from" inflow
+        # one way "from" inflow-1
 
         # from
-        self.send( time, 'inflow' )
-        (check_time, inflow_state) = self.recv('inflow')
+        self.send( time, 'inflow-1' )
+        (check_time, inflow_state) = self.recv('inflow-1')
         assert abs(check_time-time) <= 1e-6
 
         self.inflow_state = inflow_state
         self.inflow_state['time'] = time
 
-        # Interactions in the coolant-outflow port
+        # Interactions in the inflow port
+        #----------------------------------------
+        # one way "from" inflow-2
+
+        # from
+        self.send( time, 'inflow-2' )
+        (check_time, inflow_state) = self.recv('inflow-2')
+        assert abs(check_time-time) <= 1e-6
+
+        self.inflow_state = inflow_state
+        self.inflow_state['time'] = time
+
+        # Interactions in the outflow port
         #-----------------------------------------
         # one way "to" outflow
 
