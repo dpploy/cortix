@@ -80,7 +80,7 @@ class Condenser(Module):
         end_time = self.end_time
 
         while time <  end_time + self.time_step:
-            #print('condenser looped')
+
             if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
                 self.log.info('time = '+str(round(time/const.minute,1)))
 
