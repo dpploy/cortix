@@ -214,7 +214,9 @@ class Turbine(Module):
         #pressure of steam when it enters the turbine equals the current reactor operating pressure
         if self.params['high_pressure_turbine'] == True:
             p_in = steam_table._PSat_T(temp_in)
+            print('not evaluated')
         else:
+            print('evaluated')
             p_in = self.params['turbine_inlet_pressure']
 
         p_out = self.params['turbine_outlet_pressure']
@@ -278,7 +280,6 @@ class Turbine(Module):
             t_runoff = steam_table._TSat_P(p_out)
 
         w_real = w_real * params['steam flowrate'] * sc.kilo
-
         #w_real = heat_removed
         return (t_runoff, w_real, x_runoff)
 

@@ -175,6 +175,7 @@ def main():
     params['high_pressure_turbine'] = True
 
     turbine1   = Turbine(params)
+    print('turb1', turbine1.params['high_pressure_turbine'])
 
     turbine1.name = 'High Pressure Turbine'
     turbine1.save = True
@@ -190,6 +191,7 @@ def main():
     params['steam flowrate'] = params['steam flowrate']/2
 
     turbine2   = Turbine(params)
+    print(turbine2.params['high_pressure_turbine'])
 
     turbine2.name = 'Low Pressure Turbine 1'
     turbine2.save = True
@@ -201,7 +203,7 @@ def main():
     #*****************************************************************************
     params['turbine_inlet_pressure'] = 0.5
     params['turbine_outlet_pressure'] = 0.005
-    params['high_pressure_turbine'] = True
+    params['high_pressure_turbine'] = False
 
     turbine3   = Turbine(params)
 
@@ -211,7 +213,7 @@ def main():
     turbine3.end_time = end_time
     turbine3.show_time = show_time
     plant_net.module(turbine3)
-
+    print('turb2', turbine1.params['high_pressure_turbine'])
     #*****************************************************************************
     params['steam flowrate'] = params['steam flowrate'] * 2
 
