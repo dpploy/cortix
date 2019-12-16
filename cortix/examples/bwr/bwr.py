@@ -299,8 +299,8 @@ class BWR(Module):
 
         outflow_cool_temp = self.coolant_outflow_phase.get_value('temp', time)
 
-        coolant_outflow_stream['inflow-temp'] = outflow_cool_temp
-        coolant_outflow_stream['inflow-quality'] = 0.7
+        coolant_outflow_stream['temp'] = outflow_cool_temp
+        coolant_outflow_stream['quality'] = 0.7
         return coolant_outflow_stream
 
     def __get_state_vector(self, time):

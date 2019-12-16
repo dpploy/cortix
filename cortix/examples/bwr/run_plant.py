@@ -174,13 +174,13 @@ def main():
     params['turbine_outlet_pressure'] = 0.5
     params['high_pressure_turbine'] = True
 
-    turbine   = Turbine(params)
-    turbine.name = 'High Pressure Turbine'
-    turbine.save = True
-    turbine.time_step = time_step
-    turbine.end_time = end_time
-    turbine.show_time = show_time
-    plant_net.module(turbine)
+    turbine1   = Turbine(params)
+    turbine1.name = 'High Pressure Turbine'
+    turbine1.save = True
+    turbine1.time_step = time_step
+    turbine1.end_time = end_time
+    turbine1.show_time = show_time
+    plant_net.module(turbine1)
 
     params['turbine_inlet_pressure'] = 0.5
     params['turbine_outlet_pressure'] = 0.005
@@ -199,13 +199,13 @@ def main():
     params['turbine_outlet_pressure'] = 0.005
     params['high_pressure_turbine'] = True
 
-    turbine3   = Turbine(params)
-    turbine3.name = 'Low Pressure Turbine 2'
-    turbine3.save = True
-    turbine3.time_step = time_step
-    turbine3.end_time = end_time
-    turbine3.show_time = show_time
-    plant_net.module(turbine3)
+    #turbine3   = Turbine(params)
+    #turbine3.name = 'Low Pressure Turbine 2'
+    #turbine3.save = True
+    #turbine3.time_step = time_step
+    #turbine3.end_time = end_time
+    #turbine3.show_time = show_time
+    #plant_net.module(turbine3)
 
     #*****************************************************************************
     params['steam flowrate'] = params['steam flowrate'] * 2
@@ -218,10 +218,10 @@ def main():
     condenser.show_time = show_time
     plant_net.module(condenser)
 
-    plant_net.connect( [reactor,'coolant-outflow'], [turbine,'steam-inflow'] )
-    plant_net.connect( [turbine,'runoff'], [turbine2,'steam-inflow'] )
-    plant_net.connect( [turbine, 'runoff'], [turbine3, 'steam-inflow'])
-    plant_net.connect( [turbine2, 'runoff'], [condenser, 'inflow'])
+    plant_net.connect( [reactor,'coolant-outflow'], [turbine1,'inflow'] )
+    plant_net.connect( [turbine1,'outflow'], [turbine2,'inflow'] )
+    #plant_net.connect( [turbine1, 'outflow'], [turbine3, 'inflow'])
+    plant_net.connect( [turbine2, 'outflow'], [condenser, 'inflow'])
     plant_net.connect( [condenser,'outflow'], [reactor,'coolant-inflow'] )
 
     #*****************************************************************************
@@ -261,14 +261,14 @@ def main():
         # Turbine graphs
         turbine = plant_net.modules[1]
 
-        (quant, time_unit) = turbine.turbine_work_phase.get_quantity_history('turbine-power')
+        (quant, time_unit) = turbine.outflow_phase.get_quantity_history('power')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
                     y_label='power')
         plt.grid()
         plt.savefig('turbine-power.png', dpi=300)
 
-        (quant, time_unit) = turbine.turbine_runoff_phase.get_quantity_history('runoff-temp')
+        (quant, time_unit) = turbine.outflow_phase.get_quantity_history('temp')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
                     y_label='runoff temp')
         plt.grid()

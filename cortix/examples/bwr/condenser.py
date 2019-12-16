@@ -130,11 +130,12 @@ class Condenser(Module):
         self.send( time, 'inflow' )
         (check_time, inflow_state) = self.recv('inflow')
         assert abs(check_time-time) <= 1e-6
+
         if self.turbine_runoff_phase.has_time_stamp(time) == False:
             inflow = self.turbine_runoff_phase.get_row(time - self.time_step)
             self.turbine_runoff_phase.add_row(time, inflow)
-            self.turbine_runoff_phase.set_value('inflow-temp', inflow_state['inflow-temp'], time)
-            self.turbine_runoff_phase.set_value('inflow-quality', inflow_state['inflow-quality'], time)
+            self.turbine_runoff_phase.set_value('inflow-temp', inflow_state['temp'], time)
+            self.turbine_runoff_phase.set_value('inflow-quality', inflow_state['quality'], time)
 
         # Interactions in the coolant-outflow port
         #-----------------------------------------
@@ -152,9 +153,12 @@ class Condenser(Module):
     def __step(self, time):
 
         import iapws.iapws97 as steam
+
         temp_in = self.turbine_runoff_phase.get_value('inflow-temp', time)
         x_in = self.turbine_runoff_phase.get_value('inflow-quality', time)
+
         temp_c = 0
+
         t_out = self.__condenser(time, temp_in, x_in, temp_c, self.params)
 
         condenser_runoff = self.condenser_runoff_phase.get_row(time)

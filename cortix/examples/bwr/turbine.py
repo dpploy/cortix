@@ -38,7 +38,7 @@ class Turbine(Module):
 
         super().__init__()
         self.params = params
-        self.port_names_expected = ['steam-inflow','runoff']
+        self.port_names_expected = ['inflow','outflow']
 
         self.initial_time = 0.0 * const.day
         self.end_time     = 4 * const.hour
@@ -47,44 +47,46 @@ class Turbine(Module):
 
         self.log = logging.getLogger('cortix')
 
-        # Coolant outflow phase history
+        # Inflow phase history
         quantities = list()
 
-        temp = Quantity(name='reactor-runoff-temp', formal_name = 'T_in',
-                unit = 'k', value = 273.15)
+        temp = Quantity(name='temp', formal_name = 'T_in',
+                unit = 'k', value = 273.15,
+                info='Turbine Steam Inflow Temperature')
 
         quantities.append(temp)
 
-        self.coolant_inflow_phase = Phase(self.initial_time, time_unit = 's', quantities = quantities)
+        self.inflow_phase = Phase(self.initial_time, time_unit = 's',
+                quantities = quantities)
 
         # Outflow phase history
         quantities = list()
 
-        temp = Quantity(name='runoff-temp', formal_name='T_o',
-                unit = 'k', value=273.15)
+        temp = Quantity(name='temp', formal_name='T_o',
+                unit = 'k', value=273.15,
+                info='Turbine Steam Outflow Temperature')
 
         quantities.append(temp)
 
-        press = Quantity(name='runoff-press', formal_name='P_t',
-                unit = 'Pa', value = params['runoff-pressure'])
+        press = Quantity(name='pressure', formal_name='P_t',
+                unit = 'Pa', value = params['runoff-pressure'],
+                info='Turbine Steam Outflow Pressure')
 
         quantities.append(press)
 
-        x = Quantity(name='runoff-quality', formal_name='chi_t',
-                formalName = 'Turbine Runoff Quality', unit = '%', value = 0.0)
+        x = Quantity(name='quality', formal_name='chi_t',
+                unit = '%', value = 0.0,
+                info='Turbine Steam Outflow Quality')
 
         quantities.append(x)
 
-        self.turbine_runoff_phase = Phase(self.initial_time, time_unit = 's', quantities = quantities)
+        work = Quantity(name='power', formal_name='P_t',
+                unit = 'w', value = 0.0,
+                info='Turbine Power')
 
-        # Turbine params history
-        quantities = list()
-
-        work = Quantity(name='turbine-power', formal_name='P_t',
-                unit = 'w', value = 0.0)
         quantities.append(work)
 
-        self.turbine_work_phase = Phase(self.initial_time, time_unit = 's', quantities = quantities)
+        self.outflow_phase = Phase(self.initial_time, time_unit = 's', quantities = quantities)
 
         return
 
@@ -107,43 +109,47 @@ class Turbine(Module):
 
     def __call_ports(self, time):
 
-        # Interactions in the steam-inflow port
+        # Interactions in the steam-outflow port
         #-----------------------------------------
-        # one way "to" steam-inflow
+        # one way "to" outflow
 
         # to 
-        if self.get_port('runoff').connected_port:
-            message_time = self.recv('runoff')
-            #print('message time', message_time)
+        if self.get_port('outflow').connected_port:
+
+            message_time = self.recv('outflow')
+
             outflow_state = dict()
-            outflow_cool_temp = self.turbine_runoff_phase.get_value('runoff-temp', time)
-            outflow_cool_quality = self.turbine_runoff_phase.get_value('runoff-quality', time)
-            outflow_cool_press = self.turbine_runoff_phase.get_value('runoff-press', time)
 
-            outflow_state['inflow-temp'] = outflow_cool_temp
-            outflow_state['inflow-quality'] = outflow_cool_quality
-            outflow_state['inflow-press'] = outflow_cool_press
-            self.send( (message_time, outflow_state), 'runoff' )
+            steam_temp = self.outflow_phase.get_value('temp', time)
+            steam_quality = self.outflow_phase.get_value('quality', time)
+            steam_press = self.outflow_phase.get_value('pressure', time)
 
-        # Interactions in the coolant-inflow port
+            outflow_state['temp'] = steam_temp
+            outflow_state['quality'] = steam_quality
+            outflow_state['press'] = steam_press
+
+            self.send( (message_time, outflow_state), 'outflow' )
+
+        # Interactions in the steam-inflow port
         #----------------------------------------
-        # one way "from" coolant-inflow
+        # one way "from" inflow
 
         # from
-        if self.get_port('steam-inflow').connected_port:
-            self.send( time, 'steam-inflow' )
-            (check_time, inflow_state) = self.recv('steam-inflow')
+        if self.get_port('inflow').connected_port:
+
+            self.send( time, 'inflow' )
+
+            (check_time, inflow_state) = self.recv('inflow')
             assert abs(check_time-time) <= 1e-6
-            self.temp = inflow_state['inflow-temp']
-            self.x = inflow_state['inflow-quality']
+
+            #print(inflow_state)
+
+            self.temp = inflow_state['temp']
+            self.chi  = inflow_state['quality']
 
     def __step(self, time=0.0):
         r'''
-        ODE IVP problem:
-        Given the initial data at :math:`t=0`,
-        :math:`u = (u_1(0),u_2(0),\ldots)`
-        solve :math:`\frac{\text{d}u}{\text{d}t} = f(u)` in the interval
-        :math:`0\le t \le t_f`.
+        Advance the state of the turbine.
 
         Parameters
         ----------
@@ -156,27 +162,28 @@ class Turbine(Module):
 
         '''
         import iapws.iapws97 as steam
-        output = self.__turbine(time, self.temp, self.x, self.params)
-        time = time + self.time_step
+
+        output = self.__turbine(time, self.temp, self.chi, self.params)
+
+        tmp = self.outflow_phase.get_row(time)
+
+        time += self.time_step
+
+        self.outflow_phase.add_row(time, tmp)
+
         t_runoff = output[0]
+
         x_runoff = output[2]
         if x_runoff < 0 and x_runoff != -1:
             x_runoff = 0
+
         w_turbine = output[1]
 
-        if self.turbine_work_phase.has_time_stamp(time) == False:
-            work = list()
-            work.append(w_turbine)
-            self.turbine_work_phase.add_row(time, work)
-            runoff = self.turbine_runoff_phase.get_row(time - self.time_step)
-            self.turbine_runoff_phase.add_row(time, runoff)
-
-        self.turbine_work_phase.set_value('turbine-power', w_turbine, time)
-        self.turbine_runoff_phase.set_value('runoff-quality', x_runoff, time)
-        self.turbine_runoff_phase.set_value('runoff-temp', t_runoff, time)
+        self.outflow_phase.set_value('power', w_turbine, time)
+        self.outflow_phase.set_value('quality', x_runoff, time)
+        self.outflow_phase.set_value('temp', t_runoff, time)
 
         return(time)
-        # Get state values
 
     def __turbine(self, time, temp_in, x,  params):
         #expand the entering steam from whatever temperature and pressure it enters at to 0.035 kpa, with 80% efficiency.
