@@ -54,24 +54,24 @@ class BWR(Module):
 
         flowrate = Quantity(name='flowrate', formal_name='q_c', latex_name='$q_c$',
                    unit='kg/s', value=0.0,
-                   info='Outflow Coolant Flowrate')
+                   info='Reactor Outflow Coolant Flowrate')
 
         quantities.append(flowrate)
 
         temp = Quantity(name='temp', formal_name='T_c', latex_name='$T_c$',
                    unit='K', value=273.15,
-                   info='Outflow Coolant Temperature')
+                   info='Reactor Outflow Coolant Temperature')
         quantities.append(temp)
 
         press = Quantity(name='pressure', formal_name='P_c', latex_name='$P_c$',
                    unit='Pa', value=0.0,
-                   info='Outflow Coolant Pressure')
+                   info='Reactor Outflow Coolant Pressure')
 
         quantities.append(press)
 
         quality = Quantity(name='steam-quality', formal_name='chi_s', latex_name='$\chi$',
                    unit='', value=0.0,
-                   info='Steam Quality')
+                   info='Reactor Steam Quality')
 
         quantities.append(quality)
 
@@ -83,7 +83,7 @@ class BWR(Module):
 
         neutron_dens = Quantity(name='neutron-dens', formal_name='n', latex_name='$n$',
                    unit='1/m^3', value=0.0,
-                   info='Neutron Density')
+                   info='Reactor Neutron Density')
 
         quantities.append(neutron_dens)
 
@@ -104,14 +104,14 @@ class BWR(Module):
 
         fuel_temp = Quantity( name='fuel-temp', formalName='T_f', latex_name='$T_f$',
                 unit='k', value=273.15,
-                info='Nuclear Fuel Temperature')
+                info='Reactor Nuclear Fuel Temperature')
 
         quantities.append(fuel_temp)
 
         reg_rod_position = Quantity(name='reg-rod-position',
                 formal_name = 'reg rod position', latex_name='$x_p$',
                 unit='m', value=0.0,
-                info='Regulating Rod Position')
+                info='Reactor Regulating Rod Position')
 
         quantities.append(reg_rod_position)
 

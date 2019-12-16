@@ -275,16 +275,37 @@ def main():
         (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('power')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']')
+                    y_label=quant.latex_name+' ['+quant.unit+']',
+                    title='High Pressure Turbine Power')
         plt.grid()
         plt.savefig('turbine1-power.png', dpi=300)
 
         (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('temp')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']')
+                    y_label=quant.latex_name+' ['+quant.unit+']',
+                    title='High Pressure Turbine Outflow Temperature')
         plt.grid()
         plt.savefig('turbine1-outflow-temp.png', dpi=300)
+
+        # Turbine graphs
+        turbine2 = plant_net.modules[2]
+
+        (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('power')
+
+        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
+                    y_label=quant.latex_name+' ['+quant.unit+']',
+                    title='Lower Pressure Turbine 1 Power')
+        plt.grid()
+        plt.savefig('turbine2-power.png', dpi=300)
+
+        (quant, time_unit) = turbine2.outflow_phase.get_quantity_history('temp')
+
+        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
+                    y_label=quant.latex_name+' ['+quant.unit+']',
+                    title='Lower Pressure Turbine 1 Outflow Temperature')
+        plt.grid()
+        plt.savefig('turbine2-outflow-temp.png', dpi=300)
 
         # Condenser graphs
         condenser = plant_net.modules[-1]
