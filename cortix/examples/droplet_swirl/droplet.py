@@ -133,7 +133,9 @@ class Droplet(Module):
             # Interactions in the external-flow port
             #---------------------------------------
 
-            position = self.liquid_phase.GetValue('position')
+            # Constant value (no search)
+            position = np.zeros(3) # self.liquid_phase.GetValue('position')
+
             self.send( (time,position), 'external-flow' )
 
             (check_time, velocity,fluid_props) = self.recv( 'external-flow' )
