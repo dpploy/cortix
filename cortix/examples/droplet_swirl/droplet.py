@@ -232,8 +232,8 @@ class Droplet(Module):
 
         if not self.bottom_impact:
 
-           x_0 = self.liquid_phase.GetValue('position', time)
-           v_0 = self.liquid_phase.GetValue('velocity', time)
+           x_0 = self.liquid_phase.GetValue('position')
+           v_0 = self.liquid_phase.GetValue('velocity')
            u_vec_0 = np.concatenate((x_0,v_0))
 
            t_interval_sec = np.linspace(0.0, self.time_step, num=2)
@@ -250,7 +250,7 @@ class Droplet(Module):
 
            u_vec = u_vec_hist[1,:]  # solution vector at final time step
 
-        values = self.liquid_phase.GetRow(time) # values at previous time
+        values = self.liquid_phase.GetRow() # values at previous time
 
         time += self.time_step
 
@@ -274,10 +274,9 @@ class Droplet(Module):
                 self.bottom_impact = True
 
             # Update current values
-            self.liquid_phase.SetValue('position', u_vec[0:3], time)
-            self.liquid_phase.SetValue('velocity', u_vec[3:], time)
-            self.liquid_phase.SetValue('speed', np.linalg.norm(u_vec[3:]), time)
-            self.liquid_phase.SetValue('radial-position', np.linalg.norm(u_vec[0:2]),
-                    time)
+            self.liquid_phase.SetValue('position', u_vec[0:3])
+            self.liquid_phase.SetValue('velocity', u_vec[3:])
+            self.liquid_phase.SetValue('speed', np.linalg.norm(u_vec[3:]))
+            self.liquid_phase.SetValue('radial-position', np.linalg.norm(u_vec[0:2]))
 
         return time

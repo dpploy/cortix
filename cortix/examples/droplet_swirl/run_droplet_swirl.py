@@ -10,7 +10,7 @@ are made by variables listed below in the executable portion of this run file.
 To run this case using MPI you should compute the number of
 processes as follows:
 
-    `nprocs = n_droplets + 1 vortex + 1 cortix`
+    `nprocs = 2 * n_droplets + 1 cortix`
 
 then issue the MPI run command as follows (replace `nprocs` with a number):
 
@@ -25,12 +25,10 @@ command line as
 
 import scipy.constants as const
 
-
 from cortix import Cortix
 from cortix import Network
 from cortix.examples.droplet_swirl.droplet import Droplet
 from cortix.examples.droplet_swirl.vortex import Vortex
-
 
 def main():
     '''Cortix run file for a `Droplet`-`Vortex` network.
@@ -55,10 +53,10 @@ def main():
 
     # Configuration Parameters
     n_droplets = 5
-    end_time   = 3*const.minute
+    end_time   = 3 * const.minute
     time_step  = 0.2
 
-    create_plots = True
+    create_plots = False
 
     if n_droplets >= 2000:
         create_plots = False
@@ -71,18 +69,17 @@ def main():
 
     swirl.network = Network()
 
-    # Vortex module (single).
-    vortex = Vortex()
-    swirl.network.module(vortex)
-    vortex.show_time = (True,1*const.minute)
-    vortex.end_time = end_time
-    vortex.time_step = time_step
-    if plot_vortex_profile:
-        vortex.plot_velocity()
-
     for i in range(n_droplets):
+        # Vortex module 1-to-1
+        vortex = Vortex()
+        swirl.network.module(vortex)
+        vortex.show_time = (True, 1*const.minute)
+        vortex.end_time = end_time
+        vortex.time_step = time_step
+        if plot_vortex_profile:
+            vortex.plot_velocity()
 
-        # Droplet modules (multiple).
+        # Droplet modules (multiple)
         droplet = Droplet()
         swirl.network.module(droplet)
         droplet.end_time = end_time
@@ -93,16 +90,14 @@ def main():
 
         # Network port connectivity (connect modules through their ports)
         swirl.network.connect( [droplet,'external-flow'],
-                               [vortex,vortex.get_port('fluid-flow:{}'.format(i))],
+                               [vortex, vortex.get_port('fluid-flow:{}'.format(i))],
                                'bidirectional' )
-
     swirl.network.draw()
 
     swirl.run()
 
     # Plot all droplet trajectories
     if create_plots:
-
         modules = swirl.network.modules
 
         if swirl.use_multiprocessing or swirl.rank == 0:
@@ -114,7 +109,8 @@ def main():
 
             positions = list()
             for m in swirl.network.modules[1:]:
-                positions.append(m.liquid_phase.get_quantity_history('position')[0].value)
+                if type(m) is not Vortex:
+                    positions.append(m.liquid_phase.get_quantity_history('position')[0].value)
 
             fig = plt.figure(1)
             ax = fig.add_subplot(111,projection='3d')
@@ -136,8 +132,9 @@ def main():
             plt.title('All Droplets')
 
             for m in modules[1:]:
-                speed = m.liquid_phase.get_quantity_history('speed')[0].value
-                plt.plot(list(speed.index/60), speed.tolist())
+                if type(m) is not Vortex:
+                    speed = m.liquid_phase.get_quantity_history('speed')[0].value
+                    plt.plot(list(speed.index/60), speed.tolist())
 
             plt.grid()
             fig.savefig('speeds.png', dpi=300)
@@ -149,8 +146,9 @@ def main():
             plt.title('All Droplets')
 
             for m in modules[1:]:
-                radial_pos = m.liquid_phase.get_quantity_history('radial-position')[0].value
-                plt.plot(list(radial_pos.index/60)[1:], radial_pos.tolist()[1:])
+                if type(m) is not Vortex:
+                    radial_pos = m.liquid_phase.get_quantity_history('radial-position')[0].value
+                    plt.plot(list(radial_pos.index / 60)[1:], radial_pos.tolist()[1:])
 
             plt.grid()
             fig.savefig('radialpos.png', dpi=300)
