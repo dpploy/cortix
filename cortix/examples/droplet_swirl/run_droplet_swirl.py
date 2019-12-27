@@ -150,4 +150,6 @@ def main(n_droplets = 5, end_time = 3 * const.minute, time_step = 0.2):
     swirl.close()
 
 if __name__ == '__main__':
-    main()
+    import sys
+    num_drops = int(sys.argv[1]) if len(sys.argv) > 1 else 5
+    main(n_droplets=num_drops)
