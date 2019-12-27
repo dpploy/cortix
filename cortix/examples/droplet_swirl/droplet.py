@@ -57,40 +57,42 @@ class Droplet(Module):
         self.ode_params['gravity'] = const.g
 
         # Species in the liquid phase
+        '''
         water = Specie(name='water', formula_name='H2O(l)', phase='liquid', \
                 atoms=['2*H','O'])
         water.massCC =  0.99965 # [g/cc]
         water.massCCUnit = 'g/cc'
         water.molarCCUnit = 'mole/cc'
         species.append(water)
+        '''
 
-        droplet_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * water.massCC * \
+        water_massCC =  0.99965 # [g/cc]
+        droplet_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * water_massCC * \
                 const.gram / const.centi**3  # [kg]
         self.ode_params['droplet-mass'] = droplet_mass
 
         # Spatial position
         x_0 = np.zeros(3)
-        position = Quantity(name='position', formalName='Pos.', unit='m', value=x_0)
+        position = x_0 # Quantity(name='position', formalName='Pos.', unit='m', value=x_0)
         quantities.append(position)
 
         # Velocity
         v_0 = np.zeros(3)
-        velocity = Quantity(name='velocity', formalName='Veloc.', unit='m/s', value=v_0)
+        velocity = v_0 # Quantity(name='velocity', formalName='Veloc.', unit='m/s', value=v_0)
         quantities.append(velocity)
 
         # Speed
-        speed = Quantity(name='speed', formalName='Speed', unit='m/s', value=0.0)
+        speed = np.zeros(3) # Quantity(name='speed', formalName='Speed', unit='m/s', value=0.0)
         quantities.append(speed)
 
         # Radial position
-        radial_pos = Quantity(name='radial-position', formalName='Radius', unit='m', \
-                value=np.linalg.norm(x_0[0:2]))
+        radial_pos = np.zeros(3) #Quantity(name='radial-position', formalName='Radius', unit='m', value=np.linalg.norm(x_0[0:2]))
         quantities.append(radial_pos)
 
         # Liquid phase 
-        self.liquid_phase = Phase(self.initial_time, time_unit='s', species=species, \
-                quantities=quantities)
-        self.liquid_phase.SetValue('water', water.massCC, self.initial_time)
+        #self.liquid_phase = Phase(self.initial_time, time_unit='s', species=species, \
+        #        quantities=quantities)
+        #self.liquid_phase.SetValue('water', water.massCC, self.initial_time)
 
         # Domain box dimensions: LxLxH m^3 box with given H.
         # Origin of cartesian coordinate system at the bottom of the box. 
@@ -101,11 +103,11 @@ class Droplet(Module):
         # Random positioning of the droplet constrained to a box sub-region.
         x_0 = (2 * np.random.random(3) - np.ones(3)) * self.box_half_length / 4.0
         x_0[2] = self.box_height
-        self.liquid_phase.SetValue('position', x_0, self.initial_time)
+        #self.liquid_phase.SetValue('position', x_0, self.initial_time)
 
         # Droplet Initial velocity = 0 -> placed still in the flow
-        self.liquid_phase.SetValue('velocity', np.array([0.0,0.0,0.0]), \
-                self.initial_time)
+        #self.liquid_phase.SetValue('velocity', np.array([0.0,0.0,0.0]), \
+        #        self.initial_time)
 
         # Default value for the medium surrounding the droplet if data is not passed
         # through a conneted port.
@@ -229,8 +231,8 @@ class Droplet(Module):
 
         if not self.bottom_impact:
 
-           x_0 = self.liquid_phase.GetValue('position')
-           v_0 = self.liquid_phase.GetValue('velocity')
+           x_0 = np.zeros(3) # self.liquid_phase.GetValue('position')
+           v_0 = np.zeros(3) # self.liquid_phase.GetValue('velocity')
            u_vec_0 = np.concatenate((x_0,v_0))
 
            t_interval_sec = np.linspace(0.0, self.time_step, num=2)
@@ -247,17 +249,17 @@ class Droplet(Module):
 
            u_vec = u_vec_hist[1,:]  # solution vector at final time step
 
-        values = self.liquid_phase.GetRow() # values at previous time
+        #values = self.liquid_phase.GetRow() # values at previous time
 
         time += self.time_step
 
-        self.liquid_phase.AddRow(time, values)
+        #self.liquid_phase.AddRow(time, values)
 
         if not self.bottom_impact:
 
             # Ground impact with bouncing drop
             if u_vec[2] <= 0.0 and self.bounce:
-                position = self.liquid_phase.GetValue('position', self.initial_time)
+                position = np.zeros(3) #self.liquid_phase.GetValue('position', self.initial_time)
                 bounced_position = position[2] * np.random.random(1)
                 u_vec[2]  = bounced_position
                 u_vec[3:] = 0.0  # zero velocity
@@ -271,9 +273,11 @@ class Droplet(Module):
                 self.bottom_impact = True
 
             # Update current values
+            '''
             self.liquid_phase.SetValue('position', u_vec[0:3])
             self.liquid_phase.SetValue('velocity', u_vec[3:])
             self.liquid_phase.SetValue('speed', np.linalg.norm(u_vec[3:]))
             self.liquid_phase.SetValue('radial-position', np.linalg.norm(u_vec[0:2]))
+            '''
 
         return time
