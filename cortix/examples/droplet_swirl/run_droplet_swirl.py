@@ -63,7 +63,7 @@ def main():
 
     plot_vortex_profile = False # True may crash the X server.
 
-    use_mpi = False # True for MPI; False for Python multiprocessing
+    use_mpi = True # True for MPI; False for Python multiprocessing
 
     swirl = Cortix(use_mpi=use_mpi, splash=True)
 
