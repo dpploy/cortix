@@ -24,13 +24,12 @@ command line as
 '''
 
 import scipy.constants as const
-
 from cortix import Cortix
 from cortix import Network
 from cortix.examples.droplet_swirl.droplet import Droplet
 from cortix.examples.droplet_swirl.vortex import Vortex
 
-def main():
+def main(n_droplets = 5, end_time = 3 * const.minute, time_step = 0.2):
     '''Cortix run file for a `Droplet`-`Vortex` network.
 
     Attributes
@@ -50,12 +49,6 @@ def main():
         If set to `True` use MPI otherwise use Python multiprocessing.
 
     '''
-
-    # Configuration Parameters
-    n_droplets = 5
-    end_time   = 3 * const.minute
-    time_step  = 0.2
-
     create_plots = False
 
     if n_droplets >= 2000:
@@ -63,7 +56,7 @@ def main():
 
     plot_vortex_profile = False # True may crash the X server.
 
-    use_mpi = True # True for MPI; False for Python multiprocessing
+    use_mpi = False # True for MPI; False for Python multiprocessing
 
     swirl = Cortix(use_mpi=use_mpi, splash=True)
 
