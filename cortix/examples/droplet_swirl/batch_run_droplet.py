@@ -26,6 +26,9 @@ def main():
             f.write("{},{}\n".format(drops, elapsed_time))
 
     plt.plot([x for (x, y) in runs], [y for (x, y) in runs])
+    plt.title("Number of droplets vs Run time")
+    plt.xlabel("Number of Droplets")
+    plt.ylabel("Elapsed time (s)")
     plt.savefig("runs.png")
 
 if __name__ == "__main__":
