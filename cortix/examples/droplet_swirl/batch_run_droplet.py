@@ -22,8 +22,8 @@ def main():
         runs.append((num_drops, elapsed_time))
 
     with open("output.csv", "w") as f:
-        for (drops, time) in runs:
-            f.write("{},{}".format(drops, time))
+        for (drops, elapsed_time) in runs:
+            f.write("{},{}\n".format(drops, elapsed_time))
 
     plt.plot([x for (x, y) in runs], [y for (x, y) in runs])
     plt.savefig("runs.png")
