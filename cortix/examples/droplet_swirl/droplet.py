@@ -21,7 +21,7 @@ class Droplet(Module):
     `visualization` sends data to a visualization module.
     '''
 
-    def __init__(self, save=False):
+    def __init__(self):
         '''
         Attributes
         ----------
@@ -31,8 +31,6 @@ class Droplet(Module):
         show_time: tuple
             Two-element tuple, `(bool,float)`, `True` will print to standard
             output.
-        save: bool
-            Save droplet quantities across time
         '''
 
         super().__init__()
@@ -46,8 +44,10 @@ class Droplet(Module):
 
         self.bounce = True
         self.slip   = True
-        self.save   = save
 
+        if self.save:
+            self.positions = []
+            self.velocitites = []
 
         self.ode_params = dict()
 
@@ -63,14 +63,6 @@ class Droplet(Module):
                 const.gram / const.centi**3  # [kg]
         self.ode_params['droplet-mass'] = droplet_mass
 
-        # Spatial position
-        self.position = np.zeros(3)
-        self.velocity = np.zeros(3)
-
-        if self.save:
-            self.positions = []
-            self.velocities = []
-
         # Domain box dimensions: LxLxH m^3 box with given H.
         # Origin of cartesian coordinate system at the bottom of the box. 
         # z coordinate pointing upwards. -L <= x <= L, -L <= y <= L, 
@@ -80,12 +72,15 @@ class Droplet(Module):
         # Random positioning of the droplet constrained to a box sub-region.
         x_0 = (2 * np.random.random(3) - np.ones(3)) * self.box_half_length / 4.0
         x_0[2] = self.box_height
+
         self.initial_pos = self.position = x_0
+        self.velocity = np.zeros(3)
 
         # Default value for the medium surrounding the droplet if data is not passed
         # through a conneted port.
         medium_mass_density = 0.1 * const.gram / const.centi**3 # [kg/m^3]
         self.ode_params['medium-mass-density'] = medium_mass_density
+
         medium_displaced_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * \
                 medium_mass_density # [kg]
         self.ode_params['medium-displaced-mass'] = medium_displaced_mass
@@ -103,15 +98,11 @@ class Droplet(Module):
 
             # Interactions in the external-flow port
             #---------------------------------------
-
-            self.send( (time, self.position), 'external-flow' )
-
-            (check_time, velocity,fluid_props) = self.recv( 'external-flow' )
+            self.send((time, self.position), 'external-flow')
+            (check_time, velocity,fluid_props) = self.recv('external-flow')
 
             assert abs(check_time-time) <= 1e-6
             self.ode_params['flow-velocity'] = velocity
-            #medium_mass_density  = fluid_props.mass_density  # see Vortex
-            #medium_dyn_viscosity = fluid_props.dyn_viscosity # see Vortex
             medium_mass_density  = fluid_props[0]
             medium_dyn_viscosity = fluid_props[1]
 
@@ -126,15 +117,10 @@ class Droplet(Module):
             # Interactions in the visualization port
             #---------------------------------------
 
-            self.send(self.position, 'visualization')
+            self.send(self.position, 'visualization' )
 
             # Evolve droplet state to next time stamp
             #----------------------------------------
-
-            # Save current values (if necessary)
-            if self.save:
-                self.positions.append(self.position)
-                self.velocities.append(self.velocity)
 
             time = self.__step(time)
 
@@ -204,10 +190,7 @@ class Droplet(Module):
         '''
 
         if not self.bottom_impact:
-
-           x_0 = self.position # self.liquid_phase.GetValue('position')
-           v_0 = self.velocity # self.liquid_phase.GetValue('velocity')
-           u_vec_0 = np.concatenate((x_0,v_0))
+           u_vec_0 = np.concatenate((self.position,self.velocity))
 
            t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
@@ -229,7 +212,7 @@ class Droplet(Module):
 
             # Ground impact with bouncing drop
             if u_vec[2] <= 0.0 and self.bounce:
-                position = self.initial_pos # self.liquid_phase.GetValue('position', self.initial_time)
+                position = self.liquid_phase.GetValue('position', self.initial_time)
                 bounced_position = position[2] * np.random.random(1)
                 u_vec[2]  = bounced_position
                 u_vec[3:] = 0.0  # zero velocity
@@ -241,6 +224,12 @@ class Droplet(Module):
                 u_vec[2]  = 0.0  # don't bounce
                 u_vec[3:] = 0.0  # zero velocity
                 self.bottom_impact = True
+
+
+            # Save values (if necessary)
+            if self.save:
+                self.positions.append(self.postion)
+                self.velocities.append(self.velocity)
 
             # Update current values
             self.position = u_vec[0:3]
