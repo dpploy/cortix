@@ -21,7 +21,7 @@ class Droplet(Module):
     `visualization` sends data to a visualization module.
     '''
 
-    def __init__(self):
+    def __init__(self, save=True):
         '''
         Attributes
         ----------
@@ -31,6 +31,8 @@ class Droplet(Module):
         show_time: tuple
             Two-element tuple, `(bool,float)`, `True` will print to standard
             output.
+        save: bool
+            Save droplet history across time
         '''
 
         super().__init__()
@@ -44,10 +46,11 @@ class Droplet(Module):
 
         self.bounce = True
         self.slip   = True
+        self.save   = save
 
         if self.save:
             self.positions = []
-            self.velocitites = []
+            self.velocities = []
 
         self.ode_params = dict()
 
@@ -228,7 +231,7 @@ class Droplet(Module):
 
             # Save values (if necessary)
             if self.save:
-                self.positions.append(self.postion)
+                self.positions.append(self.position)
                 self.velocities.append(self.velocity)
 
             # Update current values
