@@ -24,7 +24,6 @@ command line as
 '''
 
 import scipy.constants as const
-import numpy as np
 
 from cortix import Cortix
 from cortix import Network
@@ -95,18 +94,13 @@ def main(n_droplets = 5, end_time = 3 * const.minute, time_step = 0.2, create_pl
         modules = swirl.network.modules
 
         if swirl.use_multiprocessing or swirl.rank == 0:
-
-            # All droplets' trajectory
-
             from mpl_toolkits.mplot3d import Axes3D
             import matplotlib.pyplot as plt
+            import numpy as np
 
-            positions = []
-            velocities = []
-            for m in swirl.network.modules[1:]:
-                if type(m) is Droplet:
-                    positions.append(m.positions)
-                    velocities.append(m.velocities)
+            # Extract droplets' trajectory from modules
+            positions = [m.positions for m in swirl.network.modules if type(m) is Droplet]
+            velocities = [m.velocities for m in swirl.network.modules if type(m) is Droplet]
 
             fig = plt.figure(1)
             ax = fig.add_subplot(111,projection='3d')
@@ -127,7 +121,7 @@ def main(n_droplets = 5, end_time = 3 * const.minute, time_step = 0.2, create_pl
             plt.ylabel('Speed [m/s]')
             plt.title('All Droplets')
 
-            for m in modules[1:]:
+            for m in modules:
                 if type(m) is Droplet:
                     speeds = [(i , np.linalg.norm(vel)) for (i, vel) in enumerate(m.velocities)]
                     plt.plot(speeds)
@@ -141,7 +135,7 @@ def main(n_droplets = 5, end_time = 3 * const.minute, time_step = 0.2, create_pl
             plt.ylabel('Radial Position [m]')
             plt.title('All Droplets')
 
-            for m in modules[1:]:
+            for m in modules:
                 if type(m) is Droplet:
                     radial_positions = [(i , np.linalg.norm(vel[0:2])) for (i, vel) in enumerate(m.velocities)]
                     plt.plot(radial_positions)
