@@ -29,7 +29,7 @@ from cortix import Network
 from cortix.examples.droplet_swirl.droplet import Droplet
 from cortix.examples.droplet_swirl.vortex import Vortex
 
-def main(n_droplets = 5, end_time = 3 * const.minute, time_step = 0.2):
+def main(n_droplets = 5, end_time = 3 * const.minute, time_step = 0.2, create_plots = False):
     '''Cortix run file for a `Droplet`-`Vortex` network.
 
     Attributes
@@ -49,7 +49,6 @@ def main(n_droplets = 5, end_time = 3 * const.minute, time_step = 0.2):
         If set to `True` use MPI otherwise use Python multiprocessing.
 
     '''
-    create_plots = False
 
     if n_droplets >= 2000:
         create_plots = False
@@ -152,4 +151,4 @@ def main(n_droplets = 5, end_time = 3 * const.minute, time_step = 0.2):
 if __name__ == '__main__':
     import sys
     num_drops = int(sys.argv[1]) if len(sys.argv) > 1 else 5
-    main(n_droplets=num_drops)
+    main(n_droplets=num_drops, create_plots=True)
