@@ -46,10 +46,8 @@ class Droplet(Module):
 
         self.bounce = True
         self.slip   = True
+        self.save   = save
 
-
-        species = list()
-        quantities = list()
 
         self.ode_params = dict()
 
@@ -59,15 +57,6 @@ class Droplet(Module):
         self.ode_params['droplet-xsec-area'] = np.pi * (self.droplet_diameter/2.0)**2
         self.ode_params['gravity'] = const.g
 
-        # Species in the liquid phase
-        '''
-        water = Specie(name='water', formula_name='H2O(l)', phase='liquid', \
-                atoms=['2*H','O'])
-        water.massCC =  0.99965 # [g/cc]
-        water.massCCUnit = 'g/cc'
-        water.molarCCUnit = 'mole/cc'
-        species.append(water)
-        '''
 
         water_massCC =  0.99965 # [g/cc]
         droplet_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * water_massCC * \
@@ -80,6 +69,9 @@ class Droplet(Module):
         self.speed = np.zeros(3)
         self.radial_pos = np.zeros(3)
 
+        if self.save:
+            self.positions = []
+            self.velocities = []
 
         # Domain box dimensions: LxLxH m^3 box with given H.
         # Origin of cartesian coordinate system at the bottom of the box. 
@@ -100,7 +92,6 @@ class Droplet(Module):
         # through a conneted port.
         medium_mass_density = 0.1 * const.gram / const.centi**3 # [kg/m^3]
         self.ode_params['medium-mass-density'] = medium_mass_density
-
         medium_displaced_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * \
                 medium_mass_density # [kg]
         self.ode_params['medium-displaced-mass'] = medium_displaced_mass
@@ -262,11 +253,9 @@ class Droplet(Module):
             self.speed = np.linalg.norm(u_vec[3:])
             self.radial_pos = np.linalg.norm(u_vec[0:2])
 
-            '''
-            self.liquid_phase.SetValue('position', u_vec[0:3])
-            self.liquid_phase.SetValue('velocity', u_vec[3:])
-            self.liquid_phase.SetValue('speed', np.linalg.norm(u_vec[3:]))
-            self.liquid_phase.SetValue('radial-position', np.linalg.norm(u_vec[0:2]))
-            '''
+            # Save values (if necessary)
+            if self.save:
+                self.positions.append(self.position)
+                self.velocities.append(self.velocity)
 
         return time
