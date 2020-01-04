@@ -66,8 +66,6 @@ class Droplet(Module):
         # Spatial position
         self.position = np.zeros(3)
         self.velocity = np.zeros(3)
-        self.speed = np.zeros(3)
-        self.radial_pos = np.zeros(3)
 
         if self.save:
             self.positions = []
@@ -83,10 +81,6 @@ class Droplet(Module):
         x_0 = (2 * np.random.random(3) - np.ones(3)) * self.box_half_length / 4.0
         x_0[2] = self.box_height
         self.initial_pos = self.position = x_0
-
-        # Droplet Initial velocity = 0 -> placed still in the flow
-        #self.liquid_phase.SetValue('velocity', np.array([0.0,0.0,0.0]), \
-        #        self.initial_time)
 
         # Default value for the medium surrounding the droplet if data is not passed
         # through a conneted port.
@@ -132,12 +126,17 @@ class Droplet(Module):
             # Interactions in the visualization port
             #---------------------------------------
 
-            self.send(self.position, 'visualization' )
+            self.send(self.position, 'visualization')
 
             # Evolve droplet state to next time stamp
             #----------------------------------------
 
-            time = self.__step( time )
+            # Save current values (if necessary)
+            if self.save:
+                self.positions.append(self.position)
+                self.velocities.append(self.velocity)
+
+            time = self.__step(time)
 
         self.send('DONE', 'visualization') # this should not be needed: TODO
         return
@@ -224,17 +223,13 @@ class Droplet(Module):
 
            u_vec = u_vec_hist[1,:]  # solution vector at final time step
 
-        #values = self.liquid_phase.GetRow() # values at previous time
-
         time += self.time_step
-
-        #self.liquid_phase.AddRow(time, values)
 
         if not self.bottom_impact:
 
             # Ground impact with bouncing drop
             if u_vec[2] <= 0.0 and self.bounce:
-                position = self.initial_pos #self.liquid_phase.GetValue('position', self.initial_time)
+                position = self.initial_pos # self.liquid_phase.GetValue('position', self.initial_time)
                 bounced_position = position[2] * np.random.random(1)
                 u_vec[2]  = bounced_position
                 u_vec[3:] = 0.0  # zero velocity
@@ -250,12 +245,5 @@ class Droplet(Module):
             # Update current values
             self.position = u_vec[0:3]
             self.velocity = u_vec[3:]
-            self.speed = np.linalg.norm(u_vec[3:])
-            self.radial_pos = np.linalg.norm(u_vec[0:2])
-
-            # Save values (if necessary)
-            if self.save:
-                self.positions.append(self.position)
-                self.velocities.append(self.velocity)
 
         return time

@@ -123,7 +123,7 @@ def main(n_droplets = 5, end_time = 3 * const.minute, time_step = 0.2, create_pl
 
             for m in modules:
                 if type(m) is Droplet:
-                    speeds = [(i , np.linalg.norm(vel)) for (i, vel) in enumerate(m.velocities)]
+                    speeds = [(i*m.time_step , np.linalg.norm(vel)) for (i, vel) in enumerate(m.velocities)]
                     plt.plot(speeds)
 
             plt.grid()
@@ -137,7 +137,7 @@ def main(n_droplets = 5, end_time = 3 * const.minute, time_step = 0.2, create_pl
 
             for m in modules:
                 if type(m) is Droplet:
-                    radial_positions = [(i , np.linalg.norm(vel[0:2])) for (i, vel) in enumerate(m.velocities)]
+                    radial_positions = [(i*m.time_step , np.linalg.norm(vel[0:2])) for (i, vel) in enumerate(m.velocities)]
                     plt.plot(radial_positions)
 
             plt.grid()
