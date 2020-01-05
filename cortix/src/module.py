@@ -23,7 +23,7 @@ class Module:
 
     '''
 
-    def __init__(self):
+    def __init__(self, save=True):
         '''Module super class constructor.
 
         Note
@@ -66,7 +66,7 @@ class Module:
         self.use_multiprocessing = True
         self.ports = list()
         self.log = logging.getLogger('cortix')
-        self.save = False
+        self.save = save
 
         self.id = None
 
