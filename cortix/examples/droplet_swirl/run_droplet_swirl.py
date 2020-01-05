@@ -24,7 +24,6 @@ command line as
 '''
 
 import scipy.constants as const
-import numpy as np
 
 from cortix import Cortix
 from cortix import Network
