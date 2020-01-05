@@ -24,13 +24,15 @@ command line as
 '''
 
 import scipy.constants as const
+import numpy as np
 
 from cortix import Cortix
 from cortix import Network
 from cortix.examples.droplet_swirl.droplet import Droplet
 from cortix.examples.droplet_swirl.vortex import Vortex
 
-def main(n_droplets = 5, end_time = 3 * const.minute, time_step = 0.2, create_plots = False):
+
+def main(n_droplets=5, end_time = 3 * const.minute, time_step = 0.2, create_plots=True):
     '''Cortix run file for a `Droplet`-`Vortex` network.
 
     Attributes
@@ -51,6 +53,7 @@ def main(n_droplets = 5, end_time = 3 * const.minute, time_step = 0.2, create_pl
 
     '''
 
+    # Configuration Parameters
     if n_droplets >= 2000:
         create_plots = False
 
@@ -62,45 +65,49 @@ def main(n_droplets = 5, end_time = 3 * const.minute, time_step = 0.2, create_pl
 
     swirl.network = Network()
 
-    for i in range(n_droplets):
-        # Vortex module 1-to-1
-        vortex = Vortex()
-        swirl.network.module(vortex)
-        vortex.show_time = (True, 1*const.minute)
-        vortex.end_time = end_time
-        vortex.time_step = time_step
-        if plot_vortex_profile:
-            vortex.plot_velocity()
+    # Vortex module (single).
+    vortex = Vortex()
+    swirl.network.module(vortex)
+    vortex.show_time = (True,1*const.minute)
+    vortex.end_time = end_time
+    vortex.time_step = time_step
+    if plot_vortex_profile:
+        vortex.plot_velocity()
 
-        # Droplet modules (multiple)
+    for i in range(n_droplets):
+        # Droplet modules (multiple).
         droplet = Droplet(save=create_plots)
         swirl.network.module(droplet)
         droplet.end_time = end_time
         droplet.time_step = time_step
         droplet.bounce = False
         droplet.slip = False
-        droplet.save = True
 
         # Network port connectivity (connect modules through their ports)
         swirl.network.connect( [droplet,'external-flow'],
-                               [vortex, vortex.get_port('fluid-flow:{}'.format(i))],
+                               [vortex,vortex.get_port('fluid-flow:{}'.format(i))],
                                'bidirectional' )
+
     swirl.network.draw()
 
     swirl.run()
 
     # Plot all droplet trajectories
     if create_plots:
+
         modules = swirl.network.modules
 
         if swirl.use_multiprocessing or swirl.rank == 0:
+
+            # All droplets' trajectory
+
             from mpl_toolkits.mplot3d import Axes3D
             import matplotlib.pyplot as plt
             import numpy as np
 
-            # Extract droplets' trajectory from modules
-            positions = [m.positions for m in swirl.network.modules if type(m) is Droplet]
-            velocities = [m.velocities for m in swirl.network.modules if type(m) is Droplet]
+            positions = list()
+            for m in swirl.network.modules[1:]:
+                positions.append(m.positions)
 
             fig = plt.figure(1)
             ax = fig.add_subplot(111,projection='3d')
@@ -117,28 +124,26 @@ def main(n_droplets = 5, end_time = 3 * const.minute, time_step = 0.2, create_pl
 
             # All droplets' speed
             fig = plt.figure(2)
-            plt.xlabel('Time [min]')
+            plt.xlabel('Time')
             plt.ylabel('Speed [m/s]')
             plt.title('All Droplets')
 
-            for m in modules:
-                if type(m) is Droplet:
-                    speeds = [(i*m.time_step , np.linalg.norm(vel)) for (i, vel) in enumerate(m.velocities)]
-                    plt.plot(speeds)
+            for m in modules[1:]:
+                speeds = [np.linalg.norm(vel) for vel in m.velocities]
+                plt.plot(speeds)
 
             plt.grid()
             fig.savefig('speeds.png', dpi=300)
 
             # All droplets' radial position
             fig = plt.figure(3)
-            plt.xlabel('Time [min]')
+            plt.xlabel('Time')
             plt.ylabel('Radial Position [m]')
             plt.title('All Droplets')
 
-            for m in modules:
-                if type(m) is Droplet:
-                    radial_positions = [(i*m.time_step , np.linalg.norm(vel[0:2])) for (i, vel) in enumerate(m.velocities)]
-                    plt.plot(radial_positions)
+            for m in modules[1:]:
+                radial_pos = [np.linalg.norm(pos[0:2]) for pos in m.positions]
+                plt.plot(radial_pos[1:])
 
             plt.grid()
             fig.savefig('radialpos.png', dpi=300)
