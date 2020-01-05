@@ -276,7 +276,7 @@ class Network:
                     module.log = logging.getLogger('cortix')
                     self.modules[module.id] = module
 
-        if num_files and num_files != len(self.modules):
+        if num_files and num_files != len(self.modules) - 1:
             self.log.warn('Network::run(): not all modules reloaded from disk.')
 
         if self.use_mpi:
