@@ -59,13 +59,15 @@ class Cortix:
 
         self.__network = None
         self.log_filename = log_filename
-
         # Fall back to multiprocessing if mpi4py is not available
         if self.use_mpi:
+            try:
                 from mpi4py import MPI
                 self.comm = MPI.COMM_WORLD
                 self.rank = self.comm.Get_rank()
                 self.size = self.comm.size
+            except ImportError:
+                self.use_mpi = False
 
         # Setup the global logger 
         self.__create_logger()
