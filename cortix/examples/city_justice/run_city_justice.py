@@ -30,6 +30,10 @@ command line as
 
     `run_city_justice.py`
 
+To profile this run do:
+
+     python -m cProfile -s time run_city_justice.py > lixo
+
 '''
 
 import scipy.constants as unit
