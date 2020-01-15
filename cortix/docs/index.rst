@@ -9,7 +9,7 @@ Network dynamics simulation
 
 What is Cortix?
 ---------------
-* Cortix is an open-source Python library for enabling develoment and simulation of
+* Cortix is an open-source Python library for enabling development and simulation of
   `network` models on `massively` parallel computers.
 * Cortix takes a collection of computational `modules` and provides an 
   environment for the coupling of these modules into a `network` simulation.
