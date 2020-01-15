@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>arrested module &#8212; Cortix 0.1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -13,6 +11,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -27,6 +26,8 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+          
+
           <div class="body" role="main">
             
   <div class="section" id="module-arrested">
@@ -37,27 +38,23 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">cortix.src.module.Module</span></code></p>
 <p>Arrested Cortix module used to model criminal group population in an arrested system.</p>
 <div class="admonition-notes admonition">
-<p class="first admonition-title">Notes</p>
-<p class="last">These are the <cite>port</cite> names available in this module to connect to respective
+<p class="admonition-title">Notes</p>
+<p>These are the <cite>port</cite> names available in this module to connect to respective
 modules: <cite>probation</cite>, <cite>adjudication</cite>, <cite>jail</cite>, and <cite>community</cite>.
 See instance attribute <cite>port_names_expected</cite>.</p>
 </div>
 <dl class="method">
 <dt id="arrested.Arrested.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>n_groups=1</em>, <em>pool_size=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/arrested.html#Arrested.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#arrested.Arrested.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>n_groups</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of groups in the population.</li>
-<li><strong>pool_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Upperbound on the range of the existing population groups. A random value
-from 0 to the upperbound value will be assigned to each group.</li>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_groups</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Number of groups in the population.</p></li>
+<li><p><strong>pool_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)"><em>float</em></a>) – Upperbound on the range of the existing population groups. A random value
+from 0 to the upperbound value will be assigned to each group.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -71,45 +68,40 @@ or <cite>run(self, *args)</cite> as long as <cite>self.state = None</cite>.
 If <cite>self.state</cite> points to anything but <cite>None</cite>, the user must use
 <a href="#id1"><span class="problematic" id="id2">`</span></a>run(self, <a href="#id3"><span class="problematic" id="id4">*</span></a>args).</p>
 <div class="admonition-notes admonition">
-<p class="first admonition-title">Notes</p>
+<p class="admonition-title">Notes</p>
 <p>When in multiprocessing, <cite>*args</cite> has two elements: <cite>comm_idx</cite> and <cite>comm_state</cite>.
 To pass back the state of the module, the user should insert the provided
 index <cite>comm_idx</cite> and the <cite>state</cite> into the queue as follows:</p>
 <blockquote>
-<div><dl class="docutils">
-<dt>if self.use_multiprocessing:</dt>
-<dd><dl class="first last docutils">
-<dt>try:</dt>
-<dd>pickle.dumps(self.state)</dd>
-<dt>except pickle.PicklingError:</dt>
-<dd>args[1].put((arg[0],None))</dd>
-<dt>else:</dt>
-<dd>args[1].put((arg[0],self.state))</dd>
+<div><dl class="simple">
+<dt>if self.use_multiprocessing:</dt><dd><dl class="simple">
+<dt>try:</dt><dd><p>pickle.dumps(self.state)</p>
+</dd>
+<dt>except pickle.PicklingError:</dt><dd><p>args[1].put((arg[0],None))</p>
+</dd>
+<dt>else:</dt><dd><p>args[1].put((arg[0],self.state))</p>
+</dd>
 </dl>
 </dd>
 </dl>
 </div></blockquote>
-<p class="last">at the bottom of the user defined <cite>run()</cite> function.</p>
+<p>at the bottom of the user defined <cite>run()</cite> function.</p>
 </div>
 <div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">This function must be overridden by all Cortix modules</p>
+<p class="admonition-title">Warning</p>
+<p>This function must be overridden by all Cortix modules</p>
 </div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>arg</strong><strong>[</strong><strong>0</strong><strong>]</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index of the state in the communication queue.</li>
-<li><strong>arg</strong><strong>[</strong><strong>1</strong><strong>]</strong> (<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v3.7)"><em>multiprocessing.Queue</em></a>) – When using the Python <cite>multiprocessing</cite> library <cite>state_comm</cite> must have
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>arg</strong><strong>[</strong><strong>0</strong><strong>]</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)"><em>int</em></a>) – Index of the state in the communication queue.</p></li>
+<li><p><strong>arg</strong><strong>[</strong><strong>1</strong><strong>]</strong> (<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html#multiprocessing.Queue" title="(in Python v3.8)"><em>multiprocessing.Queue</em></a>) – When using the Python <cite>multiprocessing</cite> library <cite>state_comm</cite> must have
 the module’s <cite>self.state</cite> in it. That is,
 <cite>state_comm.put((idx_comm,self.state))</cite> must be the last command in the
-method before <cite>return</cite>. In addition, self.state must be <cite>pickle-able</cite>.</li>
+method before <cite>return</cite>. In addition, self.state must be <cite>pickle-able</cite>.</p></li>
 </ul>
-</td>
-</tr>
-</tbody>
-</table>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -118,6 +110,7 @@ method before <cite>return</cite>. In addition, self.state must be <cite>pickle-
 
 
           </div>
+          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -176,8 +169,6 @@ Group Leader <br>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

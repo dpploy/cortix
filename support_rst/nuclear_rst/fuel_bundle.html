@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>fuel_bundle module &#8212; Cortix 0.1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -13,6 +11,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -27,6 +26,8 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+          
+
           <div class="body" role="main">
             
   <div class="section" id="module-fuel_bundle">
@@ -36,9 +37,9 @@ It is meant to represent a fuel bundle of an oxide fuel LWR reactor.
 There are three main data structures:</p>
 <blockquote>
 <div><ol class="arabic simple">
-<li>fuel bundle specs</li>
-<li>solid phase</li>
-<li>gas phase</li>
+<li><p>fuel bundle specs</p></li>
+<li><p>solid phase</p></li>
+<li><p>gas phase</p></li>
 </ol>
 </div></blockquote>
 <p>The container user will have to provide all the data and from then on, this class
@@ -49,69 +50,61 @@ Sun Dec 27 15:06:55 EST 2015</p>
 <dl class="class">
 <dt id="fuel_bundle.FuelBundle">
 <em class="property">class </em><code class="descclassname">fuel_bundle.</code><code class="descname">FuelBundle</code><span class="sig-paren">(</span><em>specs=Empty DataFrame Columns: [] Index: []</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <dl class="attribute">
 <dt id="fuel_bundle.FuelBundle.fresh_u235_mass">
 <code class="descname">fresh_u235_mass</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fresh_u235_mass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the amount of uranium-235 in the bucket, in grams.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fresh_u235_mass</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fresh_u235_mass</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bundle.FuelBundle.fresh_u238_mass">
 <code class="descname">fresh_u238_mass</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fresh_u238_mass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the amount of uranium-238 in the bucket, in grams.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fresh_u238_mass</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fresh_u238_mass</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bundle.FuelBundle.fresh_u_mass">
 <code class="descname">fresh_u_mass</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fresh_u_mass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the amount of uranium in the bundle, in grams.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fresh_u_mass</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fresh_u_mass</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bundle.FuelBundle.fuel_enrichment">
 <code class="descname">fuel_enrichment</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_enrichment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the enrichment of the fuel pins in the bundle, in %.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_enrichment</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_enrichment</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -119,32 +112,28 @@ Sun Dec 27 15:06:55 EST 2015</p>
 <code class="descname">fuel_mass</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_mass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total numerical value for  mass of fuel in the solid phase
 in the bundle.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_mass</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_mass</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bundle.FuelBundle.fuel_mass_unit">
 <code class="descname">fuel_mass_unit</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_mass_unit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the unit used to measure the mass of fuel in the bundle.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_mass_unit</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_mass_unit</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -152,16 +141,14 @@ in the bundle.</p>
 <code class="descname">fuel_pin_length</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_pin_length" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the length of each fuel pin in the fuel bundle. A fuel pin is
 a cylindircal section of uranium fuel that is surrounded by cladding.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_pin_length</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_pin_length</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -174,16 +161,14 @@ a cylindircal section of uranium fuel that is surrounded by cladding.</p>
 <dt id="fuel_bundle.FuelBundle.fuel_pin_volume">
 <code class="descname">fuel_pin_volume</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_pin_volume" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the volume of fuel in each fuel pin, in cm^3.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_pin_volume</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_pin_volume</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -191,16 +176,14 @@ a cylindircal section of uranium fuel that is surrounded by cladding.</p>
 <code class="descname">fuel_radioactivity</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_radioactivity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total radioactivity of the fuel in the solid phase in the
 fuel bundle.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_radioactivity</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_radioactivity</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -208,32 +191,28 @@ fuel bundle.</p>
 <code class="descname">fuel_rod_od</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_rod_od" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the outer diameter of the fuel rod, in cm.
 A fuel rod consists of a fuel pin surrounded by cladding.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_rod_od</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_rod_od</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bundle.FuelBundle.fuel_volume">
 <code class="descname">fuel_volume</code><a class="headerlink" href="#fuel_bundle.FuelBundle.fuel_volume" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total volume of fuel in the bundle, in cm^3.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_volume</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_volume</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -241,16 +220,14 @@ A fuel rod consists of a fuel pin surrounded by cladding.</p>
 <code class="descname">gamma_pwr</code><a class="headerlink" href="#fuel_bundle.FuelBundle.gamma_pwr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total amount of gamma radiation given by the fuel bundle,
 in watts.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>gamma_pwr</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>gamma_pwr</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -264,16 +241,14 @@ phase.</p>
 <dt id="fuel_bundle.FuelBundle.gas_phase">
 <code class="descname">gas_phase</code><a class="headerlink" href="#fuel_bundle.FuelBundle.gas_phase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the gas phase history of the fuel.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>gas_phase</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dataFrame</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>gas_phase</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
@@ -281,80 +256,70 @@ phase.</p>
 <code class="descname">gas_radioactivity</code><a class="headerlink" href="#fuel_bundle.FuelBundle.gas_radioactivity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total radioactivity of the fuel in the gas phase in the
 fuel bundle, in curies.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>gas_radioactivity</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>gas_radioactivity</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fuel_bundle.FuelBundle.get_fresh_U235_mass">
 <code class="descname">get_fresh_U235_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_fresh_U235_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fresh_U235_mass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the amount of uranium-235 in the bucket, in grams.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fresh_u235_mass</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fresh_u235_mass</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fuel_bundle.FuelBundle.get_fresh_u238_mass">
 <code class="descname">get_fresh_u238_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_fresh_u238_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fresh_u238_mass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the amount of uranium-238 in the bucket, in grams.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fresh_u238_mass</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fresh_u238_mass</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fuel_bundle.FuelBundle.get_fresh_u_mass">
 <code class="descname">get_fresh_u_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_fresh_u_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fresh_u_mass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the amount of uranium in the bundle, in grams.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fresh_u_mass</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fresh_u_mass</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fuel_bundle.FuelBundle.get_fuel_enrichment">
 <code class="descname">get_fuel_enrichment</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_fuel_enrichment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_enrichment" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the enrichment of the fuel pins in the bundle, in %.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_enrichment</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_enrichment</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -362,32 +327,28 @@ fuel bundle, in curies.</p>
 <code class="descname">get_fuel_mass</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_fuel_mass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_mass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total numerical value for  mass of fuel in the solid phase
 in the bundle.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_mass</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_mass</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fuel_bundle.FuelBundle.get_fuel_mass_unit">
 <code class="descname">get_fuel_mass_unit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_fuel_mass_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_mass_unit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the unit used to measure the mass of fuel in the bundle.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_mass_unit</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_mass_unit</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -395,16 +356,14 @@ in the bundle.</p>
 <code class="descname">get_fuel_pin_length</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_fuel_pin_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_pin_length" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the length of each fuel pin in the fuel bundle. A fuel pin is
 a cylindircal section of uranium fuel that is surrounded by cladding.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_pin_length</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_pin_length</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -417,16 +376,14 @@ a cylindircal section of uranium fuel that is surrounded by cladding.</p>
 <dt id="fuel_bundle.FuelBundle.get_fuel_pin_volume">
 <code class="descname">get_fuel_pin_volume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_fuel_pin_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_pin_volume" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the volume of fuel in each fuel pin, in cm^3.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_pin_volume</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_pin_volume</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -434,16 +391,14 @@ a cylindircal section of uranium fuel that is surrounded by cladding.</p>
 <code class="descname">get_fuel_radioactivity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_fuel_radioactivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_radioactivity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total radioactivity of the fuel in the solid phase in the
 fuel bundle.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_radioactivity</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_radioactivity</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -451,32 +406,28 @@ fuel bundle.</p>
 <code class="descname">get_fuel_rod_od</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_fuel_rod_od"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_rod_od" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the outer diameter of the fuel rod, in cm.
 A fuel rod consists of a fuel pin surrounded by cladding.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_rod_od</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_rod_od</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fuel_bundle.FuelBundle.get_fuel_volume">
 <code class="descname">get_fuel_volume</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_fuel_volume"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_fuel_volume" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total volume of fuel in the bundle, in cm^3.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>fuel_volume</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>fuel_volume</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -484,16 +435,14 @@ A fuel rod consists of a fuel pin surrounded by cladding.</p>
 <code class="descname">get_gamma_pwr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_gamma_pwr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_gamma_pwr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total amount of gamma radiation given by the fuel bundle,
 in watts.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>gamma_pwr</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>gamma_pwr</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -507,16 +456,14 @@ phase.</p>
 <dt id="fuel_bundle.FuelBundle.get_gas_phase">
 <code class="descname">get_gas_phase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_gas_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_gas_phase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the gas phase history of the fuel.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>gas_phase</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dataFrame</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>gas_phase</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -524,220 +471,190 @@ phase.</p>
 <code class="descname">get_gas_radioactivity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_gas_radioactivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_gas_radioactivity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total radioactivity of the fuel in the gas phase in the
 fuel bundle, in curies.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>gas_radioactivity</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>gas_radioactivity</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fuel_bundle.FuelBundle.get_heat_pwr">
 <code class="descname">get_heat_pwr</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_heat_pwr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_heat_pwr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total amount of heat produced by the fuel bundle, in watts.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>heat_pwr</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>heat_pwr</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fuel_bundle.FuelBundle.get_n_fuel_rods">
 <code class="descname">get_n_fuel_rods</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_n_fuel_rods"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_n_fuel_rods" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the number of fuel rods in the bundle.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>n_fuel_rods</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>n_fuel_rods</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fuel_bundle.FuelBundle.get_name">
 <code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the name of the fuel bundle.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>name</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>name</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fuel_bundle.FuelBundle.get_radioactivity">
 <code class="descname">get_radioactivity</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_radioactivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_radioactivity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total radioactivity of the fuel bundle, in curies.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>raduioactivity</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>raduioactivity</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fuel_bundle.FuelBundle.get_solid_phase">
 <code class="descname">get_solid_phase</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.get_solid_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.get_solid_phase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the solid phase history associated with this fuel bundle.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>solidPhase</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dataFrame</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>solidPhase</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bundle.FuelBundle.heat_pwr">
 <code class="descname">heat_pwr</code><a class="headerlink" href="#fuel_bundle.FuelBundle.heat_pwr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total amount of heat produced by the fuel bundle, in watts.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>heat_pwr</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>heat_pwr</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bundle.FuelBundle.n_fuel_rods">
 <code class="descname">n_fuel_rods</code><a class="headerlink" href="#fuel_bundle.FuelBundle.n_fuel_rods" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the number of fuel rods in the bundle.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>n_fuel_rods</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>n_fuel_rods</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bundle.FuelBundle.name">
 <code class="descname">name</code><a class="headerlink" href="#fuel_bundle.FuelBundle.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the name of the fuel bundle.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>name</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>name</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bundle.FuelBundle.radioactivity">
 <code class="descname">radioactivity</code><a class="headerlink" href="#fuel_bundle.FuelBundle.radioactivity" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the total radioactivity of the fuel bundle, in curies.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>raduioactivity</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>raduioactivity</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fuel_bundle.FuelBundle.set_fuel_pin_length">
 <code class="descname">set_fuel_pin_length</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.set_fuel_pin_length"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.set_fuel_pin_length" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the length of all fuel pins in the bundle to x.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>x</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)">float</a></td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>x</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fuel_bundle.FuelBundle.set_gas_phase">
 <code class="descname">set_gas_phase</code><span class="sig-paren">(</span><em>phase</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.set_gas_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.set_gas_phase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the gas phase history of the fuel equal to phase.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>phase</strong> (<em>dataFrame</em>) – </td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>phase</strong> (<em>dataFrame</em>) – </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="fuel_bundle.FuelBundle.set_solid_phase">
 <code class="descname">set_solid_phase</code><span class="sig-paren">(</span><em>phase</em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/fuel_bundle.html#FuelBundle.set_solid_phase"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#fuel_bundle.FuelBundle.set_solid_phase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the solid phase history of the fuel equal to phase.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>phase</strong> (<em>dataFrame</em>) – </td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>phase</strong> (<em>dataFrame</em>) – </p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="fuel_bundle.FuelBundle.solid_phase">
 <code class="descname">solid_phase</code><a class="headerlink" href="#fuel_bundle.FuelBundle.solid_phase" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the solid phase history associated with this fuel bundle.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>solidPhase</strong></td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dataFrame</td>
-</tr>
-</tbody>
-</table>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>solidPhase</strong></p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dataFrame</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -746,6 +663,7 @@ fuel bundle, in curies.</p>
 
 
           </div>
+          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -804,8 +722,6 @@ Group Leader <br>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>

@@ -1,11 +1,9 @@
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
     <title>run_city_justice module &#8212; Cortix 0.1.0 documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -13,6 +11,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
@@ -27,21 +26,22 @@
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+          
+
           <div class="body" role="main">
             
   <div class="section" id="module-run_city_justice">
 <span id="run-city-justice-module"></span><h1>run_city_justice module<a class="headerlink" href="#module-run_city_justice" title="Permalink to this headline">¶</a></h1>
 <p>Crimninal justice network dynamics modeling.</p>
-<dl class="docutils">
-<dt>This example uses 7 modules:</dt>
-<dd><ul class="first last simple">
-<li>Community</li>
-<li>Arrested</li>
-<li>Adjudication</li>
-<li>Jail</li>
-<li>Prison</li>
-<li>Probation</li>
-<li>Parole</li>
+<dl class="simple">
+<dt>This example uses 7 modules:</dt><dd><ul class="simple">
+<li><p>Community</p></li>
+<li><p>Arrested</p></li>
+<li><p>Adjudication</p></li>
+<li><p>Jail</p></li>
+<li><p>Prison</p></li>
+<li><p>Probation</p></li>
+<li><p>Parole</p></li>
 </ul>
 </dd>
 </dl>
@@ -50,14 +50,17 @@ groups between modules.</p>
 <p>To run this case using MPI you should compute the number of
 processes as follows:</p>
 <blockquote>
-<div><cite>nprocs = 7 + 1 cortix</cite></div></blockquote>
+<div><p><cite>nprocs = 7 + 1 cortix</cite></p>
+</div></blockquote>
 <p>then issue the MPI run command as follows (replace <cite>nprocs</cite> with a number):</p>
 <blockquote>
-<div><cite>mpiexec -n nprocs run_justice.py</cite></div></blockquote>
+<div><p><cite>mpiexec -n nprocs run_justice.py</cite></p>
+</div></blockquote>
 <p>To run this case with the Python multiprocessing library, just run this file at the
 command line as</p>
 <blockquote>
-<div><cite>run_city_justice.py</cite></div></blockquote>
+<div><p><cite>run_city_justice.py</cite></p>
+</div></blockquote>
 <dl class="function">
 <dt id="run_city_justice.main">
 <code class="descclassname">run_city_justice.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/run_city_justice.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#run_city_justice.main" title="Permalink to this definition">¶</a></dt>
@@ -65,26 +68,46 @@ command line as</p>
 <dl class="attribute">
 <dt id="run_city_justice.n_groups">
 <code class="descclassname">run_city_justice.</code><code class="descname">n_groups</code><a class="headerlink" href="#run_city_justice.n_groups" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>int</em> – Number of population groups being followed. This must be the same for all
+<dd><p>Number of population groups being followed. This must be the same for all
 modules.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="run_city_justice.end_time">
 <code class="descclassname">run_city_justice.</code><code class="descname">end_time</code><a class="headerlink" href="#run_city_justice.end_time" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – End of the flow time in SI unit.</p>
+<dd><p>End of the flow time in SI unit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="run_city_justice.time_step">
 <code class="descclassname">run_city_justice.</code><code class="descname">time_step</code><a class="headerlink" href="#run_city_justice.time_step" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>float</em> – Size of the time step between port communications in SI unit.</p>
+<dd><p>Size of the time step between port communications in SI unit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="run_city_justice.use_mpi">
 <code class="descclassname">run_city_justice.</code><code class="descname">use_mpi</code><a class="headerlink" href="#run_city_justice.use_mpi" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> – If set to <cite>True</cite> use MPI otherwise use Python multiprocessing.</p>
+<dd><p>If set to <cite>True</cite> use MPI otherwise use Python multiprocessing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.8)">bool</a></p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -93,6 +116,7 @@ modules.</p>
 
 
           </div>
+          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -151,8 +175,6 @@ Group Leader <br>
     <form class="search" action="../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
     </form>
     </div>
 </div>
