@@ -28,10 +28,6 @@ Features
 * Support classes for building applications and modules.
 * Examples of applications using Cortix.
 
-Documentation
--------------
-Please see :ref:`Contents <toc>` for full documentation, including installation, examples, and PDF documents.
-
 Bugs/Requests
 -------------
 Please use the `GitHub issue tracker <https://github.com/dpploy/cortix/issues>`_ to submit bugs or request features.
