@@ -52,26 +52,19 @@ class BWR(Module):
         # Coolant outflow phase history
         quantities = list()
 
-        flowrate = Quantity(name='flowrate', formal_name='q_c', latex_name='$q_c$',
-                   unit='kg/s', value=0.0,
-                   info='Reactor Outflow Coolant Flowrate')
+        flowrate = Quantity(name='flowrate', formal_name='q_c', unit='kg/s', value=0.0) #info='Reactor Outflow Coolant Flowrate') # latex_name='$q_c$',
 
         quantities.append(flowrate)
 
-        temp = Quantity(name='temp', formal_name='T_c', latex_name='$T_c$',
-                   unit='K', value=273.15,
-                   info='Reactor Outflow Coolant Temperature')
+        temp = Quantity(name='temp', formal_name='T_c', unit='K', value=273.15) #info='Reactor Outflow Coolant Temperature') #latex_name='$T_c$',
+
         quantities.append(temp)
 
-        press = Quantity(name='pressure', formal_name='P_c', latex_name='$P_c$',
-                   unit='Pa', value=0.0,
-                   info='Reactor Outflow Coolant Pressure')
+        press = Quantity(name='pressure', formal_name='P_c', unit='Pa', value=0.0) #info='Reactor Outflow Coolant Pressure') #latex_name='$P_c$',
 
         quantities.append(press)
 
-        quality = Quantity(name='steam-quality', formal_name='chi_s', latex_name='$\chi$',
-                   unit='', value=0.0,
-                   info='Reactor Steam Quality')
+        quality = Quantity(name='steam-quality', formal_name='chi_s', unit='', value=0.0) #info='Reactor STeam Quality') #latex_name='$\chi$',
 
         quantities.append(quality)
 
@@ -81,18 +74,13 @@ class BWR(Module):
         # Neutron phase history
         quantities = list()
 
-        neutron_dens = Quantity(name='neutron-dens', formal_name='n', latex_name='$n$',
-                   unit='1/m^3', value=0.0,
-                   info='Reactor Neutron Density')
+        neutron_dens = Quantity(name='neutron-dens', formal_name='n', unit='1/m^3', value=0.0) #info='Reactor Neutron Density') #latex_name='$n$',
 
         quantities.append(neutron_dens)
 
         delayed_neutrons_0 = np.zeros(6)
 
-        delayed_neutron_cc = Quantity(name='delayed-neutrons-cc', formal_name='c_i',
-                             latex_name='$c_i$',
-                             unit='1/m^3', value=delayed_neutrons_0,
-                             info='Delayed Neutron Precursors')
+        delayed_neutron_cc = Quantity(name='delayed-neutrons-cc', formal_name='c_i', unit='1/m^3', value=delayed_neutrons_0) #info='Delayed Neutron Precursors') #latex_name='$c_i$',
 
         quantities.append(delayed_neutron_cc)
 
@@ -102,16 +90,12 @@ class BWR(Module):
         #reactor paramaters
         quantities = list()
 
-        fuel_temp = Quantity( name='fuel-temp', formalName='T_f', latex_name='$T_f$',
-                unit='k', value=273.15,
-                info='Reactor Nuclear Fuel Temperature')
+        fuel_temp = Quantity( name='fuel-temp', formalName='T_f', unit='k', value=273.15) #info='Reactor Nuclear Fuel Temperature') #latex_name='$T_f$',
 
         quantities.append(fuel_temp)
 
         reg_rod_position = Quantity(name='reg-rod-position',
-                formal_name = 'reg rod position', latex_name='$x_p$',
-                unit='m', value=0.0,
-                info='Reactor Regulating Rod Position')
+                formal_name = 'reg rod position', unit='m', value=0.0) #info='Reactor Regulating Rod Position') #latex_name='$x_p$',
 
         quantities.append(reg_rod_position)
 
@@ -129,7 +113,7 @@ class BWR(Module):
             self.end_time = self.initial_time + self.time_step
 
         time = self.initial_time
-
+        self.two_time = time
         print_time = self.initial_time
         print_time_step = self.show_time[1]
         if print_time_step < self.time_step:
@@ -152,7 +136,7 @@ class BWR(Module):
 
             # Communicate information
             #------------------------
-
+            self.two_time = time
             self.__call_ports(time)
 
             # Evolve one time step
@@ -206,7 +190,6 @@ class BWR(Module):
     def __get_coolant_outflow(message_time):
 
         outflow = self.params['coolant-outflow']
-        print('golgotha')
         return(outflow)
 
     def __step(self, time=0.0):
@@ -533,7 +516,6 @@ class BWR(Module):
         return q_f
 
     def __f_vec(self, u_vec, time, params):
-
         num_negatives = u_vec[u_vec < 0]
 
         if num_negatives.any() < 0:
@@ -560,7 +542,8 @@ class BWR(Module):
         #----------------
         # neutron balance
         #----------------
-        rho_t = self.__rho_func(time, n_dens, temp_c, self.params)[0]
+        print(self.two_time)
+        rho_t = self.__rho_func(self.two_time + time, n_dens, temp_c, self.params)[0]
 
         beta = params['beta']
         gen_time = params['gen_time']

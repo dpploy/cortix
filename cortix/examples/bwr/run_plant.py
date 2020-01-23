@@ -116,7 +116,7 @@ def main():
 
     params['malfunction start'] = 999 * unit.hour
     params['malfunction end'] = 999 * unit.hour
-    params['shutdown time'] = 9999 * unit.hour
+    params['shutdown time'] = 0.5  * unit.hour
 
     gen_time = params['gen_time'] # retrieve neutron generation time
     params['q_0'] = 0.1
@@ -237,7 +237,7 @@ def main():
     plant_net.connect( [condenser,'outflow'], [reactor,'coolant-inflow'] )
 
     #*****************************************************************************
-    plant_net.draw()
+    #plant_net.draw()
 
     plant_net.run()
 
@@ -249,27 +249,27 @@ def main():
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('neutron-dens')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']')
+                    y_label=quant.formal_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('neutron-dens.png', dpi=300)
 
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('delayed-neutrons-cc')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']')
+                    y_label=quant.formal_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('delayed-neutrons-cc.png', dpi=300)
 
         (quant, time_unit) = reactor.coolant_outflow_phase.get_quantity_history('temp')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']')
+                    y_label=quant.formal_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('coolant-outflow-temp.png', dpi=300)
 
         (quant, time_unit) = reactor.reactor_phase.get_quantity_history('fuel-temp')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label =quant.latex_name+' ['+quant.unit+']')
+                    y_label =quant.formal_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('fuel-temp.png', dpi=300)
 
@@ -279,7 +279,7 @@ def main():
         (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('power')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']',
+                    y_label=quant.formal_name+' ['+quant.unit+']',
                     title='High Pressure Turbine Power')
         plt.grid()
         plt.savefig('turbine1-power.png', dpi=300)
@@ -287,7 +287,7 @@ def main():
         (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('temp')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']',
+                    y_label=quant.formal_name+' ['+quant.unit+']',
                     title='High Pressure Turbine Outflow Temperature')
         plt.grid()
         plt.savefig('turbine1-outflow-temp.png', dpi=300)
@@ -298,7 +298,7 @@ def main():
         (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('power')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']',
+                    y_label=quant.formal_name+' ['+quant.unit+']',
                     title='Lower Pressure Turbine 1 Power')
         plt.grid()
         plt.savefig('turbine2-power.png', dpi=300)
@@ -306,7 +306,7 @@ def main():
         (quant, time_unit) = turbine2.outflow_phase.get_quantity_history('temp')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']',
+                    y_label=quant.formal_name+' ['+quant.unit+']',
                     title='Lower Pressure Turbine 1 Outflow Temperature')
         plt.grid()
         plt.savefig('turbine2-outflow-temp.png', dpi=300)
@@ -317,7 +317,7 @@ def main():
         (quant, time_unit) = condenser.outflow_phase.get_quantity_history('temp')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.latex_name+' ['+quant.unit+']')
+                    y_label=quant.formal_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('condenser-outflow-temp.png', dpi=300)
 
