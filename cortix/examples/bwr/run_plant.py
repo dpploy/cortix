@@ -62,6 +62,10 @@ def main():
     params['turbine_outlet_pressure'] = 0.5
     params['high_pressure_turbine'] = True
 
+    #params_turbine = reactor.params
+    #params_turbine.inlet_pressure = 2
+    #params.turbine_outlet_pressure = 0.5
+
     turbine1   = Turbine(params)
     print('turb1', turbine1.params['high_pressure_turbine'])
 
@@ -70,6 +74,7 @@ def main():
     turbine1.time_step = time_step
     turbine1.end_time = end_time
     turbine1.show_time = show_time
+
     plant_net.module(turbine1)
 
     #*****************************************************************************
@@ -86,6 +91,7 @@ def main():
     turbine2.time_step = time_step
     turbine2.end_time = end_time
     turbine2.show_time = show_time
+
     plant_net.module(turbine2)
 
     #*****************************************************************************
@@ -100,6 +106,7 @@ def main():
     turbine3.time_step = time_step
     turbine3.end_time = end_time
     turbine3.show_time = show_time
+
     plant_net.module(turbine3)
 
     print('turb2', turbine1.params['high_pressure_turbine'])
@@ -114,6 +121,7 @@ def main():
     condenser.time_step = time_step
     condenser.end_time = end_time
     condenser.show_time = show_time
+
     plant_net.module(condenser)
 
     #*****************************************************************************
@@ -125,11 +133,14 @@ def main():
     plant_net.connect( [condenser,'outflow'], [reactor,'coolant-inflow'] )
 
     #*****************************************************************************
-    #plant_net.draw()
 
-    plant_net.run()
+    plant_net.draw()
 
-    if plant.use_multiprocessing or plant.rank == 0:
+    #plant_net.run()
+
+    plot_results = False
+
+    if plot_results and ( plant.use_multiprocessing or plant.rank == 0 ):
 
         # Reactor graphs
         reactor = plant_net.modules[0]
