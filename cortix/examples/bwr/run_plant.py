@@ -31,7 +31,7 @@ def main():
 
     '''
 
-    # Simulation time and stepping input
+    # Preamble 
 
     end_time  = 1.0 * unit.hour
     time_step = 0.5 * unit.minute
@@ -39,14 +39,16 @@ def main():
 
     use_mpi = False  # True for MPI; False for Python multiprocessing
 
+    # System top level
     plant = Cortix( use_mpi=use_mpi, splash=True )
 
+    # Network
     plant_net = plant.network = Network()
 
     from shutdown_params import shutdown_params
     params = shutdown_params()
 
-    #*****************************************************************************
+    # Create reactor module
     reactor = BWR(params)
 
     reactor.name      = 'BWR'
@@ -55,9 +57,10 @@ def main():
     reactor.end_time  = end_time
     reactor.show_time = show_time
 
+    # Add reactor module to network
     plant_net.module(reactor)
 
-    #*****************************************************************************
+    # Create turbine 1 module
     params['turbine_inlet_pressure'] = 2
     params['turbine_outlet_pressure'] = 0.5
     params['high_pressure_turbine'] = True
@@ -66,7 +69,7 @@ def main():
     #params_turbine.inlet_pressure = 2
     #params.turbine_outlet_pressure = 0.5
 
-    turbine1   = Turbine(params)
+    turbine1   = Turbine( params )
     print('turb1', turbine1.params['high_pressure_turbine'])
 
     turbine1.name = 'High Pressure Turbine'
@@ -75,6 +78,7 @@ def main():
     turbine1.end_time = end_time
     turbine1.show_time = show_time
 
+    # Add turbine 1 module to network
     plant_net.module(turbine1)
 
     #*****************************************************************************
@@ -124,7 +128,7 @@ def main():
 
     plant_net.module(condenser)
 
-    #*****************************************************************************
+    # Create the network connectivity
     plant_net.connect( [reactor, 'coolant-outflow'], [turbine1,'inflow'] )
     plant_net.connect( [turbine1, 'outflow-1'], [turbine2,'inflow'] )
     plant_net.connect( [turbine1, 'outflow-2'], [turbine3, 'inflow'])
@@ -136,9 +140,10 @@ def main():
 
     plant_net.draw()
 
-    #plant_net.run()
+    # Run network dynamics simulation
+    plant_net.run()
 
-    plot_results = False
+    plot_results = True
 
     if plot_results and ( plant.use_multiprocessing or plant.rank == 0 ):
 
