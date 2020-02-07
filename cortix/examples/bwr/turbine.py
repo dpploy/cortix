@@ -54,9 +54,7 @@ class Turbine(Module):
         # Inflow phase history
         quantities = list()
 
-        temp = Quantity(name='temp', formal_name = 'T_in', latex_name='$T_i$',
-                unit = 'k', value = 273.15,
-                info='Turbine Steam Inflow Temperature')
+        temp = Quantity(name='temp', formal_name = 'T_in', unit='k', value=273.15) #info='Turbine Steam Inflow Temperature') #latex_name='$T_i$',
 
         quantities.append(temp)
 
@@ -66,27 +64,19 @@ class Turbine(Module):
         # Outflow phase history
         quantities = list()
 
-        temp = Quantity(name='temp', formal_name='T_o', latex_name='$T_o$',
-                unit = 'k', value=273.15,
-                info='Turbine Steam Outflow Temperature')
+        temp = Quantity(name='temp', formal_name='T_o', unit='k', value=273.15) #info='Turbine Steam Outflow Temperature') #latex_name='$T_o$',
 
         quantities.append(temp)
 
-        press = Quantity(name='pressure', formal_name='P_t', latex_name='$P_t$',
-                unit = 'Pa', value = params['runoff-pressure'],
-                info='Turbine Steam Outflow Pressure')
+        press = Quantity(name='pressure', formal_name='P_t', unit = 'Pa', value=params['runoff-pressure']) #info='Turbine Steam Outflow Pressure') #latex_name='$P_t$',
 
         quantities.append(press)
 
-        x = Quantity(name='quality', formal_name='chi_t', latex_name='$\chi_t$',
-                unit = '%', value = 0.0,
-                info='Turbine Steam Outflow Quality')
+        x = Quantity(name='quality', formal_name='chi_t', unit='%', value=0.0) #info='Turbine Steam Outflow Quality') #latex_name='$\chi_t$',
 
         quantities.append(x)
 
-        work = Quantity(name='power', formal_name='P_t', latex_name='$W_t$',
-                unit = 'W', value = 0.0,
-                info='Turbine Power')
+        work = Quantity(name='power', formal_name='P_t', unit='W', value=0.0) #info='Turbine Power') #latex_name='$W_t$',
 
         quantities.append(work)
 
