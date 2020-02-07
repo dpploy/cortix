@@ -91,7 +91,7 @@ class Parole(Module):
 
         time = self.initial_time
 
-        while time < self.end_time:
+        while time <= self.end_time:
 
             # Interactions in the prison port
             #--------------------------------

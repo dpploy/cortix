@@ -138,7 +138,7 @@ class Community(Module):
 
         time = self.initial_time
 
-        while time < self.end_time:
+        while time <= self.end_time:
 
             if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
                 self.log.info('Community::time[d] = '+str(round(time/unit.day,1)))
