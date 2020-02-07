@@ -4,7 +4,7 @@
 # https://cortix.org
 
 import numpy as np
-import scipy.constants as const
+import scipy.constants as unit
 from scipy.integrate import odeint
 
 from cortix import Module
@@ -42,55 +42,53 @@ class Prison(Module):
         quantities      = list()
         self.ode_params = dict()
 
-        self.initial_time = 0.0 * const.day
-        self.end_time     = 100 * const.day
-        self.time_step    = 0.5 * const.day
+        self.initial_time = 0.0 * unit.day
+        self.end_time     = 100 * unit.day
+        self.time_step    = 0.5 * unit.day
+
+        unit.percent = 1/100
 
         # Population groups
         self.n_groups = n_groups
 
         # Prison population groups
         fpg_0 = np.random.random(self.n_groups) * pool_size
-        fpg = Quantity(name='fpg', formalName='prison-pop-grps',
-                unit='individual', value=fpg_0)
+        fpg = Quantity(name='npg', formal_name='prison-pop-grps',
+                latex_name = '$n_p^{(g)}$',
+                unit='# offenders', value=fpg_0, info='Prison Population Groups')
         quantities.append(fpg)
 
-        # Model parameters: commitment coefficients and their modifiers
+        # Model parameters: commitment coefficients 
 
         # Prison to community
-        cp0g_0 = np.random.random(self.n_groups) / const.day
-        cp0g = Quantity(name='cp0g', formalName='commit-community-coeff-grps',
-               unit='individual', value=cp0g_0)
+        a = 10*unit.percent/unit.year * np.ones(self.n_groups)
+        b = 15*unit.percent/unit.year * np.ones(self.n_groups)
+        cp0g_0 = (a + (b-a)*np.random.random(self.n_groups)) / self.n_groups
+        cp0g = Quantity(name='cp0g', formal_name='commit-community-coeff-grps',
+               unit='1/s', value=cp0g_0)
         self.ode_params['commit-to-community-coeff-grps'] = cp0g_0
         quantities.append(cp0g)
 
-        mp0g_0 = np.random.random(self.n_groups)
-        mp0g = Quantity(name='mp0g', formalName='commit-community-coeff-mod-grps',
-               unit='individual', value=mp0g_0)
-        self.ode_params['commit-to-community-coeff-mod-grps'] = mp0g_0
-        quantities.append(mp0g)
-
         # Prison to parole  
-        cpeg_0 = np.random.random(self.n_groups) / const.day
-        cpeg = Quantity(name='cpeg', formalName='commit-parole-coeff-grps',
-               unit='individual', value=cpeg_0)
+        a = 20*unit.percent/unit.year * np.ones(self.n_groups)
+        b = 25*unit.percent/unit.year * np.ones(self.n_groups)
+        cpeg_0 = (a + (b-a)*np.random.random(self.n_groups)) / self.n_groups
+        cpeg = Quantity(name='cpeg', formal_name='commit-parole-coeff-grps',
+               unit='1/s', value=cpeg_0)
         self.ode_params['commit-to-parole-coeff-grps'] = cpeg_0
         quantities.append(cpeg)
 
-        mpeg_0 = np.random.random(self.n_groups)
-        mpeg = Quantity(name='mpeg', formalName='commit-parole-coeff-mod-grps',
-               unit='individual', value=mpeg_0)
-        self.ode_params['commit-to-parole-coeff-mod-grps'] = mpeg_0
-        quantities.append(mpeg)
-
         # Death term
-        self.ode_params['death-rates'] = np.zeros(self.n_groups)
+        a = 0.8*unit.percent/unit.year * np.ones(self.n_groups)
+        b = 0.9*unit.percent/unit.year * np.ones(self.n_groups)
+        dpg_0 = (a + (b-a)*np.random.random(self.n_groups)) / self.n_groups
+        self.ode_params['death-rates-coeff'] = dpg_0
 
         # Phase state
         self.population_phase = Phase(self.initial_time, time_unit='s',
                 quantities=quantities)
 
-        self.population_phase.SetValue('fpg', fpg_0, self.initial_time)
+        self.population_phase.SetValue('npg', fpg_0, self.initial_time)
 
         # Initialize inflows to zero
         self.ode_params['parole-inflow-rates']       = np.zeros(self.n_groups)
@@ -105,7 +103,7 @@ class Prison(Module):
 
         time = self.initial_time
 
-        while time < self.end_time:
+        while time <= self.end_time:
 
             # Interactions in the parole port
             #--------------------------------
@@ -161,17 +159,17 @@ class Prison(Module):
         adjudication_inflow_rates = params['adjudication-inflow-rates']
         jail_inflow_rates         = params['jail-inflow-rates']
 
-        inflow_rates  = parole_inflow_rates + adjudication_inflow_rates + jail_inflow_rates
+        inflow_rates = parole_inflow_rates + adjudication_inflow_rates + jail_inflow_rates
 
         cp0g = self.ode_params['commit-to-community-coeff-grps']
-        mp0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
         cpeg = self.ode_params['commit-to-parole-coeff-grps']
-        mpeg = self.ode_params['commit-to-parole-coeff-mod-grps']
 
-        outflow_rates = ( cp0g * mp0g + cpeg * mpeg ) * fpg
+        outflow_rates = ( cp0g + cpeg ) * fpg
 
-        death_rates = params['death-rates']
+        death_rates_coeff = params['death-rates-coeff']
+
+        death_rates = death_rates_coeff * fpg
 
         dt_fpg = inflow_rates - outflow_rates - death_rates
 
@@ -196,7 +194,7 @@ class Prison(Module):
 
         '''
 
-        u_vec_0 = self.population_phase.GetValue('fpg', time)
+        u_vec_0 = self.population_phase.GetValue('npg', time)
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
         (u_vec_hist, info_dict) = odeint(self.__rhs_fn,
@@ -215,29 +213,27 @@ class Prison(Module):
         self.population_phase.AddRow(time, values)
 
         # Update current values
-        self.population_phase.SetValue('fpg', u_vec, time)
+        self.population_phase.SetValue('npg', u_vec, time)
 
         return time
 
     def __compute_outflow_rates(self, time, name):
 
-      fpg = self.population_phase.GetValue('fpg',time)
+      fpg = self.population_phase.GetValue('npg',time)
 
       assert np.all(fpg>=0.0), 'values: %r'%fpg
 
       if name == 'parole':
 
           cpeg = self.ode_params['commit-to-parole-coeff-grps']
-          mpeg = self.ode_params['commit-to-parole-coeff-mod-grps']
 
-          outflow_rates = cpeg * mpeg * fpg
+          outflow_rates = cpeg * fpg
 
       if name == 'community':
 
           cp0g = self.ode_params['commit-to-community-coeff-grps']
-          mp0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
-          outflow_rates = cp0g * mp0g * fpg
+          outflow_rates = cp0g * fpg
 
       return outflow_rates
 
@@ -253,10 +249,8 @@ class Prison(Module):
 
         if 'community' not in p_names:
             self.ode_params['commit-to-community-coeff-grps']     = zeros
-            self.ode_params['commit-to-community-coeff-mod-grps'] = zeros
 
         if 'parole' not in p_names:
             self.ode_params['commit-to-parole-coeff-grps'] = zeros
-            self.ode_params['commit-to-parole-coeff-mod-grps'] = zeros
 
         return

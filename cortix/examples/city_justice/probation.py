@@ -4,7 +4,7 @@
 # https://cortix.org
 
 import numpy as np
-import scipy.constants as const
+import scipy.constants as unit
 from scipy.integrate import odeint
 
 from cortix import Module
@@ -42,49 +42,48 @@ class Probation(Module):
         quantities      = list()
         self.ode_params = dict()
 
-        self.initial_time = 0.0 * const.day
-        self.end_time     = 100 * const.day
-        self.time_step    = 0.5 * const.day
+        self.initial_time = 0.0 * unit.day
+        self.end_time     = 100 * unit.day
+        self.time_step    = 0.5 * unit.day
+
+        unit.month = 30*unit.day
+        unit.percent = 1/100
 
         # Population groups
         self.n_groups = n_groups
 
         # Probation population groups
         fbg_0 = np.random.random(self.n_groups) * pool_size
-        fbg = Quantity(name='fbg', formalName='probation-pop-grps',
-                unit='individual', value=fbg_0)
+        fbg = Quantity(name='fbg', formal_name='probation-pop-grps',
+                latex_name = '$n_b^{(g)}$',
+                unit='# offenders', value=fbg_0, info='Probation Population Groups')
         quantities.append(fbg)
 
-        # Model parameters: commitment coefficients and their modifiers
+        # Model parameters: commitment coefficients
 
         # Probation to community
-        cb0g_0 = np.random.random(self.n_groups) / const.day
-        cb0g = Quantity(name='cb0g', formalName='commit-community-coeff-grps',
-               unit='individual', value=cb0g_0)
+        a = 35*unit.percent/unit.year * np.ones(self.n_groups)
+        b = 45*unit.percent/unit.year * np.ones(self.n_groups)
+        cb0g_0 = (a + (b-a)*np.random.random(self.n_groups)) / self.n_groups
+        cb0g = Quantity(name='cb0g', formal_name='commit-community-coeff-grps',
+               unit='1/s', value=cb0g_0)
         self.ode_params['commit-to-community-coeff-grps'] = cb0g_0
         quantities.append(cb0g)
 
-        mb0g_0 = np.random.random(self.n_groups)
-        mb0g = Quantity(name='mb0g', formalName='commit-community-coeff-mod-grps',
-               unit='individual', value=mb0g_0)
-        self.ode_params['commit-to-community-coeff-mod-grps'] = mb0g_0
-        quantities.append(mb0g)
-
         # Probation to jail
-        cbjg_0 = np.random.random(self.n_groups) / const.day
-        cbjg = Quantity(name='cbjg', formalName='commit-jail-coeff-grps',
-               unit='individual', value=cbjg_0)
+        a = 55*unit.percent/unit.year * np.ones(self.n_groups)
+        b = 65*unit.percent/unit.year * np.ones(self.n_groups)
+        cbjg_0 = (a + (b-a)*np.random.random(self.n_groups)) / self.n_groups
+        cbjg = Quantity(name='cbjg', formal_name='commit-jail-coeff-grps',
+               unit='1/s', value=cbjg_0)
         self.ode_params['commit-to-jail-coeff-grps'] = cbjg_0
         quantities.append(cbjg)
 
-        mbjg_0 = np.random.random(self.n_groups)
-        mbjg = Quantity(name='mbjg', formalName='commit-jail-coeff-mod-grps',
-               unit='individual', value=mbjg_0)
-        self.ode_params['commit-to-jail-coeff-mod-grps'] = mbjg_0
-        quantities.append(mbjg)
-
         # Death term
-        self.ode_params['probation-death-rates'] = np.zeros(self.n_groups)
+        a = 0.5*unit.percent/unit.year * np.ones(self.n_groups)
+        b = 0.7*unit.percent/unit.year * np.ones(self.n_groups)
+        dbg_0 = (a + (b-a)*np.random.random(self.n_groups)) / self.n_groups
+        self.ode_params['probation-death-rates-coeff'] = dbg_0
 
         # Initialize inflows to zero
         self.ode_params['arrested-inflow-rates']     = np.zeros(self.n_groups)
@@ -104,7 +103,7 @@ class Probation(Module):
 
         time = self.initial_time
 
-        while time < self.end_time:
+        while time <= self.end_time:
 
             # Interactions in the jail port
             #------------------------------
@@ -155,14 +154,14 @@ class Probation(Module):
         inflow_rates  = arrested_inflow_rates + adjudication_inflow_rates
 
         cb0g = self.ode_params['commit-to-community-coeff-grps']
-        mb0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
         cbjg = self.ode_params['commit-to-jail-coeff-grps']
-        mbjg = self.ode_params['commit-to-jail-coeff-mod-grps']
 
-        outflow_rates = ( cb0g * mb0g + cbjg * mbjg ) * fbg
+        outflow_rates = ( cb0g + cbjg ) * fbg
 
-        death_rates = params['probation-death-rates']
+        death_rates_coeff = params['probation-death-rates-coeff']
+
+        death_rates = death_rates_coeff * fbg
 
         dt_fbg = inflow_rates - outflow_rates - death_rates
 
@@ -219,16 +218,14 @@ class Probation(Module):
         if name == 'jail':
 
             cbjg = self.ode_params['commit-to-jail-coeff-grps']
-            mbjg = self.ode_params['commit-to-jail-coeff-mod-grps']
 
-            outflow_rates = cbjg * mbjg * fbg
+            outflow_rates = cbjg * fbg
 
         if name == 'community':
 
             cb0g = self.ode_params['commit-to-community-coeff-grps']
-            mb0g = self.ode_params['commit-to-community-coeff-mod-grps']
 
-            outflow_rates = cb0g * mb0g * fbg
+            outflow_rates = cb0g * fbg
 
         return outflow_rates
 
@@ -244,10 +241,8 @@ class Probation(Module):
 
         if 'community' not in p_names:
             self.ode_params['commit-to-community-coeff-grps']     = zeros
-            self.ode_params['commit-to-community-coeff-mod-grps'] = zeros
 
         if 'jail' not in p_names:
             self.ode_params['commit-to-jail-coeff-grps'] = zeros
-            self.ode_params['commit-to-jail-coeff-mod-grps'] = zeros
 
         return

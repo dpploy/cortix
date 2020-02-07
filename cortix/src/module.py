@@ -115,9 +115,9 @@ class Module:
         if isinstance(port, str):
             port = self.get_port(port)
         elif isinstance(port, Port):
-            assert port in self.ports, "Unknown port!"
+            assert port in self.ports, 'Unknown port!'
         else:
-            raise TypeError("port must be of Port or String type")
+            raise TypeError('port must be of Port or String type')
 
         return port.recv()
 

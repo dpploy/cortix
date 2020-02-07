@@ -59,8 +59,10 @@ class Actor():
 #*********************************************************************************
 
     def __get_atoms(self):
+
         '''
-        Returns the specific nuclides found in the specified chemical.
+        Returns an ordered list of the number and type of all atoms that make
+        up the actor. For example, ['2*H1', 'O16'].
 
         Returns
         -------
@@ -71,8 +73,9 @@ class Actor():
     atoms = property(__get_atoms, None, None, None)
 
     def __get_formula(self):
+
         '''
-        Returns the formula of the chemical in question.
+        Returns the formula of the chemical in question. For example, 'H2O.
 
         Returns
         -------
