@@ -153,7 +153,7 @@ class Condenser(Module):
 
         critical_temp = steam_table._TSat_P(0.005)
         condenser_runoff = critical_temp
-
+        return(293.15)
         x = x_in
 
         if x == -1 and temp_in > critical_temp: #superheated vapor inlet; deprecated
