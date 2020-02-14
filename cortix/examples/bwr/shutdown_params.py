@@ -72,7 +72,7 @@ def shutdown_params():
 
     params['malfunction start'] = 999 * unit.hour
     params['malfunction end'] = 999 * unit.hour
-    params['shutdown time'] = 9999  * unit.hour
+    params['shutdown time'] = 0.5 * unit.hour
 
     gen_time = params['gen_time'] # retrieve neutron generation time
     params['q_0'] = 0.1
@@ -87,7 +87,7 @@ def shutdown_params():
     params['reactivity'] = rho_0_over_beta * beta # "rho/beta = 10 cents"
 
     params['temp_0'] = params['temp_o']
-	
+
     params['tau_fake'] = 1 # s
     params['malfunction subcooling'] = 0.75
     params['alpha_n_malfunction'] = 0

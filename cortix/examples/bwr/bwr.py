@@ -52,19 +52,23 @@ class BWR(Module):
         # Coolant outflow phase history
         quantities = list()
 
-        flowrate = Quantity(name='flowrate', formal_name='q_c', unit='kg/s', value=0.0) #info='Reactor Outflow Coolant Flowrate') # latex_name='$q_c$',
+        flowrate = Quantity(name='flowrate', formal_name='q_c', unit='kg/s', value=0.0,
+                info='Reactor Outflow Coolant Flowrate' ,latex_name='$q_c$')
 
         quantities.append(flowrate)
 
-        temp = Quantity(name='temp', formal_name='T_c', unit='K', value=273.15) #info='Reactor Outflow Coolant Temperature') #latex_name='$T_c$',
+        temp = Quantity(name='temp', formal_name='T_c', unit='K', value=273.15,
+                info='Reactor Outflow Coolant Temperature', latex_name='$T_c$')
 
         quantities.append(temp)
 
-        press = Quantity(name='pressure', formal_name='P_c', unit='Pa', value=0.0) #info='Reactor Outflow Coolant Pressure') #latex_name='$P_c$',
+        press = Quantity(name='pressure', formal_name='P_c', unit='Pa', value=0.0,
+                info='Reactor Outflow Coolant Pressure', latex_name='$P_c$')
 
         quantities.append(press)
 
-        quality = Quantity(name='steam-quality', formal_name='chi_s', unit='', value=0.0) #info='Reactor STeam Quality') #latex_name='$\chi$',
+        quality = Quantity(name='steam-quality', formal_name='chi_s', unit='', value=0.0,
+                info='Reactor STeam Quality', latex_name='$\chi$')
 
         quantities.append(quality)
 
@@ -74,13 +78,16 @@ class BWR(Module):
         # Neutron phase history
         quantities = list()
 
-        neutron_dens = Quantity(name='neutron-dens', formal_name='n', unit='1/m^3', value=0.0) #info='Reactor Neutron Density') #latex_name='$n$',
+        neutron_dens = Quantity(name='neutron-dens', formal_name='n', unit='1/m^3',
+                value=0.0, info='Reactor Neutron Density', latex_name='$n$')
 
         quantities.append(neutron_dens)
 
         delayed_neutrons_0 = np.zeros(6)
 
-        delayed_neutron_cc = Quantity(name='delayed-neutrons-cc', formal_name='c_i', unit='1/m^3', value=delayed_neutrons_0) #info='Delayed Neutron Precursors') #latex_name='$c_i$',
+        delayed_neutron_cc = Quantity(name='delayed-neutrons-cc', formal_name='c_i',
+                unit='1/m^3', value=delayed_neutrons_0,
+                info='Delayed Neutron Precursors', latex_name='$c_i$')
 
         quantities.append(delayed_neutron_cc)
 
@@ -90,16 +97,20 @@ class BWR(Module):
         #reactor paramaters
         quantities = list()
 
-        fuel_temp = Quantity( name='fuel-temp', formalName='T_f', unit='k', value=273.15) #info='Reactor Nuclear Fuel Temperature') #latex_name='$T_f$',
+        fuel_temp = Quantity( name='fuel-temp', formalName='T_f', unit='k',
+                value=273.15, info='Reactor Nuclear Fuel Temperature',
+                latex_name='$T_f$')
 
         quantities.append(fuel_temp)
 
         reg_rod_position = Quantity(name='reg-rod-position',
-                formal_name = 'reg rod position', unit='m', value=0.0) #info='Reactor Regulating Rod Position') #latex_name='$x_p$',
+                formal_name = 'reg rod position', unit='m', value=0.0,
+                info='Reactor Regulating Rod Position', latex_name='$x_p$')
 
         quantities.append(reg_rod_position)
 
-        self.reactor_phase = Phase(self.initial_time, time_unit='s', quantities=quantities)
+        self.reactor_phase = Phase(self.initial_time, time_unit='s',
+                quantities=quantities)
 
         # Initialize inflow
         self.params['inflow-cool-temp'] = 273.15
@@ -113,7 +124,6 @@ class BWR(Module):
             self.end_time = self.initial_time + self.time_step
 
         time = self.initial_time
-        self.two_time = time
         print_time = self.initial_time
         print_time_step = self.show_time[1]
         if print_time_step < self.time_step:
@@ -126,7 +136,8 @@ class BWR(Module):
             if self.show_time[0] and time>=print_time and \
                     time<print_time+print_time_step:
 
-                self.log.info(self.name+'::run():time[s]='+ str(round(time,1)))
+                self.log.info( self.name+'::run():time[m]='+
+                        str(round(time/unit.minute,1)))
 
                 self.__logit = True
                 print_time += self.show_time[1]
@@ -136,7 +147,6 @@ class BWR(Module):
 
             # Communicate information
             #------------------------
-            self.two_time = time
             self.__call_ports(time)
 
             # Evolve one time step
@@ -215,7 +225,7 @@ class BWR(Module):
         # Get state values
         u_0 = self.__get_state_vector( time )
 
-        t_interval_sec = np.linspace(0.0, self.time_step, num=2)
+        t_interval_sec = np.linspace(time, time+self.time_step, num=2)
 
         (u_vec_hist, info_dict) = odeint( self.__f_vec,
                                           u_0, t_interval_sec,
@@ -383,7 +393,7 @@ class BWR(Module):
         alpha_tn = alpha_tn/3
         return alpha_tn
 
-    def __rho_func(self, t, n_dens, temp, params, ):
+    def __rho_func(self, time, n_dens, temp, params, ):
         '''
         Reactivity function.
 
@@ -405,10 +415,10 @@ class BWR(Module):
         --------
         '''
 
-        rho_0  = params['rho_0']
+        rho_0    = params['rho_0']
         temp_ref = params['temp_0']
         n_dens_ss_operation = params['n_dens_ss_operation']
-        alpha_n = params['alpha_n']
+        alpha_n  = params['alpha_n']
 
         if temp < 293.15: # if temperature is less than the starting temperature then moderator feedback is zero
             alpha_tn = 0
@@ -416,11 +426,11 @@ class BWR(Module):
         else:
             alpha_tn = self.__alpha_tn_func(temp , self.params) #alpha_tn_func(temp, params)
 
-        if t > params['malfunction start'] and t < params['malfunction end']: # reg rod held in position; only mod temp reactivity varies with time during malfunction
+        if time > params['malfunction start'] and time < params['malfunction end']: # reg rod held in position; only mod temp reactivity varies with time during malfunction
             alpha_n = params['alpha_n_malfunction']
             rho_t = rho_0 + alpha_n + alpha_tn * (temp - temp_ref)
 
-        elif t > params['shutdown time']: # effectively the inverse of startup; gradually reduce reactivity and neutron density.
+        elif time > params['shutdown time']: # effectively the inverse of startup; gradually reduce reactivity and neutron density.
             rho_0 = -1 * n_dens * rho_0
             alpha_n = rho_0 - (alpha_tn * (temp - temp_ref))
             rho_t = rho_0
@@ -434,14 +444,14 @@ class BWR(Module):
 
         else:
             rho_current = (1 - n_dens) * rho_0
-            alpha_n = rho_current - rho_0 - alpha_tn * (temp - temp_ref)
+            alphh_n = rho_current - rho_0 - alpha_tn * (temp - temp_ref)
             rho_t = rho_current
             params['alpha_n_malfunction'] = alpha_n
         #print(n_dens)
 
         return (rho_t, alpha_n, alpha_tn * (temp - temp_ref))
 
-    def __q_source(self, t, params):
+    def __q_source(self, time, params):
         '''
         Neutron source delta function.
 
@@ -462,7 +472,7 @@ class BWR(Module):
         '''
         q_0 = params['q_0']
 
-        if t <= 1e-5: # small time value
+        if time <= 1e-5: # small time value
             q = q_0
         else:
             q = 0.0
@@ -542,8 +552,7 @@ class BWR(Module):
         #----------------
         # neutron balance
         #----------------
-        print(self.two_time)
-        rho_t = self.__rho_func(self.two_time + time, n_dens, temp_c, self.params)[0]
+        rho_t = self.__rho_func(time, n_dens, temp_c, self.params)[0]
 
         beta = params['beta']
         gen_time = params['gen_time']

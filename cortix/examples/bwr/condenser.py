@@ -54,11 +54,13 @@ class Condenser(Module):
         quantities = list()
 
         flowrate = Quantity(name='condenser-runoff-flowrate',
-                   formal_name='Condenser Runoff Flowrate', unit='kg/s', value=0.0) #info='Condenser Outflow Flowrate') #latex_name='$Q$',
+                   formal_name='Condenser Runoff Flowrate', unit='kg/s', value=0.0,
+                   info='Condenser Outflow Flowrate', latex_name='$Q$')
 
         quantities.append(flowrate)
 
-        temp = Quantity(name='temp', formal_name='Condenser Runoff Temp.', unit='K', value=273.15) #info='Condenser Outflow Temperature') #latex_name='$T_o$',
+        temp = Quantity(name='temp', formal_name='Condenser Runoff Temp.', unit='K',
+                value=273.15, info='Condenser Outflow Temperature', latex_name='$T_o$')
 
         quantities.append(temp)
 
@@ -136,9 +138,9 @@ class Condenser(Module):
         assert abs( time-self.inflow_state['time'] ) <= 1e-6
 
         temp_in = self.inflow_state['temp']
-        x_in    = self.inflow_state['quality']
+        chi_in    = self.inflow_state['quality']
 
-        t_out = self.__condenser(time, temp_in, x_in, self.params)
+        t_out = self.__condenser(time, temp_in, chi_in, self.params)
 
         condenser_runoff = self.outflow_phase.get_row(time)
 
@@ -149,14 +151,15 @@ class Condenser(Module):
 
         return time
 
-    def __condenser(self, time, temp_in, x_in, params):
+    def __condenser(self, time, temp_in, chi_in, params):
+        '''
+        Simple model to condense a vapor-liquid mixture and subcool it.
+        '''
 
-        critical_temp = steam_table._TSat_P(0.005)
+        critical_temp    = steam_table._TSat_P(0.005)
         condenser_runoff = critical_temp
 
-        x = x_in
-
-        if x == -1 and temp_in > critical_temp: #superheated vapor inlet; deprecated
+        if chi_in == -1 and temp_in > critical_temp: #superheated vapor inlet; deprecated
             pressure = 0.005
             h_steam = steam_table._Region2(temp_in, pressure)['h']
             h_sat = steam_table._Region4(0.005, 1)['h']
@@ -193,9 +196,9 @@ class Condenser(Module):
 
             average_ht_transfer_coeff = (high_heat_transfer_coeff + low_heat_transfer_coeff)/2
 
-        if x > 0:
+        if chi_in > 0:
             pressure = 0.005
-            h_mixture = steam_table._Region4(pressure, x)['h']
+            h_mixture = steam_table._Region4(pressure, chi_in)['h']
             h_dewpt = steam_table._Region4(pressure, 0)['h']
             q = (h_mixture - h_dewpt) * sc.kilo * params['steam flowrate']
 
@@ -230,9 +233,9 @@ class Condenser(Module):
             steam_rho = steam.rho
             steam_viscosity = steam.mu
 
-            #print(x)
+            #print(chi_in)
 
-            xtt = ((1 -x)/x)**1.8 * (steam_rho/liquid_rho) * (liquid_viscosity/steam_viscosity)**0.5
+            xtt = ((1 -chi_in)/chi_in)**1.8 * (steam_rho/liquid_rho) * (liquid_viscosity/steam_viscosity)**0.5
             xtt = math.sqrt(xtt)
 
             #determine the overall heat transfer coefficient from the McNaught expression
@@ -264,7 +267,11 @@ class Condenser(Module):
                 final_runoff_temperature_guess = 300 # initial guess
                 final_runoff_temperature = 0 #iteration variable
 
-                while abs((final_runoff_temperature_guess - final_runoff_temperature))> 1: #loop until convergeance, +- 1 degree kelvin
+                # Loop until convergeance, +- 1 degree kelvin
+                # Compute the runoff temperature (subcooled liquid)
+                while abs((final_runoff_temperature_guess -
+                           final_runoff_temperature)) > 1:
+
                     runoff_in = steam_table._TSat_P(0.005)
                     coolant_in = 14 + 273.15 #k
                     #assert(final_coolant_temperature_guess < final_runoff_temperature_guess)
@@ -321,7 +328,10 @@ class Condenser(Module):
                     steam_cp = steam_table.IAPWS97(T=runoff_in, P=0.005).cp
                     iterated_steam_final_temp = runoff_in - (q_1/(steam_cp * params['steam flowrate'] * sc.kilo))
 
-                    if(iterated_steam_final_temp < coolant_in or iterated_coolant_final_temp > runoff_in or iterated_steam_final_temp < iterated_coolant_final_temp):
+                    if ( iterated_steam_final_temp   < coolant_in or
+                         iterated_coolant_final_temp > runoff_in or
+                         iterated_steam_final_temp   < iterated_coolant_final_temp):
+
                         final_runoff_temperature_guess = coolant_in
                         final_coolant_runoff_guess = runoff_in
                         break
@@ -329,6 +339,7 @@ class Condenser(Module):
                     final_runoff_temperature_guess = iterated_steam_final_temp
                     final_coolant_temperature_guess = iterated_coolant_final_temp
 
+                # end of: Loop until convergeance, +- 1 degree kelvin
                 condenser_runoff = final_runoff_temperature_guess
 
         return condenser_runoff

@@ -35,7 +35,7 @@ def main():
 
     end_time  = 1.0 * unit.hour
     time_step = 0.5 * unit.minute
-    show_time = (True,15*unit.minute)
+    show_time = (True,5*unit.minute)
 
     use_mpi = False  # True for MPI; False for Python multiprocessing
 
@@ -76,7 +76,6 @@ def main():
     turbine1.save = True
     turbine1.time_step = time_step
     turbine1.end_time = end_time
-    turbine1.show_time = show_time
 
     # Add turbine 1 module to network
     plant_net.module(turbine1)
@@ -94,7 +93,6 @@ def main():
     turbine2.save = True
     turbine2.time_step = time_step
     turbine2.end_time = end_time
-    turbine2.show_time = show_time
 
     plant_net.module(turbine2)
 
@@ -109,7 +107,6 @@ def main():
     turbine3.save = True
     turbine3.time_step = time_step
     turbine3.end_time = end_time
-    turbine3.show_time = show_time
 
     plant_net.module(turbine3)
 
@@ -124,7 +121,6 @@ def main():
     condenser.save = True
     condenser.time_step = time_step
     condenser.end_time = end_time
-    condenser.show_time = show_time
 
     plant_net.module(condenser)
 
