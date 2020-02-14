@@ -54,7 +54,8 @@ class Turbine(Module):
         # Inflow phase history
         quantities = list()
 
-        temp = Quantity(name='temp', formal_name = 'T_in', unit='k', value=273.15) #info='Turbine Steam Inflow Temperature') #latex_name='$T_i$',
+        temp = Quantity(name='temp', formal_name = 'T_in', unit='k', value=273.15,
+                info='Turbine Steam Inflow Temperature', latex_name='$T_i$')
 
         quantities.append(temp)
 
@@ -64,23 +65,29 @@ class Turbine(Module):
         # Outflow phase history
         quantities = list()
 
-        temp = Quantity(name='temp', formal_name='T_o', unit='k', value=273.15) #info='Turbine Steam Outflow Temperature') #latex_name='$T_o$',
+        temp = Quantity(name='temp', formal_name='T_o', unit='k', value=273.15,
+                info='Turbine Steam Outflow Temperature', latex_name='$T_o$')
 
         quantities.append(temp)
 
-        press = Quantity(name='pressure', formal_name='P_t', unit = 'Pa', value=params['runoff-pressure']) #info='Turbine Steam Outflow Pressure') #latex_name='$P_t$',
+        press = Quantity(name='pressure', formal_name='P_t', unit = 'Pa',
+                value=params['runoff-pressure'],
+                info='Turbine Steam Outflow Pressure', latex_name='$P_t$')
 
         quantities.append(press)
 
-        x = Quantity(name='quality', formal_name='chi_t', unit='%', value=0.0) #info='Turbine Steam Outflow Quality') #latex_name='$\chi_t$',
+        x = Quantity(name='quality', formal_name='chi_t', unit='%', value=0.0,
+                info='Turbine Steam Outflow Quality', latex_name='$\chi_t$')
 
         quantities.append(x)
 
-        work = Quantity(name='power', formal_name='P_t', unit='W', value=0.0) #info='Turbine Power') #latex_name='$W_t$',
+        work = Quantity(name='power', formal_name='P_t', unit='W', value=0.0,
+                info='Turbine Power', latex_name='$W_t$')
 
         quantities.append(work)
 
-        self.outflow_phase = Phase(self.initial_time, time_unit = 's', quantities = quantities)
+        self.outflow_phase = Phase(self.initial_time, time_unit = 's',
+                quantities = quantities)
 
         return
 
@@ -276,4 +283,3 @@ class Turbine(Module):
         w_real = w_real * params['steam flowrate'] * sc.kilo
         #w_real = heat_removed
         return (t_runoff, w_real, x_runoff)
-

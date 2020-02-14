@@ -37,7 +37,6 @@ To profile this run do:
 '''
 
 import scipy.constants as unit
-
 import matplotlib.pyplot as plt
 
 from cortix import Cortix
