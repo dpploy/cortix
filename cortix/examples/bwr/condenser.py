@@ -160,6 +160,9 @@ class Condenser(Module):
         condenser_runoff = critical_temp
 
         if chi_in == -1 and temp_in > critical_temp: #superheated vapor inlet; deprecated
+        return(293.15)
+        x = x_in
+
             pressure = 0.005
             h_steam = steam_table._Region2(temp_in, pressure)['h']
             h_sat = steam_table._Region4(0.005, 1)['h']

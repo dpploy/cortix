@@ -134,7 +134,7 @@ def main():
 
     #*****************************************************************************
 
-    plant_net.draw()
+    #plant_net.draw()
 
     # Run network dynamics simulation
     plant_net.run()

@@ -221,7 +221,7 @@ class Turbine(Module):
             p_in = self.params['turbine_inlet_pressure']
 
         p_out = self.params['turbine_outlet_pressure']
-
+ 
         if temp_in <= 273.15 or p_in <= p_out: # if temp is below this the turbine will not work
             t_runoff = temp_in
             w_real = 0
