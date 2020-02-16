@@ -776,7 +776,7 @@ params['temp_0'] = params['temp_o']
 params['tau_fake'] = .025 # s residence time
 
 # setup remaining initial conditions
-setup_initial_conditions(params)
+setup_initial_conditions( params )
 
 '''Evolve the point-reactor'''
 

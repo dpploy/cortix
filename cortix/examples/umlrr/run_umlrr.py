@@ -30,17 +30,17 @@ def main():
 
     # Preamble 
 
-    end_time  = 1.0 * unit.hour
+    end_time  = 0.5 * unit.hour
     time_step = 0.5 * unit.minute
     show_time = (True,15*unit.minute)
 
     use_mpi = False  # True for MPI; False for Python multiprocessing
 
     # System top level
-    system = Cortix( use_mpi=use_mpi, splash=True )
+    radlab = Cortix( use_mpi=use_mpi, splash=True )
 
     # Network
-    plant_net = plant.network = Network()
+    radlab_net = radlab.network = Network()
 
     #from shutdown_params import shutdown_params
     #params = shutdown_params()
@@ -55,33 +55,33 @@ def main():
     reactor.show_time = show_time
 
     # Add reactor module to network
-    plant_net.module(reactor)
+    radlab_net.module(reactor)
 
     # Create the network connectivity
-    #plant_net.connect( [reactor, 'none'], [none,'none'] )
+    #radlab_net.connect( [reactor, 'none'], [none,'none'] )
 
     #*****************************************************************************
 
-    plant_net.draw()
+    radlab_net.draw()
 
     # Run network dynamics simulation
-    plant_net.run()
+    radlab.run()
 
-    plot_results = False
+    plot_results = True
 
-    if plot_results and ( plant.use_multiprocessing or plant.rank == 0 ):
+    if plot_results and ( radlab.use_multiprocessing or radlab.rank == 0 ):
 
         # Reactor graphs
-        reactor = plant_net.modules[0]
+        reactor = radlab_net.modules[0]
 
-        (quant, time_unit) = reactor.neutron_phase.get_quantity_history('neutron-dens')
+        (quant, time_unit) = reactor.reactor_phase.get_quantity_history('neutron-dens')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
                     y_label=quant.formal_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('neutron-dens.png', dpi=300)
 
-        (quant, time_unit) = reactor.neutron_phase.get_quantity_history('delayed-neutrons-cc')
+        (quant, time_unit) = reactor.reactor_phase.get_quantity_history('delayed-neutrons-cc')
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
                     y_label=quant.formal_name+' ['+quant.unit+']')
         plt.grid()
@@ -94,8 +94,15 @@ def main():
         plt.grid()
         plt.savefig('fuel-temp.png', dpi=300)
 
-    # Properly shutdow plant
-    plant.close()
+        (quant, time_unit) = reactor.coolant_phase.get_quantity_history('temp')
+
+        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
+                    y_label =quant.formal_name+' ['+quant.unit+']')
+        plt.grid()
+        plt.savefig('cool-temp.png', dpi=300)
+
+    # Properly shutdow radlab
+    radlab.close()
 
 if __name__ == '__main__':
     main()
