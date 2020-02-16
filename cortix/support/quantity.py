@@ -19,7 +19,7 @@ class Quantity:
                  name        = 'null-quantity-name',
                  formalName  = 'null-quantity-formal-name', # deprecated
                  formal_name = 'null-quantity-formal-name',
-                 latex_name = 'null-quantity-latex-name',
+                 latex_name  = 'null-quantity-latex-name',
                  value      = float(0.0),      # this can be any type
                  unit       = 'null-quantity-unit',
                  info       = 'null-quantity-info'
@@ -30,6 +30,8 @@ class Quantity:
 
         assert isinstance(formalName, str), 'not a string.'
         self.__formalName = formalName  # deprecated
+        self.__formal_name = formalName
+
         assert isinstance(formal_name, str), 'not a string.'
         self.__formal_name = formal_name
 
@@ -58,7 +60,6 @@ class Quantity:
         n: str
         '''
         self.__name = n
-
     def get_name(self):
         '''
         Returns the name of the quantity.
@@ -78,9 +79,9 @@ class Quantity:
         Parameters
         ----------
         v: float
+
         '''
         self.__value = v
-
     def GetValue(self):
         '''
         Gets the numerical value of the quantity.
@@ -88,8 +89,8 @@ class Quantity:
         Returns
         -------
         value: any type
-        '''
 
+        '''
         return self.__value
     value = property(GetValue, SetValue, None, None)
 
@@ -105,7 +106,6 @@ class Quantity:
 
         self.__formalName = fn
         self.__formal_name = fn
-
     def GetFormalName(self):
         '''
         Returns the formal name of the quantity.
@@ -131,7 +131,6 @@ class Quantity:
         '''
 
         self.__latex_name = ln
-
     def get_latex_name(self):
         '''
         Returns the formal name of the quantity.
@@ -155,7 +154,6 @@ class Quantity:
         '''
 
         self.__latex_name = ln
-
     def get_info(self):
         '''
         Returns the formal name of the quantity.
@@ -179,7 +177,6 @@ class Quantity:
         '''
 
         self.__unit = f
-
     def GetUnit(self):
         '''
         Returns the units of the quantity.

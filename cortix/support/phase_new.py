@@ -186,7 +186,7 @@ class PhaseNew:
         return self.__species
     species = property(__get_species_list, None, None, None)
 
-    def GetQuantities(self):
+    def __get_quantities(self):
         '''
         Returns the list of `Quantities`. The values in each `Quantity` are
         synchronized with the `Phase` data frame.
@@ -197,9 +197,10 @@ class PhaseNew:
         '''
 
         for quant in self.__quantities:
-          tmp = self.GetQuantity(quant.name) # handy way to synchronize the whole list
+          tmp = self.get_quantity(quant.name) # handy way to synchronize the whole list
+
         return self.__quantities
-    quantities = property(GetQuantities, None, None, None)
+    quantities = property(__get_quantities, None, None, None)
 
     def __get_actors(self):
         '''
@@ -315,7 +316,7 @@ class PhaseNew:
 
         Returns
         -------
-        quant_history: tuple(Quantity,str)
+        quant_history: tuple(Quantity,str) or None
         '''
 
         assert name in self.__df.columns, 'name %r not in %r'%\
@@ -326,6 +327,8 @@ class PhaseNew:
                 quant_history = deepcopy(quant)
                 quant_history.value = self.__df[name] # whole data frame index series
                 return (quant_history,self.__time_unit) # return tuple
+
+        return None
 
     def add_single_species(self, new_species):
         '''
