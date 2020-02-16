@@ -331,7 +331,7 @@ class PhaseNewest:
         for quant in self.__quantities:
             if quant.name == name:
                 quant_history = deepcopy(quant)
-                quant_history.value = self.__df[name] # whole data frame index series
+                quant_history.value = deepcopy(self.__df[name]) # whole data frame index series
                 return (quant_history,self.__time_unit) # return tuple
 
     def add_single_species(self, new_species):
