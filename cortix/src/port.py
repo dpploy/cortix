@@ -55,8 +55,11 @@ class Port:
         Parameters
         ----------
         port: Port
-           A Port object to connect to
+           A Port object to connect to.
 
+        Returns
+        -------
+        None
 
         '''
 
@@ -70,16 +73,17 @@ class Port:
             (self.pipe, port.pipe) = Pipe()
 
     def send(self, data, tag=None):
-        '''Send data to the connected port.
+        '''
+        Send data to the connected port.
 
         If the sending port is not connected do nothing.
 
         Parameters
         ----------
         data: any
-           This data must be pickleable
+           This data must be pickleable.
         tag: int, optional
-           MPI tag used in sending data
+           MPI tag used in sending data.
 
         '''
 
@@ -93,8 +97,31 @@ class Port:
             else:
                 self.pipe.send(data)
 
+        return
+
+    def __is_connected(self):
+        '''
+        Check for a connected port.
+
+        Parameters
+        ----------
+        None
+
+        Returs
+        ------
+        False or True: boolean
+        Default False.
+
+        '''
+        if self.connected_port:
+            return True
+        else:
+            return False
+    is_connected = property(__is_connected, None, None, None)
+
     def recv(self):
-        '''Receive data from the connected port.
+        '''
+        Receive data from the connected port.
 
         Warning
         -------
@@ -113,6 +140,8 @@ class Port:
             else:
                 return self.pipe.recv()
 
+        return
+
     def __eq__(self, other):
         '''Check for port equality'''
 
@@ -120,6 +149,7 @@ class Port:
 
     def __repr__(self):
         '''Port name representation'''
+
         return self.name
 
 if __name__ == '__main__':
