@@ -504,13 +504,14 @@ class BWR(Module):
 
         v_o = params['thermal_neutron_velo'] # m/s
 
-        neutron_flux = n_dens * 4.5e14 * v_o
+        neutron_flux = n_dens * 4.5e14 * v_o * sigma_f/params['sigma_f_o']*0.7
 
          #reaction rate density
         rxn_rate_dens = Sigma_fis * neutron_flux
 
         # nuclear power source
         q3prime = - rxn_heat * rxn_rate_dens # exothermic reaction W/m3
+        print(q3prime * params['fuel_volume']/unit.mega)
         #q3prime = - n_dens * 3323E6
         #print("q3prime")
         #print(q3prime)

@@ -33,7 +33,7 @@ def main():
 
     # Preamble 
 
-    end_time  = 1.0 * unit.hour
+    end_time  = 0.3 * unit.hour
     time_step = 0.5 * unit.minute
     show_time = (True,5*unit.minute)
 
@@ -45,8 +45,8 @@ def main():
     # Network
     plant_net = plant.network = Network()
 
-    from shutdown_params import shutdown_params
-    params = shutdown_params()
+    from startup_params import startup_params
+    params = startup_params()
 
     # Create reactor module
     reactor = BWR(params)
@@ -70,7 +70,6 @@ def main():
     #params.turbine_outlet_pressure = 0.5
 
     turbine1   = Turbine( params )
-    print('turb1', turbine1.params['high_pressure_turbine'])
 
     turbine1.name = 'High Pressure Turbine'
     turbine1.save = True
@@ -87,7 +86,6 @@ def main():
     params['steam flowrate'] = params['steam flowrate']/2
 
     turbine2   = Turbine(params)
-    print(turbine2.params['high_pressure_turbine'])
 
     turbine2.name = 'Low Pressure Turbine 1'
     turbine2.save = True
@@ -109,8 +107,6 @@ def main():
     turbine3.end_time = end_time
 
     plant_net.module(turbine3)
-
-    print('turb2', turbine1.params['high_pressure_turbine'])
 
     #*****************************************************************************
     params['steam flowrate'] = params['steam flowrate'] * 2

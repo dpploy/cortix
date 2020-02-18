@@ -1,4 +1,4 @@
-#shutdown params
+#startup params
 def shutdown_params():
     params = dict()
     import math
@@ -51,15 +51,15 @@ def shutdown_params():
     params['q_c'] = 303 # volumetric flow rate
 
     params['fuel_dens']   = 10500 # kg/m3
-    params['cp_fuel']     = 236.58 # J/(kg K)
-    params['fuel_volume'] = 5 # m3
+    params['cp_fuel']     = 175 # J/(kg K)
+    params['fuel_volume'] = 7.25  # m3
 
     params['steam flowrate'] = 1820 # kg/s
     params['coolant_dens']   = 1000 #  kg/m3
-    params['cp_coolant']     =  4184# J/(mol K) - > J/(kg K)
-    params['coolant_volume'] = 7.5 #m3
+    params['cp_coolant']     =  3500# J/(mol K) - > J/(kg K)
+    params['coolant_volume'] = 7 #m3
 
-    params['ht_coeff'] = 10000000
+    params['ht_coeff'] = 45000000
     params['turbine efficiency'] = 0.8
     params['pump efficiency'] = 0.8
 
