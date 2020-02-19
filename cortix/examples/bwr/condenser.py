@@ -153,7 +153,7 @@ class Condenser(Module):
 
     def __condenser(self, time, temp_in, chi_in, params):
         '''
-        Simple model to condense a vapor-liquid mixture and subcool it.
+        Simple model to condense a vapor-liquid mixture and subcool it. Takes in either superheated steam or a two-phase water mixture, and calculates the amount of surface area within a simple condenser required to remove all degrees of superheat and condense the mixture.
         '''
 
         critical_temp    = steam_table._TSat_P(0.005)
