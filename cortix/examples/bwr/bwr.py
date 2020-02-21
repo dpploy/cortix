@@ -510,8 +510,7 @@ class BWR(Module):
         rxn_rate_dens = Sigma_fis * neutron_flux
 
         # nuclear power source
-        q3prime = - rxn_heat * rxn_rate_dens # exothermic reaction W/m3
-        print(q3prime * params['fuel_volume']/unit.mega)
+        q3prime = - rxn_heat * rxn_rate_dens # exothermic reaction W/m3)
         #q3prime = - n_dens * 3323E6
         #print("q3prime")
         #print(q3prime)

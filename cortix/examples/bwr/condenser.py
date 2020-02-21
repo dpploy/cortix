@@ -252,7 +252,7 @@ class Condenser(Module):
 
             if time > params['malfunction start'] and time < params['malfunction end']:
                 condenser_runoff = critical_temp
-
+            
             elif remaining_area > 0:
             #subcool the remaining liquid
 
@@ -344,5 +344,8 @@ class Condenser(Module):
 
                 # end of: Loop until convergeance, +- 1 degree kelvin
                 condenser_runoff = final_runoff_temperature_guess
+
+        else:
+            condenser_runoff = 14 + 273.15
 
         return condenser_runoff
