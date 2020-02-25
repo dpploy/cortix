@@ -10,7 +10,7 @@ def startup_params():
     params['gen_time']     = 1.0e-4  # s
     params['beta']         = 6.5e-3  #   params['k_infty']      = 1.3447
     params['buckling'] = (math.pi/237.5)**2.0 + (2.405/410)**2.0 # geometric buckling; B = (pi/R)^2 + (2.405/H)^2  
-    params['q_0'] = 0.1
+    params['q_0'] = 5000
     params['fuel macro a'] = 1.34226126162 #fuel macroscopic absorption cross section, cm^-1 
     params['mod micro a'] = 0.332 * unit.zepto * unit.milli #moderator microscopic absorption cross section, cm^2
     params['n fuel'] = 1.9577906e+21 #number density of the fuel, atoms/cm^3

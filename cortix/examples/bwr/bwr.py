@@ -324,7 +324,6 @@ class BWR(Module):
         u_vec = np.append(u_vec, temp)
 
         # sanity check
-        assert not u_vec[u_vec<0.0],'%r'%u_vec
 
         return u_vec
 
@@ -472,7 +471,7 @@ class BWR(Module):
         '''
         q_0 = params['q_0']
 
-        if time <= 1e-5: # small time value
+        if time <= 1500: # small time value
             q = q_0
         else:
             q = 0.0
@@ -570,8 +569,12 @@ class BWR(Module):
 
         assert len(lambda_vec)==len(c_vec)
         assert len(beta_vec)==len(c_vec)
+        #species are in RELATIVE yield, not actual; multiply by delayed neutron
+        #yield fraction of 0.0065 to get the actual delayed neutron
+        #concentration
 
-        f_tmp[1:-2] = beta_vec/gen_time * n_dens - lambda_vec * c_vec
+        f_tmp[1:-2] = beta_vec * 0.0065 *  gen_time * n_dens - lambda_vec * c_vec
+
 
         #--------------------
         # fuel energy balance

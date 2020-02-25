@@ -33,7 +33,7 @@ def main():
 
     # Preamble 
 
-    end_time  = 0.3 * unit.hour
+    end_time  = 1 * unit.hour
     time_step = 0.5 * unit.minute
     show_time = (True,5*unit.minute)
 
