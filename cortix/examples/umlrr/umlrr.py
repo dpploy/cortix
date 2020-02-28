@@ -68,6 +68,7 @@ class UMLRR(Module):
         self.params['species_rel_yield'] = [0.033, 0.219, 0.196, 0.395, 0.115, 0.042]
 
         self.params['alpha_n']       = -5e-4 # control rod reactivity worth
+        self.params['alpha_n']       = -5e-5 # control rod reactivity worth
         self.params['alpha_tn_fake'] = -1e-4/20# -1.0e-6
 
         self.params['n_dens_ss_operation'] = 1e15 * 1e4 / 2200  # neutrons/m^2
@@ -158,6 +159,17 @@ class UMLRR(Module):
                 latex_name='$T_f$')
 
         quantities.append(fuel_temp)
+
+        temp_in = self.params['temp_c_0']
+        pwr_0 = self.params['coolant_volume']/self.params['tau_fake'] * \
+                self.params['coolant_dens'] * self.params['cp_coolant'] * \
+                (self.params['temp_c_0'] - temp_in)
+
+        power = Quantity( name='power', formal_name='Pwr', unit='W',
+                value=pwr_0, info='Reactor Power',
+                latex_name='$\mathrm{Prw}$')
+
+        quantities.append(power)
 
         self.reactor_phase = Phase(self.initial_time, time_unit='s',
                 quantities=quantities)
@@ -322,16 +334,24 @@ class UMLRR(Module):
         outflow = self.coolant_phase.get_row(time)
         reactor = self.reactor_phase.get_row(time)
 
-        #update state variables
+        # Advance time
         time += self.time_step
 
-        self.coolant_phase.add_row(time, outflow)
+        # Update state variables
         self.reactor_phase.add_row(time, reactor)
+        self.coolant_phase.add_row(time, outflow)
 
-        self.coolant_phase.set_value('temp', cool_temp, time)
         self.reactor_phase.set_value('neutron-dens', n_dens, time)
         self.reactor_phase.set_value('delayed-neutrons-cc', c_vec, time)
         self.reactor_phase.set_value('fuel-temp', fuel_temp, time)
+
+        temp_in = self.params['inflow-cool-temp']
+        pwr = self.params['coolant_volume']/self.params['tau_fake'] * \
+              self.params['coolant_dens'] * self.params['cp_coolant'] * \
+              (cool_temp - temp_in)
+        self.reactor_phase.set_value('power', pwr, time)
+
+        self.coolant_phase.set_value('temp', cool_temp, time)
 
         return time
 

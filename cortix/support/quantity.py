@@ -239,10 +239,16 @@ class Quantity:
             y = list()
             for j in range(len(x)):
                 y.append( self.__value.iat[j][i] ) # must use iat()
+
+            y = [k*y_scaling for k in y]
+
             plt.xlabel(x_label)
             plt.ylabel(y_label)
+
             plt.title(title)
+
             plt.plot(x, y)
+
             if not same_axis and file_name:
                 plt.savefig(file_name+str(i)+'.png',dpi=dpi)
         if same_axis and file_name:
