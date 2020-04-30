@@ -157,7 +157,7 @@ class Condenser(Module):
         '''
 
         critical_temp    = steam_table._TSat_P(0.005)
-        condenser_runoff = critical_temp
+        condenser_runoff = 14 + 273.15
 
         if chi_in == -1 and temp_in > critical_temp: #superheated vapor inlet; deprecated
             pressure = 0.005
@@ -246,13 +246,15 @@ class Condenser(Module):
             remaining_area = params['heat transfer area'] - condensation_area
 
             condenser_runoff = critical_temp
-
+            print(remaining_area)
             if time > params['malfunction start'] and time < params['malfunction end']:
-                condenser_runoff = critical_temp
+                condenser_runoff = 14 + 273.15
+
+            if remaining_area < 0:
+                condenser_runoff = 14 + 273.15
 
             elif remaining_area > 0:
             #subcool the remaining liquid
-
             #iterative method
             #0. guess an ending value for the coolant and 
             #1. calculate high nusselt number

@@ -27,7 +27,7 @@ def shutdown_params():
     params['pipe_diameter'] = 0.1 #m
     params['liquid_velocity'] = 10 #m/s
     params['cooling water flowrate'] = 100000 #kg/s
-    params['heat transfer area'] = 22000 #m2, or 500 4m long, 0.1m diameter pipes
+    params['heat transfer area'] = 18000 #m2, or 500 4m long, 0.1m diameter pipes
 
     params['reg_rod_worth'] = 1.5e-4 # pcm
 
