@@ -45,8 +45,8 @@ def main():
     # Network
     plant_net = plant.network = Network()
 
-    from startup_params import startup_params
-    params = startup_params()
+    from shutdown_params import shutdown_params
+    params = shutdown_params()
 
     # Create reactor module
     reactor = BWR(params)

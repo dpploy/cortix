@@ -573,7 +573,7 @@ class BWR(Module):
         #yield fraction of 0.0065 to get the actual delayed neutron
         #concentration
 
-        f_tmp[1:-2] = beta_vec * 0.0065 *  gen_time * n_dens - lambda_vec * c_vec
+        f_tmp[1:-2] = beta_vec / gen_time * n_dens - lambda_vec * c_vec
 
 
         #--------------------
