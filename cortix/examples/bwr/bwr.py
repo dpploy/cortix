@@ -430,7 +430,7 @@ class BWR(Module):
             rho_t = rho_0 + alpha_n + alpha_tn * (temp - temp_ref)
 
         elif time > params['shutdown time']: # effectively the inverse of startup; gradually reduce reactivity and neutron density.
-            rho_0 = -1 * n_dens * rho_0
+            rho_0 = -1 * rho_0
             alpha_n = rho_0 - (alpha_tn * (temp - temp_ref))
             rho_t = rho_0
 
