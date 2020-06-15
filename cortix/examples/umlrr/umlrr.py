@@ -62,14 +62,19 @@ class UMLRR(Module):
 
         # General parameters
 
-        self.params['gen-time'] = 1.0e-4  # s
-        self.params['beta']     = 6.5e-3  # 
-        self.params['species-decay']     = [0.0124, 0.0305, 0.111, 0.301, 1.14, 3.01] # 1/sec
-        self.params['species_rel_yield'] = [0.033, 0.219, 0.196, 0.395, 0.115, 0.042]
+        #self.params['gen-time'] = 1.0e-4  # s
+        self.params['gen-time'] = 6.5e-5  # s
+        #self.params['beta']     = 6.5e-3  # 
+        self.params['beta']     = 7.8e-3  # 
+        #self.params['species-decay']     = [0.0124, 0.0305, 0.111, 0.301, 1.14, 3.01] # 1/sec
+        self.params['species-decay']     = [0.0127, 0.0317, 0.1160, 0.3111, 1.4003, 3.8708] # 1/sec
+        #self.params['species_rel_yield'] = [0.033, 0.219, 0.196, 0.395, 0.115, 0.042]
+        self.params['xi'] = [0.00026, 0.00146, 0.00129, 0.00279, 0.0008, 0.00018]
+        beta_i = xi*beta/sum(xi)
 
         self.params['alpha_n']       = -5e-4 # control rod reactivity worth
         self.params['alpha_n']       = -5e-5 # control rod reactivity worth
-        self.params['alpha_tn_fake'] = -1e-4/20# -1.0e-6
+        self.params['alpha_tn_fake'] = -1e-4/20 # -1.0e-6
 
         self.params['n_dens_ss_operation'] = 1e15 * 1e4 / 2200  # neutrons/m^2
 
@@ -83,6 +88,7 @@ class UMLRR(Module):
 
         self.params['fuel_dens']   = 2500 * unit.kg/unit.meter**3
         self.params['cp_fuel']     = 720  * unit.joule/unit.kg/unit.kelvin
+        #self.params['fuel_volume'] = 1.5  * unit.meter**3
         self.params['fuel_volume'] = 1.5  * unit.meter**3
 
         self.params['coolant_dens']   = 0.1786 * unit.kg/unit.meter**3
@@ -96,6 +102,8 @@ class UMLRR(Module):
         self.params['shutdown']      = False
         self.params['shutdown_time'] = 0.0 # s
         self.params['rho_shutdown']  = 0.0 # s
+
+        self.params['coolant_flowrate_forced'] = 1650.0 * unit.gallon/unit.minute
 
         # Initial data parameters
 
