@@ -79,15 +79,15 @@ class BWR(Module):
         quantities = list()
 
         neutron_dens = Quantity(name='neutron-dens', formal_name='n', unit='1/m^3',
-                value=0.0, info='Reactor Neutron Density', latex_name='$n$')
+                value=0.0, info='Rel. Reactor Neutron Density', latex_name='$n$')
 
         quantities.append(neutron_dens)
 
         delayed_neutrons_0 = np.zeros(6)
 
         delayed_neutron_cc = Quantity(name='delayed-neutrons-cc', formal_name='c_i',
-                unit='1/m^3', value=delayed_neutrons_0,
-                info='Delayed Neutron Precursors', latex_name='$c_i$')
+                unit='1/m^3 ', value=delayed_neutrons_0,
+                info='Rel. Delayed Neutron Precursors', latex_name='$c_i$')
 
         quantities.append(delayed_neutron_cc)
 
@@ -503,7 +503,7 @@ class BWR(Module):
 
         v_o = params['thermal_neutron_velo'] # m/s
 
-        neutron_flux = n_dens * 4.5e14 * v_o * sigma_f/params['sigma_f_o']*0.7
+        neutron_flux = n_dens * 0.95E15 * v_o * sigma_f/params['sigma_f_o']*0.7
 
          #reaction rate density
         rxn_rate_dens = Sigma_fis * neutron_flux

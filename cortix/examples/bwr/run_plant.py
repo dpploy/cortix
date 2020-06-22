@@ -165,7 +165,7 @@ def main():
         (quant, time_unit) = reactor.reactor_phase.get_quantity_history('fuel-temp')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label =quant.formal_name+' ['+quant.unit+']')
+                    y_label ='Fuel Temp. [k]')
         plt.grid()
         plt.savefig('fuel-temp.png', dpi=300)
 
