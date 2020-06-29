@@ -45,6 +45,7 @@ class BWR(Module):
         self.initial_time = 0.0 * unit.day
         self.end_time     = 4 * unit.hour
         self.time_step    = 10.0
+
         self.show_time    = (False,10.0)
 
         self.log = logging.getLogger('cortix')
