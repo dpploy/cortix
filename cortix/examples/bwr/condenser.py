@@ -248,7 +248,7 @@ class Condenser(Module):
             condensation_area = (q/(alpha_sh * LMTD))
             remaining_area = params['heat transfer area'] - condensation_area
             condenser_runoff = critical_temp
-            print(remaining_area)
+            #print(remaining_area)
             if time > params['malfunction start'] and time < params['malfunction end']:
                 condenser_runoff = 14 + 273.15
 
