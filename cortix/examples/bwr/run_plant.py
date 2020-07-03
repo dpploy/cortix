@@ -16,6 +16,8 @@ from cortix import Network
 from reactor import BWR
 from turbine import Turbine
 from condenser import Condenser
+from params import startup_params
+from params import shutdown_params
 
 def main():
     '''Cortix run file for a solvent extraction network.
@@ -35,7 +37,7 @@ def main():
 
     end_time  = 1 * unit.hour
     unit.second = 1.0
-    time_step = 10.0 * unit.second
+    time_step = 40.0 * unit.second
     show_time = (True,5*unit.minute)
 
     use_mpi = False  # True for MPI; False for Python multiprocessing
@@ -46,7 +48,6 @@ def main():
     # Network
     plant_net = plant.network = Network()
 
-    from shutdown_params import shutdown_params
     params = shutdown_params()
 
     # Create reactor module
@@ -121,6 +122,7 @@ def main():
 
     plant_net.module(condenser)
 
+    #*****************************************************************************
     # Create the network connectivity
     plant_net.connect( [reactor, 'coolant-outflow'], [turbine1,'inflow'] )
     plant_net.connect( [turbine1, 'outflow-1'], [turbine2,'inflow'] )
@@ -131,7 +133,7 @@ def main():
 
     #*****************************************************************************
 
-    #plant_net.draw()
+    plant_net.draw()
 
     # Run network dynamics simulation
     plant_net.run()
