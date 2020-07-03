@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from cortix import Cortix
 from cortix import Network
 
-from bwr import BWR
+from reactor import BWR
 from turbine import Turbine
 from condenser import Condenser
 
