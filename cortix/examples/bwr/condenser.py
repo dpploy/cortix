@@ -153,13 +153,16 @@ class Condenser(Module):
 
     def __condenser(self, time, temp_in, chi_in, params):
         '''
-        Simple model to condense a vapor-liquid mixture and subcool it.
+        Simple model to condense a vapor-liquid mixture and subcool it. Takes in either superheated steam or a two-phase water mixture, and calculates the amount of surface area within a simple condenser required to remove all degrees of superheat and condense the mixture.
         '''
 
         critical_temp    = steam_table._TSat_P(0.005)
-        condenser_runoff = critical_temp
+        condenser_runoff = 14 + 273.15
 
         if chi_in == -1 and temp_in > critical_temp: #superheated vapor inlet; deprecated
+            return(293.15)
+            x = x_in
+
             pressure = 0.005
             h_steam = steam_table._Region2(temp_in, pressure)['h']
             h_sat = steam_table._Region4(0.005, 1)['h']
@@ -244,15 +247,16 @@ class Condenser(Module):
             #determine how far the two-phase mixture gets in the condenser before being fully condensed
             condensation_area = (q/(alpha_sh * LMTD))
             remaining_area = params['heat transfer area'] - condensation_area
-
             condenser_runoff = critical_temp
-
+            #print(remaining_area)
             if time > params['malfunction start'] and time < params['malfunction end']:
-                condenser_runoff = critical_temp
+                condenser_runoff = 14 + 273.15
+
+            if remaining_area < 0:
+                condenser_runoff = 14 + 273.15
 
             elif remaining_area > 0:
             #subcool the remaining liquid
-
             #iterative method
             #0. guess an ending value for the coolant and 
             #1. calculate high nusselt number
@@ -341,5 +345,8 @@ class Condenser(Module):
 
                 # end of: Loop until convergeance, +- 1 degree kelvin
                 condenser_runoff = final_runoff_temperature_guess
+
+        else:
+            condenser_runoff = 14 + 273.15
 
         return condenser_runoff

@@ -45,6 +45,7 @@ class BWR(Module):
         self.initial_time = 0.0 * unit.day
         self.end_time     = 4 * unit.hour
         self.time_step    = 10.0
+
         self.show_time    = (False,10.0)
 
         self.log = logging.getLogger('cortix')
@@ -79,15 +80,15 @@ class BWR(Module):
         quantities = list()
 
         neutron_dens = Quantity(name='neutron-dens', formal_name='n', unit='1/m^3',
-                value=0.0, info='Reactor Neutron Density', latex_name='$n$')
+                value=0.0, info='Rel. Reactor Neutron Density', latex_name='$n$')
 
         quantities.append(neutron_dens)
 
         delayed_neutrons_0 = np.zeros(6)
 
         delayed_neutron_cc = Quantity(name='delayed-neutrons-cc', formal_name='c_i',
-                unit='1/m^3', value=delayed_neutrons_0,
-                info='Delayed Neutron Precursors', latex_name='$c_i$')
+                unit='1/m^3 ', value=delayed_neutrons_0,
+                info='Rel. Delayed Neutron Precursors', latex_name='$c_i$')
 
         quantities.append(delayed_neutron_cc)
 
@@ -324,7 +325,6 @@ class BWR(Module):
         u_vec = np.append(u_vec, temp)
 
         # sanity check
-        assert not u_vec[u_vec<0.0],'%r'%u_vec
 
         return u_vec
 
@@ -431,7 +431,7 @@ class BWR(Module):
             rho_t = rho_0 + alpha_n + alpha_tn * (temp - temp_ref)
 
         elif time > params['shutdown time']: # effectively the inverse of startup; gradually reduce reactivity and neutron density.
-            rho_0 = -1 * n_dens * rho_0
+            rho_0 = -1 * rho_0
             alpha_n = rho_0 - (alpha_tn * (temp - temp_ref))
             rho_t = rho_0
 
@@ -472,7 +472,7 @@ class BWR(Module):
         '''
         q_0 = params['q_0']
 
-        if time <= 1e-5: # small time value
+        if time <= 1500: # small time value
             q = q_0
         else:
             q = 0.0
@@ -504,13 +504,13 @@ class BWR(Module):
 
         v_o = params['thermal_neutron_velo'] # m/s
 
-        neutron_flux = n_dens * 4.5e14 * v_o
+        neutron_flux = n_dens * 0.95E15 * v_o * sigma_f/params['sigma_f_o']*0.7
 
          #reaction rate density
         rxn_rate_dens = Sigma_fis * neutron_flux
 
         # nuclear power source
-        q3prime = - rxn_heat * rxn_rate_dens # exothermic reaction W/m3
+        q3prime = - rxn_heat * rxn_rate_dens # exothermic reaction W/m3)
         #q3prime = - n_dens * 3323E6
         #print("q3prime")
         #print(q3prime)
@@ -570,8 +570,12 @@ class BWR(Module):
 
         assert len(lambda_vec)==len(c_vec)
         assert len(beta_vec)==len(c_vec)
+        #species are in RELATIVE yield, not actual; multiply by delayed neutron
+        #yield fraction of 0.0065 to get the actual delayed neutron
+        #concentration
 
-        f_tmp[1:-2] = beta_vec/gen_time * n_dens - lambda_vec * c_vec
+        f_tmp[1:-2] = beta_vec / gen_time * n_dens - lambda_vec * c_vec
+
 
         #--------------------
         # fuel energy balance

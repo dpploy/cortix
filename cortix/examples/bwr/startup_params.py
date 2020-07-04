@@ -10,8 +10,8 @@ def startup_params():
     params['gen_time']     = 1.0e-4  # s
     params['beta']         = 6.5e-3  #   params['k_infty']      = 1.3447
     params['buckling'] = (math.pi/237.5)**2.0 + (2.405/410)**2.0 # geometric buckling; B = (pi/R)^2 + (2.405/H)^2  
-    params['q_0'] = 0.1
-    params['fuel macro a'] = 1.34226126162 #fuel macroscopic absorption cross section, cm^-1  
+    params['q_0'] = 5000
+    params['fuel macro a'] = 1.34226126162 #fuel macroscopic absorption cross section, cm^-1 
     params['mod micro a'] = 0.332 * unit.zepto * unit.milli #moderator microscopic absorption cross section, cm^2
     params['n fuel'] = 1.9577906e+21 #number density of the fuel, atoms/cm^3
     params['I'] = 40.9870483 * unit.zepto * unit.milli  #resonance integral, I (dimensionless)
@@ -27,7 +27,7 @@ def startup_params():
     params['pipe_diameter'] = 0.1 #m
     params['liquid_velocity'] = 10 #m/s
     params['cooling water flowrate'] = 100000 #kg/s
-    params['heat transfer area'] = 22000 #m2, or 500 4m long, 0.1m diameter pipes
+    params['heat transfer area'] = 3040 #m2, or 100 10m long, 0.1m diameter pipes
 
     params['reg_rod_worth'] = 1.5e-4 # pcm
 
@@ -51,15 +51,15 @@ def startup_params():
     params['q_c'] = 303 # volumetric flow rate
 
     params['fuel_dens']   = 10500 # kg/m3
-    params['cp_fuel']     = 236.58 # J/(kg K)
-    params['fuel_volume'] = 5 # m3
+    params['cp_fuel']     = 175 # J/(kg K)
+    params['fuel_volume'] = 7.25  # m3
 
     params['steam flowrate'] = 1820 # kg/s
     params['coolant_dens']   = 1000 #  kg/m3
-    params['cp_coolant']     =  4184# J/(mol K) - > J/(kg K)
-    params['coolant_volume'] = 7.5 #m3
+    params['cp_coolant']     =  3500# J/(mol K) - > J/(kg K)
+    params['coolant_volume'] = 7 #m3
 
-    params['ht_coeff'] = 10000000
+    params['ht_coeff'] = 45000000
     params['turbine efficiency'] = 0.8
     params['pump efficiency'] = 0.8
 
@@ -72,7 +72,7 @@ def startup_params():
 
     params['malfunction start'] = 999 * unit.hour
     params['malfunction end'] = 999 * unit.hour
-    params['shutdown time'] = 9999  * unit.hour
+    params['shutdown time'] = 999 * unit.hour
 
     gen_time = params['gen_time'] # retrieve neutron generation time
     params['q_0'] = 0.1
@@ -87,7 +87,7 @@ def startup_params():
     params['reactivity'] = rho_0_over_beta * beta # "rho/beta = 10 cents"
 
     params['temp_0'] = params['temp_o']
-	
+
     params['tau_fake'] = 1 # s
     params['malfunction subcooling'] = 0.75
     params['alpha_n_malfunction'] = 0

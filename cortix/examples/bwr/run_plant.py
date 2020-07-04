@@ -13,9 +13,11 @@ import matplotlib.pyplot as plt
 from cortix import Cortix
 from cortix import Network
 
-from bwr import BWR
+from reactor import BWR
 from turbine import Turbine
 from condenser import Condenser
+from params import startup_params
+from params import shutdown_params
 
 def main():
     '''Cortix run file for a solvent extraction network.
@@ -33,8 +35,9 @@ def main():
 
     # Preamble 
 
-    end_time  = 1.0 * unit.hour
-    time_step = 0.5 * unit.minute
+    end_time  = 1 * unit.hour
+    unit.second = 1.0
+    time_step = 30.0 * unit.second
     show_time = (True,5*unit.minute)
 
     use_mpi = False  # True for MPI; False for Python multiprocessing
@@ -45,7 +48,6 @@ def main():
     # Network
     plant_net = plant.network = Network()
 
-    from shutdown_params import shutdown_params
     params = shutdown_params()
 
     # Create reactor module
@@ -70,7 +72,6 @@ def main():
     #params.turbine_outlet_pressure = 0.5
 
     turbine1   = Turbine( params )
-    print('turb1', turbine1.params['high_pressure_turbine'])
 
     turbine1.name = 'High Pressure Turbine'
     turbine1.save = True
@@ -87,7 +88,6 @@ def main():
     params['steam flowrate'] = params['steam flowrate']/2
 
     turbine2   = Turbine(params)
-    print(turbine2.params['high_pressure_turbine'])
 
     turbine2.name = 'Low Pressure Turbine 1'
     turbine2.save = True
@@ -110,8 +110,6 @@ def main():
 
     plant_net.module(turbine3)
 
-    print('turb2', turbine1.params['high_pressure_turbine'])
-
     #*****************************************************************************
     params['steam flowrate'] = params['steam flowrate'] * 2
 
@@ -124,6 +122,7 @@ def main():
 
     plant_net.module(condenser)
 
+    #*****************************************************************************
     # Create the network connectivity
     plant_net.connect( [reactor, 'coolant-outflow'], [turbine1,'inflow'] )
     plant_net.connect( [turbine1, 'outflow-1'], [turbine2,'inflow'] )
@@ -169,7 +168,7 @@ def main():
         (quant, time_unit) = reactor.reactor_phase.get_quantity_history('fuel-temp')
 
         quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label =quant.formal_name+' ['+quant.unit+']')
+                    y_label ='Fuel Temp. [k]')
         plt.grid()
         plt.savefig('fuel-temp.png', dpi=300)
 
