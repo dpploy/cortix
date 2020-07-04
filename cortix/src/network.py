@@ -185,8 +185,10 @@ class Network:
 
         return
 
-    def run(self):
-        '''Run the network simulation.
+    def __run(self):
+        '''
+        Internal method to run the network simulation. Do not use this method, it is
+        intended for Cortix to run it.
 
         This function concurrently executes the `cortix.src.module.run` function
         for each module in the network. Modules are run using either MPI or
@@ -195,7 +197,7 @@ class Network:
         Note
         ----
         When using multiprocessing, data from the modules state are copied to the master
-        process after the `run()` method of the modules is finished.
+        process after the `__run()` method of the modules is finished.
 
         '''
         assert len(self.modules) >= 1, 'the network must have a list of modules.'

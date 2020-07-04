@@ -13,7 +13,8 @@ from cortix import Quantity
 
 class Arrested(Module):
     '''
-    Arrested Cortix module used to model criminal group population in an arrested system.
+    Arrested Cortix module used to model criminal group population in an
+    arrested system.
 
     Notes
     -----
