@@ -37,7 +37,7 @@ def main():
 
     end_time  = 1 * unit.hour
     unit.second = 1.0
-    time_step = 40.0 * unit.second
+    time_step = 30.0 * unit.second
     show_time = (True,5*unit.minute)
 
     use_mpi = False  # True for MPI; False for Python multiprocessing
