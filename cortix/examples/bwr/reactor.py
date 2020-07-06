@@ -5,10 +5,10 @@
 
 import logging
 
-import numpy as np
-import scipy.constants as unit
-from scipy.integrate import odeint
 import math
+from scipy.integrate import odeint
+import scipy.constants as unit
+import numpy as np
 
 from cortix import Module
 from cortix.support.phase_new import PhaseNew as Phase
@@ -38,57 +38,68 @@ class BWR(Module):
         super().__init__()
 
         self.port_names_expected = ['coolant-inflow', 'coolant-outflow',
-                                     'signal-out', 'signal-in']
+                                    'signal-out', 'signal-in']
 
         self.params = params
 
         self.initial_time = 0.0 * unit.day
-        self.end_time     = 4 * unit.hour
-        self.time_step    = 10.0
+        self.end_time = 4 * unit.hour
+        self.time_step = 10.0
 
-        self.show_time    = (False,10.0)
+        self.show_time = (False, 10.0)
 
         self.log = logging.getLogger('cortix')
+        self.__logit = False
 
         # Coolant outflow phase history
         quantities = list()
 
-        flowrate = Quantity(name='flowrate', formal_name='q_c', unit='kg/s', value=0.0,
-                info='Reactor Outflow Coolant Flowrate' ,latex_name='$q_c$')
+        flowrate = Quantity(name='flowrate', formal_name='q_c', unit='kg/s',
+                            value=0.0,
+                            info='Reactor Outflow Coolant Flowrate',
+                            latex_name='$q_c$')
 
         quantities.append(flowrate)
 
-        temp = Quantity(name='temp', formal_name='T_c', unit='K', value=273.15,
-                info='Reactor Outflow Coolant Temperature', latex_name='$T_c$')
+        temp = Quantity(name='temp', formal_name='T_c', unit='K',
+                        value=273.15,
+                        info='Reactor Outflow Coolant Temperature',
+                        latex_name='$T_c$')
 
         quantities.append(temp)
 
-        press = Quantity(name='pressure', formal_name='P_c', unit='Pa', value=0.0,
-                info='Reactor Outflow Coolant Pressure', latex_name='$P_c$')
+        press = Quantity(name='pressure', formal_name='P_c', unit='Pa',
+                         value=0.0,
+                         info='Reactor Outflow Coolant Pressure',
+                         latex_name='$P_c$')
 
         quantities.append(press)
 
-        quality = Quantity(name='steam-quality', formal_name='chi_s', unit='', value=0.0,
-                info='Reactor STeam Quality', latex_name='$\chi$')
+        quality = Quantity(name='steam-quality', formal_name='chi_s', unit='',
+                           value=0.0,
+                           info='Reactor STeam Quality', latex_name=r'$\chi$')
 
         quantities.append(quality)
 
         self.coolant_outflow_phase = Phase(self.initial_time, time_unit='s',
-                quantities=quantities)
+                                           quantities=quantities)
 
         # Neutron phase history
         quantities = list()
 
         neutron_dens = Quantity(name='neutron-dens', formal_name='n', unit='1/m^3',
-                value=0.0, info='Rel. Reactor Neutron Density', latex_name='$n$')
+                                value=0.0, info='Rel. Reactor Neutron Density',
+                                latex_name='$n$')
 
         quantities.append(neutron_dens)
 
         delayed_neutrons_0 = np.zeros(6)
 
         delayed_neutron_cc = Quantity(name='delayed-neutrons-cc', formal_name='c_i',
-                unit='1/m^3 ', value=delayed_neutrons_0,
-                info='Rel. Delayed Neutron Precursors', latex_name='$c_i$')
+                                      unit='1/m^3 ',
+                                      value=delayed_neutrons_0,
+                                      info='Relative Delayed Neutron Precursors',
+                                      latex_name='$c_i$')
 
         quantities.append(delayed_neutron_cc)
 
@@ -115,8 +126,6 @@ class BWR(Module):
 
         # Initialize inflow
         self.params['inflow-cool-temp'] = 273.15
-
-        return
 
     def run(self, *args):
 
@@ -161,14 +170,14 @@ class BWR(Module):
         #-----------------------------------------
         # one way "to" coolant-outflow
 
-        # send to 
+        # send to
         if self.get_port('coolant-outflow').connected_port:
 
             message_time = self.recv('coolant-outflow')
 
-            coolant_outflow = self.__get_coolant_outflow( message_time )
+            coolant_outflow = self.__get_coolant_outflow(message_time)
             outflow_params = dict()
-            self.send( (message_time, coolant_outflow), 'coolant-outflow' )
+            self.send((message_time, coolant_outflow), 'coolant-outflow')
 
         # Interactions in the coolant-inflow port
         #----------------------------------------
@@ -179,7 +188,7 @@ class BWR(Module):
         # receive from
         if self.get_port('coolant-inflow').connected_port:
 
-            self.send( time, 'coolant-inflow' )
+            self.send(time, 'coolant-inflow')
             (check_time, inflow_cool_temp) = self.recv('coolant-inflow')
 
             assert abs(check_time-time) <= 1e-6
@@ -187,21 +196,21 @@ class BWR(Module):
 
         # Interactions in the signal-out port
         #-----------------------------------------
-        # one way "to" signal-out 
+        # one way "to" signal-out
 
-        # send to 
+        # send to
         if self.get_port('signal-out').connected_port:
 
             message_time = self.recv('signal-out')
 
-            signal_out = self.__get_signal_out(time)
+            #signal_out = self.__get_signal_out(time)
 
-            self.send( (message_time, signal_out), 'signal-out' )
+            #self.send( (message_time, signal_out), 'signal-out' )
 
-    def __get_coolant_outflow(message_time):
+    def __get_coolant_outflow(self, message_time):
 
         outflow = self.params['coolant-outflow']
-        return(outflow)
+        return outflow
 
     def __step(self, time=0.0):
         r'''
