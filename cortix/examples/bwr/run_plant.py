@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
-'''
+"""
 Cortix Run File
-'''
+"""
 
 import scipy.constants as unit
 import matplotlib.pyplot as plt
@@ -18,7 +18,7 @@ from condenser import Condenser
 from params import get_params
 
 def main():
-    '''Balance of plant of a boiling water nuclear reactor.
+    """Balance of plant of a boiling water nuclear reactor.
 
     Attributes
     ----------
@@ -29,12 +29,12 @@ def main():
     use_mpi: bool
         If set to `True` use MPI otherwise use Python multiprocessing.
 
-    '''
+    """
 
     #*****************************************************************************
     # Preamble
 
-    end_time = 1 * unit.hour
+    end_time = 15 * unit.minute
     unit.second = 1.0
     time_step = 30.0 * unit.second
     show_time = (True, 5*unit.minute)

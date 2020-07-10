@@ -198,6 +198,11 @@ class BWR(Module):
 
             self.send( (message_time, signal_out), 'signal-out' )
 
+    def __get_coolant_outflow(message_time):
+
+        outflow = self.params['coolant-outflow']
+        return(outflow)
+
     def __step(self, time=0.0):
         r'''
         ODE IVP problem:
