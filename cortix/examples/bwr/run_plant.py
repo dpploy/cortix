@@ -34,7 +34,7 @@ def main():
     #*****************************************************************************
     # Preamble
 
-    end_time = 15 * unit.minute
+    end_time = 30 * unit.minute
     unit.second = 1.0
     time_step = 30.0 * unit.second
     show_time = (True, 5*unit.minute)

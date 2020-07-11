@@ -3,7 +3,7 @@
 # This file is part of the Cortix toolkit environment.
 # https://cortix.org
 """
-Cortix Module
+Cortix Example Module
 """
 
 import logging
@@ -18,8 +18,7 @@ from cortix.support.phase_new import PhaseNew as Phase
 from cortix import Quantity
 
 class Turbine(Module):
-    """
-    Boiling water single-point reactor.
+    """Boiling water single-point reactor.
 
     Notes
     -----
@@ -30,13 +29,14 @@ class Turbine(Module):
     """
 
     def __init__(self, params):
-        '''
+        """Constructor.
+
         Parameters
         ----------
         params: dict
             All parameters for the module in the form of a dictionary.
 
-        '''
+        """
 
         super().__init__()
 
@@ -180,7 +180,7 @@ class Turbine(Module):
             self.chi = inflow_state['quality']
 
     def __step(self, time=0.0):
-        r'''
+        r"""
         Advance the state of the turbine.
 
         Parameters
@@ -192,7 +192,7 @@ class Turbine(Module):
         -------
         None
 
-        '''
+        """
 
         output = self.__turbine(time, self.temp, self.chi, self.params)
 
