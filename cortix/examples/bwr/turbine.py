@@ -6,9 +6,7 @@
 import logging
 from copy import deepcopy
 
-import numpy as np
 import scipy.constants as const
-from scipy.integrate import odeint
 import scipy.constants as sc
 
 import iapws.iapws97 as steam_table
@@ -42,52 +40,52 @@ class Turbine(Module):
 
         self.params = deepcopy(params)
 
-        self.port_names_expected = ['inflow','outflow-1','outflow-2']
+        self.port_names_expected = ['inflow', 'outflow-1', 'outflow-2']
 
         self.initial_time = 0.0 * const.day
-        self.end_time     = 4 * const.hour
-        self.time_step    = 10.0
-        self.show_time    = (False,10.0)
+        self.end_time = 4 * const.hour
+        self.time_step = 10.0
+        self.show_time = (False, 10.0)
 
         self.log = logging.getLogger('cortix')
 
         # Inflow phase history
         quantities = list()
 
-        temp = Quantity(name='temp', formal_name = 'T_in', unit='k', value=273.15,
-                info='Turbine Steam Inflow Temperature', latex_name='$T_i$')
+        temp = Quantity(name='temp', formal_name='T_in', unit='k', value=273.15,
+                        info='Turbine Steam Inflow Temperature', latex_name='$T_i$')
 
         quantities.append(temp)
 
-        self.inflow_phase = Phase(self.initial_time, time_unit = 's',
-                quantities = quantities)
+        self.inflow_phase = Phase(self.initial_time, time_unit='s',
+                                  quantities=quantities)
 
         # Outflow phase history
         quantities = list()
 
         temp = Quantity(name='temp', formal_name='T_o', unit='k', value=273.15,
-                info='Turbine Steam Outflow Temperature', latex_name='$T_o$')
+                        info='Turbine Steam Outflow Temperature', latex_name='$T_o$')
 
         quantities.append(temp)
 
-        press = Quantity(name='pressure', formal_name='P_t', unit = 'Pa',
-                value=params['runoff-pressure'],
-                info='Turbine Steam Outflow Pressure', latex_name='$P_t$')
+        press = Quantity(name='pressure', formal_name='P_t', unit='Pa',
+                         value=params['runoff-pressure'],
+                         info='Turbine Steam Outflow Pressure', latex_name='$P_t$')
 
         quantities.append(press)
 
         x = Quantity(name='quality', formal_name='chi_t', unit='%', value=0.0,
-                info='Turbine Steam Outflow Quality', latex_name='$\chi_t$')
+                     info='Turbine Steam Outflow Quality', latex_name='$\chi_t$')
 
         quantities.append(x)
 
         work = Quantity(name='power', formal_name='P_t', unit='W', value=0.0,
-                info='Turbine Power', latex_name='$W_t$')
+                        info='Turbine Power', latex_name='$W_t$')
 
         quantities.append(work)
 
-        self.outflow_phase = Phase(self.initial_time, time_unit = 's',
-                quantities = quantities)
+        self.outflow_phase = Phase(self.initial_time, time_unit='s',
+                                   quantities=quantities)
 
         return
 
@@ -97,8 +95,8 @@ class Turbine(Module):
 
         while time < self.end_time + self.time_step:
 
-            if self.show_time[0] and abs(time%self.show_time[1]-0.0)<=1.e-1:
-                self.log.info('time = '+str(round(time/const.minute,1)))
+            if self.show_time[0] and abs(time%self.show_time[1]-0.0) <= 1.e-1:
+                self.log.info('time = '+str(round(time/const.minute, 1)))
 
             # Communicate information
             #------------------------
@@ -107,7 +105,7 @@ class Turbine(Module):
             # Evolve one time step
             #---------------------
 
-            time = self.__step( time )
+            time = self.__step(time)
 
         return
 
@@ -117,7 +115,7 @@ class Turbine(Module):
         #-----------------------------------------
         # one way "to" outflow-1
 
-        # to 
+        # to
         if self.get_port('outflow-1').connected_port:
 
             message_time = self.recv('outflow-1')
@@ -132,13 +130,13 @@ class Turbine(Module):
             outflow_state['quality'] = steam_quality
             outflow_state['press'] = steam_press
 
-            self.send( (message_time, outflow_state), 'outflow-1' )
+            self.send((message_time, outflow_state), 'outflow-1')
 
         # Interactions in the steam-outflow-2 port
         #-----------------------------------------
         # one way "to" outflow-2
 
-        # to 
+        # to
         if self.get_port('outflow-2').connected_port:
 
             message_time = self.recv('outflow-2')
@@ -153,7 +151,7 @@ class Turbine(Module):
             outflow_state['quality'] = steam_quality
             outflow_state['press'] = steam_press
 
-            self.send( (message_time, outflow_state), 'outflow-2' )
+            self.send((message_time, outflow_state), 'outflow-2')
 
         # Interactions in the steam-inflow port
         #----------------------------------------
@@ -162,13 +160,13 @@ class Turbine(Module):
         # from
         if self.get_port('inflow').connected_port:
 
-            self.send( time, 'inflow' )
+            self.send(time, 'inflow')
 
             (check_time, inflow_state) = self.recv('inflow')
             assert abs(check_time-time) <= 1e-6
 
             self.temp = inflow_state['temp']
-            self.chi  = inflow_state['quality']
+            self.chi = inflow_state['quality']
 
         return
 
@@ -186,7 +184,6 @@ class Turbine(Module):
         None
 
         '''
-        import iapws.iapws97 as steam
 
         output = self.__turbine(time, self.temp, self.chi, self.params)
 
@@ -210,8 +207,8 @@ class Turbine(Module):
 
         return time
 
-    def __turbine(self, time, temp_in, x,  params):
-        #expand the entering steam from whatever temperature and pressure it enters at to 0.035 kpa, with 80% efficiency.
+    def __turbine(self, time, temp_in, x, params):
+        #expand the entering steam to 0.035 kpa, with 80% efficiency.
         #pressure of steam when it enters the turbine equals the current reactor operating pressure
         if self.params['high_pressure_turbine'] == True:
             p_in = steam_table._PSat_T(temp_in)
@@ -221,7 +218,7 @@ class Turbine(Module):
             p_in = self.params['turbine_inlet_pressure']
 
         p_out = self.params['turbine_outlet_pressure']
- 
+
         if temp_in <= 273.15 or p_in <= p_out: # if temp is below this the turbine will not work
             t_runoff = temp_in
             w_real = 0
@@ -263,7 +260,7 @@ class Turbine(Module):
         #assert(w_ideal > 0)
         w_real = w_ideal * params['turbine efficiency']
         h_real = inlet_enthalpy - w_ideal
-        assert(h_real > 0)
+        assert h_real > 0
 
         # if the real runoff is a superheated steam
         if h_real > dew_enthalpy:
@@ -275,7 +272,7 @@ class Turbine(Module):
             t_runoff = steam_table._Backward1_T_Ph(p_out, h_real)
             x_runoff = 2 # subcooled liquid
 
-        #if the real runoff is a two-phase mixture    
+        #if the real runoff is a two-phase mixture
         else:
             x_runoff = (h_real - bubl_enthalpy)/(dew_enthalpy - bubl_enthalpy) # saturated vapor
             t_runoff = steam_table._TSat_P(p_out)

@@ -6,7 +6,7 @@
 
 '''
 
-import logging
+#import logging
 import scipy.constants as unit
 import matplotlib.pyplot as plt
 
@@ -16,7 +16,7 @@ from cortix import Network
 from reactor import BWR
 from turbine import Turbine
 from condenser import Condenser
-from params import startup_params
+#from params import startup_params
 from params import shutdown_params
 
 def main():
@@ -33,17 +33,17 @@ def main():
 
     '''
 
-    # Preamble 
+    # Preamble
 
-    end_time  = 1 * unit.hour
+    end_time = 1 * unit.hour
     unit.second = 1.0
     time_step = 30.0 * unit.second
-    show_time = (True,5*unit.minute)
+    show_time = (True, 5*unit.minute)
 
     use_mpi = False  # True for MPI; False for Python multiprocessing
 
     # System top level
-    plant = Cortix( use_mpi=use_mpi, splash=True )
+    plant = Cortix(use_mpi=use_mpi, splash=True)
 
     # Network
     plant_net = plant.network = Network()
@@ -53,10 +53,10 @@ def main():
     # Create reactor module
     reactor = BWR(params)
 
-    reactor.name      = 'BWR'
-    reactor.save      = True
+    reactor.name = 'BWR'
+    reactor.save = True
     reactor.time_step = time_step
-    reactor.end_time  = end_time
+    reactor.end_time = end_time
     reactor.show_time = show_time
 
     # Add reactor module to network
@@ -71,7 +71,7 @@ def main():
     #params_turbine.inlet_pressure = 2
     #params.turbine_outlet_pressure = 0.5
 
-    turbine1   = Turbine( params )
+    turbine1 = Turbine(params)
 
     turbine1.name = 'High Pressure Turbine'
     turbine1.save = True
@@ -87,7 +87,7 @@ def main():
     params['high_pressure_turbine'] = False
     params['steam flowrate'] = params['steam flowrate']/2
 
-    turbine2   = Turbine(params)
+    turbine2 = Turbine(params)
 
     turbine2.name = 'Low Pressure Turbine 1'
     turbine2.save = True
@@ -101,7 +101,7 @@ def main():
     params['turbine_outlet_pressure'] = 0.005
     params['high_pressure_turbine'] = False
 
-    turbine3   = Turbine(params)
+    turbine3 = Turbine(params)
 
     turbine3.name = 'Low Pressure Turbine 2'
     turbine3.save = True
@@ -124,12 +124,12 @@ def main():
 
     #*****************************************************************************
     # Create the network connectivity
-    plant_net.connect( [reactor, 'coolant-outflow'], [turbine1,'inflow'] )
-    plant_net.connect( [turbine1, 'outflow-1'], [turbine2,'inflow'] )
-    plant_net.connect( [turbine1, 'outflow-2'], [turbine3, 'inflow'])
-    plant_net.connect( [turbine2, 'outflow-1'], [condenser, 'inflow-1'])
-    plant_net.connect( [turbine3, 'outflow-1'], [condenser, 'inflow-2'])
-    plant_net.connect( [condenser,'outflow'], [reactor,'coolant-inflow'] )
+    plant_net.connect([reactor, 'coolant-outflow'], [turbine1, 'inflow'])
+    plant_net.connect([turbine1, 'outflow-1'], [turbine2, 'inflow'])
+    plant_net.connect([turbine1, 'outflow-2'], [turbine3, 'inflow'])
+    plant_net.connect([turbine2, 'outflow-1'], [condenser, 'inflow-1'])
+    plant_net.connect([turbine3, 'outflow-1'], [condenser, 'inflow-2'])
+    plant_net.connect([condenser, 'outflow'], [reactor, 'coolant-inflow'])
 
     #*****************************************************************************
 
@@ -140,35 +140,35 @@ def main():
 
     plot_results = True
 
-    if plot_results and ( plant.use_multiprocessing or plant.rank == 0 ):
+    if plot_results and (plant.use_multiprocessing or plant.rank == 0):
 
         # Reactor graphs
         reactor = plant_net.modules[0]
 
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('neutron-dens')
 
-        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.formal_name+' ['+quant.unit+']')
+        quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
+                   y_label=quant.formal_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('neutron-dens.png', dpi=300)
 
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('delayed-neutrons-cc')
-        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.formal_name+' ['+quant.unit+']')
+        quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
+                   y_label=quant.formal_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('delayed-neutrons-cc.png', dpi=300)
 
         (quant, time_unit) = reactor.coolant_outflow_phase.get_quantity_history('temp')
 
-        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.formal_name+' ['+quant.unit+']')
+        quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
+                   y_label=quant.formal_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('coolant-outflow-temp.png', dpi=300)
 
         (quant, time_unit) = reactor.reactor_phase.get_quantity_history('fuel-temp')
 
-        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label ='Fuel Temp. [k]')
+        quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
+                   y_label='Fuel Temp. [k]')
         plt.grid()
         plt.savefig('fuel-temp.png', dpi=300)
 
@@ -177,17 +177,17 @@ def main():
 
         (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('power')
 
-        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.formal_name+' ['+quant.unit+']',
-                    title='High Pressure Turbine Power')
+        quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
+                   y_label=quant.formal_name+' ['+quant.unit+']',
+                   title='High Pressure Turbine Power')
         plt.grid()
         plt.savefig('turbine1-power.png', dpi=300)
 
         (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('temp')
 
-        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.formal_name+' ['+quant.unit+']',
-                    title='High Pressure Turbine Outflow Temperature')
+        quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
+                   y_label=quant.formal_name+' ['+quant.unit+']',
+                   title='High Pressure Turbine Outflow Temperature')
         plt.grid()
         plt.savefig('turbine1-outflow-temp.png', dpi=300)
 
@@ -196,17 +196,17 @@ def main():
 
         (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('power')
 
-        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.formal_name+' ['+quant.unit+']',
-                    title='Lower Pressure Turbine 1 Power')
+        quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
+                   y_label=quant.formal_name+' ['+quant.unit+']',
+                   title='Lower Pressure Turbine 1 Power')
         plt.grid()
         plt.savefig('turbine2-power.png', dpi=300)
 
         (quant, time_unit) = turbine2.outflow_phase.get_quantity_history('temp')
 
-        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.formal_name+' ['+quant.unit+']',
-                    title='Lower Pressure Turbine 1 Outflow Temperature')
+        quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
+                   y_label=quant.formal_name+' ['+quant.unit+']',
+                   title='Lower Pressure Turbine 1 Outflow Temperature')
         plt.grid()
         plt.savefig('turbine2-outflow-temp.png', dpi=300)
 
@@ -215,8 +215,8 @@ def main():
 
         (quant, time_unit) = condenser.outflow_phase.get_quantity_history('temp')
 
-        quant.plot( x_scaling=1/unit.minute, x_label='Time [m]',
-                    y_label=quant.formal_name+' ['+quant.unit+']')
+        quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
+                   y_label=quant.formal_name+' ['+quant.unit+']')
         plt.grid()
         plt.savefig('condenser-outflow-temp.png', dpi=300)
 
