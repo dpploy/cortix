@@ -9,9 +9,6 @@ import numpy as np
 import scipy.constants as const
 from scipy.integrate import odeint
 from cortix.src.module import Module
-from cortix.support.phase import Phase
-from cortix.support.specie import Specie
-from cortix.support.quantity import Quantity
 
 class Droplet(Module):
     '''
@@ -24,7 +21,7 @@ class Droplet(Module):
     `visualization` sends data to a visualization module.
     '''
 
-    def __init__(self):
+    def __init__(self, save=True):
         '''
         Attributes
         ----------
@@ -34,6 +31,8 @@ class Droplet(Module):
         show_time: tuple
             Two-element tuple, `(bool,float)`, `True` will print to standard
             output.
+        save: bool
+            Save droplet history across time
         '''
 
         super().__init__()
@@ -47,9 +46,11 @@ class Droplet(Module):
 
         self.bounce = True
         self.slip   = True
+        self.save   = save
 
-        species = list()
-        quantities = list()
+        if self.save:
+            self.positions = []
+            self.velocities = []
 
         self.ode_params = dict()
 
@@ -59,41 +60,11 @@ class Droplet(Module):
         self.ode_params['droplet-xsec-area'] = np.pi * (self.droplet_diameter/2.0)**2
         self.ode_params['gravity'] = const.g
 
-        # Species in the liquid phase
-        water = Specie(name='water', formula_name='H2O(l)', phase='liquid', \
-                atoms=['2*H','O'])
-        water.massCC =  0.99965 # [g/cc]
-        water.massCCUnit = 'g/cc'
-        water.molarCCUnit = 'mole/cc'
-        species.append(water)
 
-        droplet_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * water.massCC * \
+        water_massCC =  0.99965 # [g/cc]
+        droplet_mass = 4/3 * np.pi * (self.droplet_diameter/2)**3 * water_massCC * \
                 const.gram / const.centi**3  # [kg]
         self.ode_params['droplet-mass'] = droplet_mass
-
-        # Spatial position
-        x_0 = np.zeros(3)
-        position = Quantity(name='position', formalName='Pos.', unit='m', value=x_0)
-        quantities.append(position)
-
-        # Velocity
-        v_0 = np.zeros(3)
-        velocity = Quantity(name='velocity', formalName='Veloc.', unit='m/s', value=v_0)
-        quantities.append(velocity)
-
-        # Speed
-        speed = Quantity(name='speed', formalName='Speed', unit='m/s', value=0.0)
-        quantities.append(speed)
-
-        # Radial position
-        radial_pos = Quantity(name='radial-position', formalName='Radius', unit='m', \
-                value=np.linalg.norm(x_0[0:2]))
-        quantities.append(radial_pos)
-
-        # Liquid phase 
-        self.liquid_phase = Phase(self.initial_time, time_unit='s', species=species, \
-                quantities=quantities)
-        self.liquid_phase.SetValue('water', water.massCC, self.initial_time)
 
         # Domain box dimensions: LxLxH m^3 box with given H.
         # Origin of cartesian coordinate system at the bottom of the box. 
@@ -104,11 +75,9 @@ class Droplet(Module):
         # Random positioning of the droplet constrained to a box sub-region.
         x_0 = (2 * np.random.random(3) - np.ones(3)) * self.box_half_length / 4.0
         x_0[2] = self.box_height
-        self.liquid_phase.SetValue('position', x_0, self.initial_time)
 
-        # Droplet Initial velocity = 0 -> placed still in the flow
-        self.liquid_phase.SetValue('velocity', np.array([0.0,0.0,0.0]), \
-                self.initial_time)
+        self.initial_pos = self.position = x_0
+        self.velocity = np.zeros(3)
 
         # Default value for the medium surrounding the droplet if data is not passed
         # through a conneted port.
@@ -132,16 +101,11 @@ class Droplet(Module):
 
             # Interactions in the external-flow port
             #---------------------------------------
-
-            position = self.liquid_phase.GetValue('position')
-            self.send( (time,position), 'external-flow' )
-
-            (check_time, velocity,fluid_props) = self.recv( 'external-flow' )
+            self.send((time, self.position), 'external-flow')
+            (check_time, velocity,fluid_props) = self.recv('external-flow')
 
             assert abs(check_time-time) <= 1e-6
             self.ode_params['flow-velocity'] = velocity
-            #medium_mass_density  = fluid_props.mass_density  # see Vortex
-            #medium_dyn_viscosity = fluid_props.dyn_viscosity # see Vortex
             medium_mass_density  = fluid_props[0]
             medium_dyn_viscosity = fluid_props[1]
 
@@ -156,12 +120,12 @@ class Droplet(Module):
             # Interactions in the visualization port
             #---------------------------------------
 
-            self.send( position, 'visualization' )
+            self.send(self.position, 'visualization' )
 
             # Evolve droplet state to next time stamp
             #----------------------------------------
 
-            time = self.__step( time )
+            time = self.__step(time)
 
         self.send('DONE', 'visualization') # this should not be needed: TODO
         return
@@ -229,10 +193,7 @@ class Droplet(Module):
         '''
 
         if not self.bottom_impact:
-
-           x_0 = self.liquid_phase.GetValue('position', time)
-           v_0 = self.liquid_phase.GetValue('velocity', time)
-           u_vec_0 = np.concatenate((x_0,v_0))
+           u_vec_0 = np.concatenate((self.position,self.velocity))
 
            t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
@@ -248,11 +209,7 @@ class Droplet(Module):
 
            u_vec = u_vec_hist[1,:]  # solution vector at final time step
 
-        values = self.liquid_phase.GetRow(time) # values at previous time
-
         time += self.time_step
-
-        self.liquid_phase.AddRow(time, values)
 
         if not self.bottom_impact:
 
@@ -271,11 +228,14 @@ class Droplet(Module):
                 u_vec[3:] = 0.0  # zero velocity
                 self.bottom_impact = True
 
+
+            # Save values (if necessary)
+            if self.save:
+                self.positions.append(self.position)
+                self.velocities.append(self.velocity)
+
             # Update current values
-            self.liquid_phase.SetValue('position', u_vec[0:3], time)
-            self.liquid_phase.SetValue('velocity', u_vec[3:], time)
-            self.liquid_phase.SetValue('speed', np.linalg.norm(u_vec[3:]), time)
-            self.liquid_phase.SetValue('radial-position', np.linalg.norm(u_vec[0:2]),
-                    time)
+            self.position = u_vec[0:3]
+            self.velocity = u_vec[3:]
 
         return time

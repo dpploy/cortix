@@ -10,7 +10,7 @@ are made by variables listed below in the executable portion of this run file.
 To run this case using MPI you should compute the number of
 processes as follows:
 
-    `nprocs = n_droplets + 1 vortex + 1 cortix`
+    `nprocs = 2 * n_droplets + 1 cortix`
 
 then issue the MPI run command as follows (replace `nprocs` with a number):
 
@@ -25,14 +25,13 @@ command line as
 
 import scipy.constants as const
 
-
 from cortix import Cortix
 from cortix import Network
 from cortix.examples.droplet_swirl.droplet import Droplet
 from cortix.examples.droplet_swirl.vortex import Vortex
 
 
-def main():
+def main(n_droplets=5, end_time = 3 * const.minute, time_step = 0.2, create_plots=True):
     '''Cortix run file for a `Droplet`-`Vortex` network.
 
     Attributes
@@ -54,12 +53,6 @@ def main():
     '''
 
     # Configuration Parameters
-    n_droplets = 5
-    end_time   = 3*const.minute
-    time_step  = 0.2
-
-    create_plots = True
-
     if n_droplets >= 2000:
         create_plots = False
 
@@ -81,15 +74,13 @@ def main():
         vortex.plot_velocity()
 
     for i in range(n_droplets):
-
         # Droplet modules (multiple).
-        droplet = Droplet()
+        droplet = Droplet(save=create_plots)
         swirl.network.module(droplet)
         droplet.end_time = end_time
         droplet.time_step = time_step
         droplet.bounce = False
         droplet.slip = False
-        droplet.save = True
 
         # Network port connectivity (connect modules through their ports)
         swirl.network.connect( [droplet,'external-flow'],
@@ -111,10 +102,11 @@ def main():
 
             from mpl_toolkits.mplot3d import Axes3D
             import matplotlib.pyplot as plt
+            import numpy as np
 
             positions = list()
             for m in swirl.network.modules[1:]:
-                positions.append(m.liquid_phase.get_quantity_history('position')[0].value)
+                positions.append(m.positions)
 
             fig = plt.figure(1)
             ax = fig.add_subplot(111,projection='3d')
@@ -131,26 +123,26 @@ def main():
 
             # All droplets' speed
             fig = plt.figure(2)
-            plt.xlabel('Time [min]')
+            plt.xlabel('Time')
             plt.ylabel('Speed [m/s]')
             plt.title('All Droplets')
 
             for m in modules[1:]:
-                speed = m.liquid_phase.get_quantity_history('speed')[0].value
-                plt.plot(list(speed.index/60), speed.tolist())
+                speeds = [np.linalg.norm(vel) for vel in m.velocities]
+                plt.plot(speeds)
 
             plt.grid()
             fig.savefig('speeds.png', dpi=300)
 
             # All droplets' radial position
             fig = plt.figure(3)
-            plt.xlabel('Time [min]')
+            plt.xlabel('Time')
             plt.ylabel('Radial Position [m]')
             plt.title('All Droplets')
 
             for m in modules[1:]:
-                radial_pos = m.liquid_phase.get_quantity_history('radial-position')[0].value
-                plt.plot(list(radial_pos.index/60)[1:], radial_pos.tolist()[1:])
+                radial_pos = [np.linalg.norm(pos[0:2]) for pos in m.positions]
+                plt.plot(radial_pos[1:])
 
             plt.grid()
             fig.savefig('radialpos.png', dpi=300)
@@ -159,4 +151,6 @@ def main():
     swirl.close()
 
 if __name__ == '__main__':
-    main()
+    import sys
+    num_drops = int(sys.argv[1]) if len(sys.argv) > 1 else 5
+    main(n_droplets=num_drops, create_plots=True)
