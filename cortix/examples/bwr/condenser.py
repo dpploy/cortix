@@ -25,7 +25,7 @@ class Condenser(Module):
 
     '''
 
-    def __init__(self, ode_params):
+    def __init__(self, params):
         '''
         Parameters
         ----------
@@ -40,9 +40,9 @@ class Condenser(Module):
 
         quantities = list()
         self.ode_params = dict()
-        self.params = ode_params
-        self.initial_time = 0.0
-        self.end_time = 4.0 * const.hour
+        self.params = params
+        self.initial_time = params['start-time']
+        self.end_time = params['end-time']
         self.show_time = (False, 10.0)
         self.time_step = 10.0
         self.log = logging.getLogger('cortix')
@@ -57,7 +57,7 @@ class Condenser(Module):
         quantities.append(flowrate)
 
         temp = Quantity(name='temp', formal_name='Condenser Runoff Temp.', unit='K',
-                        value=273.15, info='Condenser Outflow Temperature', latex_name='$T_o$')
+                        value=params['condenser-runoff-temp'], info='Condenser Outflow Temperature', latex_name='$T_o$')
 
         quantities.append(temp)
 

@@ -42,8 +42,8 @@ class Turbine(Module):
 
         self.port_names_expected = ['inflow', 'outflow-1', 'outflow-2']
 
-        self.initial_time = 0.0 * const.day
-        self.end_time = 4 * const.hour
+        self.initial_time = params['start-time']
+        self.end_time = params['end-time']
         self.time_step = 10.0
         self.show_time = (False, 10.0)
 
@@ -52,7 +52,7 @@ class Turbine(Module):
         # Inflow phase history
         quantities = list()
 
-        temp = Quantity(name='temp', formal_name='T_in', unit='k', value=273.15,
+        temp = Quantity(name='temp', formal_name='T_in', unit='k', value=params['coolant-temp'],
                         info='Turbine Steam Inflow Temperature', latex_name='$T_i$')
 
         quantities.append(temp)
@@ -63,7 +63,7 @@ class Turbine(Module):
         # Outflow phase history
         quantities = list()
 
-        temp = Quantity(name='temp', formal_name='T_o', unit='k', value=273.15,
+        temp = Quantity(name='temp', formal_name='T_o', unit='k', value=params['turbine-outflow-temp'],
                         info='Turbine Steam Outflow Temperature', latex_name='$T_o$')
 
         quantities.append(temp)
@@ -74,12 +74,12 @@ class Turbine(Module):
 
         quantities.append(press)
 
-        x = Quantity(name='quality', formal_name='chi_t', unit='%', value=0.0,
+        x = Quantity(name='quality', formal_name='chi_t', unit='%', value=params['turbine-chi'],
                      info='Turbine Steam Outflow Quality', latex_name='$\chi_t$')
 
         quantities.append(x)
 
-        work = Quantity(name='power', formal_name='P_t', unit='W', value=0.0,
+        work = Quantity(name='power', formal_name='P_t', unit='W', value=params['turbine-work'],
                         info='Turbine Power', latex_name='$W_t$')
 
         quantities.append(work)

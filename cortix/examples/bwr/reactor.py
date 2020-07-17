@@ -41,8 +41,8 @@ class BWR(Module):
 
         self.params = params
 
-        self.initial_time = 0.0 * unit.day
-        self.end_time = 4 * unit.hour
+        self.initial_time = params['start-time']
+        self.end_time = params['end-time']
         self.time_step = 10.0
 
         self.show_time = (False, 10.0)
@@ -57,7 +57,7 @@ class BWR(Module):
 
         quantities.append(flowrate)
 
-        temp = Quantity(name='temp', formal_name='T_c', unit='K', value=273.15,
+        temp = Quantity(name='temp', formal_name='T_c', unit='K', value=params['coolant-temp'],
                         info='Reactor Outflow Coolant Temperature', latex_name='$T_c$')
 
         quantities.append(temp)
@@ -79,14 +79,12 @@ class BWR(Module):
         quantities = list()
 
         neutron_dens = Quantity(name='neutron-dens', formal_name='n', unit='1/m^3',
-                                value=0.0, info='Rel. Reactor Neutron Density', latex_name='$n$')
+                                value=params['n-dens'], info='Rel. Reactor Neutron Density', latex_name='$n$')
 
         quantities.append(neutron_dens)
 
-        delayed_neutrons_0 = np.zeros(6)
-
         delayed_neutron_cc = Quantity(name='delayed-neutrons-cc', formal_name='c_i',
-                                      unit='1/m^3 ', value=delayed_neutrons_0,
+                                      unit='1/m^3 ', value=params['delayed-neutron-cc'],
                                       info='Rel. Delayed Neutron Precursors', latex_name='$c_i$')
 
         quantities.append(delayed_neutron_cc)
@@ -98,7 +96,7 @@ class BWR(Module):
         quantities = list()
 
         fuel_temp = Quantity(name='fuel-temp', formalName='T_f', unit='k',
-                             value=273.15, info='Reactor Nuclear Fuel Temperature',
+                             value=params['fuel-temp'], info='Reactor Nuclear Fuel Temperature',
                              latex_name='$T_f$')
 
         quantities.append(fuel_temp)
@@ -113,7 +111,7 @@ class BWR(Module):
                                    quantities=quantities)
 
         # Initialize inflow
-        self.params['inflow-cool-temp'] = 273.15
+        self.params['inflow-cool-temp'] = params['condenser-runoff-temp']
 
         return
 

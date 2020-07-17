@@ -5,6 +5,17 @@ def startup_params():
     import iapws.iapws97 as steam_table
     import scipy.constants as unit
 
+    #initial SS values for reactor startup
+    params['turbine-outflow-temp'] = 293.15
+    params['turbine-chi'] = 0
+    params['turbine-inlet-temp'] = 293.15
+    params['condenser-runoff-temp'] = 287
+    params['n-dens'] = 0
+    params['fuel-temp'] = 293.15
+    params['coolant-temp'] = 293.15
+    params['delayed-neutron-cc'] = [0,0,0,0,0,0]
+    params['turbine-work'] = 0
+
     params['steam flowrate'] = 1820 #kg/s
     #Data pertaining to one-group energy neutron balance
     params['gen_time']     = 1.0e-4  # s
@@ -27,8 +38,7 @@ def startup_params():
     params['pipe_diameter'] = 0.1 #m
     params['liquid_velocity'] = 10 #m/s
     params['cooling water flowrate'] = 100000 #kg/s
-    params['heat transfer area'] = 3040 #m2, or 100 10m long, 0.1m diameter pipes
-
+    params['heat transfer area'] = 21000 #m2, or 500 4m long, 0.1m diameter pipes
     params['reg_rod_worth'] = 1.5e-4 # pcm
 
     params['n_dens_ss_operation'] = 1 #1.963e13/2200 * 1e4 #  #neutrons/m^2
