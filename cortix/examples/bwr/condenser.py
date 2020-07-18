@@ -6,8 +6,12 @@ Returns the runoff temperature of steam from the condenser.
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment.
 # https://cortix.org
+"""
+Cortix Example Module
+"""
 
 import logging
+import math
 
 import math
 import scipy.constants as const
@@ -19,20 +23,24 @@ from cortix.support.phase_new import PhaseNew as Phase
 from cortix import Quantity
 
 class Condenser(Module):
-    '''
-    Models a condenser with steam flowing perpendicular to several horizontal tubes.
-    Returns the runoff temperature of steam from the condenser.
+    """Boiling water reactor single-point reactor.
 
-    '''
+    Notes
+    -----
+    These are the `port` names available in this module to connect to respective
+    modules: `turbine`, and `pump`.
+    See instance attribute `port_names_expected`.
+    """
 
-    def __init__(self, params):
-        '''
+    def __init__(self, ode_params):
+        """Constructor.
+
         Parameters
         ----------
         params: dict
             All parameters for the module in the form of a dictionary.
 
-        '''
+        """
 
         super().__init__()
 
@@ -43,6 +51,7 @@ class Condenser(Module):
         self.params = params
         self.initial_time = params['start-time']
         self.end_time = params['end-time']
+
         self.show_time = (False, 10.0)
         self.time_step = 10.0
         self.log = logging.getLogger('cortix')
@@ -52,19 +61,19 @@ class Condenser(Module):
 
         flowrate = Quantity(name='condenser-runoff-flowrate',
                             formal_name='Condenser Runoff Flowrate', unit='kg/s', value=0.0,
-                            info='Condenser Outflow Flowrate', latex_name='$Q$')
+                            info='Condenser Outflow Flowrate', latex_name=r'$Q$')
 
         quantities.append(flowrate)
 
         temp = Quantity(name='temp', formal_name='Condenser Runoff Temp.', unit='K',
-                        value=params['condenser-runoff-temp'], info='Condenser Outflow Temperature', latex_name='$T_o$')
+                        value=params['condenser-runoff-temp'], info='Condenser Outflow Temperature', latex_name=r'$T_o$')
 
         quantities.append(temp)
 
         self.outflow_phase = Phase(self.initial_time, time_unit='s',
                                    quantities=quantities)
 
-        return
+        self.inflow_state = None
 
     def run(self, *args):
 
@@ -76,7 +85,9 @@ class Condenser(Module):
         while time < end_time + self.time_step:
 
             if self.show_time[0] and abs(time%self.show_time[1]-0.0) <= 1.e-1:
-                self.log.info('time = ', str(round(time/const.minute, 1)))
+
+                msg = 'time = '+str(round(time/unit.minute, 1))
+                self.log.info(msg)
 
             # Communicate information
             #------------------------
@@ -128,7 +139,7 @@ class Condenser(Module):
         return
 
     def __step(self, time):
-
+        import iapws.iapws97 as steam
         assert abs(time-self.inflow_state['time']) <= 1e-6
 
         temp_in = self.inflow_state['temp']
@@ -146,11 +157,11 @@ class Condenser(Module):
         return time
 
     def __condenser(self, time, temp_in, chi_in, params):
-        '''
-        Simple model to condense a vapor-liquid mixture and subcool it. Takes in either superheated
-        steam or a two-phase water mixture, and calculates the amount of surface area within a
-        simple condenser required to remove all degrees of superheat and condense the mixture.
-        '''
+        """Simple model to condense a vapor-liquid mixture and subcool it.
+        Takes in either superheated steam or a two-phase water mixture, and
+        calculates the amount of surface area within a simple condenser required to
+        remove all degrees of superheat and condense the mixture.
+        """
 
         critical_temp = steam_table._TSat_P(0.005)
         condenser_runoff = 14 + 273.15
@@ -158,6 +169,7 @@ class Condenser(Module):
             #return 293.15
             #x = x_in
 
+<<<<<<< HEAD
             #pressure = 0.005
             #h_steam = steam_table._Region2(temp_in, pressure)['h']
             #h_sat = steam_table._Region4(0.005, 1)['h']
@@ -197,6 +209,7 @@ class Condenser(Module):
             #average_ht_transfer_coeff = (high_heat_transfer_coeff + low_heat_transfer_coeff)/2
 
         if chi_in > 0:
+
             pressure = 0.005
             h_mixture = steam_table._Region4(pressure, chi_in)['h']
             h_dewpt = steam_table._Region4(pressure, 0)['h']
@@ -221,9 +234,11 @@ class Condenser(Module):
             liquid_rho = sat_liquid.rho
             liquid_prandlt = sat_liquid.Prandt
             liquid_viscosity = sat_liquid.mu
-            liquid_reynolds = (liquid_rho * pipe_diameter * liquid_velocity)/liquid_viscosity
+            liquid_reynolds = (liquid_rho * pipe_diameter * liquid_velocity)/\
+                    liquid_viscosity
 
-            liquid_nusselt = (0.3 + 0.629 * (liquid_reynolds ** 0.5) * liquid_prandlt**(1/3))
+            liquid_nusselt = (0.3 + 0.629 * (liquid_reynolds ** 0.5) * \
+                    liquid_prandlt**(1/3))
             liquid_nusselt = liquid_nusselt/(1+(0.4/liquid_prandlt)**(2/3))**(1/4)
             #nusselt number at the critical temperature according to the
             #churchill-bernstein correlation
@@ -242,12 +257,14 @@ class Condenser(Module):
                                                                          steam_viscosity)**0.5)
             xtt = math.sqrt(xtt)
 
-            #determine the overall heat transfer coefficient from the McNaught expression
+            #determine the overall heat transfer coefficient from the McNaught
+            #expression
             alpha_sh = liquid_heat_transfer_coeff * (1/xtt)**0.78
 
             #determine how far the two-phase mixture gets in the condenser
             #before being fully condensed
             condensation_area = (Q/(alpha_sh * lmtd))
+
             remaining_area = params['heat transfer area'] - condensation_area
             condenser_runoff = critical_temp
             #print(remaining_area)
@@ -264,12 +281,14 @@ class Condenser(Module):
             #1. calculate high nusselt number
             #2. guess a value for low temperature
             #3. calculate low nusselt number
-            #4. calculate LMTD and average heat transfer coefficient
+            #4. calculate lmtd and average heat transfer coefficient
             #5. calculate q
-            #6. use q to calculate a new ending temperature for the water and the vapor
+            #6. use q to calculate a new ending temperature for the water and the
+            #   vapor
             #7. rinse and repeat
 
-                final_coolant_temperature_guess = steam_table._TSat_P(0.005) - 10 # initial guess
+                # initial guess
+                final_coolant_temperature_guess = steam_table._TSat_P(0.005) - 10
                 final_runoff_temperature_guess = 300 # initial guess
                 final_runoff_temperature = 0 #iteration variable
 
@@ -290,31 +309,37 @@ class Condenser(Module):
 
                     #average wall temperatures
                     upper_wall_temp = (coolant_in + runoff_in)/2
-                    lower_wall_temp = (final_runoff_temperature + final_coolant_temperature_guess)/2
+                    lower_wall_temp = (final_runoff_temperature + \
+                            final_coolant_temperature_guess)/2
 
                     #high temperature heat transfer coefficient calculation
-                    high_properties = steam_table.IAPWS97(T=upper_wall_temp, P=pressure)
+                    high_properties = steam_table.IAPWS97(T=upper_wall_temp,
+                                                          P=pressure)
                     high_conductivity = high_properties.k
                     high_rho = high_properties.rho
                     high_prandlt = high_properties.Prandt
                     high_viscosity = high_properties.mu
-                    high_reynolds = (high_rho * pipe_diameter * liquid_velocity)/high_viscosity
+                    high_reynolds = (high_rho * pipe_diameter * liquid_velocity)/\
+                            high_viscosity
 
-                    high_nusselt = (0.3 + 0.629 * (high_reynolds ** 0.5) * high_prandlt**(1/3))
+                    high_nusselt = (0.3 + 0.629 * (high_reynolds ** 0.5) * \
+                            high_prandlt**(1/3))
                     high_nusselt = high_nusselt/(1+(0.4/high_prandlt)**(2/3))**(1/4)
                     high_nusselt = high_nusselt * (1 + (high_reynolds / 282000)**(5/6))**(4/4.5)
                     #overall convective heat transfer coefficient
                     high_heat_transfer_coeff = high_nusselt * (high_conductivity/pipe_diameter)
 
-                #   low temperature heat transfer coefficient calculation
+                    #   low temperature heat transfer coefficient calculation
                     low_properties = steam_table.IAPWS97(T=lower_wall_temp, P=pressure)
                     low_conductivity = low_properties.k
                     low_rho = low_properties.rho
                     low_prandlt = low_properties.Prandt
                     low_viscosity = low_properties.mu
-                    low_reynolds = (low_rho * pipe_diameter * liquid_velocity)/low_viscosity
+                    low_reynolds = (low_rho * pipe_diameter * \
+                            liquid_velocity)/low_viscosity
 
-                    low_nusselt = (0.3 + 0.629 * (low_reynolds ** 0.5) * low_prandlt**(1/3))
+                    low_nusselt = 0.3 + 0.629 * (low_reynolds ** 0.5) * \
+                            low_prandlt**(1/3)
                     low_nusselt = low_nusselt/(1+(0.4/low_prandlt)**(2/3))**(1/4)
                     low_nusselt = low_nusselt * (1 + (low_reynolds / 282000)**(5/6))**(4/4.5)
                     #overall convective heat transfer coefficient

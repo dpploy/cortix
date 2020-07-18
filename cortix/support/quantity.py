@@ -3,26 +3,26 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 import pandas
-import matplotlib
-matplotlib.use('Agg', warn=False)
+#import matplotlib
+#matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
 
 class Quantity:
-    '''
+    """
     todo: this probably should not have a "value" for the same reason as Species.
           this needs some thinking.
     well not so fast. This can be used to build a quantity with anything as a
     value. For instance a history of the quantity as a time series.
 
-    '''
+    """
     def __init__(self,
-                 name        = 'null-quantity-name',
-                 formalName  = 'null-quantity-formal-name', # deprecated
+                 name = 'null-quantity-name',
+                 formalName = 'null-quantity-formal-name', # deprecated
                  formal_name = 'null-quantity-formal-name',
                  latex_name = 'null-quantity-latex-name',
-                 value      = float(0.0),      # this can be any type
-                 unit       = 'null-quantity-unit',
-                 info       = 'null-quantity-info'
+                 value = float(0.0),      # this can be any type
+                 unit = 'null-quantity-unit',
+                 info = 'null-quantity-info'
                 ):
 
         assert isinstance(name, str), 'not a string.'
@@ -30,6 +30,8 @@ class Quantity:
 
         assert isinstance(formalName, str), 'not a string.'
         self.__formalName = formalName  # deprecated
+        self.__formal_name = formalName
+
         assert isinstance(formal_name, str), 'not a string.'
         self.__formal_name = formal_name
 
@@ -58,7 +60,6 @@ class Quantity:
         n: str
         '''
         self.__name = n
-
     def get_name(self):
         '''
         Returns the name of the quantity.
@@ -78,9 +79,9 @@ class Quantity:
         Parameters
         ----------
         v: float
+
         '''
         self.__value = v
-
     def GetValue(self):
         '''
         Gets the numerical value of the quantity.
@@ -88,8 +89,8 @@ class Quantity:
         Returns
         -------
         value: any type
-        '''
 
+        '''
         return self.__value
     value = property(GetValue, SetValue, None, None)
 
@@ -105,7 +106,6 @@ class Quantity:
 
         self.__formalName = fn
         self.__formal_name = fn
-
     def GetFormalName(self):
         '''
         Returns the formal name of the quantity.
@@ -131,7 +131,6 @@ class Quantity:
         '''
 
         self.__latex_name = ln
-
     def get_latex_name(self):
         '''
         Returns the formal name of the quantity.
@@ -155,7 +154,6 @@ class Quantity:
         '''
 
         self.__latex_name = ln
-
     def get_info(self):
         '''
         Returns the formal name of the quantity.
@@ -179,7 +177,6 @@ class Quantity:
         '''
 
         self.__unit = f
-
     def GetUnit(self):
         '''
         Returns the units of the quantity.
@@ -219,7 +216,14 @@ class Quantity:
         if not title:
             title = self.info
         if not y_label:
-            y_label = self.name
+            if self.latex_name != 'null-quantity-latex-name':
+                y_label = self.latex_name
+            elif self.formal_name != 'null-quantity-formal-name':
+                y_label = self.formal_name
+            elif self.name != 'null-quantity-name':
+                y_label = self.name
+            else:
+                assert False
 
         if isinstance(self.__value[0],float) or isinstance(self.__value[0],int) \
                 or isinstance(self.__value[0],bool):
@@ -242,12 +246,19 @@ class Quantity:
             y = list()
             for j in range(len(x)):
                 y.append( self.__value.iat[j][i] ) # must use iat()
+
+            y = [k*y_scaling for k in y]
+
             plt.xlabel(x_label)
             plt.ylabel(y_label)
+
             plt.title(title)
+
             plt.plot(x, y)
+
             if not same_axis and file_name:
-                plt.savefig(file_name+str(i)+'.png',dpi=dpi)
+                plt.savefig(file_name+str(i)+'.png', dpi=dpi)
+
         if same_axis and file_name:
             plt.savefig(file_name+'.png',dpi=dpi)
 

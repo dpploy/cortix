@@ -15,9 +15,9 @@ from cortix import Quantity
 
 class Community(Module):
     '''
-    Community Cortix module used to model criminal group population in a community system.
-    Community here is the system at large with all possible adult individuals included
-    in a society.
+    Community Cortix module used to model criminal group population in a
+    community system.  Community here is the system at large with all possible
+    adult individuals included in a society.
 
     Notes
     -----

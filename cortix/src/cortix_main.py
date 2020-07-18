@@ -107,7 +107,7 @@ class Cortix:
 
         '''
 
-        self.__network.run()
+        self.__network._Network__run()
 
         if self.rank==0 or self.use_multiprocessing:
             self.wall_clock_time_end = time.time()

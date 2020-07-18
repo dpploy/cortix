@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #startup params
 def startup_params():
     params = dict()
@@ -68,65 +69,11 @@ def startup_params():
     params['coolant_dens']   = 1000 #  kg/m3
     params['cp_coolant']     =  3500# J/(mol K) - > J/(kg K)
     params['coolant_volume'] = 7 #m3
+=======
+#all params
+def get_params():
+>>>>>>> master
 
-    params['ht_coeff'] = 45000000
-    params['turbine efficiency'] = 0.8
-    params['pump efficiency'] = 0.8
-
-    params['fis_prod_beta_energy_rate']  = 1.26 * 1.602e-13 # J/(fission sec) 1.26 t^-1.2 (t in seconds)
-    params['fis_prod_alpha_energy_rate'] = 1.40 * 1.602e-13 # J/(fission sec) 1.40 t^-1.2 (t in seconds)
-	# % subcooling based on the % subcooling that exists at steady state
-    params['% subcooling'] = 1 #(1 -(steam_table._Region4(7, 0)["h"]  - steam_table._Region1(493.15, 7)["h"])/(steam_table._Region4(7,0)["h"]))
-    params['shutdown temp reached'] = False
-    params['q_source_status'] = 'in' # is q_source inserted (in) or withdrawn (out)
-
-    params['malfunction start'] = 999 * unit.hour
-    params['malfunction end'] = 999 * unit.hour
-    params['shutdown time'] = 999 * unit.hour
-
-    gen_time = params['gen_time'] # retrieve neutron generation time
-    params['q_0'] = 0.1
-
-    params['n_ss'] = 0 # neutronless steady state before start up
-
-    rho_0_over_beta = 0.25 # $
-    beta = params['beta']
-
-    params['alpha_n'] = 0 # control rod reactivity worth; enough to cancel out the negative 
-
-    params['reactivity'] = rho_0_over_beta * beta # "rho/beta = 10 cents"
-
-    params['temp_0'] = params['temp_o']
-
-    params['tau_fake'] = 1 # s
-    params['malfunction subcooling'] = 0.75
-    params['alpha_n_malfunction'] = 0
-    n_species = len(params['species_decay'])
-    assert len(params['species_rel_yield']) == n_species
-    import numpy as np
-    c_vec_0 = np.zeros(n_species,dtype=np.float64) # initialize conentration vector
-    species_decay = params['species_decay'] # retrieve list of decay constants
-    lambda_vec    = np.array(species_decay) # create a numpy vector
-    beta = params['beta']
-    species_rel_yield = params['species_rel_yield']
-    beta_vec = np.array(species_rel_yield) * beta  # create the beta_i's vector
-    gen_time = params['gen_time'] # retrieve neutron generation time
-    n_ss = params['n_ss']
-    c_vec_ss = beta_vec/lambda_vec/gen_time * n_ss # compute the steady state precursors number density
-    params['c_vec_ss'] = c_vec_ss
-    # setup initial condition for variables
-    params['n_0']     = n_ss
-    params['c_vec_0'] = c_vec_ss
-    params['rho_0']   = params['reactivity']
-    params['temp_f_0'] = 300
-    params['temp_c_0'] = params['temp_0']
-    params['pressure_0'] = 1.013 # bar
-    params['turbine-runoff-pressure'] = 1
-    params['runoff-pressure'] = params['turbine-runoff-pressure']
-    return(params)
-
-#startup params
-def shutdown_params():
     params = dict()
     import math
     import iapws.iapws97 as steam_table
@@ -240,4 +187,5 @@ def shutdown_params():
     params['pressure_0'] = 1.013 # bar
     params['turbine-runoff-pressure'] = 1
     params['runoff-pressure'] = params['turbine-runoff-pressure']
+
     return(params)

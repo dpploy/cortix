@@ -20,13 +20,16 @@ class UMLRR(Module):
 
     Notes
     -----
-    These are the `port` names available in this module to connect to other
-    modules if any.
+    These are the `port` names available in this module
+
+      coolant-inflow, coolant-outflow, signal-out, signal-in
+
+    to connect to other modules if any.
     See instance attribute `port_names_expected`.
 
     '''
 
-    def __init__(self, params):
+    def __init__(self):
         '''
         Parameters
         ----------
@@ -38,75 +41,179 @@ class UMLRR(Module):
         super().__init__()
 
         self.port_names_expected = ['coolant-inflow', 'coolant-outflow',
-                                     'signal-out', 'signal-in']
+                                    'signal-out', 'signal-in']
 
-        self.params = params
+        unit.kg     = unit.kilo*unit.gram
+        unit.meter  = 1.0
+        unit.second = 1.0
+        unit.joule  = 1.0
+        unit.kj     = unit.kilo*unit.joule
+        unit.kelvin = 1.0
+        unit.watt   = 1.0
+        unit.barn   = 1.0e-28 * unit.meter**2
 
         self.initial_time = 0.0 * unit.day
         self.end_time     = 4 * unit.hour
-        self.time_step    = 10.0
+        self.time_step    = 10.0 * unit.second
         self.show_time    = (False,10.0)
-
         self.log = logging.getLogger('cortix')
 
-        # Coolant outflow phase history
-        quantities = list()
+        self.params = dict()
 
-        flowrate = Quantity(name='flowrate', formal_name='q_c', unit='kg/s', value=0.0,
-                info='Reactor Outflow Coolant Flowrate', latex_name='$q_c$')
+        # General parameters
 
-        quantities.append(flowrate)
+        #self.params['gen-time'] = 1.0e-4  # s
+        self.params['gen-time'] = 6.5e-5  # s
+        #self.params['beta']     = 6.5e-3  # 
+        self.params['beta']     = 7.8e-3  # 
+        #self.params['species-decay']     = [0.0124, 0.0305, 0.111, 0.301, 1.14, 3.01] # 1/sec
+        self.params['species-decay']     = [0.0127, 0.0317, 0.1160, 0.3111, 1.4003, 3.8708] # 1/sec
+        #self.params['species_rel_yield'] = [0.033, 0.219, 0.196, 0.395, 0.115, 0.042]
+        self.params['xi'] = [0.00026, 0.00146, 0.00129, 0.00279, 0.0008, 0.00018]
+        beta_i = xi*beta/sum(xi)
 
-        temp = Quantity(name='temp', formal_name='T_c', unit='K', value=273.15,
-                info='Reactor Outflow Coolant Temperature',latex_name='$T_c$')
+        self.params['alpha_n']       = -5e-4 # control rod reactivity worth
+        self.params['alpha_n']       = -5e-5 # control rod reactivity worth
+        self.params['alpha_tn_fake'] = -1e-4/20 # -1.0e-6
 
-        quantities.append(temp)
+        self.params['n_dens_ss_operation'] = 1e15 * 1e4 / 2200  # neutrons/m^2
 
-        self.coolant_outflow_phase = Phase(self.initial_time, time_unit='s',
-                quantities=quantities)
+        self.params['fis_energy']           = 180 * 1.602e-13 * unit.joule # per fission 
+        self.params['sigma_f_o']            = 586.2 * unit.barn
+        self.params['temp_o']               = unit.convert_temperature(20,'C','K')
+        self.params['temp_c_ss_operation']  = unit.convert_temperature(550,'C','K') # desired ss operation temp of coolant
+        self.params['temp_f_safe_max']      = unit.convert_temperature(1100,'C','K')
+        self.params['thermal_neutron_velo'] = 2200 * unit.meter/unit.second
+        self.params['fis_nuclide_num_dens_fake'] = 1e17/40 * 1.0e+6 # (fissile nuclei)/m3
+
+        self.params['fuel_dens']   = 2500 * unit.kg/unit.meter**3
+        self.params['cp_fuel']     = 720  * unit.joule/unit.kg/unit.kelvin
+        #self.params['fuel_volume'] = 1.5  * unit.meter**3
+        self.params['fuel_volume'] = 1.5  * unit.meter**3
+
+        self.params['coolant_dens']   = 0.1786 * unit.kg/unit.meter**3
+        self.params['cp_coolant']     = 20.78/4e-3 * unit.joule/unit.kg/unit.kelvin
+        self.params['coolant_volume'] = 0.8 * unit.meter**3
+
+        self.params['ht_coeff'] = 800 * unit.watt/unit.kelvin
+
+        self.params['strict'] = True # apply strict testing to some quantities
+
+        self.params['shutdown']      = False
+        self.params['shutdown_time'] = 0.0 # s
+        self.params['rho_shutdown']  = 0.0 # s
+
+        self.params['coolant_flowrate_forced'] = 1650.0 * unit.gallon/unit.minute
+
+        # Initial data parameters
+
+        gen_time = self.params['gen-time'] # retrieve neutron generation time
+        self.params['q_0'] = 1/gen_time # pulse at t = 0
+        self.params['n_ss']       = 0.0 # neutronless steady state before start up
+        self.params['n_dens_ref'] = 1.0
+        rho_0_over_beta = 0.5 # $
+        beta = self.params['beta'] # retrieve the delayed neutron fraction
+        self.params['reactivity'] = rho_0_over_beta * beta # "rho/beta = 10 cents"
+        self.params['temp_0'] = self.params['temp_o']
+        self.params['tau_fake'] = .025 # s residence time
+
+        # Setup steady state initial conditions
+
+        n_species = len(self.params['species-decay'])
+
+        assert len(self.params['species_rel_yield']) == n_species
+
+        c_vec_0 = np.zeros(n_species,dtype=np.float64) # initialize conentration vector
+
+        species_decay = self.params['species-decay'] # retrieve list of decay constants
+        lambda_vec    = np.array(species_decay) # create a numpy vector
+
+        species_rel_yield = self.params['species_rel_yield']
+        beta = self.params['beta']
+        beta_vec = np.array(species_rel_yield) * beta  # create the beta_i's vector
+
+        gen_time = self.params['gen-time'] # retrieve neutron generation time
+
+        n_ss = self.params['n_ss']
+        c_vec_ss = beta_vec/lambda_vec/gen_time * n_ss # compute the steady state precursors number density
+
+        self.params['c_vec_ss'] = c_vec_ss
+
+        # setup initial condition for variables
+        self.params['n_0']     = n_ss
+        self.params['c_vec_0'] = c_vec_ss
+        self.params['rho_0']   = self.params['reactivity']
+
+        self.params['temp_f_0'] = self.params['temp_0'] + 10.0 # helps startup integration
+        self.params['temp_c_0'] = self.params['temp_0']
 
         # Reactor phase history
         quantities = list()
 
-        neutron_dens = Quantity(name='neutron-dens', formal_name='n', unit='1/m^3',
-                value=0.0,
+        neutron_dens = Quantity( name='neutron-dens', formal_name='n', unit='1/m^3',
+                value=self.params['n_0'],
                 info='Reactor Neutron Density', latex_name='$n$')
 
         quantities.append(neutron_dens)
 
-        delayed_neutron_cc = Quantity(name='delayed-neutrons-cc', formal_name='c_i',
-                unit='1/m^3', value= np.zeros(6),
+        delayed_neutron_cc = Quantity( name='delayed-neutrons-cc', formal_name='c_i',
+                unit='1/m^3', value= self.params['c_vec_0'],
                 info='Delayed Neutron Precursors', latex_name='$c_i$')
 
         quantities.append(delayed_neutron_cc)
 
-        self.reactor_phase = Phase(self.initial_time, time_unit='s',
-                quantities=quantities)
-
-        # Reactor parameters
-        quantities = list()
-
-        fuel_temp = Quantity( name='fuel-temp', formalName='T_f', unit='k',
-                value=273.15, info='Reactor Nuclear Fuel Temperature',
+        fuel_temp = Quantity( name='fuel-temp', formal_name='T_f', unit='K',
+                value=self.params['temp_f_0'], info='Reactor Nuclear Fuel Temperature',
                 latex_name='$T_f$')
 
         quantities.append(fuel_temp)
 
-        self.reactor_phase = Phase(self.initial_time, time_unit='s', quantities=quantities)
+        temp_in = self.params['temp_c_0']
+        pwr_0 = self.params['coolant_volume']/self.params['tau_fake'] * \
+                self.params['coolant_dens'] * self.params['cp_coolant'] * \
+                (self.params['temp_c_0'] - temp_in)
+
+        power = Quantity( name='power', formal_name='Pwr', unit='W',
+                value=pwr_0, info='Reactor Power',
+                latex_name='$\mathrm{Prw}$')
+
+        quantities.append(power)
+
+        self.reactor_phase = Phase(self.initial_time, time_unit='s',
+                quantities=quantities)
+
+        # Coolant outflow phase history
+        quantities = list()
+
+        flowrate = Quantity( name='flowrate', formal_name='q_c', unit='kg/s', value=0.0,
+                info='Reactor Outflow Coolant Flowrate', latex_name='$q_c$')
+
+        quantities.append(flowrate)
+
+        temp = Quantity( name='temp', formal_name='T_c', unit='K',
+                value=self.params['temp_c_0'],
+                info='Reactor Outflow Coolant Temperature', latex_name='$T_c$')
+
+        quantities.append(temp)
+
+        self.coolant_phase = Phase(self.initial_time, time_unit='s',
+                quantities=quantities)
 
         # Initialize inflow
-        self.params['inflow-cool-temp'] = 273.15
+        self.params['inflow-cool-temp'] = self.params['temp_c_0']
+
+        self.__logit = False # flag for when to log throughout the code
 
         return
 
-    def run(self, *args):
+    def run(self):
 
         # Some logic for logging time stamps
         if self.initial_time + self.time_step > self.end_time:
             self.end_time = self.initial_time + self.time_step
 
         time = self.initial_time
-        self.two_time = time
+
         print_time = self.initial_time
         print_time_step = self.show_time[1]
         if print_time_step < self.time_step:
@@ -119,7 +226,7 @@ class UMLRR(Module):
             if self.show_time[0] and time>=print_time and \
                     time<print_time+print_time_step:
 
-                self.log.info(self.name+'::run():time[s]='+ str(round(time,1)))
+                self.log.info(self.name+'::run():time[m]='+ str(round(time/unit.minute,1)))
 
                 self.__logit = True
                 print_time += self.show_time[1]
@@ -129,7 +236,6 @@ class UMLRR(Module):
 
             # Communicate information
             #------------------------
-            self.two_time = time
             self.__call_ports(time)
 
             # Evolve one time step
@@ -139,51 +245,60 @@ class UMLRR(Module):
 
     def __call_ports(self, time):
 
+        # Interactions in the coolant-inflow port
+        #----------------------------------------
+        # one way "from" coolant-inflow
+
+        # receive from
+        if self.get_port('coolant-inflow').is_connected:
+
+            self.send( time, 'coolant-inflow' )
+            (check_time, coolant_stream) = self.recv('coolant-inflow')
+            assert abs(check_time-time) <= 1e-6
+            self.params['inflow-cool-temp'] = coolant_stream['temp']
+        #
+        # removed this later; must have a heat exchanger
+        # 
+        else:
+            coolant_stream = self.__get_coolant_stream( time )
+            if coolant_stream['temp'] < self.params['temp_c_ss_operation']:
+                self.params['inflow-cool-temp'] = coolant_stream['temp']
+            else:
+                self.params['inflow-cool-temp'] = self.params['temp_c_ss_operation']
+
         # Interactions in the coolant-outflow port
         #-----------------------------------------
         # one way "to" coolant-outflow
 
         # send to 
-        if self.get_port('coolant-outflow').connected_port:
+        if self.get_port('coolant-outflow').is_connected:
 
             message_time = self.recv('coolant-outflow')
-
-            coolant_outflow = self.__get_coolant_outflow( message_time )
-            outflow_params = dict()
-            self.send( (message_time, coolant_outflow), 'coolant-outflow' )
-
-        # Interactions in the coolant-inflow port
-        #----------------------------------------
-        # one way "from" coolant-inflow
-
-        #self.send( time, 'coolant-inflow' )
-
-        # receive from
-        if self.get_port('coolant-inflow').connected_port:
-
-            self.send( time, 'coolant-inflow' )
-            (check_time, inflow_cool_temp) = self.recv('coolant-inflow')
-
-            assert abs(check_time-time) <= 1e-6
-            self.params['inflow-cool-temp'] = inflow_cool_temp
+            coolant_stream = self.__get_coolant_stream( message_time )
+            self.send( (message_time, coolant_stream), 'coolant-outflow' )
 
         # Interactions in the signal-out port
         #-----------------------------------------
         # one way "to" signal-out 
 
         # send to 
-        if self.get_port('signal-out').connected_port:
+        if self.get_port('signal-out').is_connected:
 
             message_time = self.recv('signal-out')
-
             signal_out = self.__get_signal_out(time)
-
             self.send( (message_time, signal_out), 'signal-out' )
 
-    def __get_coolant_outflow(message_time):
+        # Interactions in the signal-in port
+        #-----------------------------------------
+        # one way "from" signal-in 
 
-        outflow = self.params['coolant-outflow']
-        return(outflow)
+        # receive from
+        if self.get_port('signal-in').is_connected:
+
+            self.send( time, 'signal-in' )
+            (check_time, signal_in) = self.recv('signal-in')
+            assert abs(check_time-time) <= 1e-6
+            self.params['signal-in'] = signal_in
 
     def __step(self, time=0.0):
         r'''
@@ -203,15 +318,14 @@ class UMLRR(Module):
         None
 
         '''
-        import iapws.iapws97 as steam
 
         # Get state values
         u_0 = self.__get_state_vector( time )
 
-        t_interval_sec = np.linspace(0.0, self.time_step, num=2)
+        t_interval = np.linspace(time, time+self.time_step, num=2)
 
         (u_vec_hist, info_dict) = odeint( self.__f_vec,
-                                          u_0, t_interval_sec,
+                                          u_0, t_interval,
                                           args=( self.params, ),
                                           rtol=1e-4, atol=1e-8, mxstep=200,
                                           full_output=True )
@@ -225,21 +339,27 @@ class UMLRR(Module):
         fuel_temp = u_vec[7]
         cool_temp = u_vec[8]
 
-        #update state variables
-        outflow  = self.coolant_outflow_phase.get_row(time)
-        neutrons = self.neutron_phase.get_row(time)
-        reactor  = self.reactor_phase.get_row(time)
-        self.params['outflow temp'] = cool_temp
+        outflow = self.coolant_phase.get_row(time)
+        reactor = self.reactor_phase.get_row(time)
+
+        # Advance time
         time += self.time_step
 
-        self.coolant_outflow_phase.add_row(time, outflow)
-        self.neutron_phase.add_row(time, neutrons)
+        # Update state variables
         self.reactor_phase.add_row(time, reactor)
+        self.coolant_phase.add_row(time, outflow)
 
-        self.coolant_outflow_phase.set_value('temp', cool_temp, time)
-        self.neutron_phase.set_value('neutron-dens', n_dens, time)
-        self.neutron_phase.set_value('delayed-neutrons-cc', c_vec, time)
+        self.reactor_phase.set_value('neutron-dens', n_dens, time)
+        self.reactor_phase.set_value('delayed-neutrons-cc', c_vec, time)
         self.reactor_phase.set_value('fuel-temp', fuel_temp, time)
+
+        temp_in = self.params['inflow-cool-temp']
+        pwr = self.params['coolant_volume']/self.params['tau_fake'] * \
+              self.params['coolant_dens'] * self.params['cp_coolant'] * \
+              (cool_temp - temp_in)
+        self.reactor_phase.set_value('power', pwr, time)
+
+        self.coolant_phase.set_value('temp', cool_temp, time)
 
         return time
 
@@ -250,7 +370,7 @@ class UMLRR(Module):
         Parameters
         ----------
         time: float
-            Time in SI unit.
+            Time.
 
         Returns
         -------
@@ -259,12 +379,13 @@ class UMLRR(Module):
         '''
 
         signals = dict()
+        signals['time'] = time
 
         return signals
 
-    def __get_coolant_outflow(self, time=0.0):
+    def __get_coolant_stream(self, time=0.0):
         '''
-        Get the coolant outflow stream.
+        Get the coolant outflow stream. Fully mixed system.
 
         Parameters
         ----------
@@ -277,33 +398,33 @@ class UMLRR(Module):
 
         '''
 
-        coolant_outflow_stream = dict()
+        coolant_stream = dict()
 
-        outflow_cool_temp = self.coolant_outflow_phase.get_value('temp', time)
+        outflow_cool_temp = self.coolant_phase.get_value('temp', time)
 
-        coolant_outflow_stream['temp'] = outflow_cool_temp
-        coolant_outflow_stream['quality'] = 0.7
-        return coolant_outflow_stream
+        coolant_stream['temp'] = outflow_cool_temp
+
+        return coolant_stream
 
     def __get_state_vector(self, time):
         '''
         Return a numpy array of all unknowns ordered as below:
-            neutron density (1), delayed neutron emmiter concentrations (6),
-            termperature of fuel (1), temperature of coolant (1).
+        neutron density (1), delayed neutron emmiter concentrations (6),
+        termperature of fuel (1), temperature of coolant (1).
         '''
 
         u_vec = np.empty(0,dtype=np.float64)
 
-        neutron_dens = self.neutron_phase.get_value('neutron-dens',time)
+        neutron_dens = self.reactor_phase.get_value('neutron-dens',time)
         u_vec = np.append( u_vec, neutron_dens )
 
-        delayed_neutrons_cc = self.neutron_phase.get_value('delayed-neutrons-cc',time)
+        delayed_neutrons_cc = self.reactor_phase.get_value('delayed-neutrons-cc',time)
         u_vec = np.append(u_vec, delayed_neutrons_cc)
 
         fuel_temp = self.reactor_phase.get_value('fuel-temp',time)
         u_vec = np.append( u_vec, fuel_temp)
 
-        temp = self.coolant_outflow_phase.get_value('temp',time)
+        temp = self.coolant_phase.get_value('temp',time)
         u_vec = np.append(u_vec, temp)
 
         # sanity check
@@ -312,71 +433,16 @@ class UMLRR(Module):
         return u_vec
 
     def __alpha_tn_func(self, temp, params):
-        import math
-        import scipy.misc as diff
-        import scipy.constants as unit
-        import iapws.iapws97 as steam
-        import iapws.iapws95 as steam2
+        '''
+        Reactivity temperature feedback coefficient.
 
-        pressure = steam._PSat_T(temp)
+        '''
 
-        d_rho = steam2.IAPWS95(P=pressure, T=temp-1).drhodT_P
+        alpha_tn = params['alpha_tn_fake']
 
-        #d_rho2 = diff.derivative(derivative_helper, temp) # dRho/dTm
-
-        rho = 1 / steam._Region4(pressure, 0)['v'] # mass density, kg/m3
-
-        Nm = ((rho * unit.kilo)/params['mod molar mass']) * unit.N_A * (unit.centi)**3 # number density of the moderator
-        d_Nm =  ((d_rho * unit.kilo)/params['mod molar mass']) * unit.N_A * (unit.centi)**3 #dNm/dTm
-        d_Nm = d_Nm * unit.zepto * unit.milli
-
-        mod_macro_a = params['mod micro a'] * Nm # macroscopic absorption cross section of the moderator
-        mod_macro_s = params['mod micro s'] * Nm # macroscopic scattering cross section of the moderator
-
-        F = params['fuel macro a']/(params['fuel macro a'] + mod_macro_a) # thermal utilization, F
-    #dF/dTm
-        d_F = -1*(params['fuel macro a'] * params['mod micro a'] * d_Nm)/(params['fuel macro a'] + mod_macro_a)**2
-
-        # Resonance escape integral, P
-        P = math.exp((-1 * params['n fuel'] * (params['fuel_volume']) * params['I'])/(mod_macro_s * 3000))
-        #dP/dTm
-        d_P = P * (-1 * params['n fuel'] * params['fuel_volume'] * unit.centi**3 * params['mod micro s'] * d_Nm)/(mod_macro_s * 3000 * unit.centi**3)**2
-
-        Eth = 0.0862 * temp # convert temperature to energy in MeV
-        E1 = mod_macro_s/math.log(params['E0']/Eth) # neutron thermalization macroscopic cross section
-
-        Df = 1/(3 * mod_macro_s * (1 - params['mod mu0'])) # neutron diffusion coefficient
-        tau = Df/E1 # fermi age, tau
-        #dTau/dTm
-        d_tau = (((0.0862 * (Eth/params['E0'])) * 3 * Nm) - math.log(params['E0']/Eth) * (params['mod micro s'] * d_Nm))/((3 * Nm)**2 * (1 - params['mod mu0']))
-
-        L = math.sqrt(1/(3 * mod_macro_s * mod_macro_a * (1 - params['mod mu0']))) # diffusion length L
-        # dL/dTm
-        d_L = 1/(2 * math.sqrt((-2 * d_Nm * unit.zepto * unit.milli)/(3 * params['mod micro s'] * params['mod micro a'] * (Nm * unit.zepto * unit.milli)**3 * (1 - params['mod mu0']))))
-
-        # left term of the numerator of the moderator temperature feedback coefficient, alpha
-        left_1st_term = d_tau * (params['buckling']**2 + L**2 * params['buckling']**4) #holding L as constant
-        left_2nd_term = d_L * (2 * L * params['buckling']**2 + 2 * L * tau * params['buckling']**4) # holding tau as constant
-        left_term = (P * F) * (left_1st_term + left_2nd_term) # combining with P and F held as constant
-
-        # right term of the numerator of the moderator temperature feedback coefficient, alpha
-
-        right_1st_term = (-1) * (1 + ((tau + L**2) * params['buckling']**2) + tau * L**2 * params['buckling']**4) # num as const
-        right_2nd_term = F * d_P # holding thermal utilization as constant
-        right_3rd_term = P * d_F # holding resonance escpae as constant
-        right_term = right_1st_term * (right_2nd_term + right_3rd_term) # combining all three terms together
-
-        # numerator and denominator
-        numerator = left_term + right_term
-        denominator = params['eta'] * params['epsilon'] * (F * P)**2
-
-        alpha_tn = numerator/denominator
-
-
-        alpha_tn = alpha_tn/3
         return alpha_tn
 
-    def __rho_func(self, t, n_dens, temp, params, ):
+    def __rho_func(self, t, n_dens, temp, params):
         '''
         Reactivity function.
 
@@ -396,43 +462,41 @@ class UMLRR(Module):
 
         Examples
         --------
+
         '''
 
-        rho_0  = params['rho_0']
-        temp_ref = params['temp_0']
-        n_dens_ss_operation = params['n_dens_ss_operation']
-        alpha_n = params['alpha_n']
+        if params['shutdown'] == False or \
+           (params['shutdown'] == True and time < params['shutdown_time']):
 
-        if temp < 293.15: # if temperature is less than the starting temperature then moderator feedback is zero
+            rho_0 = params['rho_0']
+            n_dens_ref = params['n_dens_ref']
+            temp_ref = params['temp_c_ss_operation']
+            alpha_n  = params['alpha_n']
+            alpha_tn = self.__alpha_tn_func( temp, params )
+
+        elif params['shutdown'] == True and time >= params['shutdown_time']:
+
+            rho_0 = params['rho_shutdown']
+            n_dens_ref = 0.0
+            temp_ref = params['temp_o']
+            alpha_n  = 0
             alpha_tn = 0
 
         else:
-            alpha_tn = self.__alpha_tn_func(temp , self.params) #alpha_tn_func(temp, params)
 
-        if t > params['malfunction start'] and t < params['malfunction end']: # reg rod held in position; only mod temp reactivity varies with time during malfunction
-            alpha_n = params['alpha_n_malfunction']
-            rho_t = rho_0 + alpha_n + alpha_tn * (temp - temp_ref)
+            assert False
 
-        elif t > params['shutdown time']: # effectively the inverse of startup; gradually reduce reactivity and neutron density.
-            rho_0 = -1 * n_dens * rho_0
-            alpha_n = rho_0 - (alpha_tn * (temp - temp_ref))
-            rho_t = rho_0
+        rho_t = rho_0 + alpha_n * (n_dens - n_dens_ref) + alpha_tn * (temp - temp_ref)
 
-        elif n_dens < 1e-5: #controlled startup w/ blade; gradually increase neutron density to SS value.
-            #rho_current = (1 - n_dens) * rho_0
-            #alpha_n = rho_current - rho_0 - alpha_tn * (temp - temp_ref)
-            #rho_t = rho_current
-            #params['alpha_n_malfunction'] = alpha_n
-            rho_t = rho_0
+        beta = params['beta']
 
-        else:
-            rho_current = (1 - n_dens) * rho_0
-            alpha_n = rho_current - rho_0 - alpha_tn * (temp - temp_ref)
-            rho_t = rho_current
-            params['alpha_n_malfunction'] = alpha_n
-        #print(n_dens)
+        if params['strict'] == True:
+            assert rho_t/beta < 1,\
+            'rho/beta = %r at time = %r; rho_0 = %r; rho_n = %r; rho_tn = %r'%\
+            ( rho_t/beta, time, rho_0/beta, alpha_n*(n_dens - n_dens_ref)/beta, \
+              alpha_tn*(temp - temp_ref)/beta )
 
-        return (rho_t, alpha_n, alpha_tn * (temp - temp_ref))
+        return rho_t
 
     def __q_source(self, t, params):
         '''
@@ -452,14 +516,16 @@ class UMLRR(Module):
 
         Examples
         --------
+
         '''
+
+        q = 0.0
         q_0 = params['q_0']
 
         if t <= 1e-5: # small time value
             q = q_0
         else:
             q = 0.0
-            params['q_source_status'] = 'out'
 
         return q
 
@@ -467,19 +533,19 @@ class UMLRR(Module):
         '''
         Place holder for implementation
         '''
-        sigma_f = params['sigma_f_o']  * math.sqrt(298/temp) * math.sqrt(math.pi) * 0.5
 
-        return(sigma_f)
+        sigma_f = params['sigma_f_o']
+
+        return sigma_f
 
     def __nuclear_pwr_dens_func(self, time, temp, n_dens, params ):
         '''
         Place holder for implementation
         '''
-        n_dens = n_dens + self.__q_source(time, self.params) # include the neutrons from the initial source
 
         rxn_heat = params['fis_energy'] # get fission reaction energy J per reaction
 
-        sigma_f = self.__sigma_fis_func( temp, self.params ) # m2
+        sigma_f = self.__sigma_fis_func( temp, params ) # m2
 
         fis_nuclide_num_dens = params['fis_nuclide_num_dens_fake'] #  #/m3
 
@@ -487,16 +553,16 @@ class UMLRR(Module):
 
         v_o = params['thermal_neutron_velo'] # m/s
 
-        neutron_flux = n_dens * 4.5e14 * v_o
+        neutron_flux = n_dens * params['n_dens_ss_operation'] * v_o
 
-         #reaction rate density
+        # reaction rate density
         rxn_rate_dens = Sigma_fis * neutron_flux
 
         # nuclear power source
         q3prime = - rxn_heat * rxn_rate_dens # exothermic reaction W/m3
-        #q3prime = - n_dens * 3323E6
-        #print("q3prime")
-        #print(q3prime)
+
+        if params['strict'] == True:
+            assert q3prime <= 0.0,"time = %r, q''' = %r, n_dens = %r"%(time,q3prime,n_dens)
 
         return q3prime
 
@@ -505,43 +571,46 @@ class UMLRR(Module):
         ht_coeff = params['ht_coeff']
 
         q_f = - ht_coeff * (temp_f - temp_c)
-        #print(q_f)
+
+        if params['strict'] == True:
+            assert q_f <= 0.0,'q_f = %r at time = %r; temp_f = %r, temp_c = %r'%(q_f,time,temp_f,temp_c)
+
         return q_f
 
     def __f_vec(self, u_vec, time, params):
-        num_negatives = u_vec[u_vec < 0]
+        '''
+        ODE RHS function
+        '''
 
-        if num_negatives.any() < 0:
-            assert np.max(abs(u_vec[u_vec < 0])) <= 1e-8, 'u_vec = %r'%u_vec
-
-        #assert np.all(u_vec >= 0.0), 'u_vec = %r'%u_vec
-        q_source_t = self.__q_source(time, self.params)
+        import numpy as np
+        #assert np.all(u_vec >= 0.0),'time = %r; u_vec = %r'%(time,u_vec)
 
         n_dens = u_vec[0] # get neutron dens
 
-        c_vec  = u_vec[1:-2] # get delayed neutron emitter concentration
+        c_vec = u_vec[1:-2] # get delayed neutron emitter concentration
 
         temp_f = u_vec[-2] # get temperature of fuel
 
         temp_c = u_vec[-1] # get temperature of coolant
 
-        # initialize f_vec to zero 
-        species_decay = params['species_decay']
-        lambda_vec = np.array(species_decay)
-        n_species  = len(lambda_vec)
+        # initialize f_vec to zero
+        species_decay = params['species-decay']
+        lambda_vec    = np.array(species_decay)
+        n_species     = len(lambda_vec)
+
+        assert len(lambda_vec)==len(c_vec)
 
         f_tmp = np.zeros(1+n_species+2,dtype=np.float64) # vector for f_vec return
 
         #----------------
         # neutron balance
         #----------------
-        print(self.two_time)
-        rho_t = self.__rho_func(self.two_time + time, n_dens, temp_c, self.params)[0]
+        rho_t    = self.__rho_func(time, n_dens, (temp_f+temp_c)/2.0, params)
 
-        beta = params['beta']
-        gen_time = params['gen_time']
+        beta     = params['beta']
+        gen_time = params['gen-time']
 
-        assert len(lambda_vec)==len(c_vec)
+        q_source_t = self.__q_source(time, params)
 
         f_tmp[0] = (rho_t - beta)/gen_time * n_dens + lambda_vec @ c_vec + q_source_t
 
@@ -552,8 +621,7 @@ class UMLRR(Module):
         species_rel_yield = params['species_rel_yield']
         beta_vec = np.array(species_rel_yield) * beta
 
-        assert len(lambda_vec)==len(c_vec)
-        assert len(beta_vec)==len(c_vec)
+        assert len(beta_vec)==len(lambda_vec)
 
         f_tmp[1:-2] = beta_vec/gen_time * n_dens - lambda_vec * c_vec
 
@@ -564,13 +632,11 @@ class UMLRR(Module):
         cp_f     = params['cp_fuel']
         vol_fuel = params['fuel_volume']
 
-        pwr_dens  = self.__nuclear_pwr_dens_func( time, (temp_f+temp_c)/2, n_dens, self.params)
+        pwr_dens = self.__nuclear_pwr_dens_func( time, (temp_f+temp_c)/2, n_dens, params )
 
-        heat_sink = self.__heat_sink_rate( time, temp_f, temp_c, self.params)
+        heat_sink = self.__heat_sink_rate( time, temp_f, temp_c, params )
 
-        #assert heat_sink <= 0.0,'heat_sink = %r'%heat_sink
-
-        f_tmp[-2] =  -1/rho_f/cp_f * ( pwr_dens - heat_sink/vol_fuel )
+        f_tmp[-2] = - 1/rho_f/cp_f * ( pwr_dens - heat_sink/vol_fuel )
 
         #-----------------------
         # coolant energy balance
@@ -579,19 +645,12 @@ class UMLRR(Module):
         cp_c     = params['cp_coolant']
         vol_cool = params['coolant_volume']
 
-        # subcooled liquid
-        pump_out = params['inflow-cool-temp']
+        temp_in = params['inflow-cool-temp']
 
         tau = params['tau_fake']
 
-        heat_source = heat_sink
-        temp_in = pump_out
+        heat_source = - heat_sink
 
-        f_tmp[-1] = - 1/tau * (temp_c - temp_in) - 1./rho_c/cp_c/vol_cool * heat_source
-
-        # pressure calculations
-
-        #print(time)
-        #print(u_vec)
+        f_tmp[-1] = - 1/tau * (temp_c - temp_in) + 1./rho_c/cp_c/vol_cool * heat_source
 
         return f_tmp
