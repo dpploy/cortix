@@ -210,16 +210,18 @@ class Turbine(Module):
     def __turbine(self, time, temp_in, x, params):
         #expand the entering steam to 0.035 kpa, with 80% efficiency.
         #pressure of steam when it enters the turbine equals the current reactor operating pressure
+
         if self.params['high_pressure_turbine'] == True:
             p_in = steam_table._PSat_T(temp_in)
             #print('not evaluated')
         else:
             #print('evaluated')
+            print(time, ' and x is: ', x)
             p_in = self.params['turbine_inlet_pressure']
 
         p_out = self.params['turbine_outlet_pressure']
 
-        if temp_in <= 273.15 or p_in <= p_out: # if temp is below this the turbine will not work
+        if temp_in <= 273.15: # if temp is below this the turbine will not work
             t_runoff = temp_in
             w_real = 0
             x = 0

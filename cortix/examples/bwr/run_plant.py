@@ -35,8 +35,8 @@ def main():
 
     # Preamble
 
-    end_time = 25 * unit.minute
-    time_step = 30.0 # seconds
+    end_time = 5 * unit.minute
+    time_step = 10.0 # seconds
     show_time = (True, 5*unit.minute)
 
     use_mpi = False  # True for MPI; False for Python multiprocessing
@@ -223,19 +223,19 @@ def main():
 
 
     #setup initial values for simulation
-    turbine1-outflow-temp = turbine1.outflow_phase.get_value('temp', end_time)
-    turbine1-chi = turbine1.outflow_phase.get_value('quality', end_time)
-    turbine1-power = turbine1.outflow_phase.get_value('power', end_time)
+    turbine1_outflow_temp = turbine1.outflow_phase.get_value('temp', end_time)
+    turbine1_chi = turbine1.outflow_phase.get_value('quality', end_time)
+    turbine1_power = turbine1.outflow_phase.get_value('power', end_time)
 
-    turbine2-outflow-temp = turbine2.outflow_phase.get_value('temp', end_time)
-    turbine2-chi = turbine2.outflow_phase.get_value('quality', end_time)
-    turbine2-power = turbine2.outflow_phase.get_value('power', end_time)
+    turbine2_outflow_temp = turbine2.outflow_phase.get_value('temp', end_time)
+    turbine2_chi = turbine2.outflow_phase.get_value('quality', end_time)
+    turbine2_power = turbine2.outflow_phase.get_value('power', end_time)
 
-    condenser-runoff-temp = condenser.outflow_phase.get_value('temp', end_time)
-    delayed-neutron-cc = reactor.neutron_phase.get_value('delayed-neutrons-cc', time)
-    n-dens = reactor.neutron_phase.get_value('neutron-dens', end_time)
-    fuel-temp = reactor.reactor_phase.get_value('fuel-temp', end_time)
-    coolant-temp = reactor.coolant_outflow_phase.get_value('temp', end_time)
+    condenser_runoff_temp = condenser.outflow_phase.get_value('temp', end_time)
+    delayed_neutron_cc = reactor.neutron_phase.get_value('delayed-neutrons-cc', end_time)
+    n_dens = reactor.neutron_phase.get_value('neutron-dens', end_time)
+    fuel_temp = reactor.reactor_phase.get_value('fuel-temp', end_time)
+    coolant_temp = reactor.coolant_outflow_phase.get_value('temp', end_time)
 
     # Properly shutdown simulation
     plant.close()
@@ -245,7 +245,7 @@ def main():
 
     # Preamble
     start_time = end_time
-    end_time = 1 * unit.hour
+    end_time = 10 * unit.minute
     time_step = 30.0 # seconds
     show_time = (True, 5*unit.minute)
 
@@ -256,21 +256,22 @@ def main():
 
     # Network
     plant_net = plant.network = Network()
+    params.clear()
     params = shutdown_params()
     params['start-time'] = start_time
     params['end-time'] = end_time
 
     #setup params
-    params['turbine-outflow-temp'] = turbine1-outflow-temp
-    params['turbine-chi'] = turbine1-chi
-    params['turbine-power'] = turbine1-power
+    params['turbine-outflow-temp'] = turbine1_outflow_temp
+    params['turbine-chi'] = turbine1_chi
+    params['turbine-work'] = turbine1_power
 
-    params['delayed-neutron-cc'] = delayed-neutron-cc
-    params['n-dens'] = n-dens
-    params['fuel-temp'] = fuel-temp
-    params['coolant-temp'] = coolant-temp
+    params['delayed-neutron-cc'] = delayed_neutron_cc
+    params['n-dens'] = n_dens
+    params['fuel-temp'] = fuel_temp
+    params['coolant-temp'] = coolant_temp
 
-    params['condenser-runoff-temp'] = condenser-runoff-temp
+    params['condenser-runoff-temp'] = condenser_runoff_temp
 
     # Create reactor module
     reactor = BWR(params)
@@ -299,14 +300,15 @@ def main():
     turbine1.save = True
     turbine1.time_step = time_step
     turbine1.end_time = end_time
-
+    print(turbine1.initial_time)
+    print(turbine1.outflow_phase.get_value('temp', 300))
     # Add turbine 1 module to network
     plant_net.module(turbine1)
 
     #*****************************************************************************
-    params['turbine-chi'] = turbine2-chi
-    params['turbine-outflow-temp'] = turbine2-outflow-temp
-    params['turbine-power'] = turbine2-power
+    params['turbine-chi'] = turbine2_chi
+    params['turbine-outflow-temp'] = turbine2_outflow_temp
+    params['turbine-work'] = turbine2_power
     params['turbine_inlet_pressure'] = 0.5
     params['turbine_outlet_pressure'] = 0.005
     params['high_pressure_turbine'] = False

@@ -181,7 +181,7 @@ class BWR(Module):
 
             assert abs(check_time-time) <= 1e-6
             self.params['inflow-cool-temp'] = inflow_cool_temp
-
+        self.params['inflow-cool-temp'] = 287
         # Interactions in the signal-out port
         #-----------------------------------------
         # one way "to" signal-out
@@ -460,7 +460,7 @@ class BWR(Module):
         '''
         q_0 = params['q_0']
 
-        if time <= 1500: # small time value
+        if time <= 20: # small time value
             q = q_0
         else:
             q = 0.0
