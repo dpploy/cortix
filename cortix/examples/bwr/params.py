@@ -1,6 +1,5 @@
-<<<<<<< HEAD
 #startup params
-def startup_params():
+def get_params():
     params = dict()
     import math
     import iapws.iapws97 as steam_table
@@ -10,7 +9,7 @@ def startup_params():
     params['turbine-outflow-temp'] = 293.15
     params['turbine-chi'] = 0
     params['turbine-inlet-temp'] = 293.15
-    params['condenser-runoff-temp'] = 287
+    params['condenser-runoff-temp'] = 287.15
     params['n-dens'] = 0
     params['fuel-temp'] = 293.15
     params['coolant-temp'] = 293.15
@@ -69,69 +68,6 @@ def startup_params():
     params['coolant_dens']   = 1000 #  kg/m3
     params['cp_coolant']     =  3500# J/(mol K) - > J/(kg K)
     params['coolant_volume'] = 7 #m3
-=======
-#all params
-def get_params():
->>>>>>> master
-
-    params = dict()
-    import math
-    import iapws.iapws97 as steam_table
-    import scipy.constants as unit
-
-    params['steam flowrate'] = 1820 #kg/s
-    #Data pertaining to one-group energy neutron balance
-    params['gen_time']     = 1.0e-4  # s
-    params['beta']         = 6.5e-3  #   params['k_infty']      = 1.3447
-    params['buckling'] = (math.pi/237.5)**2.0 + (2.405/410)**2.0 # geometric buckling; B = (pi/R)^2 + (2.405/H)^2  
-    params['q_0'] = 0.1
-    params['fuel macro a'] = 1.34226126162 #fuel macroscopic absorption cross section, cm^-1 
-    params['mod micro a'] = 0.332 * unit.zepto * unit.milli #moderator microscopic absorption cross section, cm^2
-    params['n fuel'] = 1.9577906e+21 #number density of the fuel, atoms/cm^3
-    params['I'] = 40.9870483 * unit.zepto * unit.milli  #resonance integral, I (dimensionless)
-    params['mod micro s'] = 20 * unit.zepto * unit.milli # moderator microscopic scattering cross section, cm^2
-    params['xi'] = 1 # average logarithmic energy decrement for light water
-    params['E0'] = 2 * unit.mega # energy of a neutron produced by fissioning, in electron volts
-    params['mod mu0'] = 0.71 # migration and diffusion area constants
-    params['eta'] = 1.03 # fast fission factor
-    params['epsilon'] = 2.05 # neutron multiplecation factor
-    params['mod molar mass'] = 18 # g/mol
-
-    #data required by the condenser
-    params['pipe_diameter'] = 0.1 #m
-    params['liquid_velocity'] = 10 #m/s
-    params['cooling water flowrate'] = 100000 #kg/s
-    params['heat transfer area'] = 21000 #m2, or 500 4m long, 0.1m diameter pipes
-
-    params['reg_rod_worth'] = 1.5e-4 # pcm
-
-    params['n_dens_ss_operation'] = 1 #1.963e13/2200 * 1e4 #  #neutrons/m^2
-
-    #Delayed neutron emission
-    params['species_decay']     = [0.0124, 0.0305, 0.111, 0.301, 1.14, 3.01] # 1/sec
-    params['species_rel_yield'] = [0.033, 0.219, 0.196, 0.395, 0.115, 0.042]
-
-    #Data pertaining to two-temperature heat balances
-    params['fis_energy']           = 180 * 1.602e-13 # J/fission 
-    params['enrich']               = 4.3/100.
-    params['fuel_mat_mass_dens']   = 10.5 # g/cc
-    #params['moderator_fuel_ratio'] = 387 # atomic number concentration ratio
-    params['sigma_f_o']            = 586.2 * 100 * 1e-30 # m2
-    params['temp_o']               = 20 + 273.15 # K
-    params['thermal_neutron_velo'] = 2200 # m/s
-
-    params['fis_nuclide_num_dens_fake'] = 9.84e26 # (fissile nuclei)/m3
-
-    params['q_c'] = 303 # volumetric flow rate
-
-    params['fuel_dens']   = 10500 # kg/m3
-    params['cp_fuel']     = 175 # J/(kg K)
-    params['fuel_volume'] = 7.25  # m3
-
-    params['steam flowrate'] = 1820 # kg/s
-    params['coolant_dens']   = 1000 #  kg/m3
-    params['cp_coolant']     =  3500# J/(mol K) - > J/(kg K)
-    params['coolant_volume'] = 7 #m3
 
     params['ht_coeff'] = 45000000
     params['turbine efficiency'] = 0.8
@@ -146,7 +82,7 @@ def get_params():
 
     params['malfunction start'] = 999 * unit.hour
     params['malfunction end'] = 999 * unit.hour
-    params['shutdown time'] = 0.5 * unit.hour
+    params['shutdown time'] = 999 * unit.hour
 
     gen_time = params['gen_time'] # retrieve neutron generation time
     params['q_0'] = 0.1
@@ -187,5 +123,4 @@ def get_params():
     params['pressure_0'] = 1.013 # bar
     params['turbine-runoff-pressure'] = 1
     params['runoff-pressure'] = params['turbine-runoff-pressure']
-
     return(params)

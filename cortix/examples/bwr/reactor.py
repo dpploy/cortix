@@ -182,7 +182,6 @@ class BWR(Module):
 
             assert abs(check_time-time) <= 1e-6
             self.params['inflow-cool-temp'] = inflow_cool_temp
-        self.params['inflow-cool-temp'] = 287
         # Interactions in the signal-out port
         #-----------------------------------------
         # one way "to" signal-out
@@ -195,11 +194,6 @@ class BWR(Module):
             #signal_out = self.__get_signal_out(time)
 
             self.send((message_time, signal_out), 'signal-out')
-
-    def __get_coolant_outflow(self, message_time):
-
-        outflow = self.params['coolant-outflow']
-        return outflow
 
     def __step(self, time=0.0):
         r"""ODE IVP problem.
@@ -274,7 +268,6 @@ class BWR(Module):
         coolant_outflow_stream = dict()
 
         outflow_cool_temp = self.coolant_outflow_phase.get_value('temp', time)
-
         coolant_outflow_stream['temp'] = outflow_cool_temp
         coolant_outflow_stream['quality'] = 0.7
 
@@ -307,7 +300,6 @@ class BWR(Module):
 
         d_rho = steam2.IAPWS95(P=pressure, T=temp-1).drhodT_P
 
-<<<<<<< HEAD
         rho = 1 / steam._Region4(pressure, 0)['v'] # mass density, kg/m3
 
         n_m = ((rho * unit.kilo)/params['mod molar mass']) * unit.N_A * (unit.centi)**3
@@ -368,7 +360,7 @@ class BWR(Module):
         # numerator and denominator
         numerator = left_term + right_term
         denominator = params['eta'] * params['epsilon'] * \
-                (thermal_util * resonan_escape)**2
+                (F * P)**2
 
         alpha_tn = numerator/denominator
 
@@ -459,8 +451,8 @@ class BWR(Module):
         """
         q_0 = params['q_0']
 
-        if time <= 20: # small time value
-            q = q_0
+        if time <= 30: # small time value
+            q_source = q_0
         else:
             q_source = 0.0
             params['q_source_status'] = 'out'
@@ -479,7 +471,6 @@ class BWR(Module):
     def __nuclear_pwr_dens_func(self, time, temp, n_dens, params):
         """Place holder for implementation.
         """
-        n_dens = n_dens + self.__q_source(time, self.params)
         # include the neutrons from the initial source
 
         rxn_heat = params['fis_energy'] # get fission reaction energy J per reaction

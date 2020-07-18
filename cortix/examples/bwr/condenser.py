@@ -32,7 +32,7 @@ class Condenser(Module):
     See instance attribute `port_names_expected`.
     """
 
-    def __init__(self, ode_params):
+    def __init__(self, params):
         """Constructor.
 
         Parameters
@@ -168,8 +168,6 @@ class Condenser(Module):
         #if chi_in == -1 and temp_in > critical_temp: #superheated vapor inlet; deprecated
             #return 293.15
             #x = x_in
-
-<<<<<<< HEAD
             #pressure = 0.005
             #h_steam = steam_table._Region2(temp_in, pressure)['h']
             #h_sat = steam_table._Region4(0.005, 1)['h']

@@ -80,7 +80,7 @@ class Turbine(Module):
         x = Quantity(name='quality', formal_name='chi_t', unit='%', value=params['turbine-chi'],
                      info='Turbine Steam Outflow Quality', latex_name=r'$\chi_t$')
 
-        quantities.append(steam_quality)
+        quantities.append(x)
 
         work = Quantity(name='power', formal_name='P_t', unit='W', value=params['turbine-work'],
                         info='Turbine Power', latex_name=r'$W_t$')
@@ -218,9 +218,7 @@ class Turbine(Module):
             # austin: I could not find a public method in the IAPWS class that does what the
             # private methods do. Therefore, I have to use the protected members.
             p_in = steam_table._PSat_T(temp_in)
-            #print('not evaluated')
         else:
-            #print('evaluated')
             p_in = self.params['turbine_inlet_pressure']
 
         p_out = self.params['turbine_outlet_pressure']
@@ -230,8 +228,7 @@ class Turbine(Module):
             w_real = 0
             steam_quality = 0
             return (t_runoff, w_real, steam_quality)
-
-        if temp_in < 373.15:
+        if temp_in < 373.15 and self.params['high_pressure_turbine']:
             # vfda: access of a protected member?
             t_runoff = steam_table._TSat_P(p_out)
             w_real = 0
@@ -268,6 +265,9 @@ class Turbine(Module):
             t_ideal = steam_table._Backward2_T_Ps(p_out, inlet_entropy)
             # vfda: access of a protected member?
             h_ideal = steam_table._Region2(t_ideal, p_out)['h']
+
+        if self.params['high_pressure_turbine']:
+            print(h_ideal)
 
         #calculate the real runoff enthalpy
         w_ideal = inlet_enthalpy - h_ideal #on a per mass basis
