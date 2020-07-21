@@ -41,6 +41,7 @@ class Turbine(Module):
         super().__init__()
 
         self.params = deepcopy(params)
+        self.params['entropy'] = 4.5 # Kj/Kg-K
 
         self.port_names_expected = ['inflow', 'outflow-1', 'outflow-2']
 
@@ -184,7 +185,8 @@ class Turbine(Module):
         -------
         None
         """
-
+        #if self.params['entropy'] < 6:
+            #self.params['entropy'] += 0.25
         output = self.__turbine(time, self.temp, self.chi, self.params)
 
         tmp = self.outflow_phase.get_row(time)
@@ -213,6 +215,8 @@ class Turbine(Module):
         # Pressure of steam when it enters the turbine equals the current reactor
         # operating pressure
 
+
+
         if self.params['high_pressure_turbine']:
             # vfda: access of a protected member?
             # austin: I could not find a public method in the IAPWS class that does what the
@@ -229,11 +233,15 @@ class Turbine(Module):
             steam_quality = 0
             return (t_runoff, w_real, steam_quality)
         if temp_in < 373.15 and self.params['high_pressure_turbine']:
-            # vfda: access of a protected member?
-            t_runoff = steam_table._TSat_P(p_out)
+            #vfda: access of a protected member?
+            t_runoff = temp_in
             w_real = 0
             steam_quality = -3
             return (t_runoff, w_real, steam_quality)
+        if temp_in < steam_table._TSat_P(0.5) and self.params['high_pressure_turbine'] == False:
+            t_runoff = temp_in
+            w_real = 0
+            return(t_runoff, w_real, steam_quality)
 
         #properties of the inlet steam
 
@@ -241,6 +249,11 @@ class Turbine(Module):
         inlet_parameters = steam_table._Region4(p_in, steam_quality)
         inlet_entropy = inlet_parameters['s']
         inlet_enthalpy = inlet_parameters['h']
+
+        if self.params['high_pressure_turbine']:
+            inlet_parameters = steam_table.IAPWS97(P=p_in, s=self.params['entropy'])
+            inlet_entropy = self.params['entropy']
+            inlet_enthalpy = inlet_parameters.h
 
         #bubble and dewpoint properties at turbine outlet
         # vfda: access of a protected member?
@@ -252,6 +265,8 @@ class Turbine(Module):
         bubl_enthalpy = bubl['h']
         dew_enthalpy = dew['h']
 
+        #print(bubl_entropy, inlet_entropy, dew_entropy, self.params['high_pressure_turbine'])
+
         #if the ideal runoff is two-phase mixture:
         #if inlet_entropy < dew_entropy and inlet_entropy > bubl_entropy:
         if  bubl_entropy < inlet_entropy < dew_entropy:
@@ -260,14 +275,11 @@ class Turbine(Module):
             h_ideal = steam_table._Region4(p_out, x_ideal)['h']
 
         #if the ideal runoff is a superheated steam
-        elif inlet_entropy > dew_entropy:
+        #elif inlet_entropy > dew_entropy:
             # vfda: access of a protected member?
-            t_ideal = steam_table._Backward2_T_Ps(p_out, inlet_entropy)
+            #t_ideal = steam_table._Backward2_T_Ps(p_out, inlet_entropy)
             # vfda: access of a protected member?
-            h_ideal = steam_table._Region2(t_ideal, p_out)['h']
-
-        if self.params['high_pressure_turbine']:
-            print(h_ideal)
+            #h_ideal = steam_table._Region2(t_ideal, p_out)['h']
 
         #calculate the real runoff enthalpy
         w_ideal = inlet_enthalpy - h_ideal #on a per mass basis
@@ -275,6 +287,8 @@ class Turbine(Module):
         w_real = w_ideal * params['turbine efficiency']
         h_real = inlet_enthalpy - w_ideal
         assert h_real > 0
+        if w_real < 0:
+            w_real = 0
 
         # if the real runoff is a superheated steam
         if h_real > dew_enthalpy:

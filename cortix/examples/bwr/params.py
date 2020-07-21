@@ -38,7 +38,7 @@ def get_params():
     params['pipe_diameter'] = 0.1 #m
     params['liquid_velocity'] = 10 #m/s
     params['cooling water flowrate'] = 100000 #kg/s
-    params['heat transfer area'] = 21000 #m2, or 500 4m long, 0.1m diameter pipes
+    params['heat transfer area'] = 25000 #m2, or 500 4m long, 0.1m diameter pipes
     params['reg_rod_worth'] = 1.5e-4 # pcm
 
     params['n_dens_ss_operation'] = 1 #1.963e13/2200 * 1e4 #  #neutrons/m^2
