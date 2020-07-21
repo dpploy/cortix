@@ -16,8 +16,7 @@ from cortix import Network
 from reactor import BWR
 from turbine import Turbine
 from condenser import Condenser
-from params import startup_params
-from params import shutdown_params
+from params import get_params
 
 def main():
     '''Cortix run file for a solvent extraction network.
@@ -47,7 +46,7 @@ def main():
     # Network
     plant_net = plant.network = Network()
 
-    params = startup_params()
+    params = get_params()
     params['start-time'] = 0
     params['end-time'] = end_time
 
@@ -70,7 +69,7 @@ def main():
     plant_net.draw()
 
     # Run network dynamics simulation
-    plant_net.run()
+    plant.run()
 
     plot_results = True
 
@@ -105,21 +104,6 @@ def main():
                    y_label='Fuel Temp. [k]')
         plt.grid()
         plt.savefig('test-fuel-temp.png', dpi=300)
-
-    #setup initial values for simulation
-    turbine1_outflow_temp = turbine1.outflow_phase.get_value('temp', end_time)
-    turbine1_chi = turbine1.outflow_phase.get_value('quality', end_time)
-    turbine1_power = turbine1.outflow_phase.get_value('power', end_time)
-
-    turbine2_outflow_temp = turbine2.outflow_phase.get_value('temp', end_time)
-    turbine2_chi = turbine2.outflow_phase.get_value('quality', end_time)
-    turbine2_power = turbine2.outflow_phase.get_value('power', end_time)
-
-    condenser_runoff_temp = condenser.outflow_phase.get_value('temp', end_time)
-    delayed_neutron_cc = reactor.neutron_phase.get_value('delayed-neutrons-cc', end_time)
-    n_dens = reactor.neutron_phase.get_value('neutron-dens', end_time)
-    fuel_temp = reactor.reactor_phase.get_value('fuel-temp', end_time)
-    coolant_temp = reactor.coolant_outflow_phase.get_value('temp', end_time)
 
     # Properly shutdown simulation
     plant.close()
