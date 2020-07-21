@@ -14,12 +14,10 @@ from cortix import Cortix
 from cortix import Network
 
 from reactor import BWR
-from turbine import Turbine
-from condenser import Condenser
 from params import get_params
 
 def main():
-    '''Cortix run file for a solvent extraction network.
+    """Cortix run file for a solvent extraction network.
 
     Attributes
     ----------
@@ -30,7 +28,7 @@ def main():
     use_mpi: bool
         If set to `True` use MPI otherwise use Python multiprocessing.
 
-    '''
+    """
 
     # Preamble
 
