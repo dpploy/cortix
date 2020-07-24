@@ -6,16 +6,11 @@ Returns the runoff temperature of steam from the condenser.
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment.
 # https://cortix.org
-"""
-Cortix Example Module
-"""
 
 import logging
 import math
 
-import math
-import scipy.constants as const
-import scipy.constants as sc
+import scipy.constants as unit
 import iapws.iapws97 as steam_table
 
 from cortix import Module
@@ -139,7 +134,6 @@ class Condenser(Module):
         return
 
     def __step(self, time):
-        import iapws.iapws97 as steam
         assert abs(time-self.inflow_state['time']) <= 1e-6
 
         temp_in = self.inflow_state['temp']
@@ -163,7 +157,7 @@ class Condenser(Module):
         remove all degrees of superheat and condense the mixture.
         """
         if chi_in == -5:
-            return(temp_in)
+            return temp_in
 
         #print(time, ' chi_in is ', chi_in)
         critical_temp = steam_table._TSat_P(0.005)
@@ -186,24 +180,24 @@ class Condenser(Module):
 
             #low_conductivity = low.k
             #low_rho = low.rho
-            #low_prandlt = low.Prandt
+            #low_prandtl = low.Prandt
             #low_viscosity = low.mu
             #low_reynolds = (low_rho * 0.1 * 40)/low_viscosity
-            #low_nusselt = (0.3 + 0.629 * (low_reynolds ** 0.5) * low_prandlt**(1/3))
-            #low_nusselt = low_nusselt/(1+(0.4/low_prandlt)**(2/3))**(1/4)
+            #low_nusselt = (0.3 + 0.629 * (low_reynolds ** 0.5) * low_prandtl**(1/3))
+            #low_nusselt = low_nusselt/(1+(0.4/low_prandtl)**(2/3))**(1/4)
             #low_nusselt = low_nusselt * (1 + (low_reynolds / 282000)**(5/6))**(4/4.5)
             #nusselt number at the crtical temperature according to the
             #churchill-bernsetin correlation
             #low_heat_transfer_coeff = low_nusselt * (low.k/0.1)
 
             #high_rho = high.rho
-            #high_prandlt = high.Prandt
+            #high_prandtl = high.Prandt
             #high_viscocity = high.mu
             #high_conductivity = high.k
             #high_viscosity = high.mu
             #high_reynolds = (high_rho * 0.1 * 40)/high_viscosity
-            #high_nusselt = (0.3 + 0.629 * (high_reynolds ** 0.5) * high_prandlt**(1/3))
-            #high_nusselt = high_nusselt/(1+(0.4/high_prandlt)**(2/3))**(1/4)
+            #high_nusselt = (0.3 + 0.629 * (high_reynolds ** 0.5) * high_prandtl**(1/3))
+            #high_nusselt = high_nusselt/(1+(0.4/high_prandtl)**(2/3))**(1/4)
             #high_nusselt = high_nusselt * (1 + (high_reynolds / 282000)**(5/6))**(4/4.5)
             #high_heat_transfer_coeff = high_nusselt * (high_conductivity/0.1)
 
@@ -214,17 +208,19 @@ class Condenser(Module):
             pressure = 0.005
             h_mixture = steam_table._Region4(pressure, chi_in)['h']
             h_dewpt = steam_table._Region4(pressure, 0)['h']
-            Q = (h_mixture - h_dewpt) * sc.kilo * params['steam flowrate']
+            heat_pwr = (h_mixture - h_dewpt) * unit.kilo * params['steam flowrate']
 
             critical_temp = temp_in
             critical_temp = steam_table._TSat_P(pressure)
             sat_liquid = steam_table.IAPWS97(T=critical_temp - 1, P=pressure)
             water_cp = steam_table.IAPWS97(T=287.15, P=0.1013).cp
-            delta_tb = Q/(params['cooling water flowrate'] * water_cp * sc.kilo)
+            delta_tb = heat_pwr/(params['cooling water flowrate'] * \
+                    water_cp * unit.kilo)
             t_c_in = 14 + 273.15
             t_c_out = 14 + 273.15 + delta_tb
 
-            lmtd = (t_c_out - t_c_in)/(math.log(critical_temp - t_c_in))/(critical_temp - t_c_out)
+            lmtd = (t_c_out - t_c_in)/(math.log(critical_temp - t_c_in))/\
+                    (critical_temp - t_c_out)
 
             pipe_diameter = params['pipe_diameter']
             liquid_velocity = params['liquid_velocity']
@@ -233,14 +229,14 @@ class Condenser(Module):
             #from the Churchill-Bernstein correlation
             liquid_conductivity = sat_liquid.k
             liquid_rho = sat_liquid.rho
-            liquid_prandlt = sat_liquid.Prandt
+            liquid_prandtl = sat_liquid.Prandt
             liquid_viscosity = sat_liquid.mu
             liquid_reynolds = (liquid_rho * pipe_diameter * liquid_velocity)/\
                     liquid_viscosity
 
             liquid_nusselt = (0.3 + 0.629 * (liquid_reynolds ** 0.5) * \
-                    liquid_prandlt**(1/3))
-            liquid_nusselt = liquid_nusselt/(1+(0.4/liquid_prandlt)**(2/3))**(1/4)
+                    liquid_prandtl**(1/3))
+            liquid_nusselt = liquid_nusselt/(1+(0.4/liquid_prandtl)**(2/3))**(1/4)
             #nusselt number at the critical temperature according to the
             #churchill-bernstein correlation
             liquid_nusselt = liquid_nusselt * (1 + (liquid_reynolds / 282000)**(5/6))**(4/4.5)
@@ -264,7 +260,7 @@ class Condenser(Module):
 
             #determine how far the two-phase mixture gets in the condenser
             #before being fully condensed
-            condensation_area = (Q/(alpha_sh * lmtd))
+            condensation_area = (heat_pwr/(alpha_sh * lmtd))
 
             remaining_area = params['heat transfer area'] - condensation_area
             condenser_runoff = critical_temp
@@ -319,14 +315,14 @@ class Condenser(Module):
                                                           P=pressure)
                     high_conductivity = high_properties.k
                     high_rho = high_properties.rho
-                    high_prandlt = high_properties.Prandt
+                    high_prandtl = high_properties.Prandt
                     high_viscosity = high_properties.mu
                     high_reynolds = (high_rho * pipe_diameter * liquid_velocity)/\
                             high_viscosity
 
                     high_nusselt = (0.3 + 0.629 * (high_reynolds ** 0.5) * \
-                            high_prandlt**(1/3))
-                    high_nusselt = high_nusselt/(1+(0.4/high_prandlt)**(2/3))**(1/4)
+                            high_prandtl**(1/3))
+                    high_nusselt = high_nusselt/(1+(0.4/high_prandtl)**(2/3))**(1/4)
                     high_nusselt = high_nusselt * (1 + (high_reynolds / 282000)**(5/6))**(4/4.5)
                     #overall convective heat transfer coefficient
                     high_heat_transfer_coeff = high_nusselt * (high_conductivity/pipe_diameter)
@@ -335,14 +331,14 @@ class Condenser(Module):
                     low_properties = steam_table.IAPWS97(T=lower_wall_temp, P=pressure)
                     low_conductivity = low_properties.k
                     low_rho = low_properties.rho
-                    low_prandlt = low_properties.Prandt
+                    low_prandtl = low_properties.Prandt
                     low_viscosity = low_properties.mu
                     low_reynolds = (low_rho * pipe_diameter * \
                             liquid_velocity)/low_viscosity
 
                     low_nusselt = 0.3 + 0.629 * (low_reynolds ** 0.5) * \
-                            low_prandlt**(1/3)
-                    low_nusselt = low_nusselt/(1+(0.4/low_prandlt)**(2/3))**(1/4)
+                            low_prandtl**(1/3)
+                    low_nusselt = low_nusselt/(1+(0.4/low_prandtl)**(2/3))**(1/4)
                     low_nusselt = low_nusselt * (1 + (low_reynolds / 282000)**(5/6))**(4/4.5)
                     #overall convective heat transfer coefficient
                     low_heat_transfer_coeff = low_nusselt * (low_conductivity/pipe_diameter)
@@ -359,12 +355,12 @@ class Condenser(Module):
                     coolant_cp = steam_table.IAPWS97(T=coolant_in, P=0.005).cp
                     iterated_coolant_final_temp = ((q_1/(coolant_cp *
                                                          params['cooling water flowrate']
-                                                         * sc.kilo)) + coolant_in)
+                                                         * unit.kilo)) + coolant_in)
 
                     steam_cp = steam_table.IAPWS97(T=runoff_in, P=0.005).cp
                     iterated_steam_final_temp = (runoff_in - (q_1/(steam_cp *
                                                                    params['steam flowrate'] *
-                                                                   sc.kilo)))
+                                                                   unit.kilo)))
 
                     if (iterated_steam_final_temp < coolant_in or
                             iterated_coolant_final_temp > runoff_in or
