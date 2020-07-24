@@ -213,8 +213,8 @@ class Turbine(Module):
         # at to 0.035 kpa, with 80% efficiency.
         # Pressure of steam when it enters the turbine equals the current reactor
         # operating pressure
-        if self.params['high_pressure_turbine']:
-            print(time, ' and temp is', temp_in)
+        #if self.params['high_pressure_turbine']:
+            #print(time, ' and temp is', temp_in)
         if self.params['high_pressure_turbine']:
             # vfda: access of a protected member?
             # austin: I could not find a public method in the IAPWS class that does what the
@@ -332,8 +332,8 @@ class Turbine(Module):
         #print(self.params['high_pressure_turbine'], ' and time is ', time, ' and x is ', x_runoff)
         #w_real = heat_removed
 
-        if t_runoff < steam_table._TSat_P(0.5) and params['high_pressure_turbine'] == False:
-            t_runoff = temp_in
-            x_runoff = -5
-            w_real = 0
+        #if t_runoff < steam_table._TSat_P(0.5) and params['high_pressure_turbine'] == False:
+            #t_runoff = temp_in
+            #x_runoff = -5
+            #w_real = 0
         return (t_runoff, w_real, x_runoff)
