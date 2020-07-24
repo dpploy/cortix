@@ -10,6 +10,7 @@ import logging
 from copy import deepcopy
 
 import scipy.constants as unit
+import numpy as math
 
 import iapws.iapws97 as steam_table
 
@@ -185,8 +186,6 @@ class Turbine(Module):
         -------
         None
         """
-        #if self.params['entropy'] < 6:
-            #self.params['entropy'] += 0.25
         output = self.__turbine(time, self.temp, self.chi, self.params)
 
         tmp = self.outflow_phase.get_row(time)
@@ -198,8 +197,8 @@ class Turbine(Module):
         t_runoff = output[0]
 
         x_runoff = output[2]
-        if x_runoff < 0 and x_runoff != -1:
-            x_runoff = 0
+        #if x_runoff < 0 and x_runoff != -1:
+            #x_runoff = 0
 
         w_turbine = output[1]
 
@@ -214,9 +213,8 @@ class Turbine(Module):
         # at to 0.035 kpa, with 80% efficiency.
         # Pressure of steam when it enters the turbine equals the current reactor
         # operating pressure
-
-
-
+        if self.params['high_pressure_turbine']:
+            print(time, ' and temp is', temp_in)
         if self.params['high_pressure_turbine']:
             # vfda: access of a protected member?
             # austin: I could not find a public method in the IAPWS class that does what the
@@ -251,9 +249,30 @@ class Turbine(Module):
         inlet_enthalpy = inlet_parameters['h']
 
         if self.params['high_pressure_turbine']:
-            inlet_parameters = steam_table.IAPWS97(P=p_in, s=self.params['entropy'])
-            inlet_entropy = self.params['entropy']
-            inlet_enthalpy = inlet_parameters.h
+            inlet_parameters = steam_table.IAPWS97(P=p_in, x=0)
+            #inlet_entropy = self.params['entropy']
+            #inlet_enthalpy = inlet_parameters.h
+            
+            #testing the entropy modell
+            base_temp = 373.15 # K
+            base_pressure = 0.101 # mPa
+            base_params = steam_table.IAPWS97(P=base_pressure, x=0) # bubl pt 373.15 K
+            base_entropy = base_params.s # Kj/Kg-K
+            base_cp = base_params.Liquid.cp # Kj/Kg-K
+            inlet_cp = inlet_parameters.Liquid.cp # Kj/Kg-K
+            average_cp = (base_cp + inlet_cp)/2
+
+            delta_s =  average_cp * math.log(temp_in/base_temp) - (unit.R/1000) * math.log(p_in/base_pressure)
+
+            inlet_entropy = (delta_s + base_entropy) * 1.25 # fudge factor
+            bubl_entropy = inlet_parameters.Liquid.s
+            bubl_enthalpy = inlet_parameters.Liquid.h
+
+            inlet_parameters = steam_table.IAPWS97(P=p_in, x=1)
+            dew_entropy = inlet_parameters.Vapor.s
+            dew_enthalpy = inlet_parameters.Vapor.h
+            quality = (inlet_entropy - bubl_entropy)/(dew_entropy - bubl_entropy)
+            inlet_enthalpy = quality * dew_enthalpy + (1 - quality) * bubl_enthalpy
 
         #bubble and dewpoint properties at turbine outlet
         # vfda: access of a protected member?
@@ -310,6 +329,11 @@ class Turbine(Module):
             t_runoff = steam_table._TSat_P(p_out)
 
         w_real = w_real * params['steam flowrate'] * unit.kilo
+        #print(self.params['high_pressure_turbine'], ' and time is ', time, ' and x is ', x_runoff)
         #w_real = heat_removed
 
+        if t_runoff < steam_table._TSat_P(0.5) and params['high_pressure_turbine'] == False:
+            t_runoff = temp_in
+            x_runoff = -5
+            w_real = 0
         return (t_runoff, w_real, x_runoff)

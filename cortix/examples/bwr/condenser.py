@@ -162,6 +162,9 @@ class Condenser(Module):
         calculates the amount of surface area within a simple condenser required to
         remove all degrees of superheat and condense the mixture.
         """
+        if chi_in == -5:
+            return(temp_in)
+
         #print(time, ' chi_in is ', chi_in)
         critical_temp = steam_table._TSat_P(0.005)
         condenser_runoff = 14 + 273.15
@@ -265,12 +268,13 @@ class Condenser(Module):
 
             remaining_area = params['heat transfer area'] - condensation_area
             condenser_runoff = critical_temp
-            #print(remaining_area)
+            print(remaining_area)
             #if time > params['malfunction start'] and time < params['malfunction end']:
                 #condenser_runoff = 14 + 273.15
 
             if remaining_area < 0:
                 condenser_runoff = 14 + 273.15
+                print(time, ' benis')
 
             elif remaining_area > 0:
             #subcool the remaining liquid
