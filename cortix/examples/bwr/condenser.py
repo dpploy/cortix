@@ -9,6 +9,8 @@ Returns the runoff temperature of steam from the condenser.
 
 import logging
 import math
+import numpy as np
+import matplotlib.pyplot as pyplot
 
 import scipy.constants as unit
 import iapws.iapws97 as steam_table
@@ -72,7 +74,7 @@ class Condenser(Module):
 
     def run(self, *args):
 
-       # self.__zero_ode_parameters()
+        #self.__zero_ode_parameters()
 
         time = self.initial_time
         end_time = self.end_time
@@ -93,6 +95,42 @@ class Condenser(Module):
             time = self.__step(time)
 
         return
+
+    def tester(self):
+        """Passes a string of test data (temperature, chi) to the condenser to debug the model itself."""
+        x = '===================='
+        #start with a basic temperature scale
+        print(x, '\n', 'TESTING TEMPERATURE', '\n', x)
+        temp =  np.linspace(300, 500, 200)
+        test_chi = 0
+        output_vector = []
+        for i in temp:
+            output = self.__condenser(0, i, test_chi, self.params)
+            print('temp is ', i, ' and outflow temp is ', output)
+            output_vector.append(output)
+        
+        #test how the system responds to different chi's
+        print(x, '\n', 'TESTING CHI', '\n', x)
+        chi = np.linspace(0, 0.98, 100)
+        test_temperature = steam_table._TSat_P(0.005)
+        output_vector_2 = []
+        for i in chi:
+            output = self.__condenser(0, test_temperature, i, self.params)
+            print('chi is ', i, ' and outflow temp is ', output)
+            output_vector_2.append(output)
+
+        #graph the results
+        pyplot.plot(temp, output_vector)
+        pyplot.title('inflow temperature vs outflow temperature')
+        pyplot.savefig('condenser-inflow-temp-vs-outflow-temp.png')
+        pyplot.close()
+        pyplot.plot(chi, output_vector_2)
+        pyplot.title('inflow quality vs outflow temperature')
+        pyplot.savefig('inflow-quality-vs-outflow-temp.png')
+        return
+
+
+
 
     def __call_ports(self, time):
 
@@ -256,6 +294,8 @@ class Condenser(Module):
             #determine the overall heat transfer coefficient from the McNaught
             #expression
             alpha_sh = liquid_heat_transfer_coeff * (1/xtt)**0.78
+            alpha_sh = alpha_sh
+            print(alpha_sh, 'alpha_sh')
 
             #determine how far the two-phase mixture gets in the condenser
             #before being fully condensed
@@ -268,7 +308,7 @@ class Condenser(Module):
                 #condenser_runoff = 14 + 273.15
 
             if remaining_area < 0:
-                condenser_runoff = 14 + 273.15
+                condenser_runoff = critical_temp
 
             elif remaining_area > 0:
             #subcool the remaining liquid
