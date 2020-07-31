@@ -369,7 +369,7 @@ class BWR(Module):
 
         return alpha_tn
 
-    def __rho_func(self, time, n_dens, temp, params, ):
+    def __rho_func(self, time, n_dens, temp, params):
         """Reactivity function.
 
         Parameters
@@ -462,9 +462,7 @@ class BWR(Module):
     def __sigma_fis_func(self, temp, params):
         """Place holder for implementation
         """
-
-        sigma_f = params['sigma_f_o']  * math.sqrt(298/temp) * \
-                math.sqrt(math.pi) * 0.5
+        sigma_f = params['sigma_f_o']  * math.sqrt(298/temp) * math.sqrt(math.pi) * 0.5
 
         return sigma_f
 

@@ -114,6 +114,9 @@ class Turbine(Module):
 
             time = self.__step(time)
 
+    def module_tester(self):
+        return
+
     def __call_ports(self, time):
 
         # Interactions in the steam-outflow-1 port
@@ -234,12 +237,16 @@ class Turbine(Module):
             #vfda: access of a protected member?
             t_runoff = temp_in
             w_real = 0
-            steam_quality = -3
+            steam_quality = 0
             return (t_runoff, w_real, steam_quality)
         if temp_in < steam_table._TSat_P(0.5) and self.params['high_pressure_turbine'] == False:
-            t_runoff = temp_in
+            print('under temp')
+            t_runoff = steam_table._TSat_P(0.5)
             w_real = 0
-            return(t_runoff, w_real, steam_quality)
+            runoff_quality = 0
+            return(t_runoff, w_real, runoff_quality)
+        else:
+            print('over temp')
 
         #properties of the inlet steam
 
@@ -283,7 +290,6 @@ class Turbine(Module):
         dew_entropy = dew['s']
         bubl_enthalpy = bubl['h']
         dew_enthalpy = dew['h']
-
         #print(bubl_entropy, inlet_entropy, dew_entropy, self.params['high_pressure_turbine'])
 
         #if the ideal runoff is two-phase mixture:
@@ -329,11 +335,5 @@ class Turbine(Module):
             t_runoff = steam_table._TSat_P(p_out)
 
         w_real = w_real * params['steam flowrate'] * unit.kilo
-        #print(self.params['high_pressure_turbine'], ' and time is ', time, ' and x is ', x_runoff)
-        #w_real = heat_removed
 
-        #if t_runoff < steam_table._TSat_P(0.5) and params['high_pressure_turbine'] == False:
-            #t_runoff = temp_in
-            #x_runoff = -5
-            #w_real = 0
         return (t_runoff, w_real, x_runoff)

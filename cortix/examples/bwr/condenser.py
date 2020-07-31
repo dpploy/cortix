@@ -118,12 +118,13 @@ class Condenser(Module):
         # one way "from" inflow-2
 
         # from
-        self.send(time, 'inflow-2')
-        (check_time, inflow_state) = self.recv('inflow-2')
-        assert abs(check_time-time) <= 1e-6
+        if self.get_port('inflow-2').connected_port:
+            self.send(time, 'inflow-2')
+            (check_time, inflow_state) = self.recv('inflow-2')
+            assert abs(check_time-time) <= 1e-6
 
-        self.inflow_state = inflow_state
-        self.inflow_state['time'] = time
+            self.inflow_state = inflow_state
+            self.inflow_state['time'] = time
 
         # Interactions in the outflow port
         #-----------------------------------------
@@ -162,9 +163,6 @@ class Condenser(Module):
         calculates the amount of surface area within a simple condenser required to
         remove all degrees of superheat and condense the mixture.
         """
-        if chi_in == -5:
-            return(temp_in)
-
         #print(time, ' chi_in is ', chi_in)
         critical_temp = steam_table._TSat_P(0.005)
         condenser_runoff = 14 + 273.15
@@ -274,7 +272,6 @@ class Condenser(Module):
 
             if remaining_area < 0:
                 condenser_runoff = 14 + 273.15
-                print(time, ' benis')
 
             elif remaining_area > 0:
             #subcool the remaining liquid
