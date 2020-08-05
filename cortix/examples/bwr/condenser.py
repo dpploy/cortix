@@ -177,8 +177,10 @@ class Condenser(Module):
 
         temp_in = self.inflow_state['temp']
         chi_in = self.inflow_state['quality']
+        pressure = self.inflow_state['pressure']
+        flowrate = self.inflow_state['flowrate']
 
-        t_out = self.__condenser(time, temp_in, chi_in, self.params)
+        t_out = self.__condenser(time, temp_in, chi_in, pressure, flowrate, self.params)
 
         condenser_runoff = self.outflow_phase.get_row(time)
 
@@ -189,12 +191,14 @@ class Condenser(Module):
 
         return time
 
-    def __condenser(self, time, temp_in, chi_in, params):
+    def __condenser(self, time, temp_in, chi_in, p_in, flowrate, params):
         """Simple model to condense a vapor-liquid mixture and subcool it.
         Takes in either superheated steam or a two-phase water mixture, and
         calculates the amount of surface area within a simple condenser required to
         remove all degrees of superheat and condense the mixture.
         """
+        if flowrate == 0:
+            return 287.15
 
         #print(time, ' chi_in is ', chi_in)
         critical_temp = steam_table._TSat_P(0.005)
@@ -245,7 +249,7 @@ class Condenser(Module):
             pressure = 0.005
             h_mixture = steam_table._Region4(pressure, chi_in)['h']
             h_dewpt = steam_table._Region4(pressure, 0)['h']
-            heat_pwr = (h_mixture - h_dewpt) * unit.kilo * params['steam flowrate']
+            heat_pwr = (h_mixture - h_dewpt) * unit.kilo * flowrate
 
             critical_temp = temp_in
             critical_temp = steam_table._TSat_P(pressure)
@@ -397,7 +401,7 @@ class Condenser(Module):
 
                     steam_cp = steam_table.IAPWS97(T=runoff_in, P=0.005).cp
                     iterated_steam_final_temp = (runoff_in - (q_1/(steam_cp *
-                                                                   params['steam flowrate'] *
+                                                                   flowrate *
                                                                    unit.kilo)))
 
                     if (iterated_steam_final_temp < coolant_in or
