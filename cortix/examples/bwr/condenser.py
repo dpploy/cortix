@@ -200,6 +200,34 @@ class Condenser(Module):
         if flowrate == 0:
             return 287.15
 
+        #temporary, basic model for condensation, until I can work out a more
+        #advanced model that gives realistic values.
+        pressure = 0.005
+        t_coolant = 14 + 273.15
+        h_mixture = steam_table._Region4(pressure, chi_in)['h']
+        h_dewpt = steam_table._Region4(pressure, 0)['h']
+        heat_pwr = (h_mixture - h_dewpt) * unit.kilo * flowrate
+        area_required = heat_pwr/(params['condensation_ht_coeff'] * (temp_in - t_coolant))
+        area_remaining = params['heat transfer area'] - area_required
+
+        if area_remaining < 0:
+            return 287.15
+        else:
+            initial_coolant_temp = 14 + 273.15
+            delta_t = heat_pwr/(params['cooling water flowrate'] * unit.kilo * 4.184)
+            final_coolant_temp = initial_coolant_temp + delta_t
+            subcooling_pwr = area_remaining * params['subcooling_ht_coeff'] * (temp_in - final_coolant_temp)
+            delta_tb = subcooling_pwr/(flowrate * 4.184 * unit.kilo)
+            runoff_temp = temp_in - delta_tb
+            
+            if runoff_temp < initial_coolant_temp:
+                runoff_temp = initial_coolant_temp
+            return(runoff_temp)
+
+        #anything below this point is not currently in use; I need to figure
+        #out a more accurate condensation model, the current one calculates
+        #heat transfer coefficients in excess of 100k w/m2-k
+        
         #print(time, ' chi_in is ', chi_in)
         critical_temp = steam_table._TSat_P(0.005)
         condenser_runoff = 14 + 273.15
@@ -245,7 +273,6 @@ class Condenser(Module):
             #average_ht_transfer_coeff = (high_heat_transfer_coeff + low_heat_transfer_coeff)/2
 
         if chi_in > 0:
-
             pressure = 0.005
             h_mixture = steam_table._Region4(pressure, chi_in)['h']
             h_dewpt = steam_table._Region4(pressure, 0)['h']

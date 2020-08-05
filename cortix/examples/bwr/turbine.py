@@ -243,7 +243,7 @@ class Turbine(Module):
         # at to 0.035 kpa, with 80% efficiency.
 
         if flowrate == 0:
-            return(273.15, 0, 0, 0)
+            return(293.15, 0, 0, 0)
 
         if temp_in < steam_table._TSat_P(0.5) and self.params['high_pressure_turbine'] == False:
             t_runoff = steam_table._TSat_P(0.5)
