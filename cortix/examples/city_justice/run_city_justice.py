@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
-'''
-Crimninal justice network dynamics modeling.
+"""Crimninal justice network dynamics modeling.
 
 This example uses 7 modules:
     - Community
@@ -34,7 +33,7 @@ To profile this run do:
 
      python -m cProfile -s time run_city_justice.py > lixo
 
-'''
+"""
 
 import scipy.constants as unit
 import matplotlib.pyplot as plt

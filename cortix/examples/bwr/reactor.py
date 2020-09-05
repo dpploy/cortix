@@ -40,13 +40,12 @@ class BWR(Module):
 
         super().__init__()
 
-        self.port_names_expected = ['coolant-inflow', 'coolant-outflow',
-                                    'signal-out', 'signal-in']
+        self.port_names_expected = ['coolant-inflow', 'coolant-outflow', 'signal-out', 'signal-in']
 
         self.params = params
 
-        self.initial_time = 0.0 * unit.day
-        self.end_time = 4 * unit.hour
+        self.initial_time = params['start-time']
+        self.end_time = params['end-time']
         self.time_step = 10.0
 
         self.show_time = (False, 10.0)
@@ -57,33 +56,23 @@ class BWR(Module):
         # Coolant outflow phase history
         quantities = list()
 
-        flowrate = Quantity(name='flowrate', formal_name='q_c',
-                            latex_name='$q_c$',
-                            value=0.0, unit='kg/s',
-                            info='Reactor Outflow Coolant Flowrate')
+        flowrate = Quantity(name='flowrate', formal_name='q_c', unit='kg/s', value=0.0,
+                            info='Reactor Outflow Coolant Flowrate', latex_name=r'$q_c$')
 
         quantities.append(flowrate)
 
-        temp = Quantity(name='temp', formal_name='T_c',
-                        latex_name='$T_c$',
-                        value=273.15, unit='K',
-                        info='Reactor Outflow Coolant Temperature')
+        temp = Quantity(name='temp', formal_name='T_c', unit='K', value=params['coolant-temp'],
+                        info='Reactor Outflow Coolant Temperature', latex_name=r'$T_c$')
 
         quantities.append(temp)
 
-        press = Quantity(name='pressure', formal_name='P_c',
-                         latex_name='$P_c$',
-                         value=0.0, unit='Pa',
-                         info='Reactor Outflow Coolant Pressure')
+        press = Quantity(name='pressure', formal_name='P_c', unit='Pa', value=0.0,
+                         info='Reactor Outflow Coolant Pressure', latex_name=r'$P_c$')
 
         quantities.append(press)
 
-        quality = Quantity(name='steam-quality', formal_name='chi_s',
-                           latex_name=r'$\chi$',
-                           value=0.0,
-                           unit='',
-                           info='Reactor Steam Quality')
-
+        quality = Quantity(name='steam-quality', formal_name='chi_s', unit='', value=0.0,
+                           info='Reactor STeam Quality', latex_name=r'$\chi$')
         quantities.append(quality)
 
         self.coolant_outflow_phase = Phase(self.initial_time, time_unit='s',
@@ -92,20 +81,14 @@ class BWR(Module):
         # Neutron phase history
         quantities = list()
 
-        neutron_dens = Quantity(name='neutron-dens', formal_name='n',
-                                latex_name=r'$n$',
-                                value=0.0, unit='1/m^3',
-                                info='Normalized Reactor Neutron Density')
+        neutron_dens = Quantity(name='neutron-dens', formal_name='n', unit='1/m^3',
+                                value=params['n-dens'], info='Rel. Reactor Neutron Density', latex_name=r'$n$')
 
         quantities.append(neutron_dens)
 
-        delayed_neutrons_0 = np.zeros(6)
-
         delayed_neutron_cc = Quantity(name='delayed-neutrons-cc', formal_name='c_i',
-                                      latex_name='$c_i$',
-                                      value=delayed_neutrons_0, unit='1/m^3 ',
-                                      info='Relative Delayed Neutron Precursors')
-
+                                      unit='1/m^3 ', value=params['delayed-neutron-cc'],
+                                      info='Rel. Delayed Neutron Precursors', latex_name=r'$c_i$')
         quantities.append(delayed_neutron_cc)
 
         self.neutron_phase = Phase(self.initial_time, time_unit='s',
@@ -114,18 +97,15 @@ class BWR(Module):
         # Reactor phase
         quantities = list()
 
-        fuel_temp = Quantity(name='fuel-temp', formal_name='T_f',
-                             latex_name=r'$T_f$',
-                             value=273.15, unit='K',
-                             info='Reactor Nuclear Fuel Temperature')
+        fuel_temp = Quantity(name='fuel-temp', formalName='T_f', unit='k',
+                             value=params['fuel-temp'], info='Reactor Nuclear Fuel Temperature',
+                             latex_name=r'$T_f$')
 
         quantities.append(fuel_temp)
 
         reg_rod_position = Quantity(name='reg-rod-position',
-                                    formal_name='reg rod position',
-                                    latex_name=r'$x_p$',
-                                    value=0.0, unit='m',
-                                    info='Reactor Regulating Rod Position')
+                                    formal_name='reg rod position', unit='m', value=0.0,
+                                    info='Reactor Regulating Rod Position', latex_name=r'$x_p$')
 
         quantities.append(reg_rod_position)
 
@@ -133,7 +113,7 @@ class BWR(Module):
                                    quantities=quantities)
 
         # Initialize inflow
-        self.params['inflow-cool-temp'] = 273.15
+        self.params['inflow-cool-temp'] = params['condenser-runoff-temp']
 
     def run(self, *args):
 
@@ -202,7 +182,6 @@ class BWR(Module):
 
             assert abs(check_time-time) <= 1e-6
             self.params['inflow-cool-temp'] = inflow_cool_temp
-
         # Interactions in the signal-out port
         #-----------------------------------------
         # one way "to" signal-out
@@ -214,7 +193,7 @@ class BWR(Module):
 
             #signal_out = self.__get_signal_out(time)
 
-            #self.send((message_time, signal_out), 'signal-out')
+            self.send((message_time, signal_out), 'signal-out')
 
     def __step(self, time=0.0):
         r"""ODE IVP problem.
@@ -231,7 +210,6 @@ class BWR(Module):
         Returns
         -------
         None
-
         """
         #import iapws.iapws97 as steam
 
@@ -273,25 +251,7 @@ class BWR(Module):
 
         return time
 
-    def __signal_out(self, time=0.0):
-        """Send reactor signals to anyone requesting it.
-
-        Parameters
-        ----------
-        time: float
-            Time in SI unit.
-
-        Returns
-        -------
-        None
-
-        """
-
-        signals = dict()
-
-        return signals
-
-    def __get_coolant_outflow(self, time=0.0):
+    def __get_coolant_outflow(self, time):
         """Get the coolant outflow stream.
 
         Parameters
@@ -306,11 +266,54 @@ class BWR(Module):
         """
 
         coolant_outflow_stream = dict()
-
+        
         outflow_cool_temp = self.coolant_outflow_phase.get_value('temp', time)
 
-        coolant_outflow_stream['temp'] = outflow_cool_temp
-        coolant_outflow_stream['quality'] = 0.7
+        if outflow_cool_temp <= 373.15:
+            coolant_outflow_stream['temp'] = outflow_cool_temp
+            coolant_outflow_stream['pressure'] = 0
+            coolant_outflow_stream['quality'] = 0
+            coolant_outflow_stream['flowrate'] = 0
+
+        else:
+
+            if self.params['valve_opened']:
+                pressure = steam._PSat_T(outflow_cool_temp)
+                base_temp = 373.15
+                base_pressure = steam._PSat_T(base_temp)
+                base_params = steam.IAPWS97(T=base_temp, x=0)
+                base_entropy = base_params.s
+                base_cp = base_params.cp
+                inlet_params = steam.IAPWS97(T=outflow_cool_temp, x=0)
+                inlet_cp = inlet_params.cp
+                average_cp = (base_cp + inlet_cp)/2
+
+                delta_s = average_cp * math.log(outflow_cool_temp/base_temp) - (unit.R/1000) * math.log(pressure/base_pressure)
+
+                inlet_entropy = (delta_s + base_entropy) * 1.25
+                bubl_entropy = inlet_params.s
+                bubl_enthalpy = inlet_params.h
+
+                inlet_params = steam.IAPWS97(T=base_temp, x=1)
+                dew_entropy = inlet_params.s
+                dew_enthalpy = inlet_params.h
+                quality = (inlet_entropy - bubl_entropy)/(dew_entropy - bubl_entropy)
+
+                delta_t = time - self.params['valve_opening_time']
+                mass_flowrate = 1820 * (1 - math.exp(-1 * delta_t/(3 * unit.minute)))
+
+                coolant_outflow_stream['temp'] = outflow_cool_temp
+                coolant_outflow_stream['pressure'] = pressure
+                coolant_outflow_stream['quality'] = quality
+                coolant_outflow_stream['flowrate'] = mass_flowrate
+
+            else:
+                self.params['valve_opened'] = True
+                self.params['valve_opening_time'] = time
+                coolant_outflow_stream['temp'] = 373.15
+                coolant_outflow_stream['pressure'] = 0
+                coolant_outflow_stream['quality'] = 0
+                coolant_outflow_stream['flowrate'] = 0
 
         return coolant_outflow_stream
 
@@ -337,90 +340,71 @@ class BWR(Module):
         return u_vec
 
     def __alpha_tn_func(self, temp, params):
-        #import scipy.misc as diff
-
         pressure = steam._PSat_T(temp) # vfda: why accessing protected method?
 
         d_rho = steam2.IAPWS95(P=pressure, T=temp-1).drhodT_P
 
-        #d_rho2 = diff.derivative(derivative_helper, temp) # dRho/dTm
-
-        # vfda: again why accessing protected method?
         rho = 1 / steam._Region4(pressure, 0)['v'] # mass density, kg/m3
 
-        n_m = ((rho * unit.kilo)/params['mod molar mass']) * unit.N_A * \
-                (unit.centi)**3 # number density of the moderator
-        d_nm = ((d_rho * unit.kilo)/params['mod molar mass']) * unit.N_A * \
-                (unit.centi)**3 #dnm/dTm
+        n_m = ((rho * unit.kilo)/params['mod molar mass']) * unit.N_A * (unit.centi)**3
+        # number density of the moderator
+        d_nm = ((d_rho * unit.kilo)/params['mod molar mass']) * unit.N_A * (unit.centi)**3 #dNm/dTm
         d_nm = d_nm * unit.zepto * unit.milli
 
-        # macroscopic absorption cross section of the moderator
         mod_macro_a = params['mod micro a'] * n_m
-        # macroscopic scattering cross section of the moderator
+        # macroscopic absorption cross section of the moderator
         mod_macro_s = params['mod micro s'] * n_m
+        # macroscopic scattering cross section of the moderator
 
-        # thermal utilization, F
-        thermal_util = params['fuel macro a']/(params['fuel macro a'] + mod_macro_a)
-
-        #dF/dTm
-        d_f = -(params['fuel macro a'] * params['mod micro a'] * d_nm) / \
-                (params['fuel macro a'] + mod_macro_a)**2
+        F = params['fuel macro a']/(params['fuel macro a'] + mod_macro_a) # thermal utilization, F
+    #dF/dTm
+        d_f = -1*(params['fuel macro a'] * params['mod micro a'] * d_nm)/(
+            (params['fuel macro a'] + mod_macro_a)**2)
 
         # Resonance escape integral, P
-        resonan_escape = math.exp((-1 * params['n fuel'] * (params['fuel_volume']) * \
-                params['I'])/(mod_macro_s * 3000))
+        P = math.exp((-1 * params['n fuel'] * (params['fuel_volume']) * params['I'])/
+                     ((mod_macro_s * 3000)))
         #dP/dTm
-        dp_dtm = resonan_escape * (-1 * params['n fuel'] * params['fuel_volume'] * \
-                unit.centi**3 * params['mod micro s'] * d_nm) / \
-                (mod_macro_s * 3000 * unit.centi**3)**2
+        d_p = P * (-1 * params['n fuel'] * params['fuel_volume'] * unit.centi**3 *
+                   (params['mod micro s']) * d_nm)/(mod_macro_s * 3000 * unit.centi**3)**2
 
-        eth = 0.0862 * temp # convert temperature to energy in MeV
-
+        e_th = 0.0862 * temp # convert temperature to energy in MeV
+        e_one = mod_macro_s/math.log(params['E0']/e_th)
         # neutron thermalization macroscopic cross section
-        sigma_1 = mod_macro_s/math.log(params['E0']/eth)
 
-        # neutron diffusion coefficient
-        diff_f = 1/(3 * mod_macro_s * (1 - params['mod mu0']))
-        tau = diff_f/sigma_1 # fermi age, tau
-
+        d_f = 1/(3 * mod_macro_s * (1 - params['mod mu0'])) # neutron diffusion coefficient
+        tau = d_f/e_one # fermi age, tau
         #dTau/dTm
-        d_tau = (((0.0862 * (eth/params['E0'])) * 3 * n_m) - \
-                math.log(params['E0']/eth) * (params['mod micro s'] * d_nm))/\
-                ((3 * n_m)**2 * (1 - params['mod mu0']))
+        d_tau = (((0.0862 * (e_th/params['E0'])) * 3 * n_m) - math.log(params['E0']/e_th) *
+                 ((params['mod micro s'] * d_nm))/((3 * n_m)**2 * (1 - params['mod mu0'])))
 
-        # L
-        diff_l = math.sqrt(1/(3 * mod_macro_s * mod_macro_a * \
-            (1 - params['mod mu0']))) # diffusion length L
-
+        L = math.sqrt(1/(3 * mod_macro_s * mod_macro_a * (1 - params['mod mu0'])))
+        # diffusion length L
         # dL/dTm
-        dl_dtm = 1/(2 * math.sqrt((-2 * d_nm * unit.zepto * unit.milli)/\
-                (3 * params['mod micro s'] * params['mod micro a'] *\
-                (n_m * unit.zepto * unit.milli)**3 * (1 - params['mod mu0']))))
+        d_l = 1/(2 * math.sqrt((-2 * d_nm * unit.zepto * unit.milli)/(3 * params['mod micro s'] * (params['mod micro a'] * (n_m * unit.zepto * unit.milli)**3 * ((1 - params['mod mu0']))))))
 
         # left term of the numerator of the moderator temperature feedback coefficient, alpha
-        left_1st_term = d_tau * (params['buckling']**2 + diff_l**2 * \
-                params['buckling']**4) #holding L as constant
-        left_2nd_term = dl_dtm * (2 * diff_l * params['buckling']**2 + 2 * \
-                diff_l * tau * params['buckling']**4) # holding tau as constant
-        left_term = (resonan_escape * thermal_util) * \
-                (left_1st_term + left_2nd_term) # combining with P and F held as constant
+        left_first_term = d_tau * (params['buckling']**2 + L**2 * params['buckling']**4)
+        #holding L as constant
+        left_second_term = d_l * (2 * L * params['buckling']**2 + 2 * L *
+                                  (tau * params['buckling']**4)) # holding tau as constant
+        left_term = (P * F) * (left_first_term + left_second_term)
+        # combining with P and F held as constant
 
-        # right term of the numerator of the moderator temperature feedback
-        # coefficient, alpha
+        right_1st_term = (-1) * (1 + ((tau + d_l**2) * params['buckling']**2) + \
+                tau * d_l**2 * params['buckling']**4) # num as const
 
-        right_1st_term = (-1) * (1 + ((tau + diff_l**2) * params['buckling']**2) + \
-                tau * diff_l**2 * params['buckling']**4) # num as const
-
-        right_2nd_term = thermal_util * dp_dtm # holding thermal utilization as constant
-        right_3rd_term = resonan_escape * d_f # holding resonance escpae as constant
-
+        right_first_term = (-1) * ((1 + ((tau + L**2) * params['buckling']**2))
+                                   + tau * L**2 * params['buckling']**4) # num as const
+        right_second_term = F * d_p # holding thermal utilization as constant
+        right_third_term = P * d_f # holding resonance escpae as constant
+        right_term = right_first_term * (right_second_term + right_third_term)
         # combining all three terms together
-        right_term = right_1st_term * (right_2nd_term + right_3rd_term)
 
         # numerator and denominator
         numerator = left_term + right_term
         denominator = params['eta'] * params['epsilon'] * \
-                (thermal_util * resonan_escape)**2
+                (F * P)**2
 
         alpha_tn = numerator/denominator
 
@@ -429,7 +413,7 @@ class BWR(Module):
 
         return alpha_tn
 
-    def __rho_func(self, time, n_dens, temp, params, ):
+    def __rho_func(self, time, n_dens, temp, params):
         """Reactivity function.
 
         Parameters
@@ -470,15 +454,13 @@ class BWR(Module):
             rho_t = rho_0 + alpha_n + alpha_tn * (temp - temp_ref)
 
         elif time > params['shutdown time']:
-            # effectively the inverse of startup; gradually reduce reactivity and
-            # neutron density.
+            # effectively the inverse of startup; gradually reduce reactivity and neutron density.
             rho_0 = -1 * rho_0
             alpha_n = rho_0 - (alpha_tn * (temp - temp_ref))
             rho_t = rho_0
 
         elif n_dens < 1e-5:
-            #controlled startup w/ blade; gradually increase neutron density to SS
-            # value.
+            #controlled startup w/ blade; gradually increase neutron density to SS value.
             #rho_current = (1 - n_dens) * rho_0
             #alpha_n = rho_current - rho_0 - alpha_tn * (temp - temp_ref)
             #rho_t = rho_current
@@ -487,10 +469,9 @@ class BWR(Module):
 
         else:
             rho_current = (1 - n_dens) * rho_0
-            #alphh_n = rho_current - rho_0 - alpha_tn * (temp - temp_ref)
+            alpha_n = rho_current - rho_0 - alpha_tn * (temp - temp_ref)
             rho_t = rho_current
             params['alpha_n_malfunction'] = alpha_n
-        #print(n_dens)
 
         return (rho_t, alpha_n, alpha_tn * (temp - temp_ref))
 
@@ -514,7 +495,7 @@ class BWR(Module):
         """
         q_0 = params['q_0']
 
-        if time <= 1500: # small time value
+        if time <= 30: # small time value
             q_source = q_0
         else:
             q_source = 0.0
@@ -525,16 +506,13 @@ class BWR(Module):
     def __sigma_fis_func(self, temp, params):
         """Place holder for implementation
         """
-
-        sigma_f = params['sigma_f_o']  * math.sqrt(298/temp) * \
-                math.sqrt(math.pi) * 0.5
+        sigma_f = params['sigma_f_o']  * math.sqrt(298/temp) * math.sqrt(math.pi) * 0.5
 
         return sigma_f
 
     def __nuclear_pwr_dens_func(self, time, temp, n_dens, params):
         """Place holder for implementation.
         """
-        n_dens = n_dens + self.__q_source(time, self.params)
         # include the neutrons from the initial source
 
         rxn_heat = params['fis_energy'] # get fission reaction energy J per reaction
@@ -554,9 +532,6 @@ class BWR(Module):
 
         # nuclear power source
         q3prime = - rxn_heat * rxn_rate_dens # exothermic reaction W/m3)
-        #q3prime = - n_dens * 3323E6
-        #print("q3prime")
-        #print(q3prime)
 
         return q3prime
 
@@ -565,8 +540,6 @@ class BWR(Module):
         ht_coeff = params['ht_coeff']
 
         q_f = - ht_coeff * (temp_f - temp_c)
-        #print(q_f)
-
         return q_f
 
     def __f_vec(self, u_vec, time, params):
@@ -614,9 +587,6 @@ class BWR(Module):
 
         assert len(lambda_vec) == len(c_vec)
         assert len(beta_vec) == len(c_vec)
-        #species are in RELATIVE yield, not actual; multiply by delayed neutron
-        #yield fraction of 0.0065 to get the actual delayed neutron
-        #concentration
 
         f_tmp[1:-2] = beta_vec / gen_time * n_dens - lambda_vec * c_vec
 
@@ -653,10 +623,5 @@ class BWR(Module):
         temp_in = pump_out
 
         f_tmp[-1] = - 1/tau * (temp_c - temp_in) - 1./rho_c/cp_c/vol_cool * heat_source
-
-        # pressure calculations
-
-        #print(time)
-        #print(u_vec)
 
         return f_tmp
