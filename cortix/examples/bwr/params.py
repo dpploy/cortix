@@ -7,6 +7,9 @@ import numpy as np
 def get_params():
     params = dict()
 
+    params['valve_opened'] = False
+    params['valve_opening_time'] = 0
+
     #initial SS values for reactor startup
     params['turbine-outflow-temp'] = 293.15
     params['turbine-chi'] = 0
@@ -17,6 +20,7 @@ def get_params():
     params['coolant-temp'] = 293.15
     params['delayed-neutron-cc'] = [0, 0, 0, 0, 0, 0]
     params['turbine-work'] = 0
+    params['initial-flowrate'] = 0
 
     params['steam flowrate'] = 1820 #kg/s
     #Data pertaining to one-group energy neutron balance
@@ -47,7 +51,9 @@ def get_params():
     params['pipe_diameter'] = 0.1 #m
     params['liquid_velocity'] = 10 #m/s
     params['cooling water flowrate'] = 100000 #kg/s
-    params['heat transfer area'] = 32000 #m2, or 500 4m long, 0.1m diameter pipes
+    params['heat transfer area'] = 10200 #m2, or 500 4m long, 0.1m diameter pipes
+    params['condensation_ht_coeff'] = 5000 # w/m-k
+    params['subcooling_ht_coeff'] = 1000 # w/m-k
     params['reg_rod_worth'] = 1.5e-4 # pcm
 
     params['n_dens_ss_operation'] = 1 #1.963e13/2200 * 1e4 #  #neutrons/m^2

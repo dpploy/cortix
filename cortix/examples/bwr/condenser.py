@@ -177,8 +177,10 @@ class Condenser(Module):
 
         temp_in = self.inflow_state['temp']
         chi_in = self.inflow_state['quality']
+        pressure = self.inflow_state['pressure']
+        flowrate = self.inflow_state['flowrate']
 
-        t_out = self.__condenser(time, temp_in, chi_in, self.params)
+        t_out = self.__condenser(time, temp_in, chi_in, pressure, flowrate, self.params)
 
         condenser_runoff = self.outflow_phase.get_row(time)
 
@@ -189,13 +191,43 @@ class Condenser(Module):
 
         return time
 
-    def __condenser(self, time, temp_in, chi_in, params):
+    def __condenser(self, time, temp_in, chi_in, p_in, flowrate, params):
         """Simple model to condense a vapor-liquid mixture and subcool it.
         Takes in either superheated steam or a two-phase water mixture, and
         calculates the amount of surface area within a simple condenser required to
         remove all degrees of superheat and condense the mixture.
         """
+        if flowrate == 0:
+            return 287.15
 
+        #temporary, basic model for condensation, until I can work out a more
+        #advanced model that gives realistic values.
+        pressure = 0.005
+        t_coolant = 14 + 273.15
+        h_mixture = steam_table._Region4(pressure, chi_in)['h']
+        h_dewpt = steam_table._Region4(pressure, 0)['h']
+        heat_pwr = (h_mixture - h_dewpt) * unit.kilo * flowrate
+        area_required = heat_pwr/(params['condensation_ht_coeff'] * (temp_in - t_coolant))
+        area_remaining = params['heat transfer area'] - area_required
+
+        if area_remaining < 0:
+            return 287.15
+        else:
+            initial_coolant_temp = 14 + 273.15
+            delta_t = heat_pwr/(params['cooling water flowrate'] * unit.kilo * 4.184)
+            final_coolant_temp = initial_coolant_temp + delta_t
+            subcooling_pwr = area_remaining * params['subcooling_ht_coeff'] * (temp_in - final_coolant_temp)
+            delta_tb = subcooling_pwr/(flowrate * 4.184 * unit.kilo)
+            runoff_temp = temp_in - delta_tb
+            
+            if runoff_temp < initial_coolant_temp:
+                runoff_temp = initial_coolant_temp
+            return(runoff_temp)
+
+        #anything below this point is not currently in use; I need to figure
+        #out a more accurate condensation model, the current one calculates
+        #heat transfer coefficients in excess of 100k w/m2-k
+        
         #print(time, ' chi_in is ', chi_in)
         critical_temp = steam_table._TSat_P(0.005)
         condenser_runoff = 14 + 273.15
@@ -241,11 +273,10 @@ class Condenser(Module):
             #average_ht_transfer_coeff = (high_heat_transfer_coeff + low_heat_transfer_coeff)/2
 
         if chi_in > 0:
-
             pressure = 0.005
             h_mixture = steam_table._Region4(pressure, chi_in)['h']
             h_dewpt = steam_table._Region4(pressure, 0)['h']
-            heat_pwr = (h_mixture - h_dewpt) * unit.kilo * params['steam flowrate']
+            heat_pwr = (h_mixture - h_dewpt) * unit.kilo * flowrate
 
             critical_temp = temp_in
             critical_temp = steam_table._TSat_P(pressure)
@@ -397,7 +428,7 @@ class Condenser(Module):
 
                     steam_cp = steam_table.IAPWS97(T=runoff_in, P=0.005).cp
                     iterated_steam_final_temp = (runoff_in - (q_1/(steam_cp *
-                                                                   params['steam flowrate'] *
+                                                                   flowrate *
                                                                    unit.kilo)))
 
                     if (iterated_steam_final_temp < coolant_in or

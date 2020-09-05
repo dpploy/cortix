@@ -251,7 +251,7 @@ class BWR(Module):
 
         return time
 
-    def __get_coolant_outflow(self, time=0.0):
+    def __get_coolant_outflow(self, time):
         """Get the coolant outflow stream.
 
         Parameters
@@ -266,10 +266,54 @@ class BWR(Module):
         """
 
         coolant_outflow_stream = dict()
-
+        
         outflow_cool_temp = self.coolant_outflow_phase.get_value('temp', time)
-        coolant_outflow_stream['temp'] = outflow_cool_temp
-        coolant_outflow_stream['quality'] = 0.7
+
+        if outflow_cool_temp <= 373.15:
+            coolant_outflow_stream['temp'] = outflow_cool_temp
+            coolant_outflow_stream['pressure'] = 0
+            coolant_outflow_stream['quality'] = 0
+            coolant_outflow_stream['flowrate'] = 0
+
+        else:
+
+            if self.params['valve_opened']:
+                pressure = steam._PSat_T(outflow_cool_temp)
+                base_temp = 373.15
+                base_pressure = steam._PSat_T(base_temp)
+                base_params = steam.IAPWS97(T=base_temp, x=0)
+                base_entropy = base_params.s
+                base_cp = base_params.cp
+                inlet_params = steam.IAPWS97(T=outflow_cool_temp, x=0)
+                inlet_cp = inlet_params.cp
+                average_cp = (base_cp + inlet_cp)/2
+
+                delta_s = average_cp * math.log(outflow_cool_temp/base_temp) - (unit.R/1000) * math.log(pressure/base_pressure)
+
+                inlet_entropy = (delta_s + base_entropy) * 1.25
+                bubl_entropy = inlet_params.s
+                bubl_enthalpy = inlet_params.h
+
+                inlet_params = steam.IAPWS97(T=base_temp, x=1)
+                dew_entropy = inlet_params.s
+                dew_enthalpy = inlet_params.h
+                quality = (inlet_entropy - bubl_entropy)/(dew_entropy - bubl_entropy)
+
+                delta_t = time - self.params['valve_opening_time']
+                mass_flowrate = 1820 * (1 - math.exp(-1 * delta_t/(3 * unit.minute)))
+
+                coolant_outflow_stream['temp'] = outflow_cool_temp
+                coolant_outflow_stream['pressure'] = pressure
+                coolant_outflow_stream['quality'] = quality
+                coolant_outflow_stream['flowrate'] = mass_flowrate
+
+            else:
+                self.params['valve_opened'] = True
+                self.params['valve_opening_time'] = time
+                coolant_outflow_stream['temp'] = 373.15
+                coolant_outflow_stream['pressure'] = 0
+                coolant_outflow_stream['quality'] = 0
+                coolant_outflow_stream['flowrate'] = 0
 
         return coolant_outflow_stream
 
