@@ -10,6 +10,8 @@ def get_params():
     params['valve_opened'] = False
     params['valve_opening_time'] = 0
 
+    params['RCIS_UA'] = 1000000000 # w/m-k
+
     #initial SS values for reactor startup
     params['turbine-outflow-temp'] = 293.15
     params['turbine-chi'] = 0

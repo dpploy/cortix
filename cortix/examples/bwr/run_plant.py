@@ -14,6 +14,7 @@ from cortix import Network
 from reactor import BWR
 from turbine import Turbine
 from condenser import Condenser
+from cooler import Cooler
 from params import get_params
 
 def main():
@@ -51,6 +52,7 @@ def main():
 
     params['start-time'] = 0
     params['end-time'] = end_time
+    params['shutdown-time'] = end_time
 
     #*****************************************************************************
     # Create reactor module
@@ -130,6 +132,16 @@ def main():
     plant_net.module(condenser)
 
     #*****************************************************************************
+    params['RCIS-shutdown-time'] = 5 * unit.minute
+    rcis = Cooler(params)
+    rcis.name = 'RCIS'
+    rcis.save = True
+    rcis.time_step = time_step
+    rcis.end_time = end_time
+
+    plant_net.module(rcis)
+
+    #*****************************************************************************
     # Create the BoP network connectivity
     plant_net.connect([reactor, 'coolant-outflow'], [turbine1, 'inflow'])
     plant_net.connect([turbine1, 'outflow-1'], [turbine2, 'inflow'])
@@ -137,6 +149,8 @@ def main():
     plant_net.connect([turbine2, 'outflow-1'], [condenser, 'inflow-1'])
     plant_net.connect([turbine3, 'outflow-1'], [condenser, 'inflow-2'])
     plant_net.connect([condenser, 'outflow'], [reactor, 'coolant-inflow'])
+    plant_net.connect([reactor, 'RCIS-outflow'], [rcis, 'coolant-inflow'])
+    plant_net.connect([rcis, 'coolant-outflow'], [reactor, 'RCIS-inflow'])
 
     plant_net.draw()
 
@@ -221,7 +235,7 @@ def main():
         plt.savefig('startup-turbine2-outflow-temp.png', dpi=300)
 
         # Condenser graphs
-        condenser = plant_net.modules[-1]
+        condenser = plant_net.modules[3]
 
         (quant, time_unit) = condenser.outflow_phase.get_quantity_history('temp')
 
@@ -248,5 +262,6 @@ def main():
 
     # Properly shutdown simulation
     plant.close()
+
 if __name__ == '__main__':
     main()
