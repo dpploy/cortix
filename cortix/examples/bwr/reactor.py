@@ -72,11 +72,10 @@ class BWR(Module):
         quantities.append(press)
 
         quality = Quantity(name='steam-quality', formal_name='chi_s', unit='', value=0.0,
-                           info='Reactor STeam Quality', latex_name=r'$\chi$')
+                           info='Reactor Steam Quality', latex_name=r'$\chi$')
         quantities.append(quality)
 
-        self.coolant_outflow_phase = Phase(self.initial_time, time_unit='s',
-                                           quantities=quantities)
+        self.coolant_outflow_phase = Phase(time_stamp=self.initial_time, time_unit='s', quantities=quantities)
 
         # Neutron phase history
         quantities = list()
@@ -91,7 +90,7 @@ class BWR(Module):
                                       info='Rel. Delayed Neutron Precursors', latex_name=r'$c_i$')
         quantities.append(delayed_neutron_cc)
 
-        self.neutron_phase = Phase(self.initial_time, time_unit='s',
+        self.neutron_phase = Phase(time_stamp=self.initial_time, time_unit='s',
                                    quantities=quantities)
 
         # Reactor phase
@@ -109,7 +108,7 @@ class BWR(Module):
 
         quantities.append(reg_rod_position)
 
-        self.reactor_phase = Phase(self.initial_time, time_unit='s',
+        self.reactor_phase = Phase(time_stamp=self.initial_time, time_unit='s',
                                    quantities=quantities)
 
         # Initialize inflow
@@ -159,8 +158,12 @@ class BWR(Module):
         # one way "to" coolant-outflow
 
         # send to
+        current_temp = self.__get_coolant_outflow(time)['temp']
+        RCIS = False
+        if current_temp < 373.15:
+            RCIS = True
 
-        if time < self.params['RCIS-shutdown-time'] or time > self.params['shutdown-time']:
+        if time < self.params['RCIS-shutdown-time'] or self.params['shutdown-mode'] and RCIS:
             if self.get_port('coolant-outflow').connected_port:
                 message_time = self.recv('coolant-outflow')
                 coolant_outflow = dict()

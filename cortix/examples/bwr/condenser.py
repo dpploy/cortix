@@ -67,7 +67,7 @@ class Condenser(Module):
 
         quantities.append(temp)
 
-        self.outflow_phase = Phase(self.initial_time, time_unit='s',
+        self.outflow_phase = Phase(time_stamp=self.initial_time, time_unit='s',
                                    quantities=quantities)
 
         self.inflow_state = None

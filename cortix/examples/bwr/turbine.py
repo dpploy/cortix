@@ -46,8 +46,8 @@ class Turbine(Module):
 
         self.port_names_expected = ['inflow', 'outflow-1', 'outflow-2']
 
-        self.initial_time = 0.0 * unit.day
-        self.end_time = 4 * unit.hour
+        self.initial_time = params['start-time']
+        self.end_time = params['end-time']
 
         self.time_step = 10.0
         self.show_time = (False, 10.0)
@@ -62,7 +62,7 @@ class Turbine(Module):
 
         quantities.append(temp)
 
-        self.inflow_phase = Phase(self.initial_time, time_unit='s',
+        self.inflow_phase = Phase(time_stamp=self.initial_time, time_unit='s',
                                   quantities=quantities)
 
         # Outflow phase history
@@ -93,7 +93,7 @@ class Turbine(Module):
 
         quantities.append(flowrate)
 
-        self.outflow_phase = Phase(self.initial_time, time_unit='s',
+        self.outflow_phase = Phase(time_stamp=self.initial_time, time_unit='s',
                                    quantities=quantities)
 
     def run(self, *args):
