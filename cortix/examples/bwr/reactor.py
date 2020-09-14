@@ -114,6 +114,15 @@ class BWR(Module):
         # Initialize inflow
         self.params['inflow-cool-temp'] = params['condenser-runoff-temp']
 
+        self.params['decay-heat-0'] = 0
+        # Set up initial decay heat value
+        if self.params['shutdown-mode']:
+            temp = params['fuel-temp']
+            n_dens = params['n-dens']
+            decay_heat = self.__nuclear_pwr_dens_func(999, temp, n_dens, params)
+            decay_heat *= 0.0622 # assume decay heat at 6.5% total power
+            self.params['decay-heat-0'] = decay_heat
+
     def run(self, *args):
         # Some logic for logging time stamps
         if self.initial_time + self.time_step > self.end_time:
@@ -539,7 +548,7 @@ class BWR(Module):
         """
         q_0 = params['q_0']
 
-        if time <= 30: # small time value
+        if time <= 30 and params['shutdown-mode'] == False: # small time value
             q_source = q_0
         else:
             q_source = 0.0
@@ -569,7 +578,7 @@ class BWR(Module):
 
         v_o = params['thermal_neutron_velo'] # m/s
 
-        neutron_flux = n_dens * 0.95E15 * v_o * sigma_f/params['sigma_f_o']*0.7
+        neutron_flux = n_dens * 0.9E15 * v_o * sigma_f/params['sigma_f_o']*0.7
 
          #reaction rate density
         rxn_rate_dens = sigma_fis * neutron_flux
@@ -577,6 +586,13 @@ class BWR(Module):
         # nuclear power source
         q3prime = - rxn_heat * rxn_rate_dens # exothermic reaction W/m3)
 
+        # add decay heat
+        if self.params['shutdown-mode']:
+            t_0 = unit.hour * 24 # assume 24 hours of steady state operation before shutdown
+            p_0 = self.params['decay-heat-0']
+            p_t = p_0 * (((time + 1) ** -0.2) - (t_0 + time) ** -0.2)
+            q3prime += p_t
+        
         return q3prime
 
     def __heat_sink_rate(self, time, temp_f, temp_c, params):
@@ -609,7 +625,6 @@ class BWR(Module):
         n_species = len(lambda_vec)
 
         f_tmp = np.zeros(1+n_species+2, dtype=np.float64) # vector for f_vec return
-
         #----------------
         # neutron balance
         #----------------
@@ -633,7 +648,6 @@ class BWR(Module):
         assert len(beta_vec) == len(c_vec)
 
         f_tmp[1:-2] = beta_vec / gen_time * n_dens - lambda_vec * c_vec
-
 
         #--------------------
         # fuel energy balance
@@ -667,5 +681,7 @@ class BWR(Module):
         temp_in = pump_out
 
         f_tmp[-1] = - 1/tau * (temp_c - temp_in) - 1./rho_c/cp_c/vol_cool * heat_source
+        
+        f_tmp[:] = [0 if np.isnan(x) else x for x in f_tmp] #nifty conditional mutator
 
         return f_tmp

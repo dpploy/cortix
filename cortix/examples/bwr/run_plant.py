@@ -34,7 +34,7 @@ def main():
     # Preamble
 
 
-    end_time = 30 * unit.minute
+    end_time = 30.0 * unit.minute
     time_step = 30.0 # seconds
     show_time = (True, 5*unit.minute)
 
@@ -53,7 +53,7 @@ def main():
 
     params['start-time'] = 0.0
     params['end-time'] = end_time
-    params['shutdown-time'] = end_time
+    params['shutdown-time'] = 999.0 * unit.hour
     params['shutdown-mode'] = False
     #*****************************************************************************
     # Create reactor module
@@ -168,7 +168,7 @@ def main():
         reactor = plant_net.modules[0]
 
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('neutron-dens')
-
+        print(quant)
         quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
                    y_label=quant.latex_name+' ['+quant.unit+']')
 
@@ -273,8 +273,8 @@ def main():
 
     # Preamble
 
-    start_time = 30.0 * unit.minute
-    end_time = 60 * unit.minute
+    start_time = 0.0 * unit.minute
+    end_time = 30 * unit.minute
     time_step = 30.0 # seconds
     show_time = (True, 5*unit.minute)
 
@@ -293,7 +293,7 @@ def main():
 
     params['start-time'] = start_time
     params['end-time'] = end_time
-    params['shutdown-time'] = end_time
+    params['shutdown time'] = 0.0
     params['shutdown-mode'] = True
 
     #*****************************************************************************
@@ -377,7 +377,7 @@ def main():
     params['steam flowrate'] = params['steam flowrate'] * 2
     params['condenser-runoff-temp'] = condenser_runoff_temp
     condenser = Condenser(params)
-
+    
     condenser.name = 'Condenser'
     condenser.save = True
     condenser.time_step = time_step
@@ -386,7 +386,7 @@ def main():
     plant_net.module(condenser)
 
     #*****************************************************************************
-    params['RCIS-shutdown-time'] = 5 * unit.minute
+    params['RCIS-shutdown-time'] = -1 * unit.minute
     rcis = Cooler(params)
     rcis.name = 'RCIS'
     rcis.save = True
@@ -421,7 +421,6 @@ def main():
         reactor = plant_net.modules[0]
 
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('neutron-dens')
-
         quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
                    y_label=quant.latex_name+' ['+quant.unit+']')
 
