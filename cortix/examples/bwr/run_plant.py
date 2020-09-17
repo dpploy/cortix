@@ -168,7 +168,6 @@ def main():
         reactor = plant_net.modules[0]
 
         (quant, time_unit) = reactor.neutron_phase.get_quantity_history('neutron-dens')
-        print(quant)
         quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
                    y_label=quant.latex_name+' ['+quant.unit+']')
 
@@ -274,7 +273,7 @@ def main():
     # Preamble
 
     start_time = 0.0 * unit.minute
-    end_time = 30 * unit.minute
+    end_time = 60 * unit.minute
     time_step = 30.0 # seconds
     show_time = (True, 5*unit.minute)
 

@@ -120,10 +120,12 @@ class Cooler(Module):
             top of the reactor, in Kelvin.
 
         """
-
         ua = self.params['RCIS_UA']
         cp_rho = 4.184 * unit.kilo * flowrate # Kj/Kg-k
         tc = 287.15 # assumed constant for simplicity
+
+        if self.params['shutdown-mode']:
+            ua = ua/10
 
         #initial guess: outflow temp = 300k
         temp_out_2 = temp_in - 5

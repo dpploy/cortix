@@ -170,9 +170,10 @@ class BWR(Module):
         current_temp = self.__get_coolant_outflow(time)['temp']
         RCIS = False
         if current_temp < 373.15:
-            RCIS = True
+            if self.params['shutdown-mode']:
+                RCIS = True
 
-        if time < self.params['RCIS-shutdown-time'] or self.params['shutdown-mode'] and RCIS:
+        if time < self.params['RCIS-shutdown-time'] or (self.params['shutdown-mode'] and RCIS):
             if self.get_port('coolant-outflow').connected_port:
                 message_time = self.recv('coolant-outflow')
                 coolant_outflow = dict()
