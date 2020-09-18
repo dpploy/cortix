@@ -99,9 +99,14 @@ class Cooler(Module):
 
                 self.send(outflow_temp, 'coolant-outflow')
 
+        # Interactions in the signal-in port
+        #-----------------------------------
+        # one way "from" signal-in
+
         if self.get_port('signal-in').connected_port:
             self.send(time, 'signal-in')
             (check_time, rcis_state) = self.recv('signal-in')
+            assert abs(check_time-time) <= 1e-6
             self.params['offline'] = rcis_state
 
     def __step(self, time=0.0):
