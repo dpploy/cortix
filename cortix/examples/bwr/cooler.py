@@ -73,7 +73,6 @@ class Cooler(Module):
 
         # send to
         if self.status == 'online':
-            print('chingis!')
         if self.params['offline'] == False:
             if self.get_port('coolant-inflow').connected_port:
                 self.send(time, 'coolant-inflow')
@@ -95,8 +94,6 @@ class Cooler(Module):
                 rcis_state = self.recv('signal-in')
                 self.status = rcis_state
                 print('signal is being run!', time)
-
-        print('pingis!')
 
     def __step(self, time=0.0):
         time += self.time_step
