@@ -53,6 +53,110 @@ class BWR(Module):
         self.log = logging.getLogger('cortix')
         self.__logit = False
 
+        #Data pertaining to one-group energy neutron balance
+        self.gen_time = 1.0e-4  # s
+        self.beta = 6.5e-3  # params['k_infty'] = 1.3447
+        # geometric buckling; B = (pi/R)^2 + (2.405/H)^2
+        self.buckling = (math.pi/237.5)**2.0 + (2.405/410)**2.0
+        self.q_0 = 5000
+        # fuel macroscopic absorption cross section, cm^-1
+        self.fuel_macro_a = 1.34226126162
+        # moderator microscopic absorption cross section, cm^2
+        self.mod_micro_a = 0.332 * unit.zepto * unit.milli
+        #number density of the fuel, atoms/cm^3
+        self.n_fuel = 1.9577906e+21
+        #resonance integral, I (dimensionless)
+        self.I = 40.9870483 * unit.zepto * unit.milli
+        # moderator microscopic scattering cross section, cm^2
+        self.mod_micro_s = 20 * unit.zepto * unit.milli
+        self.xi = 1 # average logarithmic energy decrement for light water
+        # energy of a neutron produced by fissioning, in electron volts
+        self.E0 = 2 * unit.mega
+        self.mod_mu0 = 0.71 # migration and diffusion area constants
+        self.eta = 1.03 # fast fission factor
+        self.epsilon = 2.05 # neutron multiplecation factor
+        self.mod_molar_mass = 18 # g/mol
+        
+        # Delayed neutron emission
+        self.species_decay = [0.0124, 0.0305, 0.111, 0.301, 1.14, 3.01] # 1/sec
+        self.species_rel_yield = [0.033, 0.219, 0.196, 0.395, 0.115, 0.042]
+
+        # Data pertaining to two-temperature heat balances
+        self.fis_energy = 180 * 1.602e-13 # J/fission
+        self.enrich = 4.3/100.
+        self.fuel_mat_mass_dens = 10.5 # g/cc
+        #params['moderator_fuel_ratio'] = 387 # atomic number concentration ratio
+        self.sigma_f_o = 586.2 * 100 * 1e-30 # m2
+        self.temp_o = 20 + 273.15 # K
+        self.thermal_neutron_velo = 2200 # m/s
+
+        self.fis_nuclide_num_dens = 9.84e26 # (fissile nuclei)/m3
+
+        self.q_c = 303 # volumetric flow rate
+
+        self.fuel_dens = 10500 # kg/m3
+        self.cp_fuel = 175 # J/(kg K)
+        self.fuel_volume = 7.25  # m3
+
+        self.steam_flowrate = 1820 # kg/s
+        self.coolant_dens = 1000 #  kg/m3
+        self.cp_coolant = 3500# J/(mol K) - > J/(kg K)
+        self.coolant_volume = 7 #m3
+
+        self.ht_coeff = 45000000
+
+        # J/(fission sec) 1.26 t^-1.2 (t in seconds)
+        self.fis_beta_energy = 1.26 * 1.602e-13
+        # J/(fission sec) 1.40 t^-1.2 (t in seconds)
+        self.fis_alpha_energy = 1.40 * 1.602e-13
+        # % subcooling based on the % subcooling that exists at steady state
+        self.subcooling_percent = 1 #(1 -(steam_table._Region4(7, 0)["h"]  - steam_table._Region1(493.15, 7)["h"])/(steam_table._Region4(7,0)["h"]))
+        self.shutdown_temp_reached = False
+        self.q_source_status = 'in' # is q_source inserted (in) or withdrawn (out)
+
+        gen_time = self.gen_time # retrieve neutron generation time
+        self.q_0 = 0.1
+
+        self.n_ss = 0 # neutronless steady state before start up
+
+        rho_0_over_beta = 0.25 # $
+        beta = self.beta
+
+        # control rod reactivity worth; enough to cancel out the negative
+        self.alpha_n = 0
+
+        self.reactivity = rho_0_over_beta * beta # "rho/beta = 10 cents"
+
+        self.temp_o = self.temp_o
+
+        self.tau = 1 # s
+        self.malfunction_subcooling = 0.75
+        self.alpha_n_malfunction = 0
+        n_species = len(self.species_decay)
+
+        assert len(self.species_rel_yield) == n_species
+
+        # initialize concentration vector
+        c_vec_0 = np.zeros(n_species, dtype=np.float64)
+        # retrieve list of decay constants
+        species_decay = self.species_decay
+        lambda_vec = np.array(species_decay) # create a numpy vector
+        beta = self.beta
+        species_rel_yield = self.species_rel_yield
+        # create the beta_i's vector
+        beta_vec = np.array(species_rel_yield) * beta
+        gen_time = self.gen_time # retrieve neutron generation time
+        n_ss = self.n_ss
+        # compute the steady state precursors number density
+        c_vec_ss = beta_vec/lambda_vec/gen_time * n_ss
+        self.c_vec_ss = c_vec_ss
+        # setup initial condition for variables
+        self.n_0 = n_ss
+        self.c_vec_0 = c_vec_ss
+        self.rho_0 = self.reactivity
+
+        self.RCIS = False
+
         # Coolant outflow phase history
         quantities = list()
 
@@ -96,7 +200,7 @@ class BWR(Module):
         # Reactor phase
         quantities = list()
 
-        fuel_temp = Quantity(name='fuel-temp', formalName='T_f', unit='k',
+        fuel_temp = Quantity(name='fuel-temp', formalName='T_f', unit='K',
                              value=params['fuel-temp'], info='Reactor Nuclear Fuel Temperature',
                              latex_name=r'$T_f$')
 
@@ -168,14 +272,18 @@ class BWR(Module):
 
         # send to
         current_temp = self.__get_coolant_outflow(time)['temp']
-        RCIS = False
         if current_temp < 373.15:
-            if self.params['shutdown-mode']:
-                RCIS = True
+            if self.params['operating-mode'] == 'shutdown':
+                self.RCIS = True
 
-        if time < self.params['RCIS-shutdown-time'] or (self.params['shutdown-mode'] and RCIS):
+        if current_temp > 373.15:
+            if self.params['operating-mode'] == 'startup':
+                self.RCIS = False
+
+        if self.RCIS:
             if self.get_port('coolant-outflow').connected_port:
                 message_time = self.recv('coolant-outflow')
+                print('coolant-outflow', message_time)
                 coolant_outflow = dict()
                 coolant_outflow['temp'] = 287.15
                 coolant_outflow['pressure'] = 0
@@ -184,28 +292,30 @@ class BWR(Module):
                 self.send((message_time, coolant_outflow), 'coolant-outflow')
 
             if self.get_port('RCIS-outflow').connected_port:
+                print('rcis-outflow')
                 message_time = self.recv('RCIS-outflow')
+                print('time_received')
                 coolant_outflow = self.__get_coolant_outflow(message_time)
+                coolant_outflow['flowrate'] = 5280 # kg/s
                 self.send((message_time, coolant_outflow), 'RCIS-outflow')
-
             if self.get_port('coolant-inflow').connected_port:
+                print('coolant-inflow')
                 self.send(time, 'coolant-inflow')
                 (check_time, useless) = self.recv('coolant-inflow')
 
             if self.get_port('RCIS-inflow').connected_port:
-                self.send(time, 'RCIS-inflow')
+                print('rcis-inflow')
                 inflow_temp = self.recv('RCIS-inflow')
                 self.params['inflow-cool-temp'] = inflow_temp
 
             if self.get_port('signal-out').connected_port:
-                RCIS_status = False
-
-                message_time = self.recv('signal-in')
-                self.send((message_time, RCIS_status), 'signal-out')
+                print('signal-out')
+                RCIS_status = self.__get_signal_out(0)
+                self.send(RCIS_status, 'signal-out')
         else:
 
             if self.get_port('coolant-outflow').connected_port:
-
+                print('coolant-outflow', time)
                 message_time = self.recv('coolant-outflow')
 
                 coolant_outflow = self.__get_coolant_outflow(message_time)
@@ -220,34 +330,23 @@ class BWR(Module):
 
             # receive from
 
-            if self.get_port('RCIS-outflow').connected_port:
-                message_time = self.recv('RCIS-outflow')
-                coolant_outflow = self.__get_coolant_outflow(message_time)
-                self.send((message_time, coolant_outflow), 'RCIS-outflow')
-
             if self.get_port('coolant-inflow').connected_port:
-
+                print('coolant-inflow')
                 self.send(time, 'coolant-inflow')
                 (check_time, inflow_cool_temp) = self.recv('coolant-inflow')
 
                 assert abs(check_time-time) <= 1e-6
                 self.params['inflow-cool-temp'] = inflow_cool_temp
 
-            if self.get_port('RCIS-inflow').connected_port:
-                self.send(time, 'RCIS-inflow')
-                useless = self.recv('RCIS-inflow')
             # Interactions in the signal-out port
             #-----------------------------------------
             # one way "to" signal-out
 
             # send to
-        if self.get_port('signal-out').connected_port:
-
-            message_time = self.recv('signal-out')
-
-            #signal_out = self.__get_signal_out(time)
-
-            self.send((message_time, signal_out), 'signal-out')
+            if self.get_port('signal-out').connected_port:
+                signal_out = self.__get_signal_out(time)
+                self.send(signal_out, 'signal-out')
+                print('this signal is being run!')
 
     def __step(self, time=0.0):
         r"""ODE IVP problem.
@@ -304,6 +403,27 @@ class BWR(Module):
         self.reactor_phase.set_value('fuel-temp', fuel_temp, time)
 
         return time
+
+    def __get_signal_out(self, time):
+        """Determine whether the RCIS module should be on or off.
+
+        Parameters
+        ----------
+        time: float
+            Time in SI unit.
+
+        Returns
+        -------
+        signal: string
+            either 'online' or 'offline' to represent desired RCIS operation mode
+        """
+        if self.RCIS:
+            signal = 'online'
+            return(signal)
+        else:
+            signal = 'offline'
+            return(signal)
+
 
     def __get_coolant_outflow(self, time):
         """Get the coolant outflow stream.
@@ -400,56 +520,56 @@ class BWR(Module):
 
         rho = 1 / steam._Region4(pressure, 0)['v'] # mass density, kg/m3
 
-        n_m = ((rho * unit.kilo)/params['mod molar mass']) * unit.N_A * (unit.centi)**3
+        n_m = ((rho * unit.kilo)/self.mod_molar_mass) * unit.N_A * (unit.centi)**3
         # number density of the moderator
-        d_nm = ((d_rho * unit.kilo)/params['mod molar mass']) * unit.N_A * (unit.centi)**3 #dNm/dTm
+        d_nm = ((d_rho * unit.kilo)/self.mod_molar_mass) * unit.N_A * (unit.centi)**3 #dNm/dTm
         d_nm = d_nm * unit.zepto * unit.milli
 
-        mod_macro_a = params['mod micro a'] * n_m
+        mod_macro_a = self.mod_micro_a * n_m
         # macroscopic absorption cross section of the moderator
-        mod_macro_s = params['mod micro s'] * n_m
+        mod_macro_s = self.mod_micro_s * n_m
         # macroscopic scattering cross section of the moderator
 
-        F = params['fuel macro a']/(params['fuel macro a'] + mod_macro_a) # thermal utilization, F
+        F = self.fuel_macro_a/(self.fuel_macro_a + mod_macro_a) # thermal utilization, F
     #dF/dTm
-        d_f = -1*(params['fuel macro a'] * params['mod micro a'] * d_nm)/(
-            (params['fuel macro a'] + mod_macro_a)**2)
+        d_f = -1*(self.fuel_macro_a * self.mod_micro_a * d_nm)/(
+            (self.fuel_macro_a + mod_macro_a)**2)
 
         # Resonance escape integral, P
-        P = math.exp((-1 * params['n fuel'] * (params['fuel_volume']) * params['I'])/
+        P = math.exp((-1 * self.n_fuel * (self.fuel_volume) * self.I)/
                      ((mod_macro_s * 3000)))
         #dP/dTm
-        d_p = P * (-1 * params['n fuel'] * params['fuel_volume'] * unit.centi**3 *
-                   (params['mod micro s']) * d_nm)/(mod_macro_s * 3000 * unit.centi**3)**2
+        d_p = P * (-1 * self.n_fuel * self.fuel_volume * unit.centi**3 *
+                   (self.mod_micro_s) * d_nm)/(mod_macro_s * 3000 * unit.centi**3)**2
 
         e_th = 0.0862 * temp # convert temperature to energy in MeV
-        e_one = mod_macro_s/math.log(params['E0']/e_th)
+        e_one = mod_macro_s/math.log(self.E0/e_th)
         # neutron thermalization macroscopic cross section
 
-        d_f = 1/(3 * mod_macro_s * (1 - params['mod mu0'])) # neutron diffusion coefficient
+        d_f = 1/(3 * mod_macro_s * (1 - self.mod_mu0)) # neutron diffusion coefficient
         tau = d_f/e_one # fermi age, tau
         #dTau/dTm
-        d_tau = (((0.0862 * (e_th/params['E0'])) * 3 * n_m) - math.log(params['E0']/e_th) *
-                 ((params['mod micro s'] * d_nm))/((3 * n_m)**2 * (1 - params['mod mu0'])))
+        d_tau = (((0.0862 * (e_th/self.E0)) * 3 * n_m) - math.log(self.E0/e_th) *
+                 ((self.mod_micro_s * d_nm))/((3 * n_m)**2 * (1 - self.mod_mu0)))
 
-        L = math.sqrt(1/(3 * mod_macro_s * mod_macro_a * (1 - params['mod mu0'])))
+        L = math.sqrt(1/(3 * mod_macro_s * mod_macro_a * (1 - self.mod_mu0)))
         # diffusion length L
         # dL/dTm
-        d_l = 1/(2 * math.sqrt((-2 * d_nm * unit.zepto * unit.milli)/(3 * params['mod micro s'] * (params['mod micro a'] * (n_m * unit.zepto * unit.milli)**3 * ((1 - params['mod mu0']))))))
+        d_l = 1/(2 * math.sqrt((-2 * d_nm * unit.zepto * unit.milli)/(3 * self.mod_micro_s * (self.mod_micro_a * (n_m * unit.zepto * unit.milli)**3 * ((1 - self.mod_mu0))))))
 
         # left term of the numerator of the moderator temperature feedback coefficient, alpha
-        left_first_term = d_tau * (params['buckling']**2 + L**2 * params['buckling']**4)
+        left_first_term = d_tau * (self.buckling**2 + L**2 * self.buckling**4)
         #holding L as constant
-        left_second_term = d_l * (2 * L * params['buckling']**2 + 2 * L *
-                                  (tau * params['buckling']**4)) # holding tau as constant
+        left_second_term = d_l * (2 * L * self.buckling**2 + 2 * L *
+                                  (tau * self.buckling**4)) # holding tau as constant
         left_term = (P * F) * (left_first_term + left_second_term)
         # combining with P and F held as constant
 
-        right_1st_term = (-1) * (1 + ((tau + d_l**2) * params['buckling']**2) + \
-                tau * d_l**2 * params['buckling']**4) # num as const
+        right_1st_term = (-1) * (1 + ((tau + d_l**2) * self.buckling**2) + \
+                tau * d_l**2 * self.buckling**4) # num as const
 
-        right_first_term = (-1) * ((1 + ((tau + L**2) * params['buckling']**2))
-                                   + tau * L**2 * params['buckling']**4) # num as const
+        right_first_term = (-1) * ((1 + ((tau + L**2) * self.buckling**2))
+                                   + tau * L**2 * self.buckling**4) # num as const
         right_second_term = F * d_p # holding thermal utilization as constant
         right_third_term = P * d_f # holding resonance escpae as constant
         right_term = right_first_term * (right_second_term + right_third_term)
@@ -457,7 +577,7 @@ class BWR(Module):
 
         # numerator and denominator
         numerator = left_term + right_term
-        denominator = params['eta'] * params['epsilon'] * \
+        denominator = self.eta * self.epsilon * \
                 (F * P)**2
 
         alpha_tn = numerator/denominator
@@ -488,10 +608,10 @@ class BWR(Module):
         --------
         """
 
-        rho_0 = params['rho_0']
-        temp_ref = params['temp_0']
+        rho_0 = self.rho_0
+        temp_ref = self.temp_o
         #n_dens_ss_operation = params['n_dens_ss_operation']
-        alpha_n = params['alpha_n']
+        alpha_n = self.alpha_n
 
         if temp < 293.15:
             # if temperature is less than the starting temperature then moderator
@@ -504,7 +624,7 @@ class BWR(Module):
         if params['malfunction start'] < time < params['malfunction end']:
             # reg rod held in position; only mod temp reactivity varies with time
             # during malfunction
-            alpha_n = params['alpha_n_malfunction']
+            alpha_n = self.alpha_n_malfunction
             rho_t = rho_0 + alpha_n + alpha_tn * (temp - temp_ref)
 
         elif time > params['shutdown time']:
@@ -518,14 +638,14 @@ class BWR(Module):
             #rho_current = (1 - n_dens) * rho_0
             #alpha_n = rho_current - rho_0 - alpha_tn * (temp - temp_ref)
             #rho_t = rho_current
-            #params['alpha_n_malfunction'] = alpha_n
+            #self.alpha_n_malfunction = alpha_n
             rho_t = rho_0
 
         else:
             rho_current = (1 - n_dens) * rho_0
             alpha_n = rho_current - rho_0 - alpha_tn * (temp - temp_ref)
             rho_t = rho_current
-            params['alpha_n_malfunction'] = alpha_n
+            self.alpha_n_malfunction = alpha_n
 
         return (rho_t, alpha_n, alpha_tn * (temp - temp_ref))
 
@@ -547,20 +667,20 @@ class BWR(Module):
         Examples
         --------
         """
-        q_0 = params['q_0']
+        q_0 = self.q_0
 
         if time <= 30 and params['shutdown-mode'] == False: # small time value
             q_source = q_0
         else:
             q_source = 0.0
-            params['q_source_status'] = 'out'
+            self.q_source_status = 'out'
 
         return q_source
 
     def __sigma_fis_func(self, temp, params):
         """Place holder for implementation
         """
-        sigma_f = params['sigma_f_o']  * math.sqrt(298/temp) * math.sqrt(math.pi) * 0.5
+        sigma_f = self.sigma_f_o  * math.sqrt(298/temp) * math.sqrt(math.pi) * 0.5
 
         return sigma_f
 
@@ -569,17 +689,17 @@ class BWR(Module):
         """
         # include the neutrons from the initial source
 
-        rxn_heat = params['fis_energy'] # get fission reaction energy J per reaction
+        rxn_heat = self.fis_energy # get fission reaction energy J per reaction
 
         sigma_f = self.__sigma_fis_func(temp, self.params) # m2
 
-        fis_nuclide_num_dens = params['fis_nuclide_num_dens_fake'] #  #/m3
+        fis_nuclide_num_dens = self.fis_nuclide_num_dens #  #/m3
 
         sigma_fis = sigma_f * fis_nuclide_num_dens # macroscopic cross section
 
-        v_o = params['thermal_neutron_velo'] # m/s
+        v_o = self.thermal_neutron_velo # m/s
 
-        neutron_flux = n_dens * 0.9E15 * v_o * sigma_f/params['sigma_f_o']*0.7
+        neutron_flux = n_dens * 0.9E15 * v_o * sigma_f/self.sigma_f_o*0.7
 
          #reaction rate density
         rxn_rate_dens = sigma_fis * neutron_flux
@@ -598,7 +718,7 @@ class BWR(Module):
 
     def __heat_sink_rate(self, time, temp_f, temp_c, params):
 
-        ht_coeff = params['ht_coeff']
+        ht_coeff = self.ht_coeff
 
         q_f = - ht_coeff * (temp_f - temp_c)
         return q_f
@@ -621,7 +741,7 @@ class BWR(Module):
         temp_c = u_vec[-1] # get temperature of coolant
 
         # initialize f_vec to zero
-        species_decay = params['species_decay']
+        species_decay = self.species_decay
         lambda_vec = np.array(species_decay)
         n_species = len(lambda_vec)
 
@@ -631,8 +751,8 @@ class BWR(Module):
         #----------------
         rho_t = self.__rho_func(time, n_dens, temp_c, self.params)[0]
 
-        beta = params['beta']
-        gen_time = params['gen_time']
+        beta = self.beta
+        gen_time = self.gen_time
 
         assert len(lambda_vec) == len(c_vec)
 
@@ -642,7 +762,7 @@ class BWR(Module):
         # n species balances (implicit loop)
         #-----------------------------------
 
-        species_rel_yield = params['species_rel_yield']
+        species_rel_yield = self.species_rel_yield
         beta_vec = np.array(species_rel_yield) * beta
 
         assert len(lambda_vec) == len(c_vec)
@@ -653,9 +773,9 @@ class BWR(Module):
         #--------------------
         # fuel energy balance
         #--------------------
-        rho_f = params['fuel_dens']
-        cp_f = params['cp_fuel']
-        vol_fuel = params['fuel_volume']
+        rho_f = self.fuel_dens
+        cp_f = self.cp_fuel
+        vol_fuel = self.fuel_volume
 
         pwr_dens = self.__nuclear_pwr_dens_func(time, (temp_f+temp_c)/2,
                                                 n_dens, self.params)
@@ -669,14 +789,14 @@ class BWR(Module):
         #-----------------------
         # coolant energy balance
         #-----------------------
-        rho_c = params['coolant_dens']
-        cp_c = params['cp_coolant']
-        vol_cool = params['coolant_volume']
+        rho_c = self.coolant_dens
+        cp_c = self.cp_coolant
+        vol_cool = self.coolant_volume
 
         # subcooled liquid
         pump_out = params['inflow-cool-temp']
 
-        tau = params['tau_fake']
+        tau = self.tau
 
         heat_source = heat_sink
         temp_in = pump_out

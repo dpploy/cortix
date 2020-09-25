@@ -53,11 +53,12 @@ class Turbine(Module):
         self.show_time = (False, 10.0)
 
         self.log = logging.getLogger('cortix')
+        self.efficiency = 0.8
 
         # Inflow phase history
         quantities = list()
 
-        temp = Quantity(name='temp', formal_name='T_in', unit='k', value=params['coolant-temp'],
+        temp = Quantity(name='temp', formal_name='T_in', unit='K', value=params['coolant-temp'],
                         info='Turbine Steam Inflow Temperature', latex_name=r'$T_i$')
 
         quantities.append(temp)
@@ -68,7 +69,7 @@ class Turbine(Module):
         # Outflow phase history
         quantities = list()
 
-        temp = Quantity(name='temp', formal_name='T_o', unit='k', value=params['turbine-outflow-temp'],
+        temp = Quantity(name='temp', formal_name='T_o', unit='K', value=params['turbine-outflow-temp'],
                         info='Turbine Steam Outflow Temperature', latex_name=r'$T_o$')
 
         quantities.append(temp)
@@ -286,7 +287,7 @@ class Turbine(Module):
         #calculate the real runoff enthalpy
         w_ideal = inlet_enthalpy - h_ideal #on a per mass basis
         #assert(w_ideal > 0)
-        w_real = w_ideal * params['turbine efficiency']
+        w_real = w_ideal * self.efficiency
         h_real = inlet_enthalpy - w_ideal
         assert h_real > 0
         if w_real < 0:

@@ -53,6 +53,15 @@ class Condenser(Module):
         self.time_step = 10.0
         self.log = logging.getLogger('cortix')
 
+        # data required by the condenser
+        self.pipe_diameter = 0.1 #m
+        self.liquid_velocity = 10 #m/s
+        self.cooling_water_flowrate = 100000 #kg/s
+        self.heat_transfer_area = 10200 #m2, or 500 4m long, 0.1m diameter pipes
+        self.condensation_ht_coeff = 5000 # w/m-k
+        self.subcooling_ht_coeff = 1000 # w/m-k
+
+
         # Condenser outflow phase history
         quantities = list()
 
@@ -207,16 +216,16 @@ class Condenser(Module):
         h_mixture = steam_table._Region4(pressure, chi_in)['h']
         h_dewpt = steam_table._Region4(pressure, 0)['h']
         heat_pwr = (h_mixture - h_dewpt) * unit.kilo * flowrate
-        area_required = heat_pwr/(params['condensation_ht_coeff'] * (temp_in - t_coolant))
-        area_remaining = params['heat transfer area'] - area_required
+        area_required = heat_pwr/(self.condensation_ht_coeff * (temp_in - t_coolant))
+        area_remaining = self.heat_transfer_area - area_required
 
         if area_remaining < 0:
             return 287.15
         else:
             initial_coolant_temp = 14 + 273.15
-            delta_t = heat_pwr/(params['cooling water flowrate'] * unit.kilo * 4.184)
+            delta_t = heat_pwr/(self.cooling_water_flowrate * unit.kilo * 4.184)
             final_coolant_temp = initial_coolant_temp + delta_t
-            subcooling_pwr = area_remaining * params['subcooling_ht_coeff'] * (temp_in - final_coolant_temp)
+            subcooling_pwr = area_remaining * self.subcooling_ht_coeff * (temp_in - final_coolant_temp)
             delta_tb = subcooling_pwr/(flowrate * 4.184 * unit.kilo)
             runoff_temp = temp_in - delta_tb
             
@@ -282,7 +291,7 @@ class Condenser(Module):
             critical_temp = steam_table._TSat_P(pressure)
             sat_liquid = steam_table.IAPWS97(T=critical_temp - 1, P=pressure)
             water_cp = steam_table.IAPWS97(T=287.15, P=0.1013).cp
-            delta_tb = heat_pwr/(params['cooling water flowrate'] * \
+            delta_tb = heat_pwr/(self.cooling_water_flowrate * \
                     water_cp * unit.kilo)
             t_c_in = 14 + 273.15
             t_c_out = 14 + 273.15 + delta_tb
@@ -290,8 +299,8 @@ class Condenser(Module):
             lmtd = (t_c_out - t_c_in)/(math.log(critical_temp - t_c_in))/\
                     (critical_temp - t_c_out)
 
-            pipe_diameter = params['pipe_diameter']
-            liquid_velocity = params['liquid_velocity']
+            pipe_diameter = self.pipe_diameter
+            liquid_velocity = self.liquid_velocity
 
             #calculate the convective heat transfer coefficient on a liquid basis
             #from the Churchill-Bernstein correlation
@@ -332,7 +341,7 @@ class Condenser(Module):
             #before being fully condensed
             condensation_area = (heat_pwr/(alpha_sh * lmtd))
 
-            remaining_area = params['heat transfer area'] - condensation_area
+            remaining_area = self.heat_transfer_area - condensation_area
             condenser_runoff = critical_temp
             print(remaining_area)
             #if time > params['malfunction start'] and time < params['malfunction end']:
@@ -423,7 +432,7 @@ class Condenser(Module):
 
                     coolant_cp = steam_table.IAPWS97(T=coolant_in, P=0.005).cp
                     iterated_coolant_final_temp = ((q_1/(coolant_cp *
-                                                         params['cooling water flowrate']
+                                                         self.cooling_water_flowrate
                                                          * unit.kilo)) + coolant_in)
 
                     steam_cp = steam_table.IAPWS97(T=runoff_in, P=0.005).cp

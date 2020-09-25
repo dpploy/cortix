@@ -64,6 +64,7 @@ def main():
     reactor.time_step = time_step
     reactor.end_time = end_time
     reactor.show_time = show_time
+    reactor.RCIS = True
 
     # Add reactor module to network
     plant_net.module(reactor)
@@ -152,7 +153,7 @@ def main():
     plant_net.connect([condenser, 'outflow'], [reactor, 'coolant-inflow'])
     plant_net.connect([reactor, 'RCIS-outflow'], [rcis, 'coolant-inflow'])
     plant_net.connect([rcis, 'coolant-outflow'], [reactor, 'RCIS-inflow'])
-
+    plant_net.connect([rcis, 'signal-in'], [reactor, 'signal-out'])
     plant_net.draw()
 
     #*****************************************************************************
@@ -301,6 +302,7 @@ def main():
     params['n-dens'] = n_dens
     params['fuel-temp'] = fuel_temp
     params['coolant-temp'] = coolant_temp
+    params['operating-mode'] = 'shutdown'
     reactor = BWR(params)
 
     reactor.name = 'BWR'
@@ -308,6 +310,7 @@ def main():
     reactor.time_step = time_step
     reactor.end_time = end_time
     reactor.show_time = show_time
+    reactor.RCIS = False
 
     # Add reactor module to network
     plant_net.module(reactor)
@@ -404,7 +407,7 @@ def main():
     plant_net.connect([condenser, 'outflow'], [reactor, 'coolant-inflow'])
     plant_net.connect([reactor, 'RCIS-outflow'], [rcis, 'coolant-inflow'])
     plant_net.connect([rcis, 'coolant-outflow'], [reactor, 'RCIS-inflow'])
-
+    plant_net.connect([rcis, 'signal-in'], [reactor, 'signal-out'])
     plant_net.draw()
 
     #*****************************************************************************

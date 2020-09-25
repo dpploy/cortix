@@ -6,12 +6,8 @@
 import logging
 
 import math
-from scipy.integrate import odeint
 import scipy.constants as unit
 import numpy as np
-
-import iapws.iapws97 as steam
-import iapws.iapws95 as steam2
 
 from cortix import Module
 from cortix.support.phase_new import PhaseNew as Phase
@@ -32,17 +28,18 @@ class Cooler(Module):
 
         self.params = params
 
-        self.params['offline'] = False
+        self.status = 'online'
 
         self.initial_time = params['start-time']
         self.end_time = params['end-time']
         self.time_step = 10.0
-
+        
         self.show_time = (False, 10.0)
 
         self.log = logging.getLogger('cortix')
         self.__logit = False
 
+        self.rcis_ua = 100000000 #w/m-k
     def run(self, *args):
 
         # Some logic for logging time stamps
@@ -78,24 +75,29 @@ class Cooler(Module):
         # one way "to" coolant-outflow
 
         # send to
-        if self.params['offline'] == False:
-
+        if self.status == 'online':
+            print('chingis!')
             if self.get_port('coolant-inflow').connected_port:
                 self.send(time, 'coolant-inflow')
                 (check_time, inflow_state) = self.recv('coolant-inflow')
                 inflow_temp = inflow_state['temp']
-                flowrate = 5280 # kg/s
+                flowrate = inflow_state['flowrate'] # kg/s
 
                 outflow_temp = self.__get_coolant_outflow(check_time, inflow_temp, flowrate, self.params)
-                message_time = self.recv('coolant-outflow')
                 self.send(outflow_temp, 'coolant-outflow')
 
-        if self.get_port('signal-in').connected_port:
-            self.send(time, 'signal-in')
-            (check_time, rcis_state) = self.recv('signal-in')
-            self.params['offline'] = rcis_state
+                if self.get_port('signal-in').connected_port:
+                    rcis_state = self.recv('signal-in')
+                    self.status = rcis_state
+                    print('signal is being run!', time)
 
+        else:
+            if self.get_port('signal-in').connected_port:
+                rcis_state = self.recv('signal-in')
+                self.status = rcis_state
+                print('signal is being run!', time)
 
+        print('pingis!')
     def __step(self, time=0.0):
         time += self.time_step
         return time
@@ -120,11 +122,11 @@ class Cooler(Module):
             top of the reactor, in Kelvin.
 
         """
-        ua = self.params['RCIS_UA']
+        ua = self.rcis_ua
         cp_rho = 4.184 * unit.kilo * flowrate # Kj/Kg-k
         tc = 287.15 # assumed constant for simplicity
 
-        if self.params['shutdown-mode']:
+        if self.params['operating-mode'] == 'shutdown':
             ua = ua/10
 
         #initial guess: outflow temp = 300k
