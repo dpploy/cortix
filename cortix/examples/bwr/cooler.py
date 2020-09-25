@@ -73,7 +73,6 @@ class Cooler(Module):
 
         # send to
         if self.status == 'online':
-        if self.params['offline'] == False:
             if self.get_port('coolant-inflow').connected_port:
                 self.send(time, 'coolant-inflow')
                 (check_time, inflow_state) = self.recv('coolant-inflow')
