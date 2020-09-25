@@ -73,7 +73,6 @@ class Cooler(Module):
 
         # send to
         if self.status == 'online':
-        if self.params['offline'] == False:
             if self.get_port('coolant-inflow').connected_port:
                 self.send(time, 'coolant-inflow')
                 (check_time, inflow_state) = self.recv('coolant-inflow')
@@ -132,13 +131,13 @@ class Cooler(Module):
         
         while abs(temp_out_2 - temp_out_1) > 0.1:
             temp_out_1 = temp_out_2
-            delta_t1 = temp_in - 287.15
-            delta_t2 = temp_out_1 - 287.15
+            delta_t1 = temp_in - tc
+            delta_t2 = temp_out_1 - tc
             lmtd = (delta_t1 - delta_t2)/np.log(delta_t1/delta_t2)
             quantity = ua * lmtd / cp_rho
             temp_out_2 = temp_in - quantity
-            if temp_out_2 < 287.15:
-                temp_out_2 = 287.15
+            if temp_out_2 < tc:
+                temp_out_2 = tc
                 break
 
         return(temp_out_2)
