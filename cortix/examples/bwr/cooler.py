@@ -120,7 +120,7 @@ class Cooler(Module):
         """
         heat_transfer_coef = self.rcis_ua
         cp_rho = 4.184 * unit.kilo * flowrate # Kj/Kg-k
-        #unused temp_coolant = 287.15 # assumed constant for simplicity
+        tc = 287.15 # assumed constant for simplicity
 
         if self.params['operating-mode'] == 'shutdown':
             heat_transfer_coef = heat_transfer_coef/10
