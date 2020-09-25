@@ -40,6 +40,7 @@ class Cooler(Module):
         self.__logit = False
 
         self.rcis_ua = 100000000 #w/m-k
+
     def run(self, *args):
 
         # Some logic for logging time stamps
@@ -71,16 +72,24 @@ class Cooler(Module):
     def __call_ports(self, time):
 
 
-        # send to
+
         if self.status == 'online':
+
+            # Interactions in the coolant-inflow port
+            #-----------------------------------------
+            # one way "from" coolant-inflow
+
             if self.get_port('coolant-inflow').connected_port:
+
                 self.send(time, 'coolant-inflow')
                 (check_time, inflow_state) = self.recv('coolant-inflow')
                 assert abs(check_time-time) <= 1e-6
                 inflow_temp = inflow_state['temp']
                 flowrate = inflow_state['flowrate'] # kg/s
 
-                outflow_temp = self.__get_coolant_outflow(check_time, inflow_temp, flowrate, self.params)
+                outflow_temp = self.__get_coolant_outflow(check_time, inflow_temp,
+                                                          flowrate, self.params)
+
                 self.send(outflow_temp, 'coolant-outflow')
 
                 if self.get_port('signal-in').connected_port:
@@ -89,6 +98,7 @@ class Cooler(Module):
                     print('signal is being run!', time)
 
         else:
+
             if self.get_port('signal-in').connected_port:
                 rcis_state = self.recv('signal-in')
                 self.status = rcis_state
