@@ -1,11 +1,11 @@
-'''
-Models a condenser with steam flowing perpendicular to several horizontal tubes.
-Returns the runoff temperature of steam from the condenser.
-'''
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment.
 # https://cortix.org
+'''
+Models a condenser with steam flowing perpendicular to several horizontal tubes.
+Returns the runoff temperature of steam from the condenser.
+'''
 
 import logging
 import math
@@ -103,8 +103,6 @@ class Condenser(Module):
             #---------------------
             time = self.__step(time)
 
-        return
-
     def tester(self):
         """Passes a string of test data (temperature, chi) to the condenser to debug the model itself."""
         x = '===================='
@@ -117,7 +115,7 @@ class Condenser(Module):
             output = self.__condenser(0, i, test_chi, self.params)
             print('temp is ', i, ' and outflow temp is ', output)
             output_vector.append(output)
-        
+
         #test how the system responds to different chi's
         print(x, '\n', 'TESTING CHI', '\n', x)
         chi = np.linspace(0, 0.98, 100)
