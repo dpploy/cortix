@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment.
 # https://cortix.org
+'''
+Heat exchanger used for reactor startup, shutdown and emergency operation.
+'''
 
 import logging
 
-import math
 import scipy.constants as unit
 import numpy as np
 
 from cortix import Module
-from cortix.support.phase_new import PhaseNew as Phase
-from cortix import Quantity
 
 class Cooler(Module):
     """RCIS used in emergencies, cold startup and shutdown.
@@ -33,7 +33,7 @@ class Cooler(Module):
         self.initial_time = params['start-time']
         self.end_time = params['end-time']
         self.time_step = 10.0
-        
+
         self.show_time = (False, 10.0)
 
         self.log = logging.getLogger('cortix')
@@ -47,7 +47,7 @@ class Cooler(Module):
             self.end_time = self.initial_time + self.time_step
 
         time = self.initial_time
-        print_time = self.initial_time
+        #unused print_time = self.initial_time
         print_time_step = self.show_time[1]
         if print_time_step < self.time_step:
             print_time_step = self.time_step
@@ -118,26 +118,26 @@ class Cooler(Module):
             top of the reactor, in Kelvin.
 
         """
-        ua = self.rcis_ua
+        heat_transfer_coef = self.rcis_ua
         cp_rho = 4.184 * unit.kilo * flowrate # Kj/Kg-k
-        tc = 287.15 # assumed constant for simplicity
+        #unused temp_coolant = 287.15 # assumed constant for simplicity
 
         if self.params['operating-mode'] == 'shutdown':
-            ua = ua/10
+            heat_transfer_coef = heat_transfer_coef/10
 
         #initial guess: outflow temp = 300k
         temp_out_2 = temp_in - 5
         temp_out_1 = 999
-        
+
         while abs(temp_out_2 - temp_out_1) > 0.1:
             temp_out_1 = temp_out_2
             delta_t1 = temp_in - tc
             delta_t2 = temp_out_1 - tc
             lmtd = (delta_t1 - delta_t2)/np.log(delta_t1/delta_t2)
-            quantity = ua * lmtd / cp_rho
+            quantity = heat_transfer_coef * lmtd / cp_rho
             temp_out_2 = temp_in - quantity
             if temp_out_2 < tc:
                 temp_out_2 = tc
                 break
 
-        return(temp_out_2)
+        return temp_out_2
