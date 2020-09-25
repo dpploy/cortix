@@ -70,16 +70,15 @@ class Cooler(Module):
 
     def __call_ports(self, time):
 
-        # Interactions in the coolant-outflow port
-        #-----------------------------------------
-        # one way "to" coolant-outflow
 
         # send to
         if self.status == 'online':
             print('chingis!')
+        if self.params['offline'] == False:
             if self.get_port('coolant-inflow').connected_port:
                 self.send(time, 'coolant-inflow')
                 (check_time, inflow_state) = self.recv('coolant-inflow')
+                assert abs(check_time-time) <= 1e-6
                 inflow_temp = inflow_state['temp']
                 flowrate = inflow_state['flowrate'] # kg/s
 
@@ -98,6 +97,7 @@ class Cooler(Module):
                 print('signal is being run!', time)
 
         print('pingis!')
+
     def __step(self, time=0.0):
         time += self.time_step
         return time
