@@ -71,8 +71,6 @@ class Cooler(Module):
 
     def __call_ports(self, time):
 
-
-
         if self.status == 'online':
 
             # Interactions in the coolant-inflow port
@@ -87,22 +85,33 @@ class Cooler(Module):
                 inflow_temp = inflow_state['temp']
                 flowrate = inflow_state['flowrate'] # kg/s
 
-                outflow_temp = self.__get_coolant_outflow(check_time, inflow_temp,
+
+            # Interactions in the coolant-outflow port
+            #-----------------------------------------
+            # one way "to" coolant-outflow
+
+            if self.get_port('coolant-outflow').connected_port:
+
+                message_time = self.recv('coolant-outflow')
+
+                outflow_temp = self.__get_coolant_outflow(message_time,
+                                                          inflow_temp,
                                                           flowrate, self.params)
 
                 self.send(outflow_temp, 'coolant-outflow')
 
-                if self.get_port('signal-in').connected_port:
-                    rcis_state = self.recv('signal-in')
-                    self.status = rcis_state
-                    print('signal is being run!', time)
+        # Interactions in the signal-in port
+        #-----------------------------------------
+        # one way "to" coolant-outflow
 
-        else:
+        if self.get_port('signal-in').connected_port:
 
-            if self.get_port('signal-in').connected_port:
-                rcis_state = self.recv('signal-in')
-                self.status = rcis_state
-                print('signal is being run!', time)
+            self.send(time, 'coolant-inflow')
+            (check_time, rcis_state) = self.recv('signal-in')
+            assert abs(check_time-time) <= 1e-6
+            rcis_state = self.recv('signal-in')
+            self.status = rcis_state
+            print('signal is being run!', time)
 
     def __step(self, time=0.0):
         time += self.time_step
