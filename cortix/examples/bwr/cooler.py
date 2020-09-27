@@ -102,7 +102,7 @@ class Cooler(Module):
 
         # Interactions in the signal-in port
         #-----------------------------------------
-        # one way "to" coolant-outflow
+        # one way "to" signal-in
 
         if self.get_port('signal-in').connected_port:
 
