@@ -37,6 +37,11 @@ class Condenser(Module):
         params: dict
             All parameters for the module in the form of a dictionary.
 
+        Note
+        ----
+        vfda: External parameters must be eliminated. All parameters must have a
+        default value internally as an attribute.
+
         """
 
         super().__init__()
@@ -135,9 +140,6 @@ class Condenser(Module):
         pyplot.title('inflow quality vs outflow temperature')
         pyplot.savefig('inflow-quality-vs-outflow-temp.png')
         return
-
-
-
 
     def __call_ports(self, time):
 
