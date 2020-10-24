@@ -245,19 +245,20 @@ class Condenser(Module):
         #advanced model that gives realistic values.
         pressure = 0.005
         t_coolant = 14 + 273.15
-        h_mixture = steam_table._Region4(pressure, chi_in)['h']
-        h_dewpt = steam_table._Region4(pressure, 0)['h']
+        h_mixture = steam_table._Region4(pressure, chi_in)['h'] # TODO protected
+        h_dewpt = steam_table._Region4(pressure, 0)['h'] # TODO protected
         heat_pwr = (h_mixture - h_dewpt) * unit.kilo * flowrate
         area_required = heat_pwr/(self.condensation_ht_coeff * (temp_in - t_coolant))
         area_remaining = self.heat_transfer_area - area_required
 
-        if area_remaining < 0:
+        if area_remaining < 0: # TODO check unecessary else
             return 287.15
         else:
             initial_coolant_temp = 14 + 273.15
             delta_t = heat_pwr/(self.cooling_water_flowrate * unit.kilo * 4.184)
             final_coolant_temp = initial_coolant_temp + delta_t
-            subcooling_pwr = area_remaining * self.subcooling_ht_coeff * (temp_in - final_coolant_temp)
+            subcooling_pwr = area_remaining * self.subcooling_ht_coeff *
+                             (temp_in - final_coolant_temp)
             delta_tb = subcooling_pwr/(flowrate * 4.184 * unit.kilo)
             runoff_temp = temp_in - delta_tb
 
