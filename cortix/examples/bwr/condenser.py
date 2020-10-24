@@ -175,12 +175,13 @@ class Condenser(Module):
         # one way "from" inflow-1
 
         # from
-        self.send(time, 'inflow-1')
-        (check_time, inflow_state) = self.recv('inflow-1')
-        assert abs(check_time-time) <= 1e-6
+        if self.get_port('inflow-1').connected_port:
+            self.send(time, 'inflow-1')
+            (check_time, inflow_state) = self.recv('inflow-1')
+            assert abs(check_time-time) <= 1e-6
 
-        self.inflow_state = inflow_state
-        self.inflow_state['time'] = time
+            self.inflow_state = inflow_state
+            self.inflow_state['time'] = time
 
         # Interactions in the inflow port
         #----------------------------------------
@@ -199,12 +200,13 @@ class Condenser(Module):
         #-----------------------------------------
         # one way "to" outflow
 
-        message_time = self.recv('outflow')
-        #outflow_state = dict()
-        outflow_cool_temp = self.outflow_phase.get_value('temp', time)
-        condenser_runoff = dict()
-        condenser_runoff['outflow-temp'] = outflow_cool_temp
-        self.send((message_time, outflow_cool_temp), 'outflow')
+        if self.get_port('outflow').connected_port:
+            message_time = self.recv('outflow')
+            #outflow_state = dict()
+            outflow_cool_temp = self.outflow_phase.get_value('temp', time)
+            condenser_runoff = dict()
+            condenser_runoff['outflow-temp'] = outflow_cool_temp
+            self.send((message_time, outflow_cool_temp), 'outflow')
 
     def __step(self, time):
         assert abs(time-self.inflow_state['time']) <= 1e-6
