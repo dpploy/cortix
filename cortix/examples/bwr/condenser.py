@@ -29,6 +29,13 @@ class Condenser(Module):
     See instance attribute `port_names_expected`.
     """
 
+    # Class units
+    meter = unit.meter = 1.0
+    second = unit.second = 1.0
+
+    m_per_s = unit.meter/unit.second
+    kg_per_s = unit.kilo*unit.gram/unit.second
+
     def __init__(self, params):
         """Constructor.
 
@@ -44,15 +51,15 @@ class Condenser(Module):
 
         Ports:
 
-           `inflow-1`: individual inflow from a turbine module.
-           `inflow-2`: individual inflow from a turbine module.
-           `outflow`: combined outflow from condenser.
+         + `inflow-1`: individual inflow from a turbine module.
+         + `inflow-2`: individual inflow from a turbine module.
+         + `outflow`: combined outflow from condenser.
 
         Attributes:
 
-           inflow_state: float
-               0-1 quality of steam; 1 dew point steam; >1 super heated;
-               0 bubble boint; <0 subcooled liquid.
+         + inflow_state: float
+              0-1 quality of steam; 1 dew point steam; >1 super heated;
+              0 bubble boint; <0 subcooled liquid.
 
         """
 
@@ -61,6 +68,12 @@ class Condenser(Module):
         self.port_names_expected = ['inflow-1', 'inflow-2', 'outflow']
 
         self.params = params
+
+        # Units
+        self.meter = Condenser.meter
+        self.second = Condenser.second
+        self.m_per_s = Condenser.m_per_s
+        self.kg_per_s = Condenser.kg_per_s
 
         # General attributes
         self.initial_time = params['start-time']
@@ -71,10 +84,10 @@ class Condenser(Module):
         self.log = logging.getLogger('cortix')
 
         # Domain attributes
-        self.inflow_state = None # 
-        self.pipe_diameter = 0.1 # m
-        self.liquid_velocity = 10.0 # m/s
-        self.cooling_water_flowrate = 100000.0 # kg/s
+        self.inflow_state = None
+        self.pipe_diameter = 0.1*self.meter
+        self.liquid_velocity = 10.0*self.m_per_s
+        self.cooling_water_flowrate = 100000.0*self.kg_per_s
         self.heat_transfer_area = 10200.0 # m2, or 500 4m long, 0.1m diameter pipes
         self.condensation_ht_coeff = 5000.0 # w/m-k
         self.subcooling_ht_coeff = 1000.0 # w/m-k
