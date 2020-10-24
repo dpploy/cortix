@@ -36,7 +36,7 @@ class Condenser(Module):
     m_per_s = unit.meter/unit.second
     kg_per_s = unit.kilo*unit.gram/unit.second
 
-    def __init__(self, params):
+    def __init__(self):
         """Constructor.
 
         Parameters
@@ -71,8 +71,6 @@ class Condenser(Module):
 
         self.port_names_expected = ['inflow-1', 'inflow-2', 'outflow']
 
-        self.params = params
-
         # Units
         self.meter = Condenser.meter
         self.second = Condenser.second
@@ -80,8 +78,8 @@ class Condenser(Module):
         self.kg_per_s = Condenser.kg_per_s
 
         # General attributes
-        self.initial_time = params['start-time']
-        self.end_time = params['end-time']
+        self.initial_time = 0.0*self.second
+        self.end_time = 0.0*self.second
 
         self.show_time = (False, 10.0)
         self.time_step = 10.0
@@ -110,7 +108,7 @@ class Condenser(Module):
         temp = Quantity(name='temp',
                         formal_name='Condenser Runoff Temp.',
                         unit='K',
-                        value=params['condenser-runoff-temp'],
+                        value=0.0,
                         info='Condenser Outflow Temperature',
                         latex_name=r'$T_o$')
 
@@ -148,7 +146,7 @@ class Condenser(Module):
         test_chi = 0
         output_vector = []
         for i in temp:
-            output = self.__condenser(0, i, test_chi, self.params)
+            output = self.__condenser(0, i, test_chi)
             print('temp is ', i, ' and outflow temp is ', output)
             output_vector.append(output)
 
@@ -158,7 +156,7 @@ class Condenser(Module):
         test_temperature = steam_table._TSat_P(0.005)
         output_vector_2 = []
         for i in chi:
-            output = self.__condenser(0, test_temperature, i, self.params)
+            output = self.__condenser(0, test_temperature, i)
             print('chi is ', i, ' and outflow temp is ', output)
             output_vector_2.append(output)
 
@@ -220,7 +218,7 @@ class Condenser(Module):
         pressure = self.inflow_state['pressure']
         flowrate = self.inflow_state['flowrate']
 
-        t_out = self.__condenser(time, temp_in, chi_in, pressure, flowrate, self.params)
+        t_out = self.__condenser(temp_in, chi_in, flowrate)
 
         condenser_runoff = self.outflow_phase.get_row(time)
 
@@ -231,14 +229,17 @@ class Condenser(Module):
 
         return time
 
-    def __condenser(self, time, temp_in, chi_in, p_in, flowrate, params):
+    def __condenser(self, temp_in, chi_in, flowrate):
         """Simple model to condense a vapor-liquid mixture and subcool it.
+
         Takes in either superheated steam or a two-phase water mixture, and
         calculates the amount of surface area within a simple condenser required to
         remove all degrees of superheat and condense the mixture.
         """
+
         if flowrate == 0:
-            return 287.15
+
+            return 287.15 # TODO: no hardcoded values
 
         #temporary, basic model for condensation, until I can work out a more
         #advanced model that gives realistic values.
@@ -259,7 +260,7 @@ class Condenser(Module):
             subcooling_pwr = area_remaining * self.subcooling_ht_coeff * (temp_in - final_coolant_temp)
             delta_tb = subcooling_pwr/(flowrate * 4.184 * unit.kilo)
             runoff_temp = temp_in - delta_tb
-            
+
             if runoff_temp < initial_coolant_temp:
                 runoff_temp = initial_coolant_temp
             return(runoff_temp)
@@ -267,7 +268,7 @@ class Condenser(Module):
         #anything below this point is not currently in use; I need to figure
         #out a more accurate condensation model, the current one calculates
         #heat transfer coefficients in excess of 100k w/m2-k
-        
+
         #print(time, ' chi_in is ', chi_in)
         critical_temp = steam_table._TSat_P(0.005)
         condenser_runoff = 14 + 273.15
