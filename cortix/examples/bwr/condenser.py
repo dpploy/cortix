@@ -51,9 +51,9 @@ class Condenser(Module):
 
         self.port_names_expected = ['inflow-1', 'inflow-2', 'outflow']
 
-        quantities = list()
-        self.ode_params = dict()
         self.params = params
+
+        # General attributes
         self.initial_time = params['start-time']
         self.end_time = params['end-time']
 
@@ -61,7 +61,7 @@ class Condenser(Module):
         self.time_step = 10.0
         self.log = logging.getLogger('cortix')
 
-        # Attributes
+        # Domain attributes
         self.pipe_diameter = 0.1 #m
         self.liquid_velocity = 10 #m/s
         self.cooling_water_flowrate = 100000 #kg/s
@@ -69,7 +69,7 @@ class Condenser(Module):
         self.condensation_ht_coeff = 5000 # w/m-k
         self.subcooling_ht_coeff = 1000 # w/m-k
 
-        # Condenser outflow phase history
+        # Outflow phase history
         quantities = list()
 
         flowrate = Quantity(name='condenser-runoff-flowrate',
