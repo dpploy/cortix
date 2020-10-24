@@ -81,7 +81,8 @@ class Condenser(Module):
                         formal_name='Condenser Runoff Temp.',
                         unit='K',
                         value=params['condenser-runoff-temp'],
-                        info='Condenser Outflow Temperature', latex_name=r'$T_o$')
+                        info='Condenser Outflow Temperature',
+                        latex_name=r'$T_o$')
 
         quantities.append(temp)
 
