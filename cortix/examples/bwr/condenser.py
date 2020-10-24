@@ -115,7 +115,6 @@ class Condenser(Module):
         self.outflow_phase = Phase(time_stamp=self.initial_time, time_unit='s',
                                    quantities=quantities)
 
-
     def run(self, *args):
 
         time = self.initial_time
@@ -206,8 +205,6 @@ class Condenser(Module):
         condenser_runoff = dict()
         condenser_runoff['outflow-temp'] = outflow_cool_temp
         self.send((message_time, outflow_cool_temp), 'outflow')
-
-        return
 
     def __step(self, time):
         assert abs(time-self.inflow_state['time']) <= 1e-6
