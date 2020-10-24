@@ -42,6 +42,9 @@ class Condenser(Module):
         vfda: External parameters must be eliminated. All parameters must have a
         default value internally as an attribute.
 
+        Ports: `inflow-1` individual inflow from a turbine module.
+               `inflow-2` individual inflow from a turbine module.
+               `outflow` combined outflow from condenser.
         """
 
         super().__init__()
