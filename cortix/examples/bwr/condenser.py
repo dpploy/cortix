@@ -62,12 +62,13 @@ class Condenser(Module):
         self.log = logging.getLogger('cortix')
 
         # Domain attributes
-        self.pipe_diameter = 0.1 #m
-        self.liquid_velocity = 10 #m/s
-        self.cooling_water_flowrate = 100000 #kg/s
-        self.heat_transfer_area = 10200 #m2, or 500 4m long, 0.1m diameter pipes
-        self.condensation_ht_coeff = 5000 # w/m-k
-        self.subcooling_ht_coeff = 1000 # w/m-k
+        self.inflow_state = None #
+        self.pipe_diameter = 0.1 # m
+        self.liquid_velocity = 10.0 # m/s
+        self.cooling_water_flowrate = 100000.0 # kg/s
+        self.heat_transfer_area = 10200.0 # m2, or 500 4m long, 0.1m diameter pipes
+        self.condensation_ht_coeff = 5000.0 # w/m-k
+        self.subcooling_ht_coeff = 1000.0 # w/m-k
 
         # Outflow phase history
         quantities = list()
@@ -92,7 +93,6 @@ class Condenser(Module):
         self.outflow_phase = Phase(time_stamp=self.initial_time, time_unit='s',
                                    quantities=quantities)
 
-        self.inflow_state = None
 
     def run(self, *args):
 
