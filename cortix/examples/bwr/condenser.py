@@ -487,6 +487,6 @@ class Condenser(Module):
                 condenser_runoff = final_runoff_temperature_guess
 
         else:
-            condenser_runoff = 14 + 273.15
+            condenser_runoff = 14 + 273.15 # TODO hardcoded values?
 
         return condenser_runoff
