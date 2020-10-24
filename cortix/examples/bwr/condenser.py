@@ -50,7 +50,9 @@ class Condenser(Module):
 
         Attributes:
 
-           `inflow_state`:
+           inflow_state: float
+               0-1 quality of steam; 1 dew point steam; >1 super heated;
+               0 bubble boint; <0 subcooled liquid.
 
         """
 
