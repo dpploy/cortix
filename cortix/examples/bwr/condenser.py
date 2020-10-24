@@ -42,9 +42,16 @@ class Condenser(Module):
         vfda: External parameters must be eliminated. All parameters must have a
         default value internally as an attribute.
 
-        Ports: `inflow-1` individual inflow from a turbine module.
-               `inflow-2` individual inflow from a turbine module.
-               `outflow` combined outflow from condenser.
+        Ports:
+
+           `inflow-1`: individual inflow from a turbine module.
+           `inflow-2`: individual inflow from a turbine module.
+           `outflow`: combined outflow from condenser.
+
+        Attributes:
+
+           `inflow_state`:
+
         """
 
         super().__init__()
@@ -62,7 +69,7 @@ class Condenser(Module):
         self.log = logging.getLogger('cortix')
 
         # Domain attributes
-        self.inflow_state = None #
+        self.inflow_state = None # 
         self.pipe_diameter = 0.1 # m
         self.liquid_velocity = 10.0 # m/s
         self.cooling_water_flowrate = 100000.0 # kg/s
