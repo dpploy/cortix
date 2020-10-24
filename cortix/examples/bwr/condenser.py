@@ -37,8 +37,8 @@ class Condenser(Module):
         params: dict
             All parameters for the module in the form of a dictionary.
 
-        Note
-        ----
+        Notes
+        -----
         vfda: External parameters must be eliminated. All parameters must have a
         default value internally as an attribute.
 
@@ -58,7 +58,7 @@ class Condenser(Module):
         self.time_step = 10.0
         self.log = logging.getLogger('cortix')
 
-        # data required by the condenser
+        # Attributes
         self.pipe_diameter = 0.1 #m
         self.liquid_velocity = 10 #m/s
         self.cooling_water_flowrate = 100000 #kg/s
@@ -66,18 +66,22 @@ class Condenser(Module):
         self.condensation_ht_coeff = 5000 # w/m-k
         self.subcooling_ht_coeff = 1000 # w/m-k
 
-
         # Condenser outflow phase history
         quantities = list()
 
         flowrate = Quantity(name='condenser-runoff-flowrate',
-                            formal_name='Condenser Runoff Flowrate', unit='kg/s', value=0.0,
-                            info='Condenser Outflow Flowrate', latex_name=r'$Q$')
+                            formal_name='Condenser Runoff Flowrate',
+                            unit='kg/s', value=0.0,
+                            info='Condenser Outflow Flowrate',
+                            latex_name=r'$Q$')
 
         quantities.append(flowrate)
 
-        temp = Quantity(name='temp', formal_name='Condenser Runoff Temp.', unit='K',
-                        value=params['condenser-runoff-temp'], info='Condenser Outflow Temperature', latex_name=r'$T_o$')
+        temp = Quantity(name='temp',
+                        formal_name='Condenser Runoff Temp.',
+                        unit='K',
+                        value=params['condenser-runoff-temp'],
+                        info='Condenser Outflow Temperature', latex_name=r'$T_o$')
 
         quantities.append(temp)
 
@@ -87,8 +91,6 @@ class Condenser(Module):
         self.inflow_state = None
 
     def run(self, *args):
-
-        #self.__zero_ode_parameters()
 
         time = self.initial_time
         end_time = self.end_time
@@ -113,7 +115,7 @@ class Condenser(Module):
         x = '===================='
         #start with a basic temperature scale
         print(x, '\n', 'TESTING TEMPERATURE', '\n', x)
-        temp =  np.linspace(300, 500, 200)
+        temp = np.linspace(300, 500, 200)
         test_chi = 0
         output_vector = []
         for i in temp:
