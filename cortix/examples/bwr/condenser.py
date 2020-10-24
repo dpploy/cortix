@@ -206,13 +206,13 @@ class Condenser(Module):
 
         if self.get_port('outflow').connected_port:
             message_time = self.recv('outflow')
-            #outflow_state = dict()
             outflow_cool_temp = self.outflow_phase.get_value('temp', time)
             condenser_runoff = dict()
             condenser_runoff['outflow-temp'] = outflow_cool_temp
             self.send((message_time, outflow_cool_temp), 'outflow')
 
     def __step(self, time):
+
         assert abs(time-self.inflow_state['time']) <= 1e-6
 
         temp_in = self.inflow_state['temp']
