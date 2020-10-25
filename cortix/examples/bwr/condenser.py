@@ -257,7 +257,7 @@ class Condenser(Module):
             initial_coolant_temp = 14 + 273.15
             delta_t = heat_pwr/(self.cooling_water_flowrate * unit.kilo * 4.184)
             final_coolant_temp = initial_coolant_temp + delta_t
-            subcooling_pwr = area_remaining * self.subcooling_ht_coeff *
+            subcooling_pwr = area_remaining * self.subcooling_ht_coeff *\
                              (temp_in - final_coolant_temp)
             delta_tb = subcooling_pwr/(flowrate * 4.184 * unit.kilo)
             runoff_temp = temp_in - delta_tb
