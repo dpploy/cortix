@@ -41,13 +41,14 @@ class Condenser(Module):
 
         Parameters
         ----------
-        params: dict
-            All parameters for the module in the form of a dictionary.
+        None
 
         Notes
         -----
-        vfda: External parameters must be eliminated. All parameters must have a
-        default value internally as an attribute.
+
+        VFdA: as of now both turbines are supposed to send the same information
+              to the condenser. This is to be changed in the future to handle
+              different turbine steam conditions outflow.
 
         Ports:
 
