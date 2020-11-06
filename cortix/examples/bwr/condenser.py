@@ -211,8 +211,6 @@ class Condenser(Module):
         if self.get_port('outflow').connected_port:
             message_time = self.recv('outflow')
             outflow_cool_temp = self.outflow_phase.get_value('temp', time)
-            condenser_runoff = dict()
-            condenser_runoff['outflow-temp'] = outflow_cool_temp
             self.send((message_time, outflow_cool_temp), 'outflow')
 
     def __step(self, time):
