@@ -275,7 +275,7 @@ class Condenser(Module):
 
         #print(time, ' chi_in is ', chi_in)
         critical_temp = steam_table._TSat_P(self.inlet_pressure)
-        condenser_runoff = coolant_inflow_temp
+        condenser_runoff = self.coolant_inflow_temp
         #if chi_in == -1 and temp_in > critical_temp: #superheated vapor inlet; deprecated
             #return 293.15
             #x = x_in
@@ -341,7 +341,7 @@ class Condenser(Module):
             #calculate the convective heat transfer coefficient on a liquid basis
             #from the Churchill-Bernstein correlation
             liquid_conductivity = sat_liquid.Liquid.k
-            liquid_rho = sat_liquid.Liquid.Liquid.rho
+            liquid_rho = sat_liquid.Liquid.rho
             liquid_prandtl = sat_liquid.Liquid.Prandt
             liquid_viscosity = sat_liquid.Liquid.mu
             liquid_reynolds = (liquid_rho * pipe_diameter * liquid_velocity)/\
@@ -370,7 +370,6 @@ class Condenser(Module):
             #determine the overall heat transfer coefficient from the McNaught
             #expression
             alpha_sh = liquid_heat_transfer_coeff * (1/xtt)**0.78
-            alpha_sh = alpha_sh
             print(alpha_sh, 'alpha_sh')
 
             #determine how far the two-phase mixture gets in the condenser
