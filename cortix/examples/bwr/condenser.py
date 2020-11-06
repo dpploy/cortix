@@ -142,7 +142,9 @@ class Condenser(Module):
             time = self.__step(time)
 
     def tester(self):
-        """Passes a string of test data (temperature, chi) to the condenser to debug the model itself."""
+        """Passes a string of test data (temperature, chi) to the condenser.
+           Debug the model itself.
+        """
         x = 0;
         #start with a basic temperature scale
         print(x, '\n', 'TESTING TEMPERATURE', '\n', x)
@@ -218,7 +220,7 @@ class Condenser(Module):
 
         temp_in = self.inflow_state['temp']
         chi_in = self.inflow_state['quality']
-        pressure = self.inflow_state['pressure']
+        pressure = self.inflow_state['pressure'] # TODO: unused pressure
         flowrate = self.inflow_state['flowrate']
 
         t_out = self.__condenser(temp_in, chi_in, flowrate)
@@ -265,7 +267,7 @@ class Condenser(Module):
 
             if runoff_temp < initial_coolant_temp:
                 runoff_temp = initial_coolant_temp
-            return(runoff_temp)
+            return runoff_temp
 
         else:
             return self.ss_temp
