@@ -96,7 +96,7 @@ class Condenser(Module):
         self.condensation_ht_coeff = 5000.0 # w/m-k
         self.subcooling_ht_coeff = 1000.0 # w/m-k
         self.ss_temp = 287.15 # Initial and ending temperature of the condenser
-        self.inlet_pressure = 0.005 #mPa, the runoff pressure from the LPT
+        self.inlet_pressure = 0.005 #MPa, the runoff pressure from the LPT
         self.coolant_inflow_temp = 287.15 #K, condenser coolant inflow temp
         # Outflow phase history
         quantities = list()
