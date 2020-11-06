@@ -190,6 +190,7 @@ class Condenser(Module):
 
             self.inflow_state = inflow_state
             self.inflow_state['time'] = time
+
         # Interactions in the inflow port
         #----------------------------------------
         # one way "from" inflow-2
