@@ -268,8 +268,7 @@ class Condenser(Module):
                 runoff_temp = initial_coolant_temp
             return runoff_temp
 
-        else:
-            return self.ss_temp
+        return self.ss_temp
         #anything below this point is not currently in use; I need to figure
         #out a more accurate condensation model, the current one calculates
         #heat transfer coefficients in excess of 100k w/m2-k
