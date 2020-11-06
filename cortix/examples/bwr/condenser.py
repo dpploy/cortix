@@ -60,10 +60,12 @@ class Condenser(Module):
          + inflow_state: dict
             ['quality']: 0-1 quality of steam; 1 dew point steam;
                          >1 super heated; 0 bubble boint; <0 subcooled liquid.
-            ['temp']:
-            ['pressure']:
-            ['flowrate']:
-            ['time']:
+            ['temp']: Runoff temperature from the turbine. Indicates how much
+                      superheat must be removed before condensation can begin.
+            ['pressure']: Not used.
+            ['flowrate']: Half the amount of liquid (kg/s) that the condenser
+                          must process each second.
+            ['time']:     Current simulation time in seconds.
 
         """
 
@@ -93,7 +95,9 @@ class Condenser(Module):
         self.heat_transfer_area = 10200.0 # m2, or 500 4m long, 0.1m diameter pipes
         self.condensation_ht_coeff = 5000.0 # w/m-k
         self.subcooling_ht_coeff = 1000.0 # w/m-k
-
+        self.ss_temp = 287.15 # Initial and ending temperature of the condenser
+        self.inlet_pressure = 0.005 #mPa, the runoff pressure from the LPT
+        self.coolant_inflow_temp = 287.15 #K, condenser coolant inflow temp
         # Outflow phase history
         quantities = list()
 
@@ -139,7 +143,7 @@ class Condenser(Module):
 
     def tester(self):
         """Passes a string of test data (temperature, chi) to the condenser to debug the model itself."""
-        x = '===================='
+        x = 0;
         #start with a basic temperature scale
         print(x, '\n', 'TESTING TEMPERATURE', '\n', x)
         temp = np.linspace(300, 500, 200)
@@ -184,7 +188,6 @@ class Condenser(Module):
 
             self.inflow_state = inflow_state
             self.inflow_state['time'] = time
-
         # Interactions in the inflow port
         #----------------------------------------
         # one way "from" inflow-2
@@ -238,23 +241,21 @@ class Condenser(Module):
         """
 
         if flowrate == 0:
-
-            return 287.15 # TODO: no hardcoded values
+            # no flowrate, return initial simulation condition
+            return self.ss_temp
 
         #temporary, basic model for condensation, until I can work out a more
         #advanced model that gives realistic values.
-        pressure = 0.005
-        t_coolant = 14 + 273.15
+        pressure = self.inlet_pressure
+        t_coolant = self.coolant_inflow_temp
         h_mixture = steam_table._Region4(pressure, chi_in)['h'] # TODO protected
         h_dewpt = steam_table._Region4(pressure, 0)['h'] # TODO protected
         heat_pwr = (h_mixture - h_dewpt) * unit.kilo * flowrate
         area_required = heat_pwr/(self.condensation_ht_coeff * (temp_in - t_coolant))
         area_remaining = self.heat_transfer_area - area_required
 
-        if area_remaining < 0: # TODO check unecessary else
-            return 287.15
-        else:
-            initial_coolant_temp = 14 + 273.15
+        if area_remaining > 0:
+            initial_coolant_temp = self.coolant_inflow_tem,p
             delta_t = heat_pwr/(self.cooling_water_flowrate * unit.kilo * 4.184)
             final_coolant_temp = initial_coolant_temp + delta_t
             subcooling_pwr = area_remaining * self.subcooling_ht_coeff *\
@@ -266,13 +267,15 @@ class Condenser(Module):
                 runoff_temp = initial_coolant_temp
             return(runoff_temp)
 
+        else:
+            return self.ss_temp
         #anything below this point is not currently in use; I need to figure
         #out a more accurate condensation model, the current one calculates
         #heat transfer coefficients in excess of 100k w/m2-k
 
         #print(time, ' chi_in is ', chi_in)
-        critical_temp = steam_table._TSat_P(0.005)
-        condenser_runoff = 14 + 273.15
+        critical_temp = steam_table._TSat_P(self.inlet_pressure)
+        condenser_runoff = coolant_inflow_temp
         #if chi_in == -1 and temp_in > critical_temp: #superheated vapor inlet; deprecated
             #return 293.15
             #x = x_in
@@ -315,7 +318,7 @@ class Condenser(Module):
             #average_ht_transfer_coeff = (high_heat_transfer_coeff + low_heat_transfer_coeff)/2
 
         if chi_in > 0:
-            pressure = 0.005
+            pressure = self.inlet_pressure
             h_mixture = steam_table._Region4(pressure, chi_in)['h']
             h_dewpt = steam_table._Region4(pressure, 0)['h']
             heat_pwr = (h_mixture - h_dewpt) * unit.kilo * flowrate
@@ -326,8 +329,8 @@ class Condenser(Module):
             water_cp = steam_table.IAPWS97(T=287.15, P=0.1013).cp
             delta_tb = heat_pwr/(self.cooling_water_flowrate * \
                     water_cp * unit.kilo)
-            t_c_in = 14 + 273.15
-            t_c_out = 14 + 273.15 + delta_tb
+            t_c_in = self.coolant_inlet_temp
+            t_c_out = t_c_in + delta_tb
 
             lmtd = (t_c_out - t_c_in)/(math.log(critical_temp - t_c_in))/\
                     (critical_temp - t_c_out)
@@ -397,7 +400,7 @@ class Condenser(Module):
             #7. rinse and repeat
 
                 # initial guess
-                final_coolant_temperature_guess = steam_table._TSat_P(0.005) - 10
+                final_coolant_temperature_guess = steam_table._TSat_P(self.inlet_pressure) - 10
                 final_runoff_temperature_guess = 300 # initial guess
                 final_runoff_temperature = 0 #iteration variable
 
@@ -406,8 +409,8 @@ class Condenser(Module):
                 while abs((final_runoff_temperature_guess -
                            final_runoff_temperature)) > 1:
 
-                    runoff_in = steam_table._TSat_P(0.005)
-                    coolant_in = 14 + 273.15 #k
+                    runoff_in = steam_table._TSat_P(self.inlet_pressure)
+                    coolant_in = self.coolant_infliw_temp #k
                     #assert(final_coolant_temperature_guess < final_runoff_temperature_guess)
                     #assert(final_coolant_temperature_guess > coolant_in)
 
@@ -463,12 +466,12 @@ class Condenser(Module):
 
                     #calculate actual coolant and liquid water temperatures
 
-                    coolant_cp = steam_table.IAPWS97(T=coolant_in, P=0.005).cp
+                    coolant_cp = steam_table.IAPWS97(T=coolant_in, P=self.inlet_pressure).cp
                     iterated_coolant_final_temp = ((q_1/(coolant_cp *
                                                          self.cooling_water_flowrate
                                                          * unit.kilo)) + coolant_in)
 
-                    steam_cp = steam_table.IAPWS97(T=runoff_in, P=0.005).cp
+                    steam_cp = steam_table.IAPWS97(T=runoff_in, P=self.inlet_pressure).cp
                     iterated_steam_final_temp = (runoff_in - (q_1/(steam_cp *
                                                                    flowrate *
                                                                    unit.kilo)))
@@ -488,6 +491,6 @@ class Condenser(Module):
                 condenser_runoff = final_runoff_temperature_guess
 
         else:
-            condenser_runoff = 14 + 273.15 # TODO hardcoded values?
+            condenser_runoff = self.ss_temp
 
         return condenser_runoff
