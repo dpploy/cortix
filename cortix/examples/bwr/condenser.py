@@ -145,7 +145,7 @@ class Condenser(Module):
         """Passes a string of test data (temperature, chi) to the condenser.
            Debug the model itself.
         """
-        x = 0;
+        x = 0
         #start with a basic temperature scale
         print(x, '\n', 'TESTING TEMPERATURE', '\n', x)
         temp = np.linspace(300, 500, 200)
@@ -220,7 +220,6 @@ class Condenser(Module):
 
         temp_in = self.inflow_state['temp']
         chi_in = self.inflow_state['quality']
-        pressure = self.inflow_state['pressure'] # TODO: unused pressure
         flowrate = self.inflow_state['flowrate']
 
         t_out = self.__condenser(temp_in, chi_in, flowrate)
@@ -257,7 +256,7 @@ class Condenser(Module):
         area_remaining = self.heat_transfer_area - area_required
 
         if area_remaining > 0:
-            initial_coolant_temp = self.coolant_inflow_tem,p
+            initial_coolant_temp = self.coolant_inflow_temp
             delta_t = heat_pwr/(self.cooling_water_flowrate * unit.kilo * 4.184)
             final_coolant_temp = initial_coolant_temp + delta_t
             subcooling_pwr = area_remaining * self.subcooling_ht_coeff *\
@@ -328,10 +327,10 @@ class Condenser(Module):
             critical_temp = temp_in
             critical_temp = steam_table._TSat_P(pressure)
             sat_liquid = steam_table.IAPWS97(T=critical_temp - 1, P=pressure)
-            water_cp = steam_table.IAPWS97(T=287.15, P=0.1013).cp
+            water_cp = steam_table.IAPWS97(T=287.15, P=0.1013).Liquid.cp
             delta_tb = heat_pwr/(self.cooling_water_flowrate * \
                     water_cp * unit.kilo)
-            t_c_in = self.coolant_inlet_temp
+            t_c_in = self.coolant_inflow_temp
             t_c_out = t_c_in + delta_tb
 
             lmtd = (t_c_out - t_c_in)/(math.log(critical_temp - t_c_in))/\
@@ -342,10 +341,10 @@ class Condenser(Module):
 
             #calculate the convective heat transfer coefficient on a liquid basis
             #from the Churchill-Bernstein correlation
-            liquid_conductivity = sat_liquid.k
-            liquid_rho = sat_liquid.rho
-            liquid_prandtl = sat_liquid.Prandt
-            liquid_viscosity = sat_liquid.mu
+            liquid_conductivity = sat_liquid.Liquid.k
+            liquid_rho = sat_liquid.Liquid.Liquid.rho
+            liquid_prandtl = sat_liquid.Liquid.Prandt
+            liquid_viscosity = sat_liquid.Liquid.mu
             liquid_reynolds = (liquid_rho * pipe_diameter * liquid_velocity)/\
                     liquid_viscosity
 
@@ -360,8 +359,8 @@ class Condenser(Module):
 
             #determine the Martinelli paremeter
             steam = steam_table.IAPWS97(T=critical_temp+1, P=pressure)
-            steam_rho = steam.rho
-            steam_viscosity = steam.mu
+            steam_rho = steam.Vapor.rho
+            steam_viscosity = steam.Vapor.mu
 
             #print(chi_in)
 
@@ -412,7 +411,7 @@ class Condenser(Module):
                            final_runoff_temperature)) > 1:
 
                     runoff_in = steam_table._TSat_P(self.inlet_pressure)
-                    coolant_in = self.coolant_infliw_temp #k
+                    coolant_in = self.coolant_inflow_temp #k
                     #assert(final_coolant_temperature_guess < final_runoff_temperature_guess)
                     #assert(final_coolant_temperature_guess > coolant_in)
 
@@ -429,10 +428,10 @@ class Condenser(Module):
                     #high temperature heat transfer coefficient calculation
                     high_properties = steam_table.IAPWS97(T=upper_wall_temp,
                                                           P=pressure)
-                    high_conductivity = high_properties.k
-                    high_rho = high_properties.rho
-                    high_prandtl = high_properties.Prandt
-                    high_viscosity = high_properties.mu
+                    high_conductivity = high_properties.Liquid.k
+                    high_rho = high_properties.Liquid.rho
+                    high_prandtl = high_properties.Liquid.Prandt
+                    high_viscosity = high_properties.Liquid.mu
                     high_reynolds = (high_rho * pipe_diameter * liquid_velocity)/\
                             high_viscosity
 
@@ -445,10 +444,10 @@ class Condenser(Module):
 
                     #   low temperature heat transfer coefficient calculation
                     low_properties = steam_table.IAPWS97(T=lower_wall_temp, P=pressure)
-                    low_conductivity = low_properties.k
-                    low_rho = low_properties.rho
-                    low_prandtl = low_properties.Prandt
-                    low_viscosity = low_properties.mu
+                    low_conductivity = low_properties.Liquid.k
+                    low_rho = low_properties.Liquid.rho
+                    low_prandtl = low_properties.Liquid.Prandt
+                    low_viscosity = low_properties.Liquid.mu
                     low_reynolds = (low_rho * pipe_diameter * \
                             liquid_velocity)/low_viscosity
 
@@ -468,12 +467,12 @@ class Condenser(Module):
 
                     #calculate actual coolant and liquid water temperatures
 
-                    coolant_cp = steam_table.IAPWS97(T=coolant_in, P=self.inlet_pressure).cp
+                    coolant_cp = steam_table.IAPWS97(T=coolant_in, P=self.inlet_pressure).Liquid.cp
                     iterated_coolant_final_temp = ((q_1/(coolant_cp *
                                                          self.cooling_water_flowrate
                                                          * unit.kilo)) + coolant_in)
 
-                    steam_cp = steam_table.IAPWS97(T=runoff_in, P=self.inlet_pressure).cp
+                    steam_cp = steam_table.IAPWS97(T=runoff_in, P=self.inlet_pressure).Vapor.cp
                     iterated_steam_final_temp = (runoff_in - (q_1/(steam_cp *
                                                                    flowrate *
                                                                    unit.kilo)))
