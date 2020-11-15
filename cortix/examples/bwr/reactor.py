@@ -343,6 +343,7 @@ class BWR(Module):
                 self.params['inflow-cool-temp'] = inflow_temp
 
             else:
+                useless = self.recv('RCIS-inflow')
 
     def __step(self, time=0.0):
         r"""ODE IVP problem.
