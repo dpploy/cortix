@@ -37,7 +37,7 @@ import numpy as np
 import pandas
 
 import matplotlib
-matplotlib.use('Agg', warn=False)
+#needed? matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 from matplotlib.ticker import MultipleLocator

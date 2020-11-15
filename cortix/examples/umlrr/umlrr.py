@@ -46,6 +46,7 @@ class UMLRR(Module):
         unit.kg     = unit.kilo*unit.gram
         unit.meter  = 1.0
         unit.second = 1.0
+        unit.pascal = 1.0
         unit.joule  = 1.0
         unit.kj     = unit.kilo*unit.joule
         unit.kelvin = 1.0
@@ -56,6 +57,7 @@ class UMLRR(Module):
         self.end_time     = 4 * unit.hour
         self.time_step    = 10.0 * unit.second
         self.show_time    = (False,10.0)
+
         self.log = logging.getLogger('cortix')
 
         self.params = dict()
