@@ -40,7 +40,8 @@ class BWR(Module):
 
         super().__init__()
 
-        self.port_names_expected = ['coolant-inflow', 'coolant-outflow', 'signal-out', 'signal-in', 'RCIS-inflow', 'RCIS-outflow']
+        self.port_names_expected = ['coolant-inflow', 'coolant-outflow',
+                                    'RCIS-inflow', 'RCIS-outflow']
 
         self.params = params
 
@@ -266,11 +267,6 @@ class BWR(Module):
 
     def __call_ports(self, time):
 
-        # Interactions in the coolant-outflow port
-        #-----------------------------------------
-        # one way "to" coolant-outflow
-
-        # send to
         current_temp = self.__get_coolant_outflow(time)['temp']
         if current_temp < 373.15:
             if self.params['operating-mode'] == 'shutdown':
@@ -280,73 +276,73 @@ class BWR(Module):
             if self.params['operating-mode'] == 'startup':
                 self.RCIS = False
 
-        if self.RCIS:
-            if self.get_port('coolant-outflow').connected_port:
-                message_time = self.recv('coolant-outflow')
-                print('coolant-outflow', message_time)
+        # Interactions in the coolant-outflow port
+        #-----------------------------------------
+        # one way "to" coolant-outflow
+
+        # send to
+        if self.get_port('coolant-outflow').connected_port:
+            message_time = self.recv('coolant-outflow')
+
+            if self.RCIS:
                 coolant_outflow = dict()
                 coolant_outflow['temp'] = 287.15
                 coolant_outflow['pressure'] = 0
                 coolant_outflow['quality'] = 0
                 coolant_outflow['flowrate'] = 0
                 self.send((message_time, coolant_outflow), 'coolant-outflow')
-
-            if self.get_port('RCIS-outflow').connected_port:
-                print('rcis-outflow')
-                message_time = self.recv('RCIS-outflow')
-                print('time_received')
-                coolant_outflow = self.__get_coolant_outflow(message_time)
-                coolant_outflow['flowrate'] = 5280 # kg/s
-                self.send((message_time, coolant_outflow), 'RCIS-outflow')
-            if self.get_port('coolant-inflow').connected_port:
-                print('coolant-inflow')
-                self.send(time, 'coolant-inflow')
-                (check_time, useless) = self.recv('coolant-inflow')
-
-            if self.get_port('RCIS-inflow').connected_port:
-                print('rcis-inflow')
-                inflow_temp = self.recv('RCIS-inflow')
-                self.params['inflow-cool-temp'] = inflow_temp
-
-            if self.get_port('signal-out').connected_port:
-                print('signal-out')
-                RCIS_status = self.__get_signal_out(0)
-                self.send(RCIS_status, 'signal-out')
-        else:
-
-            if self.get_port('coolant-outflow').connected_port:
-                print('coolant-outflow', time)
-                message_time = self.recv('coolant-outflow')
-
+            else:
                 coolant_outflow = self.__get_coolant_outflow(message_time)
                 #outflow_params = dict()
                 self.send((message_time, coolant_outflow), 'coolant-outflow')
 
-            # Interactions in the coolant-inflow port
-            #----------------------------------------
-            # one way "from" coolant-inflow
+        # Interactions in the RCIS-outflow port
+        #-----------------------------------------
+        # one way "to" RCIS-outflow
 
-            #self.send(time, 'coolant-inflow')
+        # send to
+        if self.get_port('RCIS-outflow').connected_port:
+            message_time = self.recv('RCIS-outflow')
 
-            # receive from
+            if self.RCIS:
+                coolant_outflow = self.__get_coolant_outflow(message_time)
+                coolant_outflow['flowrate'] = 5280 # kg/s
+                self.send((message_time, coolant_outflow), 'RCIS-outflow')
+            else
+                coolant_outflow = self.__get_coolant_outflow(message_time)
+                coolant_outflow['flowrate'] = 0.0 # kg/s
+                self.send((message_time, coolant_outflow), 'RCIS-outflow')
 
-            if self.get_port('coolant-inflow').connected_port:
-                print('coolant-inflow')
+        # Interactions in the coolant-inflow port
+        #----------------------------------------
+        # one way "from" coolant-inflow
+
+        # receive from
+        if self.get_port('coolant-inflow').connected_port:
+            self.send(time, 'coolant-inflow')
+
+            if self.RCIS:
+                (check_time, useless) = self.recv('coolant-inflow')
+            else:
                 self.send(time, 'coolant-inflow')
                 (check_time, inflow_cool_temp) = self.recv('coolant-inflow')
 
                 assert abs(check_time-time) <= 1e-6
                 self.params['inflow-cool-temp'] = inflow_cool_temp
 
-            # Interactions in the signal-out port
-            #-----------------------------------------
-            # one way "to" signal-out
+        # Interactions in the RCIS-inflow port
+        #----------------------------------------
+        # one way "from" RCIS-inflow
 
-            # send to
-            if self.get_port('signal-out').connected_port:
-                signal_out = self.__get_signal_out(time)
-                self.send(signal_out, 'signal-out')
-                print('this signal is being run!')
+        # receive from
+        if self.get_port('RCIS-inflow').connected_port:
+            self.send(time, 'RCIS-inflow')
+
+            if self.RCIS:
+                inflow_temp = self.recv('RCIS-inflow')
+                self.params['inflow-cool-temp'] = inflow_temp
+
+            else:
 
     def __step(self, time=0.0):
         r"""ODE IVP problem.

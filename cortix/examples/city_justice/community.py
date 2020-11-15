@@ -12,8 +12,8 @@ from cortix import Phase
 from cortix import Quantity
 
 class Community(Module):
-    '''
-    Community Cortix module used to model criminal group population in a
+    """Community system module.
+    Used to model a criminal group population in a
     community system.  Community here is the system at large with all possible
     adult individuals included in a society.
 
@@ -23,7 +23,7 @@ class Community(Module):
     modules: `probation`, `adjudication`, `jail`, `prison`, `arrested`, and `parole`.
     See instance attribute `port_names_expected`.
 
-    '''
+    """
 
     def __init__(self, n_groups=1, non_offender_adult_population=100, 
                  offender_pool_size=0.0, free_offender_pool_size=0.0):
@@ -43,16 +43,16 @@ class Community(Module):
 
         super().__init__()
 
-        self.port_names_expected = ['probation','adjudication','jail','prison',
+        self.port_names_expected = ['probation', 'adjudication', 'jail', 'prison',
                                     'arrested', 'parole']
 
-        quantities      = list()
+        quantities = list()
         self.ode_params = dict()
 
         self.initial_time = 0.0 * unit.day
-        self.end_time     = 100 * unit.day
-        self.time_step    = 0.5 * unit.day
-        self.show_time    = (False,10*unit.day)
+        self.end_time = 100 * unit.day
+        self.time_step = 0.5 * unit.day
+        self.show_time = (False, 10*unit.day)
         self.log = logging.getLogger('cortix')
 
         unit.percent = 1/100
@@ -62,16 +62,18 @@ class Community(Module):
 
         # Community non-offender population
         n0_0 = np.array([float(non_offender_adult_population)])
-        n0   = Quantity(name='n0', formal_name='non-offender-adult-pop',
-                latex_name = '$n_0$',
-                unit='# adults', value=n0_0, info='Non-Offender Adult Population')
+        n0 = Quantity(name='n0', formal_name='non-offender-adult-pop',
+                      latex_name='$n_0$',
+                      unit='# adults', value=n0_0,
+                      info='Non-Offender Adult Population')
         quantities.append(n0)
 
-        # Community free-offender population groups 
+        # Community free-offender population groups
         f0g_0 = np.random.random(self.n_groups) * offender_pool_size
         f0g = Quantity(name='f0g', formal_name='free-offender-pop-grps',
-                latex_name = '$n_0^{(g)}$',
-                unit='# offenders', value=f0g_0, info='Free-Offender Population Groups')
+                       latex_name='$n_0^{(g)}$',
+                       unit='# offenders', value=f0g_0,
+                       info='Free-Offender Population Groups')
         quantities.append(f0g)
 
         # Model parameters: commitment coefficients

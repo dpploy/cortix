@@ -78,14 +78,14 @@ def main():
     city.network = Network()
 
     community = Community(n_groups=n_groups, non_offender_adult_population=100000,
-            offender_pool_size=0)
+                          offender_pool_size=0)
     city.network.module(community)
     community.end_time = end_time
     community.time_step = time_step
-    community.show_time = (True,30*unit.day)
+    community.show_time = (True, 30*unit.day)
     community.save = True
 
-    prison = Prison(n_groups=n_groups,pool_size=0.0)
+    prison = Prison(n_groups=n_groups, pool_size=0.0)
     city.network.module(prison)
     prison.end_time = end_time
     prison.time_step = time_step
