@@ -308,7 +308,7 @@ class BWR(Module):
                 coolant_outflow = self.__get_coolant_outflow(message_time)
                 coolant_outflow['flowrate'] = 5280 # kg/s
                 self.send((message_time, coolant_outflow), 'RCIS-outflow')
-            else
+            else:
                 coolant_outflow = self.__get_coolant_outflow(message_time)
                 coolant_outflow['flowrate'] = 0.0 # kg/s
                 self.send((message_time, coolant_outflow), 'RCIS-outflow')
