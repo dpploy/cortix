@@ -1,23 +1,33 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# This file is part of the Cortix toolkit environment
+# https://cortix.org
+
+# Read contents of README file.
+from os import path
+
 import setuptools
 
-with open("README.md", "r") as fh:
-    long_description = fh.read()
+THIS_DIRECTORY = path.abspath(path.dirname(__file__))
 
-with open("requirements.txt", "r") as fh:
-    req = fh.readlines()
+with open(path.join(THIS_DIRECTORY, 'README.md'), encoding='utf-8') as f:
+    LONG_DESCRIPTION = f.read()
+
+with open('requirements.txt', 'r') as fh:
+    REQ = fh.readlines()
 
 setuptools.setup(
-    name="cortix",
-    version="1.1.8",
+    name='cortix',
+    version='1.1.9',
     author="Cortix Computing",
-    author_email="tazzaoui@cs.uml.edu",
-    description="Cortix is a Python library for network dynamics\
-            modeling and HPC simulation.",
-    long_description=long_description,
+    author_email="valmor_dealmeida@uml.edu",
+    description='Cortix is a Python library for network dynamics\
+            modeling and HPC simulation.',
+    long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     setup_requires=['wheel'],
     include_package_data=True,
-    install_requires=req,
+    install_requires=REQ,
     url="https://cortix.org",
     packages=setuptools.find_namespace_packages(),
     keywords = ['simulation', 'math'],
@@ -34,4 +44,6 @@ setuptools.setup(
         'Topic :: Education',
         'Topic :: Utilities'
     ],
+    python_requires='>=3.7'
 )
+
