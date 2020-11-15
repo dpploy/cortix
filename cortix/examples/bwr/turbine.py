@@ -46,29 +46,30 @@ class Turbine(Module):
 
         self.port_names_expected = ['inflow', 'outflow-1', 'outflow-2']
 
-        self.initial_time = 0.0 * unit.day
-        self.end_time = 4 * unit.hour
+        self.initial_time = params['start-time']
+        self.end_time = params['end-time']
 
         self.time_step = 10.0
         self.show_time = (False, 10.0)
 
         self.log = logging.getLogger('cortix')
+        self.efficiency = 0.8
 
         # Inflow phase history
         quantities = list()
 
-        temp = Quantity(name='temp', formal_name='T_in', unit='k', value=params['coolant-temp'],
+        temp = Quantity(name='temp', formal_name='T_in', unit='K', value=params['coolant-temp'],
                         info='Turbine Steam Inflow Temperature', latex_name=r'$T_i$')
 
         quantities.append(temp)
 
-        self.inflow_phase = Phase(self.initial_time, time_unit='s',
+        self.inflow_phase = Phase(time_stamp=self.initial_time, time_unit='s',
                                   quantities=quantities)
 
         # Outflow phase history
         quantities = list()
 
-        temp = Quantity(name='temp', formal_name='T_o', unit='k', value=params['turbine-outflow-temp'],
+        temp = Quantity(name='temp', formal_name='T_o', unit='K', value=params['turbine-outflow-temp'],
                         info='Turbine Steam Outflow Temperature', latex_name=r'$T_o$')
 
         quantities.append(temp)
@@ -93,7 +94,7 @@ class Turbine(Module):
 
         quantities.append(flowrate)
 
-        self.outflow_phase = Phase(self.initial_time, time_unit='s',
+        self.outflow_phase = Phase(time_stamp=self.initial_time, time_unit='s',
                                    quantities=quantities)
 
     def run(self, *args):
@@ -126,7 +127,7 @@ class Turbine(Module):
 
         # to
         if self.get_port('outflow-1').connected_port:
-
+            print(self.params['high_pressure_turbine'])
             message_time = self.recv('outflow-1')
 
             outflow_state = dict()
@@ -286,7 +287,7 @@ class Turbine(Module):
         #calculate the real runoff enthalpy
         w_ideal = inlet_enthalpy - h_ideal #on a per mass basis
         #assert(w_ideal > 0)
-        w_real = w_ideal * params['turbine efficiency']
+        w_real = w_ideal * self.efficiency
         h_real = inlet_enthalpy - w_ideal
         assert h_real > 0
         if w_real < 0:

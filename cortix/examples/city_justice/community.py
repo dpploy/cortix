@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment.
-# https://cortix.org
-
 import logging
 
 import numpy as np
@@ -82,8 +80,7 @@ class Community(Module):
         f0g_0 = np.random.random(self.n_groups) * offender_pool_size
         f0g = Quantity(name='f0g', formal_name='free-offender-pop-grps',
                        latex_name='$n_0^{(g)}$',
-                       value=f0g_0,
-                       unit='# offenders',
+                       unit='# offenders', value=f0g_0,
                        info='Free-Offender Population Groups')
         quantities.append(f0g)
 
