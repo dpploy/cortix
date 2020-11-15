@@ -153,7 +153,7 @@ def main():
     plant_net.connect([condenser, 'outflow'], [reactor, 'coolant-inflow'])
     plant_net.connect([reactor, 'RCIS-outflow'], [rcis, 'coolant-inflow'])
     plant_net.connect([rcis, 'coolant-outflow'], [reactor, 'RCIS-inflow'])
-    plant_net.connect([rcis, 'signal-in'], [reactor, 'signal-out'])
+    #plant_net.connect([rcis, 'signal-in'], [reactor, 'signal-out'])
     plant_net.draw()
 
     #*****************************************************************************
@@ -407,7 +407,7 @@ def main():
     plant_net.connect([condenser, 'outflow'], [reactor, 'coolant-inflow'])
     plant_net.connect([reactor, 'RCIS-outflow'], [rcis, 'coolant-inflow'])
     plant_net.connect([rcis, 'coolant-outflow'], [reactor, 'RCIS-inflow'])
-    plant_net.connect([rcis, 'signal-in'], [reactor, 'signal-out'])
+    #plant_net.connect([rcis, 'signal-in'], [reactor, 'signal-out'])
     plant_net.draw()
 
     #*****************************************************************************
