@@ -322,11 +322,10 @@ class BWR(Module):
             self.send(time, 'coolant-inflow')
 
             if self.RCIS:
-                (check_time, useless) = self.recv('coolant-inflow')
+                (check_time, _) = self.recv('coolant-inflow')
+                assert abs(check_time-time) <= 1e-6
             else:
-                self.send(time, 'coolant-inflow')
                 (check_time, inflow_cool_temp) = self.recv('coolant-inflow')
-
                 assert abs(check_time-time) <= 1e-6
                 self.params['inflow-cool-temp'] = inflow_cool_temp
 
@@ -339,11 +338,12 @@ class BWR(Module):
             self.send(time, 'RCIS-inflow')
 
             if self.RCIS:
-                inflow_temp = self.recv('RCIS-inflow')
+                (check_time, inflow_temp) = self.recv('RCIS-inflow')
+                assert abs(check_time-time) <= 1e-6
                 self.params['inflow-cool-temp'] = inflow_temp
-
             else:
-                useless = self.recv('RCIS-inflow')
+                (check_time, _) = self.recv('RCIS-inflow')
+                assert abs(check_time-time) <= 1e-6
 
     def __step(self, time=0.0):
         r"""ODE IVP problem.
