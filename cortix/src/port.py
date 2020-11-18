@@ -6,15 +6,14 @@
 from multiprocessing import Pipe
 
 class Port:
-    '''Provides a method of communication between modules.
+    """Provides a method of communication between modules.
 
     The Port class provides an interface for creating ports and connecting them to
     other ports for the purpose of data transfer. Data exchange takes place by
     send and/or receive calls on a given port. The concept of a port is that of a data
     transfer "interaction." This can be one- or two-way with sends and receives.
     A port is connected to only one other port; as two ends of a pipe are connected.
-
-    '''
+    """
 
     def __init__(self, name=None, use_mpi=False):
         '''Constructs a Port object

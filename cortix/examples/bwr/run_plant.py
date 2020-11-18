@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
-"""
-Cortix Run File
-"""
+"""Cortix Run File"""
 import scipy.constants as unit
 import matplotlib.pyplot as plt
 

@@ -9,7 +9,7 @@ import logging
 from cortix.src.port import Port
 
 class Module:
-    '''Cortix module super class.
+    """Cortix module super class.
 
     This class provides facilities for creating modules within the Cortix network.
     Cortix will map one object of this class to either a Multiprocessing or MPI
@@ -21,10 +21,10 @@ class Module:
     In order to execute, modules *must* override the `run` method, which will be
     executed during the simulation.
 
-    '''
+    """
 
     def __init__(self):
-        '''Module super class constructor.
+        """Module super class constructor.
 
         Note
         ----
@@ -58,7 +58,8 @@ class Module:
         __network: Network
             An internal network inherited by the derived module for nested networks.
 
-       '''
+       """
+
         self.name = self.__class__.__name__
         self.port_names_expected = None
         self.state = None
@@ -70,7 +71,7 @@ class Module:
 
         self.id = None
 
-        self._network = None
+        self.__network = None
 
     def send(self, data, port):
         '''Send data through a given port.
@@ -139,28 +140,29 @@ class Module:
         assert isinstance(name, str), 'port name must be of type str'
         port = None
 
-        for p in self.ports:
-            if p.name == name:
-                port = p
+        for pti in self.ports:
+            if pti.name == name:
+                port = pti
                 break
 
         if port is None:
             if self.port_names_expected:
                 assert name in self.port_names_expected,\
-                        'port name: {}, not expected by module: {}'.format(name,self)
-            port = Port(name,self.use_mpi)
+                        'port name: {}, not expected by module: {}'.format(name, self)
+            port = Port(name, self.use_mpi)
             self.ports.append(port)
 
         return port
 
     def __set_network(self, n):
-        assert isinstance(n,Network)
+        # Must be here to avoid infinite import loop
+        from cortix.src.network import Network
+        assert isinstance(n, Network)
         n.use_mpi = self.use_mpi
         n.use_multiprocessing = self.use_multiprocessing
-        self._network = n
-        return
+        self.__network = n
     def __get_network(self):
-        return self._network
+        return self.__network
     network = property(__get_network, __set_network, None, None)
 
     def run(self, *args):
@@ -212,19 +214,20 @@ class Module:
         self.run()
 
         if self.save:
-            file_name = os.path.join(".ctx-saved", "{}_".format(self.__class__.__name__))
+            file_name = os.path.join('.ctx-saved', '{}_'.format(self.__class__.__name__))
+            # Import where needed for no broken dependencies
             if self.use_mpi:
                 from mpi4py import MPI
                 file_name += str(MPI.COMM_WORLD.rank)
             else:
                 file_name += str(os.getpid())
-            file_name += ".pkl"
+            file_name += '.pkl'
 
             self.ports = list() # reset ports since they can't be pickled
             self.log = None
 
             try:
-                with open(file_name, "wb") as f:
-                    pickle.dump( self, f )
+                with open(file_name, 'wb') as fout:
+                    pickle.dump(self, fout)
             except pickle.PicklingError:
-                print("Unable to pickle {}!".format(file_name))
+                print('Unable to pickle {}!'.format(file_name))
