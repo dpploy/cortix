@@ -4,6 +4,7 @@
 # https://cortix.org
 
 import os
+import shutil
 import logging
 import time
 import datetime
@@ -84,7 +85,8 @@ class Cortix:
             self.wall_clock_time_start = time.time()
             self.wall_clock_time_end = self.wall_clock_time_start
             self.end_run_date = datetime.datetime.today().strftime('%d%b%y %H:%M:%S')
-            os.makedirs('.ctx-saved', exist_ok=True)
+
+            shutil.rmtree('.ctx-saved', ignore_errors=True)
 
     def __set_network(self, n):
         assert isinstance(n, Network)
@@ -139,7 +141,7 @@ class Cortix:
         # File removal
         if self.rank == 0 or self.use_multiprocessing:
             if os.path.isfile('cortix.log'):
-                os.system('rm -rf cortix.log')
+                os.remove('cortix.log')
 
         # Sync here to allow for file removal
         if self.use_mpi:
