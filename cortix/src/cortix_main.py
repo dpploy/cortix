@@ -11,7 +11,7 @@ import datetime
 from cortix.src.network import Network
 
 class Cortix:
-    '''Cortix main class definition.
+    """Cortix main class definition.
 
     The typical Cortix run file workflow:
 
@@ -19,10 +19,10 @@ class Cortix:
     2. Create tne (nested) network of modules
     3. Run and close `Cortix`
 
-    '''
+    """
 
     def __init__(self, use_mpi=False, splash=False, log_filename='cortix'):
-        '''Construct a Cortix simulation object.
+        """Construct a Cortix simulation object.
 
         Parameters
         ----------
@@ -48,7 +48,7 @@ class Cortix:
         size: int
             size of the group associated with MPI.COMM_WORLD.
 
-        '''
+        """
         self.use_mpi = use_mpi
         self.use_multiprocessing = not use_mpi
         self.comm = None
@@ -69,7 +69,7 @@ class Cortix:
             except ImportError:
                 self.use_mpi = False
 
-        # Setup the global logger 
+        # Setup the global logger
         self.__create_logger()
 
         # Done
@@ -84,44 +84,38 @@ class Cortix:
             self.wall_clock_time_start = time.time()
             self.wall_clock_time_end = self.wall_clock_time_start
             self.end_run_date = datetime.datetime.today().strftime('%d%b%y %H:%M:%S')
-            os.system("rm -rf .ctx-saved && mkdir .ctx-saved")
-
-        return
+            os.makedirs('.ctx-saved', exist_ok=True)
 
     def __set_network(self, n):
-        assert isinstance(n,Network)
+        assert isinstance(n, Network)
         n.use_mpi = self.use_mpi
         n.use_multiprocessing = self.use_multiprocessing
         n.rank = self.rank
         n.size = self.size
         n.comm = self.comm
         self.__network = n
-        return
-
     def __get_network(self):
         return self.__network
     network = property(__get_network, __set_network, None, None)
 
     def run(self, save=False):
-        '''Run the Cortix network simulation.
+        """Run the Cortix network simulation.
+        """
 
-        '''
+        self.__network._Network__run(save)
 
-        self.__network._Network__run()
-
-        if self.rank==0 or self.use_multiprocessing:
+        if self.rank == 0 or self.use_multiprocessing:
             self.wall_clock_time_end = time.time()
             self.log.info('run()::Elapsed wall clock time [s]: '+
-                    str(round(self.wall_clock_time_end-self.wall_clock_time_start,2)))
+                          str(round(self.wall_clock_time_end-self.wall_clock_time_start, 2)))
 
     def close(self):
-        '''Closes the cortix object properly before destruction.
+        """Closes the cortix object properly before destruction.
 
         User is strongly advised to call this method at the end of the run file otherwise
         timings will not be recorded.
 
-        '''
-
+        """
         # Sync here before close
         if self.use_mpi:
             self.comm.Barrier()
@@ -136,11 +130,11 @@ class Cortix:
             self.wall_clock_time_end = time.time()
 
             self.log.info('close()::Elapsed wall clock time [s]: '+
-                    str(round(self.wall_clock_time_end-self.wall_clock_time_start,2)))
+                          str(round(self.wall_clock_time_end-self.wall_clock_time_start, 2)))
         return
 
     def __create_logger(self):
-        '''A helper function to setup the logging facility.'''
+        """A helper function to setup the logging facility."""
 
         # File removal
         if self.rank == 0 or self.use_multiprocessing:
@@ -199,11 +193,11 @@ class Cortix:
 
         '''
 
-        assert begin==None or end==None
+        assert begin is None or end is None
         if begin:
-            end=False
+            end = False
         elif end:
-            begin=False
+            begin = False
 
 
         splash = \
@@ -236,7 +230,7 @@ class Cortix:
         return message + splash
 
     def __del__(self):
-        '''Destructs a Cortix simulation object.
+        """Destructs a Cortix simulation object.
 
         Warning
         -------
@@ -244,7 +238,7 @@ class Cortix:
         variables may have been deleted already. For example, `logging` is no longer
         there; do the least amount of work here.
 
-        '''
+        """
 
         pass
 
