@@ -12,7 +12,7 @@ from cortix.src.module import Module
 from cortix.src.port import Port
 
 class Network:
-    '''Cortix network.
+    """Cortix network.
 
     Attributes
     ----------
@@ -20,7 +20,7 @@ class Network:
     num_networks: int
         Number of instances of this class.
 
-    '''
+    """
 
     num_networks = 0
 
@@ -54,6 +54,8 @@ class Network:
         self.rank = None
         self.size = None
         self.comm = None
+
+        self.save = False # save all network modules
 
         Network.num_networks += 1
 
@@ -189,8 +191,8 @@ class Network:
 
         return
 
-    def __run(self):
-        '''
+    def __run(self, save=False):
+        """
         Internal method to run the network simulation. Do not use this method, it is
         intended for Cortix to run it.
 
@@ -203,12 +205,12 @@ class Network:
         When using multiprocessing, data from the modules state are copied to the master
         process after the `__run()` method of the modules is finished.
 
-        '''
+        """
         assert len(self.modules) >= 1, 'the network must have a list of modules.'
 
         # Remove the scratch file save directory
         if self.rank == 0 or self.use_multiprocessing:
-            os.system('rm -rf .ctx-saved && mkdir .ctx-saved')
+            os.makedirs('.ctx-saved', exist_ok=True)
 
         # Running under MPI
         #------------------
