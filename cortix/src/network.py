@@ -4,6 +4,7 @@
 # https://cortix.org
 
 import os
+import shutil
 import pickle
 import logging
 from multiprocessing import Process
@@ -210,7 +211,7 @@ class Network:
 
         # Remove the scratch file save directory
         if self.rank == 0 or self.use_multiprocessing:
-            os.makedirs('.ctx-saved', exist_ok=True)
+            os.makedirs('.ctx-saved')
 
         # Running under MPI
         #------------------
