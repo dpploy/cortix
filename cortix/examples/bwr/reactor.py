@@ -716,7 +716,7 @@ class BWR(Module):
             p_0 = self.params['decay-heat-0']
             p_t = p_0 * (((time + 1) ** -0.2) - (t_0 + time) ** -0.2)
             q3prime += p_t
-        
+
         return q3prime
 
     def __heat_sink_rate(self, time, temp_f, temp_c, params):
