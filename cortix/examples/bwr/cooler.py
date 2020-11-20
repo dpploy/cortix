@@ -84,7 +84,7 @@ class Cooler(Module):
                 assert abs(check_time-time) <= 1e-6
                 inflow_temp = inflow_state['temp']
                 flowrate = inflow_state['flowrate'] # kg/s
-
+                self.status = inflow_state['status']
 
             # Interactions in the coolant-outflow port
             #-----------------------------------------
@@ -103,15 +103,6 @@ class Cooler(Module):
         # Interactions in the signal-in port
         #-----------------------------------------
         # one way "to" signal-in
-
-        if self.get_port('signal-in').connected_port:
-
-            self.send(time, 'coolant-inflow')
-            (check_time, rcis_state) = self.recv('signal-in')
-            assert abs(check_time-time) <= 1e-6
-            rcis_state = self.recv('signal-in')
-            self.status = rcis_state
-            print('signal is being run!', time)
 
     def __step(self, time=0.0):
         time += self.time_step
