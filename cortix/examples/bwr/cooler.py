@@ -25,11 +25,9 @@ class Cooler(Module):
         super().__init__()
 
         self.port_names_expected = ['coolant-inflow', 'coolant-outflow', 'signal-in']
-
-        self.params = params
-
+        
         self.status = 'online'
-
+        self.params = params
         self.initial_time = params['start-time']
         self.end_time = params['end-time']
         self.time_step = 10.0
@@ -71,38 +69,33 @@ class Cooler(Module):
 
     def __call_ports(self, time):
 
-        if self.status == 'online':
 
-            # Interactions in the coolant-inflow port
-            #-----------------------------------------
-            # one way "from" coolant-inflow
+        # Interactions in the coolant-inflow port
+        #-----------------------------------------
+        # one way "from" coolant-inflow
 
-            if self.get_port('coolant-inflow').connected_port:
+        if self.get_port('coolant-inflow').connected_port:
+            self.send(time, 'coolant-inflow')
+            (check_time, inflow_state) = self.recv('coolant-inflow')
+            assert abs(check_time-time) <= 1e-6
+            inflow_temp = inflow_state['temp']
+            flowrate = inflow_state['flowrate'] # kg/s
+            self.status = inflow_state['status']
 
-                self.send(time, 'coolant-inflow')
-                (check_time, inflow_state) = self.recv('coolant-inflow')
-                assert abs(check_time-time) <= 1e-6
-                inflow_temp = inflow_state['temp']
-                flowrate = inflow_state['flowrate'] # kg/s
-                self.status = inflow_state['status']
+        # Interactions in the coolant-outflow port
+        #-----------------------------------------
+        # one way "to" coolant-outflow
 
-            # Interactions in the coolant-outflow port
-            #-----------------------------------------
-            # one way "to" coolant-outflow
-
-            if self.get_port('coolant-outflow').connected_port:
-
-                message_time = self.recv('coolant-outflow')
-
+        if self.get_port('coolant-outflow').connected_port:
+            
+            message_time = self.recv('coolant-outflow')
+            if self.status == 'online':
                 outflow_temp = self.__get_coolant_outflow(message_time,
                                                           inflow_temp,
                                                           flowrate, self.params)
-
-                self.send(outflow_temp, 'coolant-outflow')
-
-        # Interactions in the signal-in port
-        #-----------------------------------------
-        # one way "to" signal-in
+            else:
+                outflow_temp = 0
+            self.send(outflow_temp, 'coolant-outflow')
 
     def __step(self, time=0.0):
         time += self.time_step

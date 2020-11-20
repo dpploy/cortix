@@ -313,12 +313,12 @@ class BWR(Module):
             if self.RCIS_operating_mode == 'online':
                 coolant_outflow = self.__get_coolant_outflow(message_time)
                 coolant_outflow['flowrate'] = 5280 # kg/s
-                coolant_outflow['operating mode'] = self.RCIS_operating_mode
+                coolant_outflow['status'] = self.RCIS_operating_mode
                 self.send((message_time, coolant_outflow), 'RCIS-outflow')
             else:
                 coolant_outflow = self.__get_coolant_outflow(message_time)
                 coolant_outflow['flowrate'] = 0.0 # kg/s
-                coolant_outflow['operating mode'] = self.RCIS_operating_mode
+                coolant_outflow['status'] = self.RCIS_operating_mode
                 self.send((message_time, coolant_outflow), 'RCIS-outflow')
 
         # Interactions in the coolant-inflow port
@@ -346,12 +346,10 @@ class BWR(Module):
             self.send(time, 'RCIS-inflow')
 
             if self.RCIS_operating_mode == 'online':
-                (check_time, inflow_temp) = self.recv('RCIS-inflow')
-                assert abs(check_time-time) <= 1e-6
+                inflow_temp = self.recv('RCIS-inflow')
                 self.params['inflow-cool-temp'] = inflow_temp
             else:
-                (check_time, _) = self.recv('RCIS-inflow')
-                assert abs(check_time-time) <= 1e-6
+                _ = self.recv('RCIS-inflow')
 
     def __step(self, time=0.0):
         r"""ODE IVP problem.

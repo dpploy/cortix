@@ -378,7 +378,7 @@ def main():
     # Create condenser module
     params['steam flowrate'] = params['steam flowrate'] * 2
     params['condenser-runoff-temp'] = condenser_runoff_temp
-    condenser = Condenser(params)
+    condenser = Condenser()
     
     condenser.name = 'Condenser'
     condenser.save = True
