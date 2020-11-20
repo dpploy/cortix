@@ -4,6 +4,7 @@
 # https://cortix.org
 
 import os
+import shutil
 import pickle
 import logging
 from multiprocessing import Process
@@ -12,7 +13,7 @@ from cortix.src.module import Module
 from cortix.src.port import Port
 
 class Network:
-    '''Cortix network.
+    """Cortix network.
 
     Attributes
     ----------
@@ -20,7 +21,7 @@ class Network:
     num_networks: int
         Number of instances of this class.
 
-    '''
+    """
 
     num_networks = 0
 
@@ -50,6 +51,12 @@ class Network:
 
         self.use_mpi = None
         self.use_multiprocessing = None
+
+        self.rank = None
+        self.size = None
+        self.comm = None
+
+        self.save = False # save all network modules
 
         Network.num_networks += 1
 
@@ -117,7 +124,7 @@ class Network:
         '''
 
         if info:
-            assert isinstance(info,str)
+            assert isinstance(info, str)
 
         if isinstance(module_port_a, Module) and isinstance(module_port_b, Module):
 
@@ -126,15 +133,15 @@ class Network:
 
             assert module_a.name and module_b.name  # sanity check
 
-            assert module_a in self.modules,'module %r not in network.'%module_a.name
-            assert module_b in self.modules,'module %r not in network.'%module_b.name
+            assert module_a in self.modules, 'module %r not in network.'%module_a.name
+            assert module_b in self.modules, 'module %r not in network.'%module_b.name
 
             idx_a = self.modules.index(module_a)
             idx_b = self.modules.index(module_b)
-            self.gv_edges.append( (str(idx_a),str(idx_b)) )
+            self.gv_edges.append((str(idx_a), str(idx_b)))
 
-            if info=='bidirectional':
-                self.gv_edges.append( (str(idx_b),str(idx_a)) )
+            if info == 'bidirectional':
+                self.gv_edges.append((str(idx_b), str(idx_a)))
 
             port_a = module_a.get_port(module_b.name.lower())
             port_b = module_b.get_port(module_a.name.lower())
@@ -143,37 +150,37 @@ class Network:
 
         elif isinstance(module_port_a, list) and isinstance(module_port_b, list):
 
-            assert len(module_port_a) == 2 and isinstance(module_port_a[0],Module) and\
-                  (isinstance(module_port_a[1],str) or isinstance(module_port_a[1],Port))
+            assert len(module_port_a) == 2 and isinstance(module_port_a[0], Module) and\
+                  (isinstance(module_port_a[1], str) or isinstance(module_port_a[1], Port))
 
-            assert len(module_port_b) == 2 and isinstance(module_port_b[0],Module) and\
-                  (isinstance(module_port_b[1],str) or isinstance(module_port_b[1],Port))
+            assert len(module_port_b) == 2 and isinstance(module_port_b[0], Module) and\
+                  (isinstance(module_port_b[1], str) or isinstance(module_port_b[1], Port))
 
             module_a = module_port_a[0]
             module_b = module_port_b[0]
 
             assert module_a.name and module_b.name  # sanity check
 
-            assert module_a in self.modules,'module %r not in network.'%module_a.name
-            assert module_b in self.modules,'module %r not in network.'%module_b.name
+            assert module_a in self.modules, 'module %r not in network.'%module_a.name
+            assert module_b in self.modules, 'module %r not in network.'%module_b.name
 
             idx_a = self.modules.index(module_a)
             idx_b = self.modules.index(module_b)
-            self.gv_edges.append( (str(idx_a),str(idx_b)) )
+            self.gv_edges.append((str(idx_a), str(idx_b)))
 
-            if info=='bidirectional':
-                self.gv_edges.append( (str(idx_b),str(idx_a)) )
+            if info == 'bidirectional':
+                self.gv_edges.append((str(idx_b), str(idx_a)))
 
-            if isinstance(module_port_a[1],str):
+            if isinstance(module_port_a[1], str):
                 port_a = module_a.get_port(module_port_a[1])
-            elif isinstance(module_port_a[1],Port):
+            elif isinstance(module_port_a[1], Port):
                 port_a = module_port_a[1]
             else:
                 assert False, 'help!'
 
-            if isinstance(module_port_b[1],str):
+            if isinstance(module_port_b[1], str):
                 port_b = module_b.get_port(module_port_b[1])
-            elif isinstance(module_port_b[1],Port):
+            elif isinstance(module_port_b[1], Port):
                 port_b = module_port_b[1]
             else:
                 assert False, 'help!'
@@ -181,12 +188,12 @@ class Network:
             port_a.connect(port_b)
 
         else:
-            assert False,' not implemented.'
+            assert False, ' not implemented.'
 
         return
 
-    def __run(self):
-        '''
+    def __run(self, save=False):
+        """
         Internal method to run the network simulation. Do not use this method, it is
         intended for Cortix to run it.
 
@@ -199,12 +206,12 @@ class Network:
         When using multiprocessing, data from the modules state are copied to the master
         process after the `__run()` method of the modules is finished.
 
-        '''
+        """
         assert len(self.modules) >= 1, 'the network must have a list of modules.'
 
         # Remove the scratch file save directory
         if self.rank == 0 or self.use_multiprocessing:
-            os.system('rm -rf .ctx-saved && mkdir .ctx-saved')
+            os.makedirs('.ctx-saved')
 
         # Running under MPI
         #------------------
@@ -218,9 +225,9 @@ class Network:
 
             # Assign an mpi rank to all ports of a module using the module list index
             # If a port has rank assignment from a previous run; leave it alone
-            for m in self.modules:
-                rank = self.modules.index(m)+1
-                for port in m.ports:
+            for mod in self.modules:
+                rank = self.modules.index(mod)+1
+                for port in mod.ports:
                     if port.rank is None:
                         port.rank = rank
 
@@ -250,16 +257,15 @@ class Network:
             # Parallel run all modules in Python multiprocessing
             processes = list()
 
-            count_states = 0
             for mod in self.modules:
                 self.log.info('Launching Module {}'.format(mod))
-                p = Process( target=mod.run_and_save )
-                processes.append(p)
-                p.start()
+                proc = Process(target=mod.run_and_save)
+                processes.append(proc)
+                proc.start()
 
             # Synchronize at the end
-            for p in processes:
-                p.join()
+            for proc in processes:
+                proc.join()
 
         # Reload saved modules
         #---------------------
@@ -272,14 +278,14 @@ class Network:
             if file_name.endswith('.pkl'):
                 num_files += 1
                 file_name = os.path.join('.ctx-saved', file_name)
-                with open(file_name, 'rb') as f:
-                    module = pickle.load(f)
+                with open(file_name, 'rb') as fin:
+                    module = pickle.load(fin)
                     # reintroduce logging
                     module.log = logging.getLogger('cortix')
                     self.modules[module.id] = module
 
         if num_files and num_files != len(self.modules):
-            self.log.warn('Network::run(): not all modules reloaded from disk.')
+            self.log.warning('Network::run(): not all modules reloaded from disk.')
 
         if self.use_mpi:
             # Make double sure all are in sync here before going forward
@@ -287,30 +293,32 @@ class Network:
             # that do not exist anymore
             self.comm.Barrier()
 
-    def draw( self, graph_attr=None, node_attr=None, engine='twopi', lr=False, 
-              ports=False, node_shape='hexagon' ):
+    def draw(self, graph_attr=None, node_attr=None, engine='twopi', lr=False,
+             ports=False, node_shape='hexagon'):
 
         # Import here to avoid broken dependency. Only this method needs this.
         from graphviz import Digraph
 
-        graph_attr = graph_attr if graph_attr else {'splines':'true','overlap':'scale',
-                'ranksep':'2.0'}
+        if graph_attr is None:
+            graph_attr = {'splines':'true', 'overlap':'scale', 'ranksep':'2.0'}
 
-        node_attr = node_attr if node_attr else {'shape':'hexagon','style':'filled'}
+        if node_attr is None:
+            node_attr = {'shape':'hexagon', 'style':'filled'}
 
-        g = Digraph( name=self.name, comment='Network::graphviz',format='png',
-                     graph_attr=graph_attr,node_attr=node_attr, engine=engine )
+        dgr = Digraph(name=self.name, comment='Network::graphviz', format='png',
+                      graph_attr=graph_attr, node_attr=node_attr, engine=engine)
 
-        if lr: g.attr(rankdir='LR')
+        if lr:
+            dgr.attr(rankdir='LR')
 
-        g.attr('node', shape=node_shape)
+        dgr.attr('node', shape=node_shape)
 
-        for id, m in enumerate(self.modules):
-            g.node(str(id), m.name)
+        for idx, mod in enumerate(self.modules):
+            dgr.node(str(idx), mod.name)
 
-        for e in self.gv_edges:
-            g.edge(e[0], e[1])
+        for edg in self.gv_edges:
+            dgr.edge(edg[0], edg[1])
 
-        g.render()
+        dgr.render()
 
-        return g
+        return dgr
