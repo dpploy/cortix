@@ -101,9 +101,15 @@ class PhaseNew:
         # List of species and quantities objects; columns of data frame are named
         # by objects.
         # A new object held by a Phase() object
-        self.__species = deepcopy(species)
+        if species is not None:
+            self.__species = deepcopy(species)
+        else:
+            self.__species = None
         # A new object held by a Phase() object
-        self.__quantities = deepcopy(quantities)
+        if quantities is not None:
+            self.__quantities = deepcopy(quantities)
+        else:
+            self.__quantities = None
 
         names = list()
 
@@ -236,9 +242,14 @@ class PhaseNew:
         specie: str
 
         '''
-        for species in self.__species:
-            if species.name == name:
-                return species
+
+        assert name in self.__df.columns, 'name %r not in %r'%\
+                (name,self.__df.columns)
+
+        if self.__species:
+            for species in self.__species:
+                if species.name == name:
+                    return species
         return None
 
     def get_species_concentration(self, name, try_time_stamp=None):
@@ -268,14 +279,40 @@ class PhaseNew:
         val: int
 
         '''
+
+        assert name in self.__df.columns, 'name %r not in %r'%\
+                (name,self.__df.columns)
+
         for species in self.__species:
             if species.name == name:
                 species.flag = val
                 return
 
-    def get_quantity(self, name, try_time_stamp=None):
+    def get_quantity(self, name):
         '''
-        Get the quantity `name` at a point in time closest to
+        Get the quantity with `name`.
+
+        Parameters
+        ----------
+        name: str
+
+        Returns
+        -------
+        Quantity or None
+        '''
+
+        assert name in self.__df.columns, 'name %r not in %r'%\
+                (name,self.__df.columns)
+
+        if self.__quantities:
+            for quant in self.__quantities:
+                if quant.name == name:
+                   return quant
+        return None
+
+    def get_quantity_value(self, name, try_time_stamp=None):
+        '''
+        Get the quantity value with given `name` at a point in time closest to
         `try_time_stamp` up to a tolerance. If no time stamp is passed,
         the value at the last time stamp is returned.
 
@@ -288,18 +325,19 @@ class PhaseNew:
 
         Returns
         -------
-        quant.value: float or int or other
+        quant.value: type of Quantity.value
         '''
 
         assert name in self.__df.columns, 'name %r not in %r'%\
                 (name,self.__df.columns)
 
-        time_stamp = self.__get_time_stamp( try_time_stamp )
+        time_stamp = self.__get_time_stamp(try_time_stamp)
 
-        for quant in self.__quantities:
-            if quant.name == name:
-                quant.value = self.__df.loc[time_stamp, name] # labels' access mode
-                return quant  # return quantity syncronized with the phase
+        if self.__quantities:
+            for quant in self.__quantities:
+                if quant.name == name:
+                    quant.value = self.__df.loc[time_stamp, name] # labels' access mode
+                    return quant  # return quantity syncronized with the phase
 
     def get_quantity_history(self, name):
         '''
@@ -703,13 +741,13 @@ class PhaseNew:
         if filename_tag:
             fig_name += filename_tag
 
-        fig.savefig(fig_name+'.png', dpi=dpi, fomat='png')
+        fig.savefig(fig_name+'.png', dpi=dpi, format='png')
         plt.close(fig)
 
         return
 
-    def plot( self, name='phase-plot-name', time_unit='s', legend=None, 
-            nrows=2, ncols=2, dpi=200):
+    def plot(self, name='phase-plot-null-name', time_unit='s', legend=None, 
+             nrows=2, ncols=2, dpi=200):
 
         num_var = len(self.__df.columns)
         if num_var == 0:
@@ -730,7 +768,7 @@ class PhaseNew:
                 if i_var != 0:  # flush any current figure
                     fig_name = lead_name+'-'+self.name+'-phase-plot-' + \
                             str(i_dash).zfill(2)
-                    fig.savefig(fig_name+'.png', dpi=dpi, fomat='png')
+                    fig.savefig(fig_name+'.png', dpi=dpi, format='png')
                     plt.close(fig_num)
 
                     #pickle.dump( fig, open(fig_name+'.pickle','wb') )
@@ -777,14 +815,21 @@ class PhaseNew:
             species = self.get_species(col_name)
             if species:
                 varName = species.formula_name
-            else:
-                quant = self.get_quantity(col_name)
-                varName = quant.formal_name
+                info_str = species.info
+
+            quantity = self.get_quantity(col_name)
+            if quantity:
+                varName = quantity.formal_name
+                info_str = quantity.info
 
             # sanity check
-            if i_var <= len(self.__species):
-                assert self.__species[i_var].name == self.__df.columns[i_var]
-            else:
+            if species:
+                if i_var <= len(self.__species):
+                    assert self.__species[i_var].name == self.__df.columns[i_var]
+            if quantity and species:
+                if i_var > len(self.__species):
+                    assert self.__quantities[i_var].name == self.__df.columns[i_var]
+            elif quantity:
                 assert self.__quantities[i_var].name == self.__df.columns[i_var]
 
             varUnit = 'g/L'
@@ -1074,16 +1119,15 @@ class PhaseNew:
 
             # ...................
 
-            if species.info:
-                ax.set_title(species.info,fontsize=8)
+            ax.set_title(info_str, fontsize=8)
             if varLegend:
                 ax.legend(loc='best', prop={'size': 7})
             ax.grid()
 
         # end of: for i_var in range(num_var):
 
-        fig_name = name+'-'+self.name+'-phase-plot-' + str(i_dash).zfill(2)
-        fig.savefig(fig_name+'.png', dpi=dpi, fomat='png')
+        fig_name = name+'-'+self.name+str(i_dash).zfill(2)
+        fig.savefig(fig_name+'.png', dpi=dpi, format='png')
         plt.close(fig_num)
 
         #pickle.dump( fig, open(fig_name+'.pickle','wb') )

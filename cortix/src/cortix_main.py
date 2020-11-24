@@ -86,6 +86,7 @@ class Cortix:
             self.wall_clock_time_end = self.wall_clock_time_start
             self.end_run_date = datetime.datetime.today().strftime('%d%b%y %H:%M:%S')
 
+            # Delete any existing .ctx-saved/*
             shutil.rmtree('.ctx-saved', ignore_errors=True)
 
     def __set_network(self, n):
