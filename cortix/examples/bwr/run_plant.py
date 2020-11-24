@@ -68,7 +68,7 @@ def main():
     plant_net.module(reactor)
 
     #*****************************************************************************
-    # Create turbine 1 module
+    # Create turbine high pressure module
     params['turbine_inlet_pressure'] = 2
     params['turbine_outlet_pressure'] = 0.5
     params['high_pressure_turbine'] = True
@@ -77,46 +77,46 @@ def main():
     #params_turbine.inlet_pressure = 2
     #params.turbine_outlet_pressure = 0.5
 
-    turbine1 = Turbine(params)
+    turbine_hp = Turbine(params)
 
-    turbine1.name = 'High Pressure Turbine'
-    turbine1.save = True
-    turbine1.time_step = time_step
-    turbine1.end_time = end_time
+    turbine_hp.name = 'High Pressure Turbine'
+    turbine_hp.save = True
+    turbine_hp.time_step = time_step
+    turbine_hp.end_time = end_time
 
-    # Add turbine 1 module to network
-    plant_net.module(turbine1)
+    # Add turbine high pressure module to network
+    plant_net.module(turbine_hp)
 
     #*****************************************************************************
-    # Create turbine 2 module
+    # Create turbine low pressure module
     params['turbine_inlet_pressure'] = 0.5
     params['turbine_outlet_pressure'] = 0.005
     params['high_pressure_turbine'] = False
     params['steam flowrate'] = params['steam flowrate']/2
 
-    turbine2 = Turbine(params)
+    turbine_lp1 = Turbine(params)
 
-    turbine2.name = 'Low Pressure Turbine 1'
-    turbine2.save = True
-    turbine2.time_step = time_step
-    turbine2.end_time = end_time
+    turbine_lp1.name = 'Low Pressure Turbine 1'
+    turbine_lp1.save = True
+    turbine_lp1.time_step = time_step
+    turbine_lp1.end_time = end_time
 
-    plant_net.module(turbine2)
+    plant_net.module(turbine_lp1)
 
     #*****************************************************************************
-    # Create turbine 3 module
+    # Create turbine low pressure module
     params['turbine_inlet_pressure'] = 0.5
     params['turbine_outlet_pressure'] = 0.005
     params['high_pressure_turbine'] = False
 
-    turbine3 = Turbine(params)
+    turbine_lp2 = Turbine(params)
 
-    turbine3.name = 'Low Pressure Turbine 2'
-    turbine3.save = True
-    turbine3.time_step = time_step
-    turbine3.end_time = end_time
+    turbine_lp2.name = 'Low Pressure Turbine 2'
+    turbine_lp2.save = True
+    turbine_lp2.time_step = time_step
+    turbine_lp2.end_time = end_time
 
-    plant_net.module(turbine3)
+    plant_net.module(turbine_lp2)
 
     #*****************************************************************************
     # Create condenser module
@@ -143,11 +143,11 @@ def main():
 
     #*****************************************************************************
     # Create the BoP network connectivity
-    plant_net.connect([reactor, 'coolant-outflow'], [turbine1, 'inflow'])
-    plant_net.connect([turbine1, 'outflow-1'], [turbine2, 'inflow'])
-    plant_net.connect([turbine1, 'outflow-2'], [turbine3, 'inflow'])
-    plant_net.connect([turbine2, 'outflow-1'], [condenser, 'inflow-1'])
-    plant_net.connect([turbine3, 'outflow-1'], [condenser, 'inflow-2'])
+    plant_net.connect([reactor, 'coolant-outflow'], [turbine_hp, 'inflow'])
+    plant_net.connect([turbine_hp, 'outflow-1'], [turbine_lp1, 'inflow'])
+    plant_net.connect([turbine_hp, 'outflow-2'], [turbine_lp2, 'inflow'])
+    plant_net.connect([turbine_lp1, 'outflow-1'], [condenser, 'inflow-1'])
+    plant_net.connect([turbine_lp2, 'outflow-1'], [condenser, 'inflow-2'])
     plant_net.connect([condenser, 'outflow'], [reactor, 'coolant-inflow'])
     plant_net.connect([reactor, 'RCIS-outflow'], [rcis, 'coolant-inflow'])
     plant_net.connect([rcis, 'coolant-outflow'], [reactor, 'RCIS-inflow'])
@@ -195,43 +195,43 @@ def main():
         plt.grid()
         plt.savefig('startup-fuel-temp.png', dpi=300)
 
-        # Turbine1 plots
-        turbine1 = plant_net.modules[1]
+        # Turbine high pressure plots
+        turbine_hp = plant_net.modules[1]
 
-        (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('power')
+        (quant, time_unit) = turbine_hp.outflow_phase.get_quantity_history('power')
 
         quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
                    y_label=quant.latex_name+' ['+quant.unit+']',
                    title='High Pressure Turbine Power')
         plt.grid()
-        plt.savefig('startup-turbine1-power.png', dpi=300)
+        plt.savefig('startup-turbine-hp-power.png', dpi=300)
 
-        (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('temp')
+        (quant, time_unit) = turbine_hp.outflow_phase.get_quantity_history('temp')
 
         quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
                    y_label=quant.latex_name+' ['+quant.unit+']',
                    title='High Pressure Turbine Outflow Temperature')
         plt.grid()
-        plt.savefig('startup-turbine1-outflow-temp.png', dpi=300)
+        plt.savefig('startup-turbine-hp-outflow-temp.png', dpi=300)
 
-        # Turbine2 graphs
-        turbine2 = plant_net.modules[2]
+        # Turbine low pressure graphs
+        turbine_lp1 = plant_net.modules[2]
 
-        (quant, time_unit) = turbine2.outflow_phase.get_quantity_history('power')
+        (quant, time_unit) = turbine_lp1.outflow_phase.get_quantity_history('power')
 
         quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
                    y_label=quant.latex_name+' ['+quant.unit+']',
                    title='Lower Pressure Turbine 1 Power')
         plt.grid()
-        plt.savefig('startup-turbine2-power.png', dpi=300)
+        plt.savefig('startup-turbine-lp1-power.png', dpi=300)
 
-        (quant, time_unit) = turbine2.outflow_phase.get_quantity_history('temp')
+        (quant, time_unit) = turbine_lp1.outflow_phase.get_quantity_history('temp')
 
         quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
                    y_label=quant.latex_name+' ['+quant.unit+']',
                    title='Lower Pressure Turbine 1 Outflow Temperature')
         plt.grid()
-        plt.savefig('startup-turbine2-outflow-temp.png', dpi=300)
+        plt.savefig('startup-turbine-lp1-outflow-temp.png', dpi=300)
 
         # Condenser graphs
         condenser = plant_net.modules[3]
@@ -245,13 +245,13 @@ def main():
 
 
     #setup initial values for simulation
-    turbine1_outflow_temp = turbine1.outflow_phase.get_value('temp', end_time)
-    turbine1_chi = turbine1.outflow_phase.get_value('quality', end_time)
-    turbine1_power = turbine1.outflow_phase.get_value('power', end_time)
+    turbine1_outflow_temp = turbine_hp.outflow_phase.get_value('temp', end_time)
+    turbine1_chi = turbine_hp.outflow_phase.get_value('quality', end_time)
+    turbine1_power = turbine_hp.outflow_phase.get_value('power', end_time)
 
-    turbine2_outflow_temp = turbine2.outflow_phase.get_value('temp', end_time)
-    turbine2_chi = turbine2.outflow_phase.get_value('quality', end_time)
-    turbine2_power = turbine2.outflow_phase.get_value('power', end_time)
+    turbine2_outflow_temp = turbine_lp1.outflow_phase.get_value('temp', end_time)
+    turbine2_chi = turbine_lp1.outflow_phase.get_value('quality', end_time)
+    turbine2_power = turbine_lp1.outflow_phase.get_value('power', end_time)
 
     condenser_runoff_temp = condenser.outflow_phase.get_value('temp', end_time)
 
@@ -314,7 +314,7 @@ def main():
     plant_net.module(reactor)
 
     #*****************************************************************************
-    # Create turbine 1 module
+    # Create turbine high pressure module
     params['turbine_inlet_pressure'] = 2
     params['turbine_outlet_pressure'] = 0.5
     params['high_pressure_turbine'] = True
@@ -327,18 +327,18 @@ def main():
     #params_turbine.inlet_pressure = 2
     #params.turbine_outlet_pressure = 0.5
 
-    turbine1 = Turbine(params)
+    turbine_hp = Turbine(params)
 
-    turbine1.name = 'High Pressure Turbine'
-    turbine1.save = True
-    turbine1.time_step = time_step
-    turbine1.end_time = end_time
+    turbine_hp.name = 'High Pressure Turbine'
+    turbine_hp.save = True
+    turbine_hp.time_step = time_step
+    turbine_hp.end_time = end_time
 
-    # Add turbine 1 module to network
-    plant_net.module(turbine1)
+    # Add turbine high pressure module to network
+    plant_net.module(turbine_hp)
 
     #*****************************************************************************
-    # Create turbine 2 module
+    # Create turbine low pressure 1 module
     params['turbine_inlet_pressure'] = 0.5
     params['turbine_outlet_pressure'] = 0.005
     params['high_pressure_turbine'] = False
@@ -348,36 +348,36 @@ def main():
     params['turbine-chi'] = turbine2_chi
     params['turbine-work'] = turbine2_power
 
-    turbine2 = Turbine(params)
+    turbine_lp1 = Turbine(params)
 
-    turbine2.name = 'Low Pressure Turbine 1'
-    turbine2.save = True
-    turbine2.time_step = time_step
-    turbine2.end_time = end_time
+    turbine_lp1.name = 'Low Pressure Turbine 1'
+    turbine_lp1.save = True
+    turbine_lp1.time_step = time_step
+    turbine_lp1.end_time = end_time
 
-    plant_net.module(turbine2)
+    plant_net.module(turbine_lp1)
 
     #*****************************************************************************
-    # Create turbine 3 module
+    # Create turbine low pressure 2 module
     params['turbine_inlet_pressure'] = 0.5
     params['turbine_outlet_pressure'] = 0.005
     params['high_pressure_turbine'] = False
 
-    turbine3 = Turbine(params)
+    turbine_lp2 = Turbine(params)
 
-    turbine3.name = 'Low Pressure Turbine 2'
-    turbine3.save = True
-    turbine3.time_step = time_step
-    turbine3.end_time = end_time
+    turbine_lp2.name = 'Low Pressure Turbine 2'
+    turbine_lp2.save = True
+    turbine_lp2.time_step = time_step
+    turbine_lp2.end_time = end_time
 
-    plant_net.module(turbine3)
+    plant_net.module(turbine_lp2)
 
     #*****************************************************************************
     # Create condenser module
     params['steam flowrate'] = params['steam flowrate'] * 2
     params['condenser-runoff-temp'] = condenser_runoff_temp
-    condenser = Condenser(params)
-    
+    condenser = Condenser()
+
     condenser.name = 'Condenser'
     condenser.save = True
     condenser.time_step = time_step
@@ -397,11 +397,11 @@ def main():
 
     #*****************************************************************************
     # Create the BoP network connectivity
-    plant_net.connect([reactor, 'coolant-outflow'], [turbine1, 'inflow'])
-    plant_net.connect([turbine1, 'outflow-1'], [turbine2, 'inflow'])
-    plant_net.connect([turbine1, 'outflow-2'], [turbine3, 'inflow'])
-    plant_net.connect([turbine2, 'outflow-1'], [condenser, 'inflow-1'])
-    plant_net.connect([turbine3, 'outflow-1'], [condenser, 'inflow-2'])
+    plant_net.connect([reactor, 'coolant-outflow'], [turbine_hp, 'inflow'])
+    plant_net.connect([turbine_hp, 'outflow-1'], [turbine_lp1, 'inflow'])
+    plant_net.connect([turbine_hp, 'outflow-2'], [turbine_lp2, 'inflow'])
+    plant_net.connect([turbine_lp1, 'outflow-1'], [condenser, 'inflow-1'])
+    plant_net.connect([turbine_lp2, 'outflow-1'], [condenser, 'inflow-2'])
     plant_net.connect([condenser, 'outflow'], [reactor, 'coolant-inflow'])
     plant_net.connect([reactor, 'RCIS-outflow'], [rcis, 'coolant-inflow'])
     plant_net.connect([rcis, 'coolant-outflow'], [reactor, 'RCIS-inflow'])
@@ -449,46 +449,46 @@ def main():
         plt.grid()
         plt.savefig('shutdown-fuel-temp.png', dpi=300)
 
-        # Turbine1 plots
-        turbine1 = plant_net.modules[1]
+        # Turbine high pressure plots
+        turbine_hp = plant_net.modules[1]
 
-        (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('power')
+        (quant, time_unit) = turbine_hp.outflow_phase.get_quantity_history('power')
 
         quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
                    y_label=quant.latex_name+' ['+quant.unit+']',
                    title='High Pressure Turbine Power')
         plt.grid()
-        plt.savefig('shutdown-turbine1-power.png', dpi=300)
+        plt.savefig('shutdown-turbine-hp-power.png', dpi=300)
 
-        (quant, time_unit) = turbine1.outflow_phase.get_quantity_history('temp')
+        (quant, time_unit) = turbine_hp.outflow_phase.get_quantity_history('temp')
 
         quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
                    y_label=quant.latex_name+' ['+quant.unit+']',
                    title='High Pressure Turbine Outflow Temperature')
         plt.grid()
-        plt.savefig('shutdown-turbine1-outflow-temp.png', dpi=300)
+        plt.savefig('shutdown-turbine-hp-outflow-temp.png', dpi=300)
 
-        # Turbine2 graphs
-        turbine2 = plant_net.modules[2]
+        # Turbine low pressure graphs
+        turbine_lp1 = plant_net.modules[2]
 
-        (quant, time_unit) = turbine2.outflow_phase.get_quantity_history('power')
+        (quant, time_unit) = turbine_lp1.outflow_phase.get_quantity_history('power')
 
         quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
                    y_label=quant.latex_name+' ['+quant.unit+']',
                    title='Lower Pressure Turbine 1 Power')
         plt.grid()
-        plt.savefig('shutdown-turbine2-power.png', dpi=300)
+        plt.savefig('shutdown-turbine-lp1-power.png', dpi=300)
 
-        (quant, time_unit) = turbine2.outflow_phase.get_quantity_history('temp')
+        (quant, time_unit) = turbine_lp1.outflow_phase.get_quantity_history('temp')
 
         quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
                    y_label=quant.latex_name+' ['+quant.unit+']',
                    title='Lower Pressure Turbine 1 Outflow Temperature')
         plt.grid()
-        plt.savefig('shutdown-turbine2-outflow-temp.png', dpi=300)
+        plt.savefig('shutdown-turbine-lp1-outflow-temp.png', dpi=300)
 
         # Condenser graphs
-        condenser = plant_net.modules[3]
+        condenser = plant_net.modules[4]
 
         (quant, time_unit) = condenser.outflow_phase.get_quantity_history('temp')
 
@@ -499,7 +499,6 @@ def main():
 
     # Shutdown The Simulation
     plant.close()
-
 
 if __name__ == '__main__':
     main()

@@ -156,7 +156,7 @@ class BWR(Module):
         self.c_vec_0 = c_vec_ss
         self.rho_0 = self.reactivity
 
-        self.RCIS = False
+        self.RCIS_operating_mode = 'offline'
 
         # Coolant outflow phase history
         quantities = list()
@@ -256,6 +256,20 @@ class BWR(Module):
             else:
                 self.__logit = False
 
+            #determine operating mode for this timestep
+            #------------------------------------------
+
+            current_temp = self.__get_coolant_outflow(time)['temp']
+            if current_temp < 373.15:
+                #if self.params['operating-mode'] == 'shutdown':
+                    self.RCIS_operating_mode = 'online'
+
+            if current_temp > 373.15:
+                if self.params['operating-mode'] == 'startup':
+                    #self.RCIS = False
+                    self.RCIS_operating_mode = 'offline'
+
+
             # Communicate information
             #------------------------
             self.__call_ports(time)
@@ -267,15 +281,6 @@ class BWR(Module):
 
     def __call_ports(self, time):
 
-        current_temp = self.__get_coolant_outflow(time)['temp']
-        if current_temp < 373.15:
-            if self.params['operating-mode'] == 'shutdown':
-                self.RCIS = True
-
-        if current_temp > 373.15:
-            if self.params['operating-mode'] == 'startup':
-                self.RCIS = False
-
         # Interactions in the coolant-outflow port
         #-----------------------------------------
         # one way "to" coolant-outflow
@@ -284,13 +289,14 @@ class BWR(Module):
         if self.get_port('coolant-outflow').connected_port:
             message_time = self.recv('coolant-outflow')
 
-            if self.RCIS:
+            if self.RCIS_operating_mode == 'online':
                 coolant_outflow = dict()
                 coolant_outflow['temp'] = 287.15
                 coolant_outflow['pressure'] = 0
                 coolant_outflow['quality'] = 0
                 coolant_outflow['flowrate'] = 0
                 self.send((message_time, coolant_outflow), 'coolant-outflow')
+
             else:
                 coolant_outflow = self.__get_coolant_outflow(message_time)
                 #outflow_params = dict()
@@ -304,13 +310,15 @@ class BWR(Module):
         if self.get_port('RCIS-outflow').connected_port:
             message_time = self.recv('RCIS-outflow')
 
-            if self.RCIS:
+            if self.RCIS_operating_mode == 'online':
                 coolant_outflow = self.__get_coolant_outflow(message_time)
                 coolant_outflow['flowrate'] = 5280 # kg/s
+                coolant_outflow['status'] = self.RCIS_operating_mode
                 self.send((message_time, coolant_outflow), 'RCIS-outflow')
             else:
                 coolant_outflow = self.__get_coolant_outflow(message_time)
                 coolant_outflow['flowrate'] = 0.0 # kg/s
+                coolant_outflow['status'] = self.RCIS_operating_mode
                 self.send((message_time, coolant_outflow), 'RCIS-outflow')
 
         # Interactions in the coolant-inflow port
@@ -321,7 +329,7 @@ class BWR(Module):
         if self.get_port('coolant-inflow').connected_port:
             self.send(time, 'coolant-inflow')
 
-            if self.RCIS:
+            if self.RCIS_operating_mode == 'online':
                 (check_time, _) = self.recv('coolant-inflow')
                 assert abs(check_time-time) <= 1e-6
             else:
@@ -337,13 +345,11 @@ class BWR(Module):
         if self.get_port('RCIS-inflow').connected_port:
             self.send(time, 'RCIS-inflow')
 
-            if self.RCIS:
-                (check_time, inflow_temp) = self.recv('RCIS-inflow')
-                assert abs(check_time-time) <= 1e-6
+            if self.RCIS_operating_mode == 'online':
+                inflow_temp = self.recv('RCIS-inflow')
                 self.params['inflow-cool-temp'] = inflow_temp
             else:
-                (check_time, _) = self.recv('RCIS-inflow')
-                assert abs(check_time-time) <= 1e-6
+                _ = self.recv('RCIS-inflow')
 
     def __step(self, time=0.0):
         r"""ODE IVP problem.
@@ -710,7 +716,7 @@ class BWR(Module):
             p_0 = self.params['decay-heat-0']
             p_t = p_0 * (((time + 1) ** -0.2) - (t_0 + time) ** -0.2)
             q3prime += p_t
-        
+
         return q3prime
 
     def __heat_sink_rate(self, time, temp_f, temp_c, params):

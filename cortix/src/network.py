@@ -4,7 +4,6 @@
 # https://cortix.org
 
 import os
-import shutil
 import pickle
 import logging
 from multiprocessing import Process
@@ -209,7 +208,7 @@ class Network:
         """
         assert len(self.modules) >= 1, 'the network must have a list of modules.'
 
-        # Remove the scratch file save directory
+        # Create directory for saving modules states
         if self.rank == 0 or self.use_multiprocessing:
             os.makedirs('.ctx-saved')
 
@@ -270,7 +269,8 @@ class Network:
         # Reload saved modules
         #---------------------
         if self.use_mpi:
-            # make double sure all are in sync here before reading files from disk
+            # make double sure all processes are in sync here before reading files
+            # from disk
             self.comm.Barrier()
 
         num_files = 0
@@ -294,24 +294,115 @@ class Network:
             self.comm.Barrier()
 
     def draw(self, graph_attr=None, node_attr=None, engine='twopi', lr=False,
-             ports=False, node_shape='hexagon'):
+             size=None, ports=False, node_shape='hexagon'):
+        """Build a `graphviz` graph and draw the network saving it to a file.
+
+        Parameters
+        ----------
+        graph_attr: dict(str:str)
+            Graph attributes per GraphViz library. Use a dictionary of key:value
+            strings.
+
+        node_attr: dict(str:str)
+            Node attributes per GraphViz library. Use a dictionary of key:value
+            strings.
+
+        engine: str
+            Name of drawing engine (from GraphViz):
+            'dot': draws directed graphs. It works well on directed acyclic graphs
+                   and other graphs that can be drawn as hierarchies or have a natural
+                   flow.
+
+            'neato': draws  undirected  graphs  using  a  spring model  and reducing
+                     the  related  energy.
+
+            'twopi': draws graphs using a radial layout.  Basically,one node is
+                     chosen as the center and put at the origin. The remaining nodes
+                     are placed onasequence  of  concentric  circles  centered  about
+                     the  origin,  each  a  fixed  radial  distance  from  the
+                     previous circle.  Allnodes distance 1 from the center are placed
+                     on the first circle; all nodes distance 1 from a nodeon the
+                     first circle are placed on the second circle; and so forth.
+
+            'circo': draws graphs using a circular layout. The tool identifies
+                     biconnected components and draws the nodes of the component
+                     on a circle. The block-cutpoint tree is then laid out using a
+                     recursive radial algorithm. Edge crossings within acircle  are
+                     minimized by placing as manyedges on the circle’s
+                     perimeter as possible. In particular,ifthecomponent is
+                     outer planar, the component will have a planar layout. If a node
+                     belongs to multiple non-triv-ial biconnected components, the
+                     layout puts the node in one of them. By default, this is the
+                     first non-trivialcomponent found in the search from the root
+                     component.
+
+            'fdp': draws undirected graphs using a spring model. It relies on a
+                   force-directed approach in the spirit of Fruchterman and Reingold.
+
+            `sfdp` also  draws  undirected  graphs  using  the spring model described
+                   above,but  it  uses  a  multi-scaleapproach to produce layouts of
+                   large graphs in a reasonably short time.patchworkdraws the graph
+                   as a squarified treemap. The clusters of the graph are used to
+                   specify the tree.
+
+            'osage' draws the graph using its cluster structure. For a givencluster,
+                    each of its subclusters is laid out inter-nally.Then  the
+                    subclusters, plus anyremaining  nodes, are repositioned based on
+                    the  cluster’s
+
+        lr: boolean
+            True draws graph left to right. False draws top down.
+
+        size: str
+            Pair of integer numbers in a string: 'a,b'.
+
+        ports: boolean
+            Draw name of ports
+
+        node_shape: str
+            Select node shape to draw. Options:
+            'box', 'polygon', 'ellipse', 'oval',
+            'circle', 'point', 'egg', 'triangle',
+            'plaintext', 'plain', 'diamond', 'trapezium',
+            'parallelogram', 'house', 'pentagon', 'hexagon',
+            'septagon', 'octagon', 'doublecircle', 'doubleoctagon',
+            'tripleoctagon', 'invtriangle', 'invtrapezium', 'invhouse',
+            'Mdiamod', 'Msquare', 'Mcircle', 'rect',
+            'rectangle', 'square', 'star', 'none',
+            'underline', 'cylinder', 'note', 'tab',
+            'folder', 'box3d', 'component', 'promoter',
+            'cds', 'terminator', 'utr', 'primersite',
+            'restrictionsite', 'fivepoverhang', threepoverhang', 'noverhang',
+            'rnastab', 'proteasesite', 'proteinstab', 'rpromoter',
+            'rarrow', 'larrow', 'lpromoter'.
+
+        """
+
+        # Delete existing graph files is any.
+        if os.path.isfile(self.name+'.gv'):
+            os.remove(self.name+'.gv')
+        if os.path.isfile(self.name+'.gv.png'):
+            os.remove(self.name+'.gv.png')
 
         # Import here to avoid broken dependency. Only this method needs this.
         from graphviz import Digraph
 
         if graph_attr is None:
-            graph_attr = {'splines':'true', 'overlap':'scale', 'ranksep':'2.0'}
+            graph_attr = {'splines':'true', 'overlap':'scale', 'ranksep':'1.5'}
 
         if node_attr is None:
-            node_attr = {'shape':'hexagon', 'style':'filled'}
+            node_attr = {'shape':node_shape, 'style':'filled'}
 
         dgr = Digraph(name=self.name, comment='Network::graphviz', format='png',
                       graph_attr=graph_attr, node_attr=node_attr, engine=engine)
 
         if lr:
-            dgr.attr(rankdir='LR')
+          dgr.attr(rankdir="LR")
 
-        dgr.attr('node', shape=node_shape)
+        if size:
+          dgr.attr(size=size)
+
+        #dgr.attr('node', shape=node_shape)
 
         for idx, mod in enumerate(self.modules):
             dgr.node(str(idx), mod.name)

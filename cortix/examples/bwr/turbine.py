@@ -127,7 +127,6 @@ class Turbine(Module):
 
         # to
         if self.get_port('outflow-1').connected_port:
-            print(self.params['high_pressure_turbine'])
             message_time = self.recv('outflow-1')
 
             outflow_state = dict()
