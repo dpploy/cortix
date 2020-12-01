@@ -189,7 +189,7 @@ class Quantity:
         return self.__unit
     unit = property(GetUnit, SetUnit, None, None)
 
-    def plot(self, x_scaling=1, y_scaling=1, title=None, x_label='x', y_label=None,
+    def plot(self, x_scaling=1, y_scaling=1, y_shift=0, title=None, x_label='x', y_label=None,
             file_name=None, same_axis=True, dpi=300):
         '''
         This will support a few possibities for data storage in the self.__value
@@ -247,7 +247,7 @@ class Quantity:
             for j in range(len(x)):
                 y.append( self.__value.iat[j][i] ) # must use iat()
 
-            y = [k*y_scaling for k in y]
+            y = [(k-y_shift)*y_scaling for k in y]
 
             plt.xlabel(x_label)
             plt.ylabel(y_label)
