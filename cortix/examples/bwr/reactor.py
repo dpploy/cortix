@@ -269,7 +269,6 @@ class BWR(Module):
                     #self.RCIS = False
                     self.RCIS_operating_mode = 'offline'
 
-
             # Communicate information
             #------------------------
             self.__call_ports(time)
@@ -632,7 +631,7 @@ class BWR(Module):
 
         elif time > params['shutdown time']:
             # effectively the inverse of startup; gradually reduce reactivity and neutron density.
-            rho_0 = -1 * rho_0
+            rho_0 = -0.5 * rho_0
             alpha_n = rho_0 - (alpha_tn * (temp - temp_ref))
             rho_t = rho_0
 
@@ -715,6 +714,7 @@ class BWR(Module):
             t_0 = unit.hour * 24 # assume 24 hours of steady state operation before shutdown
             p_0 = self.params['decay-heat-0']
             p_t = p_0 * (((time + 1) ** -0.2) - (t_0 + time) ** -0.2)
+            print(time, q3prime, p_t, q3prime+p_t, 'p_t')
             q3prime += p_t
 
         return q3prime
