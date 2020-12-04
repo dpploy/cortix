@@ -152,8 +152,8 @@ def main():
     plant_net.connect([reactor, 'RCIS-outflow'], [rcis, 'coolant-inflow'])
     plant_net.connect([rcis, 'coolant-outflow'], [reactor, 'RCIS-inflow'])
     #plant_net.connect([rcis, 'signal-in'], [reactor, 'signal-out'])
-    plant_net.draw()
 
+    plant_net.draw(engine='dot', node_shape='folder')
     #*****************************************************************************
     # Run network dynamics simulation
     plant.run()
@@ -406,8 +406,8 @@ def main():
     plant_net.connect([reactor, 'RCIS-outflow'], [rcis, 'coolant-inflow'])
     plant_net.connect([rcis, 'coolant-outflow'], [reactor, 'RCIS-inflow'])
     #plant_net.connect([rcis, 'signal-in'], [reactor, 'signal-out'])
-    plant_net.draw()
 
+    plant_net.draw(engine='dot', node_shape='folder')
     #*****************************************************************************
     # Run network dynamics simulation
     plant.run()
