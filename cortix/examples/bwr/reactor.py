@@ -442,7 +442,7 @@ class BWR(Module):
         """
 
         coolant_outflow_stream = dict()
-        
+
         outflow_cool_temp = self.coolant_outflow_phase.get_value('temp', time)
 
         if outflow_cool_temp <= 373.15:
@@ -805,7 +805,7 @@ class BWR(Module):
         temp_in = pump_out
 
         f_tmp[-1] = - 1/tau * (temp_c - temp_in) - 1./rho_c/cp_c/vol_cool * heat_source
-        
+
         f_tmp[:] = [0 if np.isnan(x) else x for x in f_tmp] #nifty conditional mutator
 
         return f_tmp

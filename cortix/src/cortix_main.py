@@ -134,6 +134,8 @@ class Cortix:
 
             self.log.info('close()::Elapsed wall clock time [s]: '+
                           str(round(self.wall_clock_time_end-self.wall_clock_time_start, 2)))
+            self.log.shutdown()
+
         return
 
     def __create_logger(self):
