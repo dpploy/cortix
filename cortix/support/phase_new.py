@@ -618,8 +618,14 @@ class PhaseNew:
         assert isinstance(fileName, str)
         tmp = pandas.DataFrame(self.__df)
         column_names = tmp.columns
-        species_names = [species.name for species in self.__species]
-        quantity_names = [quantity.name for quantity in self.__quantities]
+        if self.__species:
+            species_names = [species.name for species in self.__species]
+        else:
+            species_names = list()
+        if self.__quantities:
+            quantity_names = [quantity.name for quantity in self.__quantities]
+        else:
+            quantity_names = list()
         for col in column_names:
             if col in species_names:
                 idx = species_names.index(col)
@@ -628,8 +634,7 @@ class PhaseNew:
             elif col in quantity_names:
                 idx = quantity_names.index(col)
                 quant = self.__quantities[idx]
-                tmp.rename( columns={ col: col + '[' + quant.unit + ']'},
-                            inplace=True )
+                tmp.rename(columns={ col: col + '[' + quant.unit + ']'}, inplace=True)
             else:
                 assert False, 'oops fatal.'
 
@@ -706,7 +711,7 @@ class PhaseNew:
             else:
                 return  self.__df.index[loc]
 
-    def plot_species(self, name, scaling=[1.0,1.0] , title=None, xlabel='Time [s]', 
+    def plot_species(self, name, scaling=[1.0,1.0] , title=None, xlabel='Time [s]',
             ylabel='y', legend='no-legend', filename_tag=None, figsize=[6,5], dpi=100 ):
 
         fig,ax=plt.subplots(1,figsize=figsize)
@@ -746,12 +751,30 @@ class PhaseNew:
 
         return
 
-    def plot(self, name='phase-plot-null-name', time_unit='s', legend=None, 
-             nrows=2, ncols=2, dpi=200):
+    def plot(self, actors=list(), name='phase-plot-null-name',
+             legend=None, nrows=2, ncols=2, figsize=[6,5], show=False, dpi=200):
+        """Plot assistant for a phase container.
 
-        num_var = len(self.__df.columns)
-        if num_var == 0:
+        Parameters
+        ----------
+        actors: list(str)
+            List of names of quantities or species in the phase. Defaults to all
+            quantities being plotted.
+
+        name: str
+            Stem of the filename of the plots saved to file.
+
+        show: boolean
+            When used in an interactive session, show the plots on display.
+        """
+
+        if len(self.__df.columns) == 0:
             return
+
+        if not actors:
+            actors = self.__df.columns
+
+        num_var = len(actors)
 
         today = datetime.datetime.today().strftime("%d%b%y %H:%M:%S")
 
@@ -761,7 +784,11 @@ class PhaseNew:
 
         # Loop over variables and assign to the dashboards
         i_dash = 0
+
         for i_var in range(num_var):
+
+            col_name = actors[i_var]
+
             # if multiple of nrows*ncols start new dashboard
             if i_var % (nrows*ncols) == 0:
 
@@ -769,14 +796,14 @@ class PhaseNew:
                     fig_name = lead_name+'-'+self.name+'-phase-plot-' + \
                             str(i_dash).zfill(2)
                     fig.savefig(fig_name+'.png', dpi=dpi, format='png')
-                    plt.close(fig_num)
+                    #plt.close(fig_num)
 
                     #pickle.dump( fig, open(fig_name+'.pickle','wb') )
 
                     i_dash += 1
 
                 fig_num = str(np.random.random()) + '.' + str(i_dash)
-                fig = plt.figure(num=fig_num)
+                fig = plt.figure(num=fig_num, figsize=figsize)
 
                 gs = gridspec.GridSpec(nrows, ncols)
 #                gs.update(left=0.08, right=0.98, wspace=0.4, hspace=0.4)
@@ -807,19 +834,21 @@ class PhaseNew:
             # end of: if i_var % nrows*ncols == 0: # if a multiple of nrows*ncols
             # start a new dashboard
 
+            var_unit = 'g/L'
+
             ax = axs[axId]
             axId += 1
 
-            col_name = self.__df.columns[i_var]
-
             species = self.get_species(col_name)
             if species:
-                varName = species.formula_name
+                latex_name = species.latex_name
+                var_unit = species.unit
                 info_str = species.info
 
             quantity = self.get_quantity(col_name)
             if quantity:
-                varName = quantity.formal_name
+                latex_name = quantity.latex_name
+                var_unit = quantity.unit
                 info_str = quantity.info
 
             # sanity check
@@ -831,8 +860,6 @@ class PhaseNew:
                     assert self.__quantities[i_var].name == self.__df.columns[i_var]
             elif quantity:
                 assert self.__quantities[i_var].name == self.__df.columns[i_var]
-
-            varUnit = 'g/L'
 
             '''
             if varUnit == 'gram':
@@ -1017,8 +1044,8 @@ class PhaseNew:
                     varUnit = 'mm/s'
             '''
 
-            ax.set_xlabel('Time [' + time_unit + ']', fontsize=9)
-            ax.set_ylabel(varName + ' [' + varUnit + ']', fontsize=9)
+            ax.set_xlabel('Time [' + time_unit + ']', fontsize=12)
+            ax.set_ylabel(latex_name + ' [' + var_unit + ']', fontsize=12)
 
             '''
             ymax = y.max()
@@ -1119,7 +1146,7 @@ class PhaseNew:
 
             # ...................
 
-            ax.set_title(info_str, fontsize=8)
+            ax.set_title(info_str, fontsize=14)
             if varLegend:
                 ax.legend(loc='best', prop={'size': 7})
             ax.grid()
@@ -1128,7 +1155,11 @@ class PhaseNew:
 
         fig_name = name+'-'+self.name+str(i_dash).zfill(2)
         fig.savefig(fig_name+'.png', dpi=dpi, format='png')
-        plt.close(fig_num)
+
+        #plt.close(fig_num)
+
+        if show:
+            plt.show()
 
         #pickle.dump( fig, open(fig_name+'.pickle','wb') )
 
