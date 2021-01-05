@@ -708,7 +708,8 @@ class BWR(Module):
 
         # nuclear power source
         q3prime = - rxn_heat * rxn_rate_dens # exothermic reaction W/m3)
-
+        
+        print(q3prime * self.fuel_volume / 1000000000)
         # add decay heat
         if self.params['shutdown-mode']:
             t_0 = unit.hour * 24 # assume 24 hours of steady state operation before shutdown
