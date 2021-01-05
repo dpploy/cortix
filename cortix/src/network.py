@@ -4,6 +4,7 @@
 # https://cortix.org
 
 import os
+import shutil
 import pickle
 import logging
 from multiprocessing import Process
@@ -135,17 +136,21 @@ class Network:
             assert module_a in self.modules, 'module %r not in network.'%module_a.name
             assert module_b in self.modules, 'module %r not in network.'%module_b.name
 
-            idx_a = self.modules.index(module_a)
-            idx_b = self.modules.index(module_b)
-            self.gv_edges.append((str(idx_a), str(idx_b)))
-
-            if info == 'bidirectional':
-                self.gv_edges.append((str(idx_b), str(idx_a)))
-
+            # Connect ports
             port_a = module_a.get_port(module_b.name.lower())
             port_b = module_b.get_port(module_a.name.lower())
 
             port_a.connect(port_b)
+
+            # Record connectivity for graph viz.
+            idx_a = self.modules.index(module_a)
+            idx_b = self.modules.index(module_b)
+
+            if (str(idx_a), str(idx_b)) not in self.gv_edges:
+                self.gv_edges.append((str(idx_a), str(idx_b)))
+
+                if info == 'bidirectional' and (str(idx_b), str(idx_a)) not in self.gv_edges:
+                    self.gv_edges.append((str(idx_b), str(idx_a)))
 
         elif isinstance(module_port_a, list) and isinstance(module_port_b, list):
 
@@ -165,6 +170,7 @@ class Network:
 
             idx_a = self.modules.index(module_a)
             idx_b = self.modules.index(module_b)
+
             self.gv_edges.append((str(idx_a), str(idx_b)))
 
             if info == 'bidirectional':
@@ -210,6 +216,7 @@ class Network:
 
         # Create directory for saving modules states
         if self.rank == 0 or self.use_multiprocessing:
+            shutil.rmtree('.ctx-saved', ignore_errors=True)
             os.makedirs('.ctx-saved')
 
         # Running under MPI
@@ -275,6 +282,9 @@ class Network:
 
         num_files = 0
         for file_name in os.listdir('.ctx-saved'):
+
+            self.gv_edges = list() # re-initialize since ports were not pickled
+
             if file_name.endswith('.pkl'):
                 num_files += 1
                 file_name = os.path.join('.ctx-saved', file_name)
