@@ -37,7 +37,7 @@ class Cooler(Module):
         self.log = logging.getLogger('cortix')
         self.__logit = False
 
-        self.rcis_ua = 10000000 #w/m-k
+        self.rcis_ua = 12500000 #w/m-k
 
     def run(self, *args):
 
@@ -135,11 +135,10 @@ class Cooler(Module):
             delta_t2 = temp_out_1 - tc
             lmtd = (delta_t1 - delta_t2)/np.log(delta_t1/delta_t2)
             quantity = heat_transfer_coef * lmtd / cp_rho
-            print(lmtd)
-            print(time, heat_transfer_coef * lmtd, 'cooler')
+            #print(lmtd)
+            #print(time, heat_transfer_coef * lmtd, 'cooler')
             temp_out_2 = temp_in - quantity
             if temp_out_2 < tc:
                 temp_out_2 = tc
                 break
-
         return temp_out_2

@@ -95,16 +95,16 @@ class BWR(Module):
 
         self.q_c = 303 # volumetric flow rate
 
-        self.fuel_dens = 10500 # kg/m3
-        self.cp_fuel = 175 # J/(kg K)
-        self.fuel_volume = 7.25  # m3
+        self.fuel_dens = 11000 # kg/m3
+        self.cp_fuel = 275 # J/(kg K)
+        self.fuel_volume = 12.55  # m3
 
         self.steam_flowrate = 1820 # kg/s
         self.coolant_dens = 1000 #  kg/m3
-        self.cp_coolant = 3500# J/(mol K) - > J/(kg K)
-        self.coolant_volume = 7 #m3
+        self.cp_coolant = 4184# J/(mol K) - > J/(kg K)
+        self.coolant_volume = 40 #m3
 
-        self.ht_coeff = 45000000
+        self.ht_coeff = 150000
 
         # J/(fission sec) 1.26 t^-1.2 (t in seconds)
         self.fis_beta_energy = 1.26 * 1.602e-13
@@ -120,7 +120,7 @@ class BWR(Module):
 
         self.n_ss = 0 # neutronless steady state before start up
 
-        rho_0_over_beta = 0.25 # $
+        rho_0_over_beta = 0.01 # $
         beta = self.beta
 
         # control rod reactivity worth; enough to cancel out the negative
@@ -130,7 +130,7 @@ class BWR(Module):
 
         self.temp_o = self.temp_o
 
-        self.tau = 1 # s
+        self.tau = 6 # s
         self.malfunction_subcooling = 0.75
         self.alpha_n_malfunction = 0
         n_species = len(self.species_decay)
@@ -240,7 +240,7 @@ class BWR(Module):
             print_time_step = self.time_step
 
         while time <= self.end_time:
-
+            self.z_time = time
             #last_time_stamp = time - self.time_step
 
             #if self.show_time[0] and time >= print_time and \
@@ -261,13 +261,23 @@ class BWR(Module):
 
             current_temp = self.__get_coolant_outflow(time)['temp']
             if current_temp < 373.15:
-                #if self.params['operating-mode'] == 'shutdown':
+                if self.params['operating-mode'] == 'shutdown':
                     self.RCIS_operating_mode = 'online'
 
             if current_temp > 373.15:
                 if self.params['operating-mode'] == 'startup':
-                    #self.RCIS = False
+                    self.RCIS = False
                     self.RCIS_operating_mode = 'offline'
+
+            if self.params['operating-mode'] =='shutdown':
+                n_dens = self.neutron_phase.get_value('neutron-dens', time)
+                print(n_dens)
+                if n_dens < 1E-3:
+                    self.RCIS = True
+                    self.RCIS_operating_mode = 'online'
+                else:
+                    self.RCIS = False
+                    self.RCIS_operatig_mode = 'offline'
 
             # Communicate information
             #------------------------
@@ -387,6 +397,7 @@ class BWR(Module):
         c_vec = u_vec[1:7]
         fuel_temp = u_vec[7]
         cool_temp = u_vec[8]
+        print(cool_temp)
 
         #update state variables
         outflow = self.coolant_outflow_phase.get_row(time)
@@ -474,11 +485,12 @@ class BWR(Module):
                 dew_entropy = inlet_params.s
                 dew_enthalpy = inlet_params.h
                 quality = (inlet_entropy - bubl_entropy)/(dew_entropy - bubl_entropy)
-
+                quality = quality * 0.75
                 delta_t = time - self.params['valve_opening_time']
-                mass_flowrate = 1820 * (1 - math.exp(-1 * delta_t/(3 * unit.minute)))
+                mass_flowrate = 1820 * (1 - math.exp(-1 * delta_t/(60 * unit.minute)))
 
                 coolant_outflow_stream['temp'] = outflow_cool_temp
+                pressure = pressure * 1.074
                 coolant_outflow_stream['pressure'] = pressure
                 coolant_outflow_stream['quality'] = quality
                 coolant_outflow_stream['flowrate'] = mass_flowrate
@@ -709,21 +721,20 @@ class BWR(Module):
         # nuclear power source
         q3prime = - rxn_heat * rxn_rate_dens # exothermic reaction W/m3)
         
-        print(q3prime * self.fuel_volume / 1000000000)
+        #print(q3prime * self.fuel_volume / 1000000000)
         # add decay heat
         if self.params['shutdown-mode']:
             t_0 = unit.hour * 24 # assume 24 hours of steady state operation before shutdown
             p_0 = self.params['decay-heat-0']
             p_t = p_0 * (((time + 1) ** -0.2) - (t_0 + time) ** -0.2)
-            print(time, q3prime, p_t, q3prime+p_t, 'p_t')
+            #print(time, q3prime, p_t, q3prime+p_t, 'p_t')
             q3prime += p_t
 
         return q3prime
 
     def __heat_sink_rate(self, time, temp_f, temp_c, params):
 
-        ht_coeff = self.ht_coeff
-
+        ht_coeff = self.ht_coeff 
         q_f = - ht_coeff * (temp_f - temp_c)
         return q_f
 
@@ -803,10 +814,15 @@ class BWR(Module):
         tau = self.tau
 
         heat_source = heat_sink
-        temp_in = pump_out
-
+        if self.params['operating-mode'] == 'startup':
+            if temp_c < 492.6:
+                if self.z_time > 1:
+                    temp_in = self.coolant_outflow_phase.get_value('temp', self.z_time - self.time_step)
+                else:
+                    temp_in = self.coolant_outflow_phase.get_value('temp', self.z_time)
+            else:
+                temp_in = pump_out
         f_tmp[-1] = - 1/tau * (temp_c - temp_in) - 1./rho_c/cp_c/vol_cool * heat_source
-
         f_tmp[:] = [0 if np.isnan(x) else x for x in f_tmp] #nifty conditional mutator
 
         return f_tmp

@@ -32,8 +32,8 @@ def main():
     # Preamble
 
 
-    end_time = 30.0 * unit.minute
-    time_step = 30.0 # seconds
+    end_time = 300.0 * unit.minute
+    time_step = 60.0 # seconds
     show_time = (True, 5*unit.minute)
 
     use_mpi = False  # True for MPI; False for Python multiprocessing
@@ -63,13 +63,14 @@ def main():
     reactor.end_time = end_time
     reactor.show_time = show_time
     reactor.RCIS = True
+    reactor.RCIS_operating_mode = 'online'
 
     # Add reactor module to network
     plant_net.module(reactor)
 
     #*****************************************************************************
     # Create turbine high pressure module
-    params['turbine_inlet_pressure'] = 2
+    params['turbine_inlet_pressure'] = 7
     params['turbine_outlet_pressure'] = 0.5
     params['high_pressure_turbine'] = True
 
@@ -181,6 +182,52 @@ def main():
         plt.savefig('startup-delayed-neutrons-cc.png', dpi=300)
 
         (quant, time_unit) = reactor.coolant_outflow_phase.get_quantity_history('temp')
+        no_time_stamps = end_time/time_step
+
+        coolant_temp = list()
+        fuel_temp = list()
+        neutron_dens = list()
+        i=0
+
+        while i < no_time_stamps:
+            cool_temp = reactor.coolant_outflow_phase.get_value('temp', i * time_step)
+            coolant_temp.append(cool_temp)
+            fuel_tmp = reactor.reactor_phase.get_value('fuel-temp', i * time_step)
+            fuel_temp.append(fuel_tmp)
+            neut = reactor.neutron_phase.get_value('neutron-dens', i * time_step)
+            neutron_dens.append(neut)
+            i+=1
+
+        q_f = list()
+        q_c = list()
+        z = 0
+        while z < no_time_stamps:
+            fuel_T = fuel_temp[z]
+            cool_T = coolant_temp[z]
+            n_dens = neutron_dens[z]
+            fuel_q = reactor._BWR__nuclear_pwr_dens_func(0, (fuel_T + cool_T)/2, n_dens, reactor.params)
+            fuel_q = fuel_q * reactor.fuel_volume
+            cool_q = reactor._BWR__heat_sink_rate(0, fuel_T, cool_T, reactor.params)
+            fuel_q *= -1
+            cool_q *= -1
+            q_f.append(fuel_q)
+            q_c.append(cool_q)
+            z = z+1
+
+        x = 0
+        time = list()
+        while x < no_time_stamps:
+            time.append((x * time_step)/60.0)
+            x += 1
+        
+        plt.plot(time, q_f, label='q_f')
+        plt.plot(time, q_c, label='q_c')
+        plt.title('heat')
+        plt.xlabel('time')
+        plt.xlabel('watts')
+        plt.legend()
+        plt.savefig('startup-heat.png', dpi=300)
+
 
         quant.plot(x_scaling=1/unit.minute, x_label='Time [m]',
                    y_label=quant.latex_name+' ['+quant.unit+']')

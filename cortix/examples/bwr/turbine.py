@@ -273,8 +273,10 @@ class Turbine(Module):
         #if inlet_entropy < dew_entropy and inlet_entropy > bubl_entropy:
         if  bubl_entropy < inlet_entropy < dew_entropy:
             x_ideal = (inlet_entropy - bubl_entropy)/(dew_entropy - bubl_entropy)
+        else:
+            x_ideal = 0
             # vfda: access of a protected member?
-            h_ideal = steam_table._Region4(p_out, x_ideal)['h']
+        h_ideal = steam_table._Region4(p_out, x_ideal)['h']
 
         #if the ideal runoff is a superheated steam
         #elif inlet_entropy > dew_entropy:

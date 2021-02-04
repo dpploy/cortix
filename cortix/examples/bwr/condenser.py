@@ -244,7 +244,8 @@ class Condenser(Module):
         if flowrate == 0:
             # no flowrate, return initial simulation condition
             return self.ss_temp
-
+        
+        return 492.6
         #temporary, basic model for condensation, until I can work out a more
         #advanced model that gives realistic values.
         pressure = self.inlet_pressure
@@ -266,10 +267,10 @@ class Condenser(Module):
 
             if runoff_temp < initial_coolant_temp:
                 runoff_temp = initial_coolant_temp
-
+            print(runoff_temp)
             return runoff_temp
+        return runoff_temp
 
-        return self.ss_temp
         #anything below this point is not currently in use; I need to figure
         #out a more accurate condensation model, the current one calculates
         #heat transfer coefficients in excess of 100k w/m2-k
