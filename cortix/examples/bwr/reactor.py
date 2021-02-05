@@ -271,7 +271,6 @@ class BWR(Module):
 
             if self.params['operating-mode'] =='shutdown':
                 n_dens = self.neutron_phase.get_value('neutron-dens', time)
-                print(n_dens)
                 if n_dens < 1E-3:
                     self.RCIS = True
                     self.RCIS_operating_mode = 'online'
@@ -397,7 +396,6 @@ class BWR(Module):
         c_vec = u_vec[1:7]
         fuel_temp = u_vec[7]
         cool_temp = u_vec[8]
-        print(cool_temp)
 
         #update state variables
         outflow = self.coolant_outflow_phase.get_row(time)
@@ -626,6 +624,15 @@ class BWR(Module):
         temp_ref = self.temp_o
         #n_dens_ss_operation = params['n_dens_ss_operation']
         alpha_n = self.alpha_n
+        if self.params['malfunction-start'] != 999.0 * unit.hour:
+            if self.params['malfunction-start'] < time < self.params['malfunction-end']:
+                t_0 = self.reactor_phase.get_value('temp', 0.0)
+                rho_0 = 0.000005 * (t_0 - temp_ref)
+                rho_t = rho_0 + 0.000005 * (temp - temp_ref)
+                print('jelqing')
+            else:
+                rho_t = 0
+            return(rho_t, 0, 0)
 
         if temp < 293.15:
             # if temperature is less than the starting temperature then moderator
@@ -688,7 +695,8 @@ class BWR(Module):
         else:
             q_source = 0.0
             self.q_source_status = 'out'
-
+        if self.params['malfunction-start'] != 999.0 * unit.hour:
+            q_source = 0.0
         return q_source
 
     def __sigma_fis_func(self, temp, params):
@@ -772,7 +780,6 @@ class BWR(Module):
         assert len(lambda_vec) == len(c_vec)
 
         f_tmp[0] = (rho_t - beta)/gen_time * n_dens + lambda_vec @ c_vec + q_source_t
-
         #-----------------------------------
         # n species balances (implicit loop)
         #-----------------------------------
@@ -815,13 +822,16 @@ class BWR(Module):
 
         heat_source = heat_sink
         if self.params['operating-mode'] == 'startup':
-            if temp_c < 492.6:
-                if self.z_time > 1:
-                    temp_in = self.coolant_outflow_phase.get_value('temp', self.z_time - self.time_step)
-                else:
-                    temp_in = self.coolant_outflow_phase.get_value('temp', self.z_time)
-            else:
+            if self.params['malfunction-start'] != 999.0 * unit.hour:
                 temp_in = pump_out
+            else:
+                if temp_c < 492.6:
+                    if self.z_time > 1:
+                        temp_in = self.coolant_outflow_phase.get_value('temp', self.z_time - self.time_step)
+                    else:
+                        temp_in = self.coolant_outflow_phase.get_value('temp', self.z_time)
+                else:
+                    temp_in = pump_out
         f_tmp[-1] = - 1/tau * (temp_c - temp_in) - 1./rho_c/cp_c/vol_cool * heat_source
         f_tmp[:] = [0 if np.isnan(x) else x for x in f_tmp] #nifty conditional mutator
 

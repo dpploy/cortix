@@ -222,7 +222,7 @@ class Condenser(Module):
         chi_in = self.inflow_state['quality']
         flowrate = self.inflow_state['flowrate']
 
-        t_out = self.__condenser(temp_in, chi_in, flowrate)
+        t_out = self.__condenser(temp_in, chi_in, flowrate, time)
 
         condenser_runoff = self.outflow_phase.get_row(time)
 
@@ -233,7 +233,7 @@ class Condenser(Module):
 
         return time
 
-    def __condenser(self, temp_in, chi_in, flowrate):
+    def __condenser(self, temp_in, chi_in, flowrate, time):
         """Simple model to condense a vapor-liquid mixture and subcool it.
 
         Takes in either superheated steam or a two-phase water mixture, and
@@ -244,7 +244,8 @@ class Condenser(Module):
         if flowrate == 0:
             # no flowrate, return initial simulation condition
             return self.ss_temp
-        
+        if self.params['malfunction-start'] < time < self.params['malfunction-end']:
+            return 508
         return 492.6
         #temporary, basic model for condensation, until I can work out a more
         #advanced model that gives realistic values.

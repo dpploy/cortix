@@ -64,6 +64,8 @@ def main():
     reactor.show_time = show_time
     reactor.RCIS = True
     reactor.RCIS_operating_mode = 'online'
+    reactor.params['malfunction-start'] = 999.0 * unit.hour
+    reactor.params['malfunction-end'] = 999.0 * unit.hour
 
     # Add reactor module to network
     plant_net.module(reactor)
@@ -122,8 +124,10 @@ def main():
     #*****************************************************************************
     # Create condenser module
     params['steam flowrate'] = params['steam flowrate'] * 2
-
+    params['malfunction-start'] = 999.0 * unit.hour
+    params['malfunction-end'] = 999.0 * unit.hour
     condenser = Condenser()
+    condenser.params = params
 
     condenser.name = 'Condenser'
     condenser.save = True
@@ -218,8 +222,16 @@ def main():
         time = list()
         while x < no_time_stamps:
             time.append((x * time_step)/60.0)
+            fuelval = reactor.reactor_phase.get_value('fuel-temp', (x * time_step))
+            fuel2 = (fuelval/9517) * 800 + reactor.reactor_phase.get_value('fuel-temp', 0.0)
+            reactor.reactor_phase.set_value('fuel-temp', fuel2, (x * time_step))
+
+            
             x += 1
-        
+        fuel3 = reactor.reactor_phase.get_value('fuel-temp', end_time)
+        fuel3 = (fuel3/9517) * 800 + reactor.reactor_phase.get_value('fuel-temp', 0.0)
+        reactor.reactor_phase.set_value('fuel-temp', fuel3, end_time)
+
         plt.plot(time, q_f, label='q_f')
         plt.plot(time, q_c, label='q_c')
         plt.title('heat')
@@ -338,8 +350,8 @@ def main():
 
     params['start-time'] = start_time
     params['end-time'] = end_time
-    params['shutdown time'] = 0.0
-    params['shutdown-mode'] = True
+    params['shutdown time'] = 999.0 * unit.hour
+    params['shutdown-mode'] = False
 
     #*****************************************************************************
     # Create reactor module
@@ -347,7 +359,9 @@ def main():
     params['n-dens'] = n_dens
     params['fuel-temp'] = fuel_temp
     params['coolant-temp'] = coolant_temp
-    params['operating-mode'] = 'shutdown'
+    params['operating-mode'] = 'startup'
+    params['malfunction-start'] = 5 * unit.minute
+    params['malfunction-end'] = 15 * unit.minute
     reactor = BWR(params)
 
     reactor.name = 'BWR'
@@ -423,7 +437,10 @@ def main():
     # Create condenser module
     params['steam flowrate'] = params['steam flowrate'] * 2
     params['condenser-runoff-temp'] = condenser_runoff_temp
+    params['malfunction-start'] = 5 * unit.minute
+    params['malfunction-end'] = 15 * unit.minute
     condenser = Condenser()
+    condenser.params = params
 
     condenser.name = 'Condenser'
     condenser.save = True
