@@ -9,7 +9,6 @@ import numpy as np
 import scipy.constants as const
 from collections import namedtuple
 import matplotlib
-matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
 
 from cortix.src.module import Module
