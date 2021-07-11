@@ -22,7 +22,7 @@ class Cortix:
 
     """
 
-    def __init__(self, use_mpi=False, splash=False, log_filename='cortix'):
+    def __init__(self, use_mpi=False, splash=False, log_filename_stem='cortix'):
         """Construct a Cortix simulation object.
 
         Parameters
@@ -59,7 +59,7 @@ class Cortix:
         self.splash = splash
 
         self.__network = None
-        self.log_filename = log_filename
+        self.log_filename_stem = log_filename_stem
         # Fall back to multiprocessing if mpi4py is not available
         if self.use_mpi:
             try:
@@ -143,19 +143,19 @@ class Cortix:
 
         # File removal
         if self.rank == 0 or self.use_multiprocessing:
-            if os.path.isfile('cortix.log'):
-                os.remove('cortix.log')
+            if os.path.isfile(self.log_filename_stem+'.log'):
+                os.remove(self.log_filename_stem+'.log')
 
         # Sync here to allow for file removal
         if self.use_mpi:
             self.comm.Barrier()
 
-        self.log = logging.getLogger(self.log_filename)
+        self.log = logging.getLogger(self.log_filename_stem)
 
         self.log.setLevel(logging.DEBUG)
         #10/8/19 Added check to see if log hander exsists before creating new ones
         if not self.log.hasHandlers():
-            file_handler = logging.FileHandler(self.log_filename+'.log')
+            file_handler = logging.FileHandler(self.log_filename_stem+'.log')
             file_handler.setLevel(logging.DEBUG)
 
             console_handler = logging.StreamHandler()

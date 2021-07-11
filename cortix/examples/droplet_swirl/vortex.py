@@ -26,7 +26,7 @@ class Vortex(Module):
 
     '''
 
-    def __init__(self):
+    def __init__(self, log_filename_stem='cortix'):
         '''
         Attributes
         ----------
@@ -48,7 +48,7 @@ class Vortex(Module):
         self.end_time = 5*const.minute
         self.time_step = 0.1
         self.show_time = (False,1*const.minute)
-        self.log = logging.getLogger('cortix')
+        self.log = logging.getLogger(log_filename_stem)
 
         air = Specie(name='air', formula_name='Air', phase='gas')
         air.massCCUnit = 'g/cc'
