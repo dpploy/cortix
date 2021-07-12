@@ -18,7 +18,7 @@ with open('requirements.txt', 'r') as fh:
 
 setuptools.setup(
     name='cortix',
-    version='1.1.19',
+    version='1.1.20',
     author="Cortix Computing",
     author_email="valmor_dealmeida@uml.edu",
     description='Cortix is a Python library for network dynamics modeling and HPC simulation.',
@@ -43,6 +43,6 @@ setuptools.setup(
         'Topic :: Education',
         'Topic :: Utilities'
     ],
-    python_requires='>=3.8'
+    python_requires='>=3.7'
 )
 
