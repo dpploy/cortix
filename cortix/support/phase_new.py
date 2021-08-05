@@ -841,8 +841,8 @@ class PhaseNew:
 
             species = self.get_species(col_name)
             if species:
-                latex_name = species.latex_name
-                var_unit = species.unit
+                latex_name = 'species.latex_name' # FIXME
+                var_unit = 'species.unit' # FIXME
                 info_str = species.info
 
             quantity = self.get_quantity(col_name)
