@@ -73,6 +73,9 @@ class Species:
 
         self.molar_radioactivity_fractions = list()
 
+        if len(self.atoms) == 0 and self.formula_name != 'null-species-formula-name':
+            self.__get_atoms_from_formula_name()
+
         self.update_molar_mass()
 
         return
@@ -214,6 +217,74 @@ class Species:
             atoms2 = sorted_atoms
 
         return atoms2
+
+    def __get_atoms_from_formula_name(self):
+        """Try to build the atoms list from the empirical formula.
+
+        Examples:  *OH^-, [CH2]3OH*^2-(a), H2O2(v)
+
+        This is useful for automating the creation of a species from a reaction mechanism.
+
+        """
+
+        formula_name = self.formula_name.strip()
+
+        # remove radical symbol *
+        formula_name = formula_name.strip('*')
+        tmp = formula_name.split('*')
+        if len(tmp) > 1:
+            assert len(tmp) == 2, 'fatal: only one "*" allowed.'
+            formula_name = tmp[0]+tmp[1]
+
+        # remove phase indicator
+        i = formula_name.find('(')
+        j = formula_name.rfind(')')
+        if i != -1 and j != -1:
+            formula_name = formula_name.replace(formula_name[i:j+1], '')
+        elif (i == -1 and j != -1) or (i != -1 and j == -1):
+            assert False, 'fatal: missing pairing ")".'
+
+        # remove charge
+        i = formula_name.find('^')
+        if i != -1:
+            if formula_name[i+1].isnumeric():
+                formula_name = formula_name.replace(formula_name[i:i+3], '')
+            else:
+                formula_name = formula_name.replace(formula_name[i:i+2], '')
+
+        # find atom group multiplicity
+        i = formula_name.find('[')
+        if i != -1:
+            assert False, 'fatal: "[]" not yet implemented.' # TODO
+
+        assert formula_name.isalnum(), 'fatal: formula name = %r'%formula_name
+
+        upper_case_ids = list()
+        lower_case_ids = list()
+        number_of_atoms_ids = list()
+
+        for id,s in enumerate(formula_name):
+            if s.isupper():
+                upper_case_ids.append(id)
+            if s.islower():
+                lower_case_ids.append(id)
+            if s.isnumeric():
+                number_of_atoms_ids.append(id)
+
+        for i in upper_case_ids:
+            num_atoms = 1
+            symbol = formula_name[i]
+            if i+1 in number_of_atoms_ids:
+                num_atoms = formula_name[i+1]
+            if i+1 in lower_case_ids:
+                symbol += formula_name[i+1]
+                if i+2 in number_of_atoms_ids:
+                    num_atoms = formula_name[i+2]
+
+            if num_atoms == 1:
+                self.atoms.append(symbol)
+            else:
+                self.atoms.append(num_atoms+'*'+symbol)
 
     def __str__(self):
         s = '\n\t ' + \
