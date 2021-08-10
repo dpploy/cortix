@@ -43,7 +43,7 @@ class Species:
     def __init__( self,
                   name='null-species-name',
                   formula_name='null-species-formula-name',
-                  atoms=list(),
+                  atoms=None,
                   flag='null-species-flag',
                   info=None):
 
@@ -53,8 +53,11 @@ class Species:
         assert isinstance(formula_name, str)
         self.formula_name = formula_name
 
-        assert isinstance(atoms, list)
-        self.atoms = atoms
+        if atoms is not None:
+            assert isinstance(atoms, list)
+            self.atoms = atoms
+        else:
+            self.atoms = list()
 
         self.flag = flag  # flag can be any type
 
@@ -74,6 +77,7 @@ class Species:
         self.molar_radioactivity_fractions = list()
 
         if len(self.atoms) == 0 and self.formula_name != 'null-species-formula-name':
+            print('made here')
             self.__get_atoms_from_formula_name()
 
         self.update_molar_mass()
@@ -257,6 +261,11 @@ class Species:
         if i != -1:
             assert False, 'fatal: "[]" not yet implemented.' # TODO
 
+        # build the atom list
+
+        assert isinstance(self.atoms, list)
+        assert len(self.atoms) == 0
+
         assert formula_name.isalnum(), 'fatal: formula name = %r'%formula_name
 
         upper_case_ids = list()
@@ -297,7 +306,7 @@ class Species:
             '\n\t molar radioactivity=%9.3e[%s];' + \
             '\n\t molar heat pwr=%9.3e[%s];' + \
             '\n\t molar gamma pwr=%9.3e[%s];' + \
-            '\n\t atoms=%s;' + \
+            '\n\t individual atoms=%s;' + \
             '\n\t molar radioactivity fractions=%s'
         return s % (self.name,
                 self.formula_name,
@@ -321,7 +330,7 @@ class Species:
             '\n\t molar radioactivity=%9.3e[%s];' + \
             '\n\t molar heat pwr=%9.3e[%s];' + \
             '\n\t molar gamma pwr=%9.3e[%s];' + \
-            '\n\t atoms=%s;' + \
+            '\n\t individual atoms=%s;' + \
             '\n\t molar radioactivity fractions=%s'
         return s % (self.name,
                 self.formula_name,
