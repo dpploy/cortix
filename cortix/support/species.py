@@ -77,7 +77,6 @@ class Species:
         self.molar_radioactivity_fractions = list()
 
         if len(self.atoms) == 0 and self.formula_name != 'null-species-formula-name':
-            print('made here')
             self.__get_atoms_from_formula_name()
 
         self.update_molar_mass()
