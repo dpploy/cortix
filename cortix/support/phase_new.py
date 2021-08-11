@@ -368,22 +368,39 @@ class PhaseNew:
 
         return None
 
-    def add_single_species(self, new_species):
-        '''
+    def add_single_species(self, new_species, discard_new_duplicate=False):
+        """
         Adds a new specie object to the phase history. See species.py for
         more details on the Species class.
 
         Parameters
         ----------
         new_species: obj
-        '''
+
+        discard_new_duplicate: if there exists a species with the same name, discard the new one.
+
+        """
 
         assert isinstance(new_species, Species)
-        assert new_species.name not in list(self.__df.columns), \
-               'new_species: %r exists. Current names: %r' % \
-               (new_species, self.__df.columns)
+
+        if not discard_new_duplicate:
+            assert new_species.name not in list(self.__df.columns), \
+                   'new_species: %r exists. Current names: %r' % \
+                   (new_species, self.__df.columns)
+
         species_formulae = [specie.formula_name for specie in self.__species]
-        assert new_species.formula_name not in species_formulae
+
+        if not discard_new_duplicate:
+            assert new_species.formula_name not in species_formulae
+
+        species_names = [spc.name for spc in self.__species]
+
+        if not discard_new_duplicate:
+            assert new_species.name not in species_names
+
+        if (new_species.name in species_names):
+            return
+
         self.__species.append(new_species)
         new_name = new_species.name
         col = pandas.DataFrame( index=list(self.__df.index), columns=[new_name] )
