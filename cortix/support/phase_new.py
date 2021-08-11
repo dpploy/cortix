@@ -772,6 +772,8 @@ class PhaseNew:
              legend=None, nrows=2, ncols=2, figsize=[6,5], show=False, dpi=200):
         """Plot assistant for a phase container.
 
+        Make plots of all actors.
+
         Parameters
         ----------
         actors: list(str)
@@ -858,8 +860,8 @@ class PhaseNew:
 
             species = self.get_species(col_name)
             if species:
-                latex_name = 'species.latex_name' # FIXME
-                var_unit = 'species.unit' # FIXME
+                latex_name = species.formula_name
+                var_unit = 'Conc.' # FIXME
                 info_str = species.info
 
             quantity = self.get_quantity(col_name)
@@ -1170,7 +1172,7 @@ class PhaseNew:
 
         # end of: for i_var in range(num_var):
 
-        fig_name = name+'-'+self.name+str(i_dash).zfill(2)
+        fig_name = lead_name+'-'+self.name+'-phase-plot-'+str(i_dash).zfill(2)
         fig.savefig(fig_name+'.png', dpi=dpi, format='png')
 
         #plt.close(fig_num)
