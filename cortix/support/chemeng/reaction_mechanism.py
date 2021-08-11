@@ -22,7 +22,7 @@ class ReactionMechanism:
 
     """
 
-    def __init__(self, file_name=None, mechanism=None):
+    def __init__(self, header='no-header', file_name=None, mechanism=None):
         """Module class constructor.
 
         Returns data structures for a reaction mechanism. Namely, species list,
@@ -63,6 +63,8 @@ class ReactionMechanism:
        """
 
         assert file_name is not None or mechanism is not None
+        assert isinstance(header, str)
+        self.header = header
 
 
         if mechanism is not None:
@@ -89,28 +91,29 @@ class ReactionMechanism:
         for m_i in mechanism:
 
             if m_i[0].strip() == '#':
+                if self.header == 'no-header':
+                    self.header = m_i.strip() + '\n'
+                else:
+                    self.header += m_i.strip() + '\n'
                 continue
 
             data = m_i.split(':')
 
             self.reactions.append(data[0].strip())
 
-            var_names = list()
-            var_values = list()
+            tmp_dict = dict()
 
             if len(data) > 1:
 
                 for d in data[1:]:
                     datum = d.strip()
+
                     name = datum.split('=')[0].strip()
-                    var_names.append(name)
-
                     val_str = datum.split('=')[1].strip()
-                    var_values.append(float(val_str))
 
-            Data = namedtuple('Data', var_names)
+                    tmp_dict[name] = float(val_str)
 
-            self.data.append(Data._make(var_values))
+            self.data.append(tmp_dict)
 
         # find species
 
@@ -156,15 +159,16 @@ class ReactionMechanism:
 
         species_filter = set(species_tmp) # filter species as a set
 
-        species_names = list(species_filter)  # convert species set to list
+        self.species_names = list(species_filter)  # convert species set to list
 
+        # Create the species list
         self.species = list()
 
-        for name in species_names:
+        for name in self.species_names:
             spc = Species(name=name, formula_name=name)
             self.species.append(spc)
 
-        # build stoichiometric matrix
+        # Build the stoichiometric matrix
 
         s_mtrx = np.zeros((len(self.reactions),len(self.species)), dtype=np.float64)
 
@@ -203,14 +207,14 @@ class ReactionMechanism:
                 if len(tmp) == 2:
                     coeff = float(tmp[0].strip())
                     species_member = tmp[1].strip()
-                    j_col = species_names.index(species_member)
+                    j_col = self.species_names.index(species_member)
                     assert s_mtrx[i_row,j_col] == 0.0, \
                            'duplicates not allowed r%r: %r %r %r'%\
                            (i_row,r,species_member,s_mtrx[i_row,j_col])
                     s_mtrx[i_row,j_col] = -1.0 * coeff
                 else:
                     species_member = tmp[0].strip()
-                    j_col = species_names.index(species_member)
+                    j_col = self.species_names.index(species_member)
                     assert s_mtrx[i_row,j_col] == 0.0, \
                            'duplicates not allowed r%r: %r %r %r'%\
                            (i_row,r,species_member,s_mtrx[i_row,j_col])
@@ -221,17 +225,44 @@ class ReactionMechanism:
                 if len(tmp) == 2:
                     coeff = float(tmp[0].strip())
                     species_member = tmp[1].strip()
-                    j_col = species_names.index(species_member)
+                    j_col = self.species_names.index(species_member)
                     assert s_mtrx[i_row,j_col] == 0.0, \
                            'duplicates not allowed r%r: %r %r %r'%\
                            (i_row,r,species_member,s_mtrx[i_row,j_col])
                     s_mtrx[i_row,j_col] = 1.0 * coeff
                 else:
                     species_member = tmp[0].strip()
-                    j_col = species_names.index(species_member)
+                    j_col = self.species_names.index(species_member)
                     assert s_mtrx[i_row,j_col] == 0.0, \
                            'duplicates not allowed r%r: %r %r %r'%\
                            (i_row,r,species_member,s_mtrx[i_row,j_col])
                     s_mtrx[i_row,j_col] = 1.0
 
         self.stoic_mtrx = s_mtrx
+
+    def __str__(self):
+        s = '\n\t **ReactionMechanism()**:' + \
+            '\n\t header: %s;' + \
+            '\n\t reactions: %s;' + \
+            '\n\t data: %s;' + \
+            '\n\t species_names: %s;' + \
+            '\n\t species: %s'
+        return s % (self.header,
+                    self.reactions,
+                    self.data,
+                    self.species_names,
+                    self.species)
+
+    def __repr__(self):
+        s = '\n\t **ReactionMechanism()**:' + \
+            '\n\t header: %s;' + \
+            '\n\t reactions: %s;' + \
+            '\n\t data: %s;' + \
+            '\n\t species_names: %s;' + \
+            '\n\t species: %s;'
+        return s % (self.header,
+                    self.reactions,
+                    self.data,
+                    self.species_names,
+                    self.species)
+
