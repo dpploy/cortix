@@ -767,7 +767,7 @@ class PhaseNew:
 
         return
 
-    def plot(self, actors=list(), name='phase-plot-null-name',
+    def plot(self, actors=None, name='phase-plot-null-name',
              legend=None, nrows=2, ncols=2, figsize=[6,5], show=False, dpi=200):
         """Plot assistant for a phase container.
 
@@ -789,8 +789,10 @@ class PhaseNew:
         if len(self.__df.columns) == 0:
             return
 
-        if not actors:
+        if actors is None:
             actors = self.__df.columns
+        else:
+            assert isinstance(actors, list)
 
         num_var = len(actors)
 
