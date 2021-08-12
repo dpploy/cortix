@@ -22,7 +22,7 @@ class ReactionMechanism:
 
     """
 
-    def __init__(self, header='no-header', file_name=None, mechanism=None):
+    def __init__(self, header='no-header', file_name=None, mechanism=None, order_species=True):
         """Module class constructor.
 
         Returns data structures for a reaction mechanism. Namely, species list,
@@ -111,7 +111,18 @@ class ReactionMechanism:
                     name = datum.split('=')[0].strip()
                     val_str = datum.split('=')[1].strip()
 
-                    tmp_dict[name] = float(val_str)
+                    if name == 'alpha':
+                        assert '(' in val_str and ')' in val_str
+                        alpha = tuple(val_str)
+                        alpha_dict = dict()
+                        i = 0
+                        for s in alpha:
+                            if s.isnumeric():
+                                alpha_dict[i] = float(s)
+                                i += 1
+                        tmp_dict[name] = alpha_dict
+                    else:
+                        tmp_dict[name] = float(val_str)
 
             self.data.append(tmp_dict)
 
@@ -160,6 +171,9 @@ class ReactionMechanism:
         species_filter = set(species_tmp) # filter species as a set
 
         self.species_names = list(species_filter)  # convert species set to list
+
+        if order_species:
+            self.species_names = sorted(self.species_names)
 
         # Create the species list
         self.species = list()
@@ -220,6 +234,10 @@ class ReactionMechanism:
                            (i_row,r,species_member,s_mtrx[i_row,j_col])
                     s_mtrx[i_row,j_col] = -1.0
 
+                if 'alpha' in self.data[i_row].keys():
+                    species_name = self.species_names[j_col]
+                    self.data[i_row]['alpha'][species_name] = self.data[i_row]['alpha'].pop(left_terms.index(t))
+
             for t in right_terms:
                 tmp = t.split(' ')
                 if len(tmp) == 2:
@@ -239,6 +257,27 @@ class ReactionMechanism:
                     s_mtrx[i_row,j_col] = 1.0
 
         self.stoic_mtrx = s_mtrx
+
+    def mass_conserved(self, tol=1e-9):
+        """Check mass conservation if species have a molar mass value.
+        """
+
+        m_vec = np.zeros(len(self.species), dtype=np.float64)
+
+        for idx, spc in enumerate(self.species):
+            m_vec[idx] = spc.molar_mass
+
+        assert np.prod(m_vec) > 0.0
+
+        mass_residual = self.stoic_mtrx @ m_vec
+
+        #print('mass res=', mass_residual)
+        #print('np.max(np.abs(mass_residual)=', np.max(np.abs(mass_residual)))
+
+        if np.max(np.abs(mass_residual)) < tol:
+            return True
+
+        return False
 
     def __str__(self):
         s = '\n\t **ReactionMechanism()**:' + \
