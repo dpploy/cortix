@@ -258,7 +258,7 @@ class ReactionMechanism:
 
         self.stoic_mtrx = s_mtrx
 
-    def mass_conserved(self, tol=1e-9):
+    def is_mass_conserved(self, tol=1e-9):
         """Check mass conservation if species have a molar mass value.
         """
 
@@ -278,6 +278,24 @@ class ReactionMechanism:
             return True
 
         return False
+
+    def rank_analysis(self, tol=1e-8):
+        """Compute the rank of the stoichiometric matrix.
+        """
+
+        assert self.is_mass_conserved(tol), 'fatal: mass conservation failed'
+
+        s_rank = np.linalg.matrix_rank(self.stoic_mtrx, tol=1e-8)
+        assert s_rank <= min(self.stoic_mtrx.shape)
+        print('*********************')
+        print('# reactions = ', len(self.reactions))
+        print('# species   = ', len(self.species))
+        print('rank of S = ', s_rank)
+        if s_rank == min(self.stoic_mtrx.shape):
+            print('S is full rank.')
+        else:
+            print('S is rank deficient.')
+        print('*********************')
 
     def __str__(self):
         s = '\n\t **ReactionMechanism()**:' + \
