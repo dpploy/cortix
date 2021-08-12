@@ -148,6 +148,11 @@ class Species:
         self.num_atoms = num_atoms
         self.num_nuclide_types = len(nuclides)
 
+        # Exception: e^- (solvated electron)
+
+        if self.formula_name == 'e^-':
+            self.molar_mass = const.physical_constants['electron molar mass'][0]
+
         return
 
     def reorder_formula(self):

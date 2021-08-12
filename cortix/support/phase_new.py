@@ -267,7 +267,7 @@ class PhaseNew:
         concentration: float
 
         '''
-        return self.get_value(name,try_time_stamp)
+        return self.get_value(name, try_time_stamp)
 
     def set_species_id(self, name, val):
         '''
@@ -280,8 +280,7 @@ class PhaseNew:
 
         '''
 
-        assert name in self.__df.columns, 'name %r not in %r'%\
-                (name,self.__df.columns)
+        assert name in self.__df.columns, 'name %r not in %r'%(name,self.__df.columns)
 
         for species in self.__species:
             if species.name == name:
@@ -341,7 +340,7 @@ class PhaseNew:
 
     def get_quantity_history(self, name):
         '''
-        Create a Quantity `name` history. This will create a fully qualified
+        Creates a Quantity `name` history. This will create a fully qualified
         Quantity object and return to the caller. The function is typically
         needed for data output to a file through `pickle`. Since the value
         attribute of a quantity can be any data structure, a time-series is
