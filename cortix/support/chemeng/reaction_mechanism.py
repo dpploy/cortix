@@ -6,7 +6,6 @@
 Suupport class for working with chemical reactions.
 '''
 
-from collections import namedtuple
 import numpy as np
 
 from cortix.support.species import Species
@@ -37,9 +36,10 @@ class ReactionMechanism:
         Any amount of spacing is allowed except:
         a) there must be only one blank space between the stoichiometric coefficient and its
            species name.
-        b) there must be at least one blank before and after each + sign in the reaction.
-        c) charge preceded with ^: O2^2+, X^1-, X^+, X^-
-        d) phase in parenthesis (): O2^2+(a), O2^2+(aq), O2^2+(aqu)
+        b) there must be at least one blank space before and after each + sign in the reaction.
+        c) species formula name as described in Cortix Species() e.g.:
+            charge preceded with ^: O2^2+, X^1-, X^+, X^-
+            phase in parenthesis (): O2^2+(a), O2^2+(aq), O2^2+(aqu)
 
         There must be no blank lines. A stoichiometric coefficient equal to 1 can be ommited.
 
@@ -281,6 +281,8 @@ class ReactionMechanism:
 
     def rank_analysis(self, tol=1e-8):
         """Compute the rank of the stoichiometric matrix.
+
+        This will establish rank deficiency.
         """
 
         assert self.is_mass_conserved(tol), 'fatal: mass conservation failed'

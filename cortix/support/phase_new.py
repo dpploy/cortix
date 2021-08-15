@@ -861,7 +861,7 @@ class PhaseNew:
 
             species = self.get_species(col_name)
             if species:
-                latex_name = species.formula_name
+                latex_name = species.latex_name
                 var_unit = 'Conc.' # FIXME
                 info_str = species.info
 
