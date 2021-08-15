@@ -2,19 +2,24 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
+'''
+Species class from Cortix support.
+'''
 
 import scipy.constants as const
 from cortix.support.periodictable import ELEMENTS
 
 class Species:
-    '''
+    """
     All SI units (kg,s,K,Pa,J,W).
 
-    The Specie() class encapsulates either the molecular or empirical chemical
-    formula of a compound.
-    This is done as follows. Say MAO2 is either a molecular or empirical chemical
-    formula of a ficticious compound denoting minor actinides dioxide. The list
-    of atoms is given as follows:
+    Notes
+    -----
+    The Species() class encapsulates either the molecular or empirical chemical formula of
+    a compound. This is done as follows.
+
+    Say `MAO2` is either a molecular or empirical chemical formula of a ficticious compound
+    denoting minor actinides dioxide. The list of atoms is given as follows:
 
     ['0.49*Np-237', '0.42*Am-241', '0.08*Am-243', '0.01*Cm-244', '2.0*O-16']
 
@@ -28,7 +33,7 @@ class Species:
     The numbers preceeding the nuclide symbol before the * will be referred to as
     multipliers. The sum of the multipliers will add to the number of "atoms" in
     the formula. WARNING: a multiplier could be in the format 0.00e-00. In this
-    case a hiphen may appear twice, e.g.: 1.549e-09*U-233
+    case a hyphen may appear twice, e.g.: 1.549e-09*U-233
 
     Other forms can be used for common true species
 
@@ -38,14 +43,49 @@ class Species:
     This code will calculate the molar mass of any species with a given valid
     atom list using a provided periodic table of chemical elements. The user
     can also reset the value of the molar mass with a setter method.
-    '''
+
+    Attributes
+    ----------
+
+    """
 
     def __init__( self,
-                  name='null-species-name',
-                  formula_name='null-species-formula-name',
+                  name='no-species-name',
+                  formula_name='no-species-formula-name',
                   atoms=None,
-                  flag='null-species-flag',
-                  info=None):
+                  flag='no-species-flag',
+                  info=None,
+                  latex_name='no-species-latex-name'):
+        """Constructs a Species object.
+
+        Parameters
+        ----------
+        name: str
+            The name or "nick-name" of the species; often a short-hand name for the species,
+            e.g. ndd for C12H26. The empirical formula name may be too long for typesetting into
+            code, the name is usually a shorter variable name.
+
+        formula_name: str
+            The empirical formula name. See __atoms_from_formula_name() method for valid strings
+            that allow for automatic build up of the list of atoms.
+
+        atoms: list(str)
+            List of atoms as described above in the class notes.
+
+        flag: anytype
+            Any data type specified by user. This can be used as an identification of the
+            species when solving for concentration, or other designation of status.
+
+        info: str
+            A textual information about the species, e.g. the commercial name of the compound.
+
+        latex_name: str
+            A LaTeX string type varible typically generated automatically by this constructor.
+
+        Examples
+        --------
+
+        """
 
         assert isinstance(name, str)
         self.name = name
@@ -63,6 +103,9 @@ class Species:
 
         self.info = info # info text such as technical name or other properties info
 
+        assert isinstance(latex_name, str)
+        self.latex_name = latex_name
+
         self.molar_mass = 0.0      # kg/mol
         self.molar_heat_pwr = 0.0
         self.molar_gamma_pwr = 0.0
@@ -76,22 +119,24 @@ class Species:
 
         self.molar_radioactivity_fractions = list()
 
-        if len(self.atoms) == 0 and self.formula_name != 'null-species-formula-name':
-            self.__get_atoms_from_formula_name()
+        if self.latex_name == 'no-species-latex-name' and self.formula_name != 'no-species-formula-name':
+            self.__latex_name_from_formula_name()
+
+        if len(self.atoms) == 0 and self.formula_name != 'no-species-formula-name':
+            self.__atoms_from_formula_name()
 
         self.update_molar_mass()
 
-        return
-
     def update_molar_mass(self):
-        '''
-        Updates the molar mass of the species after the molecular formula has
-        been changed.
+        """Recalculates the molar mass of the species and updates the species attribute.
 
-        '''
+        The typical use is to update the molar mass of the species after the list of atoms
+        has been changed.
+
+        """
 
         molar_mass_const = const.physical_constants['molar mass constant'][0]
-        molar_mass_const_unit = const.physical_constants['molar mass constant'][1]
+        #molar_mass_const_unit = const.physical_constants['molar mass constant'][1]
 
         for entry in self.atoms:
             assert isinstance(entry, str)
@@ -153,12 +198,11 @@ class Species:
         if self.formula_name == 'e^-':
             self.molar_mass = const.physical_constants['electron molar mass'][0]
 
-        return
+    def ordered_atoms_list(self):
+        """Sorted list of the atoms in the species; mostly for printing purposes.
 
-    def reorder_formula(self):
-        '''
-        Takes a list of atoms for a molecular or empirical formula and places
-        it in order of decreasing magnitude of stoichiometric coefficient. For
+        This method uses the internal list of atoms for a molecular or empirical formula and
+        places it in order of decreasing magnitude of stoichiometric coefficient. For
         example, [O, 2*H] will be returned as [2*H, O]. This is used for
         printing purposes. The internal order will not change.
 
@@ -166,7 +210,7 @@ class Species:
         -------
         atoms2: list
 
-        '''
+        """
 
         atoms1 = self.atoms[:]  # shallow copy
         atoms2 = list()
@@ -226,12 +270,17 @@ class Species:
 
         return atoms2
 
-    def __get_atoms_from_formula_name(self):
+    def __atoms_from_formula_name(self):
         """Try to build the atoms list from the empirical formula.
 
-        Examples:  *OH^-, [CH2]3OH*^2-(a), H2O2(v)
+        Examples that can be handled by the code below:
 
-        This is useful for automating the creation of a species from a reaction mechanism.
+            *OH^-:              * for radical, ^ for charged species
+            [CH2]3OH*^2-(a):    [] for groups of atoms
+            H2O2(v):            () for phase
+
+        This is useful for automating the creation of a species list of atoms, say from a
+        reaction mechanism.
 
         """
 
@@ -254,7 +303,7 @@ class Species:
 
         # remove charge
         i = formula_name.find('^')
-        if i != -1:
+        if i != -1: # if success
             if formula_name[i+1].isnumeric():
                 formula_name = formula_name.replace(formula_name[i:i+3], '')
             else:
@@ -262,7 +311,7 @@ class Species:
 
         # find atom group multiplicity
         i = formula_name.find('[')
-        if i != -1:
+        if i != -1: # if success
             assert False, 'fatal: "[]" not yet implemented.' # TODO
 
         # build the atom list
@@ -272,6 +321,7 @@ class Species:
 
         assert formula_name.isalnum(), 'fatal: formula name = %r'%formula_name
 
+        # Find the chemical element symbol in the general form: Xy, say He, Na, O, etc.
         upper_case_ids = list()
         lower_case_ids = list()
         number_of_atoms_ids = list()
@@ -299,6 +349,67 @@ class Species:
             else:
                 self.atoms.append(num_atoms+'*'+symbol)
 
+    def __latex_name_from_formula_name(self):
+        """Try to build a LaTeX name from the empirical formula.
+
+        Examples that can be handled by the code below:
+
+            *OH^-:              * for radical, ^ for charged species
+            [CH2]3OH*^2-(a):    [] for groups of atoms
+            H2O2(v):            () for phase
+
+        This is useful for automating the creation of a species list of atoms, say from a
+        reaction mechanism.
+
+        """
+
+        latex_name = str()
+
+        formula_name = self.formula_name.strip()
+
+        open_parenthesis = False
+
+        for idx, c_i in enumerate(formula_name):
+
+            if c_i == '(':
+                open_parenthesis = True
+                latex_name += r'$_\mathrm{(' # escape \
+                continue
+            elif c_i == ')':
+                open_parenthesis = False
+                latex_name += ')}$'
+                continue
+
+            if not open_parenthesis:
+
+                if c_i == '*':
+                    latex_name += r'$^\bullet$' # escape \
+                    continue
+
+                if c_i == '^':
+                    if formula_name[idx+1].isnumeric():
+                        latex_name += '$^{' + formula_name[idx+1:idx+3] + '}$'
+                    else:
+                        latex_name += '$^' + formula_name[idx+1] + '$'
+                    continue
+
+                if c_i.isalpha():
+                    latex_name += c_i
+
+                if c_i.isnumeric() and formula_name[idx-1].isalpha():
+                    latex_name += '$_' + c_i + '$'
+                    continue
+
+                if c_i == '[' or c_i == ']':
+                    assert False, 'fatal: "[]" not implemented yet.' #TODO
+
+            else:
+                latex_name += c_i
+
+
+        self.latex_name = latex_name
+
+
     def __str__(self):
         s = '\n\t ' + \
             '\n\t Species(): name=%s;' + \
@@ -307,6 +418,7 @@ class Species:
             '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + \
             '\n\t flag=%s;' + \
             '\n\t info=%s;' + \
+            '\n\t latex_name=%s;' + \
             '\n\t molar radioactivity=%9.3e[%s];' + \
             '\n\t molar heat pwr=%9.3e[%s];' + \
             '\n\t molar gamma pwr=%9.3e[%s];' + \
@@ -314,11 +426,12 @@ class Species:
             '\n\t molar radioactivity fractions=%s'
         return s % (self.name,
                 self.formula_name,
-                self.reorder_formula(),
+                self.ordered_atoms_list(),
                 self.num_atoms, self.num_nuclide_types, self.molar_mass, \
                         self.molar_mass_unit,
                 self.flag,
                 self.info,
+                self.latex_name,
                 self.molar_radioactivity, self.molar_radioactivity_unit,
                 self.molar_heat_pwr, self.molar_heat_pwr_unit,
                 self.molar_gamma_pwr, self.molar_gamma_pwr_unit,
@@ -331,6 +444,7 @@ class Species:
             '\n\t formula=%s;' + \
             '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + \
             '\n\t flag=%s;' + \
+            '\n\t latex_name=%s;' + \
             '\n\t molar radioactivity=%9.3e[%s];' + \
             '\n\t molar heat pwr=%9.3e[%s];' + \
             '\n\t molar gamma pwr=%9.3e[%s];' + \
@@ -338,10 +452,11 @@ class Species:
             '\n\t molar radioactivity fractions=%s'
         return s % (self.name,
                 self.formula_name,
-                self.reorder_formula(),
+                self.ordered_atoms_list(),
                 self.num_atoms, self.num_nuclide_types, self.molar_mass, \
                         self.molar_mass_unit,
                 self.flag,
+                self.latex_name,
                 self.molar_radioactivity, self.molar_radioactivity_unit,
                 self.molar_heat_pwr, self.molar_heat_pwr_unit,
                 self.molar_gamma_pwr, self.molar_gamma_pwr_unit,
@@ -349,9 +464,9 @@ class Species:
                 ['%9.3e' % i for i in self.molar_radioactivity_fractions])
 
 if __name__ == '__main__':
-    tbp_org = Species( name='TBP', formula_name='(C4H9O)_3PO(o)',
+    tbp_org = Species( name='TBP', formula_name='[C4H9O]_3PO(o)',
               atoms=['12*C','27*H','4*O','P'] )
     print(tbp_org)
-    no3Minus_aqu = Species( name='NO3-', formula_name='NO3-(a)',
+    no3Minus_aqu = Species( name='NO3-', formula_name='NO3^-(a)',
                    atoms=['N','3*O'] )
     print(no3Minus_aqu)
