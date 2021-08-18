@@ -16,49 +16,72 @@ class ReactionMechanism:
     Attributes
     ----------
 
-    xxxx: int
-        Some attribute
+    species_names: list(str)
+        List of species names.
 
+    species: list(Species)
+        List of Species.
+
+    data: dict
+        Dictionary (key, value) of data given in the reaction mechanism.
+        Special keys: `alpha`, `beta` tuples of empirical power-law exponents of reaction rates.
+
+    stoic_mtrx: numpy.ndarray
+        Stoichiometric matrix; 2D `numpy` array.
     """
 
     def __init__(self, header='no-header', file_name=None, mechanism=None, order_species=True):
         """Module class constructor.
 
         Returns data structures for a reaction mechanism. Namely, species list,
-        reactions list, equilibrium constant list, and stoichiometric matrix.
+        reactions list, data (equilibrium constant list, etc.), and stoichiometric matrix.
 
         Reaction mechanism format is as follows:
 
         # comment
         # comment
-        4 NH3 + 5 O2        <=> 4 NO  + 6 H2O   :   quantity1 = 2.5e+02 : quantity2 = '2+2'
+        4 NH3 + 5 O2 <=> 4 NO + 6 H2O : quantity1 = 2.5e+02 : quantity2 = '2+2'
 
-        Any amount of spacing is allowed except:
+        Data follows reaction after ":" as `quantity` = `number`. A `data` dictionary will be
+        created as: data['`quantity`'] = `number`. Any number of pairs of keys,value can be
+        given.
+
+        Special control word for `alpha` and `beta` data given as power-law exponent of the
+        reaction rate empirical formula in the order of reactants and products. E.g.:
+
+        4 NH3 + 5 O2 <=> 4 NO + 6 H2O  :  alpha = (4.3, 5.8) : beta = (4.1, 6.7)
+
+        therefore, alpha[0] is the empirical power-law exponent of the NH3 reactant.
+
+
+        Any amount of spacing in the reaction mechanism description is allowed except:
+
         a) there must be only one blank space between the stoichiometric coefficient and its
            species name.
+
         b) there must be at least one blank space before and after each + sign in the reaction.
-        c) species formula name as described in Cortix Species() e.g.:
+
+        c) species formula name are stated as described in Cortix Species() e.g.:
             charge preceded with ^: O2^2+, X^1-, X^+, X^-
             phase in parenthesis (): O2^2+(a), O2^2+(aq), O2^2+(aqu)
+            etc.
 
         There must be no blank lines. A stoichiometric coefficient equal to 1 can be ommited.
 
         Parameters
         ----------
-        file_name: str, optional
+        file_name: str
               Full path file name of the reaction mechanism file. If the reaction has an
               equilibrium constant it will follow the reaction separated by a colon.
-        reactions: list(str), optional
-              list of reaction strings.
+
+        mechanism: list(str)
+              List of reaction strings per above convention.
+
+        order_species: bool
+              Alphabetically order the species names in the mechanism.
 
         Examples
         --------
-
-        Attributes
-        ----------
-        (reactions, data, species, stoic_mtrx): list(str), list(str), nump.ndarray, lst(type), list(type) )
-          a: type 
-              A ...
 
        """
 
@@ -260,6 +283,12 @@ class ReactionMechanism:
 
     def mass_balance_residuals(self):
         """Reaction mass balance residual vector.
+
+        Returns
+        -------
+
+        mb_residual_vec: numpy.ndarray
+            1D vector of mass balance residuals for each reaction.
         """
 
         m_vec = np.zeros(len(self.species), dtype=np.float64)
@@ -274,7 +303,13 @@ class ReactionMechanism:
         return mb_residual_vec
 
     def max_mass_balance_residual(self):
-        """Compute the maximum reaction mass balance residual.
+        """Compute the maximum magnitude reaction mass balance residual.
+
+        Returns
+        -------
+
+        max(abs(mb): float
+
         """
 
         mb_residual_vec = self.mass_balance_residuals()
@@ -283,6 +318,12 @@ class ReactionMechanism:
 
     def is_mass_conserved(self, tol=1e-10):
         """Check mass conservation if species have a molar mass value.
+
+        Returns
+        -------
+
+        bool
+
         """
 
         residual = self.max_mass_balance_residual()
@@ -293,6 +334,11 @@ class ReactionMechanism:
         """Compute the rank of the stoichiometric matrix.
 
         This will establish rank deficiency.
+
+        Returns
+        -------
+
+        print out
         """
 
         assert self.is_mass_conserved(tol), 'fatal: mass conservation failed'
