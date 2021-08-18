@@ -826,8 +826,8 @@ class PhaseNew:
                 fig = plt.figure(num=fig_num, figsize=figsize)
 
                 gs = gridspec.GridSpec(nrows, ncols)
-#                gs.update(left=0.08, right=0.98, wspace=0.4, hspace=0.4)
-                gs.update(left=0.11, right=0.98, wspace=0.4, hspace=0.5)
+                #gs.update(left=0.08, right=0.98, wspace=0.4, hspace=0.4)
+                gs.update(left=0.13, right=0.98, wspace=0.4, hspace=0.4)
 
                 axlst = list()
 
