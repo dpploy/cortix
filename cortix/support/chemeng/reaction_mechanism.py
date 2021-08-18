@@ -258,8 +258,8 @@ class ReactionMechanism:
 
         self.stoic_mtrx = s_mtrx
 
-    def is_mass_conserved(self, tol=1e-9):
-        """Check mass conservation if species have a molar mass value.
+    def max_mass_balance_residual(self):
+        """Compute the maximum reaction mass balance residual.
         """
 
         m_vec = np.zeros(len(self.species), dtype=np.float64)
@@ -274,10 +274,15 @@ class ReactionMechanism:
         #print('mass res=', mass_residual)
         #print('np.max(np.abs(mass_residual)=', np.max(np.abs(mass_residual)))
 
-        if np.max(np.abs(mass_residual)) < tol:
-            return True
+        return np.max(np.abs(mass_residual))
 
-        return False
+    def is_mass_conserved(self, tol=1e-10):
+        """Check mass conservation if species have a molar mass value.
+        """
+
+        residual = self.max_mass_balance_residual()
+
+        return True if residual < tol else False
 
     def rank_analysis(self, tol=1e-8):
         """Compute the rank of the stoichiometric matrix.
@@ -324,4 +329,3 @@ class ReactionMechanism:
                     self.data,
                     self.species_names,
                     self.species)
-
