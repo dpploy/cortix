@@ -24,7 +24,9 @@ class ReactionMechanism:
 
     data: dict
         Dictionary (key, value) of data given in the reaction mechanism.
-        Special keys: `alpha`, `beta` tuples of empirical power-law exponents of reaction rates.
+        Special keys: `alpha`, `beta` contain a dictionary of the empirical power-law exponents
+        of reaction rates for reactants and products respectively.
+        E.g.: self.data['alpha'] = {'e^-': 1e7, 'NO3': 15}
 
     stoic_mtrx: numpy.ndarray
         Stoichiometric matrix; 2D `numpy` array.
@@ -52,6 +54,8 @@ class ReactionMechanism:
         4 NH3 + 5 O2 <=> 4 NO + 6 H2O  :  alpha = (4.3, 5.8) : beta = (4.1, 6.7)
 
         therefore, alpha[0] is the empirical power-law exponent of the NH3 reactant.
+        The data will be stored as a dictionary of a dictionary.
+        E.g.: self.data['alpha'] = {'NH3': 4.3, 'O2': 5.8}
 
 
         Any amount of spacing in the reaction mechanism description is allowed except:
