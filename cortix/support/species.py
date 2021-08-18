@@ -53,6 +53,7 @@ class Species:
                   name='no-species-name',
                   formula_name='no-species-formula-name',
                   atoms=None,
+                  charge=None,
                   flag='no-species-flag',
                   info=None,
                   latex_name='no-species-latex-name'):
@@ -98,6 +99,12 @@ class Species:
             self.atoms = atoms
         else:
             self.atoms = list()
+
+        if charge is not None:
+            assert isinstance(charge, int)
+            self.charge = charge
+        else:
+            self.charge = 0 # defaults to neutral species
 
         self.flag = flag  # flag can be any type
 
@@ -193,8 +200,13 @@ class Species:
         self.num_atoms = num_atoms
         self.num_nuclide_types = len(nuclides)
 
-        # Exception: e^- (solvated electron)
+        # Add charge
+        if self.charge > 0:
+            self.molar_mass -= self.charge * const.physical_constants['electron molar mass'][0]
+        else:
+            self.molar_mass += -1 * self.charge * const.physical_constants['electron molar mass'][0]
 
+        # Exception: e^- (solvated electron)
         if self.formula_name == 'e^-':
             self.molar_mass = const.physical_constants['electron molar mass'][0]
 
@@ -304,10 +316,26 @@ class Species:
         # remove charge
         i = formula_name.find('^')
         if i != -1: # if success
-            if formula_name[i+1].isnumeric():
+            if formula_name[i+1].isnumeric():    # integer followed by sign
+                charge = formula_name[i+1:i+3]
                 formula_name = formula_name.replace(formula_name[i:i+3], '')
-            else:
+            else: # just a sign
+                charge = formula_name[i+1:i+2]
                 formula_name = formula_name.replace(formula_name[i:i+2], '')
+
+            sign = charge[-1]
+
+            if len(charge) == 2:
+                val = int(charge[0])
+            elif len(charge) == 1:
+                val = 1
+            else:
+                assert False, 'fatal: invalid charge = %r'%charge
+
+            if sign == '-':
+                self.charge = -1 * val
+            else:
+                self.charge = val
 
         # find atom group multiplicity
         i = formula_name.find('[')
@@ -315,7 +343,6 @@ class Species:
             assert False, 'fatal: "[]" not yet implemented.' # TODO
 
         # build the atom list
-
         assert isinstance(self.atoms, list)
         assert len(self.atoms) == 0
 
@@ -409,13 +436,13 @@ class Species:
 
         self.latex_name = latex_name
 
-
     def __str__(self):
         s = '\n\t ' + \
             '\n\t Species(): name=%s;' + \
             ' formula_name=%s;' + \
             '\n\t formula=%s;' + \
             '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + \
+            '\n\t charge=%s;' + \
             '\n\t flag=%s;' + \
             '\n\t info=%s;' + \
             '\n\t latex_name=%s;' + \
@@ -429,6 +456,7 @@ class Species:
                 self.ordered_atoms_list(),
                 self.num_atoms, self.num_nuclide_types, self.molar_mass, \
                         self.molar_mass_unit,
+                self.charge,
                 self.flag,
                 self.info,
                 self.latex_name,
@@ -443,6 +471,7 @@ class Species:
             ' formula_name=%s;' + \
             '\n\t formula=%s;' + \
             '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + \
+            '\n\t charge=%s;' + \
             '\n\t flag=%s;' + \
             '\n\t latex_name=%s;' + \
             '\n\t molar radioactivity=%9.3e[%s];' + \
@@ -455,6 +484,7 @@ class Species:
                 self.ordered_atoms_list(),
                 self.num_atoms, self.num_nuclide_types, self.molar_mass, \
                         self.molar_mass_unit,
+                self.charge,
                 self.flag,
                 self.latex_name,
                 self.molar_radioactivity, self.molar_radioactivity_unit,
