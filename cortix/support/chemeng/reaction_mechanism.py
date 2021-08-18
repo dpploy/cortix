@@ -258,8 +258,8 @@ class ReactionMechanism:
 
         self.stoic_mtrx = s_mtrx
 
-    def max_mass_balance_residual(self):
-        """Compute the maximum reaction mass balance residual.
+    def mass_balance_residuals(self):
+        """Reaction mass balance residual vector.
         """
 
         m_vec = np.zeros(len(self.species), dtype=np.float64)
@@ -269,12 +269,17 @@ class ReactionMechanism:
 
         assert np.prod(m_vec) > 0.0
 
-        mass_residual = self.stoic_mtrx @ m_vec
+        mb_residual_vec = self.stoic_mtrx @ m_vec
 
-        #print('mass res=', mass_residual)
-        #print('np.max(np.abs(mass_residual)=', np.max(np.abs(mass_residual)))
+        return mb_residual_vec
 
-        return np.max(np.abs(mass_residual))
+    def max_mass_balance_residual(self):
+        """Compute the maximum reaction mass balance residual.
+        """
+
+        mb_residual_vec = self.mass_balance_residuals()
+
+        return np.max(np.abs(mb_residual_vec))
 
     def is_mass_conserved(self, tol=1e-10):
         """Check mass conservation if species have a molar mass value.
@@ -310,12 +315,14 @@ class ReactionMechanism:
             '\n\t reactions: %s;' + \
             '\n\t data: %s;' + \
             '\n\t species_names: %s;' + \
-            '\n\t species: %s'
+            '\n\t species: %s' + \
+            '\n\t max mass balance residual: %s'
         return s % (self.header,
                     self.reactions,
                     self.data,
                     self.species_names,
-                    self.species)
+                    self.species,
+                    str(self.max_mass_balance_residual()))
 
     def __repr__(self):
         s = '\n\t **ReactionMechanism()**:' + \
@@ -323,9 +330,11 @@ class ReactionMechanism:
             '\n\t reactions: %s;' + \
             '\n\t data: %s;' + \
             '\n\t species_names: %s;' + \
-            '\n\t species: %s;'
+            '\n\t species: %s;' + \
+            '\n\t max mass balance residual: %s'
         return s % (self.header,
                     self.reactions,
                     self.data,
                     self.species_names,
-                    self.species)
+                    self.species,
+                    str(self.max_mass_balance_residual()))
