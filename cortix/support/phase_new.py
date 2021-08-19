@@ -727,28 +727,37 @@ class PhaseNew:
             else:
                 return  self.__df.index[loc]
 
-    def plot_species(self, name, scaling=[1.0,1.0] , title=None, xlabel='Time [s]',
-            ylabel='y', legend='no-legend', filename_tag=None, figsize=[6,5], dpi=100 ):
+    def plot_species(self, name, scaling=[1.0, 1.0] , title=None, xlabel='Time [s]',
+                     ylabel='y', legend=None, filename_tag=None, figsize=[6,5], 
+                     dpi=100 ):
 
-        fig,ax=plt.subplots(1,figsize=figsize)
+        if legend is not None:
+            assert isinstance(legend, str)
 
-        x = np.array( [t for t in self.__df.index] )
+        fig,ax=plt.subplots(1, figsize=figsize)
+
+        x = np.array([t for t in self.__df.index])
         x *= float(scaling[0])
 
-        y = np.array( self.get_column(name),dtype=np.float64 )
+        y = np.array(self.get_column(name), dtype=np.float64)
         y *= float(scaling[1])
 
         yformatter = ScalarFormatter(useMathText=True,useOffset=True)
         yformatter.set_powerlimits((15, 5))
         ax.yaxis.set_major_formatter(yformatter)
 
-        ax.plot(x, y, 'b-', label=legend)
+        if legend:
+            ax.plot(x, y, 'b-', label=legend)
+        else:
+            ax.plot(x, y, 'b-')
 
         ax.set_xlabel(r''+xlabel,fontsize=16)
         ax.set_ylabel(r''+ylabel,fontsize=16,color='black')
         ax.tick_params(axis='y',labelsize=14)
         ax.tick_params(axis='x',labelsize=14)
-        ax.legend(loc='best',fontsize=12)
+
+        if legend:
+            ax.legend(loc='best',fontsize=12)
 
         if title:
             ax.set_title(title)
@@ -768,6 +777,7 @@ class PhaseNew:
         return
 
     def plot(self, actors=None, name='phase-plot-null-name',
+             var_unit=None,
              legend=None, nrows=2, ncols=2, figsize=[6,5], show=False, dpi=200):
         """Plot assistant for a phase container.
 
@@ -782,6 +792,10 @@ class PhaseNew:
         name: str
             Stem of the filename of the plots saved to file.
 
+        var_unit: str
+            An alternative unit for the species concentration. The quantities variable in the
+            phase will have its own unit but species does not have a unit.
+
         show: boolean
             When used in an interactive session, show the plots on display.
         """
@@ -793,6 +807,9 @@ class PhaseNew:
             actors = self.__df.columns
         else:
             assert isinstance(actors, list)
+
+        if var_unit is not None:
+            assert isinstance(var_unit, str)
 
         num_var = len(actors)
 
@@ -854,7 +871,8 @@ class PhaseNew:
             # end of: if i_var % nrows*ncols == 0: # if a multiple of nrows*ncols
             # start a new dashboard
 
-            var_unit = 'g/L'
+            if var_unit is None:
+                var_unit = 'g/L'
 
             ax = axs[axId]
             axId += 1
@@ -862,7 +880,7 @@ class PhaseNew:
             species = self.get_species(col_name)
             if species:
                 latex_name = species.latex_name
-                var_unit = 'Conc.' # FIXME
+                var_unit = var_unit
                 info_str = species.info
 
             quantity = self.get_quantity(col_name)
