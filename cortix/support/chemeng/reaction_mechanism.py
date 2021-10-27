@@ -5,11 +5,9 @@
 '''
 Suupport class for working with chemical reactions.
 '''
-
 import numpy as np
 
 from cortix.support.species import Species
-
 class ReactionMechanism:
     """Chemical reaction mechanism.
 
@@ -31,7 +29,6 @@ class ReactionMechanism:
     stoic_mtrx: numpy.ndarray
         Stoichiometric matrix; 2D `numpy` array.
     """
-
     def __init__(self, header='no-header', file_name=None, mechanism=None, order_species=True):
         """Module class constructor.
 
@@ -284,7 +281,6 @@ class ReactionMechanism:
                     s_mtrx[i_row,j_col] = 1.0
 
         self.stoic_mtrx = s_mtrx
-
     def mass_balance_residuals(self):
         """Reaction mass balance residual vector.
 
@@ -305,7 +301,6 @@ class ReactionMechanism:
         mb_residual_vec = self.stoic_mtrx @ m_vec
 
         return mb_residual_vec
-
     def max_mass_balance_residual(self):
         """Compute the maximum magnitude reaction mass balance residual.
 
@@ -319,7 +314,6 @@ class ReactionMechanism:
         mb_residual_vec = self.mass_balance_residuals()
 
         return np.max(np.abs(mb_residual_vec))
-
     def is_mass_conserved(self, tol=1e-10):
         """Check mass conservation if species have a molar mass value.
 
@@ -333,7 +327,6 @@ class ReactionMechanism:
         residual = self.max_mass_balance_residual()
 
         return True if residual < tol else False
-
     def rank_analysis(self, tol=1e-8):
         """Compute the rank of the stoichiometric matrix.
 
@@ -345,7 +338,7 @@ class ReactionMechanism:
         print out
         """
 
-        assert self.is_mass_conserved(tol), 'fatal: mass conservation failed'
+        #assert self.is_mass_conserved(tol), 'fatal: mass conservation failed'
 
         s_rank = np.linalg.matrix_rank(self.stoic_mtrx, tol=1e-8)
         assert s_rank <= min(self.stoic_mtrx.shape)
@@ -358,7 +351,6 @@ class ReactionMechanism:
         else:
             print('S is rank deficient.')
         print('*********************')
-
     def __str__(self):
         s = '\n\t **ReactionMechanism()**:' + \
             '\n\t header: %s;' + \
@@ -373,7 +365,6 @@ class ReactionMechanism:
                     self.species_names,
                     self.species,
                     str(self.max_mass_balance_residual()))
-
     def __repr__(self):
         s = '\n\t **ReactionMechanism()**:' + \
             '\n\t header: %s;' + \
