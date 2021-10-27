@@ -150,7 +150,9 @@ class Species:
             tmp = entry.split('*')
             nuclide = tmp[-1]
             element = nuclide.split('-')[0]
-            assert element in ELEMENTS, 'element = %r'%(element)
+            if not element in ELEMENTS:
+                print('Warning: not a chemical element %s'%element)
+            #assert element in ELEMENTS, 'element = %r'%(element)
 
         self.num_atoms = 0
         self.num_nuclide_types = 0
