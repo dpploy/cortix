@@ -1,6 +1,6 @@
-Copyright (c) 2017-2019 University of Massachusetts, Lowell
-              Developers: Valmor F. de Almeida, Taha M. Azzaoui, Seamus D. Gallagher
-              Contributors: Gilberto E. Alas, Austin Rotker 
+Copyright (c) 2017-2022 University of Massachusetts, Lowell
+              Developers: Valmor F. de Almeida, Taha M. Azzaoui (see repository)
+              Contributors: Gilberto E. Alas, Austin Rotker, Seamus D. Gallagher (see repository)
               URL: http://www.uml.edu
               
 All rights reserved.
