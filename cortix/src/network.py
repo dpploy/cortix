@@ -388,13 +388,13 @@ class Network:
 
         """
 
-        # Delete existing graph files is any.
+        # Delete existing graph files if any.
         if os.path.isfile(self.name+'.gv'):
             os.remove(self.name+'.gv')
         if os.path.isfile(self.name+'.gv.png'):
             os.remove(self.name+'.gv.png')
 
-        # Import here to avoid broken dependency. Only this method needs this.
+        # Import here to avoid broken dependency. Only this method needs graphviz.
         from graphviz import Digraph
 
         if graph_attr is None:
