@@ -332,8 +332,15 @@ class ReactionMechanism:
 
         This will establish rank deficiency.
 
+        Parameters
+        ----------
+
+        tol: float
+
         Returns
         -------
+
+        rank: int
 
         print out
         """
@@ -341,7 +348,9 @@ class ReactionMechanism:
         #assert self.is_mass_conserved(tol), 'fatal: mass conservation failed'
 
         s_rank = np.linalg.matrix_rank(self.stoic_mtrx, tol=1e-8)
+
         assert s_rank <= min(self.stoic_mtrx.shape)
+
         print('*********************')
         print('# reactions = ', len(self.reactions))
         print('# species   = ', len(self.species))
@@ -351,6 +360,15 @@ class ReactionMechanism:
         else:
             print('S is rank deficient.')
         print('*********************')
+
+        if s_rank == self.stoic_mtrx.shape[1]:
+            print('***********************')
+            print('Warning: rank = n')
+            print('Reaction mechanism fails mass conservation')
+            print('***********************')
+
+        return s_rank
+
     def __str__(self):
         s = '\n\t **ReactionMechanism()**:' + \
             '\n\t header: %s;' + \
