@@ -127,7 +127,7 @@ class ReactionMechanism:
 
             tmp_dict = dict()
 
-            if len(data) > 1:
+            if len(data) > 1: # if colon separated data exists
 
                 for d in data[1:]:
                     datum = d.strip()
@@ -135,16 +135,17 @@ class ReactionMechanism:
                     name = datum.split('=')[0].strip()
                     val_str = datum.split('=')[1].strip()
 
-                    if name == 'alpha':
+                    # alpha and beta cases; convert tuple of integers into dictionary
+                    if name == 'alpha' or name == 'beta':
                         assert '(' in val_str and ')' in val_str
-                        alpha = tuple(val_str)
-                        alpha_dict = dict()
+                        alpha_or_beta = val_str[1:-1] # ignore ( and )
+                        alpha_or_beta_dict = dict()
                         i = 0
-                        for s in alpha:
-                            if s.isnumeric():
-                                alpha_dict[i] = float(s)
-                                i += 1
-                        tmp_dict[name] = alpha_dict
+                        for s in alpha_or_beta.split(','):
+                            alpha_or_beta_dict[i] = float(s.strip())
+                            i += 1
+                        tmp_dict[name] = alpha_or_beta_dict
+                    # any other colon separated data
                     else:
                         tmp_dict[name] = float(val_str)
 
@@ -248,18 +249,20 @@ class ReactionMechanism:
                     j_col = self.species_names.index(species_member)
                     assert s_mtrx[i_row,j_col] == 0.0, \
                            'duplicates not allowed r%r: %r %r %r'%\
-                           (i_row,r,species_member,s_mtrx[i_row,j_col])
+                           (i_row, r, species_member, s_mtrx[i_row, j_col])
                     s_mtrx[i_row,j_col] = -1.0 * coeff
                 else:
                     species_member = tmp[0].strip()
                     j_col = self.species_names.index(species_member)
                     assert s_mtrx[i_row,j_col] == 0.0, \
                            'duplicates not allowed r%r: %r %r %r'%\
-                           (i_row,r,species_member,s_mtrx[i_row,j_col])
+                           (i_row, r, species_member, s_mtrx[i_row, j_col])
                     s_mtrx[i_row,j_col] = -1.0
 
                 if 'alpha' in self.data[i_row].keys():
                     species_name = self.species_names[j_col]
+                    assert len(self.data[i_row]['alpha']) == len(left_terms), 'incorrect length of alpha.'
+                    # replace species index with name
                     self.data[i_row]['alpha'][species_name] = self.data[i_row]['alpha'].pop(left_terms.index(t))
 
             for t in right_terms:
@@ -279,6 +282,12 @@ class ReactionMechanism:
                            'duplicates not allowed r%r: %r %r %r'%\
                            (i_row,r,species_member,s_mtrx[i_row,j_col])
                     s_mtrx[i_row,j_col] = 1.0
+
+                if 'beta' in self.data[i_row].keys():
+                    species_name = self.species_names[j_col]
+                    assert len(self.data[i_row]['beta']) == len(right_terms), 'incorrect length of beta.'
+                    # replace species index with name
+                    self.data[i_row]['beta'][species_name] = self.data[i_row]['beta'].pop(right_terms.index(t))
 
         self.stoic_mtrx = s_mtrx
     def mass_balance_residuals(self):
@@ -347,7 +356,7 @@ class ReactionMechanism:
 
         #assert self.is_mass_conserved(tol), 'fatal: mass conservation failed'
 
-        s_rank = np.linalg.matrix_rank(self.stoic_mtrx, tol=1e-8)
+        s_rank = np.linalg.matrix_rank(self.stoic_mtrx, tol=tol)
 
         assert s_rank <= min(self.stoic_mtrx.shape)
 

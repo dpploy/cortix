@@ -129,8 +129,8 @@ class PhaseNew:
 
         # This is meant to be the value of species concentration; a float type
         if species is not None:
-            for each_species in species:
-                self.__df.loc[time_stamp, each_species.name] = 0.0
+            for spc in species:
+                self.__df.loc[time_stamp, spc.name] = 0.0
 
         if quantities is not None:
             for quant in quantities:
@@ -148,8 +148,7 @@ class PhaseNew:
         try_time_stamp:
         '''
 
-
-        time_stamp = self.__get_time_stamp( try_time_stamp )
+        time_stamp = self.__get_time_stamp(try_time_stamp)
 
         if time_stamp is not None:
             return True
@@ -370,7 +369,7 @@ class PhaseNew:
     def add_single_species(self, new_species, discard_new_duplicate=False):
         """
         Adds a new specie object to the phase history. See species.py for
-        more details on the Species class.
+        details on the Species class.
 
         Parameters
         ----------
@@ -387,25 +386,31 @@ class PhaseNew:
                    'new_species: %r exists. Current names: %r' % \
                    (new_species, self.__df.columns)
 
-        species_formulae = [specie.formula_name for specie in self.__species]
+        if self.__species is not None: # self.__species could be empty
+            species_formulae = [specie.formula_name for specie in self.__species]
 
-        if not discard_new_duplicate:
-            assert new_species.formula_name not in species_formulae
+            if not discard_new_duplicate:
+                assert new_species.formula_name not in species_formulae
 
-        species_names = [spc.name for spc in self.__species]
+        if self.__species is not None: # self.__species could be empty
+            species_names = [spc.name for spc in self.__species]
 
-        if not discard_new_duplicate:
-            assert new_species.name not in species_names
+            if not discard_new_duplicate:
+                assert new_species.name not in species_names
 
-        if (new_species.name in species_names):
-            return
+            if new_species.name in species_names:
+                return
 
-        self.__species.append(new_species)
+        if self.__species is not None:
+            self.__species.append(deepcopy(new_species))
+        else:
+            self.__species = [deepcopy(new_species)] # create a list here
+
         new_name = new_species.name
         col = pandas.DataFrame( index=list(self.__df.index), columns=[new_name] )
         tmp = self.__df
         df = tmp.join(col, how='outer')
-        self.__df = df.fillna(0.0)   # for species have float as default
+        self.__df = df.fillna(0.0)   # for species fill concentration with float as default
 
     def add_quantity(self, new_quant):
         '''
@@ -719,10 +724,18 @@ class PhaseNew:
             time_stamps = np.array(self.__df.index)
             if time_stamps.size >= 2:
                tol = 1.0e-3 * np.diff(time_stamps).mean() # 1e-3 * the mean delta t
-            try: # abs(index_value - try_time_stamp) <= tolerance
-                loc = self.__df.index.get_loc( try_time_stamp, method='nearest',
-                        tolerance=tol )
-            except KeyError: # no value found withing tol
+
+            # deprecated (no exception thrown)
+            #try: # abs(index_value - try_time_stamp) <= tolerance
+            #    loc = self.__df.index.get_loc(try_time_stamp, method='nearest', tolerance=tol)
+            #except KeyError: # no value found within tol
+            #    return None
+            #else:
+            #    return  self.__df.index[loc]
+
+            # abs(index_value - try_time_stamp) <= tolerance
+            loc = self.__df.index.get_indexer([try_time_stamp], method='nearest', tolerance=tol)[0]
+            if loc == -1:
                 return None
             else:
                 return  self.__df.index[loc]
