@@ -14,6 +14,12 @@ class ReactionMechanism:
     Attributes
     ----------
 
+    header: str
+        Concatenated string of comments preceded by # in the reaction header.
+
+    reactions: list(str)
+        List of strings for each reaction.
+
     species_names: list(str)
         List of species names.
 

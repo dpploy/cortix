@@ -12,8 +12,10 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 from cortix.src.module import Module
-from cortix.support.phase import Phase
-from cortix.support.specie import Specie
+#orig from cortix.support.phase import Phase
+from cortix.support.phase_new import PhaseNew as Phase
+#orig from cortix.support.specie import Specie
+from cortix.support.species import Species as Specie
 from cortix.support.quantity import Quantity
 
 class Vortex(Module):
@@ -50,7 +52,8 @@ class Vortex(Module):
         self.show_time = (False,1*const.minute)
         self.log = logging.getLogger(log_filename_stem)
 
-        air = Specie(name='air', formula_name='Air', phase='gas')
+        #orig air = Specie(name='air', formula_name='Air', phase='gas')
+        air = Specie(name='air', formula_name='Air')
         air.massCCUnit = 'g/cc'
         air.molarCCUnit = 'mole/cc'
         air.molarMass = 0.3 * 16 * 2 + 0.7 * 14 *2

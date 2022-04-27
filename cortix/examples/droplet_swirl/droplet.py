@@ -9,8 +9,10 @@ import numpy as np
 import scipy.constants as const
 from scipy.integrate import odeint
 from cortix.src.module import Module
-from cortix.support.phase import Phase
-from cortix.support.specie import Specie
+#orig from cortix.support.phase import Phase
+from cortix.support.phase_new import PhaseNew as Phase
+#orig from cortix.support.specie import Specie
+from cortix.support.species import Species as Specie
 from cortix.support.quantity import Quantity
 
 class Droplet(Module):
@@ -60,7 +62,8 @@ class Droplet(Module):
         self.ode_params['gravity'] = const.g
 
         # Species in the liquid phase
-        water = Specie(name='water', formula_name='H2O(l)', phase='liquid', \
+        #orig water = Specie(name='water', formula_name='H2O(l)', phase='liquid', \
+        water = Specie(name='water', formula_name='H2O(l)', \
                 atoms=['2*H','O'])
         water.massCC =  0.99965 # [g/cc]
         water.massCCUnit = 'g/cc'
@@ -93,7 +96,8 @@ class Droplet(Module):
         # Liquid phase 
         self.liquid_phase = Phase(self.initial_time, time_unit='s', species=species, \
                 quantities=quantities)
-        self.liquid_phase.SetValue('water', water.massCC, self.initial_time)
+        #orig self.liquid_phase.SetValue('water', water.massCC, self.initial_time)
+        self.liquid_phase.set_value('water', water.massCC, self.initial_time)
 
         # Domain box dimensions: LxLxH m^3 box with given H.
         # Origin of cartesian coordinate system at the bottom of the box. 
@@ -104,10 +108,12 @@ class Droplet(Module):
         # Random positioning of the droplet constrained to a box sub-region.
         x_0 = (2 * np.random.random(3) - np.ones(3)) * self.box_half_length / 4.0
         x_0[2] = self.box_height
-        self.liquid_phase.SetValue('position', x_0, self.initial_time)
+        #orig self.liquid_phase.SetValue('position', x_0, self.initial_time)
+        self.liquid_phase.set_value('position', x_0, self.initial_time)
 
         # Droplet Initial velocity = 0 -> placed still in the flow
-        self.liquid_phase.SetValue('velocity', np.array([0.0,0.0,0.0]), \
+        #orig self.liquid_phase.SetValue('velocity', np.array([0.0,0.0,0.0]), \
+        self.liquid_phase.set_value('velocity', np.array([0.0,0.0,0.0]), \
                 self.initial_time)
 
         # Default value for the medium surrounding the droplet if data is not passed
@@ -272,10 +278,14 @@ class Droplet(Module):
                 self.bottom_impact = True
 
             # Update current values
-            self.liquid_phase.SetValue('position', u_vec[0:3], time)
-            self.liquid_phase.SetValue('velocity', u_vec[3:], time)
-            self.liquid_phase.SetValue('speed', np.linalg.norm(u_vec[3:]), time)
-            self.liquid_phase.SetValue('radial-position', np.linalg.norm(u_vec[0:2]),
+            #orig self.liquid_phase.SetValue('position', u_vec[0:3], time)
+            self.liquid_phase.set_value('position', u_vec[0:3], time)
+            #orig self.liquid_phase.SetValue('velocity', u_vec[3:], time)
+            self.liquid_phase.set_value('velocity', u_vec[3:], time)
+            #orig self.liquid_phase.SetValue('speed', np.linalg.norm(u_vec[3:]), time)
+            self.liquid_phase.set_value('speed', np.linalg.norm(u_vec[3:]), time)
+            #orig self.liquid_phase.SetValue('radial-position', np.linalg.norm(u_vec[0:2]),
+            self.liquid_phase.set_value('radial-position', np.linalg.norm(u_vec[0:2]),
                     time)
 
         return time
