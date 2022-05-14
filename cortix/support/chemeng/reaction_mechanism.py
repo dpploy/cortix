@@ -6,6 +6,7 @@
 Suupport class for working with chemical reactions.
 '''
 import math
+import numpy       # used in asserts
 import numpy as np
 
 from cortix.support.species import Species
@@ -421,7 +422,7 @@ class ReactionMechanism:
         List of beta power-law exponents as a vector ordered in the order of appearance of products
         in the corresponding reaction. If not provided, it will be assembled internally.
         """
-        assert isinstance(spc_molar_cc_vec, np.ndarray)
+        assert isinstance(spc_molar_cc_vec, numpy.ndarray), 'type(spc_molar_cc_vec) = %r'%(type(spc_molar_cc_vec))
         assert spc_molar_cc_vec.size == len(self.species)
 
         if kf_vec is not None:
@@ -436,11 +437,15 @@ class ReactionMechanism:
             assert isinstance(alpha_lst, list)
             assert len(alpha_lst) == len(self.reactions)
             assert isinstance(alpha_lst[0], np.ndarray)
+            for alpha_vec in alpha_lst:
+                assert np.all(alpha_vec>=0), 'alpha_vec = \n%r'%alpha_vec
 
         if beta_lst is not None:
             assert isinstance(beta_lst, list)
             assert len(beta_lst) == len(self.reactions)
             assert isinstance(beta_lst[0], np.ndarray)
+            for beta_vec in beta_lst:
+                assert np.all(beta_vec>=0)
 
         # Compute the reaction rate density vector
         r_vec = np.zeros(len(self.reactions), dtype=np.float64)
@@ -506,6 +511,9 @@ class ReactionMechanism:
         The parameters in the derivative are ordered as: k_fs, k_bs, alphas, betas.
         """
 
+        assert isinstance(spc_molar_cc_vec, np.ndarray)
+        assert np.all(spc_molar_cc_vec>=0), 'spc_molar_cc_vec =\n%r'%spc_molar_cc_vec
+
         # Partial r_vec partial kf matrix
         dr_dk_f = np.zeros((len(self.reactions),len(self.reactions)), dtype=np.float64)
         # Partial r_vec partial kb matrix
@@ -514,6 +522,7 @@ class ReactionMechanism:
         # Partial r_vec partial alpha
         n_alphas = 0
         for alpha_vec in alpha_lst:
+            assert np.all(alpha_vec>=0), 'alpha_vec =\%r'%alpha_vec
             n_alphas += alpha_vec.size
 
         dr_dalpha = np.zeros((len(self.reactions),n_alphas), dtype=np.float64)
@@ -521,6 +530,7 @@ class ReactionMechanism:
         # Partial r_vec partial beta
         n_betas = 0
         for beta_vec in beta_lst:
+            assert np.all(beta_vec>=0)
             n_betas += beta_vec.size
 
         dr_dbeta = np.zeros((len(self.reactions),n_betas), dtype=np.float64)
@@ -570,6 +580,126 @@ class ReactionMechanism:
         drdtheta_mtrx = np.hstack([dr_dk_f, dr_dk_b, dr_dalpha, dr_dbeta])
 
         return drdtheta_mtrx
+
+    def __get_ks(self):
+        """Utility for returning packed kf and kb into vectors.
+
+        Returns
+        -------
+        (kf_vec, kb_vec): tuple(numpy.ndarray, numpy.ndarray)
+        """
+
+        # k's
+        kf_vec = np.zeros(len(self.reactions), dtype=np.float64)
+        kb_vec = np.zeros(len(self.reactions), dtype=np.float64)
+
+        for idx, rxn_data in enumerate(self.data):
+            kf_vec[idx] = rxn_data['k_f']
+            kb_vec[idx] = rxn_data['k_b']
+
+        return (kf_vec, kb_vec)
+    def __set_ks(self, pair):
+        """Utility for setting kf and kb from packed vectors.
+
+        Parameters
+        ----------
+        kf_kb_pair: tuple(numpy.ndarray, numpy.ndarray)
+
+        Returns
+        -------
+        """
+
+        assert isinstance(pair, tuple)
+        assert len(pair) == 2
+        assert isinstance(pair[0], numpy.ndarray)
+        assert isinstance(pair[1], numpy.ndarray)
+        assert pair[0].size == len(self.reactions)
+        assert pair[1].size == len(self.reactions)
+
+
+        for idx, rxn_data in enumerate(self.data):
+            rxn_data['k_f'] = pair[0][idx]
+            rxn_data['k_b'] = pair[1][idx]
+    ks = property(__get_ks, __set_ks, None, None)
+
+    def __get_power_law_exponents(self):
+        """Utility for packing alpha and beta exponents into a list of vectors.
+
+        This must be a pair of unstructured data since each reactor has different number of species and
+        different number of associated power-law exponents.
+
+        Returns
+        -------
+        (alpha_lst, beta_lst): tuple(list(numpy.ndarray), list(numpy.ndarray))
+        """
+        alpha_lst = list() # list of vectors
+        beta_lst  = list() # list of vectors
+
+        for idx, rxn_data in enumerate(self.data):
+
+            (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
+
+            if 'alpha' in rxn_data.keys():
+                alpha = rxn_data['alpha']
+                exponents = list()
+                for j in reactants_ids:
+                    spc_name = self.species_names[j]
+                    exponents.append(alpha[spc_name])
+                exponents = np.array(exponents)
+            else:
+                exponents = -self.stoic_mtrx[idx, reactants_ids]
+
+            alpha_lst.append(exponents)
+
+            (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
+
+            if 'beta' in rxn_data.keys():
+                beta = rxn_data['beta']
+                exponents = list()
+                for j in products_ids:
+                    spc_name = self.species_names[j]
+                    exponents.append(beta[spc_name])
+                exponents = np.array(exponents)
+            else:
+                exponents = self.stoic_mtrx[idx, products_ids]
+
+            beta_lst.append(exponents)
+
+            return (alpha_lst, beta_lst)
+    def __set_power_law_exponents(self, pair):
+        """Utility for setting alpha and beta from packed vectors.
+
+        The alpha and vector list of vectors must be ordered both in reactions and reactants and products. 
+        """
+
+        alpha_lst = pair[0]
+        beta_lst  = pair[1]
+
+        for idx, rxn_data in enumerate(self.data):
+
+            (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
+
+            if 'alpha' in rxn_data.keys():
+                alpha = rxn_data['alpha']
+                exponents = alpha_lst[idx]
+                for jdx,j in enumerate(reactants_ids):
+                    spc_name = self.species_names[j]
+                    alpha[spc_name] = exponents[jdx]
+            else:
+                exponents = -self.stoic_mtrx[idx, reactants_ids]
+
+            (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
+
+            if 'beta' in rxn_data.keys():
+                beta = rxn_data['beta']
+                exponents = tuple(beta_lst[idx])
+                for jdx,j in enumerate(products_ids):
+                    spc_name = self.species_names[j]
+                    beta[spc_name] = exponents[jdx]
+            else:
+                exponents = self.stoic_mtrx[idx, products_ids]
+    power_law_exponents = property(__get_power_law_exponents, __set_power_law_exponents, None, None)
+
 
     def __str__(self):
         s = '\n\t **ReactionMechanism()**:' + \
