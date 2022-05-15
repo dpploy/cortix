@@ -435,7 +435,7 @@ class ReactionMechanism:
 
         if alpha_lst is not None:
             assert isinstance(alpha_lst, list)
-            assert len(alpha_lst) == len(self.reactions)
+            assert len(alpha_lst) == len(self.reactions), '# reactions=%r alpha_lst=\n%r'%(len(self.reactions),alpha_lst)
             assert isinstance(alpha_lst[0], np.ndarray)
             for alpha_vec in alpha_lst:
                 assert np.all(alpha_vec>=0), 'alpha_vec = \n%r'%alpha_vec
@@ -635,7 +635,8 @@ class ReactionMechanism:
         alpha_lst = list() # list of vectors
         beta_lst  = list() # list of vectors
 
-        for idx, rxn_data in enumerate(self.data):
+        print(len(self.data))
+        for (idx, rxn_data) in enumerate(self.data):
 
             (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
 
@@ -649,6 +650,7 @@ class ReactionMechanism:
             else:
                 exponents = -self.stoic_mtrx[idx, reactants_ids]
 
+            #print('made here')
             alpha_lst.append(exponents)
 
             (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
@@ -665,7 +667,7 @@ class ReactionMechanism:
 
             beta_lst.append(exponents)
 
-            return (alpha_lst, beta_lst)
+        return (alpha_lst, beta_lst)
     def __set_power_law_exponents(self, pair):
         """Utility for setting alpha and beta from packed vectors.
 
@@ -699,7 +701,6 @@ class ReactionMechanism:
             else:
                 exponents = self.stoic_mtrx[idx, products_ids]
     power_law_exponents = property(__get_power_law_exponents, __set_power_law_exponents, None, None)
-
 
     def __str__(self):
         s = '\n\t **ReactionMechanism()**:' + \
