@@ -512,6 +512,7 @@ class ReactionMechanism:
         """
 
         assert isinstance(spc_molar_cc_vec, np.ndarray)
+        assert spc_molar_cc_vec.size == len(self.species)
         assert np.all(spc_molar_cc_vec>=0), 'spc_molar_cc_vec =\n%r'%spc_molar_cc_vec
 
         # Partial r_vec partial kf matrix
@@ -535,11 +536,13 @@ class ReactionMechanism:
 
         dr_dbeta = np.zeros((len(self.reactions),n_betas), dtype=np.float64)
 
+        dr_dalpha_j0 = 0
         for (idx, rxn_data) in enumerate(self.data):
 
             (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
 
             reactants_molar_cc = spc_molar_cc_vec[reactants_ids]
+            assert reactants_molar_cc.size == alpha_lst[idx].size
 
             spc_cc_power_prod = np.prod(reactants_molar_cc**alpha_lst[idx])
 
@@ -551,31 +554,61 @@ class ReactionMechanism:
             if min_c_j <= 1e-8:
                 #print('min_c_j=',min_c_j)
                 (jdx, ) = np.where(reactants_molar_cc == min_c_j)
-                reactants_molar_cc[jdx] = 1.0
+                reactants_molar_cc[jdx] = 1.0 # any non-zero value will do it since rb_i will be zero
 
             for (jdx, c_j) in enumerate(reactants_molar_cc):
-                dr_dalpha[idx, jdx] = math.log(c_j) * rf_i
+                dr_dalpha[idx, dr_dalpha_j0+jdx] = math.log(c_j) * rf_i
+                #dr_dalpha[idx, jdx] = math.log(c_j) * rf_i
 
+            dr_dalpha_j0 += alpha_lst[idx].size
+
+        assert dr_dalpha_j0 == n_alphas, 'n_alphas = %r; sum = %r'%(n_alphas, dr_dalpha_j0 )
+
+        #print(' ')
+        #print('begin here')
+        dr_dbeta_j0 = 0
         for idx, rxn_data in enumerate(self.data):
+            #print('idx=',idx)
 
             (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
 
             products_molar_cc = spc_molar_cc_vec[products_ids]
+            #print('            products_molar_cc =',products_molar_cc)
 
             spc_cc_power_prod = np.prod(products_molar_cc**beta_lst[idx])
 
             dr_dk_b[idx, idx] = - spc_cc_power_prod
 
             rb_i = kb_vec[idx] * spc_cc_power_prod
+            #print('            rb_i =',rb_i)
+            #print('            kb_vec[idx] = ',kb_vec[idx])
 
             min_c_j = products_molar_cc.min()
             if min_c_j <= 1e-8:
                 #print('min_c_j=',min_c_j)
                 (jdx, ) = np.where(products_molar_cc == min_c_j)
-                products_molar_cc[jdx] = 1.0
+                products_molar_cc[jdx] = 1.0 # any non-zero value will do it since rb_i will be zero
 
             for (jdx, c_j) in enumerate(products_molar_cc):
-                dr_dbeta[idx, jdx] = - math.log(c_j) * rb_i
+                dr_dbeta[idx, dr_dbeta_j0+jdx] = - math.log(c_j) * rb_i
+                #dr_dbeta[idx, jdx] = - math.log(c_j) * rb_i
+
+            dr_dbeta_j0 += beta_lst[idx].size
+
+                #if abs(rb_i) <= 1e-8:
+                #    print('')
+                #    print('jdx =',jdx, ' dr_dbeta[idx,jdx]=', dr_dbeta[idx,jdx])
+                #    print('c_j=',c_j,' rb_i = ',rb_i)
+                #    print('products_molar_cc =', products_molar_cc)
+
+        assert dr_dbeta_j0 == n_betas, 'n_betas = %r sum = %r'%(n_betas, dr_dbeta_j0)
+
+
+        #print('')
+        #print('spc_molar_cc_vec =',spc_molar_cc_vec)
+        #print('dr_dalpha=\n',dr_dalpha)
+        #np.set_printoptions(precision=5, linewidth=300)
+        #print('dr_dbeta =\n',dr_dbeta)
 
         drdtheta_mtrx = np.hstack([dr_dk_f, dr_dk_b, dr_dalpha, dr_dbeta])
 
