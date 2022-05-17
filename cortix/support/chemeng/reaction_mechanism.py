@@ -306,6 +306,27 @@ class ReactionMechanism:
 
         self.stoic_mtrx = s_mtrx
 
+        # Fill-in missing k_f, k_b, alpha, and beta
+        for idx,dat in enumerate(self.data):
+            if 'k_f' not in dat:
+                dat['k_f'] = 0.0
+            if 'k_b' not in dat:
+                dat['k_b'] = 0.0
+            if 'alpha' not in dat:
+                (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
+                tmp = dict()
+                for j in reactants_ids:
+                    spc_name = self.species_names[j]
+                    tmp[spc_name] = abs(self.stoic_mtrx[idx,j])
+                dat['alpha'] = tmp
+            if 'beta' not in dat:
+                (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
+                tmp = dict()
+                for j in products_ids:
+                    spc_name = self.species_names[j]
+                    tmp[spc_name] = abs(self.stoic_mtrx[idx,j])
+                dat['beta'] = tmp
+
     def mass_balance_residuals(self):
         """Reaction mass balance residual vector.
 
@@ -494,6 +515,12 @@ class ReactionMechanism:
 
         return r_vec
 
+    def rxn_rate_law(self, spc_molar_cc_vec, kf_vec=None, kb_vec=None, alpha_lst=None, beta_lst=None):
+        """See r_vec.
+        """
+
+        return self.r_vec(spc_molar_cc_vec, kf_vec, kb_vec, alpha_lst, beta_lst)
+
     def g_vec(self, spc_molar_cc_vec, kf_vec=None, kb_vec=None, alpha_lst=None, beta_lst=None):
         """Compute the species production rate density vector.
 
@@ -504,6 +531,15 @@ class ReactionMechanism:
         g_vec = self.stoic_mtrx.transpose() @ self.r_vec(spc_molar_cc_vec, kf_vec, kb_vec, alpha_lst, beta_lst)
 
         return g_vec
+
+    def species_prod_rate_dens(self, spc_molar_cc_vec, kf_vec=None, kb_vec=None, alpha_lst=None, beta_lst=None):
+        """Compute the species production rate density vector.
+
+        Parameters:
+        -----------
+        """
+
+        return self.g_vec(spc_molar_cc_vec, kf_vec, kb_vec, alpha_lst, beta_lst)
 
     def drdtheta_mtrx(self, spc_molar_cc_vec, kf_vec, kb_vec, alpha_lst, beta_lst):
         """Partial derivative of the reaction rate law wrt parameters.
