@@ -308,18 +308,18 @@ class ReactionMechanism:
 
         # Fill-in missing k_f, k_b, alpha, and beta
         for idx,dat in enumerate(self.data):
-            if 'k_f' not in dat:
+            if 'k_f' not in dat.keys():
                 dat['k_f'] = 0.0
-            if 'k_b' not in dat:
+            if 'k_b' not in dat.keys():
                 dat['k_b'] = 0.0
-            if 'alpha' not in dat:
+            if 'alpha' not in dat.keys():
                 (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
                 tmp = dict()
                 for j in reactants_ids:
                     spc_name = self.species_names[j]
                     tmp[spc_name] = abs(self.stoic_mtrx[idx,j])
                 dat['alpha'] = tmp
-            if 'beta' not in dat:
+            if 'beta' not in dat.keys():
                 (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
                 tmp = dict()
                 for j in products_ids:
@@ -578,12 +578,10 @@ class ReactionMechanism:
             dr_dk_b = np.zeros((len(self.reactions),len(self.reactions)), dtype=np.float64)
 
             for idx, rxn_data in enumerate(self.data):
-                #print('idx=',idx)
 
                 (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
 
                 products_molar_cc = spc_molar_cc_vec[products_ids]
-                #print('            products_molar_cc =',products_molar_cc)
 
                 spc_cc_power_prod = np.prod(products_molar_cc**beta_lst[idx])
 
@@ -752,7 +750,6 @@ class ReactionMechanism:
         alpha_lst = list() # list of vectors
         beta_lst  = list() # list of vectors
 
-        print(len(self.data))
         for (idx, rxn_data) in enumerate(self.data):
 
             (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
@@ -767,7 +764,6 @@ class ReactionMechanism:
             else:
                 exponents = -self.stoic_mtrx[idx, reactants_ids]
 
-            #print('made here')
             alpha_lst.append(exponents)
 
             (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
@@ -828,6 +824,10 @@ class ReactionMechanism:
                 else:
                     exponents = self.stoic_mtrx[idx, products_ids]
     power_law_exponents = property(__get_power_law_exponents, __set_power_law_exponents, None, None)
+
+    def print_data(self):
+        for idx, data in enumerate(self.data):
+            print(self.reactions[idx], ' ', data)
 
     def __str__(self):
         s = '\n\t **ReactionMechanism()**:' + \
