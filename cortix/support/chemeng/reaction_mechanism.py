@@ -41,6 +41,14 @@ class ReactionMechanism:
 
     stoic_mtrx: numpy.ndarray
         Stoichiometric matrix; 2D `numpy` array.
+
+    latex_species: str
+        String containing the LaTeX typetting of the species in the order they appear in the stoichiometric
+        matrix. Use the Python print function to print this attribute and copy/paste into a LaTex
+        environment.
+
+    latex_rxn: str
+        String containing the LaTeX typsetting of all reactions into the LaTeX `align` environment.
     """
 
     def __init__(self, header='no-header', file_name=None, mechanism=None, order_species=True):
@@ -305,6 +313,8 @@ class ReactionMechanism:
                     self.data[i_row]['beta'][species_name] = self.data[i_row]['beta'].pop(right_terms.index(t))
 
         self.stoic_mtrx = s_mtrx
+
+        (self.latex_species, self.latex_rxn) = self.__latex()
 
         # Fill-in missing k_f, k_b, alpha, and beta
         for idx,dat in enumerate(self.data):
@@ -618,7 +628,7 @@ class ReactionMechanism:
                 if min_c_j <= 1e-8:
                     #print('min_c_j=',min_c_j)
                     (jdx, ) = np.where(reactants_molar_cc == min_c_j)
-                    reactants_molar_cc[jdx] = 1.0 # any non-zero value will do it since rb_i will be zero
+                    reactants_molar_cc[jdx] = 1.0 # any non-zero value will do since rb_i will be zero
 
                 for (jdx, c_j) in enumerate(reactants_molar_cc):
                     dr_dalpha[idx, dr_dalpha_j0+jdx] = math.log(c_j) * rf_i
@@ -826,8 +836,46 @@ class ReactionMechanism:
     power_law_exponents = property(__get_power_law_exponents, __set_power_law_exponents, None, None)
 
     def print_data(self):
+        """Helper to print the reaction data line by line.
+        """
+
         for idx, data in enumerate(self.data):
             print(self.reactions[idx], ' ', data)
+
+    def __latex(self):
+        """Internal helper for LaTeX typesetting.
+
+        See attributes.
+        """
+
+        # Latex species
+        species_str = str()
+        for spc in self.species[:-1]:
+            species_str += spc.latex_name + ', '
+        species_str += self.species[-1].latex_name
+
+        # Latex reactions into align environment
+        rxn_str = self.header + '\n'
+        rxn_str += '\\begin{align*} \n'
+        for row in self.stoic_mtrx:
+
+            (reactants_ids, ) = np.where(row < 0)
+            for j in reactants_ids[:-1]:
+                rxn_str += self.species[j].latex_name + r'\ + \ '
+
+            rxn_str += self.species[reactants_ids[-1]].latex_name
+
+            rxn_str += r'\ &\rightarrow \ '
+
+            (products_ids, ) = np.where(row > 0)
+            for j in products_ids[:-1]:
+                rxn_str += self.species[j].latex_name + r'\ + \ '
+
+            rxn_str += self.species[products_ids[-1]].latex_name + '\\\\ \n'
+
+        rxn_str += '\\end{align*} \n'
+
+        return (species_str, rxn_str)
 
     def __str__(self):
         s = '\n\t **ReactionMechanism()**:' + \

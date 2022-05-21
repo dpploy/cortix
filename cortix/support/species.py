@@ -388,7 +388,10 @@ class Species:
             H2O2(v):            () for phase
 
         This is useful for automating the creation of a species list of atoms, say from a
-        reaction mechanism.
+        reaction mechanism. Important, to copy and paste this into a LaTeX document, first
+        had Python `print` the string and then copy the string. To use in a Jupyter notebook with
+        markdown cells, again, print using a code cell and copy the output into a markdown cell.
+        To use under LaTex, either enclose in $$ or drop it into a LaTex environment.
 
         """
 
@@ -402,31 +405,31 @@ class Species:
 
             if c_i == '(':
                 open_parenthesis = True
-                latex_name += r'$_\mathrm{(' # escape \
+                latex_name += r'_\mathrm{(' # escape \
                 continue
             elif c_i == ')':
                 open_parenthesis = False
-                latex_name += ')}$'
+                latex_name += ')}'
                 continue
 
             if not open_parenthesis:
 
                 if c_i == '*':
-                    latex_name += r'$^\bullet$' # escape \
+                    latex_name += r'^\bullet' # escape \
                     continue
 
                 if c_i == '^':
                     if formula_name[idx+1].isnumeric():
-                        latex_name += '$^{' + formula_name[idx+1:idx+3] + '}$'
+                        latex_name += '^{' + formula_name[idx+1:idx+3] + '}'
                     else:
-                        latex_name += '$^' + formula_name[idx+1] + '$'
+                        latex_name += '^' + formula_name[idx+1]
                     continue
 
                 if c_i.isalpha():
-                    latex_name += c_i
+                    latex_name += r'\mathrm{'+c_i+'}'
 
                 if c_i.isnumeric() and formula_name[idx-1].isalpha():
-                    latex_name += '$_' + c_i + '$'
+                    latex_name += '_' + c_i
                     continue
 
                 if c_i == '[' or c_i == ']':
