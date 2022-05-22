@@ -35,9 +35,11 @@ class ReactionMechanism:
         List (one element per reaction) of dicitionaries (key, value) of data given in the reaction
         mechanism.  Special keys: `alpha`, `beta` contain a dictionary of the empirical power-law
         exponents of reaction rates for reactants and products respectively; `k_f`, `k_b` contain the
-        reaction rate constants  per reaction.
+        reaction rate constants  per reaction; `info` contains any `string` type for information about
+        the reaction.
         E.g.: self.data[idx]['alpha'] = {'e^-': 1e7, 'NO3': 15}
               self.data[idx]['k_f'] = 1e3
+              self.data[idx]['info'] = 'condensation reaction'
 
     stoic_mtrx: numpy.ndarray
         Stoichiometric matrix; 2D `numpy` array.
@@ -169,6 +171,8 @@ class ReactionMechanism:
                             i += 1
                         tmp_dict[name] = alpha_or_beta_dict
                     # any other colon separated data
+                    elif name == 'info':
+                        tmp_dict[name] = val_str
                     else:
                         tmp_dict[name] = float(val_str)
 
@@ -234,6 +238,8 @@ class ReactionMechanism:
 
         s_mtrx = np.zeros((len(self.reactions),len(self.species)), dtype=np.float64)
 
+        self.reaction_direction_symbol = list()
+
         for r in self.reactions:
 
             i_row = self.reactions.index(r)
@@ -241,18 +247,26 @@ class ReactionMechanism:
             tmp = r.split(' -> ')
             n_terms = len(tmp)
             assert n_terms == 1 or n_terms == 2
+            if n_terms == 2:
+                self.reaction_direction_symbol.append('->')
             if n_terms == 1:
                 tmp = r.split(' <-> ')
                 n_terms = len(tmp)
                 assert n_terms == 1 or n_terms == 2
+                if n_terms == 2:
+                    self.reaction_direction_symbol.append('<->')
                 if n_terms == 1:
                     tmp = r.split(' <=> ')
                     n_terms = len(tmp)
                     assert n_terms == 1 or n_terms == 2
+                    if n_terms == 2:
+                        self.reaction_direction_symbol.append('<=>')
                     if n_terms == 1:
                         tmp = r.split(' <- ')
                         n_terms = len(tmp)
                         assert n_terms == 1 or n_terms == 2
+                        if n_terms == 2:
+                            self.reaction_direction_symbol.append('<-')
 
             assert n_terms == 2
 
@@ -336,6 +350,11 @@ class ReactionMechanism:
                     spc_name = self.species_names[j]
                     tmp[spc_name] = abs(self.stoic_mtrx[idx,j])
                 dat['beta'] = tmp
+
+        # Fill-in missing info
+        for idx,dat in enumerate(self.data):
+            if 'info' not in dat.keys():
+                dat['info'] = 'no-info'
 
     def mass_balance_residuals(self):
         """Reaction mass balance residual vector.
@@ -857,21 +876,49 @@ class ReactionMechanism:
         # Latex reactions into align environment
         rxn_str = self.header + '\n'
         rxn_str += '\\begin{align*} \n'
-        for row in self.stoic_mtrx:
+        for idx,row in enumerate(self.stoic_mtrx):
 
             (reactants_ids, ) = np.where(row < 0)
+
             for j in reactants_ids[:-1]:
-                rxn_str += self.species[j].latex_name + r'\ + \ '
+                coeff = abs(int(self.stoic_mtrx[idx,j]))
+                if coeff != 1:
+                    rxn_str += str(coeff) + '\,' + self.species[j].latex_name + r'\ + \ '
+                else:
+                    rxn_str += self.species[j].latex_name + r'\ + \ '
 
-            rxn_str += self.species[reactants_ids[-1]].latex_name
+            j = reactants_ids[-1]
+            coeff = abs(int(self.stoic_mtrx[idx,j]))
+            if coeff != 1:
+                rxn_str += str(coeff) + '\,' + self.species[j].latex_name
+            else:
+                rxn_str += self.species[j].latex_name
 
-            rxn_str += r'\ &\rightarrow \ '
+            if self.reaction_direction_symbol[idx] == '->':
+                rxn_str += r'\ &\longrightarrow \ '
+            elif self.reaction_direction_symbol[idx] == '<->':
+                rxn_str += r'\ &\longleftrightarrow \ '
+            elif self.reaction_direction_symbol[idx] == '<=>':
+                rxn_str += r'\ &\longleftrightarrow \ '
+            elif self.reaction_direction_symbol[idx] == '<-':
+                rxn_str += r'\ &\longleftarrow \ '
+            else:
+                assert False, 'Unknown reaction direction.'
 
             (products_ids, ) = np.where(row > 0)
             for j in products_ids[:-1]:
-                rxn_str += self.species[j].latex_name + r'\ + \ '
+                coeff = abs(int(self.stoic_mtrx[idx,j]))
+                if coeff != 1:
+                    rxn_str += str(coeff) + '\,' + self.species[j].latex_name + r'\ + \ '
+                else:
+                    rxn_str += self.species[j].latex_name + r'\ + \ '
 
-            rxn_str += self.species[products_ids[-1]].latex_name + '\\\\ \n'
+            j = products_ids[-1]
+            coeff = abs(int(self.stoic_mtrx[idx,j]))
+            if coeff != 1:
+                rxn_str += str(coeff) + '\,' + self.species[j].latex_name + '\\\\ \n'
+            else:
+                rxn_str += self.species[j].latex_name + '\\\\ \n'
 
         rxn_str += '\\end{align*} \n'
 
