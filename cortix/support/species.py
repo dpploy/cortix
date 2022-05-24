@@ -429,7 +429,7 @@ class Species:
                     latex_name += r'\mathrm{'+c_i+'}'
 
                 if c_i.isnumeric() and formula_name[idx-1].isalpha():
-                    latex_name += '_' + c_i
+                    latex_name += '_{' + c_i + '}'
                     continue
 
                 if c_i == '[' or c_i == ']':

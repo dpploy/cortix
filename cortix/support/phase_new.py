@@ -892,7 +892,8 @@ class PhaseNew:
 
             species = self.get_species(col_name)
             if species:
-                latex_name = species.latex_name
+                #latex_name = species.latex_name  # not working
+                latex_name = species.name
                 var_unit = var_unit
                 info_str = species.info
 
@@ -1096,7 +1097,8 @@ class PhaseNew:
             '''
 
             ax.set_xlabel('Time [' + time_unit + ']', fontsize=12)
-            ax.set_ylabel(latex_name + ' [' + var_unit + ']', fontsize=12)
+            #ax.set_ylabel('$'+latex_name+'$' + ' [' + var_unit + ']', fontsize=12)
+            ax.set_ylabel(latex_name+' [' + var_unit + ']', fontsize=12)
 
             '''
             ymax = y.max()
@@ -1217,8 +1219,8 @@ class PhaseNew:
         return
 
 if __name__ == '__main__':
-    tbp_org = Species( name='TBP', formula_name='(C4H9O)_3PO(o)',
-              phase_name='organic', atoms=['12*C','27*H','4*O','P'] )
+    tbp_org = Species(name='TBP', formula_name='(C4H9O)_3PO(o)',
+                      atoms=['12*C','27*H','4*O','P'] )
     quant = Quantity( name='volume' )
     phase = PhaseNew(name='solvent',species=[tbp_org],quantities=[quant])
     print(phase)

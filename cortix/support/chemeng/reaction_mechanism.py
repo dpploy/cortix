@@ -487,8 +487,8 @@ class ReactionMechanism:
             assert isinstance(alpha_lst, list)
             assert len(alpha_lst) == len(self.reactions), '# reactions=%r alpha_lst=\n%r'%(len(self.reactions),alpha_lst)
             assert isinstance(alpha_lst[0], np.ndarray)
-            for alpha_vec in alpha_lst:
-                assert np.all(alpha_vec>=0), 'alpha_vec = \n%r'%alpha_vec
+            #for alpha_vec in alpha_lst:
+            #    assert np.all(alpha_vec>=0), 'alpha_vec = \n%r'%alpha_vec
 
         if beta_lst is not None:
             assert isinstance(beta_lst, list)
@@ -625,7 +625,7 @@ class ReactionMechanism:
         if alpha_lst is not None:
             n_alphas = 0
             for alpha_vec in alpha_lst:
-                assert np.all(alpha_vec>=0), 'alpha_vec =\%r'%alpha_vec
+                #assert np.all(alpha_vec>=0), 'alpha_vec =\%r'%alpha_vec
                 n_alphas += alpha_vec.size
 
             dr_dalpha = np.zeros((len(self.reactions),n_alphas), dtype=np.float64)
@@ -644,7 +644,7 @@ class ReactionMechanism:
                 rf_i = kf_vec[idx] * spc_cc_power_prod
 
                 min_c_j = reactants_molar_cc.min()
-                if min_c_j <= 1e-8:
+                if min_c_j <= 1e-25:
                     #print('min_c_j=',min_c_j)
                     (jdx, ) = np.where(reactants_molar_cc == min_c_j)
                     reactants_molar_cc[jdx] = 1.0 # any non-zero value will do since rb_i will be zero
