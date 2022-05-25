@@ -13,3 +13,4 @@ from .support.phase import Phase
 from .support.quantity import Quantity
 from .support.species import Species
 from .support.chemeng.reaction_mechanism import ReactionMechanism
+from .support.chemeng.reaction_mechanism import print_reaction_sub_mechanisms

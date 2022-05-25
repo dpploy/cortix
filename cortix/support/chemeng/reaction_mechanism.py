@@ -8,6 +8,8 @@ Suupport class for working with chemical reactions.
 import math
 import numpy       # used in asserts
 import numpy as np
+from itertools import combinations
+import random
 
 from cortix.support.species import Species
 
@@ -136,6 +138,10 @@ class ReactionMechanism:
         self.reactions = list()
         self.data = list()
 
+        # Keep the original data internally for future use in sub-mechanisms
+        # Remove header and comment lines
+        self.__original_mechanism = list()
+
         for m_i in mechanism:
 
             if m_i[0].strip() == '#':
@@ -145,9 +151,11 @@ class ReactionMechanism:
                     self.header += m_i.strip() + '\n'
                 continue
 
+            self.__original_mechanism.append(m_i)
+
             data = m_i.split(':')
 
-            self.reactions.append(data[0].strip())
+            self.reactions.append(data[0].strip())  # do not save comments
 
             tmp_dict = dict()
 
@@ -769,8 +777,8 @@ class ReactionMechanism:
     def __get_power_law_exponents(self):
         """Utility for packing alpha and beta exponents into a list of vectors.
 
-        This must be a pair of unstructured data since each reactor has different number of species and
-        different number of associated power-law exponents.
+        The return from this method must be a pair of unstructured data since each reaction has different
+        number of species and different number of associated power-law exponents.
 
         Returns
         -------
@@ -853,6 +861,86 @@ class ReactionMechanism:
                 else:
                     exponents = self.stoic_mtrx[idx, products_ids]
     power_law_exponents = property(__get_power_law_exponents, __set_power_law_exponents, None, None)
+
+    def full_rank_sub_mechanisms(self, n_sub_mec=1000):
+        """Construct sub-mechanisms with full-rank stoichiometric matrix.
+
+        Returns
+        -------
+        sub_mechanisms: list([ReactionMechanism, gidxs, score])
+
+        """
+
+        s_rank = np.linalg.matrix_rank(self.stoic_mtrx)
+
+        if s_rank == min(self.stoic_mtrx.shape):
+            return self
+
+        m_reactions = self.stoic_mtrx.shape[0]
+
+        n_mechanisms = math.factorial(m_reactions)/\
+                       math.factorial(m_reactions-s_rank)/\
+                       math.factorial(s_rank)
+        #print('# of all possible sub_mechanisms = %i'%n_mechanisms)
+
+        tmp = combinations(range(m_reactions),s_rank)
+        reaction_sets = [i for i in tmp]
+        random.shuffle(reaction_sets) # this may be time consuming
+
+        sub_mechanisms = list() # list of list
+
+        for idxs in reaction_sets:
+
+            stoic_mtrx = self.stoic_mtrx[idxs,:]
+
+            rank = np.linalg.matrix_rank(stoic_mtrx)
+
+            if rank == s_rank:
+
+                mechanism = list()
+                for idx in idxs:
+                    mechanism.append(self.__original_mechanism[idx])
+
+                rxn_mech = ReactionMechanism(mechanism=mechanism, order_species=True)
+
+                assert np.linalg.matrix_rank(rxn_mech.stoic_mtrx) == s_rank
+
+                sub_mechanisms.append([rxn_mech, idxs])
+
+            if len(sub_mechanisms) >= n_sub_mec:
+                break
+
+        # Count number of times a global reaction appear in a sub-mechanism
+        reactions_hits = np.zeros(m_reactions)
+        for sm in sub_mechanisms:
+            gidxs = list(sm[1])
+            reactions_hits[gidxs] += 1
+
+        # Score the global reactions
+        sub_mech_reactions_score = list()
+        for subm in sub_mechanisms:
+            score = 0
+            for gid in subm[1]:
+                score += reactions_hits[gid]
+            sub_mech_reactions_score.append(score)
+
+        sub_mech_reactions_score = np.array(sub_mech_reactions_score)
+        sub_mech_reactions_score /= sub_mech_reactions_score.max()
+        sub_mech_reactions_score *= 10.0
+
+        results = sorted( zip(sub_mechanisms, sub_mech_reactions_score),
+                          key=lambda entry: entry[1], reverse=True )
+
+        sub_mechanisms           = [a for (a,b) in results]
+        sub_mech_reactions_score = [b for (a,b) in results]
+
+        # Encode score in to sub_mech_reactions mech. list of list
+        for (sr, score) in zip(sub_mechanisms, sub_mech_reactions_score):
+            sr += [score]
+
+        #max_score = max( [sm[3] for sm in sub_mechanisms] )
+
+        return sub_mechanisms
 
     def print_data(self):
         """Helper to print the reaction data line by line.
@@ -952,3 +1040,52 @@ class ReactionMechanism:
                     self.species_names,
                     self.species,
                     str(self.max_mass_balance_residual()))
+
+def print_reaction_sub_mechanisms(sub_mechanisms, mode=None, n_sub_mech=None):
+    '''
+    Nice printout of a scored reaction sub-mechanism list
+
+    Parameters
+    ----------
+    sub_mechanisms: list([ReactionMechanism, gidxs, score])
+        Sorted reaction mechanims in the form of a list.
+
+    mode: str
+        Printing mode: all, top, None.
+
+    Returns
+    -------
+    None:
+
+    Examples
+    --------
+
+    '''
+    assert mode is None or n_sub_mech is None
+    assert mode =='top' or mode =='all' or mode==None
+    assert isinstance(n_sub_mech, int) or n_sub_mech is None
+
+    if mode is None and n_sub_mech is None:
+        mode = 'all'
+
+    if n_sub_mech is None:
+        if mode == 'all':
+            n_sub_mech = len(sub_mechanisms)
+        elif mode == 'top':
+            scores = [sm[2] for sm in sub_mechanisms]
+            max_score = max(scores)
+            tmp = list()
+            for s in scores:
+                if s == max_score:
+                    tmp.append(s)
+            n_sub_mech = len(tmp)
+        else:
+            assert False, 'illegal mode %r'%mode
+
+    for idx, rsm in enumerate(sub_mechanisms[:n_sub_mech]):
+        print('Full-Rank Reaction Sub Mechanism: %s (score %4.2f)'%(idx, rsm[2]))
+        print('Species = ',rsm[0].species_names)
+        for (r,data,gidx) in zip(rsm[0].reactions, rsm[0].data, rsm[1]):
+            print('r%s'%gidx, r,' ', data['info'])
+
+    return
