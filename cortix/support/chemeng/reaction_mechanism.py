@@ -578,10 +578,19 @@ class ReactionMechanism:
 
         return self.g_vec(spc_molar_cc_vec, kf_vec, kb_vec, alpha_lst, beta_lst)
 
-    def drdtheta_mtrx(self, spc_molar_cc_vec, kf_vec=None, kb_vec=None, alpha_lst=None, beta_lst=None):
-        """Partial derivative of the reaction rate law wrt parameters.
+    def dr_dtheta_mtrx(self, spc_molar_cc_vec,
+                      kf_vec=None, kb_vec=None, alpha_lst=None, beta_lst=None):
+        """Partial derivative of the reaction rate law vector wrt parameters.
 
         The parameters in the derivative are ordered as: k_fs, k_bs, alphas, betas.
+        If a parameter is `None`, it is not considered a varying parameter.
+        As of now parameter sensitivity is either on or off for all kf's , or k'bs, or alphas, or betas.
+        Maybe this can be extended for individual parameters later.
+
+        The matrix is m x p. Where m is the number of reactions, p is the total number of parameters.
+        That is, p = 2 * m + n_Ri + n_Pi, where n_Ri is the number of active reactant species, and
+        n_Pi is the number of active product species. If say, alpha_lst is not a varying parameter,
+        then n_Ri = 0.
         """
 
         assert isinstance(spc_molar_cc_vec, np.ndarray)
@@ -605,9 +614,9 @@ class ReactionMechanism:
                 dr_dk_f[idx, idx] = spc_cc_power_prod
 
             try:
-                drdtheta_mtrx = np.hstack([drdtheta_mtrx, dr_dk_f])
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, dr_dk_f])
             except NameError:
-                drdtheta_mtrx = np.hstack([dr_dk_f])
+                dr_dtheta_mtrx = np.hstack([dr_dk_f])
 
         # Partial r_vec partial kb matrix
         if kb_vec is not None:
@@ -625,9 +634,9 @@ class ReactionMechanism:
                 dr_dk_b[idx, idx] = - spc_cc_power_prod
 
             try:
-                drdtheta_mtrx = np.hstack([drdtheta_mtrx, dr_dk_b])
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, dr_dk_b])
             except NameError:
-                drdtheta_mtrx = np.hstack([dr_dk_b])
+                dr_dtheta_mtrx = np.hstack([dr_dk_b])
 
         # Partial r_vec partial alpha
         if alpha_lst is not None:
@@ -666,9 +675,9 @@ class ReactionMechanism:
             assert dr_dalpha_j0 == n_alphas, 'n_alphas = %r; sum = %r'%(n_alphas, dr_dalpha_j0 )
 
             try:
-                drdtheta_mtrx = np.hstack([drdtheta_mtrx, dr_dalpha])
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, dr_dalpha])
             except NameError:
-                drdtheta_mtrx = np.hstack([dr_dalpha])
+                dr_dtheta_mtrx = np.hstack([dr_dalpha])
 
         #print(' ')
         #print('begin here')
@@ -717,9 +726,9 @@ class ReactionMechanism:
             assert dr_dbeta_j0 == n_betas, 'n_betas = %r sum = %r'%(n_betas, dr_dbeta_j0)
 
             try:
-                drdtheta_mtrx = np.hstack([drdtheta_mtrx, dr_dbeta])
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, dr_dbeta])
             except NameError:
-                drdtheta_mtrx = np.hstack([dr_dbeta])
+                dr_dtheta_mtrx = np.hstack([dr_dbeta])
 
             #print('')
             #print('spc_molar_cc_vec =',spc_molar_cc_vec)
@@ -727,9 +736,125 @@ class ReactionMechanism:
             #np.set_printoptions(precision=5, linewidth=300)
             #print('dr_dbeta =\n',dr_dbeta)
 
-        #drdtheta_mtrx = np.hstack([dr_dk_f, dr_dk_b, dr_dalpha, dr_dbeta])
+        #dr_dtheta_mtrx = np.hstack([dr_dk_f, dr_dk_b, dr_dalpha, dr_dbeta])
 
-        return drdtheta_mtrx
+        return dr_dtheta_mtrx
+
+    def d2ri_theta2_mtrx(self, rxn_idx, spc_molar_cc_vec,
+                               kf_vec=None, kb_vec=None, alpha_lst=None, beta_lst=None):
+        """Second partial derivatives of the ith reaction rate law wrt parameters.
+
+        Only the forward case reaction case is implemented.
+
+        The parameters in the derivative are ordered as: k_fs, k_bs, alphas, betas.
+        The matrix is p x p. Where p is the total number of parameters.
+        That, is p = 2 * m + n_Ri + n_Pi, where n_Ri is the number of active reactant species, and
+        n_Pi is the number of active product species.
+        """
+
+        assert isinstance(rxn_idx, int)
+        assert rxn_idx <= len(self.reactions)
+
+        assert isinstance(spc_molar_cc_vec, np.ndarray)
+        assert spc_molar_cc_vec.size == len(self.species)
+        assert np.all(spc_molar_cc_vec>=0), 'spc_molar_cc_vec =\n%r'%spc_molar_cc_vec
+
+        assert kb_vec   is None
+        assert beta_lst is None
+
+        assert kf_vec   is not None
+        assert alpha_lst is not None
+
+        #---------------------------
+        # partial_kf(partial_kf r_i)
+        #---------------------------
+        d_kf_d_kf_ri_mtrx = np.zeros((len(self.reactions),len(self.reactions)), dtype=np.float64)
+
+        #------------------------------
+        # partial_alpha(partial_kf r_i)
+        #------------------------------
+        n_alphas = 0
+        for alpha_vec in alpha_lst:
+            #assert np.all(alpha_vec>=0), 'alpha_vec =\%r'%alpha_vec
+            n_alphas += alpha_vec.size
+
+        d_alpha_d_kf_ri_mtrx = np.zeros((len(self.reactions),n_alphas), dtype=np.float64)
+
+        jdx_start = 0
+        for (idx, rxn_data) in enumerate(self.data):  # loop to find the column index
+
+            if idx != rxn_idx:
+                jdx_start += alpha_lst[idx].size
+                continue
+
+            (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
+
+            reactants_molar_cc = spc_molar_cc_vec[reactants_ids]
+            assert reactants_molar_cc.size == alpha_lst[idx].size
+
+            spc_cc_power_prod = np.prod(reactants_molar_cc**alpha_lst[idx])
+
+            min_c_j = reactants_molar_cc.min()
+            if min_c_j <= 1e-25:
+                #print('min_c_j=',min_c_j)
+                (jdx, ) = np.where(reactants_molar_cc == min_c_j)
+                reactants_molar_cc[jdx] = 1.0 # any non-zero value will do since rb_i will be zero
+
+            for (jdx, c_j) in enumerate(reactants_molar_cc):
+                d_alpha_d_kf_ri_mtrx[idx, jdx_start+jdx] = math.log(c_j) * spc_cc_power_prod
+
+            jdx_start += alpha_lst[idx].size
+
+        assert jdx_start == n_alphas, 'n_alphas = %r; sum = %r'%(n_alphas, jdx_start )
+
+
+        hessian_ri_top = np.hstack([d_kf_d_kf_ri_mtrx, d_alpha_d_kf_ri_mtrx])
+
+
+        #---------------------------------
+        # partial_alpha(partial_alpha r_i)
+        #---------------------------------
+        d_alpha_d_alpha_ri_mtrx = np.zeros((n_alphas,n_alphas), dtype=np.float64)
+
+        jdx_start = 0
+        idx_start = 0
+        for (idx, rxn_data) in enumerate(self.data):
+
+            if idx != rxn_idx:
+                idx_start += alpha_lst[idx].size
+                jdx_start += alpha_lst[idx].size
+                continue
+
+            (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
+
+            reactants_molar_cc = spc_molar_cc_vec[reactants_ids]
+            assert reactants_molar_cc.size == alpha_lst[idx].size
+
+            spc_cc_power_prod = np.prod(reactants_molar_cc**alpha_lst[idx])
+
+            rf_i = kf_vec[idx] * spc_cc_power_prod
+
+            min_c_j = reactants_molar_cc.min()
+            if min_c_j <= 1e-25:
+                #print('min_c_j=',min_c_j)
+                (jdx, ) = np.where(reactants_molar_cc == min_c_j)
+                reactants_molar_cc[jdx] = 1.0 # any non-zero value will do since rb_i will be zero
+
+            for (Jdx, c_J) in enumerate(reactants_molar_cc):
+                for (jdx, c_j) in enumerate(reactants_molar_cc):
+                    d_alpha_d_alpha_ri_mtrx[idx_start+Jdx, jdx_start+jdx] = math.log(c_J) * math.log(c_j) * rf_i
+
+            idx_start += alpha_lst[idx].size
+            jdx_start += alpha_lst[idx].size
+
+
+        hessian_ri_bot = np.hstack([d_alpha_d_kf_ri_mtrx.transpose(), d_alpha_d_alpha_ri_mtrx])
+
+
+        hessian_ri = np.vstack([hessian_ri_top, hessian_ri_bot])
+
+
+        return hessian_ri
 
     def __get_ks(self):
         """Utility for returning packed kf and kb into vectors.
@@ -1044,6 +1169,9 @@ class ReactionMechanism:
 def print_reaction_sub_mechanisms(sub_mechanisms, mode=None, n_sub_mech=None):
     '''
     Nice printout of a scored reaction sub-mechanism list
+
+    Once the sub-mechanisms have been computed this function makes a printout.
+    Note: This is not a class method; just a helper function to the ReactionMechanism class.
 
     Parameters
     ----------
