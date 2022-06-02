@@ -687,13 +687,11 @@ class ReactionMechanism:
 
                 min_c_j = reactants_molar_cc.min()
                 if min_c_j <= 1e-25:
-                    #print('min_c_j=',min_c_j)
                     (jdx, ) = np.where(reactants_molar_cc == min_c_j)
-                    reactants_molar_cc[jdx] = 1.0 # any non-zero value will do since rb_i will be zero
+                    reactants_molar_cc[jdx] = 1.0 # any non-zero value will do since rf_i will be zero
 
                 for (jdx, c_j) in enumerate(reactants_molar_cc):
                     dr_dalpha[idx, dr_dalpha_j0+jdx] = math.log(c_j) * rf_i
-                    #dr_dalpha[idx, jdx] = math.log(c_j) * rf_i
 
                 dr_dalpha_j0 += alpha_lst[idx].size
 
@@ -1081,9 +1079,13 @@ class ReactionMechanism:
 
             hessian_ri = np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
 
-        # kfs, alphas and betas only case
-        elif kf_vec is not None and kb_vec is None and alpha_lst is not None and beta_lst is not None:
-            pass
+        # kfs and betas only case
+        elif kf_vec is not None and kb_vec is None and alpha_lst is None and beta_lst is not None:
+
+            hessian_ri_1st_row = np.hstack([d_kf_d_kf_ri_mtrx, d_beta_d_kf_ri_mtrx])
+            hessian_ri_2nd_row = np.hstack([d_beta_d_kf_ri_mtrx.transpose(), d_beta_d_beta_ri_mtrx])
+
+            hessian_ri = np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
 
         else:
             assert False, 'Hessian ri case not implemented.'
