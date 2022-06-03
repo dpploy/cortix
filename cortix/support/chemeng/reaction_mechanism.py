@@ -474,11 +474,11 @@ class ReactionMechanism:
 
         alpha_lst: list(numpy.ndarray)
         List of alpha power-law exponents as a vector ordered in the order of appearance of reactants
-        in the corresponding reaction. If not provided, it will be assembled internally.
+        in the corresponding reaction. If not provided, it will be assembled internally from `self.data`.
 
         beta_lst: list(numpy.ndarray)
         List of beta power-law exponents as a vector ordered in the order of appearance of products
-        in the corresponding reaction. If not provided, it will be assembled internally.
+        in the corresponding reaction. If not provided, it will be assembled internally from `self.data`.
         """
         assert isinstance(spc_molar_cc_vec, numpy.ndarray), 'type(spc_molar_cc_vec) = %r'%(type(spc_molar_cc_vec))
         assert spc_molar_cc_vec.size == len(self.species)
@@ -508,8 +508,8 @@ class ReactionMechanism:
             assert isinstance(beta_lst, list)
             assert len(beta_lst) == len(self.reactions)
             assert isinstance(beta_lst[0], np.ndarray)
-            for beta_vec in beta_lst:
-                assert np.all(beta_vec>=0)
+            #for beta_vec in beta_lst:
+            #    assert np.all(beta_vec>=0)
         else:
             (_, beta_lst) = self.__get_power_law_exponents()
 
@@ -595,7 +595,7 @@ class ReactionMechanism:
         The parameters in the derivative are ordered as: k_fs, k_bs, alphas, betas.
         If a parameter is `None`, it is not considered a varying parameter.
         As of now parameter sensitivity is either on or off for all kf's , or k'bs, or alphas, or betas.
-        Maybe this can be extended for individual parameters later.
+        Maybe this can be extended for individual reaction parameters later.
 
         The matrix is m x p. Where m is the number of reactions, p is the total number of parameters.
         That is, p = 2 * m + n_Ri + n_Pi, where n_Ri is the number of active reactant species, and
@@ -666,7 +666,7 @@ class ReactionMechanism:
                 #assert np.all(alpha_vec>=0), 'alpha_vec =\%r'%alpha_vec
                 n_alphas += alpha_vec.size
 
-            dr_dalpha = np.zeros((len(self.reactions),n_alphas), dtype=np.float64)
+            dr_dalpha = np.zeros((len(self.reactions), n_alphas), dtype=np.float64)
 
             if kf_vec is None:
                 (kf_vec_local, _) = self.__get_ks()
@@ -1052,6 +1052,11 @@ class ReactionMechanism:
 
             hessian_ri = np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
 
+        # kfs only case
+        elif kf_vec is not None and kb_vec is None and alpha_lst is None and beta_lst is None:
+
+            hessian_ri = d_kf_d_kf_ri_mtrx
+
         # k's and alphas only case
         elif kf_vec is not None and kb_vec is not None and alpha_lst is not None and beta_lst is None:
 
@@ -1087,6 +1092,14 @@ class ReactionMechanism:
 
             hessian_ri = np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
 
+        # kbs and alphas only case
+        elif kf_vec is None and kb_vec is not None and alpha_lst is not None and beta_lst is None:
+
+            hessian_ri_1st_row = np.hstack([d_kb_d_kb_ri_mtrx, d_alpha_d_kb_ri_mtrx])
+            hessian_ri_2nd_row = np.hstack([d_alpha_d_kb_ri_mtrx.transpose(), d_alpha_d_alpha_ri_mtrx])
+
+            hessian_ri = np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
+
         else:
             assert False, 'Hessian ri case not implemented.'
 
@@ -1094,6 +1107,8 @@ class ReactionMechanism:
 
     def __get_ks(self):
         """Utility for returning packed kf and kb into vectors.
+
+        Should this return the stoichiometric coefficients in case there is no data in `self.data`?
 
         Returns
         -------
@@ -1161,6 +1176,7 @@ class ReactionMechanism:
                     exponents.append(alpha[spc_name])
                 exponents = np.array(exponents)
             else:
+                assert False
                 exponents = -self.stoic_mtrx[idx, reactants_ids]
 
             alpha_lst.append(exponents)
@@ -1175,6 +1191,7 @@ class ReactionMechanism:
                     exponents.append(beta[spc_name])
                 exponents = np.array(exponents)
             else:
+                assert False
                 exponents = self.stoic_mtrx[idx, products_ids]
 
             beta_lst.append(exponents)
@@ -1209,7 +1226,9 @@ class ReactionMechanism:
                     for jdx,j in enumerate(reactants_ids):
                         spc_name = self.species_names[j]
                         alpha[spc_name] = exponents[jdx]
+                        assert spc_name in [spc.name for spc in np.array(self.species_names)[reactants_ids]]
                 else:
+                    assert False
                     exponents = -self.stoic_mtrx[idx, reactants_ids]
 
         if alpha_beta_pair[1] is not None:
@@ -1226,7 +1245,9 @@ class ReactionMechanism:
                     for jdx,j in enumerate(products_ids):
                         spc_name = self.species_names[j]
                         beta[spc_name] = exponents[jdx]
+                        assert spc_name in [spc.name for spc in np.array(self.species_names)[products_ids]]
                 else:
+                    assert False
                     exponents = self.stoic_mtrx[idx, products_ids]
     power_law_exponents = property(__get_power_law_exponents, __set_power_law_exponents, None, None)
 
