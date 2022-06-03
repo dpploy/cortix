@@ -707,7 +707,7 @@ class ReactionMechanism:
 
             n_betas = 0
             for beta_vec in beta_lst:
-                assert np.all(beta_vec>=0)
+                #assert np.all(beta_vec>=0)
                 n_betas += beta_vec.size
 
             dr_dbeta = np.zeros((len(self.reactions),n_betas), dtype=np.float64)
@@ -1226,7 +1226,7 @@ class ReactionMechanism:
                     for jdx,j in enumerate(reactants_ids):
                         spc_name = self.species_names[j]
                         alpha[spc_name] = exponents[jdx]
-                        assert spc_name in [spc.name for spc in np.array(self.species_names)[reactants_ids]]
+                        assert spc_name in [name for name in np.array(self.species_names)[reactants_ids]]
                 else:
                     assert False
                     exponents = -self.stoic_mtrx[idx, reactants_ids]
@@ -1245,7 +1245,7 @@ class ReactionMechanism:
                     for jdx,j in enumerate(products_ids):
                         spc_name = self.species_names[j]
                         beta[spc_name] = exponents[jdx]
-                        assert spc_name in [spc.name for spc in np.array(self.species_names)[products_ids]]
+                        assert spc_name in [name for name in np.array(self.species_names)[products_ids]]
                 else:
                     assert False
                     exponents = self.stoic_mtrx[idx, products_ids]
