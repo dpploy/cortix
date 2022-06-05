@@ -60,7 +60,7 @@ class ReactionMechanism:
                  reparam=False):
         """Module class constructor.
 
-        Returns data structures for a reaction mechanism. Namely, species list,
+        Build data structures for a reaction mechanism. Namely, species list,
         reactions list, data (equilibrium constant list, etc.), and stoichiometric matrix.
 
         Reaction mechanism format is as follows:
@@ -100,14 +100,22 @@ class ReactionMechanism:
         Parameters
         ----------
         file_name: str
-              Full path file name of the reaction mechanism file. If the reaction has an
-              equilibrium constant it will follow the reaction separated by a colon.
+            Full path file name of the reaction mechanism file. If the reaction has data
+            sucha as equilibrium constant or reaction rate constant, etc., it will follow the
+            reaction separated by a colon.
 
         mechanism: list(str)
-              List of reaction strings per above convention.
+            List of reaction strings per above convention. Alternative to information contained
+            in a file.
 
         order_species: bool
-              Alphabetically order the species names in the mechanism.
+            Alphabetically order the species names in the mechanism.
+
+        reparam: bool
+           Reparameterize the reaction rate parameters: all reaction rate constants and power-law
+           exponents using an exponential transformation: e.g. k_f = exp(k_f'). Now k_f' is the
+           actual parameter used in the reaction rate law. This way k_f is guaranteed to be positive
+           for any value of k_f'. The entire mechanism is affected.
 
         Examples
         --------
@@ -147,6 +155,8 @@ class ReactionMechanism:
         # Keep the original data internally for future use in sub-mechanisms
         # Remove header and comment lines
         self.__original_mechanism = list()
+
+        # First: read the data in the mechanism
 
         for m_i in mechanism:
 
@@ -200,7 +210,7 @@ class ReactionMechanism:
 
             self.data.append(tmp_dict)
 
-        # find species
+        # Second: find species
 
         species_tmp = list()  # temporary list for species
 
@@ -256,7 +266,7 @@ class ReactionMechanism:
             spc = Species(name=name, formula_name=name)
             self.species.append(spc)
 
-        # Build the stoichiometric matrix
+        # Third: build the stoichiometric matrix
 
         s_mtrx = np.zeros((len(self.reactions),len(self.species)), dtype=np.float64)
 
