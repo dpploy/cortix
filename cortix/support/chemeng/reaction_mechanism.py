@@ -5,6 +5,7 @@
 '''
 Suupport class for working with chemical reactions.
 '''
+import copy
 import math
 import numpy       # used in asserts
 import numpy as np
@@ -55,7 +56,8 @@ class ReactionMechanism:
         String containing the LaTeX typsetting of all reactions into the LaTeX `align` environment.
     """
 
-    def __init__(self, header='no-header', file_name=None, mechanism=None, order_species=True):
+    def __init__(self, header='no-header', file_name=None, mechanism=None, order_species=True,
+                 reparam=False):
         """Module class constructor.
 
         Returns data structures for a reaction mechanism. Namely, species list,
@@ -135,6 +137,10 @@ class ReactionMechanism:
 
             finput.close()
 
+        assert isinstance(reparam, bool)
+
+        self.reparam = reparam
+
         self.reactions = list()
         self.data = list()
 
@@ -175,12 +181,20 @@ class ReactionMechanism:
                         alpha_or_beta_dict = dict()
                         i = 0
                         for s in alpha_or_beta.split(','):
-                            alpha_or_beta_dict[i] = float(s.strip())
+                            if self.reparam:
+                                alpha_or_beta_dict[i] = math.log(float(s.strip()))
+                            else:
+                                alpha_or_beta_dict[i] = float(s.strip())
                             i += 1
                         tmp_dict[name] = alpha_or_beta_dict
                     # any other colon separated data
                     elif name == 'info':
                         tmp_dict[name] = val_str
+                    elif name == 'k_f' or name == 'k_b':
+                        if self.reparam:
+                            tmp_dict[name] = math.log(float(val_str))
+                        else:
+                            tmp_dict[name] = float(val_str)
                     else:
                         tmp_dict[name] = float(val_str)
 
@@ -341,22 +355,34 @@ class ReactionMechanism:
         # Fill-in missing k_f, k_b, alpha, and beta
         for idx,dat in enumerate(self.data):
             if 'k_f' not in dat.keys():
-                dat['k_f'] = 0.0
+                if self.reparam:
+                    dat['k_f'] = -1000 # math.log(0.0)
+                else:
+                    dat['k_f'] = 0.0
             if 'k_b' not in dat.keys():
-                dat['k_b'] = 0.0
+                if self.reparam:
+                    dat['k_b'] = -1000 # math.log(0.0)
+                else:
+                    dat['k_b'] = 0.0
             if 'alpha' not in dat.keys():
                 (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
                 tmp = dict()
                 for j in reactants_ids:
                     spc_name = self.species_names[j]
-                    tmp[spc_name] = abs(self.stoic_mtrx[idx,j])
+                    if self.reparam:
+                        tmp[spc_name] = math.log(abs(self.stoic_mtrx[idx,j]))
+                    else:
+                        tmp[spc_name] = abs(self.stoic_mtrx[idx,j])
                 dat['alpha'] = tmp
             if 'beta' not in dat.keys():
                 (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
                 tmp = dict()
                 for j in products_ids:
                     spc_name = self.species_names[j]
-                    tmp[spc_name] = abs(self.stoic_mtrx[idx,j])
+                    if self.reparam:
+                        tmp[spc_name] = math.log(abs(self.stoic_mtrx[idx,j]))
+                    else:
+                        tmp[spc_name] = abs(self.stoic_mtrx[idx,j])
                 dat['beta'] = tmp
 
         # Fill-in missing info
@@ -489,11 +515,17 @@ class ReactionMechanism:
         else:
             (kf_vec, _) = self.__get_ks()
 
+        if self.reparam:
+            kf_vec = np.exp(kf_vec)
+
         if kb_vec is not None:
             assert isinstance(kb_vec, np.ndarray), 'type(kb_vec)=%r'%(type(kb_vec))
             assert kb_vec.size == len(self.reactions)
         else:
             (_, kb_vec) = self.__get_ks()
+
+        if self.reparam:
+            kb_vec = np.exp(kb_vec)
 
         if alpha_lst is not None:
             assert isinstance(alpha_lst, list)
@@ -504,6 +536,11 @@ class ReactionMechanism:
         else:
             (alpha_lst, _) = self.__get_power_law_exponents()
 
+        if self.reparam:
+            alpha_lst = copy.deepcopy(alpha_lst)
+            for idx,alpha_vec in enumerate(alpha_lst):
+                alpha_lst[idx] = np.exp(alpha_vec)
+
         if beta_lst is not None:
             assert isinstance(beta_lst, list)
             assert len(beta_lst) == len(self.reactions)
@@ -512,6 +549,11 @@ class ReactionMechanism:
             #    assert np.all(beta_vec>=0)
         else:
             (_, beta_lst) = self.__get_power_law_exponents()
+
+        if self.reparam:
+            beta_lst = copy.deepcopy(beta_lst)
+            for idx,beta_vec in enumerate(beta_lst):
+                beta_lst[idx] = np.exp(beta_vec)
 
         # Compute the reaction rate density vector
         r_vec = np.zeros(len(self.reactions), dtype=np.float64)
@@ -610,10 +652,18 @@ class ReactionMechanism:
         # Partial r_vec partial kf matrix
         if kf_vec is not None:
 
+            if self.reparam:
+                kf_vec = np.exp(kf_vec)
+
             if alpha_lst is None:
                 (alpha_lst_local, _) = self.__get_power_law_exponents()
             else:
                 alpha_lst_local = alpha_lst
+
+            if self.reparam:
+                alpha_lst_local = copy.deepcopy(alpha_lst_local)
+                for idx,alpha_vec in enumerate(alpha_lst_local):
+                    alpha_lst_local[idx] = np.exp(alpha_vec)
 
             dr_dk_f = np.zeros((len(self.reactions),len(self.reactions)), dtype=np.float64)
 
@@ -626,7 +676,7 @@ class ReactionMechanism:
 
                 spc_cc_power_prod = np.prod(reactants_molar_cc**alpha_lst_local[idx])
 
-                dr_dk_f[idx, idx] = spc_cc_power_prod
+                dr_dk_f[idx, idx] = kf_vec[idx] * spc_cc_power_prod
 
             try:
                 dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, dr_dk_f])
@@ -636,10 +686,18 @@ class ReactionMechanism:
         # Partial r_vec partial kb matrix
         if kb_vec is not None:
 
+            if self.reparam:
+                kb_vec = np.exp(kb_vec)
+
             if beta_lst is None:
                 (_, beta_lst_local) = self.__get_power_law_exponents()
             else:
                 beta_lst_local = beta_lst
+
+            if self.reparam:
+                beta_lst_local = copy.deepcopy(beta_lst_local)
+                for idx,beta_vec in enumerate(beta_lst_local):
+                    beta_lst_local[idx] = np.exp(beta_vec)
 
             dr_dk_b = np.zeros((len(self.reactions),len(self.reactions)), dtype=np.float64)
 
@@ -651,8 +709,7 @@ class ReactionMechanism:
 
                 spc_cc_power_prod = np.prod(products_molar_cc**beta_lst_local[idx])
 
-                dr_dk_b[idx, idx] = - spc_cc_power_prod
-
+                dr_dk_b[idx, idx] = - kb_vec[idx] * spc_cc_power_prod
             try:
                 dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, dr_dk_b])
             except NameError:
@@ -666,6 +723,11 @@ class ReactionMechanism:
                 #assert np.all(alpha_vec>=0), 'alpha_vec =\%r'%alpha_vec
                 n_alphas += alpha_vec.size
 
+            if self.reparam:
+                alpha_lst = copy.deepcopy(alpha_lst)
+                for idx,alpha_vec in enumerate(alpha_lst):
+                    alpha_lst[idx] = np.exp(alpha_vec)
+
             dr_dalpha = np.zeros((len(self.reactions), n_alphas), dtype=np.float64)
 
             if kf_vec is None:
@@ -673,15 +735,20 @@ class ReactionMechanism:
             else:
                 kf_vec_local = kf_vec
 
+            if self.reparam:
+                kf_vec_local = np.exp(kf_vec_local)
+
             dr_dalpha_j0 = 0
             for (idx, rxn_data) in enumerate(self.data):
+
+                alpha_vec = alpha_lst[idx]
 
                 (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
 
                 reactants_molar_cc = spc_molar_cc_vec[reactants_ids]
                 assert reactants_molar_cc.size == alpha_lst[idx].size
 
-                spc_cc_power_prod = np.prod(reactants_molar_cc**alpha_lst[idx])
+                spc_cc_power_prod = np.prod(reactants_molar_cc**alpha_vec)
 
                 rf_i = kf_vec_local[idx] * spc_cc_power_prod
 
@@ -691,7 +758,10 @@ class ReactionMechanism:
                     reactants_molar_cc[jdx] = 1.0 # any non-zero value will do since rf_i will be zero
 
                 for (jdx, c_j) in enumerate(reactants_molar_cc):
-                    dr_dalpha[idx, dr_dalpha_j0+jdx] = math.log(c_j) * rf_i
+                    if self.reparam:
+                        dr_dalpha[idx, dr_dalpha_j0+jdx] = math.log(c_j) * alpha_vec[jdx] * rf_i
+                    else:
+                        dr_dalpha[idx, dr_dalpha_j0+jdx] = math.log(c_j) * rf_i
 
                 dr_dalpha_j0 += alpha_lst[idx].size
 
@@ -710,6 +780,11 @@ class ReactionMechanism:
                 #assert np.all(beta_vec>=0)
                 n_betas += beta_vec.size
 
+            if self.reparam:
+                beta_lst = copy.deepcopy(beta_lst)
+                for idx,beta_vec in enumerate(beta_lst):
+                    beta_lst[idx] = np.exp(beta_vec)
+
             dr_dbeta = np.zeros((len(self.reactions),n_betas), dtype=np.float64)
 
             if kb_vec is None:
@@ -717,18 +792,24 @@ class ReactionMechanism:
             else:
                 kb_vec_local = kb_vec
 
+            if self.reparam:
+                kb_vec_local = np.exp(kb_vec_local)
+
             dr_dbeta_j0 = 0
             for idx, rxn_data in enumerate(self.data):
                 #print('idx=',idx)
+
+                beta_vec = beta_lst[idx]
 
                 (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
 
                 products_molar_cc = spc_molar_cc_vec[products_ids]
                 #print('            products_molar_cc =',products_molar_cc)
 
-                spc_cc_power_prod = np.prod(products_molar_cc**beta_lst[idx])
+                spc_cc_power_prod = np.prod(products_molar_cc**beta_vec[idx])
 
                 rb_i = - kb_vec_local[idx] * spc_cc_power_prod
+
                 #print('            rb_i =',rb_i)
                 #print('            kb_vec[idx] = ',kb_vec[idx])
 
@@ -739,12 +820,146 @@ class ReactionMechanism:
                     products_molar_cc[jdx] = 1.0 # any non-zero value will do it since rb_i will be zero
 
                 for (jdx, c_j) in enumerate(products_molar_cc):
-                    dr_dbeta[idx, dr_dbeta_j0+jdx] = math.log(c_j) * rb_i
+                    if self.reparam:
+                        dr_dbeta[idx, dr_dbeta_j0+jdx] = math.log(c_j) * beta_vec[jdx] * rb_i
+                    else:
+                        dr_dbeta[idx, dr_dbeta_j0+jdx] = math.log(c_j) * rb_i
                     #dr_dbeta[idx, jdx] = math.log(c_j) * rb_i
 
                 dr_dbeta_j0 += beta_lst[idx].size
 
             assert dr_dbeta_j0 == n_betas, 'n_betas = %r sum = %r'%(n_betas, dr_dbeta_j0)
+
+            try:
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, dr_dbeta])
+            except NameError:
+                dr_dtheta_mtrx = np.hstack([dr_dbeta])
+
+        return dr_dtheta_mtrx
+
+    def dr_dtheta_mtrx_numerical(self, spc_molar_cc_vec,
+                      kf_vec=None, kb_vec=None, alpha_lst=None, beta_lst=None):
+        """Numerical partial derivative of the reaction rate law vector wrt parameters.
+
+        The parameters in the derivative are ordered as: k_fs, k_bs, alphas, betas.
+        If a parameter is `None`, it is not considered a varying parameter.
+        As of now parameter sensitivity is either on or off for all kf's , or k'bs, or alphas, or betas.
+        Maybe this can be extended for individual reaction parameters later.
+
+        The matrix is m x p. Where m is the number of reactions, p is the total number of parameters.
+        That is, p = 2 * m + n_Ri + n_Pi, where n_Ri is the number of active reactant species, and
+        n_Pi is the number of active product species. If say, alpha_lst is not a varying parameter,
+        then n_Ri = 0.
+        """
+
+        assert isinstance(spc_molar_cc_vec, np.ndarray)
+        assert spc_molar_cc_vec.size == len(self.species)
+        assert np.all(spc_molar_cc_vec>=0), 'spc_molar_cc_vec =\n%r'%spc_molar_cc_vec
+
+        assert False, 'FIXME'
+
+        h = 1e-6
+
+        # Partial r_vec partial kf matrix
+        if kf_vec is not None:
+
+            if alpha_lst is None:
+                (alpha_lst_local, _) = self.__get_power_law_exponents()
+            else:
+                alpha_lst_local = alpha_lst
+
+            dr_dk_f = np.zeros((len(self.reactions),len(self.reactions)), dtype=np.float64)
+            i_mtrx = np.eye(len(self.reactions), dtype=np.float64)
+
+            for jdx in range(len(self.data)):
+
+                r_vec_h = self.r_vec(spc_molar_cc_vec, kf_vec=kf_vec + h*i_mtrx[:,jdx], alpha_lst=alpha_lst_local)
+                r_vec = self.r_vec(spc_molar_cc_vec, kf_vec=kf_vec, alpha_lst=alpha_lst_local)
+
+                dr_dk_f[:,jdx] = (r_vec_h - r_vec) / h
+
+            try:
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, dr_dk_f])
+            except NameError:
+                dr_dtheta_mtrx = np.hstack([dr_dk_f])
+
+        # Partial r_vec partial kb matrix
+        if kb_vec is not None:
+
+            if beta_lst is None:
+                (_, beta_lst_local) = self.__get_power_law_exponents()
+            else:
+                beta_lst_local = beta_lst
+
+            dr_dk_b = np.zeros((len(self.reactions),len(self.reactions)), dtype=np.float64)
+            i_mtrx = np.eye(len(self.reactions), dtype=np.float64)
+
+            for jdx in range(len(self.data)):
+
+                r_vec_h = self.r_vec(spc_molar_cc_vec, kb_vec=kb_vec + h*i_mtrx[:,jdx], beta_lst=beta_lst_local)
+                r_vec = self.r_vec(spc_molar_cc_vec, kb_vec=kb_vec, beta_lst=beta_lst_local)
+
+                dr_dk_b[:,jdx] = (r_vec_h - r_vec) / h
+
+            try:
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, dr_dk_b])
+            except NameError:
+                dr_dtheta_mtrx = np.hstack([dr_dk_b])
+
+        # Partial r_vec partial alpha
+        if alpha_lst is not None:
+
+            n_alphas = 0
+            for alpha_vec in alpha_lst:
+                #assert np.all(alpha_vec>=0), 'alpha_vec =\%r'%alpha_vec
+                n_alphas += alpha_vec.size
+
+            dr_dalpha = np.zeros((len(self.reactions), n_alphas), dtype=np.float64)
+            i_mtrx = np.eye(n_alphas, dtype=np.float64)
+
+            if kf_vec is None:
+                (kf_vec_local, _) = self.__get_ks()
+            else:
+                kf_vec_local = kf_vec
+
+            for jdx in range(n_alphas):
+
+                assert False, 'FIXME'
+
+                r_vec_h = self.r_vec(spc_molar_cc_vec, alpha_lst=alpha_lst + h*i_mtrx[:,jdx], kf_vec=kf_vec_local)
+                r_vec = self.r_vec(spc_molar_cc_vec, alpha_lst=alpha_lst, kf_vec=kf_vec_local)
+
+                dr_dalpha[:,jdx] = (r_vec_h - r_vec) / h
+
+            try:
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, dr_dalpha])
+            except NameError:
+                dr_dtheta_mtrx = np.hstack([dr_dalpha])
+
+        # Partial r_vec partial beta
+        if beta_lst is not None:
+
+            n_betas = 0
+            for beta_vec in beta_lst:
+                #assert np.all(beta_vec>=0)
+                n_betas += beta_vec.size
+
+            dr_dbeta = np.zeros((len(self.reactions),n_betas), dtype=np.float64)
+            i_mtrx = np.eye(n_betas, dtype=np.float64)
+
+            if kb_vec is None:
+                (_, kb_vec_local) = self.__get_ks()
+            else:
+                kb_vec_local = kb_vec
+
+            for jdx in range(n_betas):
+
+                assert False, 'FIXME'
+
+                r_vec_h = self.r_vec(spc_molar_cc_vec, beta_lst=beta_lst + h*i_mtrx[:,jdx], kb_vec=kb_vec_local)
+                r_vec = self.r_vec(spc_molar_cc_vec, beta_lst=beta_lst, kb_vec=kb_vec_local)
+
+                dr_dbeta[:,jdx] = (r_vec_h - r_vec) / h
 
             try:
                 dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, dr_dbeta])
@@ -782,6 +997,30 @@ class ReactionMechanism:
 
             d_kf_d_kf_ri_mtrx = np.zeros((len(self.reactions),len(self.reactions)), dtype=np.float64)
 
+            if self.reparam:
+
+                if alpha_lst is None:
+                    (alpha_lst_local, _) = self.__get_power_law_exponents()
+                else:
+                    alpha_lst_local = alpha_lst
+
+                alpha_lst_local = copy.deepcopy(alpha_lst_local)
+                for idx,alpha_vec in enumerate(alpha_lst_local):
+                    alpha_lst_local[idx] = np.exp(alpha_vec)
+
+                kf_vec = np.exp(kf_vec)
+
+                for (idx, rxn_data) in enumerate(self.data):
+
+                    (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
+
+                    reactants_molar_cc = spc_molar_cc_vec[reactants_ids]
+                    #assert reactants_molar_cc.size == alpha_lst_local[idx].size
+
+                    spc_cc_power_prod = np.prod(reactants_molar_cc**alpha_lst_local[idx])
+
+                    d_kf_d_kf_ri_mtrx[idx, idx] = kf_vec[idx] * spc_cc_power_prod
+
         #---------------------------
         # partial_kb(partial_kf r_i)
         #---------------------------
@@ -801,6 +1040,14 @@ class ReactionMechanism:
 
             d_alpha_d_kf_ri_mtrx = np.zeros((len(self.reactions),n_alphas), dtype=np.float64)
 
+            if self.reparam:
+                alpha_lst = copy.deepcopy(alpha_lst)
+                for idx,alpha_vec in enumerate(alpha_lst):
+                    alpha_lst[idx] = np.exp(alpha_vec)
+
+            if self.reparam:
+                kf_vec = np.exp(kf_vec)
+
             jdx_start = 0
             for (idx, rxn_data) in enumerate(self.data):  # loop to find the column index
 
@@ -808,12 +1055,14 @@ class ReactionMechanism:
                     jdx_start += alpha_lst[idx].size
                     continue
 
+                alpha_vec = alpha_lst[idx]
+
                 (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
 
                 reactants_molar_cc = spc_molar_cc_vec[reactants_ids]
-                assert reactants_molar_cc.size == alpha_lst[idx].size
+                assert reactants_molar_cc.size == alpha_vec.size
 
-                spc_cc_power_prod = np.prod(reactants_molar_cc**alpha_lst[idx])
+                spc_cc_power_prod = np.prod(reactants_molar_cc**alpha_vec)
 
                 min_c_j = reactants_molar_cc.min()
                 if min_c_j <= 1e-25:
@@ -822,9 +1071,13 @@ class ReactionMechanism:
                     reactants_molar_cc[jdx] = 1.0 # any non-zero value will do since rb_i will be zero
 
                 for (jdx, c_j) in enumerate(reactants_molar_cc):
-                    d_alpha_d_kf_ri_mtrx[idx, jdx_start+jdx] = math.log(c_j) * spc_cc_power_prod
 
-                jdx_start += alpha_lst[idx].size
+                    if self.reparam:
+                        d_alpha_d_kf_ri_mtrx[idx, jdx_start+jdx] = kf_vec[idx] * math.log(c_j) * alpha_vec[jdx] * spc_cc_power_prod
+                    else:
+                        d_alpha_d_kf_ri_mtrx[idx, jdx_start+jdx] = math.log(c_j) * spc_cc_power_prod
+
+                jdx_start += alpha_vec.size
 
             assert jdx_start == n_alphas, 'n_alphas = %r; sum = %r'%(n_alphas, jdx_start )
 
@@ -850,6 +1103,29 @@ class ReactionMechanism:
 
             d_kb_d_kb_ri_mtrx = np.zeros((len(self.reactions),len(self.reactions)), dtype=np.float64)
 
+            if self.reparam:
+
+                if beta_lst is None:
+                    (_, beta_lst_local) = self.__get_power_law_exponents()
+                else:
+                    beta_lst_local = beta_lst
+
+                beta_lst_local = copy.deepcopy(beta_lst_local)
+                for idx,beta_vec in enumerate(beta_lst_local):
+                    beta_lst_local[idx] = np.exp(beta_vec)
+
+                kb_vec = np.exp(kb_vec)
+
+                for idx, rxn_data in enumerate(self.data):
+
+                    (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
+
+                    products_molar_cc = spc_molar_cc_vec[products_ids]
+
+                    spc_cc_power_prod = np.prod(products_molar_cc**beta_lst_local[idx])
+
+                    d_kb_d_kb_ri_mtrx[idx, idx] = - kb_vec[idx] * spc_cc_power_prod
+
         #------------------------------
         # partial_alpha(partial_kb r_i)
         #------------------------------
@@ -874,6 +1150,14 @@ class ReactionMechanism:
 
             d_beta_d_kb_ri_mtrx = np.zeros((len(self.reactions),n_betas), dtype=np.float64)
 
+            if self.reparam:
+                beta_lst = copy.deepcopy(beta_lst)
+                for idx,beta_vec in enumerate(beta_lst):
+                    beta_lst[idx] = np.exp(beta_vec)
+
+            if self.reparam:
+                kb_vec = np.exp(kb_vec)
+
             jdx_start = 0
             for (idx, rxn_data) in enumerate(self.data):  # loop to find the column index
 
@@ -881,12 +1165,14 @@ class ReactionMechanism:
                     jdx_start += beta_lst[idx].size
                     continue
 
+                beta_vec = beta_lst[idx]
+
                 (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
 
                 products_molar_cc = spc_molar_cc_vec[products_ids]
-                assert products_molar_cc.size == beta_lst[idx].size
+                assert products_molar_cc.size == beta_vec.size
 
-                spc_cc_power_prod = np.prod(products_molar_cc**beta_lst[idx])
+                spc_cc_power_prod = np.prod(products_molar_cc**beta_vec)
 
                 min_c_j = products_molar_cc.min()
                 if min_c_j <= 1e-25:
@@ -895,11 +1181,15 @@ class ReactionMechanism:
                     products_molar_cc[jdx] = 1.0 # any non-zero value will do since rb_i will be zero
 
                 for (jdx, c_j) in enumerate(products_molar_cc):
-                    d_beta_d_kb_ri_mtrx[idx, jdx_start+jdx] = math.log(c_j) * spc_cc_power_prod
+
+                    if self.reparam:
+                        d_beta_d_kb_ri_mtrx[idx, jdx_start+jdx] = kb_vec[idx] * math.log(c_j) * beta_vec[jdx] * spc_cc_power_prod
+                    else:
+                        d_beta_d_kb_ri_mtrx[idx, jdx_start+jdx] = math.log(c_j) * spc_cc_power_prod
 
                 jdx_start += beta_lst[idx].size
 
-            assert jdx_start == n_betas, 'n_betas = %r; sum = %r'%(n_betas, jdx_start )
+            assert jdx_start == n_betas, 'n_betas = %r; sum = %r'%(n_betas, jdx_start)
 
         #*******************************************************************************************
         # 3rd row block
@@ -916,10 +1206,18 @@ class ReactionMechanism:
 
             d_alpha_d_alpha_ri_mtrx = np.zeros((n_alphas,n_alphas), dtype=np.float64)
 
+            if self.reparam:
+                alpha_lst = copy.deepcopy(alpha_lst)
+                for idx,alpha_vec in enumerate(alpha_lst):
+                    alpha_lst[idx] = np.exp(alpha_vec)
+
             if kf_vec is None:
                 (kf_vec_local, _) = self.__get_ks()
             else:
                 kf_vec_local = kf_vec
+
+            if self.reparam:
+                kf_vec_local = np.exp(kf_vec_local)
 
             jdx_start = 0
             idx_start = 0
@@ -930,12 +1228,14 @@ class ReactionMechanism:
                     jdx_start += alpha_lst[idx].size
                     continue
 
+                alpha_vec = alpha_lst[idx]
+
                 (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
 
                 reactants_molar_cc = spc_molar_cc_vec[reactants_ids]
-                assert reactants_molar_cc.size == alpha_lst[idx].size
+                assert reactants_molar_cc.size == alpha_vec.size
 
-                spc_cc_power_prod = np.prod(reactants_molar_cc**alpha_lst[idx])
+                spc_cc_power_prod = np.prod(reactants_molar_cc**alpha_vec)
 
                 rf_i = kf_vec_local[idx] * spc_cc_power_prod
 
@@ -947,7 +1247,11 @@ class ReactionMechanism:
 
                 for (Jdx, c_J) in enumerate(reactants_molar_cc):
                     for (jdx, c_j) in enumerate(reactants_molar_cc):
-                        d_alpha_d_alpha_ri_mtrx[idx_start+Jdx, jdx_start+jdx] = math.log(c_J) * math.log(c_j) * rf_i
+
+                        if self.reparam:
+                            d_alpha_d_alpha_ri_mtrx[idx_start+Jdx, jdx_start+jdx] = math.log(c_J) * math.log(c_j) * alpha_vec[idx] * alpha_vec[jdx] * rf_i
+                        else:
+                            d_alpha_d_alpha_ri_mtrx[idx_start+Jdx, jdx_start+jdx] = math.log(c_J) * math.log(c_j) * rf_i
 
                 idx_start += alpha_lst[idx].size
                 jdx_start += alpha_lst[idx].size
@@ -984,10 +1288,18 @@ class ReactionMechanism:
 
             d_beta_d_beta_ri_mtrx = np.zeros((n_betas,n_betas), dtype=np.float64)
 
+            if self.reparam:
+                beta_lst = copy.deepcopy(beta_lst)
+                for idx,beta_vec in enumerate(beta_lst):
+                    beta_lst[idx] = np.exp(beta_vec)
+
             if kb_vec is None:
                 (_, kb_vec_local) = self.__get_ks()
             else:
                 kb_vec_local = kb_vec
+
+            if self.reparam:
+                kb_vec_local = np.exp(kb_vec_local)
 
             jdx_start = 0
             idx_start = 0
@@ -998,12 +1310,14 @@ class ReactionMechanism:
                     jdx_start += beta_lst[idx].size
                     continue
 
+                beta_vec = beta_lst[idx]
+
                 (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
 
                 products_molar_cc = spc_molar_cc_vec[products_ids]
-                assert products_molar_cc.size == beta_lst[idx].size
+                assert products_molar_cc.size == beta_vec.size
 
-                spc_cc_power_prod = np.prod(products_molar_cc**beta_lst[idx])
+                spc_cc_power_prod = np.prod(products_molar_cc**beta_vec)
 
                 rb_i = - kb_vec_local[idx] * spc_cc_power_prod
 
@@ -1015,7 +1329,11 @@ class ReactionMechanism:
 
                 for (Jdx, c_J) in enumerate(products_molar_cc):
                     for (jdx, c_j) in enumerate(products_molar_cc):
-                        d_beta_d_beta_ri_mtrx[idx_start+Jdx, jdx_start+jdx] = math.log(c_J) * math.log(c_j) * rb_i
+
+                        if self.reparam:
+                            d_beta_d_beta_ri_mtrx[idx_start+Jdx, jdx_start+jdx] = math.log(c_J) * math.log(c_j) * beta_vec[idx] * beta_vec[jdx] * rb_i
+                        else:
+                            d_beta_d_beta_ri_mtrx[idx_start+Jdx, jdx_start+jdx] = math.log(c_J) * math.log(c_j) * rb_i
 
                 idx_start += beta_lst[idx].size
                 jdx_start += beta_lst[idx].size
