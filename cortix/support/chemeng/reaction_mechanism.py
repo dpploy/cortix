@@ -196,6 +196,8 @@ class ReactionMechanism:
                             val = float(val_s.strip())
                             if self.reparam and val != 0.0:
                                 alpha_or_beta_dict[i] = math.log(val)
+                            elif val == 0:
+                                alpha_or_beta_dict[i] = -9999  # internal flag for inactive species
                             else:
                                 alpha_or_beta_dict[i] = val
                             i += 1
@@ -1509,7 +1511,7 @@ class ReactionMechanism:
 
         The return from this method is a pair of unstructured data since each reaction typically has
         a different number of species, hence different number of associated power-law exponents.
-        The order of the vectors folows the ordering of (active) species ids involved in the reaction side.
+        The ids of the active species are passed in the first row of the matrices.
 
         Returns
         -------
@@ -1530,7 +1532,7 @@ class ReactionMechanism:
                 for j in reactants_ids:
                     spc_name = self.species_names[j]
                     alpha = alpha_dict[spc_name]
-                    if alpha != 0: # exclude inactive species flagged with 0
+                    if alpha != -9999: # exclude inactive species
                         active_reactants_ids.append(j)
                         exponents.append(alpha_dict[spc_name])
 
@@ -1551,7 +1553,7 @@ class ReactionMechanism:
                 for j in products_ids:
                     spc_name = self.species_names[j]
                     beta = beta_dict[spc_name]
-                    if beta != 0: # exclude inactive species flagged with 0
+                    if beta != -99999: # exclude inactive species
                         active_products_ids.append(j)
                         exponents.append(beta_dict[spc_name])
 
@@ -1567,7 +1569,9 @@ class ReactionMechanism:
     def __set_power_law_exponents(self, alpha_beta_pair):
         """Utility for setting alpha and beta from packed vectors.
 
-        The alpha and vector lists of vectors must be ordered both in reactions and reactants and products.
+        The alpha and vector lists of matrices with values for the exponents and corresponding active
+        species ids. Note that this will change the internal data of the object including inactive
+        species if the user intends to.
 
         Parameters
         ----------
@@ -1584,8 +1588,6 @@ class ReactionMechanism:
             alpha_lst = alpha_beta_pair[0]
 
             for idx, rxn_data in enumerate(self.data):
-
-                #(reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
 
                 if 'alpha' in rxn_data.keys():
                     alpha_dict = rxn_data['alpha']
@@ -1604,8 +1606,6 @@ class ReactionMechanism:
             beta_lst = alpha_beta_pair[1]
 
             for idx, rxn_data in enumerate(self.data):
-
-                (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
 
                 if 'beta' in rxn_data.keys():
                     beta_dict = rxn_data['beta']
