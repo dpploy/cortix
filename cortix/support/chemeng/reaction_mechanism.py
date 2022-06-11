@@ -1553,7 +1553,7 @@ class ReactionMechanism:
                 for j in products_ids:
                     spc_name = self.species_names[j]
                     beta = beta_dict[spc_name]
-                    if beta != -99999: # exclude inactive species
+                    if beta != -9999: # exclude inactive species
                         active_products_ids.append(j)
                         exponents.append(beta_dict[spc_name])
 
