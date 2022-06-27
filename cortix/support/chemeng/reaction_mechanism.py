@@ -579,6 +579,15 @@ class ReactionMechanism:
 
             reactants_molar_cc = spc_molar_cc_vec[reactants_ids] # must be oredered as in rxn_mech
 
+            '''
+            print('')
+            print('kf_vec[idx] =', kf_vec[idx])
+            print('reactants_molar_cc =', reactants_molar_cc)
+            print('alpha_mtrx[1,:] =', alpha_mtrx[1,:])
+            print('reactants ids =',reactants_ids)
+            print('reactants spc =',[self.species_names[i] for i in reactants_ids])
+            '''
+            reactants_molar_cc[reactants_molar_cc<0] = 0.0
             r_vec[idx] = kf_vec[idx] * np.prod(reactants_molar_cc**alpha_mtrx[1,:])
 
         for (idx, rxn_data) in enumerate(self.data):
@@ -1659,7 +1668,7 @@ class ReactionMechanism:
                 for idx in idxs:
                     mechanism.append(self.__original_mechanism[idx])
 
-                rxn_mech = ReactionMechanism(mechanism=mechanism, order_species=True)
+                rxn_mech = ReactionMechanism(mechanism=mechanism, order_species=True, reparam=self.reparam)
 
                 assert np.linalg.matrix_rank(rxn_mech.stoic_mtrx) == s_rank
 

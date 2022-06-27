@@ -383,12 +383,15 @@ class Species:
 
         Examples that can be handled by the code below:
 
-            *OH^-:              * for radical, ^ for charged species
-            [CH2]3OH*^2-(a):    [] for groups of atoms
-            H2O2(v):            () for phase
+            *OH^-               * for radical, ^ for charged species
+            [CH2]3OH*^2-(a)     [] for groups of atoms
+            H2O2(v)             () for phase
+
+        Limitation to formulas with a maximum numeric value of 9.
+        Unfinished.
 
         This is useful for automating the creation of a species list of atoms, say from a
-        reaction mechanism. Important, to copy and paste this into a LaTeX document, first
+        reaction mechanism. Important: to copy and paste the result into a LaTeX document, first
         had Python `print` the string and then copy the string. To use in a Jupyter notebook with
         markdown cells, again, print using a code cell and copy the output into a markdown cell.
         To use under LaTex, either enclose in $$ or drop it into a LaTex environment.
@@ -400,16 +403,26 @@ class Species:
         formula_name = self.formula_name.strip()
 
         open_parenthesis = False
+        open_parenthesis_after_numeric = False
 
         for idx, c_i in enumerate(formula_name):
 
             if c_i == '(':
                 open_parenthesis = True
-                latex_name += r'_\mathrm{(' # escape \
+                if formula_name[idx-1].isnumeric():
+                    latex_name += r'_{\mathrm{(' # escape \
+                    open_parenthesis_after_numeric = True
+                else:
+                    latex_name += r'_\mathrm{(' # escape \
                 continue
-            elif c_i == ')':
+
+            if c_i == ')':
+                if open_parenthesis_after_numeric:
+                    latex_name += ')}}}'
+                    open_parenthesis_after_numeric = False
+                else:
+                    latex_name += ')}'
                 open_parenthesis = False
-                latex_name += ')}'
                 continue
 
             if not open_parenthesis:
@@ -419,23 +432,32 @@ class Species:
                     continue
 
                 if c_i == '^':
-                    if formula_name[idx+1].isnumeric():
+                    assert idx < len(formula_name)-1, 'Error on %r'%formula_name
+                    if formula_name[idx+1].isnumeric(): # there must be a charge sign
                         latex_name += '^{' + formula_name[idx+1:idx+3] + '}'
-                    else:
+                    else: # no numeric, hence just a charge sign
                         latex_name += '^' + formula_name[idx+1]
                     continue
 
-                if c_i.isalpha():
-                    latex_name += r'\mathrm{'+c_i+'}'
+                if c_i.isalpha(): # alphabetic
+                    latex_name += r'\mathrm{' + c_i + '}'
+                    continue
 
-                if c_i.isnumeric() and formula_name[idx-1].isalpha():
+                if idx < len(formula_name)-1:
+                    if c_i.isnumeric() and formula_name[idx-1].isalpha() and formula_name[idx+1] != '(':
+                        latex_name += '_{' + c_i + '}'
+                    elif c_i.isnumeric() and formula_name[idx-1].isalpha() and formula_name[idx+1] == '(':
+                        latex_name += '_{' + c_i
+                    continue
+
+                if c_i.isnumeric(): # numeric
                     latex_name += '_{' + c_i + '}'
                     continue
 
-                if c_i == '[' or c_i == ']':
+                if c_i in ['[', ']']:
                     assert False, 'fatal: "[]" not implemented yet.' #TODO
 
-            else:
+            else: # phase token
                 latex_name += c_i
 
 
