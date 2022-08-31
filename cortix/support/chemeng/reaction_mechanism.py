@@ -829,7 +829,7 @@ class ReactionMechanism:
                     else:
                         dr_dbeta[idx, dr_dbeta_j0+jdx] = math.log(c_j) * rb_i
 
-                dr_dbeta_j0 += beta_lst[idx].size
+                dr_dbeta_j0 += beta_mtrx.shape[1]
 
             assert dr_dbeta_j0 == n_betas, 'n_betas = %r sum = %r'%(n_betas, dr_dbeta_j0)
 
@@ -1187,7 +1187,7 @@ class ReactionMechanism:
                     else:
                         d_beta_d_kb_ri_mtrx[idx, jdx_start+jdx] = math.log(c_j) * spc_cc_power_prod
 
-                jdx_start += beta_lst[idx].size
+                jdx_start += beta_mtrx.shape[1]
 
             assert jdx_start == n_betas, 'n_betas = %r; sum = %r'%(n_betas, jdx_start)
 
