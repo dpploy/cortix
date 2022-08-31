@@ -48,10 +48,10 @@ class FuelSlug:
 #*********************************************************************************
 
     def __init__(self,
-                 specs=pandas.Series(),
+                 specs = pandas.Series(),
                  fuelPhase = Phase(),
-                 claddingPhase=Phase()
-                 ):
+                 claddingPhase = Phase()
+                ):
 
         assert isinstance(specs, pandas.Series), 'fatal.'
         assert isinstance(fuelPhase, Phase), 'fatal.'

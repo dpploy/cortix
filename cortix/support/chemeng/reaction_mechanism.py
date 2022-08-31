@@ -15,7 +15,7 @@ import random
 from cortix.support.species import Species
 
 class ReactionMechanism:
-    """Chemical reaction mechanism.
+    '''Chemical reaction mechanism.
     Quantites and services: stoichiometric matrix, mass conservation, reaction rate density vector,
     species production rate density vector.
 
@@ -54,11 +54,11 @@ class ReactionMechanism:
 
     latex_rxn: str
         String containing the LaTeX typsetting of all reactions into the LaTeX `align` environment.
-    """
+    '''
 
     def __init__(self, header='no-header', file_name=None, mechanism=None, order_species=True,
                  reparam=False):
-        """Module class constructor.
+        '''Module class constructor.
 
         Build data structures for a reaction mechanism. Namely, species list,
         reactions list, data (equilibrium constant list, etc.), and stoichiometric matrix.
@@ -120,7 +120,7 @@ class ReactionMechanism:
         Examples
         --------
 
-       """
+       '''
 
         assert file_name is not None or mechanism is not None
         assert isinstance(header, str)
@@ -407,14 +407,14 @@ class ReactionMechanism:
                 dat['info'] = 'no-info'
 
     def mass_balance_residuals(self):
-        """Reaction mass balance residual vector.
+        '''Reaction mass balance residual vector.
 
         Returns
         -------
 
         mb_residual_vec: numpy.ndarray
             1D vector of mass balance residuals for each reaction.
-        """
+        '''
 
         m_vec = np.zeros(len(self.species), dtype=np.float64)
 
@@ -428,35 +428,35 @@ class ReactionMechanism:
         return mb_residual_vec
 
     def max_mass_balance_residual(self):
-        """Compute the maximum magnitude reaction mass balance residual.
+        '''Compute the maximum magnitude reaction mass balance residual.
 
         Returns
         -------
 
         max(abs(mb): float
 
-        """
+        '''
 
         mb_residual_vec = self.mass_balance_residuals()
 
         return np.max(np.abs(mb_residual_vec))
 
     def is_mass_conserved(self, tol=1e-10):
-        """Check mass conservation if species have a molar mass value.
+        '''Check mass conservation if species have a molar mass value.
 
         Returns
         -------
 
         bool
 
-        """
+        '''
 
         residual = self.max_mass_balance_residual()
 
         return True if residual < tol else False
 
     def rank_analysis(self, verbose=False, tol=1e-8):
-        """Compute the rank of the stoichiometric matrix.
+        '''Compute the rank of the stoichiometric matrix.
 
         This will establish rank deficiency.
 
@@ -470,7 +470,7 @@ class ReactionMechanism:
         -------
 
         rank: int
-        """
+        '''
 
         #assert self.is_mass_conserved(tol), 'fatal: mass conservation failed'
 
@@ -499,7 +499,7 @@ class ReactionMechanism:
         return s_rank
 
     def r_vec(self, spc_molar_cc_vec, kf_vec=None, kb_vec=None, alpha_lst=None, beta_lst=None):
-        """Compute the reaction rate density vector.
+        '''Compute the reaction rate density vector.
 
         Parameters
         ----------
@@ -521,7 +521,7 @@ class ReactionMechanism:
         beta_lst: list(numpy.ndarray)
         List of beta power-law exponents as a matrix containing the product species ids.
         If not provided, it will be assembled internally from `self.data`.
-        """
+        '''
         assert isinstance(spc_molar_cc_vec, numpy.ndarray), 'type(spc_molar_cc_vec) = %r'%(type(spc_molar_cc_vec))
         assert spc_molar_cc_vec.size == len(self.species)
 
@@ -602,34 +602,34 @@ class ReactionMechanism:
         return r_vec
 
     def rxn_rate_law(self, spc_molar_cc_vec, kf_vec=None, kb_vec=None, alpha_lst=None, beta_lst=None):
-        """See r_vec.
-        """
+        '''See r_vec.
+        '''
 
         return self.r_vec(spc_molar_cc_vec, kf_vec, kb_vec, alpha_lst, beta_lst)
 
     def g_vec(self, spc_molar_cc_vec, kf_vec=None, kb_vec=None, alpha_lst=None, beta_lst=None):
-        """Compute the species production rate density vector.
+        '''Compute the species production rate density vector.
 
         Parameters:
         -----------
-        """
+        '''
 
         g_vec = self.stoic_mtrx.transpose() @ self.r_vec(spc_molar_cc_vec, kf_vec, kb_vec, alpha_lst, beta_lst)
 
         return g_vec
 
     def species_prod_rate_dens(self, spc_molar_cc_vec, kf_vec=None, kb_vec=None, alpha_lst=None, beta_lst=None):
-        """Compute the species production rate density vector.
+        '''Compute the species production rate density vector.
 
         Parameters:
         -----------
-        """
+        '''
 
         return self.g_vec(spc_molar_cc_vec, kf_vec, kb_vec, alpha_lst, beta_lst)
 
     def dr_dtheta_mtrx(self, spc_molar_cc_vec,
                       kf_vec=None, kb_vec=None, alpha_lst=None, beta_lst=None):
-        """Partial derivative of the reaction rate law vector wrt parameters.
+        '''Partial derivative of the reaction rate law vector wrt parameters.
 
         The parameters in the derivative are ordered as: k_fs, k_bs, alphas, betas.
         If a parameter is `None`, it indicates that it is not to be considered a varying parameter.
@@ -640,7 +640,7 @@ class ReactionMechanism:
         That is, p = 2 * m + n_Ri + n_Pi, where n_Ri is the number of active reactant species, and
         n_Pi is the number of active product species. If say, alpha_lst is not a varying parameter,
         then n_Ri = 0.
-        """
+        '''
 
         assert isinstance(spc_molar_cc_vec, np.ndarray)
         assert spc_molar_cc_vec.size == len(self.species)
@@ -843,7 +843,7 @@ class ReactionMechanism:
     def dr_dtheta_mtrx_numerical(self, spc_molar_cc_vec,
                       kf_vec=None, kb_vec=None, alpha_lst=None, beta_lst=None,
                       h_small=1e-6):
-        """Numerical partial derivative of the reaction rate law vector wrt parameters.
+        '''Numerical partial derivative of the reaction rate law vector wrt parameters.
 
         The parameters in the derivative are ordered as: k_fs, k_bs, alphas, betas.
         If a parameter is `None`, it is not considered a varying parameter.
@@ -854,7 +854,7 @@ class ReactionMechanism:
         That is, p = 2 * m + n_Ri + n_Pi, where n_Ri is the number of active reactant species, and
         n_Pi is the number of active product species. If say, alpha_lst is not a varying parameter,
         then n_Ri = 0.
-        """
+        '''
 
         assert isinstance(spc_molar_cc_vec, np.ndarray)
         assert spc_molar_cc_vec.size == len(self.species)
@@ -977,7 +977,7 @@ class ReactionMechanism:
 
     def d2ri_theta2_mtrx(self, rxn_idx, spc_molar_cc_vec,
                                kf_vec=None, kb_vec=None, alpha_lst=None, beta_lst=None):
-        """Second partial derivatives of the ith reaction rate law wrt parameters.
+        '''Second partial derivatives of the ith reaction rate law wrt parameters.
 
         Only the forward case reaction case is implemented.
 
@@ -985,7 +985,7 @@ class ReactionMechanism:
         The matrix is p x p. Where p is the total number of parameters.
         That, is p = 2 * m + n_Ri + n_Pi, where n_Ri is the number of active reactant species, and
         n_Pi is the number of active product species.
-        """
+        '''
 
         assert isinstance(rxn_idx, int)
         assert rxn_idx <= len(self.reactions)
@@ -1416,14 +1416,14 @@ class ReactionMechanism:
         return hessian_ri
 
     def __get_kf(self):
-        """Utility for returning a packed kf vector.
+        '''Utility for returning a packed kf vector.
 
         Should this return the stoichiometric coefficients in case there is no data in `self.data`?
 
         Returns
         -------
         kf_vec: numpy.ndarray
-        """
+        '''
 
         kf_vec = np.zeros(len(self.reactions), dtype=np.float64)
 
@@ -1432,7 +1432,7 @@ class ReactionMechanism:
 
         return kf_vec
     def __set_kf(self, kf_vec):
-        """Utility for setting kf from packed vectors.
+        '''Utility for setting kf from packed vectors.
 
         Parameters
         ----------
@@ -1440,7 +1440,7 @@ class ReactionMechanism:
 
         Returns
         -------
-        """
+        '''
 
         assert isinstance(kf_vec, numpy.ndarray)
         assert kf_vec.size == len(self.reactions)
@@ -1450,14 +1450,14 @@ class ReactionMechanism:
     kf = property(__get_kf, __set_kf, None, None)
 
     def __get_kb(self):
-        """Utility for returning a packed kb vector.
+        '''Utility for returning a packed kb vector.
 
         Should this return the stoichiometric coefficients in case there is no data in `self.data`?
 
         Returns
         -------
         kb_vec: numpy.ndarray
-        """
+        '''
 
         kb_vec = np.zeros(len(self.reactions), dtype=np.float64)
 
@@ -1466,7 +1466,7 @@ class ReactionMechanism:
 
         return kb_vec
     def __set_kb(self, kb_vec):
-        """Utility for setting kb from packed vectors.
+        '''Utility for setting kb from packed vectors.
 
         Parameters
         ----------
@@ -1474,7 +1474,7 @@ class ReactionMechanism:
 
         Returns
         -------
-        """
+        '''
 
         assert isinstance(kb_vec, numpy.ndarray)
         assert kb_vec.size == len(self.reactions)
@@ -1484,18 +1484,18 @@ class ReactionMechanism:
     kb = property(__get_kb, __set_kb, None, None)
 
     def __get_ks(self):
-        """Utility for returning packed kf and kb into vectors.
+        '''Utility for returning packed kf and kb into vectors.
 
         Should this return the stoichiometric coefficients in case there is no data in `self.data`?
 
         Returns
         -------
         (kf_vec, kb_vec): tuple(numpy.ndarray, numpy.ndarray)
-        """
+        '''
 
         return (self.__get_kf(), self.__get_kb())
     def __set_ks(self, kf_kb_pair):
-        """Utility for setting kf and kb from packed vectors.
+        '''Utility for setting kf and kb from packed vectors.
 
         Parameters
         ----------
@@ -1504,7 +1504,7 @@ class ReactionMechanism:
 
         Returns
         -------
-        """
+        '''
 
         assert isinstance(kf_kb_pair, tuple)
         assert len(kf_kb_pair) == 2
@@ -1516,16 +1516,17 @@ class ReactionMechanism:
     ks = property(__get_ks, __set_ks, None, None)
 
     def __get_power_law_exponents(self):
-        """Utility for packing alpha and beta exponents into a list of vectors.
+        '''Utility for packing alpha and beta exponents into a list of vectors.
 
         The return from this method is a pair of unstructured data since each reaction typically has
         a different number of species, hence different number of associated power-law exponents.
-        The ids of the active species are passed in the first row of the matrices.
+        The ids of the active species are passed in the first row of the matrices. Each of the alpha
+        and beta matrices have 2 rows. First row with ids, second row with exponents.
 
         Returns
         -------
         (alpha_lst, beta_lst): tuple(list(numpy.ndarray), list(numpy.ndarray))
-        """
+        '''
         alpha_lst = list() # list of matrices
         beta_lst  = list() # list of vectors
 
@@ -1545,7 +1546,7 @@ class ReactionMechanism:
                         active_reactants_ids.append(j)
                         exponents.append(alpha_dict[spc_name])
 
-                reactants_ids_alphas = np.array((active_reactants_ids, exponents))
+                reactants_ids_alphas = np.array((active_reactants_ids, exponents)) # 2-row matrix
 
             else:
                 assert False
@@ -1566,7 +1567,7 @@ class ReactionMechanism:
                         active_products_ids.append(j)
                         exponents.append(beta_dict[spc_name])
 
-                products_ids_betas = np.array((active_products_ids, exponents))
+                products_ids_betas = np.array((active_products_ids, exponents)) # 2-row matrix
 
             else:
                 assert False
@@ -1576,7 +1577,7 @@ class ReactionMechanism:
 
         return (alpha_lst, beta_lst)
     def __set_power_law_exponents(self, alpha_beta_pair):
-        """Utility for setting alpha and beta from packed vectors.
+        '''Utility for setting alpha and beta from packed vectors.
 
         The alpha and vector lists of matrices with values for the exponents and corresponding active
         species ids. Note that this will change the internal data of the object including inactive
@@ -1587,7 +1588,7 @@ class ReactionMechanism:
         alpha_beta_pair: tuple(list(numpy.ndarray), list(numpy.ndarray))
             If any element of the tuple is None, the corresponding data is not updated.
 
-        """
+        '''
 
         assert isinstance(alpha_beta_pair, tuple)
         assert len(alpha_beta_pair) == 2
@@ -1630,13 +1631,13 @@ class ReactionMechanism:
     power_law_exponents = property(__get_power_law_exponents, __set_power_law_exponents, None, None)
 
     def full_rank_sub_mechanisms(self, n_sub_mec=1000):
-        """Construct sub-mechanisms with full-rank stoichiometric matrix.
+        '''Construct sub-mechanisms with full-rank stoichiometric matrix.
 
         Returns
         -------
         sub_mechanisms: list([ReactionMechanism, gidxs, score])
 
-        """
+        '''
 
         s_rank = np.linalg.matrix_rank(self.stoic_mtrx)
 
@@ -1710,17 +1711,19 @@ class ReactionMechanism:
         return sub_mechanisms
 
     def print_data(self):
-        """Helper to print the reaction data line by line.
-        """
+        '''Helper to print the reaction data line by line.
+        '''
 
         for idx, data in enumerate(self.data):
-            print(self.reactions[idx], ' ', data)
+            print(self.reactions[idx])
+            print(data)
+            print('')
 
     def __latex(self):
-        """Internal helper for LaTeX typesetting.
+        '''Internal helper for LaTeX typesetting.
 
         See attributes.
-        """
+        '''
 
         # Latex species
         species_str = str()
