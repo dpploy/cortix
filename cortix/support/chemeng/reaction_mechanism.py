@@ -561,15 +561,16 @@ class ReactionMechanism:
         else:
             (kf_vec, _) = self.__get_ks()
         if self.reparam:
-            if self.kf_bnds is not None:
+            kf_vec = self.perform_reparam(kf_vec, self.kf_bnds)
+            #if self.kf_bnds is not None:
 
-                min_kf = self.kf_bnds[0]
-                max_kf = self.kf_bnds[1]
+            #    min_kf = self.kf_bnds[0]
+            #    max_kf = self.kf_bnds[1]
 
-                kf_vec = min_kf + (max_kf - min_kf) / (1 + np.exp(kf_vec))
+            #    kf_vec = min_kf + (max_kf - min_kf) / (1 + np.exp(kf_vec))
 
-            else:
-                kf_vec = np.exp(kf_vec)
+            #else:
+            #    kf_vec = np.exp(kf_vec)
 
         if kb_vec is not None:
             assert isinstance(
@@ -716,37 +717,64 @@ class ReactionMechanism:
 
         return g_vec
 
+    def unbounded_reparam(self, lst_or_vec):
+
+        if isinstance(lst_or_vec):
+
+            beta_or_alpha_lst = lst_or_vec
+
+            for idx, mtrx in enumerate(beta_or_alpha_lst):
+                beta_or_alpha_lst[idx] = np.array(
+                (mtrx[0, :], np.exp(mtrx[1, :])))
+
+            reparamed = beta_or_alpha_lst
+        else:
+            k_vec = lst_or_vec
+            reparamed = np.exp(k_vec)
+
+        return reparamed
+
     def bounded_reparam(self, lst_or_vec, bnds):
 
         if isinstance(lst_or_vec, list):
 
-           min_beta = bnds[0]
-           max_beta = bnds[1]
+           min_beta_or_alpha = bnds[0]
+           max_beta_or_alpha = bnds[1]
 
-           beta_lst = lst_or_vec
+           beta_or_alpha_lst = lst_or_vec
 
-           for idx, beta_mtrx in enumerate(beta_lst):
+           for idx, mtrx in enumerate(beta_or_alpha_lst):
 
-               a_vec = min_beta[idx]
-               b_vec = max_beta[idx]
+               a_vec = min_beta_or_alpha[idx]
+               b_vec = max_beta_or_alpha[idx]
 
-               local_beta_vec = beta_mtrx[1, :]
+               local_beta_or_alpha_vec = mtrx[1, :]
 
-               local_beta_vec = a_vec + \
-                       (b_vec - a_vec) / (1 + np.exp(local_beta_vec))
+               local_beta_or_alpha_vec = a_vec + \
+                       (b_vec - a_vec) / (1 + np.exp(local_beta_or_alpha_vec))
 
-               beta_lst[idx] = np.vstack([beta_mtrx[0, :], local_beta_vec])
+               beta_or_alpha_lst[idx] = np.vstack([mtrx[0, :], local_beta_or_alpha_vec])
 
-           reparamed = beta_lst
+           reparamed = beta_or_alpha_lst
 
         else:
-            kb_vec = lst_or_vec
-            min_kb = bnds[0]
-            max_kb = bnds[1]
+            k_vec = lst_or_vec
+            min_k = bnds[0]
+            max_k = bnds[1]
 
-            kb_vec = min_kb + (max_kb - min_kb) / (1 + np.exp(kb_vec))
+            k_vec = min_k + (max_k - min_k) / (1 + np.exp(k_vec))
 
-            reparamed = kb_vec
+            reparamed = k_vec
+
+        return reparamed
+
+    def perform_reparam(self, lst_or_vec, bnds = None):
+
+        if bnds is not None:
+
+            reparamed = self.bounded_reparam(lst_or_vec, bnds)
+        else:
+            reparamed = self.unbounded_reparam(lst_or_vec)
 
         return reparamed
 
