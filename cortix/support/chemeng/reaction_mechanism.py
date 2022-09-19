@@ -779,6 +779,63 @@ class ReactionMechanism:
 
         return dphi_dtheta
 
+    def d2phi_dtheta2(self, theta_lst_or_vec, bnds = None):
+
+        if self.reparam is False:
+
+            if isinstance(lst_or_vec, list):
+
+                dphi_dtheta_lst = lst_or_vec
+
+                for idx, theta_mtrx in enumerate(dphi_dtheta_lst):
+
+                    dphi_dtheta_vec = np.zeros(theta_mtrx[1, :].size)
+                    dphi_dtheta_lst[idx] = np.vstack([theta_mtrx[0, :], dphi_dtheta_vec])
+
+
+                dphi_dtheta = dphi_dtheta_lst
+            else:
+
+                dphi_dtheta_vec = np.zeros(lst_or_vec.size)
+                dphi_dtheta = dphi_dtheta_vec
+
+        elif bnds is not None:
+            if isinstance(lst_or_vec, list):
+
+               min_beta_or_alpha = bnds[0]
+               max_beta_or_alpha = bnds[1]
+
+               dphi_dtheta_lst = lst_or_vec
+
+               for idx, theta_mtrx in enumerate(dphi_dtheta_lst):
+
+                   a_vec = min_beta_or_alpha[idx]
+                   b_vec = max_beta_or_alpha[idx]
+
+                   theta_vec = theta_mtrx[1, :]
+
+                   dphi_dtheta_vec = (b_vec - a_vec) * (np.exp(theta_vec) - 1) * np.exp(theta_vec)/ (np.exp(theta_vec) + 1)**3
+
+                   dphi_dtheta_lst[idx] = np.vstack([theta_mtrx[0, :], dphi_dtheta_vec])
+
+               dphi_dtheta = dphi_dtheta_lst
+
+            else:
+
+                theta_vec = lst_or_vec
+                a_vec = bnds[0]
+                b_vec = bnds[1]
+
+                dphi_dtheta_vec = (b_vec - a_vec) * (np.exp(theta_vec) - 1) * np.exp(theta_vec)/ (np.exp(theta_vec) + 1)**3
+
+                dphi_dtheta = dphi_dtheta_vec
+
+        else:
+            dphi_dtheta = perform_reparam(lst_or_vec)
+
+
+
+        return dphi_dtheta
     def species_prod_rate_dens(self, spc_molar_cc_vec, kf_vec = None, kb_vec = None, alpha_lst =None, beta_lst=None):
         '''Compute the species production rate density vector.
 
@@ -812,6 +869,8 @@ class ReactionMechanism:
         # -----------------------
         if kf_vec is not None:
 
+            dkf_dtheta_vec = self.dphi_dtheta(kf_vec, self.kf_bnds)
+
             kf_vec = self.perform_reparam(kf_vec, self.kf_bnds)
 
             if alpha_lst is None:
@@ -822,7 +881,7 @@ class ReactionMechanism:
             alpha_lst_local=copy.deepcopy(alpha_lst_local)
             alpha_lst_local = self.perform_reparam(alpha_lst_local, self.alpha_bnds)
 
-            dkf_dtheta_vec = self.dphi_dtheta(kf_vec, self.kf_bnds)
+
 
             dr_dk_f = np.zeros((len(self.reactions), len(self.reactions)), dtype = np.float64)
 
@@ -849,6 +908,8 @@ class ReactionMechanism:
         # -----------------------
         if kb_vec is not None:
 
+            dkb_dtheta_vec = self.dphi_dtheta(kb_vec, self.kb_bnds)
+
             kb_vec = self.perform_reparam(kb_vec, self.kb_bnds)
 
             if beta_lst is None:
@@ -860,7 +921,6 @@ class ReactionMechanism:
             beta_lst_local=copy.deepcopy(beta_lst_local)
             beta_lst_local = self.perform_reparam(beta_lst_local, self.beta_bnds)
 
-            dkb_dtheta_vec = self.dphi_dtheta(kb_vec, self.kb_bnds)
 
 
             dr_dk_b = np.zeros((len(self.reactions), len(self.reactions)), dtype = np.float64)
@@ -891,11 +951,11 @@ class ReactionMechanism:
             for alpha_mtrx in alpha_lst:
                 n_alphas += alpha_mtrx.shape[1]
 
-
+            dalpha_dtheta_lst = self.dphi_dtheta(alpha_lst, self.alpha_bnds)
             alpha_lst=copy.deepcopy(alpha_lst)
             alpha_lst = self.perform_reparam(alpha_lst, self.alpha_bnds)
 
-            dalpha_dtheta_lst = self.dphi_dtheta(alpha_lst, self.alpha_bnds)
+
 
 
             dr_dalpha= np.zeros((len(self.reactions), n_alphas), dtype = np.float64)
@@ -951,11 +1011,12 @@ class ReactionMechanism:
             for beta_mtrx in beta_lst:
                 n_betas += beta_mtrx.shape[1]
 
+            dbeta_dtheta_lst = self.dphi_dtheta(beta_lst, self.beta_bnds)
 
             beta_lst=copy.deepcopy(beta_lst)
             beta_lst = perform_reparam(beta_lst, self.beta_bnds)
 
-            dbeta_dtheta_lst = self.dphi_dtheta(beta_lst, self.beta_bnds)
+
 
 
             dr_dbeta= np.zeros((len(self.reactions), n_betas), dtype = np.float64)
@@ -986,6 +1047,7 @@ class ReactionMechanism:
                     products_molar_cc[jdx]=1.0  # any non-zero value will do it since rb_i will be zero
 
                 dbeta_dtheta_mtrx = dbeta_dtheta_lst[idx]
+
                 assert(dalpha_dtheta_mtrx[0,:] == alpha_mtrx[0,:]) # reactant IDs must match
 
                 for (jdx, c_j) in enumerate(products_molar_cc):
@@ -1168,29 +1230,31 @@ class ReactionMechanism:
 
             d_kf_d_kf_ri_mtrx= np.zeros((len(self.reactions), len(self.reactions)), dtype = np.float64)
 
-            if self.reparam:
 
-                if alpha_lst is None:
-                    (alpha_lst_local, _)=self.__get_power_law_exponents()
-                else:
-                    alpha_lst_local=alpha_lst
 
-                alpha_lst_local=copy.deepcopy(alpha_lst_local)
-                for idx, alpha_mtrx in enumerate(alpha_lst_local):
-                    alpha_lst_local[idx]= np.array((alpha_mtrx[0, :], np.exp(alpha_mtrx[1, :])))
+            if alpha_lst is None:
+                (alpha_lst_local, _)=self.__get_power_law_exponents()
+            else:
+                alpha_lst_local=alpha_lst
 
-                kf_vec=np.exp(kf_vec)
+            alpha_lst_local=copy.deepcopy(alpha_lst_local)
+            alpha_lst_local = self.perform_reparam(alpha_lst_local, self.alpha_bnds)
 
-                for (idx, rxn_data) in enumerate(self.data):
+            kf_vec = self.perform_reparam(kf_vec, self.kf_bnds)
 
-                    alpha_mtrx=alpha_lst_local[idx]
-                    reactants_ids=alpha_mtrx[0, :].astype(int)
+            d2kf_dtheta2 = self.d2phi_dtheta2(kf_vec, self.kf_bnds)
 
-                    reactants_molar_cc=spc_molar_cc_vec[reactants_ids]
 
-                    spc_cc_power_prod=np.prod(reactants_molar_cc**alpha_mtrx[1, :])
+            for (idx, rxn_data) in enumerate(self.data):
 
-                    d_kf_d_kf_ri_mtrx[idx, idx]=kf_vec[idx] * spc_cc_power_prod
+                alpha_mtrx=alpha_lst_local[idx]
+                reactants_ids=alpha_mtrx[0, :].astype(int)
+
+                reactants_molar_cc=spc_molar_cc_vec[reactants_ids]
+
+                spc_cc_power_prod=np.prod(reactants_molar_cc**alpha_mtrx[1, :])
+
+                d_kf_d_kf_ri_mtrx[idx, idx]= d2kf_dtheta2[idx] * spc_cc_power_prod
 
         # ---------------------------
         # partial_kb(partial_kf r_i)
@@ -1210,13 +1274,17 @@ class ReactionMechanism:
 
             d_alpha_d_kf_ri_mtrx= np.zeros((len(self.reactions), n_alphas), dtype = np.float64)
 
-            if self.reparam:
-                alpha_lst=copy.deepcopy(alpha_lst)
-                for idx, alpha_mtrx in enumerate(alpha_lst):
-                    alpha_lst[idx]= np.array((alpha_mtrx[0, :], np.exp(alpha_mtrx[1, :])))
+            dalpha_dtheta_lst = self.dphi_dtheta(alpha_lst, self.alpha_bnds)
 
-            if self.reparam:
-                kf_vec=np.exp(kf_vec)
+            dkf_dtheta_vec = self.dphi_dtheta(kf_vec, self.kf_bnds)
+
+
+            alpha_lst=copy.deepcopy(alpha_lst)
+            alpha_lst = self.reparam(alpha_lst, self.alpha_bnds)
+
+            kf_vec = self.reparam(kf_vec, self.kf_bnds)
+
+
 
             jdx_start=0
             for (idx, rxn_data) in enumerate(self.data):  # loop to find the column index
