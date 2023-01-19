@@ -1523,6 +1523,11 @@ class ReactionMechanism:
         The ids of the active species are passed in the first row of the matrices. Each of the alpha
         and beta matrices have 2 rows. First row with ids, second row with exponents.
 
+        Note
+        ----
+        Here no self-catalyzed reaction is allowed; that is, the forward power-law exponents,
+        alpha, for product species are taken as zero. Similarly for beta.
+
         Returns
         -------
         (alpha_lst, beta_lst): tuple(list(numpy.ndarray), list(numpy.ndarray))
@@ -1582,6 +1587,11 @@ class ReactionMechanism:
         The alpha and vector lists of matrices with values for the exponents and corresponding active
         species ids. Note that this will change the internal data of the object including inactive
         species if the user intends to.
+
+        Note
+        ----
+        Here no self-catalyzed reaction is allowed; that is, the forward power-law exponents,
+        alpha, for product species are taken as zero. Similarly for beta.
 
         Parameters
         ----------
