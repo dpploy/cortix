@@ -668,7 +668,7 @@ class ReactionMechanism:
 
     def __unbounded_reparam(self, lst_or_vec):
 
-        lst_or_vec = np.copy(lst_or_vec)
+        lst_or_vec = copy.deepcopy(lst_or_vec)
 
         if isinstance(lst_or_vec, list):
 
@@ -686,7 +686,7 @@ class ReactionMechanism:
 
     def __bounded_reparam(self, lst_or_vec, bnds):
 
-        lst_or_vec = np.copy(lst_or_vec)
+        lst_or_vec = copy.deepcopy(lst_or_vec)
 
         if isinstance(lst_or_vec, list):
            min_beta_or_alpha = bnds[0]
@@ -746,7 +746,7 @@ class ReactionMechanism:
 
         That is, derivative of k_f, k_b, alpha, and beta wrt the nonlinear parameter theta.
         '''
-        theta_lst_or_vec = np.copy(theta_lst_or_vec)
+        theta_lst_or_vec = copy.deepcopy(theta_lst_or_vec)
 
         # TODO: move this to constructor for a single test
         if bnds is not None:
@@ -818,7 +818,7 @@ class ReactionMechanism:
         '''2nd derivative of the original parameter (phi) wrt the working parameter (theta).
         '''
 
-        theta_lst_or_vec = np.copy(theta_lst_or_vec)
+        theta_lst_or_vec = copy.deepcopy(theta_lst_or_vec)
 
         if self.reparam is False:
 
@@ -1482,7 +1482,7 @@ class ReactionMechanism:
         # ---------------------------------
         if alpha_lst is not None:
 
-            n_alphas=0
+            n_alphas = 0
             for alpha_mtrx in alpha_lst:
                 n_alphas += alpha_mtrx.shape[1]
 
@@ -1497,7 +1497,7 @@ class ReactionMechanism:
             dalpha_dtheta_lst = self.__dphi_dtheta(theta_lst, self.alpha_bnds)
 
 
-            alpha_lst_local=copy.deepcopy(alpha_lst)
+            alpha_lst_local = copy.deepcopy(alpha_lst)
             alpha_lst_local = self.perform_reparam(alpha_lst_local, self.alpha_bnds)
 
             if kf_vec is None:
