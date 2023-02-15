@@ -124,8 +124,10 @@ class ReactionMechanism:
            for any value of k_f'. The entire mechanism is affected.
 
         bounds: dict(tuple)
-           Dictionary of bounds for k_f, k_b, alpha, and beta. E.g. bounds['k_f'] is a tuple (pair) of 
-           vectors, first vector lower bounds (m reactions long), second vector upper bounds (all reactions). 
+
+           Dictionary of bounds for k_f, k_b, alpha, and beta. E.g. bounds['k_f'] is a tuple (pair) of
+           vectors, first vector lower bounds (m reactions long), second vector upper bounds (all reactions).
+
            E.g. bounds['alpha'] is a tuple (pair) of lists (m reactions long) of vectors of lower bounds and
            upper bounds for reactant species.
            If bounds is not None, then the exponential reparameterization is used with bounds.
@@ -720,7 +722,9 @@ class ReactionMechanism:
     def perform_reparam(self, theta_lst_or_vec, bnds=None):
         '''Phi(theta) function (inverse of parameterization function).
 
-        Phi is the original parameters (k_f,k_b,alpha,beta), theta is the nonlinear reparameterized 
+
+        Phi is the original parameters (k_f,k_b,alpha,beta), theta is the nonlinear reparameterized
+
         values returned by the method.
 
         Reparam function
@@ -752,9 +756,11 @@ class ReactionMechanism:
         if bnds is not None:
             assert isinstance(bnds, tuple)
             assert len(bnds) == 2
-        if isinstance(theta_lst_or_vec, lst):
-            assert isinstance(bnds[0], lst)
-            assert isinstance(bnds[1], lst)
+
+        if isinstance(theta_lst_or_vec, list):
+            assert isinstance(bnds[0], list)
+            assert isinstance(bnds[1], list)
+
         if isinstance(theta_lst_or_vec, np.ndarray):
             assert isinstance(bnds[0], np.ndarray)
             assert isinstance(bnds[1], np.ndarray)
@@ -896,7 +902,9 @@ class ReactionMechanism:
                        kf_vec=None, kb_vec=None, theta_alpha_lst=None, beta_lst=None):
         '''Partial derivative of the reaction rate law vector wrt working parameters.
 
-        Theta is the working parameter (theta(phi)). 
+
+        Theta is the working parameter (theta(phi)).
+
 
         Note: dr_dtheta = dr_dphi dphi_dtheta
 
@@ -1025,16 +1033,20 @@ class ReactionMechanism:
 
                 for (jdx, c_j) in enumerate(reactants_molar_cc):
 
-                    dr_dalpha[idx, dr_dalpha_j0 + jdx] = math.log(c_j) * dalpha_dtheta_mtrx[1, jdx] * rf_i
+
+                    dr_dtheta_alpha[idx, dr_dalpha_j0 + jdx] = math.log(c_j) * dalpha_dtheta_mtrx[1, jdx] * rf_i
+
 
                 dr_dalpha_j0 += alpha_mtrx.shape[1]
 
             assert dr_dalpha_j0 == n_alphas, 'n_alphas = %r; sum = %r' % (n_alphas, dr_dalpha_j0)
 
             try:
-                dr_dtheta_mtrx=np.hstack([dr_dtheta_mtrx, dr_dalpha])
+
+                dr_dtheta_mtrx=np.hstack([dr_dtheta_mtrx, dr_dtheta_alpha])
             except NameError:
-                dr_dtheta_mtrx=np.hstack([dr_dalpha])
+                dr_dtheta_mtrx=np.hstack([dr_dtheta_alpha])
+
 
         # -------------------------
         # partial_beta(r_vec) mtrx
@@ -1048,8 +1060,10 @@ class ReactionMechanism:
             theta_lst = copy.deepcopy(beta_lst)
             dbeta_dtheta_lst = self.__dphi_dtheta(theta_lst, self.beta_bnds)
 
+
             beta_lst_local=copy.deepcopy(beta_lst)
             beta_lst_local = self.perform_reparam(beta_lst_local, self.beta_bnds)
+
 
 
 
@@ -1390,6 +1404,7 @@ class ReactionMechanism:
 
             d2kb_dtheta2_vec = self.__d2phi_dtheta2(theta_vec, self.kb_bnds)
 
+
             if beta_lst is None:
                     (_, beta_lst_local)=self.__get_power_law_exponents()
             else:
@@ -1482,7 +1497,7 @@ class ReactionMechanism:
         # ---------------------------------
         if alpha_lst is not None:
 
-            n_alphas = 0
+            n_alphas=0
             for alpha_mtrx in alpha_lst:
                 n_alphas += alpha_mtrx.shape[1]
 
@@ -1497,8 +1512,9 @@ class ReactionMechanism:
             dalpha_dtheta_lst = self.__dphi_dtheta(theta_lst, self.alpha_bnds)
 
 
-            alpha_lst_local = copy.deepcopy(alpha_lst)
-            alpha_lst_local = self.perform_reparam(alpha_lst_local, self.alpha_bnds)
+
+            alpha_lst_local=copy.deepcopy(alpha_lst)
+
 
             if kf_vec is None:
                 (kf_vec_local, _)=self.__get_ks()
@@ -1546,6 +1562,7 @@ class ReactionMechanism:
                 d2alpha_dtheta2 = d2alpha_dtheta2_mtrx[1 , jdx]
 
                 for Jdx in range(alpha_mtrx[1,:].size):
+
 
                     dalpha_J_dtheta_J = dalpha_dtheta_mtrx[1 , Jdx]
                     c_J = reactants_molar_cc[Jdx]
