@@ -2102,14 +2102,14 @@ class ReactionMechanism:
             (reactants_ids, ) = np.where(row < 0)
 
             for j in reactants_ids[:-1]:
-                coeff = abs(int(self.stoic_mtrx[idx,j]))
+                coeff = abs(self.stoic_mtrx[idx,j])
                 if coeff != 1:
                     rxn_str += str(coeff) + '\,' + self.species[j].latex_name + r'\ + \ '
                 else:
                     rxn_str += self.species[j].latex_name + r'\ + \ '
 
             j = reactants_ids[-1]
-            coeff = abs(int(self.stoic_mtrx[idx,j]))
+            coeff = abs(self.stoic_mtrx[idx,j])
             if coeff != 1:
                 rxn_str += str(coeff) + '\,' + self.species[j].latex_name
             else:
@@ -2128,14 +2128,14 @@ class ReactionMechanism:
 
             (products_ids, ) = np.where(row > 0)
             for j in products_ids[:-1]:
-                coeff = abs(int(self.stoic_mtrx[idx,j]))
+                coeff = abs(self.stoic_mtrx[idx,j])
                 if coeff != 1:
                     rxn_str += str(coeff) + '\,' + self.species[j].latex_name + r'\ + \ '
                 else:
                     rxn_str += self.species[j].latex_name + r'\ + \ '
 
             j = products_ids[-1]
-            coeff = abs(int(self.stoic_mtrx[idx,j]))
+            coeff = abs(self.stoic_mtrx[idx,j])
             if coeff != 1:
                 rxn_str += str(coeff) + '\,' + self.species[j].latex_name + '\\\\ \n'
             else:
