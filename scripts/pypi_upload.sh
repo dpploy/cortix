@@ -4,6 +4,7 @@
 # https://pypi.org/project/cortix/
 
 cd ..
-python3 setup.py sdist bdist_wheel
+#python3 setup.py sdist bdist_wheel
+python setup.py sdist bdist_wheel
 twine upload dist/*
 rm -rf build cortix.egg-info dist
