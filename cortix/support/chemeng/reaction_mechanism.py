@@ -317,29 +317,29 @@ class ReactionMechanism:
 
         for r in self.reactions:
 
-            i_row = self.reactions.index(r)
+            i_row = self.reactions.index(r)  # leave this here to catch repeated reactions!
 
             tmp = r.split(' -> ')
             n_terms = len(tmp)
-            assert n_terms == 1 or n_terms == 2
+            assert n_terms == 1 or n_terms == 2  # n_terms = 1 means no split
             if n_terms == 2:
                 self.reaction_direction_symbol.append('->')
             if n_terms == 1:
                 tmp = r.split(' <-> ')
                 n_terms = len(tmp)
-                assert n_terms == 1 or n_terms == 2
+                assert n_terms == 1 or n_terms == 2  # n_terms = 1 means no split
                 if n_terms == 2:
                     self.reaction_direction_symbol.append('<->')
                 if n_terms == 1:
                     tmp = r.split(' <=> ')
                     n_terms = len(tmp)
-                    assert n_terms == 1 or n_terms == 2
+                    assert n_terms == 1 or n_terms == 2  # n_terms = 1 means no split
                     if n_terms == 2:
                         self.reaction_direction_symbol.append('<=>')
                     if n_terms == 1:
                         tmp = r.split(' <- ')
                         n_terms = len(tmp)
-                        assert n_terms == 1 or n_terms == 2
+                        assert n_terms == 1 or n_terms == 2  # n_terms = 1 means no split
                         if n_terms == 2:
                             self.reaction_direction_symbol.append('<-')
 
@@ -367,8 +367,9 @@ class ReactionMechanism:
                     species_member = tmp[0].strip()
                     j_col = self.species_names.index(species_member)
                     assert s_mtrx[i_row, j_col] == 0.0, \
-                           'duplicates not allowed r%r: %r %r %r'%\
-                           (i_row, r, species_member, s_mtrx[i_row, j_col])
+                           'duplicates not allowed r%r: %r %r %r\n%r\n%r'%\
+                           (i_row, r, species_member, s_mtrx[i_row, j_col], s_mtrx[i_row,:],
+                            self.species_names)
                     s_mtrx[i_row, j_col] = -1.0
 
                 if 'alpha' in self.data[i_row].keys():
