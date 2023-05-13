@@ -17,7 +17,7 @@ from cortix.support.species import Species
 class ReactionMechanism:
     '''Chemical reaction mechanism.
 
-    Quantites and services: stoichiometric matrix, mass conservation, reaction rate density vector,
+    Quantities and services: stoichiometric matrix, mass conservation, reaction rate density vector,
     species production rate density vector.
 
     Attributes
@@ -232,7 +232,8 @@ class ReactionMechanism:
                         for val_s in alpha_or_beta.split(','):
                             val = float(val_s.strip())
                             if self.reparam and val != 0.0:
-                                alpha_or_beta_dict[i] = math.log(val)
+                                #WARNING alpha_or_beta_dict[i] = math.log(val)
+                                alpha_or_beta_dict[i] = val # user must pass the reparm theta values
                             elif val == 0:
                                 alpha_or_beta_dict[i] = -9999  # internal flag for inactive species
                             else:
@@ -245,7 +246,7 @@ class ReactionMechanism:
                     elif name == 'k_f' or name == 'k_b':
                         if self.reparam:
                             #WARNING tmp_dict[name] = math.log(float(val_str))
-                            tmp_dict[name] = float(val_str) # user must pass the inverse of reparametrization
+                            tmp_dict[name] = float(val_str) # user must pass the reparam theta values
                         else:
                             tmp_dict[name] = float(val_str)
                     else:
@@ -317,29 +318,29 @@ class ReactionMechanism:
 
         for r in self.reactions:
 
-            i_row = self.reactions.index(r)
+            i_row = self.reactions.index(r)  # leave this here to catch repeated reactions!
 
             tmp = r.split(' -> ')
             n_terms = len(tmp)
-            assert n_terms == 1 or n_terms == 2
+            assert n_terms == 1 or n_terms == 2  # n_terms = 1 means no split
             if n_terms == 2:
                 self.reaction_direction_symbol.append('->')
             if n_terms == 1:
                 tmp = r.split(' <-> ')
                 n_terms = len(tmp)
-                assert n_terms == 1 or n_terms == 2
+                assert n_terms == 1 or n_terms == 2  # n_terms = 1 means no split
                 if n_terms == 2:
                     self.reaction_direction_symbol.append('<->')
                 if n_terms == 1:
                     tmp = r.split(' <=> ')
                     n_terms = len(tmp)
-                    assert n_terms == 1 or n_terms == 2
+                    assert n_terms == 1 or n_terms == 2  # n_terms = 1 means no split
                     if n_terms == 2:
                         self.reaction_direction_symbol.append('<=>')
                     if n_terms == 1:
                         tmp = r.split(' <- ')
                         n_terms = len(tmp)
-                        assert n_terms == 1 or n_terms == 2
+                        assert n_terms == 1 or n_terms == 2  # n_terms = 1 means no split
                         if n_terms == 2:
                             self.reaction_direction_symbol.append('<-')
 
@@ -367,8 +368,9 @@ class ReactionMechanism:
                     species_member = tmp[0].strip()
                     j_col = self.species_names.index(species_member)
                     assert s_mtrx[i_row, j_col] == 0.0, \
-                           'duplicates not allowed r%r: %r %r %r'%\
-                           (i_row, r, species_member, s_mtrx[i_row, j_col])
+                           'duplicates not allowed r%r: %r %r %r\n%r\n%r'%\
+                           (i_row, r, species_member, s_mtrx[i_row, j_col], s_mtrx[i_row,:],
+                            self.species_names)
                     s_mtrx[i_row, j_col] = -1.0
 
                 if 'alpha' in self.data[i_row].keys():
@@ -546,23 +548,23 @@ class ReactionMechanism:
 
         kf_vec: numpy.ndarray
         Vector of forward reaction rate constants per reaction. If not provided, it will be assembled
-        internally.
+        internally from `self.data`.
         Must be reparameterized (theta) if reparam is True.
 
         kb_vec: numpy.ndarray
         Vector of backward reaction rate constants per reaction. If not provided, it will be assembled
-        internally.
-        Must be repameterized  (theta)if reparam is True.
+        internally from `self.data`.
+        Must be repameterized (theta) if reparam is True.
 
         alpha_lst: list(numpy.ndarray)
         List of alpha power-law exponents as a matrix containing the reactant species ids.
         If not provided, it will be assembled internally from `self.data`.
-        Must be repameterized  (theta)if reparam is True.
+        Must be repameterized  (theta) if reparam is True.
 
         beta_lst: list(numpy.ndarray)
         List of beta power-law exponents as a matrix containing the product species ids.
         If not provided, it will be assembled internally from `self.data`.
-        Must be repameterized  (theta)if reparam is True.
+        Must be repameterized  (theta) if reparam is True.
         '''
         assert isinstance(spc_molar_cc_vec, numpy.ndarray), 'type(spc_molar_cc_vec) = %r'%(type(spc_molar_cc_vec))
         assert spc_molar_cc_vec.size == len(self.species)
@@ -687,6 +689,11 @@ class ReactionMechanism:
         return reparamed
 
     def __bounded_reparam(self, lst_or_vec, bnds):
+        '''Phi(theta) reparam with bounds.
+
+        That is pass theta values (new parameters) through argument, return phi values
+        (original parameters).
+        '''
 
         lst_or_vec = copy.deepcopy(lst_or_vec)
 
@@ -720,18 +727,14 @@ class ReactionMechanism:
         return reparamed
 
     def perform_reparam(self, theta_lst_or_vec, bnds=None):
-        '''Phi(theta) function (inverse of parameterization function).
-
+        '''Phi(theta) function (parameterization function).
 
         Phi is the original parameters (k_f,k_b,alpha,beta), theta is the nonlinear reparameterized
-
-        values returned by the method.
+        values.
 
         Reparam function
-        theta(phi) = log( |max_theta - phi| / |phi - min_theta| )
-
-        Inverse of reparam function
         phi(theta) = min_theta + (max_theta - min_theta) / (1 + np.exp(theta))
+
         '''
         #print(self.reparam)
 
@@ -744,6 +747,61 @@ class ReactionMechanism:
             reparamed = self.__unbounded_reparam(theta_lst_or_vec)
 
         return reparamed # return phi(theta)
+
+    def __inv_bounded_reparam(self, lst_or_vec, bnds):
+        '''Theta(phi) reparam with bounds.
+
+        That is pass phi values (orig parameters) through argument, return theta values
+        (new parameters).
+        '''
+
+        lst_or_vec = copy.deepcopy(lst_or_vec)
+
+        if isinstance(lst_or_vec, list):
+           min_beta_or_alpha = bnds[0]
+           max_beta_or_alpha = bnds[1]
+
+           beta_or_alpha_lst = lst_or_vec
+
+           for idx, mtrx in enumerate(beta_or_alpha_lst):
+
+               a_vec = min_beta_or_alpha[idx]
+               b_vec = max_beta_or_alpha[idx]
+
+               local_beta_or_alpha_vec = mtrx[1, :]
+
+               local_beta_or_alpha_vec = np.log((b_vec - local_beta_or_alpha_vec) / \
+                                               (local_beta_or_alpha_vec - a_vec))
+
+               beta_or_alpha_lst[idx] = np.vstack([mtrx[0, :], local_beta_or_alpha_vec])
+
+           params = beta_or_alpha_lst
+
+        else:
+            k_vec = lst_or_vec
+            min_k = bnds[0]
+            max_k = bnds[1]
+
+            params = np.log((max_k - k_vec)/(k_vec - min_k))
+
+        return params
+
+    def inv_reparam(self, phi_lst_or_vec, bnds=None):
+        '''Theta(phi) function (inverse parameterization function).
+
+        Phi is the original parameters (k_f,k_b,alpha,beta), theta is the nonlinear reparameterized
+        values.
+
+        Inverse of reparam function
+        theta(phi) = ln( max_phi - phi / phi - min_phi )
+        for min_phi < phi < max_phi
+        '''
+        if bnds is not None:
+            params = self.__inv_bounded_reparam(phi_lst_or_vec, bnds)
+        else:
+            params = self.__inv_unbounded_reparam(phi_lst_or_vec)
+
+        return params # return theta(phi)
 
     def __dphi_dtheta(self, theta_lst_or_vec, bnds=None):
         '''Derivative of the original parameter (phi) wrt the working parameter (theta).
@@ -1890,7 +1948,7 @@ class ReactionMechanism:
         (alpha_lst, beta_lst): tuple(list(numpy.ndarray), list(numpy.ndarray))
         '''
         alpha_lst=list()  # list of matrices
-        beta_lst=list()  # list of vectors
+        beta_lst=list()   # list of matrices
 
         for (idx, rxn_data) in enumerate(self.data):
 
@@ -2173,6 +2231,7 @@ class ReactionMechanism:
                     self.species_names,
                     self.species,
                     str(self.max_mass_balance_residual()))
+
 
 def print_reaction_sub_mechanisms(sub_mechanisms, mode=None, n_sub_mech=None):
     '''
