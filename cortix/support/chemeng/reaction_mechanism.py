@@ -698,24 +698,24 @@ class ReactionMechanism:
         lst_or_vec = copy.deepcopy(lst_or_vec)
 
         if isinstance(lst_or_vec, list):
-           min_beta_or_alpha = bnds[0]
-           max_beta_or_alpha = bnds[1]
+            min_beta_or_alpha = bnds[0]
+            max_beta_or_alpha = bnds[1]
 
-           beta_or_alpha_lst = lst_or_vec
+            beta_or_alpha_lst = lst_or_vec
 
-           for idx, mtrx in enumerate(beta_or_alpha_lst):
+            for idx, mtrx in enumerate(beta_or_alpha_lst):
 
-               a_vec = min_beta_or_alpha[idx]
-               b_vec = max_beta_or_alpha[idx]
+                a_vec = min_beta_or_alpha[idx]
+                b_vec = max_beta_or_alpha[idx]
 
-               local_beta_or_alpha_vec = mtrx[1, :]
+                local_beta_or_alpha_vec = mtrx[1, :]
 
-               local_beta_or_alpha_vec = a_vec + \
-                       (b_vec - a_vec) / (1 + np.exp(local_beta_or_alpha_vec))
+                local_beta_or_alpha_vec = a_vec + \
+                        (b_vec - a_vec) / (1 + np.exp(local_beta_or_alpha_vec))
 
-               beta_or_alpha_lst[idx] = np.vstack([mtrx[0, :], local_beta_or_alpha_vec])
+                beta_or_alpha_lst[idx] = np.vstack([mtrx[0, :], local_beta_or_alpha_vec])
 
-           reparamed = beta_or_alpha_lst
+            reparamed = beta_or_alpha_lst
 
         else:
             k_vec = lst_or_vec
@@ -748,6 +748,24 @@ class ReactionMechanism:
 
         return reparamed # return phi(theta)
 
+    def __inv_unbounded_reparam(self, lst_or_vec):
+
+        lst_or_vec = copy.deepcopy(lst_or_vec)
+
+        if isinstance(lst_or_vec, list):
+
+            beta_or_alpha_lst = lst_or_vec
+
+            for idx, mtrx in enumerate(beta_or_alpha_lst):
+                beta_or_alpha_lst[idx] = np.array((mtrx[0, :], np.log(mtrx[1, :])))
+
+            reparamed = beta_or_alpha_lst
+        else:
+            k_vec = lst_or_vec
+            reparamed = np.log(k_vec)
+
+        return reparamed
+
     def __inv_bounded_reparam(self, lst_or_vec, bnds):
         '''Theta(phi) reparam with bounds.
 
@@ -758,24 +776,24 @@ class ReactionMechanism:
         lst_or_vec = copy.deepcopy(lst_or_vec)
 
         if isinstance(lst_or_vec, list):
-           min_beta_or_alpha = bnds[0]
-           max_beta_or_alpha = bnds[1]
+            min_beta_or_alpha = bnds[0]
+            max_beta_or_alpha = bnds[1]
 
-           beta_or_alpha_lst = lst_or_vec
+            beta_or_alpha_lst = lst_or_vec
 
-           for idx, mtrx in enumerate(beta_or_alpha_lst):
+            for idx, mtrx in enumerate(beta_or_alpha_lst):
 
-               a_vec = min_beta_or_alpha[idx]
-               b_vec = max_beta_or_alpha[idx]
+                a_vec = min_beta_or_alpha[idx]
+                b_vec = max_beta_or_alpha[idx]
 
-               local_beta_or_alpha_vec = mtrx[1, :]
+                local_beta_or_alpha_vec = mtrx[1, :]
 
-               local_beta_or_alpha_vec = np.log((b_vec - local_beta_or_alpha_vec) / \
-                                               (local_beta_or_alpha_vec - a_vec))
+                local_beta_or_alpha_vec = np.log((b_vec - local_beta_or_alpha_vec) / \
+                                                (local_beta_or_alpha_vec - a_vec))
 
-               beta_or_alpha_lst[idx] = np.vstack([mtrx[0, :], local_beta_or_alpha_vec])
+                beta_or_alpha_lst[idx] = np.vstack([mtrx[0, :], local_beta_or_alpha_vec])
 
-           params = beta_or_alpha_lst
+            params = beta_or_alpha_lst
 
         else:
             k_vec = lst_or_vec
@@ -2231,7 +2249,6 @@ class ReactionMechanism:
                     self.species_names,
                     self.species,
                     str(self.max_mass_balance_residual()))
-
 
 def print_reaction_sub_mechanisms(sub_mechanisms, mode=None, n_sub_mech=None):
     '''
