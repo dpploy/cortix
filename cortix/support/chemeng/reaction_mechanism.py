@@ -710,6 +710,8 @@ class ReactionMechanism:
 
                 local_beta_or_alpha_vec = mtrx[1, :]
 
+                local_beta_or_alpha_vec[local_beta_or_alpha_vec>700] = 700
+
                 local_beta_or_alpha_vec = a_vec + \
                         (b_vec - a_vec) / (1 + np.exp(local_beta_or_alpha_vec))
 
@@ -721,6 +723,8 @@ class ReactionMechanism:
             k_vec = lst_or_vec
             min_k = bnds[0]
             max_k = bnds[1]
+
+            k_vec[k_vec>700] = 700
 
             reparamed = min_k + (max_k - min_k) / (1 + np.exp(k_vec))
 
@@ -875,7 +879,10 @@ class ReactionMechanism:
 
                    theta_vec = theta_mtrx[1, :]
 
-                   dphi_dtheta_vec = ((a_vec - b_vec)*np.exp(theta_vec))/(np.exp(theta_vec) + 1)**2
+                   theta_vec[theta_vec==0] = 1e+50
+
+                   #orig dphi_dtheta_vec = ((a_vec - b_vec)*np.exp(theta_vec))/(np.exp(theta_vec) + 1)**2
+                   dphi_dtheta_vec = (a_vec - b_vec)/(theta_vec + 1/theta_vec + 2)
 
                    dphi_dtheta_lst[idx] = np.vstack([theta_mtrx[0, :], dphi_dtheta_vec])
 
@@ -887,7 +894,10 @@ class ReactionMechanism:
                 a_vec = bnds[0]
                 b_vec = bnds[1]
 
-                dphi_dtheta_vec = ((a_vec - b_vec)*np.exp(theta_vec))/(np.exp(theta_vec) + 1)**2
+                theta_vec[theta_vec==0] = 1e+50
+
+                #orig dphi_dtheta_vec = ((a_vec - b_vec)*np.exp(theta_vec))/(np.exp(theta_vec) + 1)**2
+                dphi_dtheta_vec = (a_vec - b_vec)/(theta_vec + 1/theta_vec + 2)
 
                 dphi_dtheta = dphi_dtheta_vec
 
@@ -1027,9 +1037,9 @@ class ReactionMechanism:
                 dr_dtheta_kf[idx, idx] = dkf_dtheta_vec[idx] * dr_dphi_kf
 
             try:
-                dr_dtheta_mtrx=np.hstack([dr_dtheta_mtrx, dr_dtheta_kf])
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, dr_dtheta_kf])
             except NameError:
-                dr_dtheta_mtrx=np.hstack([dr_dtheta_kf])
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_kf])
 
         # -----------------------
         # partial_theta_kb(r_vec) mtrx
