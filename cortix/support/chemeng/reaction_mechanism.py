@@ -914,9 +914,9 @@ class ReactionMechanism:
 
         if self.reparam is False:
 
-            if isinstance(lst_or_vec, list):
+            if isinstance(theta_lst_or_vec, list):
 
-                dphi_dtheta_lst = lst_or_vec
+                dphi_dtheta_lst = theta_lst_or_vec
 
                 for idx, theta_mtrx in enumerate(dphi_dtheta_lst):
 
@@ -926,7 +926,7 @@ class ReactionMechanism:
                 dphi_dtheta = dphi_dtheta_lst
             else:
 
-                dphi_dtheta_vec = np.zeros(lst_or_vec.size)
+                dphi_dtheta_vec = np.zeros(theta_lst_or_vec.size)
                 dphi_dtheta = dphi_dtheta_vec
 
         elif bnds is not None:
@@ -971,7 +971,7 @@ class ReactionMechanism:
                 dphi_dtheta = dphi_dtheta_vec
 
         else:
-            dphi_dtheta = perform_reparam(lst_or_vec)
+            dphi_dtheta = perform_reparam(theta_lst_or_vec)
 
         return dphi_dtheta
 
