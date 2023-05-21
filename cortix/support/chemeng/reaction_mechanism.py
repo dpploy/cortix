@@ -837,13 +837,13 @@ class ReactionMechanism:
             assert isinstance(bnds, tuple)
             assert len(bnds) == 2
 
-        if isinstance(theta_lst_or_vec, list):
-            assert isinstance(bnds[0], list)
-            assert isinstance(bnds[1], list)
+            if isinstance(theta_lst_or_vec, list):
+                assert isinstance(bnds[0], list)
+                assert isinstance(bnds[1], list)
 
-        if isinstance(theta_lst_or_vec, np.ndarray):
-            assert isinstance(bnds[0], np.ndarray)
-            assert isinstance(bnds[1], np.ndarray)
+            if isinstance(theta_lst_or_vec, np.ndarray):
+                assert isinstance(bnds[0], np.ndarray)
+                assert isinstance(bnds[1], np.ndarray)
 
         lst_or_vec = theta_lst_or_vec
 
