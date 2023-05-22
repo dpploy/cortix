@@ -815,11 +815,11 @@ class ReactionMechanism:
             assert isinstance(bnds, tuple)
             assert len(bnds) == 2
 
-        if isinstance(theta_lst_or_vec, list):
+        if bnds is not None and isinstance(theta_lst_or_vec, list):
             assert isinstance(bnds[0], list)
             assert isinstance(bnds[1], list)
 
-        if isinstance(theta_lst_or_vec, np.ndarray):
+        if bnds is not None and isinstance(theta_lst_or_vec, np.ndarray):
             assert isinstance(bnds[0], np.ndarray)
             assert isinstance(bnds[1], np.ndarray)
 
@@ -886,9 +886,9 @@ class ReactionMechanism:
 
         if self.reparam is False:
 
-            if isinstance(lst_or_vec, list):
+            if isinstance(theta_lst_or_vec, list):
 
-                dphi_dtheta_lst = lst_or_vec
+                dphi_dtheta_lst = theta_lst_or_vec
 
                 for idx, theta_mtrx in enumerate(dphi_dtheta_lst):
 
@@ -898,7 +898,7 @@ class ReactionMechanism:
                 dphi_dtheta = dphi_dtheta_lst
             else:
 
-                dphi_dtheta_vec = np.zeros(lst_or_vec.size)
+                dphi_dtheta_vec = np.zeros(theta_lst_or_vec.size)
                 dphi_dtheta = dphi_dtheta_vec
 
         elif bnds is not None:
@@ -1531,7 +1531,7 @@ class ReactionMechanism:
             products_molar_cc=spc_molar_cc_vec[products_ids]
 
 
-            spc_cc_power_prod=np.prod(products_molar_cc**rxn_idx_beta_mtrx[1, :])
+            spc_cc_power_prod= - np.prod(products_molar_cc**rxn_idx_beta_mtrx[1, :])
 
             min_c_j=products_molar_cc.min()
             if min_c_j <= 1e-25:
@@ -1696,7 +1696,7 @@ class ReactionMechanism:
 
             products_molar_cc=spc_molar_cc_vec[products_ids]
 
-            spc_cc_power_prod=np.prod(products_molar_cc**beta_mtrx[1, :])
+            spc_cc_power_prod= np.prod(products_molar_cc**beta_mtrx[1, :])
 
             rb_i=- kb_vec_local[rxn_idx] * spc_cc_power_prod
 
