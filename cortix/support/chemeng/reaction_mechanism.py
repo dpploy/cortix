@@ -724,7 +724,7 @@ class ReactionMechanism:
             min_k = bnds[0]
             max_k = bnds[1]
 
-            k_vec[k_vec>700] = 700
+            #k_vec[k_vec>700] = 700
 
             reparamed = min_k + (max_k - min_k) / (1 + np.exp(k_vec))
 
@@ -879,10 +879,10 @@ class ReactionMechanism:
 
                    theta_vec = theta_mtrx[1, :]
 
-                   theta_vec[np.abs(theta_vec)<=1e-50] = 1e+50
+                   #theta_vec[np.abs(theta_vec)<=1e-50] = 1e+50
 
-                   #orig dphi_dtheta_vec = ((a_vec - b_vec)*np.exp(theta_vec))/(np.exp(theta_vec) + 1)**2
-                   dphi_dtheta_vec = (a_vec - b_vec)/(theta_vec + 1/theta_vec + 2)
+                   dphi_dtheta_vec = ((a_vec - b_vec)*np.exp(theta_vec))/(np.exp(theta_vec) + 1)**2
+                   #dphi_dtheta_vec = (a_vec - b_vec)/(theta_vec + 1/theta_vec + 2)
 
                    dphi_dtheta_lst[idx] = np.vstack([theta_mtrx[0, :], dphi_dtheta_vec])
 
@@ -894,10 +894,10 @@ class ReactionMechanism:
                 a_vec = bnds[0]
                 b_vec = bnds[1]
 
-                theta_vec[np.abs(theta_vec)<=1e-50] = 1e+50
+                #theta_vec[np.abs(theta_vec)<=1e-50] = 1e+50
 
-                #orig dphi_dtheta_vec = ((a_vec - b_vec)*np.exp(theta_vec))/(np.exp(theta_vec) + 1)**2
-                dphi_dtheta_vec = (a_vec - b_vec)/(theta_vec + 1/theta_vec + 2)
+                dphi_dtheta_vec = ((a_vec - b_vec)*np.exp(theta_vec))/(np.exp(theta_vec) + 1)**2
+                #dphi_dtheta_vec = (a_vec - b_vec)/(theta_vec + 1/theta_vec + 2)
 
                 dphi_dtheta = dphi_dtheta_vec
 
