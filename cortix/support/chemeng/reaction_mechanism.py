@@ -1202,23 +1202,6 @@ class ReactionMechanism:
 
         return dr_dtheta_mtrx
 
-    def dg_dtheta_mtrx(self, spc_molar_cc_vec,
-                       theta_kf_vec=None, theta_kb_vec=None, theta_alpha_lst=None, theta_beta_lst=None):
-        '''Compute the partial derivative of the reaction rate density vector wrt to operating parameters.
-
-        Compute dg_dtheta with theta being the operating parameters.
-        This quantity is typically the negative of the Jacobian matrix in the leasts-squares optimization
-        of parameters.
-
-        Parameters:
-        -----------
-        '''
-
-        dg_dtheta_mtrx = self.stoic_mtrx.transpose() @ self.dr_dtheta_mtrx(spc_molar_cc_vec,
-                                                                           theta_kf_vec, theta_kb_vec,
-                                                                           theta_alpha_lst, theta_beta_lst)
-
-        return dg_dtheta_mtrx
     def dr_dtheta_mtrx_numerical(self, spc_molar_cc_vec,
                       kf_vec = None, kb_vec =None, alpha_lst=None, beta_lst=None,
                       h_small = 1e-6):
@@ -1353,6 +1336,24 @@ class ReactionMechanism:
                 dr_dtheta_mtrx=np.hstack([dr_dbeta])
 
         return dr_dtheta_mtrx
+
+    def dg_dtheta_mtrx(self, spc_molar_cc_vec,
+                       theta_kf_vec=None, theta_kb_vec=None, theta_alpha_lst=None, theta_beta_lst=None):
+        '''Compute the partial derivative of the reaction rate density vector wrt to operating parameters.
+
+        Compute dg_dtheta with theta being the operating parameters.
+        This quantity is typically the negative of the Jacobian matrix in the leasts-squares optimization
+        of parameters.
+
+        Parameters:
+        -----------
+        '''
+
+        dg_dtheta_mtrx = self.stoic_mtrx.transpose() @ self.dr_dtheta_mtrx(spc_molar_cc_vec,
+                                                                           theta_kf_vec, theta_kb_vec,
+                                                                           theta_alpha_lst, theta_beta_lst)
+
+        return dg_dtheta_mtrx
 
     def d2ri_theta2_mtrx(self, rxn_idx, spc_molar_cc_vec,
                                kf_vec = None, kb_vec =None, alpha_lst=None, beta_lst=None):
