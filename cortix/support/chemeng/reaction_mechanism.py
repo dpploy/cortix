@@ -1168,7 +1168,7 @@ class ReactionMechanism:
 
                 spc_cc_power_prod = np.prod(active_spc_molar_cc**beta_mtrx[1, :])
 
-                rb_i = - kb_vec[irxn] * spc_cc_power_prod
+                rb_i = kb_vec[irxn] * spc_cc_power_prod
 
                 min_c_j = active_spc_molar_cc.min()
                 if min_c_j <= 1e-25:
