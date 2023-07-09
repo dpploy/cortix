@@ -9,6 +9,7 @@ import copy
 import math
 import numpy       # used in asserts
 import numpy as np
+import scipy as sp
 from itertools import combinations
 import random
 
@@ -1015,7 +1016,7 @@ class ReactionMechanism:
         assert np.all(spc_molar_cc_vec >= 0), 'spc_molar_cc_vec =\n%r' % spc_molar_cc_vec
 
         # --------------------------------------------
-        # P = partial_kf(r)  partial_theta_kf(kf) mtrx
+        # partial_theta_kf(r) = P partial_theta_kf(kf)
         # --------------------------------------------
         if theta_kf_vec is not None:
 
@@ -1047,7 +1048,7 @@ class ReactionMechanism:
                 dr_dtheta_mtrx = np.hstack([p_mtrx])
 
         # --------------------------------------------
-        # Q = partial_kb(r)  partial_theta_kb(kb) mtrx
+        # partial_theta_kb(r) = - Q partial_theta_kb(kb)
         # --------------------------------------------
         if theta_kb_vec is not None:
 
@@ -1079,7 +1080,7 @@ class ReactionMechanism:
                 dr_dtheta_mtrx = np.hstack([q_mtrx])
 
         # -----------------------------------------------------
-        # U = partial_alpha(r)  partial_theta_alpha(alpha) mtrx
+        # partial_theta_alpha(r) = X partial_theta_alpha(alpha)
         # -----------------------------------------------------
         if theta_alpha_lst is not None:
 
@@ -1114,33 +1115,37 @@ class ReactionMechanism:
                     (jdx, ) = np.where(active_spc_molar_cc == min_c_j)
                     active_spc_molar_cc[jdx] = 1.0 # any non-zero value will do since rf_i will be zero
 
-                dalpha_dtheta_mtrx = dalpha_dtheta_lst[irxn]
-                #assert(dalpha_dtheta_mtrx[0,:] == alpha_mtrx[0,:]) # reactant IDs must match
+                dalpha_dtheta_data_mtrx = dalpha_dtheta_lst[irxn] # this data includes the j mapping
+                #assert(dalpha_dtheta_data_mtrx[0,:] == alpha_mtrx[0,:]) # reactant IDs must match
 
                 w_vec_i = np.log(active_spc_molar_cc)
                 x_vec_i = rf_i * w_vec_i
 
-                u_vec_i = np.diag(dalpha_dtheta_mtrx[1,:]) @ x_vec_i
+                dalpha_dtheta_mtrx_i = np.diag(dalpha_dtheta_data_mtrx[1,:])
 
                 n_alpha_i = alpha_mtrx.shape[1]
-                u_mtrx_j_block = np.zeros((len(self.reactions), n_alpha_i), dtype = np.float64)
+                x_mtrx_j_block = np.zeros((len(self.reactions), n_alpha_i), dtype = np.float64)
 
-                u_mtrx_j_block[irxn, :] = u_vec_i
+                x_mtrx_j_block[irxn, :] = x_vec_i
 
                 try:
-                    u_mtrx = np.hstack([u_mtrx, u_mtrx_j_block])
+                    x_mtrx = np.hstack([x_mtrx, x_mtrx_j_block])
                 except NameError:
-                    u_mtrx = np.hstack([u_mtrx_j_block])
+                    x_mtrx = np.hstack([x_mtrx_j_block])
+                try:
+                    dalpha_dtheta_mtrx = sp.linalg.block_diag(dalpha_dtheta_mtrx, dalpha_dtheta_mtrx_i)
+                except NameError:
+                    dalpha_dtheta_mtrx = sp.linalg.block_diag(dalpha_dtheta_mtrx_i)
 
-            assert u_mtrx.shape[1] == n_alphas, 'n_alphas = %r; U shape = %r' % (n_alphas, u_mtrx.shape)
+            assert x_mtrx.shape == (len(alpha_lst), n_alphas), 'n_alphas = %r; U shape = %r' % (n_alphas, x_mtrx.shape)
 
             try:
-                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, u_mtrx])
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, x_mtrx @ dalpha_dtheta_mtrx])
             except NameError:
-                dr_dtheta_mtrx = np.hstack([u_mtrx])
+                dr_dtheta_mtrx = np.hstack([x_mtrx @ dalpha_dtheta_mtrx])
 
         # --------------------------------------------------
-        # V = partial_beta(r)  partial_theta_beta(beta) mtrx
+        # partial_theta_beta(r) = Y partial_theta_beta(beta)
         # --------------------------------------------------
         if theta_beta_lst is not None:
 
@@ -1175,30 +1180,34 @@ class ReactionMechanism:
                     (jdx, ) = np.where(active_spc_molar_cc == min_c_j)
                     active_spc_molar_cc[jdx] = 1.0  # any non-zero value will do it since rb_i will be zero
 
-                dbeta_dtheta_mtrx = dbeta_dtheta_lst[irxn]
+                dbeta_dtheta_data_mtrx = dbeta_dtheta_lst[irxn] # this data includes the j mapping
                 #assert(dalpha_dtheta_mtrx[0,:] == alpha_mtrx[0,:]) # reactant IDs must match
 
                 w_vec_i = np.log(active_spc_molar_cc)
                 y_vec_i = rb_i * w_vec_i
 
-                v_vec_i = np.diag(dbeta_dtheta_mtrx[1,:]) @ y_vec_i
+                dbeta_dtheta_mtrx_i = np.diag(dbeta_dtheta_data_mtrx[1,:])
 
                 n_beta_i = beta_mtrx.shape[1]
-                v_mtrx_j_block = np.zeros((len(self.reactions), n_beta_i), dtype = np.float64)
+                y_mtrx_j_block = np.zeros((len(self.reactions), n_beta_i), dtype = np.float64)
 
-                v_mtrx_j_block[irxn, :] = - v_vec_i
+                y_mtrx_j_block[irxn, :] = y_vec_i
 
                 try:
-                    v_mtrx = np.hstack([v_mtrx, v_mtrx_j_block])
+                    y_mtrx = np.hstack([y_mtrx, y_mtrx_j_block])
                 except NameError:
-                    v_mtrx = np.hstack([v_mtrx_j_block])
+                    y_mtrx = np.hstack([y_mtrx_j_block])
+                try:
+                    dbeta_dtheta_mtrx = sp.linalg.block_diag(dbeta_dtheta_mtrx, dbeta_dtheta_mtrx_i)
+                except NameError:
+                    dbeta_dtheta_mtrx = sp.linalg.block_diag(dbeta_dtheta_mtrx_i)
 
-            assert v_mtrx.shape[1] == n_betas, 'n_betas = %r; V shape = %r' % (n_betas, v_mtrx.shape)
+            assert y_mtrx.shape == (len(beta_lst), n_betas), 'n_betas = %r; V shape = %r' % (n_betas, y_mtrx.shape)
 
             try:
-                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, v_mtrx])
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, -y_mtrx @ dbeta_dtheta_mtrx])
             except NameError:
-                dr_dtheta_mtrx = np.hstack([v_mtrx])
+                dr_dtheta_mtrx = np.hstack([-y_mtrx @ dbeta_dtheta_mtrx])
 
         return dr_dtheta_mtrx
 
