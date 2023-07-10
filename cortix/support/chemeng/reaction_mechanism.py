@@ -1004,7 +1004,7 @@ class ReactionMechanism:
         If say, theta_alpha_lst is not a varying parameter, then n_alpha = 0.
 
           m x p
-        dr_dtheta = ( P Q U V )
+        dr_dtheta = ( P dkf_dtheta_kf  -Q dkb_dtheta_kb  X dalpha_dtheta_alpha  -Y dbeta_dtheta_beta )
 
         This partial derivative matrix is instrumental to compute other quantities in particular the
         partial derivative of g wrt parameters, dg_dtheta. This is equal to the Jacobian matrix of the
@@ -1020,9 +1020,7 @@ class ReactionMechanism:
         # --------------------------------------------
         if theta_kf_vec is not None:
 
-            theta_kf_vec = copy.deepcopy(theta_kf_vec)
-
-            dkf_dtheta_vec = self.__dphi_dtheta(theta_kf_vec, self.kf_bnds)
+            # Compute P
 
             if theta_alpha_lst is None:
                 (alpha_lst, _) = self.__get_power_law_exponents()
@@ -1035,26 +1033,36 @@ class ReactionMechanism:
             for (irxn, alpha_mtrx) in enumerate(alpha_lst):
 
                 active_spc_ids = alpha_mtrx[0, :].astype(int)
+
                 active_spc_molar_cc = spc_molar_cc_vec[active_spc_ids]
+
                 spc_cc_power_prod = np.prod(active_spc_molar_cc**alpha_mtrx[1, :])
 
                 p_vec[irxn] = spc_cc_power_prod
 
-            p_mtrx = np.diag(p_vec) @ np.diag(dkf_dtheta_vec)
+            p_mtrx = np.diag(p_vec)
+
+            # Compute partial_theta_kf(kf)
+
+            theta_kf_vec = copy.deepcopy(theta_kf_vec)
+
+            dkf_dtheta_vec = self.__dphi_dtheta(theta_kf_vec, self.kf_bnds)
+
+            dkf_dtheta_mtrx = np.diag(dkf_dtheta_vec)
+
+            # Store product
 
             try:
-                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, p_mtrx])
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, p_mtrx @ dkf_dtheta_mtrx])
             except NameError:
-                dr_dtheta_mtrx = np.hstack([p_mtrx])
+                dr_dtheta_mtrx = np.hstack([p_mtrx @ dkf_dtheta_mtrx])
 
         # --------------------------------------------
         # partial_theta_kb(r) = - Q partial_theta_kb(kb)
         # --------------------------------------------
         if theta_kb_vec is not None:
 
-            theta_kb_vec = copy.deepcopy(theta_kb_vec)
-
-            dkb_dtheta_vec = self.__dphi_dtheta(theta_kb_vec, self.kb_bnds)
+            # Compute Q
 
             if theta_beta_lst is None:
                 (_, beta_lst) = self.__get_power_law_exponents()
@@ -1067,30 +1075,42 @@ class ReactionMechanism:
             for (irxn, beta_mtrx) in enumerate(beta_lst):
 
                 active_spc_ids = beta_mtrx[0, :].astype(int)
+
                 active_spc_molar_cc = spc_molar_cc_vec[active_spc_ids]
+
                 spc_cc_power_prod = np.prod(active_spc_molar_cc**beta_mtrx[1, :])
 
                 q_vec[irxn] = spc_cc_power_prod
 
-            q_mtrx = - np.diag(q_vec) @ np.diag(dkb_dtheta_vec)
+            q_mtrx = np.diag(q_vec)
+
+            # Compute partial_theta_kb(kb)
+
+            theta_kb_vec = copy.deepcopy(theta_kb_vec)
+
+            dkb_dtheta_vec = self.__dphi_dtheta(theta_kb_vec, self.kb_bnds)
+
+            dkb_dtheta_mtrx = np.diag(dkb_dtheta_vec)
+
+            # Store product
 
             try:
-                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, q_mtrx])
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, - q_mtrx @ dkb_dtheta_mtrx])
             except NameError:
-                dr_dtheta_mtrx = np.hstack([q_mtrx])
+                dr_dtheta_mtrx = np.hstack([- q_mtrx @ dkb_dtheta_mtrx])
 
         # -----------------------------------------------------
         # partial_theta_alpha(r) = X partial_theta_alpha(alpha)
         # -----------------------------------------------------
         if theta_alpha_lst is not None:
 
+            # Compute X
+
             n_alphas = 0
             for alpha_mtrx in theta_alpha_lst:
                 n_alphas += alpha_mtrx.shape[1]
 
             theta_alpha_lst = copy.deepcopy(theta_alpha_lst)
-
-            dalpha_dtheta_lst = self.__dphi_dtheta(theta_alpha_lst, self.alpha_bnds)
 
             alpha_lst = self.perform_reparam(theta_alpha_lst, self.alpha_bnds)
 
@@ -1104,6 +1124,7 @@ class ReactionMechanism:
             for (irxn, alpha_mtrx) in enumerate(alpha_lst):
 
                 active_spc_ids = alpha_mtrx[0, :].astype(int)
+
                 active_spc_molar_cc = spc_molar_cc_vec[active_spc_ids]
 
                 spc_cc_power_prod = np.prod(active_spc_molar_cc**alpha_mtrx[1, :])
@@ -1115,13 +1136,8 @@ class ReactionMechanism:
                     (jdx, ) = np.where(active_spc_molar_cc == min_c_j)
                     active_spc_molar_cc[jdx] = 1.0 # any non-zero value will do since rf_i will be zero
 
-                dalpha_dtheta_data_mtrx = dalpha_dtheta_lst[irxn] # this data includes the j mapping
-                #assert(dalpha_dtheta_data_mtrx[0,:] == alpha_mtrx[0,:]) # reactant IDs must match
-
                 w_vec_i = np.log(active_spc_molar_cc)
                 x_vec_i = rf_i * w_vec_i
-
-                dalpha_dtheta_mtrx_i = np.diag(dalpha_dtheta_data_mtrx[1,:])
 
                 n_alpha_i = alpha_mtrx.shape[1]
                 x_mtrx_j_block = np.zeros((len(self.reactions), n_alpha_i), dtype = np.float64)
@@ -1132,12 +1148,24 @@ class ReactionMechanism:
                     x_mtrx = np.hstack([x_mtrx, x_mtrx_j_block])
                 except NameError:
                     x_mtrx = np.hstack([x_mtrx_j_block])
+
+            assert x_mtrx.shape == (len(alpha_lst), n_alphas), 'n_alphas = %r; U shape = %r' % (n_alphas, x_mtrx.shape)
+
+            # Compute partial_theta_alpha(alpha)
+
+            dalpha_dtheta_lst = self.__dphi_dtheta(theta_alpha_lst, self.alpha_bnds)
+
+            for dalpha_dtheta_data_mtrx in dalpha_dtheta_lst:
+
+                #assert(dalpha_dtheta_data_mtrx[0,:] == alpha_mtrx[0,:]) # reactant IDs must match
+                dalpha_dtheta_mtrx_i = np.diag(dalpha_dtheta_data_mtrx[1,:])
+
                 try:
                     dalpha_dtheta_mtrx = sp.linalg.block_diag(dalpha_dtheta_mtrx, dalpha_dtheta_mtrx_i)
                 except NameError:
                     dalpha_dtheta_mtrx = sp.linalg.block_diag(dalpha_dtheta_mtrx_i)
 
-            assert x_mtrx.shape == (len(alpha_lst), n_alphas), 'n_alphas = %r; U shape = %r' % (n_alphas, x_mtrx.shape)
+            # Store product
 
             try:
                 dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, x_mtrx @ dalpha_dtheta_mtrx])
@@ -1149,13 +1177,13 @@ class ReactionMechanism:
         # --------------------------------------------------
         if theta_beta_lst is not None:
 
+            # Compute Y
+
             n_betas=0
             for beta_mtrx in theta_beta_lst:
                 n_betas += beta_mtrx.shape[1]
 
             theta_beta_lst = copy.deepcopy(theta_beta_lst)
-
-            dbeta_dtheta_lst = self.__dphi_dtheta(theta_beta_lst, self.beta_bnds)
 
             beta_lst = self.perform_reparam(theta_beta_lst, self.beta_bnds)
 
@@ -1169,6 +1197,7 @@ class ReactionMechanism:
             for (irxn, beta_mtrx) in enumerate(beta_lst):
 
                 active_spc_ids = beta_mtrx[0, :].astype(int)
+
                 active_spc_molar_cc = spc_molar_cc_vec[active_spc_ids]
 
                 spc_cc_power_prod = np.prod(active_spc_molar_cc**beta_mtrx[1, :])
@@ -1180,13 +1209,8 @@ class ReactionMechanism:
                     (jdx, ) = np.where(active_spc_molar_cc == min_c_j)
                     active_spc_molar_cc[jdx] = 1.0  # any non-zero value will do it since rb_i will be zero
 
-                dbeta_dtheta_data_mtrx = dbeta_dtheta_lst[irxn] # this data includes the j mapping
-                #assert(dalpha_dtheta_mtrx[0,:] == alpha_mtrx[0,:]) # reactant IDs must match
-
                 w_vec_i = np.log(active_spc_molar_cc)
                 y_vec_i = rb_i * w_vec_i
-
-                dbeta_dtheta_mtrx_i = np.diag(dbeta_dtheta_data_mtrx[1,:])
 
                 n_beta_i = beta_mtrx.shape[1]
                 y_mtrx_j_block = np.zeros((len(self.reactions), n_beta_i), dtype = np.float64)
@@ -1197,15 +1221,27 @@ class ReactionMechanism:
                     y_mtrx = np.hstack([y_mtrx, y_mtrx_j_block])
                 except NameError:
                     y_mtrx = np.hstack([y_mtrx_j_block])
+
+            assert y_mtrx.shape == (len(beta_lst), n_betas), 'n_betas = %r; V shape = %r' % (n_betas, y_mtrx.shape)
+
+            # Compute partial_theta_beta(beta)
+
+            dbeta_dtheta_lst = self.__dphi_dtheta(theta_beta_lst, self.beta_bnds)
+
+            for dbeta_dtheta_data_mtrx in dbeta_dtheta_lst:
+
+                #assert(dalpha_dtheta_mtrx[0,:] == alpha_mtrx[0,:]) # reactant IDs must match
+                dbeta_dtheta_mtrx_i = np.diag(dbeta_dtheta_data_mtrx[1,:])
+
                 try:
                     dbeta_dtheta_mtrx = sp.linalg.block_diag(dbeta_dtheta_mtrx, dbeta_dtheta_mtrx_i)
                 except NameError:
                     dbeta_dtheta_mtrx = sp.linalg.block_diag(dbeta_dtheta_mtrx_i)
 
-            assert y_mtrx.shape == (len(beta_lst), n_betas), 'n_betas = %r; V shape = %r' % (n_betas, y_mtrx.shape)
+            # Store product
 
             try:
-                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, -y_mtrx @ dbeta_dtheta_mtrx])
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, (- y_mtrx @ dbeta_dtheta_mtrx)])
             except NameError:
                 dr_dtheta_mtrx = np.hstack([-y_mtrx @ dbeta_dtheta_mtrx])
 
@@ -1441,6 +1477,557 @@ class ReactionMechanism:
             theta_vec = copy.deepcopy(kf_vec) #kf's
 
             dkf_dtheta_vec = self.__dphi_dtheta(theta_vec, self.kf_bnds)
+
+
+            alpha_lst_local = copy.deepcopy(alpha_lst)
+            alpha_lst_local = self.perform_reparam(alpha_lst_local, self.alpha_bnds)
+
+            #kf_vec_local = copy.deepcopy(kf_vec)
+            #kf_vec = self.reparam(kf_vec, self.kf_bnds)
+
+            jdx_start=0
+
+            for idx in range(rxn_idx):
+
+                alpha_mtrx=alpha_lst_local[idx]
+                jdx_start += alpha_mtrx.shape[1]
+
+
+            rxn_idx_alpha_mtrx = alpha_lst_local[rxn_idx]
+            rxn_idx_dalpha_dtheta_mtrx = dalpha_dtheta_lst[rxn_idx]
+            #assert(rxn_idx_dalpha_dtheta_mtrx[0,:] == rxn_idx_alpha_mtrx[0,:]) # reactant IDs must match
+
+            reactants_ids=rxn_idx_alpha_mtrx[0, :].astype(int)
+
+            reactants_molar_cc=spc_molar_cc_vec[reactants_ids]
+
+            spc_cc_power_prod=np.prod(reactants_molar_cc**rxn_idx_alpha_mtrx[1, :])
+
+            min_c_j=reactants_molar_cc.min()
+            if min_c_j <= 1e-25:
+                (jdx, )=np.where(reactants_molar_cc == min_c_j)
+                reactants_molar_cc[jdx]=1.0  # any non-zero value will do since rb_i will be zero
+
+
+
+            for jdx in range(rxn_idx_alpha_mtrx[1,:].size):
+
+                c_j = reactants_molar_cc[jdx]
+
+                d_alpha_d_kf_ri_mtrx[rxn_idx, jdx_start + jdx] = spc_cc_power_prod * math.log(c_j) * rxn_idx_dalpha_dtheta_mtrx[1, jdx] * dkf_dtheta_vec [rxn_idx]
+
+
+            '''
+            for (jdx, c_j) in enumerate(reactants_molar_cc):
+                d_alpha_d_kf_ri_mtrx[idx, jdx_start + jdx] = spc_cc_power_prod * math.log(c_j)
+
+                for (jdx, c_j) in enumerate(reactants_molar_cc):
+
+                    d_alpha_d_kf_ri_mtrx[idx, jdx_start + jdx] = dkf_dtheta_vec[idx] * math.log(c_j) * dalpha_dtheta_mtrx[1, jdx] * spc_cc_power_prod
+
+                jdx_start += alpha_mtrx.shape[1]
+            '''
+            #assert jdx_start == n_alphas, 'n_alphas = %r; sum = %r' % (n_alphas, jdx_start)
+
+        # ------------------------------
+        # partial_beta(partial_kf r_i)
+        # ------------------------------
+        if kf_vec is not None and beta_lst is not None:
+
+            n_betas=0
+            for beta_mtrx in beta_lst:
+                n_betas += beta_mtrx.shape[1]
+
+            d_beta_d_kf_ri_mtrx= np.zeros((len(self.reactions), n_betas), dtype = np.float64)
+
+        # *******************************************************************************************
+        # 2nd row block
+
+        # ---------------------------
+        # partial_kb(partial_kb r_i)
+        # ---------------------------
+        if kb_vec is not None:
+
+            d_kb_d_kb_ri_mtrx= np.zeros((len(self.reactions), len(self.reactions)), dtype = np.float64)
+
+            theta_vec = copy.deepcopy(kb_vec)
+
+            d2kb_dtheta2_vec = self.__d2phi_dtheta2(theta_vec, self.kb_bnds)
+
+
+            if beta_lst is None:
+                    (_, beta_lst_local)=self.__get_power_law_exponents()
+            else:
+                    beta_lst_local= copy.deepcopy(beta_lst)
+
+            beta_lst_local = self.perform_reparam(beta_lst_local, self.beta_bnds)
+
+
+
+            beta_mtrx=beta_lst_local[rxn_idx]
+            products_ids=beta_mtrx[0, :].astype(int)
+
+            products_molar_cc=spc_molar_cc_vec[products_ids]
+
+            spc_cc_power_prod=np.prod(products_molar_cc**beta_mtrx[1, :])
+
+            d_kb_d_kb_ri_mtrx[rxn_idx, rxn_idx]=- \
+                        d2kb_dtheta2_vec[rxn_idx] * spc_cc_power_prod
+
+        # ------------------------------
+        # partial_alpha(partial_kb r_i)
+        # ------------------------------
+        if kb_vec is not None and alpha_lst is not None:
+
+            n_alphas=0
+            for alpha_mtrx in alpha_lst:
+                n_alphas += alpha_mtrx.shape[1]
+
+            d_alpha_d_kb_ri_mtrx= np.zeros((len(self.reactions), n_alphas), dtype = np.float64)
+
+        # ------------------------------
+        # partial_beta(partial_kb r_i)
+        # ------------------------------
+        if kb_vec is not None and beta_lst is not None:
+
+            n_betas=0
+            for beta_mtrx in beta_lst:
+                n_betas += beta_mtrx.shape[1]
+
+            d_beta_d_kb_ri_mtrx= np.zeros((len(self.reactions), n_betas), dtype = np.float64)
+
+            theta_lst = copy.deepcopy(beta_lst)
+            theta_vec = copy.deepcopy(kb_vec)
+
+            dbeta_dtheta_lst = self.__dphi_dtheta(theta_lst, self.beta_bnds)
+            dkb_dtheta_vec = self.__dphi_dtheta(kb_vec, self.kb_bnds)
+
+
+            beta_lst_local=copy.deepcopy(beta_lst)
+            beta_lst_local = self.perform_reparam(beta_lst_local, self.beta_bnds)
+
+            #kb_vec= self.perform_reparam(kb_vec, self.kb_bnds)
+
+            jdx_start=0
+
+            for idx in range(rxn_idx):
+
+                beta_mtrx = beta_lst_local[idx]
+                jdx_start += beta_mtrx.shape[1]
+
+            rxn_idx_beta_mtrx = beta_lst_local[rxn_idx]
+            rxn_idx_dbeta_dtheta_mtrx = dbeta_dtheta_lst[rxn_idx]
+
+            products_ids=rxn_idx_beta_mtrx[0, :].astype(int)
+
+            products_molar_cc=spc_molar_cc_vec[products_ids]
+
+
+            spc_cc_power_prod= - np.prod(products_molar_cc**rxn_idx_beta_mtrx[1, :])
+
+            min_c_j=products_molar_cc.min()
+            if min_c_j <= 1e-25:
+                (jdx, )=np.where(products_molar_cc == min_c_j)
+                products_molar_cc[jdx]=1.0  # any non-zero value will do since rb_i will be zero
+
+            for jdx in range(rxn_idx_beta_mtrx[1,:].size):
+
+
+                c_j = products_molar_cc[jdx]
+                d_beta_d_kb_ri_mtrx[rxn_idx, jdx_start + jdx] = spc_cc_power_prod * math.log(c_j) * rxn_idx_dbeta_dtheta_mtrx[1, jdx] * dkb_dtheta_vec[rxn_idx]
+
+            #assert jdx_start == n_betas, 'n_betas = %r; sum = %r' % (
+            #    n_betas, jdx_start)
+
+        # *******************************************************************************************
+        # 3rd row block
+
+        # ---------------------------------
+        # partial_alpha(partial_alpha r_i)
+        # ---------------------------------
+        if alpha_lst is not None:
+
+            n_alphas=0
+            for alpha_mtrx in alpha_lst:
+                n_alphas += alpha_mtrx.shape[1]
+
+            d_alpha_d_alpha_ri_mtrx= np.zeros((n_alphas, n_alphas), dtype = np.float64)
+
+            theta_lst = copy.deepcopy(alpha_lst)
+
+            d2alpha_dtheta2_lst = self.__d2phi_dtheta2(theta_lst, self.alpha_bnds)
+
+            theta_lst = copy.deepcopy(alpha_lst)
+
+            dalpha_dtheta_lst = self.__dphi_dtheta(theta_lst, self.alpha_bnds)
+
+
+
+            alpha_lst_local=copy.deepcopy(alpha_lst)
+
+
+            if kf_vec is None:
+                (kf_vec_local, _)=self.__get_ks()
+            else:
+                kf_vec_local= copy.deepcopy(kf_vec)
+
+
+            kf_vec_local = self.perform_reparam(kf_vec_local, self.kf_bnds)
+
+            jdx_start=0
+            idx_start=0
+
+            for idx in range(rxn_idx):
+
+                alpha_mtrx=alpha_lst_local[idx]
+                jdx_start += alpha_mtrx.shape[1]
+
+
+            alpha_mtrx = alpha_lst_local[rxn_idx]
+
+
+            reactants_ids=alpha_mtrx[0, :].astype(int)
+
+            reactants_molar_cc=spc_molar_cc_vec[reactants_ids]
+
+            spc_cc_power_prod=np.prod(reactants_molar_cc**alpha_mtrx[1, :])
+
+            rf_i=kf_vec_local[rxn_idx] * spc_cc_power_prod
+
+            min_c_j=reactants_molar_cc.min()
+            if min_c_j <= 1e-25:
+                (jdx, )=np.where(reactants_molar_cc == min_c_j)
+                reactants_molar_cc[jdx]=1.0  # any non-zero value will do since rb_i will be zero
+
+
+
+            dalpha_dtheta_mtrx = dalpha_dtheta_lst[rxn_idx]
+            d2alpha_dtheta2_mtrx = d2alpha_dtheta2_lst[rxn_idx]
+
+            for jdx in range(alpha_mtrx[1,:].size):
+
+                c_j = reactants_molar_cc[jdx]
+
+                dalpha_j_dtheta_j = dalpha_dtheta_mtrx[1 , jdx]
+                d2alpha_dtheta2 = d2alpha_dtheta2_mtrx[1 , jdx]
+
+                for Jdx in range(alpha_mtrx[1,:].size):
+
+
+                    dalpha_J_dtheta_J = dalpha_dtheta_mtrx[1 , Jdx]
+                    c_J = reactants_molar_cc[Jdx]
+
+                    d2r_dalpha2 = rf_i * math.log(c_j) * math.log(c_J)
+                    dr_dtheta_prod = dalpha_j_dtheta_j * dalpha_J_dtheta_J
+
+                    if jdx == Jdx:
+
+                        d_alpha_d_alpha_ri_mtrx[jdx_start + jdx, jdx_start + Jdx] = d2r_dalpha2 * dr_dtheta_prod + rf_i * math.log(c_j) * d2alpha_dtheta2
+
+                    else:
+
+                        d_alpha_d_alpha_ri_mtrx[jdx_start + jdx, jdx_start + Jdx] = d2r_dalpha2 * dr_dtheta_prod
+
+        # --------------------------------
+        # partial_beta(partial_alpha r_i)
+        # --------------------------------
+        if alpha_lst is not None and beta_lst is not None:
+
+            n_alphas=0
+            for alpha_mtrx in alpha_lst:
+                n_alphas += alpha_mtrx.shape[1]
+
+            n_betas=0
+            for beta_mtrx in beta_lst:
+                n_betas += beta_mtrx.shape[1]
+
+            d_beta_d_alpha_ri_mtrx= np.zeros((n_alphas, n_betas), dtype = np.float64)
+
+        # *******************************************************************************************
+        # 4th row block
+
+        # ---------------------------------
+        # partial_beta(partial_beta r_i)
+        # ---------------------------------
+        if beta_lst is not None:
+
+            n_betas=0
+            for beta_mtrx in beta_lst:
+                n_betas += beta_mtrx.shape[1]
+
+            d_beta_d_beta_ri_mtrx = np.zeros((n_betas, n_betas), dtype = np.float64)
+
+            theta_lst = copy.deepcopy(beta_lst)
+
+            d2beta_dtheta2_lst = self.__d2phi_dtheta2(theta_lst, self.beta_bnds)
+
+            theta_lst = copy.deepcopy(beta_lst)
+
+            dbeta_dtheta_lst = self.__dphi_dtheta(theta_lst, self.beta_bnds)
+
+            beta_lst_local = copy.deepcopy(beta_lst)
+            beta_lst_local = self.perform_reparam(beta_lst_local, self.beta_bnds)
+
+            if kb_vec is None:
+                (_, kb_vec_local)=self.__get_ks()
+            else:
+                kb_vec_local = copy.deepcopy(kb_vec)
+
+            kb_vec_local = self.perform_reparam(kb_vec_local, self.kb_bnds)
+
+            jdx_start=0
+            idx_start=0
+
+            for idx in range(rxn_idx):
+                beta_mtrx = beta_lst_local[idx]
+                jdx_start += beta_mtrx.shape[1]
+
+            beta_mtrx=beta_lst_local[rxn_idx]
+
+            products_ids=beta_mtrx[0, :].astype(int)
+
+            products_molar_cc=spc_molar_cc_vec[products_ids]
+
+            spc_cc_power_prod= np.prod(products_molar_cc**beta_mtrx[1, :])
+
+            rb_i=- kb_vec_local[rxn_idx] * spc_cc_power_prod
+
+            min_c_j=products_molar_cc.min()
+            if min_c_j <= 1e-25:
+                (jdx, )=np.where(products_molar_cc == min_c_j)
+                products_molar_cc[jdx]=1.0  # any non-zero value will do since rb_i will be zero
+
+            dbeta_dtheta_mtrx = dbeta_dtheta_lst[rxn_idx]
+            d2beta_dtheta2_mtrx = d2beta_dtheta2_lst[rxn_idx]
+
+            for jdx in range(beta_mtrx[1,:].size):
+
+                c_j = reactants_molar_cc[jdx]
+
+                dbeta_j_dtheta_j = dbeta_dtheta_mtrx[1 , jdx]
+                d2beta_dtheta2 = d2beta_dtheta2_mtrx[1 , jdx]
+
+                for Jdx in range(beta_mtrx[1,:].size):
+
+                    dbeta_J_dtheta_J = dbeta_dtheta_mtrx[1 , Jdx]
+                    c_J = reactants_molar_cc[Jdx]
+
+                    d2r_dbeta2 = rb_i * math.log(c_j) * math.log(c_J)
+                    dr_dtheta_prod = dbeta_j_dtheta_j * dbeta_J_dtheta_J
+
+                    if jdx == Jdx:
+
+                        d_beta_d_beta_ri_mtrx[jdx_start + jdx, jdx_start + Jdx] = d2r_dbeta2 * dr_dtheta_prod + rb_i * math.log(c_j) * d2beta_dtheta2
+
+                    else:
+
+                        d_beta_d_beta_ri_mtrx[jdx_start + jdx, jdx_start + Jdx] = d2r_dbeta2 * dr_dtheta_prod
+
+        # *******************************************************************************************
+        # Assembly
+
+        # General case
+        if kf_vec is not None and kb_vec is not None and alpha_lst is not None and beta_lst is not None:
+
+            hessian_ri_1st_row=np.hstack(
+                [d_kf_d_kf_ri_mtrx, d_kb_d_kf_ri_mtrx, d_alpha_d_kf_ri_mtrx, d_beta_d_kf_ri_mtrx])
+
+            hessian_ri_2nd_row=np.hstack([d_kb_d_kf_ri_mtrx.transpose(
+            ), d_kb_d_kb_ri_mtrx, d_alpha_d_kb_ri_mtrx, d_beta_d_kb_ri_mtrx])
+
+            hessian_ri_3rd_row=np.hstack([d_alpha_d_kf_ri_mtrx.transpose(
+            ), d_alpha_d_kb_ri_mtrx.transpose(), d_alpha_d_alpha_ri_mtrx, d_beta_d_alpha_ri_mtrx])
+
+            hessian_ri_4th_row=np.hstack([d_beta_d_kf_ri_mtrx.transpose(), d_beta_d_kb_ri_mtrx.transpose(
+            ), d_beta_d_alpha_ri_mtrx.transpose(), d_beta_d_beta_ri_mtrx])
+
+            hessian_ri=np.vstack(
+                [hessian_ri_1st_row, hessian_ri_2nd_row, hessian_ri_3rd_row, hessian_ri_4th_row])
+
+        # Forward case
+        elif kf_vec is not None and alpha_lst is not None and kb_vec is None and beta_lst is None:
+
+            hessian_ri_1st_row=np.hstack(
+                [d_kf_d_kf_ri_mtrx, d_alpha_d_kf_ri_mtrx])
+            hessian_ri_2nd_row=np.hstack(
+                [d_alpha_d_kf_ri_mtrx.transpose(), d_alpha_d_alpha_ri_mtrx])
+
+            hessian_ri=np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
+
+        # k's only case
+        elif kf_vec is not None and kb_vec is not None and alpha_lst is None and beta_lst is None:
+
+            hessian_ri_1st_row=np.hstack(
+                [d_kf_d_kf_ri_mtrx, d_kb_d_kf_ri_mtrx])
+            hessian_ri_2nd_row=np.hstack(
+                [d_kb_d_kf_ri_mtrx.transpose(), d_kb_d_kb_ri_mtrx])
+
+            hessian_ri=np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
+
+        # kfs only case
+        elif kf_vec is not None and kb_vec is None and alpha_lst is None and beta_lst is None:
+
+            hessian_ri=d_kf_d_kf_ri_mtrx
+
+        # k's and alphas only case
+        elif kf_vec is not None and kb_vec is not None and alpha_lst is not None and beta_lst is None:
+
+            hessian_ri_1st_row=np.hstack(
+                [d_kf_d_kf_ri_mtrx, d_kb_d_kf_ri_mtrx, d_alpha_d_kf_ri_mtrx])
+            hessian_ri_2nd_row=np.hstack(
+                [d_kb_d_kf_ri_mtrx.transpose(), d_kb_d_kb_ri_mtrx, d_alpha_d_kb_ri_mtrx])
+            hessian_ri_3rd_row=np.hstack([d_alpha_d_kf_ri_mtrx.transpose(
+            ), d_alpha_d_kb_ri_mtrx.transpose(), d_alpha_d_alpha_ri_mtrx])
+
+            hessian_ri=np.vstack(
+                [hessian_ri_1st_row, hessian_ri_2nd_row, hessian_ri_3rd_row])
+
+        # alphas only case
+        elif kf_vec is None and kb_vec is None and alpha_lst is not None and beta_lst is None:
+
+            hessian_ri=d_alpha_d_alpha_ri_mtrx
+
+        # betas only case
+        elif kf_vec is None and kb_vec is None and alpha_lst is None and beta_lst is not None:
+
+            hessian_ri=d_beta_d_beta_ri_mtrx
+
+        # alphas and betas only case
+        elif kf_vec is None and kb_vec is None and alpha_lst is not None and beta_lst is not None:
+
+            hessian_ri_1st_row=np.hstack(
+                [d_alpha_d_alpha_ri_mtrx, d_beta_d_alpha_ri_mtrx])
+            hessian_ri_2nd_row=np.hstack(
+                [d_beta_d_alpha_ri_mtrx.transpose(), d_beta_d_beta_ri_mtrx])
+
+            hessian_ri=np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
+
+        # kfs and betas only case
+        elif kf_vec is not None and kb_vec is None and alpha_lst is None and beta_lst is not None:
+
+            hessian_ri_1st_row=np.hstack(
+                [d_kf_d_kf_ri_mtrx, d_beta_d_kf_ri_mtrx])
+            hessian_ri_2nd_row=np.hstack(
+                [d_beta_d_kf_ri_mtrx.transpose(), d_beta_d_beta_ri_mtrx])
+
+            hessian_ri=np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
+
+        # kbs and alphas only case
+        elif kf_vec is None and kb_vec is not None and alpha_lst is not None and beta_lst is None:
+
+            hessian_ri_1st_row=np.hstack(
+                [d_kb_d_kb_ri_mtrx, d_alpha_d_kb_ri_mtrx])
+            hessian_ri_2nd_row=np.hstack(
+                [d_alpha_d_kb_ri_mtrx.transpose(), d_alpha_d_alpha_ri_mtrx])
+
+            hessian_ri=np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
+
+        else:
+            assert False, 'Hessian ri case not implemented.'
+
+        return hessian_ri
+
+    def d2ri_theta2_mtrx_new(self, rxn_idx, spc_molar_cc_vec,
+                             theta_kf_vec = None, theta_kb_vec =None, 
+                             theta_alpha_lst=None, theta_beta_lst=None):
+        '''Second partial derivatives of the ith reaction rate law wrt parameters.
+
+        The parameters in the derivative are ordered as: k_fs, k_bs, alphas, betas.
+        The matrix is p x p. Where p is the total number of parameters.
+        That, is p = 2 * m + n_alpha + n_beta, where n_alpha is the number of active forward reaction
+        species, and n_beta is the number of active reverse reaction species.
+        '''
+
+        assert isinstance(rxn_idx, int)
+        assert 0 < rxn_idx <= len(self.reactions)
+
+        assert isinstance(spc_molar_cc_vec, np.ndarray)
+        assert spc_molar_cc_vec.size == len(self.species)
+        assert np.all(spc_molar_cc_vec >= 0), 'spc_molar_cc_vec =\n%r' % spc_molar_cc_vec
+
+        # *******************************************************************************************
+        # 1st row block  partial_kf(r_i)
+
+        # --------------------------------------
+        # partial_theta_kf(partial_theta_kf r_i)
+        # --------------------------------------
+        if theta_kf_vec is not None:
+
+            d_theta_kf_d_theta_kf_ri_mtrx = np.zeros((len(self.reactions), len(self.reactions)), dtype = np.float64)
+
+        # --------------------------------------
+        # partial_theta_kb(partial_theta_kf r_i)
+        # --------------------------------------
+        if theta_kf_vec is not None and theta_kb_vec is not None:
+
+            d_theta_kb_d_theta_kf_ri_mtrx = np.zeros((len(self.reactions), len(self.reactions)), dtype = np.float64)
+
+        # -----------------------------------------
+        # partial_theta_alpha(partial_theta_kf r_i) = 
+        # partial_theta_kf(kf) P W_alpha_i partial_theta_alpha(alpha)
+        # -----------------------------------------
+        if theta_kf_vec is not None and theta_alpha_lst is not None:
+
+            n_alphas=0
+            for alpha_mtrx in theta_alpha_lst:
+                n_alphas += alpha_mtrx.shape[1]
+
+            d_theta_alpha_d_theta_kf_ri_mtrx = np.zeros((len(self.reactions), n_alphas), dtype = np.float64)
+
+            # Compute partial_theta_kf(kf)
+            theta_kf_vec = copy.deepcopy(theta_kf_vec)
+
+            dkf_dtheta_vec = self.__dphi_dtheta(theta_kf_vec, self.kf_bnds)
+
+            dkf_dtheta_mtrx = np.diag(dkf_dtheta_vec)
+
+            # Compute P
+            theta_alpha_lst = copy.deepcopy(theta_alpha_lst)
+            alpha_lst = self.perform_reparam(theta_alpha_lst, self.alpha_bnds)
+
+            p_vec = np.zeros(len(self.reactions), dtype = np.float64)
+
+            for (irxn, alpha_mtrx) in enumerate(alpha_lst):
+
+                active_spc_ids = alpha_mtrx[0, :].astype(int)
+
+                active_spc_molar_cc = spc_molar_cc_vec[active_spc_ids]
+
+                spc_cc_power_prod = np.prod(active_spc_molar_cc**alpha_mtrx[1, :])
+
+                p_vec[irxn] = spc_cc_power_prod
+
+            p_mtrx = np.diag(p_vec)
+
+            # Compute W_alpha_i where i is rxn_idx
+            alpha_mtrx = alpha_lst[rxn_idx]
+
+            active_spc_ids = alpha_mtrx[0, :].astype(int)
+
+            active_spc_molar_cc = spc_molar_cc_vec[active_spc_ids]
+
+            spc_cc_power_prod = np.prod(active_spc_molar_cc**alpha_mtrx[1, :])
+
+            dalpha_dtheta_lst = self.__dphi_dtheta(theta_alpha_lst, self.alpha_bnds)
+
+            min_c_j = active_spc_molar_cc.min()
+            if min_c_j <= 1e-25:
+                (jdx, ) = np.where(active_spc_molar_cc == min_c_j)
+                active_spc_molar_cc[jdx] = 1.0 # any non-zero value will do since rf_i will be zero
+
+            w_vec_i = np.log(active_spc_molar_cc)
+
+            w_alpha_i_mtrx = np.zeros((len(self.reactions), n_alphas), dtype = np.float64)
+
+            w_alpha_i_column_id = sum([alpha_mtrx.shape[1] for alpha_mtrx in theta_alpha_lst]) - 1
+            end = w_alpha_id_column_id + w_vec_j.size
+            assert end <= n_alphas
+
+            # insertion
+            w_alpha_i_mtrx[rxn_idx, w_alpha_i_column_id:end] = w_vec_i[:]
+
+            # Compute partial_theta_alpha(alpha)
+            #for (irxn, alpha_mtrx) in enumerate(alpha_lst):
 
 
             alpha_lst_local = copy.deepcopy(alpha_lst)
