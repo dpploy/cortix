@@ -2209,7 +2209,7 @@ class ReactionMechanism:
         # -----------------------------------------
         # partial_theta_kb(partial_theta_alpha r_i)
         # -----------------------------------------
-        if theta_alpha_lst is not None and theta_kf_vec is not None:
+        if theta_alpha_lst is not None and theta_kb_vec is not None:
 
             d_theta_kb_d_theta_alpha_ri_mtrx = d_theta_alpha_d_theta_kb_ri_mtrx.transpose()
 
@@ -2345,181 +2345,239 @@ class ReactionMechanism:
         # *******************************************************************************************
         # 4th row block
 
-        # ---------------------------------
-        # partial_beta(partial_beta r_i)
-        # ---------------------------------
-        if beta_lst is not None:
+        # ----------------------------------------
+        # partial_theta_kf(partial_theta_beta r_i)
+        # ----------------------------------------
+        if theta_beta_lst is not None and theta_kf_vec is not None:
+
+            d_theta_kf_d_theta_beta_ri_mtrx = d_theta_beta_d_theta_kf_ri_mtrx.transpose()
+
+        # ----------------------------------------
+        # partial_theta_kb(partial_theta_beta r_i)
+        # ----------------------------------------
+        if theta_beta_lst is not None and theta_kf_vec is not None:
+
+            d_theta_kb_d_theta_beta_ri_mtrx = d_theta_beta_d_theta_kb_ri_mtrx.transpose()
+
+        # -------------------------------------------
+        # partial_theta_alpha(partial_theta_beta r_i)
+        # -------------------------------------------
+        if theta_beta_lst is not None and theta_alpha_lst is not None:
+
+            d_theta_alpha_d_theta_beta_ri_mtrx = d_theta_beta_d_theta_alpha_ri_mtrx.tranpose()
+
+        # --------------------------------------------
+        # partial_theta_beta(partial_theta_beta r_i) =
+        # rbi ((partial_theta_beta(beta))^2  W_beta_iT W_beta_i + D2_theta_beta2(beta) Diag(w_beta_i)
+        # --------------------------------------------
+        if theta_beta_lst is not None:
+
+            # Compute rb_i where i is rxn_idx
+
+            # get kb
+            if theta_kb_vec is None:
+                (theta_kb_vec, _) = self.__get_ks()
+            else:
+                theta_kb_vec = copy.deepcopy(theta_kb_vec)
+
+            kb_vec = self.perform_reparam(theta_kb_vec, self.kb_bnds)
+
+            theta_beta_lst = copy.deepcopy(theta_beta_lst)
+
+            # get betas
+            beta_lst = self.perform_reparam(theta_beta_lst, self.beta_bnds)
+
+            beta_data_mtrx = beta_lst[rxn_idx]
+
+            active_spc_ids = beta_data_mtrx[0, :].astype(int)
+
+            beta_i_vec = beta_data_mtrx[1, :]
+
+            active_spc_molar_cc = spc_molar_cc_vec[active_spc_ids]
+
+            spc_cc_power_prod = np.prod(active_spc_molar_cc**beta_i_vec)
+
+            rb_i = kb_vec[rxn_idx] * spc_cc_power_prod
+
+            # Compute (partial_theta_beta(beta))^2
+
+            dbeta_dtheta_lst = self.__dphi_dtheta(theta_beta_lst, self.beta_bnds)
+
+            for dbeta_dtheta_data_mtrx in dbeta_dtheta_lst:
+
+                #assert(dbeta_dtheta_data_mtrx[0,:] == beta_data_mtrx[0,:]) # reactant IDs must match
+                dbeta_dtheta_mtrx_i = np.diag(dbeta_dtheta_data_mtrx[1,:])
+
+                try:
+                    dbeta_dtheta_mtrx = sp.linalg.block_diag(dbeta_dtheta_mtrx, dbeta_dtheta_mtrx_i)
+                except NameError:
+                    dbeta_dtheta_mtrx = sp.linalg.block_diag(dbeta_dtheta_mtrx_i)
+
+            dbeta_dtheta_mtrx_pwr2 = dbeta_dtheta_mtrx @ dbeta_dtheta_mtrx
+
+            # Compute W_beta_iT W_beta_i where i is rxn_idx
+
+            # get W_beta_i
 
             n_betas=0
-            for beta_mtrx in beta_lst:
-                n_betas += beta_mtrx.shape[1]
+            for beta_data_mtrx in beta_lst:
+                n_betas += beta_data_mtrx.shape[1]
 
-            d_beta_d_beta_ri_mtrx = np.zeros((n_betas, n_betas), dtype = np.float64)
+            beta_data_i_mtrx = beta_lst[rxn_idx]
 
-            theta_lst = copy.deepcopy(beta_lst)
+            active_spc_ids = beta_data_i_mtrx[0, :].astype(int)
 
-            d2beta_dtheta2_lst = self.__d2phi_dtheta2(theta_lst, self.beta_bnds)
+            beta_i_vec = beta_data_i_mtrx[1, :]
 
-            theta_lst = copy.deepcopy(beta_lst)
+            active_spc_molar_cc = spc_molar_cc_vec[active_spc_ids]
 
-            dbeta_dtheta_lst = self.__dphi_dtheta(theta_lst, self.beta_bnds)
+            spc_cc_power_prod = np.prod(active_spc_molar_cc**beta_i_vec)
 
-            beta_lst_local = copy.deepcopy(beta_lst)
-            beta_lst_local = self.perform_reparam(beta_lst_local, self.beta_bnds)
-
-            if kb_vec is None:
-                (_, kb_vec_local)=self.__get_ks()
-            else:
-                kb_vec_local = copy.deepcopy(kb_vec)
-
-            kb_vec_local = self.perform_reparam(kb_vec_local, self.kb_bnds)
-
-            jdx_start=0
-            idx_start=0
-
-            for idx in range(rxn_idx):
-                beta_mtrx = beta_lst_local[idx]
-                jdx_start += beta_mtrx.shape[1]
-
-            beta_mtrx=beta_lst_local[rxn_idx]
-
-            products_ids=beta_mtrx[0, :].astype(int)
-
-            products_molar_cc=spc_molar_cc_vec[products_ids]
-
-            spc_cc_power_prod= np.prod(products_molar_cc**beta_mtrx[1, :])
-
-            rb_i=- kb_vec_local[rxn_idx] * spc_cc_power_prod
-
-            min_c_j=products_molar_cc.min()
+            min_c_j = active_spc_molar_cc.min()
             if min_c_j <= 1e-25:
-                (jdx, )=np.where(products_molar_cc == min_c_j)
-                products_molar_cc[jdx]=1.0  # any non-zero value will do since rb_i will be zero
+                (jdx, ) = np.where(active_spc_molar_cc == min_c_j)
+                active_spc_molar_cc[jdx] = 1.0 # any non-zero value will do since rb_i will be zero
 
-            dbeta_dtheta_mtrx = dbeta_dtheta_lst[rxn_idx]
-            d2beta_dtheta2_mtrx = d2beta_dtheta2_lst[rxn_idx]
+            w_beta_i_vec = np.log(active_spc_molar_cc)
 
-            for jdx in range(beta_mtrx[1,:].size):
+            w_beta_i_mtrx = np.zeros((len(self.reactions), n_betas), dtype = np.float64)
 
-                c_j = reactants_molar_cc[jdx]
+            w_beta_i_column_id = \
+                    sum([beta_data_mtrx.shape[1] for beta_data_mtrx in beta_lst[:rxn_idx]]) - 1
 
-                dbeta_j_dtheta_j = dbeta_dtheta_mtrx[1 , jdx]
-                d2beta_dtheta2 = d2beta_dtheta2_mtrx[1 , jdx]
+            end = w_beta_i_column_id + w_beta_i_vec.size
 
-                for Jdx in range(beta_mtrx[1,:].size):
+            assert end <= n_betas
 
-                    dbeta_J_dtheta_J = dbeta_dtheta_mtrx[1 , Jdx]
-                    c_J = reactants_molar_cc[Jdx]
+            # insertion
+            w_beta_i_mtrx[rxn_idx, w_beta_i_column_id:end] = w_beta_i_vec[:]
 
-                    d2r_dbeta2 = rb_i * math.log(c_j) * math.log(c_J)
-                    dr_dtheta_prod = dbeta_j_dtheta_j * dbeta_J_dtheta_J
+            w_beta_i_T_w_beta_i_mtrx = w_beta_i_mtrx.transpose() @ w_beta_i_mtrx
 
-                    if jdx == Jdx:
+            # Compute D2_theta_beta2(beta)
 
-                        d_beta_d_beta_ri_mtrx[jdx_start + jdx, jdx_start + Jdx] = d2r_dbeta2 * dr_dtheta_prod + rb_i * math.log(c_j) * d2beta_dtheta2
+            d2beta_dtheta2_lst = self.__d2phi_dtheta2(theta_beta_lst, self.beta_bnds)
 
-                    else:
+            for d2beta_dtheta2_data_mtrx in d2beta_dtheta2_lst:
 
-                        d_beta_d_beta_ri_mtrx[jdx_start + jdx, jdx_start + Jdx] = d2r_dbeta2 * dr_dtheta_prod
+                d2beta_dtheta2_mtrx_i = np.diag(d2beta_dtheta2_data_mtrx[1,:])
+
+                try:
+                    d2beta_dtheta2_mtrx = sp.linalg.block_diag(d2beta_dtheta2_mtrx, d2beta_dtheta2_mtrx_i)
+                except NameError:
+                    d2beta_dtheta2_mtrx = sp.linalg.block_diag(d2beta_dtheta2_mtrx_i)
+
+            # Compute Diag(W_beta_i_irow)
+
+            w_beta_i_irow = w_beta_i_mtrx[rxn_idx]
+
+            diag_w_beta_i_irow = np.diag(w_beta_i_irow)
+
+            # Compute product
+
+            d_theta_beta_d_theta_beta_ri_mtrx = \
+                    rb_i * (dbeta_dtheta_mtrx_pwr2 @ w_beta_i_T_w_beta_i_mtrx \
+                            + \
+                            d2beta_dtheta2_mtrx @ diag_w_beta_i_irow)
 
         # *******************************************************************************************
         # Assembly
 
         # General case
-        if kf_vec is not None and kb_vec is not None and alpha_lst is not None and beta_lst is not None:
+        if theta_kf_vec is not None and theta_kb_vec is not None and theta_alpha_lst is not None and theta_beta_lst is not None:
 
-            hessian_ri_1st_row=np.hstack(
-                [d_kf_d_kf_ri_mtrx, d_kb_d_kf_ri_mtrx, d_alpha_d_kf_ri_mtrx, d_beta_d_kf_ri_mtrx])
+            hessian_ri_1st_row = np.hstack(
+                [d_theta_kf_d_theta_kf_ri_mtrx, d_theta_kb_d_theta_kf_ri_mtrx, d_theta_alpha_d_theta_kf_ri_mtrx, d_theta_beta_d_theta_kf_ri_mtrx])
 
-            hessian_ri_2nd_row=np.hstack([d_kb_d_kf_ri_mtrx.transpose(
-            ), d_kb_d_kb_ri_mtrx, d_alpha_d_kb_ri_mtrx, d_beta_d_kb_ri_mtrx])
+            hessian_ri_2nd_row = np.hstack([d_theta_kb_d_theta_kf_ri_mtrx.transpose(
+            ), d_theta_kb_d_theta_kb_ri_mtrx, d_theta_alpha_d_theta_kb_ri_mtrx, d_theta_beta_d_theta_kb_ri_mtrx])
 
-            hessian_ri_3rd_row=np.hstack([d_alpha_d_kf_ri_mtrx.transpose(
-            ), d_alpha_d_kb_ri_mtrx.transpose(), d_alpha_d_alpha_ri_mtrx, d_beta_d_alpha_ri_mtrx])
+            hessian_ri_3rd_row = np.hstack([d_theta_alpha_d_theta_kf_ri_mtrx.transpose(
+            ), d_theta_alpha_d_theta_kb_ri_mtrx.transpose(), d_theta_alpha_d_theta_alpha_ri_mtrx, d_theta_beta_d_theta_alpha_ri_mtrx])
 
-            hessian_ri_4th_row=np.hstack([d_beta_d_kf_ri_mtrx.transpose(), d_beta_d_kb_ri_mtrx.transpose(
-            ), d_beta_d_alpha_ri_mtrx.transpose(), d_beta_d_beta_ri_mtrx])
+            hessian_ri_4th_row = np.hstack([d_theta_beta_d_ktheta_f_ri_mtrx.transpose(), d_theta_beta_d_theta_kb_ri_mtrx.transpose(
+            ), d_theta_beta_d_theta_alpha_ri_mtrx.transpose(), d_theta_beta_d_theta_beta_ri_mtrx])
 
-            hessian_ri=np.vstack(
+            hessian_ri = np.vstack(
                 [hessian_ri_1st_row, hessian_ri_2nd_row, hessian_ri_3rd_row, hessian_ri_4th_row])
 
         # Forward case
-        elif kf_vec is not None and alpha_lst is not None and kb_vec is None and beta_lst is None:
+        elif theta_kf_vec is not None and theta_alpha_lst is not None and theta_kb_vec is None and theta_beta_lst is None:
 
-            hessian_ri_1st_row=np.hstack(
-                [d_kf_d_kf_ri_mtrx, d_alpha_d_kf_ri_mtrx])
-            hessian_ri_2nd_row=np.hstack(
-                [d_alpha_d_kf_ri_mtrx.transpose(), d_alpha_d_alpha_ri_mtrx])
+            hessian_ri_1st_row = np.hstack(
+                [d_theta_kf_d_theta_kf_ri_mtrx, d_theta_alpha_d_theta_kf_ri_mtrx])
+            hessian_ri_2nd_row = np.hstack(
+                [d_theta_alpha_d_theta_kf_ri_mtrx.transpose(), d_theta_alpha_d_theta_alpha_ri_mtrx])
 
-            hessian_ri=np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
+            hessian_ri = np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
 
         # k's only case
-        elif kf_vec is not None and kb_vec is not None and alpha_lst is None and beta_lst is None:
+        elif theta_kf_vec is not None and theta_kb_vec is not None and theta_alpha_lst is None and theta_beta_lst is None:
 
-            hessian_ri_1st_row=np.hstack(
-                [d_kf_d_kf_ri_mtrx, d_kb_d_kf_ri_mtrx])
-            hessian_ri_2nd_row=np.hstack(
-                [d_kb_d_kf_ri_mtrx.transpose(), d_kb_d_kb_ri_mtrx])
+            hessian_ri_1st_row = np.hstack(
+                [d_theta_kf_d_theta_kf_ri_mtrx, d_theta_kb_d_theta_kf_ri_mtrx])
+            hessian_ri_2nd_row = np.hstack(
+                [d_theta_kb_d_theta_kf_ri_mtrx.transpose(), d_theta_kb_d_theta_kb_ri_mtrx])
 
-            hessian_ri=np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
+            hessian_ri = np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
 
         # kfs only case
-        elif kf_vec is not None and kb_vec is None and alpha_lst is None and beta_lst is None:
+        elif theta_kf_vec is not None and theta_kb_vec is None and theta_alpha_lst is None and theta_beta_lst is None:
 
-            hessian_ri=d_kf_d_kf_ri_mtrx
+            hessian_ri = d_theta_kf_d_theta_kf_ri_mtrx
 
         # k's and alphas only case
-        elif kf_vec is not None and kb_vec is not None and alpha_lst is not None and beta_lst is None:
+        elif theta_kf_vec is not None and theta_kb_vec is not None and theta_alpha_lst is not None and theta_beta_lst is None:
 
-            hessian_ri_1st_row=np.hstack(
-                [d_kf_d_kf_ri_mtrx, d_kb_d_kf_ri_mtrx, d_alpha_d_kf_ri_mtrx])
-            hessian_ri_2nd_row=np.hstack(
-                [d_kb_d_kf_ri_mtrx.transpose(), d_kb_d_kb_ri_mtrx, d_alpha_d_kb_ri_mtrx])
-            hessian_ri_3rd_row=np.hstack([d_alpha_d_kf_ri_mtrx.transpose(
-            ), d_alpha_d_kb_ri_mtrx.transpose(), d_alpha_d_alpha_ri_mtrx])
+            hessian_ri_1st_row = np.hstack(
+                [d_theta_kf_d_theta_kf_ri_mtrx, d_theta_kb_d_theta_kf_ri_mtrx, d_theta_alpha_d_theta_kf_ri_mtrx])
+            hessian_ri_2nd_row = np.hstack(
+                [d_theta_kb_d_theta_kf_ri_mtrx.transpose(), d_theta_kb_d_theta_kb_ri_mtrx, d_theta_alpha_d_theta_kb_ri_mtrx])
+            hessian_ri_3rd_row = np.hstack([d_theta_alpha_d_theta_kf_ri_mtrx.transpose(
+            ), d_theta_alpha_d_theta_kb_ri_mtrx.transpose(), d_theta_alpha_d_theta_alpha_ri_mtrx])
 
-            hessian_ri=np.vstack(
+            hessian_ri = np.vstack(
                 [hessian_ri_1st_row, hessian_ri_2nd_row, hessian_ri_3rd_row])
 
         # alphas only case
-        elif kf_vec is None and kb_vec is None and alpha_lst is not None and beta_lst is None:
+        elif theta_kf_vec is None and theta_kb_vec is None and theta_alpha_lst is not None and theta_beta_lst is None:
 
-            hessian_ri=d_alpha_d_alpha_ri_mtrx
+            hessian_ri = d_theta_alpha_d_theta_alpha_ri_mtrx
 
         # betas only case
-        elif kf_vec is None and kb_vec is None and alpha_lst is None and beta_lst is not None:
+        elif theta_kf_vec is None and theta_kb_vec is None and theta_alpha_lst is None and theta_beta_lst is not None:
 
-            hessian_ri=d_beta_d_beta_ri_mtrx
+            hessian_ri = d_theta_beta_d_theta_beta_ri_mtrx
 
         # alphas and betas only case
-        elif kf_vec is None and kb_vec is None and alpha_lst is not None and beta_lst is not None:
+        elif theta_kf_vec is None and theta_kb_vec is None and theta_alpha_lst is not None and theta_beta_lst is not None:
 
-            hessian_ri_1st_row=np.hstack(
-                [d_alpha_d_alpha_ri_mtrx, d_beta_d_alpha_ri_mtrx])
-            hessian_ri_2nd_row=np.hstack(
-                [d_beta_d_alpha_ri_mtrx.transpose(), d_beta_d_beta_ri_mtrx])
+            hessian_ri_1st_row = np.hstack(
+                [d_theta_alpha_d_theta_alpha_ri_mtrx, d_theta_beta_d_theta_alpha_ri_mtrx])
+            hessian_ri_2nd_row = np.hstack(
+                [d_theta_beta_d_theta_alpha_ri_mtrx.transpose(), d_theta_beta_d_theta_beta_ri_mtrx])
 
-            hessian_ri=np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
+            hessian_ri = np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
 
         # kfs and betas only case
-        elif kf_vec is not None and kb_vec is None and alpha_lst is None and beta_lst is not None:
+        elif theta_kf_vec is not None and theta_kb_vec is None and theta_alpha_lst is None and theta_beta_lst is not None:
 
-            hessian_ri_1st_row=np.hstack(
-                [d_kf_d_kf_ri_mtrx, d_beta_d_kf_ri_mtrx])
-            hessian_ri_2nd_row=np.hstack(
-                [d_beta_d_kf_ri_mtrx.transpose(), d_beta_d_beta_ri_mtrx])
+            hessian_ri_1st_row = np.hstack(
+                [d_theta_kf_d_theta_kf_ri_mtrx, d_theta_beta_d_theta_kf_ri_mtrx])
+            hessian_ri_2nd_row = np.hstack(
+                [d_theta_beta_d_theta_kf_ri_mtrx.transpose(), d_theta_beta_d_theta_beta_ri_mtrx])
 
             hessian_ri=np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
 
         # kbs and alphas only case
-        elif kf_vec is None and kb_vec is not None and alpha_lst is not None and beta_lst is None:
+        elif theta_kf_vec is None and theta_kb_vec is not None and theta_alpha_lst is not None and theta_beta_lst is None:
 
-            hessian_ri_1st_row=np.hstack(
-                [d_kb_d_kb_ri_mtrx, d_alpha_d_kb_ri_mtrx])
-            hessian_ri_2nd_row=np.hstack(
-                [d_alpha_d_kb_ri_mtrx.transpose(), d_alpha_d_alpha_ri_mtrx])
+            hessian_ri_1st_row = np.hstack(
+                [d_theta_kb_d_theta_kb_ri_mtrx, d_theta_alpha_d_theta_kb_ri_mtrx])
+            hessian_ri_2nd_row = np.hstack(
+                [d_theta_alpha_d_theta_kb_ri_mtrx.transpose(), d_theta_alpha_d_theta_alpha_ri_mtrx])
 
-            hessian_ri=np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
+            hessian_ri = np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
 
         else:
             assert False, 'Hessian ri case not implemented.'
