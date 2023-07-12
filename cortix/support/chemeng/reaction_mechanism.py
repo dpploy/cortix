@@ -1951,7 +1951,7 @@ class ReactionMechanism:
         '''
 
         assert isinstance(rxn_idx, int)
-        assert 0 < rxn_idx <= len(self.reactions)
+        assert 0 <= rxn_idx <= len(self.reactions), 'rxn_idx = %r'%(rxn_idx)
 
         assert isinstance(spc_molar_cc_vec, np.ndarray)
         assert spc_molar_cc_vec.size == len(self.species)
@@ -2036,32 +2036,41 @@ class ReactionMechanism:
             w_alpha_i_mtrx = np.zeros((len(self.reactions), n_alphas), dtype = np.float64)
 
             w_alpha_i_column_id = \
-                    sum([alpha_data_mtrx.shape[1] for alpha_data_mtrx in alpha_lst[:rxn_idx]]) - 1
+                    sum([alpha_data_mtrx.shape[1] for alpha_data_mtrx in alpha_lst[:rxn_idx]])
 
-            end = w_alpha_i_column_id + w_alpha_i_vec.size
+            end_plus_one = w_alpha_i_column_id + w_alpha_i_vec.size # end + 1
 
-            assert end <= n_alphas
+            assert end_plus_one <= n_alphas
 
             # insertion
-            w_alpha_i_mtrx[rxn_idx, w_alpha_i_column_id:end] = w_alpha_i_vec[:]
+            #print('n_alphas ', n_alphas)
+            #print('alpha_data_mtrx\n ', alpha_data_mtrx)
+            #print('w_alpha_i_mtrx.shape ', w_alpha_i_mtrx.shape)
+            #print('w_alpha_i_mtrx ', w_alpha_i_mtrx)
+            #print('w_alpha_i_column_id ', w_alpha_i_column_id)
+            #print('end ', end)
+
+            w_alpha_i_mtrx[rxn_idx, w_alpha_i_column_id:end_plus_one] = w_alpha_i_vec[:]
 
             # Compute partial_theta_alpha(alpha)
 
-            dalpha_dtheta_lst = self.__dphi_dtheta(theta_alpha_lst, self.alpha_bnds)
+            dalpha_dtheta_alpha_lst = self.__dphi_dtheta(theta_alpha_lst, self.alpha_bnds)
 
-            for dalpha_dtheta_data_mtrx in dalpha_dtheta_lst:
+            for dalpha_dtheta_alpha_data_mtrx in dalpha_dtheta_alpha_lst:
 
-                #assert(dalpha_dtheta_data_mtrx[0,:] == alpha_mtrx[0,:]) # reactant IDs must match
-                dalpha_dtheta_mtrx_i = np.diag(dalpha_dtheta_data_mtrx[1,:])
+                #assert(dalpha_dtheta_alpha_data_mtrx[0,:] == alpha_mtrx[0,:]) # reactant IDs must match
+                dalpha_dtheta_alpha_mtrx_i = np.diag(dalpha_dtheta_alpha_data_mtrx[1,:])
 
                 try:
-                    dalpha_dtheta_mtrx = sp.linalg.block_diag(dalpha_dtheta_mtrx, dalpha_dtheta_mtrx_i)
+                    dalpha_dtheta_alpha_mtrx = sp.linalg.block_diag(dalpha_dtheta_alpha_mtrx, dalpha_dtheta_alpha_mtrx_i)
                 except NameError:
-                    dalpha_dtheta_mtrx = sp.linalg.block_diag(dalpha_dtheta_mtrx_i)
+                    dalpha_dtheta_alpha_mtrx = sp.linalg.block_diag(dalpha_dtheta_alpha_mtrx_i)
 
             # Compute product
 
-        d_theta_alpha_d_theta_kf_ri_mtrx = dkf_dtheta_mtrx @ p_mtrx @ w_alpha_i_mtrx @ dalpha_dtheta_mtrx
+        d_theta_alpha_d_theta_kf_ri_mtrx = dkf_dtheta_mtrx @ p_mtrx @ w_alpha_i_mtrx @ dalpha_dtheta_alpha_mtrx
+
+        del dalpha_dtheta_alpha_mtrx
 
         assert d_theta_alpha_d_theta_kf_ri_mtrx.shape == (len(self.reactions), n_alphas)
 
@@ -2128,7 +2137,7 @@ class ReactionMechanism:
 
             for (irxn, beta_data_mtrx) in enumerate(beta_lst):
 
-                active_spc_ids = beta_mtrx[0, :].astype(int)
+                active_spc_ids = beta_data_mtrx[0, :].astype(int)
 
                 beta_i_vec = beta_data_mtrx[1, :]
 
@@ -2166,32 +2175,34 @@ class ReactionMechanism:
             w_beta_i_mtrx = np.zeros((len(self.reactions), n_betas), dtype = np.float64)
 
             w_beta_i_column_id = \
-                    sum([beta_data_mtrx.shape[1] for beta_data_mtrx in beta_lst[:rxn_idx]]) - 1
+                    sum([beta_data_mtrx.shape[1] for beta_data_mtrx in beta_lst[:rxn_idx]])
 
-            end = w_beta_i_column_id + w_beta_i_vec_i.size
+            end_plus_one = w_beta_i_column_id + w_beta_i_vec.size  # end + 1
 
-            assert end <= n_betas
+            assert end_plus_one <= n_betas
 
             # insertion
-            w_beta_i_mtrx[rxn_idx, w_beta_i_column_id:end] = w_beta_i_vec[:]
+            w_beta_i_mtrx[rxn_idx, w_beta_i_column_id:end_plus_one] = w_beta_i_vec[:]
 
             # Compute partial_theta_beta(beta)
 
-            dbeta_dtheta_lst = self.__dphi_dtheta(theta_beta_lst, self.beta_bnds)
+            dbeta_dtheta_beta_lst = self.__dphi_dtheta(theta_beta_lst, self.beta_bnds)
 
-            for dbeta_dtheta_data_mtrx in dbeta_dtheta_lst:
+            for dbeta_dtheta_beta_data_mtrx in dbeta_dtheta_beta_lst:
 
-                #assert(dbeta_dtheta_data_mtrx[0,:] == beta_mtrx[0,:]) # reactant IDs must match
-                dbeta_dtheta_mtrx_i = np.diag(dbeta_dtheta_data_mtrx[1,:])
+                #assert(dbeta_dtheta_beta_data_mtrx[0,:] == beta_mtrx[0,:]) # reactant IDs must match
+                dbeta_dtheta_beta_mtrx_i = np.diag(dbeta_dtheta_beta_data_mtrx[1,:])
 
                 try:
-                    dbeta_dtheta_mtrx = sp.linalg.block_diag(dbeta_dtheta_mtrx, dbeta_dtheta_mtrx_i)
+                    dbeta_dtheta_beta_mtrx = sp.linalg.block_diag(dbeta_dtheta_beta_mtrx, dbeta_dtheta_beta_mtrx_i)
                 except NameError:
-                    dbeta_dtheta_mtrx = sp.linalg.block_diag(dbeta_dtheta_mtrx_i)
+                    dbeta_dtheta_beta_mtrx = sp.linalg.block_diag(dbeta_dtheta_beta_mtrx_i)
 
             # Compute product
 
-        d_theta_beta_d_theta_kb_ri_mtrx = - dkb_dtheta_mtrx @ q_mtrx @ w_beta_i_mtrx @ dbeta_dtheta_mtrx
+        d_theta_beta_d_theta_kb_ri_mtrx = - dkb_dtheta_mtrx @ q_mtrx @ w_beta_i_mtrx @ dbeta_dtheta_beta_mtrx
+
+        del dbeta_dtheta_beta_mtrx
 
         assert d_theta_beta_d_theta_kf_ri_mtrx.shape == (len(self.reactions), n_betas)
 
@@ -2248,19 +2259,21 @@ class ReactionMechanism:
 
             # Compute (partial_theta_alpha(alpha))^2
 
-            dalpha_dtheta_lst = self.__dphi_dtheta(theta_alpha_lst, self.alpha_bnds)
+            dalpha_theta_alpha_lst = self.__dphi_dtheta(theta_alpha_lst, self.alpha_bnds)
 
-            for dalpha_dtheta_data_mtrx in dalpha_dtheta_lst:
+            for dalpha_dtheta_alpha_data_mtrx in dalpha_theta_alpha_lst:
 
-                #assert(dalpha_dtheta_data_mtrx[0,:] == alpha_data_mtrx[0,:]) # reactant IDs must match
-                dalpha_dtheta_mtrx_i = np.diag(dalpha_dtheta_data_mtrx[1,:])
+                #assert(dalpha_dtheta_alpha_data_mtrx[0,:] == alpha_data_mtrx[0,:]) # reactant IDs must match
+                dalpha_dtheta_alpha_mtrx_i = np.diag(dalpha_dtheta_alpha_data_mtrx[1,:])
 
                 try:
-                    dalpha_dtheta_mtrx = sp.linalg.block_diag(dalpha_dtheta_mtrx, dalpha_dtheta_mtrx_i)
+                    dalpha_dtheta_alpha_mtrx = sp.linalg.block_diag(dalpha_dtheta_alpha_mtrx, dalpha_dtheta_alpha_mtrx_i)
                 except NameError:
-                    dalpha_dtheta_mtrx = sp.linalg.block_diag(dalpha_dtheta_mtrx_i)
+                    dalpha_dtheta_alpha_mtrx = sp.linalg.block_diag(dalpha_dtheta_alpha_mtrx_i)
 
-            dalpha_dtheta_mtrx_pwr2 = dalpha_dtheta_mtrx @ dalpha_dtheta_mtrx
+            dalpha_dtheta_alpha_mtrx_pwr2 = dalpha_dtheta_alpha_mtrx @ dalpha_dtheta_alpha_mtrx
+
+            del dalpha_dtheta_alpha_mtrx
 
             # Compute W_alpha_iT W_alpha_i where i is rxn_idx
 
@@ -2290,14 +2303,14 @@ class ReactionMechanism:
             w_alpha_i_mtrx = np.zeros((len(self.reactions), n_alphas), dtype = np.float64)
 
             w_alpha_i_column_id = \
-                    sum([alpha_data_mtrx.shape[1] for alpha_data_mtrx in alpha_lst[:rxn_idx]]) - 1
+                    sum([alpha_data_mtrx.shape[1] for alpha_data_mtrx in alpha_lst[:rxn_idx]])
 
-            end = w_alpha_i_column_id + w_alpha_i_vec.size
+            end_plus_one = w_alpha_i_column_id + w_alpha_i_vec.size # end + 1
 
-            assert end <= n_alphas
+            assert end_plus_one <= n_alphas
 
             # insertion
-            w_alpha_i_mtrx[rxn_idx, w_alpha_i_column_id:end] = w_alpha_i_vec[:]
+            w_alpha_i_mtrx[rxn_idx, w_alpha_i_column_id:end_plus_one] = w_alpha_i_vec[:]
 
             w_alpha_i_T_w_alpha_i_mtrx = w_alpha_i_mtrx.transpose() @ w_alpha_i_mtrx
 
@@ -2322,8 +2335,11 @@ class ReactionMechanism:
 
             # Compute product
 
+            #print('dalpha_dtheta_alpha_mtrx_pwr2 \n', dalpha_dtheta_alpha_mtrx_pwr2)
+            #print('w_alpha_i_T_w_alpha_i_mtrx \n', w_alpha_i_T_w_alpha_i_mtrx)
+
             d_theta_alpha_d_theta_alpha_ri_mtrx = \
-                    rf_i * (dalpha_dtheta_mtrx_pwr2 @ w_alpha_i_T_w_alpha_i_mtrx \
+                    rf_i * (dalpha_dtheta_alpha_mtrx_pwr2 @ w_alpha_i_T_w_alpha_i_mtrx \
                             + \
                             d2alpha_dtheta2_mtrx @ diag_w_alpha_i_irow)
 
@@ -2364,7 +2380,7 @@ class ReactionMechanism:
         # -------------------------------------------
         if theta_beta_lst is not None and theta_alpha_lst is not None:
 
-            d_theta_alpha_d_theta_beta_ri_mtrx = d_theta_beta_d_theta_alpha_ri_mtrx.tranpose()
+            d_theta_alpha_d_theta_beta_ri_mtrx = d_theta_beta_d_theta_alpha_ri_mtrx.transpose()
 
         # --------------------------------------------
         # partial_theta_beta(partial_theta_beta r_i) =
@@ -2401,19 +2417,21 @@ class ReactionMechanism:
 
             # Compute (partial_theta_beta(beta))^2
 
-            dbeta_dtheta_lst = self.__dphi_dtheta(theta_beta_lst, self.beta_bnds)
+            dbeta_dtheta_beta_lst = self.__dphi_dtheta(theta_beta_lst, self.beta_bnds)
 
-            for dbeta_dtheta_data_mtrx in dbeta_dtheta_lst:
+            for dbeta_dtheta_beta_data_mtrx in dbeta_dtheta_beta_lst:
 
-                #assert(dbeta_dtheta_data_mtrx[0,:] == beta_data_mtrx[0,:]) # reactant IDs must match
-                dbeta_dtheta_mtrx_i = np.diag(dbeta_dtheta_data_mtrx[1,:])
+                #assert(dbeta_dtheta_beta_data_mtrx[0,:] == beta_data_mtrx[0,:]) # reactant IDs must match
+                dbeta_dtheta_beta_mtrx_i = np.diag(dbeta_dtheta_beta_data_mtrx[1,:])
 
                 try:
-                    dbeta_dtheta_mtrx = sp.linalg.block_diag(dbeta_dtheta_mtrx, dbeta_dtheta_mtrx_i)
+                    dbeta_dtheta_beta_mtrx = sp.linalg.block_diag(dbeta_dtheta_beta_mtrx, dbeta_dtheta_beta_mtrx_i)
                 except NameError:
-                    dbeta_dtheta_mtrx = sp.linalg.block_diag(dbeta_dtheta_mtrx_i)
+                    dbeta_dtheta_beta_mtrx = sp.linalg.block_diag(dbeta_dtheta_beta_mtrx_i)
 
-            dbeta_dtheta_mtrx_pwr2 = dbeta_dtheta_mtrx @ dbeta_dtheta_mtrx
+            dbeta_dtheta_beta_mtrx_pwr2 = dbeta_dtheta_beta_mtrx @ dbeta_dtheta_beta_mtrx
+
+            del dbeta_dtheta_beta_mtrx
 
             # Compute W_beta_iT W_beta_i where i is rxn_idx
 
@@ -2443,14 +2461,14 @@ class ReactionMechanism:
             w_beta_i_mtrx = np.zeros((len(self.reactions), n_betas), dtype = np.float64)
 
             w_beta_i_column_id = \
-                    sum([beta_data_mtrx.shape[1] for beta_data_mtrx in beta_lst[:rxn_idx]]) - 1
+                    sum([beta_data_mtrx.shape[1] for beta_data_mtrx in beta_lst[:rxn_idx]])
 
-            end = w_beta_i_column_id + w_beta_i_vec.size
+            end_plus_one = w_beta_i_column_id + w_beta_i_vec.size # end + 1
 
-            assert end <= n_betas
+            assert end_plus_one <= n_betas
 
             # insertion
-            w_beta_i_mtrx[rxn_idx, w_beta_i_column_id:end] = w_beta_i_vec[:]
+            w_beta_i_mtrx[rxn_idx, w_beta_i_column_id:end_plus_one] = w_beta_i_vec[:]
 
             w_beta_i_T_w_beta_i_mtrx = w_beta_i_mtrx.transpose() @ w_beta_i_mtrx
 
@@ -2476,7 +2494,7 @@ class ReactionMechanism:
             # Compute product
 
             d_theta_beta_d_theta_beta_ri_mtrx = \
-                    rb_i * (dbeta_dtheta_mtrx_pwr2 @ w_beta_i_T_w_beta_i_mtrx \
+                    rb_i * (dbeta_dtheta_beta_mtrx_pwr2 @ w_beta_i_T_w_beta_i_mtrx \
                             + \
                             d2beta_dtheta2_mtrx @ diag_w_beta_i_irow)
 
@@ -2495,7 +2513,7 @@ class ReactionMechanism:
             hessian_ri_3rd_row = np.hstack([d_theta_alpha_d_theta_kf_ri_mtrx.transpose(
             ), d_theta_alpha_d_theta_kb_ri_mtrx.transpose(), d_theta_alpha_d_theta_alpha_ri_mtrx, d_theta_beta_d_theta_alpha_ri_mtrx])
 
-            hessian_ri_4th_row = np.hstack([d_theta_beta_d_ktheta_f_ri_mtrx.transpose(), d_theta_beta_d_theta_kb_ri_mtrx.transpose(
+            hessian_ri_4th_row = np.hstack([d_theta_beta_d_theta_kf_ri_mtrx.transpose(), d_theta_beta_d_theta_kb_ri_mtrx.transpose(
             ), d_theta_beta_d_theta_alpha_ri_mtrx.transpose(), d_theta_beta_d_theta_beta_ri_mtrx])
 
             hessian_ri = np.vstack(
