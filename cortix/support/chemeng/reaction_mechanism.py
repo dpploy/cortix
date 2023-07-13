@@ -2068,12 +2068,11 @@ class ReactionMechanism:
 
             # Compute product
 
-        d_theta_alpha_d_theta_kf_ri_mtrx = dkf_dtheta_mtrx @ p_mtrx @ w_alpha_i_mtrx @ dalpha_dtheta_alpha_mtrx
+            d_theta_alpha_d_theta_kf_ri_mtrx = dkf_dtheta_mtrx @ p_mtrx @ w_alpha_i_mtrx @ dalpha_dtheta_alpha_mtrx
 
-        del dalpha_dtheta_alpha_mtrx
+            del dalpha_dtheta_alpha_mtrx
 
-        assert d_theta_alpha_d_theta_kf_ri_mtrx.shape == (len(self.reactions), n_alphas)
-
+            assert d_theta_alpha_d_theta_kf_ri_mtrx.shape == (len(self.reactions), n_alphas)
 
         # ----------------------------------------
         # partial_theta_beta(partial_theta_kf r_i)
@@ -2200,12 +2199,11 @@ class ReactionMechanism:
 
             # Compute product
 
-        d_theta_beta_d_theta_kb_ri_mtrx = - dkb_dtheta_mtrx @ q_mtrx @ w_beta_i_mtrx @ dbeta_dtheta_beta_mtrx
+            d_theta_beta_d_theta_kb_ri_mtrx = - dkb_dtheta_mtrx @ q_mtrx @ w_beta_i_mtrx @ dbeta_dtheta_beta_mtrx
 
-        del dbeta_dtheta_beta_mtrx
+            del dbeta_dtheta_beta_mtrx
 
-        assert d_theta_beta_d_theta_kf_ri_mtrx.shape == (len(self.reactions), n_betas)
-
+            assert d_theta_beta_d_theta_kf_ri_mtrx.shape == (len(self.reactions), n_betas)
 
         # *******************************************************************************************
         # 3rd row block
@@ -2384,7 +2382,7 @@ class ReactionMechanism:
 
         # --------------------------------------------
         # partial_theta_beta(partial_theta_beta r_i) =
-        # rbi ((partial_theta_beta(beta))^2  W_beta_iT W_beta_i + D2_theta_beta2(beta) Diag(w_beta_i)
+        # - rbi ((partial_theta_beta(beta))^2  W_beta_iT W_beta_i + D2_theta_beta2(beta) Diag(w_beta_i)
         # --------------------------------------------
         if theta_beta_lst is not None:
 
@@ -2494,7 +2492,7 @@ class ReactionMechanism:
             # Compute product
 
             d_theta_beta_d_theta_beta_ri_mtrx = \
-                    rb_i * (dbeta_dtheta_beta_mtrx_pwr2 @ w_beta_i_T_w_beta_i_mtrx \
+                   - rb_i * (dbeta_dtheta_beta_mtrx_pwr2 @ w_beta_i_T_w_beta_i_mtrx \
                             + \
                             d2beta_dtheta2_mtrx @ diag_w_beta_i_irow)
 
