@@ -537,9 +537,9 @@ class ReactionMechanism:
 
         return s_rank
 
-    def r_vec(self, spc_molar_cc_vec, theta_kf_vec=None, theta_kb_vec=None, 
+    def r_vec(self, spc_molar_cc_vec, theta_kf_vec=None, theta_kb_vec=None,
               theta_alpha_lst=None, theta_beta_lst=None):
-        '''Compute the reaction rate density vector.
+        '''Compute a reaction rate density vector.
 
         This is the most common reaction rate expression for homogeneous reactions.
 
@@ -583,19 +583,17 @@ class ReactionMechanism:
         if theta_kf_vec is not None:
             assert isinstance(theta_kf_vec, np.ndarray)
             assert theta_kf_vec.size == len(self.reactions)
-            # Get true parameter phi(theta)
             kf_vec = self.perform_reparam(theta_kf_vec, self.kf_bnds)
         else:
-            (kf_vec, _) = self.__get_ks()
+            kf_vec = self.__get_kf()
 
         # Initialize kb_vec
         if theta_kb_vec is not None:
             assert isinstance(theta_kb_vec, np.ndarray), 'type(theta_kb_vec)=%r'%(type(theta_kb_vec))
             assert theta_kb_vec.size == len(self.reactions)
-            # Get true parameter phi(theta)
             kb_vec = self.perform_reparam(theta_kb_vec, self.kb_bnds)
         else:
-            (_, kb_vec) = self.__get_ks()
+            kb_vec = self.__get_kb()
 
         # Initialize alpha_lst
         if theta_alpha_lst is not None:
@@ -605,7 +603,6 @@ class ReactionMechanism:
             assert theta_alpha_lst[0].shape[0] == 2
 
             theta_alpha_lst = copy.deepcopy(theta_alpha_lst)
-            # Get the true alpha
             alpha_lst = self.perform_reparam(theta_alpha_lst, self.alpha_bnds)
         else:
             (alpha_lst, _) = self.__get_power_law_exponents()
@@ -618,7 +615,6 @@ class ReactionMechanism:
             assert theta_beta_lst[0].shape[0] == 2 #WARNING some issue with backward reaction with one species
 
             theta_beta_lst = copy.deepcopy(theta_beta_lst)
-            # Get the true beta
             beta_lst = self.perform_reparam(theta_beta_lst, self.beta_bnds)
         else:
             (_, beta_lst) = self.__get_power_law_exponents()
@@ -666,12 +662,14 @@ class ReactionMechanism:
         -----------
         '''
 
-        g_vec = self.stoic_mtrx.transpose() @ self.r_vec(spc_molar_cc_vec, theta_kf_vec, theta_kb_vec, 
+        g_vec = self.stoic_mtrx.transpose() @ self.r_vec(spc_molar_cc_vec, theta_kf_vec, theta_kb_vec,
                                                          theta_alpha_lst, theta_beta_lst)
 
         return g_vec
 
     def __unbounded_reparam(self, lst_or_vec):
+
+        assert False
 
         lst_or_vec = copy.deepcopy(lst_or_vec)
 
@@ -741,7 +739,7 @@ class ReactionMechanism:
     def perform_reparam(self, theta_lst_or_vec, bnds=None):
         '''Phi(theta) function (reparameterization function).
 
-        Phi is the original parameters (k_f,k_b,alpha,beta), theta is the nonlinear reparameterized
+        Phi is the original parameters (k_f, k_b, alpha, beta), theta is the nonlinear reparameterized
         values.
 
         Reparam function
@@ -752,7 +750,6 @@ class ReactionMechanism:
 
         if self.reparam == False:
             return theta_lst_or_vec
-
         elif bnds is not None:
             reparamed = self.__bounded_reparam(theta_lst_or_vec, bnds)
         else:
@@ -1108,9 +1105,9 @@ class ReactionMechanism:
             # Store product
 
             try:
-                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, - q_mtrx @ dkb_dtheta_mtrx])
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, -q_mtrx @ dkb_dtheta_mtrx])
             except NameError:
-                dr_dtheta_mtrx = np.hstack([- q_mtrx @ dkb_dtheta_mtrx])
+                dr_dtheta_mtrx = np.hstack([-q_mtrx @ dkb_dtheta_mtrx])
 
         # -----------------------------------------------------
         # partial_theta_alpha(r) = X partial_theta_alpha(alpha)
@@ -1121,11 +1118,10 @@ class ReactionMechanism:
 
             # get kf
             if theta_kf_vec is None:
-                (theta_kf_vec, _) = self.__get_ks()
+                kf_vec = self.__get_kf()
             else:
                 theta_kf_vec = copy.deepcopy(theta_kf_vec)
-
-            kf_vec = self.perform_reparam(theta_kf_vec, self.kf_bnds)
+                kf_vec = self.perform_reparam(theta_kf_vec, self.kf_bnds)
 
             # get alphas
             theta_alpha_lst = copy.deepcopy(theta_alpha_lst)
@@ -1198,11 +1194,10 @@ class ReactionMechanism:
 
             # get kb
             if theta_kb_vec is None:
-                (_, theta_kb_vec) = self.__get_ks()
+                kb_vec = self.__get_kb()
             else:
                 theta_kb_vec = copy.deepcopy(theta_kb_vec)
-
-            kb_vec = self.perform_reparam(theta_kb_vec, self.kb_bnds)
+                kb_vec = self.perform_reparam(theta_kb_vec, self.kb_bnds)
 
             # get betas
             theta_beta_lst = copy.deepcopy(theta_beta_lst)
@@ -1262,7 +1257,7 @@ class ReactionMechanism:
             # Store product
 
             try:
-                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, (- y_mtrx @ dbeta_dtheta_mtrx)])
+                dr_dtheta_mtrx = np.hstack([dr_dtheta_mtrx, (-y_mtrx @ dbeta_dtheta_mtrx)])
             except NameError:
                 dr_dtheta_mtrx = np.hstack([-y_mtrx @ dbeta_dtheta_mtrx])
 
@@ -1682,16 +1677,12 @@ class ReactionMechanism:
 
             dalpha_dtheta_lst = self.__dphi_dtheta(theta_lst, self.alpha_bnds)
 
-
-
             alpha_lst_local=copy.deepcopy(alpha_lst)
 
-
             if kf_vec is None:
-                (kf_vec_local, _)=self.__get_ks()
+                kf_vec_local = self.__get_kf()
             else:
                 kf_vec_local= copy.deepcopy(kf_vec)
-
 
             kf_vec_local = self.perform_reparam(kf_vec_local, self.kf_bnds)
 
@@ -1703,9 +1694,7 @@ class ReactionMechanism:
                 alpha_mtrx=alpha_lst_local[idx]
                 jdx_start += alpha_mtrx.shape[1]
 
-
             alpha_mtrx = alpha_lst_local[rxn_idx]
-
 
             reactants_ids=alpha_mtrx[0, :].astype(int)
 
@@ -1719,8 +1708,6 @@ class ReactionMechanism:
             if min_c_j <= 1e-25:
                 (jdx, )=np.where(reactants_molar_cc == min_c_j)
                 reactants_molar_cc[jdx]=1.0  # any non-zero value will do since rb_i will be zero
-
-
 
             dalpha_dtheta_mtrx = dalpha_dtheta_lst[rxn_idx]
             d2alpha_dtheta2_mtrx = d2alpha_dtheta2_lst[rxn_idx]
@@ -1790,7 +1777,7 @@ class ReactionMechanism:
             beta_lst_local = self.perform_reparam(beta_lst_local, self.beta_bnds)
 
             if kb_vec is None:
-                (_, kb_vec_local)=self.__get_ks()
+                kb_vec_local = self.__get_kb()
             else:
                 kb_vec_local = copy.deepcopy(kb_vec)
 
@@ -1989,7 +1976,7 @@ class ReactionMechanism:
             # Compute diag(pi)
 
             if theta_alpha_lst is None:
-                (alpha_lst, _) = self.__get_power_law_exponents()
+                alpha_lst = self.__get_alpha()
             else:
                 theta_alpha_lst = copy.deepcopy(theta_alpha_lst)
                 alpha_lst = self.perform_reparam(theta_alpha_lst, self.alpha_bnds)
@@ -2156,7 +2143,7 @@ class ReactionMechanism:
             # Compute diag(qi)
 
             if theta_beta_lst is None:
-                (_, beta_lst) = self.__get_power_law_exponents()
+                beta_lst = self.__get_beta()
             else:
                 theta_beta_lst = copy.deepcopy(theta_beta_lst)
                 beta_lst = self.perform_reparam(theta_beta_lst, self.beta_bnds)
@@ -2306,7 +2293,7 @@ class ReactionMechanism:
 
             # get kf
             if theta_kf_vec is None:
-                (kf_vec, _) = self.__get_ks()
+                kf_vec = self.__get_kf()
             else:
                 theta_kf_vec = copy.deepcopy(theta_kf_vec)
                 kf_vec = self.perform_reparam(theta_kf_vec, self.kf_bnds)
@@ -2463,7 +2450,7 @@ class ReactionMechanism:
 
             # get kb
             if theta_kb_vec is None:
-                (_, kb_vec) = self.__get_ks()
+                kb_vec = self.__get_kb()
             else:
                 theta_kb_vec = copy.deepcopy(theta_kb_vec)
                 kb_vec = self.perform_reparam(theta_kb_vec, self.kb_bnds)
@@ -2572,107 +2559,161 @@ class ReactionMechanism:
         # Assembly
 
         # General case
-        if theta_kf_vec is not None and theta_kb_vec is not None and theta_alpha_lst is not None and theta_beta_lst is not None:
+        if theta_kf_vec is not None and theta_kb_vec is not None and \
+           theta_alpha_lst is not None and theta_beta_lst is not None:
 
-            hessian_ri_1st_row = np.hstack(
-                [d_theta_kf_d_theta_kf_ri_mtrx, d_theta_kb_d_theta_kf_ri_mtrx, d_theta_alpha_d_theta_kf_ri_mtrx, d_theta_beta_d_theta_kf_ri_mtrx])
+            hessian_ri_1st_row = np.hstack([d_theta_kf_d_theta_kf_ri_mtrx,
+                                            d_theta_kb_d_theta_kf_ri_mtrx,
+                                            d_theta_alpha_d_theta_kf_ri_mtrx,
+                                            d_theta_beta_d_theta_kf_ri_mtrx])
 
-            hessian_ri_2nd_row = np.hstack([d_theta_kb_d_theta_kf_ri_mtrx.transpose(
-            ), d_theta_kb_d_theta_kb_ri_mtrx, d_theta_alpha_d_theta_kb_ri_mtrx, d_theta_beta_d_theta_kb_ri_mtrx])
+            hessian_ri_2nd_row = np.hstack([d_theta_kb_d_theta_kf_ri_mtrx.transpose(),
+                                            d_theta_kb_d_theta_kb_ri_mtrx,
+                                            d_theta_alpha_d_theta_kb_ri_mtrx,
+                                            d_theta_beta_d_theta_kb_ri_mtrx])
 
-            hessian_ri_3rd_row = np.hstack([d_theta_alpha_d_theta_kf_ri_mtrx.transpose(
-            ), d_theta_alpha_d_theta_kb_ri_mtrx.transpose(), d_theta_alpha_d_theta_alpha_ri_mtrx, d_theta_beta_d_theta_alpha_ri_mtrx])
+            hessian_ri_3rd_row = np.hstack([d_theta_alpha_d_theta_kf_ri_mtrx.transpose(),
+                                            d_theta_alpha_d_theta_kb_ri_mtrx.transpose(),
+                                            d_theta_alpha_d_theta_alpha_ri_mtrx,
+                                            d_theta_beta_d_theta_alpha_ri_mtrx])
 
-            hessian_ri_4th_row = np.hstack([d_theta_beta_d_theta_kf_ri_mtrx.transpose(), d_theta_beta_d_theta_kb_ri_mtrx.transpose(
-            ), d_theta_beta_d_theta_alpha_ri_mtrx.transpose(), d_theta_beta_d_theta_beta_ri_mtrx])
+            hessian_ri_4th_row = np.hstack([d_theta_beta_d_theta_kf_ri_mtrx.transpose(),
+                                            d_theta_beta_d_theta_kb_ri_mtrx.transpose(),
+                                            d_theta_beta_d_theta_alpha_ri_mtrx.transpose(),
+                                            d_theta_beta_d_theta_beta_ri_mtrx])
 
-            hessian_ri = np.vstack(
-                [hessian_ri_1st_row, hessian_ri_2nd_row, hessian_ri_3rd_row, hessian_ri_4th_row])
+            hessian_ri = np.vstack([hessian_ri_1st_row,
+                                    hessian_ri_2nd_row,
+                                    hessian_ri_3rd_row,
+                                    hessian_ri_4th_row])
 
         # Forward case
-        elif theta_kf_vec is not None and theta_alpha_lst is not None and theta_kb_vec is None and theta_beta_lst is None:
+        elif theta_kf_vec is not None and theta_alpha_lst is not None and \
+             theta_kb_vec is None and theta_beta_lst is None:
 
-            print('MADE HERE')
-            print(theta_kf_vec)
-            hessian_ri_1st_row = np.hstack(
-                [d_theta_kf_d_theta_kf_ri_mtrx, d_theta_alpha_d_theta_kf_ri_mtrx])
-            hessian_ri_2nd_row = np.hstack(
-                [d_theta_alpha_d_theta_kf_ri_mtrx.transpose(), d_theta_alpha_d_theta_alpha_ri_mtrx])
+            hessian_ri_1st_row = np.hstack([d_theta_kf_d_theta_kf_ri_mtrx,
+                                            d_theta_alpha_d_theta_kf_ri_mtrx])
 
-            hessian_ri = np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
+            hessian_ri_2nd_row = np.hstack([d_theta_alpha_d_theta_kf_ri_mtrx.transpose(),
+                                            d_theta_alpha_d_theta_alpha_ri_mtrx])
+
+            hessian_ri = np.vstack([hessian_ri_1st_row,
+                                    hessian_ri_2nd_row])
 
         # k's only case
-        elif theta_kf_vec is not None and theta_kb_vec is not None and theta_alpha_lst is None and theta_beta_lst is None:
+        elif theta_kf_vec is not None and theta_kb_vec is not None and \
+             theta_alpha_lst is None and theta_beta_lst is None:
 
-            hessian_ri_1st_row = np.hstack(
-                [d_theta_kf_d_theta_kf_ri_mtrx, d_theta_kb_d_theta_kf_ri_mtrx])
-            hessian_ri_2nd_row = np.hstack(
-                [d_theta_kb_d_theta_kf_ri_mtrx.transpose(), d_theta_kb_d_theta_kb_ri_mtrx])
+            hessian_ri_1st_row = np.hstack([d_theta_kf_d_theta_kf_ri_mtrx,
+                                            d_theta_kb_d_theta_kf_ri_mtrx])
 
-            hessian_ri = np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
+            hessian_ri_2nd_row = np.hstack([d_theta_kb_d_theta_kf_ri_mtrx.transpose(),
+                                            d_theta_kb_d_theta_kb_ri_mtrx])
+
+            hessian_ri = np.vstack([hessian_ri_1st_row,
+                                    hessian_ri_2nd_row])
 
         # kfs only case
-        elif theta_kf_vec is not None and theta_kb_vec is None and theta_alpha_lst is None and theta_beta_lst is None:
+        elif theta_kf_vec is not None and theta_kb_vec is None and \
+             theta_alpha_lst is None and theta_beta_lst is None:
 
             hessian_ri = d_theta_kf_d_theta_kf_ri_mtrx
 
         # kbs only case
-        elif theta_kf_vec is None and theta_kb_vec is not None and theta_alpha_lst is None and theta_beta_lst is None:
+        elif theta_kf_vec is None and theta_kb_vec is not None and \
+             theta_alpha_lst is None and theta_beta_lst is None:
 
             hessian_ri = d_theta_kb_d_theta_kb_ri_mtrx
 
         # k's and alphas only case
-        elif theta_kf_vec is not None and theta_kb_vec is not None and theta_alpha_lst is not None and theta_beta_lst is None:
+        elif theta_kf_vec is not None and theta_kb_vec is not None and \
+             theta_alpha_lst is not None and theta_beta_lst is None:
 
-            hessian_ri_1st_row = np.hstack(
-                [d_theta_kf_d_theta_kf_ri_mtrx, d_theta_kb_d_theta_kf_ri_mtrx, d_theta_alpha_d_theta_kf_ri_mtrx])
-            hessian_ri_2nd_row = np.hstack(
-                [d_theta_kb_d_theta_kf_ri_mtrx.transpose(), d_theta_kb_d_theta_kb_ri_mtrx, d_theta_alpha_d_theta_kb_ri_mtrx])
-            hessian_ri_3rd_row = np.hstack([d_theta_alpha_d_theta_kf_ri_mtrx.transpose(
-            ), d_theta_alpha_d_theta_kb_ri_mtrx.transpose(), d_theta_alpha_d_theta_alpha_ri_mtrx])
+            hessian_ri_1st_row = np.hstack([d_theta_kf_d_theta_kf_ri_mtrx,
+                                            d_theta_kb_d_theta_kf_ri_mtrx,
+                                            d_theta_alpha_d_theta_kf_ri_mtrx])
 
-            hessian_ri = np.vstack(
-                [hessian_ri_1st_row, hessian_ri_2nd_row, hessian_ri_3rd_row])
+            hessian_ri_2nd_row = np.hstack([d_theta_kb_d_theta_kf_ri_mtrx.transpose(),
+                                            d_theta_kb_d_theta_kb_ri_mtrx,
+                                            d_theta_alpha_d_theta_kb_ri_mtrx])
+
+            hessian_ri_3rd_row = np.hstack([d_theta_alpha_d_theta_kf_ri_mtrx.transpose(),
+                                            d_theta_alpha_d_theta_kb_ri_mtrx.transpose(),
+                                            d_theta_alpha_d_theta_alpha_ri_mtrx])
+
+            hessian_ri = np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row,
+                                    hessian_ri_3rd_row])
 
         # alphas only case
-        elif theta_kf_vec is None and theta_kb_vec is None and theta_alpha_lst is not None and theta_beta_lst is None:
+        elif theta_kf_vec is None and theta_kb_vec is None and \
+             theta_alpha_lst is not None and theta_beta_lst is None:
 
             hessian_ri = d_theta_alpha_d_theta_alpha_ri_mtrx
 
         # betas only case
-        elif theta_kf_vec is None and theta_kb_vec is None and theta_alpha_lst is None and theta_beta_lst is not None:
+        elif theta_kf_vec is None and theta_kb_vec is None and \
+             theta_alpha_lst is None and theta_beta_lst is not None:
 
             hessian_ri = d_theta_beta_d_theta_beta_ri_mtrx
 
         # alphas and betas only case
-        elif theta_kf_vec is None and theta_kb_vec is None and theta_alpha_lst is not None and theta_beta_lst is not None:
+        elif theta_kf_vec is None and theta_kb_vec is None and \
+             theta_alpha_lst is not None and theta_beta_lst is not None:
 
-            hessian_ri_1st_row = np.hstack(
-                [d_theta_alpha_d_theta_alpha_ri_mtrx, d_theta_beta_d_theta_alpha_ri_mtrx])
-            hessian_ri_2nd_row = np.hstack(
-                [d_theta_beta_d_theta_alpha_ri_mtrx.transpose(), d_theta_beta_d_theta_beta_ri_mtrx])
+            hessian_ri_1st_row = np.hstack([d_theta_alpha_d_theta_alpha_ri_mtrx,
+                                            d_theta_beta_d_theta_alpha_ri_mtrx])
 
-            hessian_ri = np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
+            hessian_ri_2nd_row = np.hstack([d_theta_beta_d_theta_alpha_ri_mtrx.transpose(),
+                                            d_theta_beta_d_theta_beta_ri_mtrx])
+
+            hessian_ri = np.vstack([hessian_ri_1st_row,
+                                    hessian_ri_2nd_row])
 
         # kfs and betas only case
-        elif theta_kf_vec is not None and theta_kb_vec is None and theta_alpha_lst is None and theta_beta_lst is not None:
+        elif theta_kf_vec is not None and theta_kb_vec is None and \
+             theta_alpha_lst is None and theta_beta_lst is not None:
 
-            hessian_ri_1st_row = np.hstack(
-                [d_theta_kf_d_theta_kf_ri_mtrx, d_theta_beta_d_theta_kf_ri_mtrx])
-            hessian_ri_2nd_row = np.hstack(
-                [d_theta_beta_d_theta_kf_ri_mtrx.transpose(), d_theta_beta_d_theta_beta_ri_mtrx])
+            hessian_ri_1st_row = np.hstack([d_theta_kf_d_theta_kf_ri_mtrx,
+                                            d_theta_beta_d_theta_kf_ri_mtrx])
 
-            hessian_ri=np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
+            hessian_ri_2nd_row = np.hstack([d_theta_beta_d_theta_kf_ri_mtrx.transpose(),
+                                            d_theta_beta_d_theta_beta_ri_mtrx])
+
+            hessian_ri=np.vstack([hessian_ri_1st_row,
+                                  hessian_ri_2nd_row])
 
         # kbs and alphas only case
-        elif theta_kf_vec is None and theta_kb_vec is not None and theta_alpha_lst is not None and theta_beta_lst is None:
+        elif theta_kf_vec is None and theta_kb_vec is not None and \
+             theta_alpha_lst is not None and theta_beta_lst is None:
 
-            hessian_ri_1st_row = np.hstack(
-                [d_theta_kb_d_theta_kb_ri_mtrx, d_theta_alpha_d_theta_kb_ri_mtrx])
-            hessian_ri_2nd_row = np.hstack(
-                [d_theta_alpha_d_theta_kb_ri_mtrx.transpose(), d_theta_alpha_d_theta_alpha_ri_mtrx])
+            hessian_ri_1st_row = np.hstack([d_theta_kb_d_theta_kb_ri_mtrx,
+                                            d_theta_alpha_d_theta_kb_ri_mtrx])
 
-            hessian_ri = np.vstack([hessian_ri_1st_row, hessian_ri_2nd_row])
+            hessian_ri_2nd_row = np.hstack([d_theta_alpha_d_theta_kb_ri_mtrx.transpose(),
+                                            d_theta_alpha_d_theta_alpha_ri_mtrx])
+
+            hessian_ri = np.vstack([hessian_ri_1st_row,
+                                    hessian_ri_2nd_row])
+
+        # kfs and kbs and betas only case
+        elif theta_kf_vec is not None and theta_kb_vec is not None and \
+             theta_alpha_lst is None and theta_beta_lst is not None:
+
+            hessian_ri_1st_row = np.hstack([d_theta_kf_d_theta_kf_ri_mtrx,
+                                            d_theta_kb_d_theta_kf_ri_mtrx,
+                                            d_theta_beta_d_theta_kf_ri_mtrx])
+
+            hessian_ri_2nd_row = np.hstack([d_theta_kb_d_theta_kf_ri_mtrx.transpose(),
+                                            d_theta_kb_d_theta_kb_ri_mtrx,
+                                            d_theta_beta_d_theta_kb_ri_mtrx])
+
+            hessian_ri_3rd_row = np.hstack([d_theta_beta_d_theta_kf_ri_mtrx.transpose(),
+                                            d_theta_beta_d_theta_kb_ri_mtrx.transpose(),
+                                            d_theta_beta_d_theta_beta_ri_mtrx])
+
+            hessian_ri = np.vstack([hessian_ri_1st_row,
+                                    hessian_ri_2nd_row,
+                                    hessian_ri_3rd_row])
 
         else:
             assert False, 'Hessian ri case not implemented.'
@@ -2689,10 +2730,10 @@ class ReactionMechanism:
         kf_vec: numpy.ndarray
         '''
 
-        kf_vec= np.zeros(len(self.reactions), dtype = np.float64)
+        kf_vec = np.zeros(len(self.reactions), dtype = np.float64)
 
         for idx, rxn_data in enumerate(self.data):
-            kf_vec[idx]=rxn_data['k_f']
+            kf_vec[idx] = rxn_data['k_f']
 
         return kf_vec
     def __set_kf(self, kf_vec):
@@ -2710,8 +2751,8 @@ class ReactionMechanism:
         assert kf_vec.size == len(self.reactions)
 
         for idx, rxn_data in enumerate(self.data):
-            rxn_data['k_f']=kf_vec[idx]
-    kf=property(__get_kf, __set_kf, None, None)
+            rxn_data['k_f'] = kf_vec[idx]
+    kf = property(__get_kf, __set_kf, None, None)
 
     def __get_kb(self):
         '''Utility for returning a packed kb vector.
@@ -2745,7 +2786,7 @@ class ReactionMechanism:
 
         for idx, rxn_data in enumerate(self.data):
             rxn_data['k_b']=kb_vec[idx]
-    kb=property(__get_kb, __set_kb, None, None)
+    kb = property(__get_kb, __set_kb, None, None)
 
     def __get_ks(self):
         '''Utility for returning packed kf and kb into vectors.
@@ -2777,13 +2818,158 @@ class ReactionMechanism:
             self.__set_kf(kf_kb_pair[0])
         if kf_kb_pair[1] is not None:
             self.__set_kb(kf_kb_pair[1])
-    ks=property(__get_ks, __set_ks, None, None)
+    ks = property(__get_ks, __set_ks, None, None)
+
+    def __get_alpha(self):
+        '''Utility for packing alpha into a list of matrices.
+
+        The return from this method is a list of compressed unstructured data since each reaction
+        typically has a different number of active species, hence different number of associated
+        power-law exponents.
+        The ids of the active species are passed in the first row of the matrices. Each of the alpha
+        matrices have 2 rows. First row with ids, second row with exponents.
+
+        Returns
+        -------
+        alpha_lst: list(numpy.ndarray)
+        '''
+
+        alpha_lst = list()  # list of matrices
+
+        for (idx, rxn_data) in enumerate(self.data):
+
+            (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
+            # reactants_ids = reactants_ids_lst[idx]
+
+            if 'alpha' in rxn_data.keys():
+                alpha_dict = rxn_data['alpha']
+                exponents = list()
+                active_reactants_ids = list()
+                for j in reactants_ids:
+                    spc_name = self.species_names[j]
+                    alpha = alpha_dict[spc_name]
+                    if alpha != -9999:  # exclude inactive species
+                        active_reactants_ids.append(j)
+                        exponents.append(alpha_dict[spc_name])
+
+                reactants_ids_alphas = np.array((active_reactants_ids, exponents))  # 2-row matrix
+
+            else:
+                assert False
+                exponents = -self.stoic_mtrx[idx, reactants_ids]
+
+            alpha_lst.append(reactants_ids_alphas)
+
+        return alpha_lst
+    def __set_alpha(self, alpha_lst):
+        '''Utility for setting alpha from packed matrices.
+
+        The alpha list of matrices with values for the exponents and corresponding active
+        species ids. Note that this will change the internal data of the object including inactive
+        species if the user intends to.
+
+        Parameters
+        ----------
+        alpha: list(numpy.ndarray)
+            If any element of the list is None, the corresponding data is not updated.
+
+        '''
+
+        if alpha_lst is not None:
+            assert isinstance(alpha_lst, list)
+
+            for idx, rxn_data in enumerate(self.data):
+
+                if 'alpha' in rxn_data.keys():
+                    alpha_dict = rxn_data['alpha']
+                    alpha_mtrx = alpha_lst[idx]
+                    reactants_ids = alpha_mtrx[0, :].astype(int)
+                    exponents = alpha_mtrx[1, :]
+                    for jdx, j in enumerate(reactants_ids):
+                        spc_name = self.species_names[j]
+                        alpha_dict[spc_name] = exponents[jdx]
+                else:
+                    assert False
+                    exponents = -self.stoic_mtrx[idx, reactants_ids]
+    alpha = property(__get_alpha, __set_alpha, None, None)
+
+    def __get_beta(self):
+        '''Utility for packing beta exponents into a list of matrices.
+
+        The return from this method is a list of compressed unstructured data since each reaction
+        typically has a different number of active species, hence different number of associated
+        power-law exponents.
+        The ids of the active species are passed in the first row of the matrices. Each of the alpha
+        and beta matrices have 2 rows. First row with ids, second row with exponents.
+
+        Returns
+        -------
+        beta_lst: list(numpy.ndarray)
+        '''
+
+        beta_lst = list()   # list of matrices
+
+        for (idx, rxn_data) in enumerate(self.data):
+
+            (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
+
+            if 'beta' in rxn_data.keys():
+                beta_dict = rxn_data['beta']
+                exponents = list()
+                active_products_ids = list()
+                for j in products_ids:
+                    spc_name = self.species_names[j]
+                    beta = beta_dict[spc_name]
+                    if beta != -9999:  # exclude inactive species
+                        active_products_ids.append(j)
+                        exponents.append(beta_dict[spc_name])
+
+                products_ids_betas = np.array((active_products_ids, exponents))  # 2-row matrix
+
+            else:
+                assert False
+                exponents = self.stoic_mtrx[idx, products_ids]
+
+            beta_lst.append(products_ids_betas)
+
+        return beta_lst
+    def __set_beta(self, beta_lst):
+        '''Utility for setting beta from packed matrices.
+
+        The alpha list of matrices with values for the exponents and corresponding active
+        species ids. Note that this will change the internal data of the object including inactive
+        species if the user intends to.
+
+        Parameters
+        ----------
+        beta: list(numpy.ndarray)
+            If any element of the list is None, the corresponding data is not updated.
+
+        '''
+
+        if beta_lst is not None:
+            assert isinstance(beta_lst, list)
+
+            for idx, rxn_data in enumerate(self.data):
+
+                if 'beta' in rxn_data.keys():
+                    beta_dict = rxn_data['beta']
+                    beta_mtrx = beta_lst[idx]
+                    products_ids = beta_mtrx[0, :].astype(int)
+                    exponents = beta_mtrx[1, :]
+                    for jdx, j in enumerate(products_ids):
+                        spc_name = self.species_names[j]
+                        beta_dict[spc_name] = exponents[jdx]
+                else:
+                    assert False
+                    exponents = self.stoic_mtrx[idx, products_ids]
+    beta = property(__get_beta, __set_beta, None, None)
 
     def __get_power_law_exponents(self):
         '''Utility for packing alpha and beta exponents into a list of vectors.
 
         The return from this method is a pair of unstructured data since each reaction typically has
-        a different number of species, hence different number of associated power-law exponents.
+        a different number of active species, hence different number of associated power-law exponents.
         The ids of the active species are passed in the first row of the matrices. Each of the alpha
         and beta matrices have 2 rows. First row with ids, second row with exponents.
 
@@ -2791,51 +2977,52 @@ class ReactionMechanism:
         -------
         (alpha_lst, beta_lst): tuple(list(numpy.ndarray), list(numpy.ndarray))
         '''
-        alpha_lst=list()  # list of matrices
-        beta_lst=list()   # list of matrices
+
+        alpha_lst = list()  # list of matrices
+        beta_lst = list()   # list of matrices
 
         for (idx, rxn_data) in enumerate(self.data):
 
-            (reactants_ids, )=np.where(self.stoic_mtrx[idx, :] < 0)
+            (reactants_ids, ) = np.where(self.stoic_mtrx[idx, :] < 0)
             # reactants_ids = reactants_ids_lst[idx]
 
             if 'alpha' in rxn_data.keys():
-                alpha_dict=rxn_data['alpha']
-                exponents=list()
-                active_reactants_ids=list()
+                alpha_dict = rxn_data['alpha']
+                exponents = list()
+                active_reactants_ids = list()
                 for j in reactants_ids:
-                    spc_name=self.species_names[j]
-                    alpha=alpha_dict[spc_name]
+                    spc_name = self.species_names[j]
+                    alpha = alpha_dict[spc_name]
                     if alpha != -9999:  # exclude inactive species
                         active_reactants_ids.append(j)
                         exponents.append(alpha_dict[spc_name])
 
-                reactants_ids_alphas=np.array((active_reactants_ids, exponents))  # 2-row matrix
+                reactants_ids_alphas = np.array((active_reactants_ids, exponents))  # 2-row matrix
 
             else:
                 assert False
-                exponents=-self.stoic_mtrx[idx, reactants_ids]
+                exponents = -self.stoic_mtrx[idx, reactants_ids]
 
             alpha_lst.append(reactants_ids_alphas)
 
-            (products_ids, )=np.where(self.stoic_mtrx[idx, :] > 0)
+            (products_ids, ) = np.where(self.stoic_mtrx[idx, :] > 0)
 
             if 'beta' in rxn_data.keys():
-                beta_dict=rxn_data['beta']
-                exponents=list()
-                active_products_ids=list()
+                beta_dict = rxn_data['beta']
+                exponents = list()
+                active_products_ids = list()
                 for j in products_ids:
-                    spc_name=self.species_names[j]
-                    beta=beta_dict[spc_name]
+                    spc_name = self.species_names[j]
+                    beta = beta_dict[spc_name]
                     if beta != -9999:  # exclude inactive species
                         active_products_ids.append(j)
                         exponents.append(beta_dict[spc_name])
 
-                products_ids_betas=np.array((active_products_ids, exponents))  # 2-row matrix
+                products_ids_betas = np.array((active_products_ids, exponents))  # 2-row matrix
 
             else:
                 assert False
-                exponents=self.stoic_mtrx[idx, products_ids]
+                exponents = self.stoic_mtrx[idx, products_ids]
 
             beta_lst.append(products_ids_betas)
 
@@ -2864,36 +3051,35 @@ class ReactionMechanism:
             for idx, rxn_data in enumerate(self.data):
 
                 if 'alpha' in rxn_data.keys():
-                    alpha_dict=rxn_data['alpha']
-                    alpha_mtrx=alpha_lst[idx]
-                    reactants_ids=alpha_mtrx[0, :].astype(int)
-                    exponents=alpha_mtrx[1, :]
+                    alpha_dict = rxn_data['alpha']
+                    alpha_mtrx = alpha_lst[idx]
+                    reactants_ids = alpha_mtrx[0, :].astype(int)
+                    exponents = alpha_mtrx[1, :]
                     for jdx, j in enumerate(reactants_ids):
-                        spc_name=self.species_names[j]
-                        alpha_dict[spc_name]=exponents[jdx]
+                        spc_name = self.species_names[j]
+                        alpha_dict[spc_name] = exponents[jdx]
                 else:
                     assert False
-                    exponents=-self.stoic_mtrx[idx, reactants_ids]
+                    exponents = -self.stoic_mtrx[idx, reactants_ids]
 
         if alpha_beta_pair[1] is not None:
             assert isinstance(alpha_beta_pair[1], list)
-            beta_lst=alpha_beta_pair[1]
+            beta_lst = alpha_beta_pair[1]
 
             for idx, rxn_data in enumerate(self.data):
 
                 if 'beta' in rxn_data.keys():
-                    beta_dict=rxn_data['beta']
-                    beta_mtrx=beta_lst[idx]
-                    products_ids=beta_mtrx[0, :].astype(int)
-                    exponents=beta_mtrx[1, :]
+                    beta_dict = rxn_data['beta']
+                    beta_mtrx = beta_lst[idx]
+                    products_ids = beta_mtrx[0, :].astype(int)
+                    exponents = beta_mtrx[1, :]
                     for jdx, j in enumerate(products_ids):
-                        spc_name=self.species_names[j]
-                        beta_dict[spc_name]=exponents[jdx]
+                        spc_name = self.species_names[j]
+                        beta_dict[spc_name] = exponents[jdx]
                 else:
                     assert False
-                    exponents=self.stoic_mtrx[idx, products_ids]
-    power_law_exponents=property(
-        __get_power_law_exponents, __set_power_law_exponents, None, None)
+                    exponents = self.stoic_mtrx[idx, products_ids]
+    power_law_exponents = property(__get_power_law_exponents, __set_power_law_exponents, None, None)
 
     def full_rank_sub_mechanisms(self, n_sub_mec = 1000):
         '''Construct sub-mechanisms with full-rank stoichiometric matrix.
