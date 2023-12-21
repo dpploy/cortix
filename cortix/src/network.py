@@ -407,10 +407,10 @@ class Network:
                       graph_attr=graph_attr, node_attr=node_attr, engine=engine)
 
         if lr:
-          dgr.attr(rankdir="LR")
+            dgr.attr(rankdir="LR")
 
         if size:
-          dgr.attr(size=size)
+            dgr.attr(size=size)
 
         #dgr.attr('node', shape=node_shape)
 

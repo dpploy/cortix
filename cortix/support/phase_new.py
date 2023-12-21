@@ -616,9 +616,9 @@ class PhaseNew:
         assert actor in self.__df.columns
 
         if try_time_stamp is not None:
-           assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float)
+            assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float)
 
-        time_stamp = self.__get_time_stamp( try_time_stamp )
+        time_stamp = self.__get_time_stamp(try_time_stamp)
         assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
 
         # Note: user value could have a different type than other column values.
@@ -911,7 +911,9 @@ class PhaseNew:
                 if i_var > len(self.__species):
                     assert self.__quantities[i_var].name == self.__df.columns[i_var]
             elif quantity:
-                assert self.__quantities[i_var].name == self.__df.columns[i_var]
+                if i_var > len(self.__species):
+                    assert self.__quantities[i_var].name == self.__df.columns[i_var], \
+                       'ivar=%r; __quant[i]=%r; __df.col[i]=%r; __quant=%r; __df.col=%r'%(i_var, self.__quantities[i_var].name, self.__df.columns[i_var], self.__quantities, self.__df.columns)
 
             '''
             if varUnit == 'gram':
