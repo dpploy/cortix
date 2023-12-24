@@ -9,6 +9,7 @@ from .src.network import Network
 from .src.module import Module
 from .src.port import Port
 
+from .support.units import Units
 from .support.phase import Phase
 from .support.quantity import Quantity
 from .support.species import Species
