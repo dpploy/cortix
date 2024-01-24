@@ -48,6 +48,7 @@ class Network:
         self.modules = list()
 
         self.gv_edges = list()
+        self.gv_info = 'undirectional'
 
         self.use_mpi = None
         self.use_multiprocessing = None
@@ -64,7 +65,6 @@ class Network:
 
     def module(self, m):
         '''Add a module.
-
         '''
 
         assert isinstance(m, Module), 'm must be a module'
@@ -119,12 +119,16 @@ class Network:
             Information on the directionality of the information flow. This is for
             graph visualization purposes only. The default value will use the order
             in the argument list to define the direction. Default: None. If set
-            to `bidiretional`, will create a double headed arrow in the graph figure.
-
+            to `bidiretional`, will create double edges with headed arrow in the graph figure.
+            'undirectional' will create plain edge lines.
+            'directional' will create edges with the arrow pointing in one direction dictated by the
+            edge ordering.
         '''
 
         if info:
             assert isinstance(info, str)
+            assert info in ['undirectional', 'directional', 'bidirectional']
+            self.gv_info = info
 
         if isinstance(module_port_a, Module) and isinstance(module_port_b, Module):
 
@@ -149,7 +153,7 @@ class Network:
             if (str(idx_a), str(idx_b)) not in self.gv_edges:
                 self.gv_edges.append((str(idx_a), str(idx_b)))
 
-                if info == 'bidirectional' and (str(idx_b), str(idx_a)) not in self.gv_edges:
+                if self.gv_info == 'bidirectional' and (str(idx_b), str(idx_a)) not in self.gv_edges:
                     self.gv_edges.append((str(idx_b), str(idx_a)))
 
         elif isinstance(module_port_a, list) and isinstance(module_port_b, list):
@@ -173,7 +177,7 @@ class Network:
 
             self.gv_edges.append((str(idx_a), str(idx_b)))
 
-            if info == 'bidirectional':
+            if self.gv_info == 'bidirectional':
                 self.gv_edges.append((str(idx_b), str(idx_a)))
 
             if isinstance(module_port_a[1], str):
@@ -395,7 +399,10 @@ class Network:
             os.remove(self.name+'.gv.png')
 
         # Import here to avoid broken dependency. Only this method needs graphviz.
-        from graphviz import Digraph
+        if self.gv_info == 'undirectional':
+            from graphviz import Graph
+        else:
+            from graphviz import Digraph
 
         if graph_attr is None:
             graph_attr = {'splines':'true', 'overlap':'scale', 'ranksep':'1.5'}
@@ -403,23 +410,27 @@ class Network:
         if node_attr is None:
             node_attr = {'shape':node_shape, 'style':'filled'}
 
-        dgr = Digraph(name=self.name, comment='Network::graphviz', format='png',
-                      graph_attr=graph_attr, node_attr=node_attr, engine=engine)
+        if self.gv_info == 'undirectional':
+            graph = Graph(name=self.name, comment='Network::graphviz', format='png',
+                        graph_attr=graph_attr, node_attr=node_attr, engine=engine)
+        else:
+            graph = Digraph(name=self.name, comment='Network::graphviz', format='png',
+                          graph_attr=graph_attr, node_attr=node_attr, engine=engine)
 
         if lr:
-            dgr.attr(rankdir="LR")
+            graph.attr(rankdir="LR")
 
         if size:
-            dgr.attr(size=size)
+            graph.attr(size=size)
 
-        #dgr.attr('node', shape=node_shape)
+        #graph.attr('node', shape=node_shape)
 
         for idx, mod in enumerate(self.modules):
-            dgr.node(str(idx), mod.name)
+            graph.node(str(idx), mod.name)
 
         for edg in self.gv_edges:
-            dgr.edge(edg[0], edg[1])
+            graph.edge(edg[0], edg[1])
 
-        dgr.render()
+        graph.render()
 
-        return dgr
+        return graph

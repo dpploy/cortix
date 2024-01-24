@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
+import math
+import cmath
 import pandas
 #import matplotlib
 #matplotlib.use('Agg', warn=False)
@@ -190,7 +192,7 @@ class Quantity:
     unit = property(GetUnit, SetUnit, None, None)
 
     def plot(self, x_scaling=1, y_scaling=1, y_shift=0, title=None, x_label='x', y_label=None,
-            file_name=None, same_axis=True, dpi=300):
+            file_name=None, same_axis=True, complex_form='polar', dpi=300):
         '''
         This will support a few possibities for data storage in the self.__value
         member.
@@ -213,8 +215,13 @@ class Quantity:
         if len(self.__value) == 1:
             return
 
+        #print(type(self.__value))
+        #print(self.__value)
+        #exit(0)
+
         if not title:
             title = self.info
+
         if not y_label:
             if self.latex_name != 'null-quantity-latex-name':
                 y_label = self.latex_name
@@ -225,36 +232,96 @@ class Quantity:
             else:
                 assert False
 
-        if isinstance(self.__value[0],float) or isinstance(self.__value[0],int) \
-                or isinstance(self.__value[0],bool):
+            if self.unit != 'null-quantity-unit':
+                y_label += ' [' + self.unit + ']'
+
+        complex_data = False
+
+        if isinstance(self.__value[0], (float, int, bool)):
             n_dim = 1
             # Turn series of values into a series of a list of one value to allow for
             # the indexing below
+            plot_values = list()
             for i in range (len(self.__value[:])):
-                self.__value.iat[i] = [ self.__value.iat[i] ]  # list of one element
+                #self.__value.iat[i] = [self.__value.iat[i]]  # list of one element
+                plot_values.append([self.__value.iat[i]])  # list of one element
+        elif isinstance(self.__value[0], complex):
+            n_dim = 1
+            complex_data = True
+            same_axis = False
+            if complex_form == 'polar':
+                legend = [r'$|'+self.latex_name+'|$', r'$\phi$']
+                y_label = r'$|V$| [' + self.unit + ']'
+            elif complex_form == 'rectangular':
+                legend = [r'$\Re('+self.latex_name+')$', r'$\Im('+self.latex_name+')$']
+            else:
+                assert False
+            plot_values = list()
+            for i in range (len(self.__value[:])):
+                z = self.__value.iat[i]
+                if complex_form == 'polar':
+                    (mag, angle) = cmath.polar(z)
+                    #self.__value.iat[i] = [mag, angle/math.pi*180]  # list of two elements
+                    plot_values.append([mag, angle/math.pi*180])  # list of two elements
+                elif complex_form == 'rectangular':
+                    #self.__value.iat[i] = [z.real, z.imag]  # list of two elements
+                    plot_values.append([z.real, z.imag]) # list of two elements
         else:
-           n_dim = len(self.__value[0])
+            n_dim = len(self.__value[0])
 
         x = [i*x_scaling for i in self.__value.index]
         #x = self.__value.index # potential bug in matplotlib
 
-        if same_axis:
+        # Warning: code needs review; complex valued data was introduced without testing
+
+        if same_axis and not complex_data:
             fig = plt.figure(self.__formal_name)
+
+        if complex_data:
+            fig,ax1 = plt.subplots()
+            ax2 = ax1.twinx()
+
         for i in range(n_dim):
-            if not same_axis:
+
+            if not same_axis and not complex_data:
                 fig = plt.figure(self.__formal_name+str(i))
+
             y = list()
+
             for j in range(len(x)):
-                y.append( self.__value.iat[j][i] ) # must use iat()
+                #y.append(self.__value.iat[j][i]) # must use iat()
+                y.append(plot_values[j][i])
 
             y = [(k-y_shift)*y_scaling for k in y]
 
-            plt.xlabel(x_label)
-            plt.ylabel(y_label)
+            if complex_data:
+                y2 = list()
+
+                for j in range(len(x)):
+                    #y2.append(self.__value.iat[j][i+1]) # must use iat()
+                    y2.append(plot_values[j][i+1])
+
+                y2 = [(k-y_shift)*y_scaling for k in y2]
 
             plt.title(title)
 
-            plt.plot(x, y)
+            if complex_data:
+                #print(x)
+                #print(y)
+                l1, = ax1.plot(x, y, color='blue')
+                #print(y2)
+                #print('')
+                l2, = ax2.plot(x, y2, color='red')
+                ax1.set_xlabel(x_label)
+                ax1.set_ylabel(y_label, color='blue')
+                ax2.set_ylabel(r'$\phi$ [degree]', color='red')
+                plt.legend([l1, l2], legend)
+            else:
+                plt.plot(x, y)
+
+            if not complex_data:
+                plt.xlabel(x_label)
+                plt.ylabel(y_label)
 
             if not same_axis and file_name:
                 plt.savefig(file_name+str(i)+'.png', dpi=dpi)
