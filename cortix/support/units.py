@@ -20,6 +20,11 @@ temp = 10*unit.kelvin
 import scipy.constants as spc
 
 class Units:
+
+    mega = spc.mega
+    kilo = spc.kilo
+    centi = spc.centi
+
     second = 1.0
     minute = spc.minute
     hour = spc.hour
@@ -30,15 +35,20 @@ class Units:
     pascal = 1.0
     watt = 1.0
     kelvin = 1.0
+    coulomb = 1.0
+    volt = joule/coulomb
+    ampere = coulomb/second
     liter = spc.liter
     gallon = spc.gallon
 
+    var = volt*ampere # reactive power
+
     ppm = 1.0
 
-    cm = spc.centi*meter
+    cm = centi*meter
     ft = spc.foot
-    cc = (spc.centi*meter)**3
-    kj = spc.kilo*joule
+    cc = (centi*meter)**3
+    kj = kilo*joule
     btu = spc.Btu
     barn = 1.0e-28 * meter**2
     F = spc.convert_temperature(2,'F','K') - spc.convert_temperature(1,'F','K')
