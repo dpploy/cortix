@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
-'''
+"""
 Phase *history* container. When you think of a phase value, think of that value at
 a specific point in time. This container holds the historic data of a phase;
 its species and quantities. This implementation treats access of time stamps within
@@ -23,11 +23,16 @@ use the GetValue() method to access the history data frame (pandas) via columns 
 rows. ALERT: The corresponding values in species and quantities are OVERRIDEN and NOT to
 be used through the phase interface.
 
+NOTE: If you find yourself creating an inflow mass flowrate Quantity in your Phase,
+call the resulting object a "stream." Outflow rates can be created on the fly from
+concentrations and volumetric flowrates, hence they should not be a Quantity. Use
+quantity for temperature, pressure, etc.
+
 Author: Valmor F. de Almeida dealmeidav@ornl.gov; vfda
 Sat Sep  5 01:26:53 EDT 2015
 
 Cortix: a program for system-level modules coupling, execution, and analysis.
-'''
+"""
 import os, io
 from copy import deepcopy
 import time
