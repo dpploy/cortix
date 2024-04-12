@@ -289,9 +289,10 @@ class Species:
 
         Examples that can be handled by the code below:
 
-            *OH^-:              * for radical, ^ for charged species
-            [CH2]3OH*^2-(a):    [] for groups of atoms
-            H2O2(v):            () for phase
+            ^*OH^-:              ^* for radical, ^ for charged species (only one ^* allowed)
+            [CH2]3OH^*^2-(a):    [] for groups of atoms
+            H2O2(v):             () for phase
+            H2O*[C4H9O]3PO:      * complexation (only one allowed)
 
         This is useful for automating the creation of a species list of atoms, say from a
         reaction mechanism.
@@ -300,22 +301,29 @@ class Species:
 
         formula_name = self.formula_name.strip()
 
-        # remove radical symbol *
-        formula_name = formula_name.strip('*')
-        tmp = formula_name.split('*')
+        # Remove radical symbol * (there can only be one)
+        formula_name = formula_name.strip('^*')
+        tmp = formula_name.split('^*')
         if len(tmp) > 1:
-            assert len(tmp) == 2, 'fatal: only one "*" allowed.'
+            assert len(tmp) == 2, 'fatal: only one "^*" allowed.'
             formula_name = tmp[0]+tmp[1]
 
-        # remove phase indicator
-        i = formula_name.find('(')
-        j = formula_name.rfind(')')
+        # Remove phase indicator
+        i = formula_name.find('(')  # first index
+        j = formula_name.rfind(')') # highest index
         if i != -1 and j != -1:
             formula_name = formula_name.replace(formula_name[i:j+1], '')
         elif (i == -1 and j != -1) or (i != -1 and j == -1):
             assert False, 'fatal: missing pairing ")".'
 
-        # remove charge
+        # Remove complexation * indicator (there can be more than one)
+        formula_name = formula_name.strip('*')
+        tmp = formula_name.split('*')
+        for frag in tmp:
+            assert frag[-1] != '^', 'fomula_name = %r; tmp = %r'%(formula_name, tmp)
+        formula_name = formula_name.replace('*', '')
+
+        # Remove charge
         i = formula_name.find('^')
         if i != -1: # if success
             if formula_name[i+1].isnumeric():    # integer followed by sign
@@ -339,15 +347,26 @@ class Species:
             else:
                 self.charge = val
 
-        # find atom group multiplicity
-        i = formula_name.find('[')
-        if i != -1: # if success
-            assert False, 'fatal: "[]" not yet implemented.' # TODO
+        # Find atom group multiplicity recursively
+        while formula_name.find('[') > 1 or formula_name.find(']') > 1:
+            i = formula_name.rfind('[')                     # innermost [
+            j = formula_name.find(']',i,len(formula_name))  # matching ]
+            if i != -1 and j != -1: # if success
+                assert formula_name[j+1].isnumeric()
+                sub_formula_name = formula_name[i+1:j]
+                right_side_of_sub_formula = formula_name[j+1:]
+                multiplicity = int(formula_name[j+1])
+                formula_name = formula_name[:j+1]
+                formula_name = formula_name.replace(formula_name[i:j+1], multiplicity*sub_formula_name)
+                formula_name += right_side_of_sub_formula[1:]
+            elif (i >= 0 and j == -1) or (i == -1 and j >=0):
+                assert False
 
-        # build the atom list
+        # Build the atom list
         assert isinstance(self.atoms, list)
         assert len(self.atoms) == 0
 
+        # At this point there must be only alpha-numeric
         assert formula_name.isalnum(), 'fatal: formula name = %r'%formula_name
 
         # Find the chemical element symbol in the general form: Xy, say He, Na, O, etc.
@@ -383,7 +402,7 @@ class Species:
 
         Examples that can be handled by the code below:
 
-            *OH^-               * for radical, ^ for charged species
+            ^*OH^-              ^* for radical, ^ for charged species
             [CH2]3OH*^2-(a)     [] for groups of atoms
             H2O2(v)             () for phase
 
@@ -391,7 +410,8 @@ class Species:
         Unfinished.
 
         This is useful for automating the creation of a species list of atoms, say from a
-        reaction mechanism. Important: to copy and paste the result into a LaTeX document, first
+        reaction mechanism.
+        IMPORTANT: to copy and paste the result into a LaTeX document, first
         had Python `print` the string and then copy the string. To use in a Jupyter notebook with
         markdown cells, again, print using a code cell and copy the output into a markdown cell.
         To use under LaTex, either enclose in $$ or drop it into a LaTex environment.
@@ -428,10 +448,15 @@ class Species:
             if not open_parenthesis:
 
                 if c_i == '*':
-                    latex_name += r'^\bullet' # escape \
+                    assert idx != 0, 'fatal: incorrect complexation on formula_name = %r'%formula_name
+                    if formula_name[idx-1] == '^':
+                        latex_name += r'^\bullet' # escape \
+                    else:
+                        assert idx != len(formula_name)-1, 'fatal: incorrect complexation on formula_name = %r'%formula_name
+                        latex_name += r'\bullet' # escape \
                     continue
 
-                if c_i == '^':
+                if c_i == '^' and formula_name[idx-1] != '*':
                     assert idx < len(formula_name)-1, 'Error on %r'%formula_name
                     if formula_name[idx+1].isnumeric(): # there must be a charge sign
                         latex_name += '^{' + formula_name[idx+1:idx+3] + '}'
