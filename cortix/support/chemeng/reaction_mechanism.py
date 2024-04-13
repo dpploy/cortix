@@ -51,11 +51,12 @@ class ReactionMechanism:
 
     latex_species: str
         String containing the LaTeX typetting of the species in the order they appear in the stoichiometric
-        matrix. Use the Python print function to print this attribute and copy/paste into a LaTex
+        matrix. Use the Python print() function to print this attribute and copy/paste into a LaTex
         environment.
 
     latex_rxn: str
         String containing the LaTeX typsetting of all reactions into the LaTeX `align` environment.
+        Use the Python print() function to print this attribute and copy/paste into a LaTex environment.
     '''
 
     def __init__(self, header='no-header', file_name=None, mechanism=None, order_species=True,
@@ -3170,10 +3171,39 @@ class ReactionMechanism:
             print(data)
             print('')
 
+    def md_print(self):
+        '''Markdown cell printout of LaTex reactions and species.
+
+        Use with Jupyter Notebooks in a code cell.
+        NB: not a member method.
+
+        Parameters
+        ----------
+        latex_species: str
+            String created by the Species class for typesetting in LaTex.
+
+        Returns
+        -------
+        None:
+
+        Examples
+        --------
+
+        '''
+
+        from IPython.display import Markdown, display
+        tmp = self.latex_species.replace(',',' \quad ')
+        string = '**Species:** %i \n $%s$'%(len(self.species_names),tmp)
+        display(Markdown(string))
+
+        string = '**Reactions:** %i \n %s'%(len(self.reactions),self.latex_rxn)
+        display(Markdown(string))
+
+
     def __latex(self):
         '''Internal helper for LaTeX typesetting.
 
-        See attributes.
+        See attributes description and usage with the Python print() function.
         '''
 
         # Latex species
@@ -3183,8 +3213,10 @@ class ReactionMechanism:
         species_str += self.species[-1].latex_name
 
         # Latex reactions into align environment
-        rxn_str = self.header + '\n'
-        rxn_str += '\\begin{align*} \n'
+        # No header
+        #rxn_str = self.header + '\n'
+        #rxn_str += '\\begin{align*} \n'
+        rxn_str = '\\begin{align*} \n'
         for idx,row in enumerate(self.stoic_mtrx):
 
             (reactants_ids, ) = np.where(row < 0)
@@ -3311,5 +3343,3 @@ def print_reaction_sub_mechanisms(sub_mechanisms, mode=None, n_sub_mech=None):
         print('Species = ',rsm[0].species_names)
         for (r,data,gidx) in zip(rsm[0].reactions, rsm[0].data, rsm[1]):
             print('r%s'%gidx, r,' ', data['info'])
-
-    return

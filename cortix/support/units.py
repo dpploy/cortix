@@ -50,7 +50,7 @@ class Units:
     cc = (centi*meter)**3
     liter = spc.liter
     L = liter
-    mL = milli/L
+    mL = milli*L
     gallon = spc.gallon
 
     # energy/power/pressure
