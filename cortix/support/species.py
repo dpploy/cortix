@@ -81,7 +81,9 @@ class Species:
             A textual information about the species, e.g. the commercial name of the compound.
 
         latex_name: str
-            A LaTeX string type varible typically generated automatically by this constructor.
+            A string type varible typically generated automatically by this constructor.
+            If this string is printed under Python, it will generate an output that can be pasted
+            into a LaTeX environment.
 
         Examples
         --------
@@ -411,16 +413,18 @@ class Species:
 
         This is useful for automating the creation of a species list of atoms, say from a
         reaction mechanism.
-        IMPORTANT: to copy and paste the result into a LaTeX document, first
-        had Python `print` the string and then copy the string. To use in a Jupyter notebook with
-        markdown cells, again, print using a code cell and copy the output into a markdown cell.
-        To use under LaTex, either enclose in $$ or drop it into a LaTex environment.
 
+        IMPORTANT: to copy and paste the result into a LaTeX document, first
+        had Python `print` the string and then copy the output. To use in a Jupyter notebook with
+        markdown cells, again, print using a code cell and copy the output into a markdown cell.
+        To render with LaTex, either enclose in $$ or drop it into a LaTex environment.
         """
 
         latex_name = str()
 
         formula_name = self.formula_name.strip()
+
+        latex_name = '{'
 
         open_parenthesis = False
         open_parenthesis_after_numeric = False
@@ -428,6 +432,7 @@ class Species:
         for idx, c_i in enumerate(formula_name):
 
             if c_i == '(':
+                latex_name += '}'
                 open_parenthesis = True
                 if formula_name[idx-1].isnumeric():
                     latex_name += r'_{\mathrm{(' # escape \
@@ -438,11 +443,19 @@ class Species:
 
             if c_i == ')':
                 if open_parenthesis_after_numeric:
-                    latex_name += ')}}}'
+                    latex_name += ')}}'
                     open_parenthesis_after_numeric = False
                 else:
                     latex_name += ')}'
                 open_parenthesis = False
+                continue
+
+            if c_i == '[':
+                latex_name += '[' # escape \
+                continue
+
+            if c_i == ']':
+                latex_name += ']'
                 continue
 
             if not open_parenthesis:
@@ -468,19 +481,20 @@ class Species:
                     latex_name += r'\mathrm{' + c_i + '}'
                     continue
 
-                if idx < len(formula_name)-1:
+                if idx < len(formula_name)-1:  # numeric
+                    # after letter and before of anything but (
                     if c_i.isnumeric() and formula_name[idx-1].isalpha() and formula_name[idx+1] != '(':
                         latex_name += '_{' + c_i + '}'
                     elif c_i.isnumeric() and formula_name[idx-1].isalpha() and formula_name[idx+1] == '(':
-                        latex_name += '_{' + c_i
+                        latex_name += '_{' + c_i + '}'
+                    elif c_i.isnumeric() and formula_name[idx-1] == ']':
+                        latex_name += '_{' + c_i + '}'
                     continue
 
                 if c_i.isnumeric(): # numeric
+                    print('made here')
                     latex_name += '_{' + c_i + '}'
                     continue
-
-                if c_i in ['[', ']']:
-                    assert False, 'fatal: "[]" not implemented yet.' #TODO
 
             else: # phase token
                 latex_name += c_i
