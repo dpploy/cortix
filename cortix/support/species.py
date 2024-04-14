@@ -237,7 +237,7 @@ class Species:
         if len(self.atoms) > 1:
 
             # save the multiplier value as a string type of scientific notation
-            for entry in self.atoms:
+            for id, entry in enumerate(self.atoms):
 
                 assert isinstance(entry, str)
 
@@ -259,7 +259,8 @@ class Species:
 
                 multiplier = '{0:9.3e}'.format(multiplier)
 
-                atoms1[self.atoms.index(entry)] = multiplier + '*' + nuclide
+                #atoms1[self.atoms.index(entry)] = multiplier + '*' + nuclide
+                atoms1[id] = multiplier + '*' + nuclide
 
             # order in decreasing order of multiplier magnitude
             multipliers_lst = list()
@@ -294,7 +295,8 @@ class Species:
             ^*OH^-:              ^* for radical, ^ for charged species (only one ^* allowed)
             [CH2]3OH^*^2-(a):    [] for groups of atoms
             H2O2(v):             () for phase
-            H2O*[C4H9O]3PO:      * complexation (only one allowed)
+            H2O*[C4H9O]3PO:      * complexation
+            I*E*S                * more than one complexation
 
         This is useful for automating the creation of a species list of atoms, say from a
         reaction mechanism.
@@ -376,7 +378,7 @@ class Species:
         lower_case_ids = list()
         number_of_atoms_ids = list()
 
-        for id,s in enumerate(formula_name):
+        for id, s in enumerate(formula_name):
             if s.isupper():
                 upper_case_ids.append(id)
             if s.islower():

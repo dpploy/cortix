@@ -3171,6 +3171,14 @@ class ReactionMechanism:
             print(data)
             print('')
 
+    def print_species(self):
+        '''Helper to print species data line by line.
+        '''
+
+        for spc in self.species:
+            print(spc)
+            print('')
+
     def md_print(self):
         '''Markdown cell printout of LaTex reactions and species.
 
@@ -3198,7 +3206,6 @@ class ReactionMechanism:
 
         string = '**Reactions:** %i \n %s'%(len(self.reactions),self.latex_rxn)
         display(Markdown(string))
-
 
     def __latex(self):
         '''Internal helper for LaTeX typesetting.
