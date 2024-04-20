@@ -494,7 +494,6 @@ class Species:
                     continue
 
                 if c_i.isnumeric(): # numeric
-                    print('made here')
                     latex_name += '_{' + c_i + '}'
                     continue
 
