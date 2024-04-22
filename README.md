@@ -37,6 +37,7 @@ pip install --user cortix=="<version>"
 ```
 NB: this will not install the GraphViz executables but only the python wrapper. Install the GraphViz library on your system by yourself.
 ## Installing via Conda
+In a `Anaconda` environment (MacOS terminal conda, or Windows Anaconda powershell) do:
 ```
 pip install cortix
 conda install graphviz
