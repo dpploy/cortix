@@ -31,13 +31,20 @@ A Python library for network dynamics modeling and HPC simulation.
 ```
 pip install --user cortix
 ```
+if updating to a new version, you may need to specify the version
+```
+pip install --user cortix=="<version>"
+```
 NB: this will not install the GraphViz executables but only the python wrapper. Install the GraphViz library on your system by yourself.
 ## Installing via Conda
 ```
 pip install cortix
 conda install graphviz
 ```
-
+if updating to a new version, you may need to specify the version
+```
+pip install cortix=="<version>"
+```
 ## Installing from source
 1. Clone this repository to install the latest version of Cortix 
 ```
