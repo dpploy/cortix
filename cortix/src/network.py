@@ -299,7 +299,8 @@ class Network:
                     self.modules[module.id] = module
 
         if num_files and num_files != len(self.modules):
-            self.log.warning('Network::run(): not all modules reloaded from disk.')
+            self.log.warning('Network::run(): not all modules reloaded from disk.\
+                              # modules = %i; # files = %i'%(len(self.modules), num_files))
 
         if self.use_mpi:
             # Make double sure all are in sync here before going forward
@@ -332,7 +333,7 @@ class Network:
 
             'twopi': draws graphs using a radial layout.  Basically,one node is
                      chosen as the center and put at the origin. The remaining nodes
-                     are placed onasequence  of  concentric  circles  centered  about
+                     are placed on a sequence of concentric  circles  centered  about
                      the  origin,  each  a  fixed  radial  distance  from  the
                      previous circle.  Allnodes distance 1 from the center are placed
                      on the first circle; all nodes distance 1 from a nodeon the

@@ -3,9 +3,10 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 '''
-This example uses two modules instantiated many times. It be executed with MPI
-(if `mpi4py` is available) or with the Python multiprocessing library. These choices
-are made by variables listed below in the executable portion of this run file.
+This example uses two modules instantiated many times. It will be executed with MPI
+using the `use_mpi=True` statement (if `mpi4py` is available) or with the Python
+multiprocessing library otherwise. These choices are made by variables listed below
+in the executable portion of this run file.
 
 To run this case using MPI you should compute the number of
 processes as follows:
@@ -20,7 +21,6 @@ To run this case with the Python multiprocessing library, just run this file at 
 command line as
 
     `run_droplet.py`
-
 '''
 
 import scipy.constants as const
@@ -30,7 +30,6 @@ from cortix import Cortix
 from cortix import Network
 from cortix.examples.droplet_swirl.droplet import Droplet
 from cortix.examples.droplet_swirl.vortex import Vortex
-
 
 def main():
     '''Cortix run file for a `Droplet`-`Vortex` network.
@@ -65,7 +64,7 @@ def main():
 
     plot_vortex_profile = False # True may crash the X server.
 
-    use_mpi = False # True for MPI; False for Python multiprocessing
+    use_mpi = False # use True for MPI runs; False for Python multiprocessing
 
     swirl = Cortix(use_mpi=use_mpi, splash=True)
 
@@ -96,7 +95,8 @@ def main():
                                [vortex,vortex.get_port('fluid-flow:{}'.format(i))],
                                'bidirectional' )
 
-    swirl.network.draw()
+    if swirl.use_multiprocessing or swirl.rank == 0:
+       swirl.network.draw(engine='neato')
 
     swirl.run()
 

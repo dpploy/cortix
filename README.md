@@ -63,8 +63,10 @@ Note: you may want to add this line to your ```.bashrc``` in order for it to be 
 
 ### Verify your Cortix install by running the Droplet example
 ```
-mpirun -np 12 examples/droplet_run.py
+mpiexec -n xx examples/run_droplet_swirl.py
 ```
+where xx is the number of MPI processes which must match the number of modules plus 1. If there are
+10 droplets and 1 vortex, use $xx = 12$.
 
 ## Testing
 
