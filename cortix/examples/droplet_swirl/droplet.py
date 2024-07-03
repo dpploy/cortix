@@ -139,7 +139,7 @@ class Droplet(Module):
             # Interactions in the external-flow port
             #---------------------------------------
 
-            position = self.liquid_phase.GetValue('position')
+            position = self.liquid_phase.get_value('position')
             self.send( (time,position), 'external-flow' )
 
             (check_time, velocity,fluid_props) = self.recv( 'external-flow' )
@@ -236,8 +236,8 @@ class Droplet(Module):
 
         if not self.bottom_impact:
 
-           x_0 = self.liquid_phase.GetValue('position', time)
-           v_0 = self.liquid_phase.GetValue('velocity', time)
+           x_0 = self.liquid_phase.get_value('position', time)
+           v_0 = self.liquid_phase.get_value('velocity', time)
            u_vec_0 = np.concatenate((x_0,v_0))
 
            t_interval_sec = np.linspace(0.0, self.time_step, num=2)
@@ -254,17 +254,17 @@ class Droplet(Module):
 
            u_vec = u_vec_hist[1,:]  # solution vector at final time step
 
-        values = self.liquid_phase.GetRow(time) # values at previous time
+        values = self.liquid_phase.get_row(time) # values at previous time
 
         time += self.time_step
 
-        self.liquid_phase.AddRow(time, values)
+        self.liquid_phase.add_row(time, values)
 
         if not self.bottom_impact:
 
             # Ground impact with bouncing drop
             if u_vec[2] <= 0.0 and self.bounce:
-                position = self.liquid_phase.GetValue('position', self.initial_time)
+                position = self.liquid_phase.get_value('position', self.initial_time)
                 bounced_position = position[2] * np.random.random(1)
                 u_vec[2]  = bounced_position
                 u_vec[3:] = 0.0  # zero velocity

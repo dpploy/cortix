@@ -210,13 +210,15 @@ class ReactionMechanism:
 
             self.__original_mechanism.append(m_i)
 
-            data = m_i.split(':')
+            assert m_i.find(':') == -1, 'Change all ":" to ";".'
+
+            data = m_i.split(';')
 
             self.reactions.append(data[0].strip())  # do not save comments
 
             tmp_dict = dict()
 
-            if len(data) > 1: # if colon separated data exists
+            if len(data) > 1: # if semi-colon separated data exists
 
                 for d in data[1:]:
                     datum = d.strip()
@@ -253,6 +255,12 @@ class ReactionMechanism:
                             tmp_dict[name] = float(val_str)
                     else:
                         tmp_dict[name] = float(val_str)
+
+            # mass transfer relaxation reaction sanity check
+            if 'k_eq' in tmp_dict:
+                assert 'tau' in tmp_dict
+            if 'tau' in tmp_dict and 'k_eq' not in tmp_dict:
+                print('WARNING: user must provide a k_eq_func(spc_molar_cc, temperature=None) %s'%(data[0]))
 
             self.data.append(tmp_dict)
 
@@ -538,7 +546,7 @@ class ReactionMechanism:
 
         return s_rank
 
-    def r_vec(self, spc_molar_cc_vec, theta_kf_vec=None, theta_kb_vec=None,
+    def r_vec(self, spc_molar_cc_vec, temperature=None, theta_kf_vec=None, theta_kb_vec=None,
               theta_alpha_lst=None, theta_beta_lst=None):
         '''Compute a reaction rate density vector.
 
@@ -551,6 +559,14 @@ class ReactionMechanism:
         Provided as a convenience to the user of a given reaction mechanism. If the reaction mechanism
         is meant to be reparameterized, the presence of named arguments decide whether that parameter
         is actually reparameterized or not.
+
+        If k_eq (partition/distribution coefficient) and tau (relaxation time) are given, these will
+        override the previous reaction rate expression with a mass transfer relaxation reaction expression
+        where k_eq is used directly.
+
+        If tau is given but not k_eq, then the user is responsible for providing the reaction rate
+        expression. This typically happens when k_eq is a function of temperature, concentration and other
+        quantities.
 
         Parameters
         ----------
@@ -644,6 +660,47 @@ class ReactionMechanism:
             #products_molar_cc[products_molar_cc < 0] = 0.0
 
             r_vec[idx] -= kb_vec[idx] * np.prod(products_molar_cc**beta_mtrx[1, :])
+
+        # If k_eq and tau are present, override reaction rate with mass transfer relaxation
+        # Complexation case
+        for (idx, rxn_data) in enumerate(self.data):
+            if 'tau' in rxn_data:
+                tau = rxn_data['tau']
+            if 'k_eq' in rxn_data:
+                k_eq = rxn_data['k_eq']
+            else:
+                k_eq_func = rxn_data['k_eq_func']
+                k_eq      = k_eq_func(spc_molar_cc_vec, temperature, self.species)
+
+            reactants_ids = alpha_mtrx[0, :].astype(int)
+            #assert len(reactants_ids) == 2
+            if len(reactants_ids) != 2:
+                continue
+
+            reactants_molar_cc = spc_molar_cc_vec[reactants_ids] # must be ordered as in rxn_mech
+
+            products_ids = beta_mtrx[0, :].astype(int)
+            #assert len(products_ids) == 1
+            if len(reactants_ids) != 1:
+                continue
+
+            products_molar_cc = spc_molar_cc_vec[products_ids] # must be oredered as in rxn_mech
+
+            complex_former_molar_cc = reactants_molar_cc[-1]
+            complex_molar_cc        = products_molar_cc[0]
+            complex_molar_cc_eq     = k_eq * complex_former_molar_cc
+
+            r_vec[idx] = - 1/tau * (complex_molar_cc - complex_molar_cc_eq)
+
+        # Phase partition case
+        for (idx, rxn_data) in enumerate(self.data):
+            if 'tau' in rxn_data:
+                tau = rxn_data['tau']
+            if 'k_eq' in rxn_data:
+                k_eq = rxn_data['k_eq']
+            else:
+                k_eq_func = rxn_data['k_eq_func']
+                k_eq      = k_eq_func(spc_molar_cc_vec, temperature, self.species)
 
         return r_vec
 
