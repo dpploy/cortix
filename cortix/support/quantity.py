@@ -257,7 +257,7 @@ class Quantity:
             else:
                 assert False
             plot_values = list()
-            for i in range (len(self.__value[:])):
+            for i in range(len(self.__value[:])):
                 z = self.__value.iat[i]
                 if complex_form == 'polar':
                     (mag, angle) = cmath.polar(z)
@@ -266,8 +266,14 @@ class Quantity:
                 elif complex_form == 'rectangular':
                     #self.__value.iat[i] = [z.real, z.imag]  # list of two elements
                     plot_values.append([z.real, z.imag]) # list of two elements
-        else:
+        elif len(self.__value[0]) >= 1:
             n_dim = len(self.__value[0])
+            plot_values = list()
+            for container in self.__value:
+                assert len(container) == n_dim
+                plot_values.append(container)
+        else:
+            assert False, 'not a valid data container in self.__value'
 
         x = [i*x_scaling for i in self.__value.index]
         #x = self.__value.index # potential bug in matplotlib
