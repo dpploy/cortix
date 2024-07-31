@@ -9,12 +9,16 @@
    -----
 
    On guest code.py:
-
    from cortix import Units as unit
 
+   examples:
    size = 10*unit.meter
    temp = 10*unit.kelvin
 
+   temp = convert_temp(10, 'C', 'K')
+
+   incorrect: temp = 20*unit.F
+   correct:   temp = unit.convert_temperature(20, 'F', 'K')
 """
 
 import scipy.constants as scipy_cte
@@ -23,6 +27,8 @@ class Units:
 
     # make scipy a make constants available
     scipy_cte = scipy_cte
+
+    # all class data
 
     # unit prefix
     mega = scipy_cte.mega
@@ -36,15 +42,19 @@ class Units:
     min = minute
     hour = scipy_cte.hour
     day = scipy_cte.day
+    year = scipy_cte.year
 
     # mass
     gram = scipy_cte.gram
     kg = kilo*gram
+    lb = scipy_cte.lb
 
     # length
     meter = 1.0
     cm = centi*meter
     ft = scipy_cte.foot
+    foot = ft
+    inch = scipy_cte.inch
 
     # area
     barn = 1.0e-28 * meter**2 # nuclear cross section
@@ -61,8 +71,10 @@ class Units:
     kj = kilo*joule
     watt = 1.0
     btu = scipy_cte.Btu
+    Btu = btu
     pascal = 1.0
     bar = scipy_cte.bar
+    psi = scipy_cte.psi
 
     # charge/electric potential/current
     coulomb = 1.0
@@ -77,3 +89,8 @@ class Units:
     C = scipy_cte.convert_temperature(2,'C','K') - scipy_cte.convert_temperature(1,'C','K')
     K = 1.0
     kelvin = 1.0
+
+    # temperature conversion
+    # static method
+    def convert_temperature(val, from_scale_name, to_scale_name):
+        return scipy_cte.convert_temperature(val, from_scale_name, to_scale_name)
