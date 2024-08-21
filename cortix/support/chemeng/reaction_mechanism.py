@@ -50,13 +50,15 @@ class ReactionMechanism:
         Stoichiometric matrix; 2D `numpy` array.
 
     latex_species: str
-        String containing the LaTeX typetting of the species in the order they appear in the stoichiometric
+        String containing the LaTeX typesetting of the species in the order they appear in the stoichiometric
         matrix. Use the Python print() function to print this attribute and copy/paste into a LaTex
-        environment.
+        environment. For example do print(rxn_mech.latex_species) in a python script or Jupyter notebook.
 
     latex_rxn: str
         String containing the LaTeX typsetting of all reactions into the LaTeX `align` environment.
         Use the Python print() function to print this attribute and copy/paste into a LaTex environment.
+        This is also used with md_print() for printing in a Jupyter notebook cell. For example do
+        print(rxn_mech.latex_rxn) in a python script or Jupyter notebook.
     '''
 
     def __init__(self, header='no-header', file_name=None, mechanism=None, order_species=True,
@@ -260,7 +262,7 @@ class ReactionMechanism:
             if 'k_eq' in tmp_dict:
                 assert 'tau' in tmp_dict
             if 'tau' in tmp_dict and 'k_eq' not in tmp_dict:
-                print('WARNING: user must provide a k_eq_func(spc_molar_cc, temperature=None) %s'%(data[0]))
+                print('WARNING: user must provide a k_eq_func(spc_molar_cc, temperature=None) for %s'%(data[0]))
 
             self.data.append(tmp_dict)
 
@@ -557,16 +559,19 @@ class ReactionMechanism:
                    j   j                j   j
 
         Provided as a convenience to the user of a given reaction mechanism. If the reaction mechanism
-        is meant to be reparameterized, the presence of named arguments decide whether that parameter
+        is meant to be reparameterized, the presence of theta named arguments decide whether that parameter
         is actually reparameterized or not.
 
-        If k_eq (partition/distribution coefficient) and tau (relaxation time) are given, these will
-        override the previous reaction rate expression with a mass transfer relaxation reaction expression
-        where k_eq is used directly.
+        If k_eq (partition or distribution coefficient) and tau (relaxation time) are given, these will
+        override the previous reaction rate expression with a mass transfer relaxation reaction
+        expression where k_eq is used directly.
+
+        r_i = - 1/tau (c  - k_eq c )
+                        j         j
 
         If tau is given but not k_eq, then the user is responsible for providing the reaction rate
-        expression. This typically happens when k_eq is a function of temperature, concentration and other
-        quantities.
+        expression. This typically happens when k_eq is a function of temperature, concentration and
+        other quantities.
 
         Parameters
         ----------
@@ -666,41 +671,43 @@ class ReactionMechanism:
         for (idx, rxn_data) in enumerate(self.data):
             if 'tau' in rxn_data:
                 tau = rxn_data['tau']
-            if 'k_eq' in rxn_data:
-                k_eq = rxn_data['k_eq']
-            else:
-                k_eq_func = rxn_data['k_eq_func']
-                k_eq      = k_eq_func(spc_molar_cc_vec, temperature, self.species)
 
-            reactants_ids = alpha_mtrx[0, :].astype(int)
-            #assert len(reactants_ids) == 2
-            if len(reactants_ids) != 2:
-                continue
+                if 'k_eq' in rxn_data:
+                    k_eq = rxn_data['k_eq']
+                else:
+                    k_eq_func = rxn_data['k_eq_func']
+                    k_eq      = k_eq_func(spc_molar_cc_vec, temperature, self.species)
 
-            reactants_molar_cc = spc_molar_cc_vec[reactants_ids] # must be ordered as in rxn_mech
+                reactants_ids = alpha_mtrx[0, :].astype(int)
+                #assert len(reactants_ids) == 2
+                if len(reactants_ids) != 2:
+                    continue
 
-            products_ids = beta_mtrx[0, :].astype(int)
-            #assert len(products_ids) == 1
-            if len(reactants_ids) != 1:
-                continue
+                reactants_molar_cc = spc_molar_cc_vec[reactants_ids] # must be ordered as in rxn_mech
 
-            products_molar_cc = spc_molar_cc_vec[products_ids] # must be oredered as in rxn_mech
+                products_ids = beta_mtrx[0, :].astype(int)
+                #assert len(products_ids) == 1
+                if len(reactants_ids) != 1:
+                    continue
 
-            complex_former_molar_cc = reactants_molar_cc[-1]
-            complex_molar_cc        = products_molar_cc[0]
-            complex_molar_cc_eq     = k_eq * complex_former_molar_cc
+                products_molar_cc = spc_molar_cc_vec[products_ids] # must be oredered as in rxn_mech
 
-            r_vec[idx] = - 1/tau * (complex_molar_cc - complex_molar_cc_eq)
+                complex_former_molar_cc = reactants_molar_cc[-1]
+                complex_molar_cc        = products_molar_cc[0]
+                complex_molar_cc_eq     = k_eq * complex_former_molar_cc
+
+                r_vec[idx] = - 1/tau * (complex_molar_cc - complex_molar_cc_eq)
 
         # Phase partition case
-        for (idx, rxn_data) in enumerate(self.data):
-            if 'tau' in rxn_data:
-                tau = rxn_data['tau']
-            if 'k_eq' in rxn_data:
-                k_eq = rxn_data['k_eq']
-            else:
-                k_eq_func = rxn_data['k_eq_func']
-                k_eq      = k_eq_func(spc_molar_cc_vec, temperature, self.species)
+        # don't remember this...working on it...
+        #for (idx, rxn_data) in enumerate(self.data):
+        #    if 'tau' in rxn_data:
+        #        tau = rxn_data['tau']
+        #    if 'k_eq' in rxn_data:
+        #        k_eq = rxn_data['k_eq']
+        #    else:
+        #        k_eq_func = rxn_data['k_eq_func']
+        #        k_eq      = k_eq_func(spc_molar_cc_vec, temperature, self.species)
 
         return r_vec
 
@@ -3240,7 +3247,6 @@ class ReactionMechanism:
         '''Markdown cell printout of LaTex reactions and species.
 
         Use with Jupyter Notebooks in a code cell.
-        NB: not a member method.
 
         Parameters
         ----------
@@ -3254,20 +3260,31 @@ class ReactionMechanism:
         Examples
         --------
 
+        rxn_mech = ReactionMechanism(file_name='some_mech.txt')
+        rxn_mech.md_print()
+
         '''
 
         from IPython.display import Markdown, display
-        tmp = self.latex_species.replace(',',' \quad ')
-        string = '**Species:** %i \n $%s$'%(len(self.species_names),tmp)
+        tmp = self.latex_species.replace(',',' \\quad ')
+        string = '%i **Species:** \n $%s$'%(len(self.species_names), tmp)
         display(Markdown(string))
 
-        string = '**Reactions:** %i \n %s'%(len(self.reactions),self.latex_rxn)
+        string = '%i **Reactions:** \n %s'%(len(self.reactions), self.latex_rxn)
         display(Markdown(string))
 
     def __latex(self):
         '''Internal helper for LaTeX typesetting.
 
         See attributes description and usage with the Python print() function.
+        notebook.
+
+        Examples
+        --------
+
+        rxn_mech = ReactionMechanism(file_name='some_mech.txt')
+        print(rxn_mech.species_str)
+        print(rxn_mech.rxn_str)
         '''
 
         # Latex species
@@ -3288,14 +3305,14 @@ class ReactionMechanism:
             for j in reactants_ids[:-1]:
                 coeff = abs(self.stoic_mtrx[idx,j])
                 if coeff != 1:
-                    rxn_str += str(coeff) + '\,' + self.species[j].latex_name + r'\ + \ '
+                    rxn_str += str(coeff) + '\\,' + self.species[j].latex_name + r'\ + \ '
                 else:
                     rxn_str += self.species[j].latex_name + r'\ + \ '
 
             j = reactants_ids[-1]
             coeff = abs(self.stoic_mtrx[idx,j])
             if coeff != 1:
-                rxn_str += str(coeff) + '\,' + self.species[j].latex_name
+                rxn_str += str(coeff) + '\\,' + self.species[j].latex_name
             else:
                 rxn_str += self.species[j].latex_name
 
@@ -3314,14 +3331,14 @@ class ReactionMechanism:
             for j in products_ids[:-1]:
                 coeff = abs(self.stoic_mtrx[idx,j])
                 if coeff != 1:
-                    rxn_str += str(coeff) + '\,' + self.species[j].latex_name + r'\ + \ '
+                    rxn_str += str(coeff) + '\\,' + self.species[j].latex_name + r'\ + \ '
                 else:
                     rxn_str += self.species[j].latex_name + r'\ + \ '
 
             j = products_ids[-1]
             coeff = abs(self.stoic_mtrx[idx,j])
             if coeff != 1:
-                rxn_str += str(coeff) + '\,' + self.species[j].latex_name + '\\\\ \n'
+                rxn_str += str(coeff) + '\\,' + self.species[j].latex_name + '\\\\ \n'
             else:
                 rxn_str += self.species[j].latex_name + '\\\\ \n'
 
