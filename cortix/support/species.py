@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
-'''
+"""
 Species class from Cortix support.
-'''
+"""
 
 import scipy.constants as const
 from cortix.support.periodictable import ELEMENTS
@@ -54,6 +54,7 @@ class Species:
                   formula_name='no-species-formula-name',
                   atoms=None,
                   charge=None,
+                  phase=None,
                   flag='no-species-flag',
                   info=None,
                   latex_name='no-species-latex-name'):
@@ -72,6 +73,12 @@ class Species:
 
         atoms: list(str)
             List of atoms as described above in the class notes.
+
+        charge: int
+            Net charge on the species.
+
+        phase: str
+            Phase the species is in. Could be '(a)', '(v)'. '(o)', '(s)', etc.
 
         flag: anytype
             Any data type specified by user. This can be used as an identification of the
@@ -107,6 +114,10 @@ class Species:
             self.charge = charge
         else:
             self.charge = 0 # defaults to neutral species
+
+        if phase is not None:
+            assert isinstance(phase, str)
+        self.phase = phase # defaults to None
 
         self.flag = flag  # flag can be any type
 
@@ -204,11 +215,13 @@ class Species:
         self.num_atoms = num_atoms
         self.num_nuclide_types = len(nuclides)
 
-        # Add charge
-        if self.charge > 0:
-            self.molar_mass -= self.charge * const.physical_constants['electron molar mass'][0]
-        else:
-            self.molar_mass += -1 * self.charge * const.physical_constants['electron molar mass'][0]
+        # Correct molar mass of species for mass of electron
+        self.molar_mass += self.charge * const.physical_constants['electron molar mass'][0]
+
+        #if self.charge > 0:
+        #    self.molar_mass -= self.charge * const.physical_constants['electron molar mass'][0]
+        #else:
+        #    self.molar_mass += -1 * self.charge * const.physical_constants['electron molar mass'][0]
 
         # Exception: e^- (solvated electron)
         if self.formula_name == 'e^-':
@@ -316,6 +329,7 @@ class Species:
         i = formula_name.find('(')  # first index
         j = formula_name.rfind(')') # highest index
         if i != -1 and j != -1:
+            self.phase = formula_name[i:j+1]
             formula_name = formula_name.replace(formula_name[i:j+1], '')
         elif (i == -1 and j != -1) or (i != -1 and j == -1):
             assert False, 'fatal: missing pairing ")".'
@@ -504,12 +518,13 @@ class Species:
         self.latex_name = latex_name
 
     def __str__(self):
-        s = '\n\t ' + \
-            '\n\t Species(): name=%s;' + \
+        s = '\n\n\t ' + \
+            '\n\t <Species(): name=%s;' + \
             ' formula_name=%s;' + \
             '\n\t formula=%s;' + \
             '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + \
             '\n\t charge=%s;' + \
+            '\n\t phase=%s;' + \
             '\n\t flag=%s;' + \
             '\n\t info=%s;' + \
             '\n\t latex_name=%s;' + \
@@ -517,13 +532,13 @@ class Species:
             '\n\t molar heat pwr=%9.3e[%s];' + \
             '\n\t molar gamma pwr=%9.3e[%s];' + \
             '\n\t individual atoms=%s;' + \
-            '\n\t molar radioactivity fractions=%s'
+            '\n\t molar radioactivity fractions=%s>'
         return s % (self.name,
                 self.formula_name,
                 self.ordered_atoms_list(),
-                self.num_atoms, self.num_nuclide_types, self.molar_mass, \
-                        self.molar_mass_unit,
+                self.num_atoms, self.num_nuclide_types, self.molar_mass, self.molar_mass_unit,
                 self.charge,
+                self.phase,
                 self.flag,
                 self.info,
                 self.latex_name,
@@ -534,24 +549,25 @@ class Species:
                 ['%9.3e' % i for i in self.molar_radioactivity_fractions])
 
     def __repr__(self):
-        s = '\n\t Species(): name=%s;' + \
+        s = '\n\n\t <Species(): name=%s;' + \
             ' formula_name=%s;' + \
             '\n\t formula=%s;' + \
             '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + \
             '\n\t charge=%s;' + \
+            '\n\t phase=%s;' + \
             '\n\t flag=%s;' + \
             '\n\t latex_name=%s;' + \
             '\n\t molar radioactivity=%9.3e[%s];' + \
             '\n\t molar heat pwr=%9.3e[%s];' + \
             '\n\t molar gamma pwr=%9.3e[%s];' + \
             '\n\t individual atoms=%s;' + \
-            '\n\t molar radioactivity fractions=%s'
+            '\n\t molar radioactivity fractions=%s>'
         return s % (self.name,
                 self.formula_name,
                 self.ordered_atoms_list(),
-                self.num_atoms, self.num_nuclide_types, self.molar_mass, \
-                        self.molar_mass_unit,
+                self.num_atoms, self.num_nuclide_types, self.molar_mass, self.molar_mass_unit,
                 self.charge,
+                self.phase,
                 self.flag,
                 self.latex_name,
                 self.molar_radioactivity, self.molar_radioactivity_unit,

@@ -20,13 +20,12 @@ class Network:
 
     num_networks: int
         Number of instances of this class.
-
     """
 
     num_networks = 0
 
     def __init__(self):
-        '''Module super class constructor.
+        """Module super class constructor.
 
         Attributes
         ----------
@@ -35,8 +34,7 @@ class Network:
               root process. This can generate an `out of memory` condition. This variable
               sets the maximum number of processes for which the data will be copied.
               Default is 1000.
-
-       '''
+       """
 
         self.id = Network.num_networks
 
@@ -64,8 +62,8 @@ class Network:
         return
 
     def module(self, m):
-        '''Add a module.
-        '''
+        """Add a module.
+        """
 
         assert isinstance(m, Module), 'm must be a module'
 
@@ -82,16 +80,15 @@ class Network:
         return
 
     def add_module(self, m):
-        '''Alternative name to `module()`.
-
-        '''
+        """Alternative name to `module()`.
+        """
 
         self.module(m)
 
         return
 
     def connect(self, module_port_a, module_port_b, info=None):
-        '''Connect two modules using either their ports directly or inferred ports.
+        """Connect two modules using either their ports directly or inferred ports.
 
         A connection always opens a channel for data communication in both ways.
         That is, both sends and receives are allowed.
@@ -123,7 +120,7 @@ class Network:
             'undirectional' will create plain edge lines.
             'directional' will create edges with the arrow pointing in one direction dictated by the
             edge ordering.
-        '''
+        """
 
         if info:
             assert isinstance(info, str)
@@ -214,7 +211,6 @@ class Network:
         ----
         When using multiprocessing, data from the modules state are copied to the master
         process after the `__run()` method of the modules is finished.
-
         """
         assert len(self.modules) >= 1, 'the network must have a list of modules.'
 
@@ -390,7 +386,6 @@ class Network:
             'restrictionsite', 'fivepoverhang', threepoverhang', 'noverhang',
             'rnastab', 'proteasesite', 'proteinstab', 'rpromoter',
             'rarrow', 'larrow', 'lpromoter'.
-
         """
 
         # Delete existing graph files if any.

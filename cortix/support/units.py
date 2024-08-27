@@ -44,6 +44,10 @@ class Units:
     day = scipy_cte.day
     year = scipy_cte.year
 
+    # event driven or iterative processes
+    event = 1.0
+    step = 1.0
+
     # mass
     gram = scipy_cte.gram
     kg = kilo*gram
