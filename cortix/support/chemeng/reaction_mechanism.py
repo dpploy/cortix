@@ -3232,8 +3232,7 @@ class ReactionMechanism:
 
         for idx, data in enumerate(self.data):
             print(self.reactions[idx])
-            print(data)
-            print('')
+            print(data,'\n')
 
     def print_species(self):
         '''Helper to print species data line by line.
