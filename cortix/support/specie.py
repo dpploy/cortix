@@ -632,20 +632,38 @@ class Specie:
     massCCUnit = property(GetMassCCUnit, SetMassCCUnit, None, None)
 
     def __str__(self):
-        s = '\n\t Specie(): name=%s;' + ' formula_name=%s;' + ' phase=%s;' + '\n\t formula=%s;' + '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + ' molar cc=%9.3e[%s];' + ' mass cc=%9.3e[%s];' + '\n\t flag=%s;' + '\n\t molar radioactivity=%9.3e[%s];' + \
-            '\n\t radioactivity  dens.=%9.3e[%s];' + '\n\t molar heat pwr=%9.3e[%s];' + '\n\t heat pwr dens.=%9.3e[%s];' + \
-            '\n\t molar gamma pwr=%9.3e[%s];' + '\n\t gamma pwr dens.=%9.3e[%s];' + \
-            '\n\t atoms=%s;' + '\n\t molar radioactivity fractions=%s\n'
-        return s % (self.name, self.__formula_name, self.phase, self.__ReorderFormula(), self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarRadioactivity *
-                    self.molarCC, '[Ci/cc]', self.molarHeatPwr, self.molarHeatPwrUnit, self.molarHeatPwr * self.molarCC, '[W/cc]', self.molarGammaPwr, self.molarGammaPwrUnit, self.molarGammaPwr * self.molarCC, '[W/cc]', [i.split('*')[-1] for i in self.formula], ['%9.3e' % i for i in self.molarRadioactivityFractions])
+        s = '\n\n\t <Specie(): name=%s;' + ' formula_name=%s;' + ' phase=%s;' + '\n\t formula=%s;' +\
+           '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' +\
+            ' molar cc=%9.3e[%s];' + ' mass cc=%9.3e[%s];' + '\n\t flag=%s;' +\
+            '\n\t molar radioactivity=%9.3e[%s];' + '\n\t radioactivity  dens.=%9.3e[%s];' +\
+            '\n\t molar heat pwr=%9.3e[%s];' + '\n\t heat pwr dens.=%9.3e[%s];' +\
+            '\n\t molar gamma pwr=%9.3e[%s];' + '\n\t gamma pwr dens.=%9.3e[%s];' +\
+            '\n\t atoms=%s;' + '\n\t molar radioactivity fractions=%s>\n'
+        return s%(self.name, self.__formula_name, self.phase, self.__ReorderFormula(), self.nAtoms,
+                  self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit,
+                  self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity,
+                  self.molarRadioactivityUnit, self.molarRadioactivity * self.molarCC, '[Ci/cc]',
+                  self.molarHeatPwr, self.molarHeatPwrUnit, self.molarHeatPwr * self.molarCC, '[W/cc]',
+                  self.molarGammaPwr, self.molarGammaPwrUnit, self.molarGammaPwr * self.molarCC, '[W/cc]',
+                  [i.split('*')[-1] for i in self.formula],
+                  ['%9.3e' % i for i in self.molarRadioactivityFractions])
 
     def __repr__(self):
-        s = '\n\n\t Specie(): name=%s;' + ' formula_name=%s;' + ' phase=%s;' + '\n\t formula=%s;' + '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' + ' molar cc=%9.3e[%s];' + ' mass cc=%9.3e[%s];' + '\n\t flag=%s;' + '\n\t molar radioactivity=%9.3e[%s];' + \
-            '\n\t radioactivity  dens.=%9.3e[%s];' + '\n\t molar heat pwr=%9.3e[%s];' + '\n\t heat pwr dens.=%9.3e[%s];' + \
-            '\n\t molar gamma pwr=%9.3e[%s];' + '\n\t gamma pwr dens.=%9.3e[%s];' + \
+        s = '\n\n\t Specie(): name=%s;' + ' formula_name=%s;' + ' phase=%s;' + '\n\t formula=%s;' +\
+            '\n\t # atoms=%s;' + ' # nuclide types=%s;' + ' molar mass=%9.3e[%s];' +\
+            ' molar cc=%9.3e[%s];' + ' mass cc=%9.3e[%s];' + '\n\t flag=%s;' +\
+            '\n\t molar radioactivity=%9.3e[%s];' + '\n\t radioactivity  dens.=%9.3e[%s];' +\
+            '\n\t molar heat pwr=%9.3e[%s];' + '\n\t heat pwr dens.=%9.3e[%s];' +\
+            '\n\t molar gamma pwr=%9.3e[%s];' + '\n\t gamma pwr dens.=%9.3e[%s];' +\
             '\n\t atoms=%s;' + '\n\t molar radioactivity fractions=%s\n'
-        return s % (self.name, self.__formula_name, self.phase, self.__ReorderFormula(), self.nAtoms, self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit, self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity, self.molarRadioactivityUnit, self.molarRadioactivity *
-                    self.molarCC, '[Ci/cc]', self.molarHeatPwr, self.molarHeatPwrUnit, self.molarHeatPwr * self.molarCC, '[W/cc]', self.molarGammaPwr, self.molarGammaPwrUnit, self.molarGammaPwr * self.molarCC, '[W/cc]', [i.split('*')[-1] for i in self.formula], ['%9.3e' % i for i in self.molarRadioactivityFractions])
+        return s%(self.name, self.__formula_name, self.phase, self.__ReorderFormula(), self.nAtoms,
+                  self.nNuclideTypes, self.molarMass, self.molarMassUnit, self.molarCC, self.molarCCUnit,
+                  self.massCC, self.massCCUnit, self.flag, self.molarRadioactivity,
+                  self.molarRadioactivityUnit, self.molarRadioactivity * self.molarCC, '[Ci/cc]',
+                  self.molarHeatPwr, self.molarHeatPwrUnit, self.molarHeatPwr * self.molarCC, '[W/cc]',
+                  self.molarGammaPwr, self.molarGammaPwrUnit, self.molarGammaPwr * self.molarCC, '[W/cc]',
+                  [i.split('*')[-1] for i in self.formula],
+                  ['%9.3e' % i for i in self.molarRadioactivityFractions])
 
 #*********************************************************************************
 # Private Helper Functions (Internal use: __)

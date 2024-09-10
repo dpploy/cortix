@@ -16,7 +16,7 @@ class Port:
     """
 
     def __init__(self, name=None, use_mpi=False):
-        '''Constructs a Port object
+        """Constructs a Port object
 
         Parameters
         ----------
@@ -30,8 +30,7 @@ class Port:
             id: int
             name: string
             use_mpi: bool
-
-        '''
+        """
 
         self.id = None
         self.name = name
@@ -47,7 +46,7 @@ class Port:
         self.connected_port = None
 
     def connect(self, port):
-        '''Connect this port to another port
+        """Connect this port to another port
 
         Ports must be connected for data to flow between them.
 
@@ -59,8 +58,7 @@ class Port:
         Returns
         -------
         None
-
-        '''
+        """
 
         assert isinstance(port, Port), 'Connecting port must be of Port type'
 
@@ -72,8 +70,7 @@ class Port:
             (self.pipe, port.pipe) = Pipe()
 
     def send(self, data, tag=None):
-        '''
-        Send data to the connected port.
+        """Send data to the connected port.
 
         If the sending port is not connected do nothing.
 
@@ -83,8 +80,7 @@ class Port:
            This data must be pickleable.
         tag: int, optional
            MPI tag used in sending data.
-
-        '''
+        """
 
         if not tag:
             tag = self.id
@@ -99,8 +95,7 @@ class Port:
         return
 
     def __is_connected(self):
-        '''
-        Check for a connected port.
+        """Check for a connected port.
 
         Parameters
         ----------
@@ -110,8 +105,8 @@ class Port:
         ------
         False or True: boolean
         Default False.
+        """
 
-        '''
         if self.connected_port:
             return True
         else:
@@ -119,8 +114,7 @@ class Port:
     is_connected = property(__is_connected, None, None, None)
 
     def recv(self):
-        '''
-        Receive data from the connected port.
+        """Receive data from the connected port.
 
         Warning
         -------
@@ -129,8 +123,8 @@ class Port:
         Returns
         --------
         data: any
+        """
 
-        '''
         if self.connected_port:
             if self.use_mpi:
                 # This is an MPI blocking receive
@@ -142,12 +136,12 @@ class Port:
         return
 
     def __eq__(self, other):
-        '''Check for port equality'''
+        """Check for port equality."""
 
         return self.name == other.name
 
     def __repr__(self):
-        '''Port name representation'''
+        """Port name representation."""
 
         return self.name
 

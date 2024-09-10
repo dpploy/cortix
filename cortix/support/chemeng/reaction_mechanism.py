@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
-'''
-Suupport class for working with chemical reactions.
-'''
+"""Suupport class for working with chemical reactions.
+"""
+
 import copy
 import math
 import numpy       # used in asserts
@@ -14,9 +14,10 @@ from itertools import combinations
 import random
 
 from cortix.support.species import Species
+from cortix.support.units import Units as unit
 
 class ReactionMechanism:
-    '''Chemical reaction mechanism.
+    """Chemical reaction mechanism.
 
     Quantities and services: stoichiometric matrix, mass conservation, reaction rate density vector,
     species production rate density vector.
@@ -59,11 +60,11 @@ class ReactionMechanism:
         Use the Python print() function to print this attribute and copy/paste into a LaTex environment.
         This is also used with md_print() for printing in a Jupyter notebook cell. For example do
         print(rxn_mech.latex_rxn) in a python script or Jupyter notebook.
-    '''
+    """
 
     def __init__(self, header='no-header', file_name=None, mechanism=None, order_species=True,
                  reparam=False, bounds=None):
-        '''Module class constructor.
+        """Module class constructor.
 
         Build data structures for a reaction mechanism. Namely, species list,
         reactions list, data (equilibrium constant list, etc.), and stoichiometric matrix.
@@ -140,8 +141,7 @@ class ReactionMechanism:
 
         Examples
         --------
-
-       '''
+       """
 
         assert file_name is not None or mechanism is not None
         assert isinstance(header, str)
@@ -459,14 +459,14 @@ class ReactionMechanism:
                 dat['info'] = 'no-info'
 
     def mass_balance_residuals(self):
-        '''Reaction mass balance residual vector.
+        """Reaction mass balance residual vector.
 
         Returns
         -------
 
         mb_residual_vec: numpy.ndarray
             1D vector of mass balance residuals for each reaction.
-        '''
+        """
 
         m_vec = np.zeros(len(self.species), dtype=np.float64)
 
@@ -480,28 +480,26 @@ class ReactionMechanism:
         return mb_residual_vec
 
     def max_mass_balance_residual(self):
-        '''Compute the maximum magnitude reaction mass balance residual.
+        """Compute the maximum magnitude reaction mass balance residual.
 
         Returns
         -------
 
         max(abs(mb): float
-
-        '''
+        """
 
         mb_residual_vec = self.mass_balance_residuals()
 
         return np.max(np.abs(mb_residual_vec))
 
     def is_mass_conserved(self, tol=1e-10):
-        '''Check mass conservation if species have a molar mass value.
+        """Check mass conservation if species have a molar mass value.
 
         Returns
         -------
 
         bool
-
-        '''
+        """
 
         residual = self.max_mass_balance_residual()
 
@@ -548,7 +546,7 @@ class ReactionMechanism:
 
         return s_rank
 
-    def r_vec(self, spc_molar_cc_vec, temperature=None, theta_kf_vec=None, theta_kb_vec=None,
+    def r_vec(self, spc_molar_cc_vec, temperature=273.15*unit.K, theta_kf_vec=None, theta_kb_vec=None,
               theta_alpha_lst=None, theta_beta_lst=None):
         '''Compute a reaction rate density vector.
 
@@ -676,7 +674,7 @@ class ReactionMechanism:
                     k_eq = rxn_data['k_eq']
                 else:
                     k_eq_func = rxn_data['k_eq_func']
-                    k_eq      = k_eq_func(spc_molar_cc_vec, temperature, self.species)
+                    k_eq      = k_eq_func(temperature, self.species, spc_molar_cc_vec)
 
                 reactants_ids = alpha_mtrx[0, :].astype(int)
                 #assert len(reactants_ids) == 2
@@ -717,7 +715,8 @@ class ReactionMechanism:
 
         return self.r_vec(spc_molar_cc_vec, kf_vec, kb_vec, alpha_lst, beta_lst)
 
-    def g_vec(self, spc_molar_cc_vec, theta_kf_vec=None, theta_kb_vec=None, 
+    def g_vec(self, spc_molar_cc_vec, temperature=273.15*unit.K,
+              theta_kf_vec=None, theta_kb_vec=None, 
               theta_alpha_lst=None, theta_beta_lst=None):
         '''Compute the species production rate density vector.
 
@@ -727,7 +726,8 @@ class ReactionMechanism:
         -----------
         '''
 
-        g_vec = self.stoic_mtrx.transpose() @ self.r_vec(spc_molar_cc_vec, theta_kf_vec, theta_kb_vec,
+        g_vec = self.stoic_mtrx.transpose() @ self.r_vec(spc_molar_cc_vec, temperature, 
+                                                         theta_kf_vec, theta_kb_vec,
                                                          theta_alpha_lst, theta_beta_lst)
 
         return g_vec
@@ -3232,8 +3232,7 @@ class ReactionMechanism:
 
         for idx, data in enumerate(self.data):
             print(self.reactions[idx])
-            print(data)
-            print('')
+            print(data,'\n')
 
     def print_species(self):
         '''Helper to print species data line by line.

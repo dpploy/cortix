@@ -617,7 +617,7 @@ class PhaseNewest:
                 self.__species,
                 len(self.__df.index),
                 self.__df.index[-1],
-                self.__df.loc[self.__df.index[-1], :] )
+                self.__df.loc[self.__df.index[-1], :])
 
     def __repr__(self):
         s = '\n\t **Phase()**: name=%s;' + \
@@ -633,7 +633,7 @@ class PhaseNewest:
                 self.__species,
                 len(self.__df.index),
                 self.__df.index[-1],
-                self.__df.loc[self.__df.index[-1], :] )
+                self.__df.loc[self.__df.index[-1], :])
 
     def __get_time_stamp(self, try_time_stamp=None):
         '''
