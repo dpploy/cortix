@@ -1,0 +1,51 @@
+[project]
+name = "cortix"
+version = "1.1.43"
+description = "Cortix is a Python library for network dynamics modeling and HPC simulation."
+authors = [
+  { name = "Valmor F. de Almeida", email = "valmor_dealmeida@uml.edu" },
+]
+maintainers = [{ name = "Uriel Acioli", email = "uriel.acioli@gmail.com" }]
+keywords = ['simulation', 'math']
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  'Topic :: Scientific/Engineering :: Mathematics',
+  'Intended Audience :: Developers',
+  'Intended Audience :: Education',
+  'Intended Audience :: End Users/Desktop',
+  'Intended Audience :: Science/Research',
+  'Operating System :: MacOS',
+  'Operating System :: Unix',
+  'Topic :: Education',
+  'Topic :: Utilities',
+]
+dependencies = [
+    "pandas",
+    "matplotlib",
+    "numpy",
+    "scipy",
+    "pytest",
+    "graphviz",
+    "networkx>=3.3",
+]
+requires-python = "==3.11.*"
+readme = "README.md"
+license = { file = "LICENSE.txt" }
+
+
+[tool.pdm]
+distribution = false
+[tool.pdm.scripts]
+lint = { cmd = [
+  'ruff',
+  'check',
+  '--output-format=concise',
+  './tests',
+  './cortix',
+  './examples',
+] }
+format = { cmd = ['ruff', 'format', './tests', './cortix', './examples'] }
+
+[tool.pdm.dev-dependencies]
+dev = ["ruff>=0.6.4"]
