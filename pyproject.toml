@@ -40,7 +40,7 @@ classifiers = [
 urls = { homepage = "https://cortix.org" }
 
 [tool.pdm]
-distribution = false
+distribution = true
 [tool.pdm.scripts]
 lint = { cmd = [
   'ruff',
