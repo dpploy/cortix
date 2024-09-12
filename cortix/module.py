@@ -6,10 +6,11 @@
 import os
 import pickle
 import logging
-from cortix.src.port import Port
+from .port import Port
+
 
 class Module:
-    '''Cortix module super class.
+    """Cortix module super class.
 
     This class provides facilities for creating modules within the Cortix network.
     Cortix will map one object of this class to either a Multiprocessing or MPI
@@ -21,10 +22,10 @@ class Module:
     In order to execute, modules *must* override the `run` method, which will be
     executed during the simulation.
 
-    '''
+    """
 
     def __init__(self):
-        '''Module super class constructor.
+        """Module super class constructor.
 
         Note
         ----
@@ -58,7 +59,7 @@ class Module:
         __network: Network
             An internal network inherited by the derived module for nested networks.
 
-       '''
+        """
 
         self.name = self.__class__.__name__
         self.port_names_expected = None
@@ -66,7 +67,7 @@ class Module:
         self.use_mpi = False
         self.use_multiprocessing = True
         self.ports = list()
-        self.log = logging.getLogger('cortix')
+        self.log = logging.getLogger("cortix")
         self.save = False
 
         self.id = None
@@ -74,7 +75,7 @@ class Module:
         self.__network = None
 
     def send(self, data, port):
-        '''Send data through a given port.
+        """Send data through a given port.
 
         Parameters
         ----------
@@ -83,7 +84,7 @@ class Module:
         port: Port, str
             A Port object to send the data through, or its string name
 
-        '''
+        """
 
         if isinstance(port, str):
             port = self.get_port(port)
@@ -95,7 +96,7 @@ class Module:
         port.send(data)
 
     def recv(self, port):
-        '''Receive data from a given port
+        """Receive data from a given port
 
         Warning
         -------
@@ -111,19 +112,19 @@ class Module:
         data: any
             The data received through the port
 
-        '''
+        """
 
         if isinstance(port, str):
             port = self.get_port(port)
         elif isinstance(port, Port):
-            assert port in self.ports, 'Unknown port!'
+            assert port in self.ports, "Unknown port!"
         else:
-            raise TypeError('port must be of Port or String type')
+            raise TypeError("port must be of Port or String type")
 
         return port.recv()
 
     def get_port(self, name):
-        '''Get port by name; if it does not exist, create one.
+        """Get port by name; if it does not exist, create one.
 
         Parameters
         ----------
@@ -135,9 +136,9 @@ class Module:
         port: Port
             The port object with the corresponding name
 
-        '''
+        """
 
-        assert isinstance(name, str), 'port name must be of type str'
+        assert isinstance(name, str), "port name must be of type str"
         port = None
 
         for pti in self.ports:
@@ -147,8 +148,9 @@ class Module:
 
         if port is None:
             if self.port_names_expected:
-                assert name in self.port_names_expected,\
-                        'port name: {}, not expected by module: {}'.format(name, self)
+                assert (
+                    name in self.port_names_expected
+                ), "port name: {}, not expected by module: {}".format(name, self)
             port = Port(name, self.use_mpi)
             self.ports.append(port)
 
@@ -156,17 +158,20 @@ class Module:
 
     def __set_network(self, n):
         # Must be here to avoid infinite import loop
-        from cortix.src.network import Network
+        from cortix.network import Network
+
         assert isinstance(n, Network)
         n.use_mpi = self.use_mpi
         n.use_multiprocessing = self.use_multiprocessing
         self.__network = n
+
     def __get_network(self):
         return self.__network
+
     network = property(__get_network, __set_network, None, None)
 
     def run(self, *args):
-        '''Module run function
+        """Module run function
 
         Run method with an option to pass data back to the parent process when running
         in Python multiprocessing mode. If the user does not want to share data with
@@ -206,28 +211,30 @@ class Module:
             `state_comm.put((idx_comm,self.state))` must be the last command in the
             method before `return`. In addition, self.state must be `pickle-able`.
 
-        '''
-        raise NotImplementedError('Module must implement run()')
+        """
+        raise NotImplementedError("Module must implement run()")
 
     def run_and_save(self):
-
         self.run()
 
         if self.save:
-            file_name = os.path.join('.ctx-saved', '{}_'.format(self.__class__.__name__))
+            file_name = os.path.join(
+                ".ctx-saved", "{}_".format(self.__class__.__name__)
+            )
             # Import where needed for no broken dependencies
             if self.use_mpi:
                 from mpi4py import MPI
+
                 file_name += str(MPI.COMM_WORLD.rank)
             else:
                 file_name += str(os.getpid())
-            file_name += '.pkl'
+            file_name += ".pkl"
 
-            self.ports = list() # reset ports since they can't be pickled
+            self.ports = list()  # reset ports since they can't be pickled
             self.log = None
 
             try:
-                with open(file_name, 'wb') as fout:
+                with open(file_name, "wb") as fout:
                     pickle.dump(self, fout)
             except pickle.PicklingError:
-                print('Unable to pickle {}!'.format(file_name))
+                print("Unable to pickle {}!".format(file_name))

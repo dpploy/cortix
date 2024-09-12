@@ -9,8 +9,9 @@ import pickle
 import logging
 from multiprocessing import Process
 
-from cortix.src.module import Module
-from cortix.src.port import Port
+from .module import Module
+from .port import Port
+
 
 class Network:
     """Cortix network.
@@ -34,19 +35,19 @@ class Network:
               root process. This can generate an `out of memory` condition. This variable
               sets the maximum number of processes for which the data will be copied.
               Default is 1000.
-       """
+        """
 
         self.id = Network.num_networks
 
-        self.name = 'network-'+str(self.id)
-        self.log = logging.getLogger('cortix')
+        self.name = "network-" + str(self.id)
+        self.log = logging.getLogger("cortix")
 
         self.max_n_modules_for_data_copy_on_root = 1000
 
         self.modules = list()
 
         self.gv_edges = list()
-        self.gv_info = 'undirectional'
+        self.gv_info = "undirectional"
 
         self.use_mpi = None
         self.use_multiprocessing = None
@@ -55,17 +56,16 @@ class Network:
         self.size = None
         self.comm = None
 
-        self.save = False # save all network modules
+        self.save = False  # save all network modules
 
         Network.num_networks += 1
 
         return
 
     def module(self, m):
-        """Add a module.
-        """
+        """Add a module."""
 
-        assert isinstance(m, Module), 'm must be a module'
+        assert isinstance(m, Module), "m must be a module"
 
         name = m.name
         if not name:
@@ -75,13 +75,12 @@ class Network:
             m.use_mpi = self.use_mpi
             m.use_multiprocessing = self.use_multiprocessing
             self.modules.append(m)
-            m.id = len(self.modules)-1  # see module doc for module id
+            m.id = len(self.modules) - 1  # see module doc for module id
 
         return
 
     def add_module(self, m):
-        """Alternative name to `module()`.
-        """
+        """Alternative name to `module()`."""
 
         self.module(m)
 
@@ -124,18 +123,17 @@ class Network:
 
         if info:
             assert isinstance(info, str)
-            assert info in ['undirectional', 'directional', 'bidirectional']
+            assert info in ["undirectional", "directional", "bidirectional"]
             self.gv_info = info
 
         if isinstance(module_port_a, Module) and isinstance(module_port_b, Module):
-
             module_a = module_port_a
             module_b = module_port_b
 
             assert module_a.name and module_b.name  # sanity check
 
-            assert module_a in self.modules, 'module %r not in network.'%module_a.name
-            assert module_b in self.modules, 'module %r not in network.'%module_b.name
+            assert module_a in self.modules, "module %r not in network." % module_a.name
+            assert module_b in self.modules, "module %r not in network." % module_b.name
 
             # Connect ports
             port_a = module_a.get_port(module_b.name.lower())
@@ -150,31 +148,45 @@ class Network:
             if (str(idx_a), str(idx_b)) not in self.gv_edges:
                 self.gv_edges.append((str(idx_a), str(idx_b)))
 
-                if self.gv_info == 'bidirectional' and (str(idx_b), str(idx_a)) not in self.gv_edges:
+                if (
+                    self.gv_info == "bidirectional"
+                    and (str(idx_b), str(idx_a)) not in self.gv_edges
+                ):
                     self.gv_edges.append((str(idx_b), str(idx_a)))
 
         elif isinstance(module_port_a, list) and isinstance(module_port_b, list):
+            assert (
+                len(module_port_a) == 2
+                and isinstance(module_port_a[0], Module)
+                and (
+                    isinstance(module_port_a[1], str)
+                    or isinstance(module_port_a[1], Port)
+                )
+            )
 
-            assert len(module_port_a) == 2 and isinstance(module_port_a[0], Module) and\
-                  (isinstance(module_port_a[1], str) or isinstance(module_port_a[1], Port))
-
-            assert len(module_port_b) == 2 and isinstance(module_port_b[0], Module) and\
-                  (isinstance(module_port_b[1], str) or isinstance(module_port_b[1], Port))
+            assert (
+                len(module_port_b) == 2
+                and isinstance(module_port_b[0], Module)
+                and (
+                    isinstance(module_port_b[1], str)
+                    or isinstance(module_port_b[1], Port)
+                )
+            )
 
             module_a = module_port_a[0]
             module_b = module_port_b[0]
 
             assert module_a.name and module_b.name  # sanity check
 
-            assert module_a in self.modules, 'module %r not in network.'%module_a.name
-            assert module_b in self.modules, 'module %r not in network.'%module_b.name
+            assert module_a in self.modules, "module %r not in network." % module_a.name
+            assert module_b in self.modules, "module %r not in network." % module_b.name
 
             idx_a = self.modules.index(module_a)
             idx_b = self.modules.index(module_b)
 
             self.gv_edges.append((str(idx_a), str(idx_b)))
 
-            if self.gv_info == 'bidirectional':
+            if self.gv_info == "bidirectional":
                 self.gv_edges.append((str(idx_b), str(idx_a)))
 
             if isinstance(module_port_a[1], str):
@@ -182,19 +194,19 @@ class Network:
             elif isinstance(module_port_a[1], Port):
                 port_a = module_port_a[1]
             else:
-                assert False, 'help!'
+                assert False, "help!"
 
             if isinstance(module_port_b[1], str):
                 port_b = module_b.get_port(module_port_b[1])
             elif isinstance(module_port_b[1], Port):
                 port_b = module_port_b[1]
             else:
-                assert False, 'help!'
+                assert False, "help!"
 
             port_a.connect(port_b)
 
         else:
-            assert False, ' not implemented.'
+            assert False, " not implemented."
 
         return
 
@@ -203,7 +215,7 @@ class Network:
         Internal method to run the network simulation. Do not use this method, it is
         intended for Cortix to run it.
 
-        This function concurrently executes the `cortix.src.module.run` function
+        This function concurrently executes the `cortix.module.run` function
         for each module in the network. Modules are run using either MPI or
         Multiprocessing, depending on the user configuration.
 
@@ -212,27 +224,27 @@ class Network:
         When using multiprocessing, data from the modules state are copied to the master
         process after the `__run()` method of the modules is finished.
         """
-        assert len(self.modules) >= 1, 'the network must have a list of modules.'
+        assert len(self.modules) >= 1, "the network must have a list of modules."
 
         # Create directory for saving modules states
         if self.rank == 0 or self.use_multiprocessing:
-            shutil.rmtree('.ctx-saved', ignore_errors=True)
-            os.makedirs('.ctx-saved')
+            shutil.rmtree(".ctx-saved", ignore_errors=True)
+            os.makedirs(".ctx-saved")
 
         # Running under MPI
-        #------------------
+        # ------------------
         if self.use_mpi:
-
             # Synchronize in the beginning
-            assert self.size == len(self.modules) + 1,\
-                'Incorrect number of processes (Required %r, got %r)'%\
-                (len(self.modules) + 1, self.size)
+            assert self.size == len(self.modules) + 1, (
+                "Incorrect number of processes (Required %r, got %r)"
+                % (len(self.modules) + 1, self.size)
+            )
             self.comm.Barrier()
 
             # Assign an mpi rank to all ports of a module using the module list index
             # If a port has rank assignment from a previous run; leave it alone
             for mod in self.modules:
-                rank = self.modules.index(mod)+1
+                rank = self.modules.index(mod) + 1
                 for port in mod.ports:
                     if port.rank is None:
                         port.rank = rank
@@ -249,22 +261,21 @@ class Network:
 
             # Parallel run module in MPI
             if self.rank != 0:
-                mod = self.modules[self.rank-1]
-                self.log.info('Launching Module {}'.format(mod))
+                mod = self.modules[self.rank - 1]
+                self.log.info("Launching Module {}".format(mod))
                 mod.run_and_save()
 
             # Sync here at the end
             self.comm.Barrier()
 
         # Running under Python multiprocessing
-        #-------------------------------------
+        # -------------------------------------
         else:
-
             # Parallel run all modules in Python multiprocessing
             processes = list()
 
             for mod in self.modules:
-                self.log.info('Launching Module {}'.format(mod))
+                self.log.info("Launching Module {}".format(mod))
                 proc = Process(target=mod.run_and_save)
                 processes.append(proc)
                 proc.start()
@@ -274,29 +285,31 @@ class Network:
                 proc.join()
 
         # Reload saved modules
-        #---------------------
+        # ---------------------
         if self.use_mpi:
             # make double sure all processes are in sync here before reading files
             # from disk
             self.comm.Barrier()
 
         num_files = 0
-        for file_name in os.listdir('.ctx-saved'):
+        for file_name in os.listdir(".ctx-saved"):
+            self.gv_edges = list()  # re-initialize since ports were not pickled
 
-            self.gv_edges = list() # re-initialize since ports were not pickled
-
-            if file_name.endswith('.pkl'):
+            if file_name.endswith(".pkl"):
                 num_files += 1
-                file_name = os.path.join('.ctx-saved', file_name)
-                with open(file_name, 'rb') as fin:
+                file_name = os.path.join(".ctx-saved", file_name)
+                with open(file_name, "rb") as fin:
                     module = pickle.load(fin)
                     # reintroduce logging
-                    module.log = logging.getLogger('cortix')
+                    module.log = logging.getLogger("cortix")
                     self.modules[module.id] = module
 
         if num_files and num_files != len(self.modules):
-            self.log.warning('Network::run(): not all modules reloaded from disk.\
-                              # modules = %i; # files = %i'%(len(self.modules), num_files))
+            self.log.warning(
+                "Network::run(): not all modules reloaded from disk.\
+                              # modules = %i; # files = %i"
+                % (len(self.modules), num_files)
+            )
 
         if self.use_mpi:
             # Make double sure all are in sync here before going forward
@@ -304,8 +317,16 @@ class Network:
             # that do not exist anymore
             self.comm.Barrier()
 
-    def draw(self, graph_attr=None, node_attr=None, engine='twopi', lr=False,
-             size=None, ports=False, node_shape='hexagon'):
+    def draw(
+        self,
+        graph_attr=None,
+        node_attr=None,
+        engine="twopi",
+        lr=False,
+        size=None,
+        ports=False,
+        node_shape="hexagon",
+    ):
         """Build a `graphviz` graph and draw the network saving it to a file.
 
         Parameters
@@ -389,29 +410,41 @@ class Network:
         """
 
         # Delete existing graph files if any.
-        if os.path.isfile(self.name+'.gv'):
-            os.remove(self.name+'.gv')
-        if os.path.isfile(self.name+'.gv.png'):
-            os.remove(self.name+'.gv.png')
+        if os.path.isfile(self.name + ".gv"):
+            os.remove(self.name + ".gv")
+        if os.path.isfile(self.name + ".gv.png"):
+            os.remove(self.name + ".gv.png")
 
         # Import here to avoid broken dependency. Only this method needs graphviz.
-        if self.gv_info == 'undirectional':
+        if self.gv_info == "undirectional":
             from graphviz import Graph
         else:
             from graphviz import Digraph
 
         if graph_attr is None:
-            graph_attr = {'splines':'true', 'overlap':'scale', 'ranksep':'1.5'}
+            graph_attr = {"splines": "true", "overlap": "scale", "ranksep": "1.5"}
 
         if node_attr is None:
-            node_attr = {'shape':node_shape, 'style':'filled'}
+            node_attr = {"shape": node_shape, "style": "filled"}
 
-        if self.gv_info == 'undirectional':
-            graph = Graph(name=self.name, comment='Network::graphviz', format='png',
-                        graph_attr=graph_attr, node_attr=node_attr, engine=engine)
+        if self.gv_info == "undirectional":
+            graph = Graph(
+                name=self.name,
+                comment="Network::graphviz",
+                format="png",
+                graph_attr=graph_attr,
+                node_attr=node_attr,
+                engine=engine,
+            )
         else:
-            graph = Digraph(name=self.name, comment='Network::graphviz', format='png',
-                          graph_attr=graph_attr, node_attr=node_attr, engine=engine)
+            graph = Digraph(
+                name=self.name,
+                comment="Network::graphviz",
+                format="png",
+                graph_attr=graph_attr,
+                node_attr=node_attr,
+                engine=engine,
+            )
 
         if lr:
             graph.attr(rankdir="LR")
@@ -419,7 +452,7 @@ class Network:
         if size:
             graph.attr(size=size)
 
-        #graph.attr('node', shape=node_shape)
+        # graph.attr('node', shape=node_shape)
 
         for idx, mod in enumerate(self.modules):
             graph.node(str(idx), mod.name)

@@ -5,6 +5,7 @@
 
 from multiprocessing import Pipe
 
+
 class Port:
     """Provides a method of communication between modules.
 
@@ -38,6 +39,7 @@ class Port:
 
         if self.use_mpi:
             from mpi4py import MPI
+
             self.comm = MPI.COMM_WORLD
             self.rank = None
         else:
@@ -60,7 +62,7 @@ class Port:
         None
         """
 
-        assert isinstance(port, Port), 'Connecting port must be of Port type'
+        assert isinstance(port, Port), "Connecting port must be of Port type"
 
         self.connected_port = port
         port.connected_port = self
@@ -111,6 +113,7 @@ class Port:
             return True
         else:
             return False
+
     is_connected = property(__is_connected, None, None, None)
 
     def recv(self):
@@ -128,8 +131,9 @@ class Port:
         if self.connected_port:
             if self.use_mpi:
                 # This is an MPI blocking receive
-                return self.comm.recv(source=self.connected_port.rank,
-                        tag=self.connected_port.id)
+                return self.comm.recv(
+                    source=self.connected_port.rank, tag=self.connected_port.id
+                )
             else:
                 return self.pipe.recv()
 
@@ -145,10 +149,11 @@ class Port:
 
         return self.name
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Create some ports
-    p1 = Port('test1')
-    p2 = Port('test2')
+    p1 = Port("test1")
+    p2 = Port("test2")
 
     # Connect the ports
     p1.connect(p2)

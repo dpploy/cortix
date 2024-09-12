@@ -9,7 +9,8 @@ import logging
 import time
 import datetime
 
-from cortix.src.network import Network
+from .network import Network
+
 
 class Cortix:
     """Cortix main class definition.
@@ -22,7 +23,7 @@ class Cortix:
 
     """
 
-    def __init__(self, use_mpi=False, splash=False, log_filename_stem='cortix'):
+    def __init__(self, use_mpi=False, splash=False, log_filename_stem="cortix"):
         """Construct a Cortix simulation object.
 
         Parameters
@@ -64,6 +65,7 @@ class Cortix:
         if self.use_mpi:
             try:
                 from mpi4py import MPI
+
                 self.comm = MPI.COMM_WORLD
                 self.rank = self.comm.Get_rank()
                 self.size = self.comm.size
@@ -75,19 +77,18 @@ class Cortix:
 
         # Done
         if self.rank == 0 or self.use_multiprocessing:
-
             if self.splash:
-                self.log.info('Created Cortix object %s', self.__get_splash(begin=True))
+                self.log.info("Created Cortix object %s", self.__get_splash(begin=True))
             else:
-                self.log.info('Created Cortix object')
+                self.log.info("Created Cortix object")
 
             # Initialize all date and timings
             self.wall_clock_time_start = time.time()
             self.wall_clock_time_end = self.wall_clock_time_start
-            self.end_run_date = datetime.datetime.today().strftime('%d%b%y %H:%M:%S')
+            self.end_run_date = datetime.datetime.today().strftime("%d%b%y %H:%M:%S")
 
             # Delete any existing .ctx-saved/*
-            shutil.rmtree('.ctx-saved', ignore_errors=True)
+            shutil.rmtree(".ctx-saved", ignore_errors=True)
 
     def __set_network(self, n):
         assert isinstance(n, Network)
@@ -97,20 +98,23 @@ class Cortix:
         n.size = self.size
         n.comm = self.comm
         self.__network = n
+
     def __get_network(self):
         return self.__network
+
     network = property(__get_network, __set_network, None, None)
 
     def run(self, save=False):
-        """Run the Cortix network simulation.
-        """
+        """Run the Cortix network simulation."""
 
         self.__network._Network__run(save)
 
         if self.rank == 0 or self.use_multiprocessing:
             self.wall_clock_time_end = time.time()
-            self.log.info('run()::Elapsed wall clock time [s]: '+
-                          str(round(self.wall_clock_time_end-self.wall_clock_time_start, 2)))
+            self.log.info(
+                "run()::Elapsed wall clock time [s]: "
+                + str(round(self.wall_clock_time_end - self.wall_clock_time_start, 2))
+            )
 
     def close(self):
         """Closes the cortix object properly before destruction.
@@ -124,16 +128,17 @@ class Cortix:
             self.comm.Barrier()
 
         if self.rank == 0 or self.use_multiprocessing:
-
             if self.splash:
-                self.log.info('Closed Cortix object.'+self.__get_splash(end=True))
+                self.log.info("Closed Cortix object." + self.__get_splash(end=True))
             else:
-                self.log.info('Closed Cortix object.')
+                self.log.info("Closed Cortix object.")
 
             self.wall_clock_time_end = time.time()
 
-            self.log.info('close()::Elapsed wall clock time [s]: '+
-                          str(round(self.wall_clock_time_end-self.wall_clock_time_start, 2)))
+            self.log.info(
+                "close()::Elapsed wall clock time [s]: "
+                + str(round(self.wall_clock_time_end - self.wall_clock_time_start, 2))
+            )
             logging.shutdown()
 
         return
@@ -143,8 +148,8 @@ class Cortix:
 
         # File removal
         if self.rank == 0 or self.use_multiprocessing:
-            if os.path.isfile(self.log_filename_stem+'.log'):
-                os.remove(self.log_filename_stem+'.log')
+            if os.path.isfile(self.log_filename_stem + ".log"):
+                os.remove(self.log_filename_stem + ".log")
 
         # Sync here to allow for file removal
         if self.use_mpi:
@@ -153,9 +158,9 @@ class Cortix:
         self.log = logging.getLogger(self.log_filename_stem)
 
         self.log.setLevel(logging.DEBUG)
-        #10/8/19 Added check to see if log hander exsists before creating new ones
+        # 10/8/19 Added check to see if log hander exsists before creating new ones
         if not self.log.hasHandlers():
-            file_handler = logging.FileHandler(self.log_filename_stem+'.log')
+            file_handler = logging.FileHandler(self.log_filename_stem + ".log")
             file_handler.setLevel(logging.DEBUG)
 
             console_handler = logging.StreamHandler()
@@ -163,10 +168,13 @@ class Cortix:
 
             # Formatter added to handlers
             if self.use_mpi:
-                fs = '[rank:{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s'.format(self.rank)
+                fs = "[rank:{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(
+                    self.rank
+                )
             else:
-
-                fs = "[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(os.getpid())
+                fs = "[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(
+                    os.getpid()
+                )
 
             formatter = logging.Formatter(fs)
             file_handler.setFormatter(formatter)
@@ -179,7 +187,7 @@ class Cortix:
         return
 
     def __get_splash(self, begin=None, end=None):
-        '''Returns the Cortix splash logo.
+        """Returns the Cortix splash logo.
 
         Note
         ----
@@ -196,7 +204,7 @@ class Cortix:
         splash: str
             The Cortix splash logo.
 
-        '''
+        """
 
         assert begin is None or end is None
         if begin:
@@ -204,33 +212,36 @@ class Cortix:
         elif end:
             begin = False
 
-
-        splash = \
-        '_____________________________________________________________________________\n'+\
-        '      ...                                        s       .     (TAAG Fraktur)\n'+\
-        '   xH88"`~ .x8X                                 :8      @88>\n'+\
-        ' :8888   .f"8888Hf        u.      .u    .      .88      %8P      uL   ..\n'+\
-        ':8888>  X8L  ^""`   ...ue888b   .d88B :@8c    :888ooo    .     .@88b  @88R\n'+\
-        'X8888  X888h        888R Y888r ="8888f8888r -*8888888  .@88u  ""Y888k/"*P\n'+\
-        '88888  !88888.      888R I888>   4888>"88"    8888    ''888E`    Y888L\n'+\
-        '88888   %88888      888R I888>   4888> "      8888      888E      8888\n'+\
-        '88888 `> `8888>     888R I888>   4888>        8888      888E      `888N\n'+\
-        '`8888L %  ?888   ! u8888cJ888   .d888L .+    .8888Lu=   888E   .u./"888&\n'+\
-        ' `8888  `-*""   /   "*888*P"    ^"8888*"     ^%888*     888&  d888" Y888*"\n'+\
-        '   "888.      :"      "Y"          "Y"         "Y"      R888" ` "Y   Y"\n'+\
-        '     `""***~"`                                           ""\n'+\
-        '                             https://cortix.org                              \n'+\
-        '_____________________________________________________________________________'
+        splash = (
+            "_____________________________________________________________________________\n"
+            + "      ...                                        s       .     (TAAG Fraktur)\n"
+            + '   xH88"`~ .x8X                                 :8      @88>\n'
+            + ' :8888   .f"8888Hf        u.      .u    .      .88      %8P      uL   ..\n'
+            + ':8888>  X8L  ^""`   ...ue888b   .d88B :@8c    :888ooo    .     .@88b  @88R\n'
+            + 'X8888  X888h        888R Y888r ="8888f8888r -*8888888  .@88u  ""Y888k/"*P\n'
+            + '88888  !88888.      888R I888>   4888>"88"    8888    '
+            "888E`    Y888L\n"
+            + '88888   %88888      888R I888>   4888> "      8888      888E      8888\n'
+            + "88888 `> `8888>     888R I888>   4888>        8888      888E      `888N\n"
+            + '`8888L %  ?888   ! u8888cJ888   .d888L .+    .8888Lu=   888E   .u./"888&\n'
+            + ' `8888  `-*""   /   "*888*P"    ^"8888*"     ^%888*     888&  d888" Y888*"\n'
+            + '   "888.      :"      "Y"          "Y"         "Y"      R888" ` "Y   Y"\n'
+            + '     `""***~"`                                           ""\n'
+            + "                             https://cortix.org                              \n"
+            + "_____________________________________________________________________________"
+        )
 
         if begin:
-            message = \
-            '\n_____________________________________________________________________________\n'+\
-            '                             L A U N C H I N G                               \n'
+            message = (
+                "\n_____________________________________________________________________________\n"
+                + "                             L A U N C H I N G                               \n"
+            )
 
         else:
-            message = \
-            '\n_____________________________________________________________________________\n'+\
-            '                           T E R M I N A T I N G                             \n'
+            message = (
+                "\n_____________________________________________________________________________\n"
+                + "                           T E R M I N A T I N G                             \n"
+            )
 
         return message + splash
 
@@ -247,5 +258,6 @@ class Cortix:
 
         pass
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     c = Cortix()

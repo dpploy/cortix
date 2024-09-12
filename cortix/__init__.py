@@ -3,11 +3,11 @@
 # This file is part of the Cortix toolkit environment
 # https://cortix.org
 
-from .src.cortix_main import Cortix
+from .cortix_main import Cortix
 
-from .src.network import Network
-from .src.module import Module
-from .src.port import Port
+from .network import Network
+from .module import Module
+from .port import Port
 
 from .support.units import Units
 from .support.phase import Phase
