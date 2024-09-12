@@ -1,10 +1,10 @@
-from cortix import Module
-from cortix import Port
-from time import sleep
+from cortix.module import Module
+
+import unittest
+
 
 class DummyModule(Module):
     def __init__(self):
-
         # Call the Module class constructor
         super().__init__()
 
@@ -19,14 +19,14 @@ class DummyModule(Module):
 
         print("Finished Sending!")
 
+
 class DummyModule2(Module):
     def __init__(self):
-
         # Call the Module class constructor
         super().__init__()
 
     def run(self):
-        # Simulate receiving data every two seconds 
+        # Simulate receiving data every two seconds
         i = 0
         while i < 10:
             sleep(1)
@@ -38,7 +38,21 @@ class DummyModule2(Module):
             # Extract the data only from test-port1
             print("Received {}!".format(data))
 
-            assert(data == i)
+            assert data == i
             i += 1
 
         print("Finished Receiving!")
+
+
+class TestModule(unittest.TestCase):
+    def test_init(self):
+        m = DummyModule()
+        p1 = m.get_port("test-port1")
+        p2 = m.get_port("test-port2")
+        self.assertEqual(
+            first=len(m.ports), second=2, msg=f"Ports len {len(m.ports)} ≠ 2"
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()

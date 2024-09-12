@@ -9,6 +9,7 @@ from cortix import Cortix
 
 from cortix.tests.dataplot import DataPlot
 
+
 class PlotData(Module):
     def __init__(self):
         super().__init__()
@@ -23,17 +24,17 @@ class PlotData(Module):
         self.send("DONE", "plot-out")
         print("Finished sending!")
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     # Cortix built-in DataPlot module
     d = DataPlot()
-    #d.set_title("Test Plot")
-    #d.set_xlabel("Time")
-    #d.set_ylabel("Position")
+    # d.set_title("Test Plot")
+    # d.set_xlabel("Time")
+    # d.set_ylabel("Position")
 
-    d.title = 'Test Plot'
-    d.xlabel = 'Time'
-    d.ylabel = 'Position'
+    d.title = "Test Plot"
+    d.xlabel = "Time"
+    d.ylabel = "Position"
 
     # Custom class to send dummy data
     p = PlotData()
