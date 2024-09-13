@@ -1,0 +1,56 @@
+# https://pip.pypa.io/en/stable/reference/build-system/pyproject-toml/#fallback-behaviour
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cortix"
+description = "Cortix is a Python library for network dynamics modeling and HPC simulation."
+authors = [{ name = "Cortix Computing", email = "valmor_dealmeida@uml.edu" }]
+maintainers = [
+  { name = "Valmor F. de Almeida", email = "valmor_dealmeida@uml.edu" },
+  { name = "Uriel Acioli", email = "uriel.acioli@gmail.com" },
+]
+version = "1.1.43"
+requires-python = "==3.11.*"
+license = { file = "LICENSE.txt" }
+readme = "README.md"
+dependencies = [
+  "pandas>=2.2.2",
+  "matplotlib>=3.9.2",
+  "numpy>=2.1.1",
+  "scipy>=1.14.1",
+  "graphviz>=0.20.3",
+  "networkx>=3.3",
+]
+keywords = ['simulation', 'math']
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+  'Topic :: Scientific/Engineering :: Mathematics',
+  'Intended Audience :: Developers',
+  'Intended Audience :: Education',
+  'Intended Audience :: End Users/Desktop',
+  'Intended Audience :: Science/Research',
+  'Operating System :: MacOS',
+  'Operating System :: Unix',
+  'Topic :: Education',
+  'Topic :: Utilities',
+]
+urls = { homepage = "https://cortix.org" }
+
+[tool.pdm]
+distribution = true
+[tool.pdm.scripts]
+lint = { cmd = [
+  'ruff',
+  'check',
+  '--output-format=concise',
+  './tests',
+  './cortix',
+  './examples',
+] }
+format = { cmd = ['ruff', 'format', './tests', './cortix', './examples'] }
+
+[tool.pdm.dev-dependencies]
+dev = ["ruff>=0.6.4", "pytest>=8.3.3"]

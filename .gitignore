@@ -46,3 +46,6 @@ cortix/docs/_build
 # Coverage files
 .coverage
 coverage.xml
+.pdm-python
+.ruff_cache
+pdm.lock
