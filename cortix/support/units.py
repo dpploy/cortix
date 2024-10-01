@@ -25,7 +25,7 @@ import scipy.constants as scipy_cte
 
 class Units:
 
-    # make scipy a make constants available
+    # make scipy constants available
     scipy_cte = scipy_cte
 
     # all class data
