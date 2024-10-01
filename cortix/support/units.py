@@ -79,6 +79,7 @@ class Units:
     pascal = 1.0
     bar = scipy_cte.bar
     psi = scipy_cte.psi
+    atm = scipy_cte.atm
 
     # charge/electric potential/current
     coulomb = 1.0
