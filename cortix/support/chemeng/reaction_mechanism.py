@@ -318,8 +318,8 @@ class ReactionMechanism:
         # Create the species list
         self.species = list()
 
-        for name in self.species_names:
-            spc = Species(name=name, formula_name=name)
+        for id, name in enumerate(self.species_names):
+            spc = Species(name=name, formula_name=name, flag=id)
             self.species.append(spc)
 
         # Third: build the stoichiometric matrix
@@ -672,9 +672,11 @@ class ReactionMechanism:
 
                 if 'k_eq' in rxn_data:
                     k_eq = rxn_data['k_eq']
-                else:
+                elif 'k_eq_func' in rxn_data:
                     k_eq_func = rxn_data['k_eq_func']
                     k_eq      = k_eq_func(temperature, self.species, spc_molar_cc_vec)
+                else:
+                    assert False, 'rxn_data = %r'%rxn_data
 
                 reactants_ids = alpha_mtrx[0, :].astype(int)
                 #assert len(reactants_ids) == 2
