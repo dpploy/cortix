@@ -9,7 +9,7 @@ import logging
 from cortix.src.port import Port
 
 class Module:
-    '''Cortix module super class.
+    """Cortix module super class.
 
     This class provides facilities for creating modules within the Cortix network.
     Cortix will map one object of this class to either a Multiprocessing or MPI
@@ -21,10 +21,10 @@ class Module:
     In order to execute, modules *must* override the `run` method, which will be
     executed during the simulation.
 
-    '''
+    """
 
     def __init__(self):
-        '''Module super class constructor.
+        """Module super class constructor.
 
         Note
         ----
@@ -58,7 +58,7 @@ class Module:
         __network: Network
             An internal network inherited by the derived module for nested networks.
 
-       '''
+       """
 
         self.name = self.__class__.__name__
         self.port_names_expected = None
