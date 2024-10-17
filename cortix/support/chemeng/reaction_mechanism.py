@@ -667,6 +667,8 @@ class ReactionMechanism:
         # If k_eq and tau are present, override reaction rate with mass transfer relaxation
         # Complexation case
         for (idx, rxn_data) in enumerate(self.data):
+            alpha_mtrx = alpha_lst[idx]
+            beta_mtrx = beta_lst[idx]
             if 'tau' in rxn_data:
                 tau = rxn_data['tau']
 
@@ -679,16 +681,16 @@ class ReactionMechanism:
                     assert False, 'rxn_data = %r'%rxn_data
 
                 reactants_ids = alpha_mtrx[0, :].astype(int)
-                #assert len(reactants_ids) == 2
-                if len(reactants_ids) != 2:
-                    continue
+                assert len(reactants_ids) == 1
+                #if len(reactants_ids) != 1:
+                #    continue
 
                 reactants_molar_cc = spc_molar_cc_vec[reactants_ids] # must be ordered as in rxn_mech
 
                 products_ids = beta_mtrx[0, :].astype(int)
-                #assert len(products_ids) == 1
-                if len(reactants_ids) != 1:
-                    continue
+                assert len(products_ids) == 1
+                #if len(reactants_ids) != 1:
+                #    continue
 
                 products_molar_cc = spc_molar_cc_vec[products_ids] # must be oredered as in rxn_mech
 
