@@ -262,7 +262,7 @@ class ReactionMechanism:
             if 'k_eq' in tmp_dict:
                 assert 'tau' in tmp_dict
             if 'tau' in tmp_dict and 'k_eq' not in tmp_dict:
-                print('WARNING: user must provide a k_eq_func(spc_molar_cc, temperature=None) for %s'%(data[0]))
+                print('WARNING: user must provide a k_eq_func(rxn_mech, temperature, spc_molar_cc) for %s'%(data[0]))
 
             self.data.append(tmp_dict)
 
@@ -676,7 +676,7 @@ class ReactionMechanism:
                     k_eq = rxn_data['k_eq']
                 elif 'k_eq_func' in rxn_data:
                     k_eq_func = rxn_data['k_eq_func']
-                    k_eq      = k_eq_func(temperature, self.species, spc_molar_cc_vec)
+                    k_eq      = k_eq_func(self, temperature, spc_molar_cc_vec)
                 else:
                     assert False, 'rxn_data = %r'%rxn_data
 
