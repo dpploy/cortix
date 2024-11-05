@@ -415,7 +415,7 @@ class PhaseNew:
         col = pandas.DataFrame( index=list(self.__df.index), columns=[new_name] )
         tmp = self.__df
         df = tmp.join(col, how='outer')
-        self.__df = df.fillna(0.0)   # for species fill concentration with float as default
+        self.__df = df.fillna(0.0) # for species fill concentration with float as default
 
     def add_quantity(self, new_quant):
         '''
@@ -671,8 +671,11 @@ class PhaseNew:
     def __str__(self):
         s = '\n\t **Phase()**: name=%s;' + \
             '\n\t time unit: %s;' + \
+            '\n' + \
             '\n\t *quantities*: %s;' + \
+            '\n' + \
             '\n\t *species*: %s;' + \
+            '\n' + \
             '\n\t *history* # time_stamps=%s;' + \
             '\n\t *history end* @%s;' + \
             '\n%s'
@@ -687,8 +690,11 @@ class PhaseNew:
     def __repr__(self):
         s = '\n\t **Phase()**: name=%s;' + \
             '\n\t time unit: %s;' + \
+            '\n' + \
             '\n\t *quantities*: %s;' + \
+            '\n' + \
             '\n\t *species*: %s;' + \
+            '\n' + \
             '\n\t *history* # time_stamps=%s;' + \
             '\n\t *history end* @%s;' + \
             '\n%s'

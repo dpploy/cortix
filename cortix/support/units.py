@@ -48,6 +48,9 @@ class Units:
     event = 1.0
     step = 1.0
 
+    # number
+    mole = 1.00
+
     # mass
     gram = scipy_cte.gram
     kg = kilo*gram
