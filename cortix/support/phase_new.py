@@ -415,7 +415,7 @@ class PhaseNew:
         col = pandas.DataFrame( index=list(self.__df.index), columns=[new_name] )
         tmp = self.__df
         df = tmp.join(col, how='outer')
-        self.__df = df.fillna(0.0)   # for species fill concentration with float as default
+        self.__df = df.fillna(0.0) # for species fill concentration with float as default
 
     def add_quantity(self, new_quant):
         '''
