@@ -119,8 +119,8 @@ class PhaseNew:
         names = list()
 
         if species is not None:
-            for each_species in self.__species:
-                names.append(each_species.name)
+            for spc in self.__species:
+                names.append(spc.name)
 
         if quantities is not None:
             for quant in self.__quantities:
@@ -130,7 +130,7 @@ class PhaseNew:
 
         # Table data phase without data type assigned; this is left to the user
         # Time stamps will always be float
-        self.__df = pandas.DataFrame( index=[float(time_stamp)], columns=names )
+        self.__df = pandas.DataFrame(index=[float(time_stamp)], columns=names)
 
         # This is meant to be the value of species concentration; a float type
         if species is not None:
@@ -140,7 +140,7 @@ class PhaseNew:
         if quantities is not None:
             for quant in quantities:
                 self.__df.loc[time_stamp, quant.name] = quant.value
-                #self.__df.fillna( 0.0, inplace=True )  # dtype defaults to float
+                #self.__df.fillna(0.0, inplace=True)  # dtype defaults to float
 
         return
 
@@ -388,8 +388,7 @@ class PhaseNew:
 
         if not discard_new_duplicate:
             assert new_species.name not in list(self.__df.columns), \
-                   'new_species: %r exists. Current names: %r' % \
-                   (new_species, self.__df.columns)
+                   'new_species: %r exists. Current names: %r'%(new_species, self.__df.columns)
 
         if self.__species is not None: # self.__species could be empty
             species_formulae = [specie.formula_name for specie in self.__species]
@@ -412,10 +411,12 @@ class PhaseNew:
             self.__species = [deepcopy(new_species)] # create a list here
 
         new_name = new_species.name
-        col = pandas.DataFrame( index=list(self.__df.index), columns=[new_name] )
+
+        new_column = pandas.DataFrame(index=list(self.__df.index), columns=[new_name])
         tmp = self.__df
-        df = tmp.join(col, how='outer')
-        self.__df = df.fillna(0.0) # for species fill concentration with float as default
+        df = tmp.join(new_column, how='outer')
+
+        self.__df = df.infer_objects().fillna(0).astype(float) # for species fill concentration with float as default
 
     def add_quantity(self, new_quant):
         '''
