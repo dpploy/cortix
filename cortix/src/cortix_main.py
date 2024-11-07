@@ -4,6 +4,7 @@
 # https://cortix.org
 
 import os
+import sys
 import shutil
 import logging
 import time
@@ -139,7 +140,11 @@ class Cortix:
         return
 
     def __create_logger(self):
-        """A helper function to setup the logging facility."""
+        """A helper function to setup the logging facility.
+
+        Note: help(logging). Levels: 0 = NOTSET, 10 = DEBUG, 20 = INFO, 30 = WARNING,
+              40 = ERROR, 50 = FATAL
+        """
 
         # File removal
         if self.rank == 0 or self.use_multiprocessing:
@@ -153,26 +158,26 @@ class Cortix:
         self.log = logging.getLogger(self.log_filename_stem)
 
         self.log.setLevel(logging.DEBUG)
-        #10/8/19 Added check to see if log hander exsists before creating new ones
+        # Check to see if log handler exsists before creating new ones
         if not self.log.hasHandlers():
             file_handler = logging.FileHandler(self.log_filename_stem+'.log')
             file_handler.setLevel(logging.DEBUG)
 
             console_handler = logging.StreamHandler()
             console_handler.setLevel(logging.DEBUG)
+            console_handler.setStream(sys.stdout)
 
             # Formatter added to handlers
             if self.use_mpi:
                 fs = '[rank:{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s'.format(self.rank)
             else:
-
                 fs = "[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(os.getpid())
 
             formatter = logging.Formatter(fs)
             file_handler.setFormatter(formatter)
             console_handler.setFormatter(formatter)
 
-            # Add handlers to logger
+            # Add handlers to logger; this creates a handlers list
             self.log.addHandler(file_handler)
             self.log.addHandler(console_handler)
 
