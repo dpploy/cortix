@@ -6,8 +6,8 @@
 import os
 import shutil
 import pickle
-import logging
-from multiprocessing import Process
+#from multiprocessing import Process
+import multiprocessing as multiproc
 
 from cortix.src.module import Module
 from cortix.src.port import Port
@@ -39,7 +39,7 @@ class Network:
         self.id = Network.num_networks
 
         self.name = 'network-'+str(self.id)
-        self.log = logging.getLogger('cortix')
+        self.log = None
 
         self.max_n_modules_for_data_copy_on_root = 1000
 
@@ -59,33 +59,26 @@ class Network:
 
         Network.num_networks += 1
 
-        return
-
     def module(self, m):
         """Add a module.
         """
 
         assert isinstance(m, Module), 'm must be a module'
 
-        name = m.name
-        if not name:
-            name = m.__class__.__name__
-
         if m not in self.modules:
             m.use_mpi = self.use_mpi
             m.use_multiprocessing = self.use_multiprocessing
             self.modules.append(m)
             m.id = len(self.modules)-1  # see module doc for module id
-
-        return
+            if not m.name:
+             m.name = m.__class__.__name__
+            m.log = self.log
 
     def add_module(self, m):
         """Alternative name to `module()`.
         """
 
         self.module(m)
-
-        return
 
     def connect(self, module_port_a, module_port_b, info=None):
         """Connect two modules using either their ports directly or inferred ports.
@@ -205,7 +198,8 @@ class Network:
 
         This function concurrently executes the `cortix.src.module.run` function
         for each module in the network. Modules are run using either MPI or
-        Multiprocessing, depending on the user configuration.
+        Python Multiprocessing, depending on the user configuration. This is `not` a multi-threaded 
+        application, it will always start multiple processes, either in MPI or Python Multiprocessing.
 
         Note
         ----
@@ -261,11 +255,14 @@ class Network:
         else:
 
             # Parallel run all modules in Python multiprocessing
+            multiproc.set_start_method('spawn') # fresh interpreter for child processes
             processes = list()
 
             for mod in self.modules:
                 self.log.info('Launching Module {}'.format(mod))
-                proc = Process(target=mod.run_and_save)
+                # Note: on the other end, args will arrive as a doubly tuple: ((self.log,),)
+                proc = multiproc.Process(target=mod.run_and_save, args=(self.log,))
+                #proc = multiproc.Process(target=mod.run_and_save, args=(self.log,), kwargs={'logger':self.log})
                 processes.append(proc)
                 proc.start()
 
@@ -276,8 +273,7 @@ class Network:
         # Reload saved modules
         #---------------------
         if self.use_mpi:
-            # make double sure all processes are in sync here before reading files
-            # from disk
+            # Make double sure all processes are in sync here before reading files from disk
             self.comm.Barrier()
 
         num_files = 0
@@ -290,8 +286,8 @@ class Network:
                 file_name = os.path.join('.ctx-saved', file_name)
                 with open(file_name, 'rb') as fin:
                     module = pickle.load(fin)
-                    # reintroduce logging
-                    module.log = logging.getLogger('cortix')
+                    # Reintroduce logging
+                    module.log = self.log
                     self.modules[module.id] = module
 
         if num_files and num_files != len(self.modules):
