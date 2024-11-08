@@ -18,7 +18,8 @@ class Cortix:
     The typical Cortix run file workflow:
 
     1. Create the `Cortix` object
-    2. Create tne (nested) network of modules
+    1. Create a network object and attach to the Cortix object
+    2. Populate the network singleton with modules
     3. Run and close `Cortix`
 
     """
@@ -61,6 +62,7 @@ class Cortix:
 
         self.__network = None
         self.log_filename_stem = log_filename_stem
+        self.logger_name = self.log_filename_stem
         # Fall back to multiprocessing if mpi4py is not available
         if self.use_mpi:
             try:
@@ -74,7 +76,7 @@ class Cortix:
         # Setup the global logger
         self.__create_logger()
 
-        # Done
+        # Wrap-up init
         if self.rank == 0 or self.use_multiprocessing:
 
             if self.splash:
@@ -97,6 +99,7 @@ class Cortix:
         n.rank = self.rank
         n.size = self.size
         n.comm = self.comm
+        n.log  = self.log
         self.__network = n
     def __get_network(self):
         return self.__network
@@ -142,6 +145,13 @@ class Cortix:
     def __create_logger(self):
         """A helper function to setup the logging facility.
 
+        The Python logging module is used to create two handlers, namely one for stdout output and
+        another for file output. File output in multiprocessing has its challenges. The implementation
+        here is experimental. The main process creates the Python logging logger. The issue is how
+        to share the logger with the Cortix modules that run in a separate process. If using MPI, the
+        logger is not implemented and modules will not share the logger. If using Python Multiprocessing
+        the logger is passed to the child process.
+
         Note: help(logging). Levels: 0 = NOTSET, 10 = DEBUG, 20 = INFO, 30 = WARNING,
               40 = ERROR, 50 = FATAL
         """
@@ -155,10 +165,10 @@ class Cortix:
         if self.use_mpi:
             self.comm.Barrier()
 
-        self.log = logging.getLogger(self.log_filename_stem)
-
+        self.log = logging.getLogger(self.logger_name)
         self.log.setLevel(logging.DEBUG)
-        # Check to see if log handler exsists before creating new ones
+
+        # Create handlers
         if not self.log.hasHandlers():
             file_handler = logging.FileHandler(self.log_filename_stem+'.log')
             file_handler.setLevel(logging.DEBUG)
@@ -180,6 +190,8 @@ class Cortix:
             # Add handlers to logger; this creates a handlers list
             self.log.addHandler(file_handler)
             self.log.addHandler(console_handler)
+        else:
+            assert False, 'Fatal: Logger exists.'
 
         return
 

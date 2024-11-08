@@ -5,7 +5,6 @@
 
 import os
 import pickle
-import logging
 from cortix.src.port import Port
 
 class Module:
@@ -55,9 +54,11 @@ class Module:
             An integer set by the external network once a module is added to it.
             The `id` is the position of the module in the network list.
             Default: None.
+        log: A Python logging logger object created at the moment a module is added to
+             a network.
         __network: Network
             An internal network inherited by the derived module for nested networks.
-
+            Future work.
        """
 
         self.name = self.__class__.__name__
@@ -66,7 +67,7 @@ class Module:
         self.use_mpi = False
         self.use_multiprocessing = True
         self.ports = list()
-        self.log = logging.getLogger('cortix')
+        self.log = None
         self.save = False
 
         self.id = None
@@ -155,7 +156,7 @@ class Module:
         return port
 
     def __set_network(self, n):
-        # Must be here to avoid infinite import loop
+        # Must import be here to avoid infinite import loop
         from cortix.src.network import Network
         assert isinstance(n, Network)
         n.use_mpi = self.use_mpi
@@ -169,12 +170,15 @@ class Module:
         '''Module run function
 
         Run method with an option to pass data back to the parent process when running
-        in Python multiprocessing mode. If the user does not want to share data with
+        in Python multiprocessing mode. This option does not apply to MPI processing.
+
+        If the user does not want to share data with
         the parent process, this function can be overriden with `run(self)`
         or `run(self, *args)` as long as `self.state = None`.
         If `self.state` points to anything but `None`, the user must use
         `run(self, *args).
 
+        **This is not current: revise in the future**
         Notes
         -----
         When in multiprocessing, `*args` has two elements: `comm_idx` and `comm_state`.
@@ -195,6 +199,7 @@ class Module:
         -------
         This function must be overridden by all Cortix modules
 
+        **This is not current: revise in the future**
         Parameters
         ----------
         arg[0]: int
@@ -209,9 +214,9 @@ class Module:
         '''
         raise NotImplementedError('Module must implement run()')
 
-    def run_and_save(self):
+    def run_and_save(self, *args):
 
-        self.run()
+        self.run(args)
 
         if self.save:
             file_name = os.path.join('.ctx-saved', '{}_'.format(self.__class__.__name__))
