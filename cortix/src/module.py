@@ -4,6 +4,8 @@
 # https://cortix.org
 
 import os
+import sys
+import logging
 import pickle
 from cortix.src.port import Port
 
@@ -236,3 +238,33 @@ class Module:
                     pickle.dump(self, fout)
             except pickle.PicklingError:
                 print('Unable to pickle {}!'.format(file_name))
+
+    def rebuild_logger(self, logger_name):
+        """Rebuild the logger in multiprocessing mode.
+
+        In multiprocessing mode the Process() method will start a child process with only limited amounts
+        of data inherited from the Module usertype. Specifically the logger will lose information. This
+        function will rebuild the data on the child process and attempt to use logging in parallel both on
+        the console and permanent storage. This is experimental. Parallel file writing is challenging.
+        """
+        self.log = logging.getLogger(logger_name)
+        self.log.setLevel(logging.DEBUG)
+
+        file_handler = logging.FileHandler(logger_name+'.log')
+        file_handler.setLevel(logging.DEBUG)
+
+        console_handler = logging.StreamHandler()
+        console_handler.setLevel(logging.DEBUG)
+        console_handler.setStream(sys.stdout)
+
+        if self.use_mpi:
+            fs = '[rank:{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s'.format(self.rank)
+        else:
+            fs = "[{}] %(asctime)s - %(name)s - %(levelname)s - %(message)s".format(os.getpid())
+
+        formatter = logging.Formatter(fs)
+        file_handler.setFormatter(formatter)
+        console_handler.setFormatter(formatter)
+
+        self.log.addHandler(file_handler)
+        self.log.addHandler(console_handler)
