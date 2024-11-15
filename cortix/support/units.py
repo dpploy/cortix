@@ -39,6 +39,7 @@ class Units:
     # time
     second = 1.0
     minute = scipy_cte.minute
+    sec = second
     min = minute
     hour = scipy_cte.hour
     day = scipy_cte.day
