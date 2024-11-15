@@ -666,6 +666,7 @@ class ReactionMechanism:
 
         # If k_eq and tau are present, override reaction rate with mass transfer relaxation
         # Complexation case
+        # Very careful here...experimental coding
         for (idx, rxn_data) in enumerate(self.data):
             alpha_mtrx = alpha_lst[idx]
             beta_mtrx = beta_lst[idx]
