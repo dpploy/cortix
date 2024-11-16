@@ -52,11 +52,10 @@ from cortix.support.species   import Species
 from cortix.support.quantity import Quantity
 
 class PhaseNew:
-    '''
-    Phase `history` container. A `Phase` consists of `Species` and `Quantities`
-    varying with time. This container is meant to reproduce the basic idea of a
-    material phase.
-    '''
+    """ Phase `history` container.
+    A `Phase` consists of `Species` and `Quantities` varying with time. This container is meant to 
+    reproduce the basic idea of a material phase.
+    """
 
     def __init__(self, name = None,
                  time_stamp = None,
@@ -65,7 +64,7 @@ class PhaseNew:
                  quantities = None
                 ):
         #TODO
-        '''
+        """
         Sometimes an empty Phase object is created by user code. This case needs
         adequate logic for None types.
         Note on usage: when passing quantities, do set the value argument explicitly
@@ -74,7 +73,7 @@ class PhaseNew:
         Maybe better to use a Quantity object and a Species object with a Pandas Series
         history as a value to avoid the existance of a value in Quantity and a value
         in Phase that are not in sync.
-        '''
+        """
 
         if not name:
             self.name = self.__class__.__name__
@@ -360,14 +359,16 @@ class PhaseNew:
         quant_history: tuple(Quantity,str) or None
         '''
 
-        assert name in self.__df.columns, 'name %r not in %r'%\
-                (name,self.__df.columns)
+        assert name in self.__df.columns, 'name %r not in %r'%(name,self.__df.columns)
 
-        for quant in self.__quantities:
-            if quant.name == name:
-                quant_history = deepcopy(quant)
-                quant_history.value = deepcopy(self.__df[name]) # whole data frame index series
-                return (quant_history,self.__time_unit) # return tuple
+        if self.__quantities is not None:
+            for quant in self.__quantities:
+                if quant.name == name:
+                    quant_history = deepcopy(quant)
+                    quant_history.value = deepcopy(self.__df[name]) # whole data frame index series
+                    return (quant_history, self.__time_unit) # return tuple
+        else:
+            return (None, self.__time_unit)
 
         return None
 
@@ -510,8 +511,7 @@ class PhaseNew:
 
         '''
         assert isinstance(actor, str)
-        assert actor in self.__df.columns, 'actor %r not in %r'% \
-                   (actor,self.__df.columns)
+        assert actor in self.__df.columns, 'actor %r not in %r'%(actor, self.__df.columns)
         return list(self.__df.loc[:, actor])
 
     def scale_row(self, try_time_stamp, value):
@@ -587,9 +587,7 @@ class PhaseNew:
         return
 
     def get_value(self, actor, try_time_stamp=None):
-        '''
-        Returns the value associated with a specified actor at a specified
-        time stamp.
+        """Returns the value associated with a specified actor at a specified time stamp.
 
         Parameters
         ----------
@@ -601,7 +599,7 @@ class PhaseNew:
         -------
         self.__df.loc[time_stamp, actor]: any
 
-        '''
+        """
         assert isinstance(actor, str)
         assert actor in self.__df.columns, 'actor %r not in %r'% \
                    (actor,self.__df.columns)
@@ -634,14 +632,13 @@ class PhaseNew:
         return
 
     def write_html(self, fileName):
-        '''
-        Convert the `Phase` container into an HTML file.
+        """Convert the `Phase` container into an HTML file.
 
         Parameters
-        ---------
+        ----------
         fileName: str
 
-        '''
+        """
         assert isinstance(fileName, str)
         tmp = pandas.DataFrame(self.__df)
         column_names = tmp.columns
@@ -666,8 +663,6 @@ class PhaseNew:
                 assert False, 'oops fatal.'
 
         tmp.to_html(fileName)
-
-        return
 
     def __str__(self):
         s = '\n\t **Phase()**: name=%s;' + \
@@ -708,9 +703,9 @@ class PhaseNew:
                 self.__df.loc[self.__df.index[-1], :] )
 
     def __get_time_stamp(self, try_time_stamp=None):
-        '''
-        Helper method for finding the closest time stamp to `try_time_stamp`
-        in the phase history. The pandas index container used for storing
+        """ Helper method for finding the closest time stamp to `try_time_stamp` in the phase history.
+
+        The pandas index container used for storing
         float data type time stamps will return the nearest time stamp up to a
         tolerance. Whether the time index has one value, this function will
         inspect for the proximity to that value.
@@ -725,7 +720,7 @@ class PhaseNew:
         self.__df.index[loc]: float or None
             Will return None if no time stamp within tolerance is found.
 
-        '''
+        """
         import numpy as np
 
         tol = 1.0e-3
@@ -753,7 +748,7 @@ class PhaseNew:
                 return  self.__df.index[loc]
 
     def plot_species(self, name, scaling=[1.0, 1.0] , title=None, xlabel='Time [s]',
-                     ylabel='y', legend=None, filename_tag=None, figsize=[6,5], 
+                     ylabel='y', legend=None, filename_tag=None, figsize=[6,5],
                      dpi=100 ):
 
         if legend is not None:
@@ -803,23 +798,22 @@ class PhaseNew:
 
     def plot(self, actors=None, name='phase-plot-null-name',
              var_unit=None,
-             legend=None, nrows=2, ncols=2, figsize=[6,5], show=False, dpi=200):
-        """Plot assistant for a phase container.
+             legend=None, nrows=2, ncols=2, figsize=[6,5], show=False, dpi=300):
+        """Plot assistant for all phase container actors.
 
-        Make plots of all actors.
+        This needs a full review...it was copied here in a hurry.
 
         Parameters
         ----------
         actors: list(str)
-            List of names of quantities or species in the phase. Defaults to all
-            quantities being plotted.
+            List of names of quantities or species in the phase. Defaults to all actors being plotted.
 
         name: str
             Stem of the filename of the plots saved to file.
 
         var_unit: str
             An alternative unit for the species concentration. The quantities variable in the
-            phase will have its own unit but species does not have a unit.
+            phase will have their own unit. Default: g/L
 
         show: boolean
             When used in an interactive session, show the plots on display.
@@ -954,7 +948,7 @@ class PhaseNew:
             if time_unit == 'minute':
                 time_unit = 'min'
 
-            x = np.array( [i for i in self.__df.index] )
+            x = np.array([i for i in self.__df.index])
 
             if (varScale == 'linear' or varScale == 'linear-linear' or \
                 varScale == 'linear-log') and x.max() >= 60.0:
@@ -964,7 +958,7 @@ class PhaseNew:
                 if time_unit == 'second' or time_unit=='s':
                     time_unit = 'min'
 
-            y = np.array( self.__df[col_name] )  # convert to numpy ndarray
+            y = np.array(self.__df[col_name]) # convert to numpy ndarray
 
             '''
             if (y.max() >= 1e3 or y.min() <= -1e3) and varScale != 'linear-log' and \
@@ -1229,8 +1223,6 @@ class PhaseNew:
             plt.show()
 
         #pickle.dump( fig, open(fig_name+'.pickle','wb') )
-
-        return
 
 if __name__ == '__main__':
     tbp_org = Species(name='TBP', formula_name='(C4H9O)_3PO(o)',
