@@ -192,7 +192,7 @@ class Quantity:
     unit = property(GetUnit, SetUnit, None, None)
 
     def plot(self, x_scaling=1, y_scaling=1, y_shift=0, title=None, x_label='x', y_label=None,
-            file_name=None, same_axis=True, complex_form='polar', dpi=300):
+            file_name=None, same_axis=True, complex_form='polar', figsize=[6,5], show=False, dpi=300):
         '''
         This will support a few possibities for data storage in the self.__value
         member.
@@ -281,7 +281,7 @@ class Quantity:
         # Warning: code needs review; complex valued data was introduced without testing
 
         if same_axis and not complex_data:
-            fig = plt.figure(self.__formal_name)
+            fig = plt.figure(self.__formal_name, figsize=figsize)
 
         if complex_data:
             fig,ax1 = plt.subplots()
@@ -290,7 +290,7 @@ class Quantity:
         for i in range(n_dim):
 
             if not same_axis and not complex_data:
-                fig = plt.figure(self.__formal_name+str(i))
+                fig = plt.figure(self.__formal_name+str(i), figsize=figsize)
 
             y = list()
 
@@ -332,8 +332,13 @@ class Quantity:
             if not same_axis and file_name:
                 plt.savefig(file_name+str(i)+'.png', dpi=dpi)
 
+        if show:
+            plt.show()
+
         if same_axis and file_name:
             plt.savefig(file_name+'.png',dpi=dpi)
+
+        plt.grid()
 
         return
 
