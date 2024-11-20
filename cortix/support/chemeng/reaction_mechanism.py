@@ -3247,15 +3247,15 @@ class ReactionMechanism:
             print(spc)
             print('')
 
-    def md_print(self):
-        '''Markdown cell printout of LaTex reactions and species.
+    def md_print(self, group='all'):
+        """Markdown cell printout of LaTex reactions and species.
 
         Use with Jupyter Notebooks in a code cell.
 
         Parameters
         ----------
-        latex_species: str
-            String created by the Species class for typesetting in LaTex.
+        group: str
+            'all', 'species', or 'reactions'.
 
         Returns
         -------
@@ -3266,19 +3266,25 @@ class ReactionMechanism:
 
         rxn_mech = ReactionMechanism(file_name='some_mech.txt')
         rxn_mech.md_print()
+        """
 
-        '''
+        assert group in ['all', 'species', 'reactions']
 
         from IPython.display import Markdown, display
-        tmp = self.latex_species.replace(',',' \\quad ')
-        string = '%i **Species:** \n $%s$'%(len(self.species_names), tmp)
-        display(Markdown(string))
 
-        string = '%i **Reactions:** \n %s'%(len(self.reactions), self.latex_rxn)
-        display(Markdown(string))
+        if group in ['all', 'species']:
+            tmp = self.latex_species.replace(',',' \\quad ')
+            string = '%i **Species:** \n $%s$'%(len(self.species_names), tmp)
+            display(Markdown(string))
+
+        if group in ['all', 'reactions']:
+            string = '%i **Reactions:** \n %s'%(len(self.reactions), self.latex_rxn)
+            if len(self.reactions) >= 25:
+                print('WARNING: display may not be able to handle more than 25 reactions')
+            display(Markdown(string))
 
     def __latex(self):
-        '''Internal helper for LaTeX typesetting.
+        """Internal helper for LaTeX typesetting.
 
         See attributes description and usage with the Python print() function.
         notebook.
@@ -3289,12 +3295,16 @@ class ReactionMechanism:
         rxn_mech = ReactionMechanism(file_name='some_mech.txt')
         print(rxn_mech.species_str)
         print(rxn_mech.rxn_str)
-        '''
+
+        then copy the output and paste into a markdown cell in a Jupyter notebook or
+        LaTeX document.
+        """
 
         # Latex species
         species_str = str()
         for spc in self.species[:-1]:
             species_str += spc.latex_name + ', '
+
         species_str += self.species[-1].latex_name
 
         # Latex reactions into align environment

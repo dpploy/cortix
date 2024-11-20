@@ -216,7 +216,7 @@ class Species:
         self.num_nuclide_types = len(nuclides)
 
         # Correct molar mass of species for mass of electron
-        self.molar_mass += self.charge * const.physical_constants['electron molar mass'][0]
+        self.molar_mass -= self.charge * const.physical_constants['electron molar mass'][0]
 
         #if self.charge > 0:
         #    self.molar_mass -= self.charge * const.physical_constants['electron molar mass'][0]
@@ -224,8 +224,10 @@ class Species:
         #    self.molar_mass += -1 * self.charge * const.physical_constants['electron molar mass'][0]
 
         # Exception: e^- (solvated electron)
-        if self.formula_name == 'e^-':
+        if self.formula_name[:3] == 'e^-':
             self.molar_mass = const.physical_constants['electron molar mass'][0]
+
+        assert self.molar_mass >= 0.0
 
     def ordered_atoms_list(self):
         """Sorted list of the atoms in the species; mostly for printing purposes.
@@ -370,7 +372,9 @@ class Species:
             i = formula_name.rfind('[')                     # innermost [
             j = formula_name.find(']',i,len(formula_name))  # matching ]
             if i != -1 and j != -1: # if success
-                assert formula_name[j+1].isnumeric()
+                assert j+1 <= len(formula_name)-1, 'j=%r, len=%r, formula_name=%r'%(j,len(formula_name),
+                                                                                    formula_name)
+                assert formula_name[j+1].isnumeric(), 'j=%r, formula_name=%r'%(j,formula_name)
                 sub_formula_name = formula_name[i+1:j]
                 right_side_of_sub_formula = formula_name[j+1:]
                 multiplicity = int(formula_name[j+1])
@@ -420,12 +424,13 @@ class Species:
 
         Examples that can be handled by the code below:
 
-            ^*OH^-              ^* for radical, ^ for charged species
+            ^*OH^-              ^* for radical, ^- for charged species
             [CH2]3OH*^2-(a)     [] for groups of atoms
             H2O2(v)             () for phase
+            O2^*^-              ^* for radical, ^- for charged species
 
-        Limitation to formulas with a maximum numeric value of 9.
-        Unfinished.
+        If radical with a charge sign, the radical is followed by the sign: ^*^-
+        Limitation to formulas with a maximum numeric value of 9. Unfinished...
 
         This is useful for automating the creation of a species list of atoms, say from a
         reaction mechanism.
@@ -476,21 +481,32 @@ class Species:
 
             if not open_parenthesis:
 
-                if c_i == '*':
+                if c_i == '*': # this can be complexation or a radical (w/ or w/o charge on it)
                     assert idx != 0, 'fatal: incorrect complexation on formula_name = %r'%formula_name
-                    if formula_name[idx-1] == '^':
-                        latex_name += r'^\bullet' # escape \
-                    else:
-                        assert idx != len(formula_name)-1, 'fatal: incorrect complexation on formula_name = %r'%formula_name
+                    assert idx != len(formula_name)-1, 'fatal: incorrect complexation on formula_name = %r'%formula_name
+                    if formula_name[idx-1] == '^' and formula_name[idx+1] != '^': # radical w/o charge
+                        latex_name += r'^\bullet' # raw str to escape \
+                    elif formula_name[idx-1] == '^' and formula_name[idx+1] == '^': # radical w/o charge
+                        latex_name += r'^{\bullet' # raw str to escape \
+                    else: # complexation
                         latex_name += r'\bullet' # escape \
                     continue
 
-                if c_i == '^' and formula_name[idx-1] != '*':
+                if c_i == '^' and formula_name[idx+1] != '*' and \
+                                  formula_name[idx-2:idx] != '^*': # checking for charge on non-radical
                     assert idx < len(formula_name)-1, 'Error on %r'%formula_name
-                    if formula_name[idx+1].isnumeric(): # there must be a charge sign
+                    if formula_name[idx+1].isnumeric(): # there must be a charge sign later
                         latex_name += '^{' + formula_name[idx+1:idx+3] + '}'
                     else: # no numeric, hence just a charge sign
                         latex_name += '^' + formula_name[idx+1]
+                    continue
+
+                if c_i == '^' and formula_name[idx-2:idx] == '^*': # radical preceding charge
+                    assert idx < len(formula_name)-1, 'Error on %r'%formula_name
+                    if formula_name[idx+1].isnumeric(): # there must be a charge sign
+                        latex_name += formula_name[idx+1:idx+3] + '}'
+                    else: # no numeric, hence just a charge sign
+                        latex_name += formula_name[idx+1] + '}' # put sign and close to include radical
                     continue
 
                 if c_i.isalpha(): # alphabetic
@@ -513,7 +529,6 @@ class Species:
 
             else: # phase token
                 latex_name += c_i
-
 
         self.latex_name = latex_name
 
