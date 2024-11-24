@@ -8,7 +8,7 @@ import scipy.constants as unit
 from scipy.integrate import odeint
 
 from cortix import Module
-from cortix import Phase
+from cortix.support.phase_new import PhaseNew as Phase
 from cortix import Quantity
 
 class Community(Module):
@@ -46,7 +46,6 @@ class Community(Module):
             Upperbound on the range of the existing population groups. A random value
             from 0 to the upperbound value will be assigned to each group. This is
             typically a small number, say a fraction of a percent.
-
         """
 
         super().__init__()
@@ -69,7 +68,7 @@ class Community(Module):
         self.n_groups = n_groups
 
         # Community non-offender population
-        n0_0 = np.array([float(non_offender_adult_population)])
+        n0_0 = float(non_offender_adult_population)
         n0 = Quantity(name='n0', formal_name='non-offender-adult-pop',
                       latex_name='$n_0$',
                       unit='# adults', value=n0_0,
@@ -129,8 +128,8 @@ class Community(Module):
         self.population_phase = Phase(self.initial_time, time_unit='s',
                                       quantities=quantities)
 
-        self.population_phase.SetValue('n0', n0_0, self.initial_time)
-        self.population_phase.SetValue('f0g', f0g_0, self.initial_time)
+        self.population_phase.set_value('n0', n0_0, self.initial_time)
+        self.population_phase.set_value('f0g', f0g_0, self.initial_time)
 
         # Initialize inflows to zero
         self.ode_params['prison-inflow-rates'] = np.zeros(self.n_groups)
@@ -142,6 +141,11 @@ class Community(Module):
 
     def run(self, *args):
 
+        # Some logic for logging time stamps
+        # Leave this here: rebuild logger
+        logger_name = args[0][0].name
+        self.rebuild_logger(logger_name)
+
         self.__zero_ode_parameters()
 
         time = self.initial_time
@@ -149,7 +153,7 @@ class Community(Module):
         while time <= self.end_time:
 
             if self.show_time[0] and abs(time%self.show_time[1]-0.0) <= 1.e-1:
-                self.log.info('Community::time[d] = '+str(round(time/unit.day, 1)))
+                self.log.info('Community::time[y] = '+str(round(time/unit.year, 1)))
 
             self.__call_ports(time)
 
@@ -221,8 +225,7 @@ class Community(Module):
         self.ode_params['arrested-inflow-rates'] = inflow_rates
 
     def __step(self, time=0.0):
-        r'''
-        ODE IVP problem:
+        r"""ODE IVP problem:
         Given the initial data at :math:`t=0`,
         :math:`u = (u_1(0),u_2(0),\ldots)`
         solve :math:`\frac{\text{d}u}{\text{d}t} = f(u)` in the interval
@@ -236,14 +239,13 @@ class Community(Module):
         Returns
         -------
         None
-
-        '''
+        """
 
         # Get state values
-        a_vec = self.population_phase.GetValue('n0', time)
-        b_vec = self.population_phase.GetValue('f0g', time)
+        a_val = self.population_phase.get_value('n0', time)
+        b_vec = self.population_phase.get_value('f0g', time)
 
-        u_0 = np.concatenate((a_vec, b_vec))
+        u_0 = np.concatenate((np.array([a_val]), b_vec))
 
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
@@ -261,11 +263,11 @@ class Community(Module):
         time += self.time_step
 
         # Update state variables
-        values = self.population_phase.GetRow() # values existing values
-        self.population_phase.AddRow(time, values) # copy on new time for convenience
+        values = self.population_phase.get_row() # values existing values
+        self.population_phase.add_row(time, values) # copy on new time for convenience
 
-        self.population_phase.SetValue('n0', u_vec[:1], time) # insert new values
-        self.population_phase.SetValue('f0g', u_vec[1:], time) # insert new values
+        self.population_phase.set_value('n0', u_vec[:1], time) # insert new values
+        self.population_phase.set_value('f0g', u_vec[1:], time) # insert new values
 
         return time
 
@@ -328,8 +330,8 @@ class Community(Module):
 
     def __compute_outflow_rates(self, time, name):
 
-        n0 = self.population_phase.GetValue('n0', time)
-        f0g = self.population_phase.GetValue('f0g', time)
+        n0 = self.population_phase.get_value('n0', time)
+        f0g = self.population_phase.get_value('f0g', time)
 
         if name == 'arrested':
 

@@ -109,10 +109,10 @@ class Network:
             Information on the directionality of the information flow. This is for
             graph visualization purposes only. The default value will use the order
             in the argument list to define the direction. Default: None. If set
-            to `bidiretional`, will create double edges with headed arrow in the graph figure.
-            'undirectional' will create plain edge lines.
-            'directional' will create edges with the arrow pointing in one direction dictated by the
-            edge ordering.
+            to `bidiretional`, will create an edge with arrows on both ends in the graph figure.
+            if set to 'undirectional' will create a plain edge lines. If set to 'directional' will
+            create edges with the arrow pointing in one direction dictated by the edge ordering.
+            If left as the default, None, a undirected edge will be drawn which means bidirectionality.
         """
 
         if info:
@@ -140,11 +140,12 @@ class Network:
             idx_a = self.modules.index(module_a)
             idx_b = self.modules.index(module_b)
 
-            if (str(idx_a), str(idx_b)) not in self.gv_edges:
-                self.gv_edges.append((str(idx_a), str(idx_b)))
+            if (str(idx_a), str(idx_b), info) not in self.gv_edges:
+                self.gv_edges.append((str(idx_a), str(idx_b), info))
 
-                if self.gv_info == 'bidirectional' and (str(idx_b), str(idx_a)) not in self.gv_edges:
-                    self.gv_edges.append((str(idx_b), str(idx_a)))
+                # Double edges for bidiectional: deprecated
+                #if self.gv_info == 'bidirectional' and (str(idx_b), str(idx_a)) not in self.gv_edges:
+                #    self.gv_edges.append((str(idx_b), str(idx_a)))
 
         elif isinstance(module_port_a, list) and isinstance(module_port_b, list):
 
@@ -165,10 +166,11 @@ class Network:
             idx_a = self.modules.index(module_a)
             idx_b = self.modules.index(module_b)
 
-            self.gv_edges.append((str(idx_a), str(idx_b)))
+            self.gv_edges.append((str(idx_a), str(idx_b), info))
 
-            if self.gv_info == 'bidirectional':
-                self.gv_edges.append((str(idx_b), str(idx_a)))
+            # Double edges for bidirectional: deprecated
+            #if self.gv_info == 'bidirectional':
+            #    self.gv_edges.append((str(idx_b), str(idx_a)))
 
             if isinstance(module_port_a[1], str):
                 port_a = module_a.get_port(module_port_a[1])
@@ -403,25 +405,31 @@ class Network:
             node_attr = {'shape':node_shape, 'style':'filled'}
 
         if self.gv_info == 'undirectional':
-            graph = Graph(name=self.name, comment='Network::graphviz', format='png',
+            graph = Graph(name=self.name, comment='Network::draw:graphviz-graph', format='png',
                         graph_attr=graph_attr, node_attr=node_attr, engine=engine)
         else:
-            graph = Digraph(name=self.name, comment='Network::graphviz', format='png',
+            graph = Digraph(name=self.name, comment='Network::draw:graphviz-digraph', format='png',
                           graph_attr=graph_attr, node_attr=node_attr, engine=engine)
 
         if lr:
-            graph.attr(rankdir="LR")
+            graph.attr(rankdir='LR')
 
         if size:
             graph.attr(size=size)
 
         #graph.attr('node', shape=node_shape)
+        #graph.attr('edge', dir='none')
 
+        # Create node ids and labels
         for idx, mod in enumerate(self.modules):
             graph.node(str(idx), mod.name)
 
+        # Create edges dir= none, both, right, left
         for edg in self.gv_edges:
-            graph.edge(edg[0], edg[1])
+            if edg[2] == 'bidirectional':
+                graph.edge(edg[0], edg[1], dir='both')
+            else:
+                graph.edge(edg[0], edg[1])
 
         graph.render()
 

@@ -19,17 +19,16 @@ from cortix.support.species import Species as Specie
 from cortix.support.quantity import Quantity
 
 class Vortex(Module):
-    '''
-    Vortex module used to model fluid flow using Cortix.
+    """Vortex module used to model fluid flow using Cortix.
 
     Notes
     -----
     Any `port` name and any number of ports are allowed.
 
-    '''
+    """
 
     def __init__(self, log_filename_stem='cortix'):
-        '''
+        """
         Attributes
         ----------
         initial_time: float
@@ -39,7 +38,7 @@ class Vortex(Module):
             Two-element tuple, `(bool,float)`, `True` will print to standard
             output.
 
-        '''
+        """
 
         super().__init__()
 

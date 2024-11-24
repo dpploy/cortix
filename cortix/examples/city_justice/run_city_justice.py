@@ -32,7 +32,6 @@ command line as
 To profile this run do:
 
      python -m cProfile -s time run_city_justice.py > lixo
-
 """
 
 import scipy.constants as unit
@@ -82,7 +81,7 @@ def main():
     city.network.module(community)
     community.end_time = end_time
     community.time_step = time_step
-    community.show_time = (True, 30*unit.day)
+    community.show_time = (True, 1*unit.year)
     community.save = True
 
     prison = Prison(n_groups=n_groups, pool_size=0.0)
@@ -121,24 +120,25 @@ def main():
     probation.time_step = time_step
     probation.save = True
 
-    city.network.connect( prison, parole, 'bidirectional' )
-    city.network.connect( adjudication, prison )
-    city.network.connect( jail, prison )
-    city.network.connect( adjudication, jail )
-    city.network.connect( arrested, jail )
-    city.network.connect( arrested, adjudication )
-    city.network.connect( arrested, probation )
-    city.network.connect( probation, jail )
-    city.network.connect( adjudication, probation )
+    city.network.connect(prison, parole, 'bidirectional')
+    city.network.connect(adjudication, prison, 'directional')
+    city.network.connect(jail, prison, 'directional')
+    city.network.connect(adjudication, jail, 'directional')
+    city.network.connect(arrested, jail, 'directional')
+    city.network.connect(arrested, adjudication, 'directional')
+    city.network.connect(arrested, probation, 'directional')
+    city.network.connect(probation, jail, 'directional')
+    city.network.connect(adjudication, probation, 'directional')
 
-    city.network.connect( arrested, community, 'bidirectional' )
-    city.network.connect( jail, community )
-    city.network.connect( probation, community )
-    city.network.connect( adjudication, community )
-    city.network.connect( prison, community )
-    city.network.connect( parole, community )
+    city.network.connect(arrested, community, 'bidirectional')
+    city.network.connect(jail, community, 'directional')
+    city.network.connect(probation, community, 'directional')
+    city.network.connect(adjudication, community, 'directional')
+    city.network.connect(prison, community, 'directional')
+    city.network.connect(parole, community, 'directional')
 
     city.network.draw()
+    #city.network.draw(engine='dot')
 
     city.run()
 
@@ -152,11 +152,11 @@ def main():
             population_phase = module.population_phase
             (fxg_quant, time_unit) = population_phase.get_quantity_history(quant_name)
 
-            fxg_quant.plot( x_scaling=1/unit.year, x_label='Time [y]',
-                    y_label=fxg_quant.latex_name+' ['+fxg_quant.unit+']')
+            fxg_quant.plot(x_scaling=1/unit.year, x_label='Time [y]',
+                           y_label=fxg_quant.latex_name+' ['+fxg_quant.unit+']')
 
             # Number of parameters in the prison model
-            n_params = (len(population_phase.GetActors())-1)*n_groups
+            n_params = (len(population_phase.actors)-1)*n_groups
             return n_params
 
         quant_names = {'Prison':'npg','Parole':'feg','Adjudication':'fag',
