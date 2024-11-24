@@ -8,7 +8,7 @@ import scipy.constants as unit
 from scipy.integrate import odeint
 
 from cortix import Module
-from cortix import Phase
+from cortix.support.phase_new import PhaseNew as Phase
 from cortix import Quantity
 
 class Probation(Module):
@@ -93,11 +93,16 @@ class Probation(Module):
         self.population_phase = Phase(self.initial_time, time_unit='s',
                 quantities=quantities)
 
-        self.population_phase.SetValue('fbg', fbg_0, self.initial_time)
+        self.population_phase.set_value('fbg', fbg_0, self.initial_time)
 
         return
 
     def run(self, *args):
+
+        # Some logic for logging time stamps
+        # Leave this here: rebuild logger
+        logger_name = args[0][0].name
+        self.rebuild_logger(logger_name)
 
         self.__zero_ode_parameters()
 
@@ -186,7 +191,7 @@ class Probation(Module):
 
         '''
 
-        u_vec_0 = self.population_phase.GetValue('fbg', time)
+        u_vec_0 = self.population_phase.get_value('fbg', time)
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
         (u_vec_hist, info_dict) = odeint(self.__rhs_fn,
@@ -198,20 +203,20 @@ class Probation(Module):
         assert info_dict['message'] =='Integration successful.', info_dict['message']
 
         u_vec = u_vec_hist[1,:]  # solution vector at final time step
-        values = self.population_phase.GetRow(time) # values at previous time
+        values = self.population_phase.get_row(time) # values at previous time
 
         time += self.time_step
 
-        self.population_phase.AddRow(time, values)
+        self.population_phase.add_row(time, values)
 
         # Update current values
-        self.population_phase.SetValue('fbg', u_vec, time)
+        self.population_phase.set_value('fbg', u_vec, time)
 
         return time
 
     def __compute_outflow_rates(self, time, name):
 
-        fbg = self.population_phase.GetValue('fbg',time)
+        fbg = self.population_phase.get_value('fbg',time)
 
         assert np.all(fbg>=0.0), 'values: %r'%fbg
 

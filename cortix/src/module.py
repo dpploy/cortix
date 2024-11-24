@@ -151,7 +151,8 @@ class Module:
         if port is None:
             if self.port_names_expected:
                 assert name in self.port_names_expected,\
-                        'port name: {}, not expected by module: {}'.format(name, self)
+                        'port name: {}, not expected by module: {}, port name expected: {}'.format(name,
+                                                                    self.name, self.port_names_expected)
             port = Port(name, self.use_mpi)
             self.ports.append(port)
 

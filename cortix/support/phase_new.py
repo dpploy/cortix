@@ -53,7 +53,7 @@ from cortix.support.quantity import Quantity
 
 class PhaseNew:
     """ Phase `history` container.
-    A `Phase` consists of `Species` and `Quantities` varying with time. This container is meant to 
+    A `Phase` consists of `Species` and `Quantities` varying with time. This container is meant to
     reproduce the basic idea of a material phase.
     """
 
@@ -83,7 +83,10 @@ class PhaseNew:
         if time_stamp is None:
             time_stamp = 0.0 # default type is float
         else:
-            assert isinstance(time_stamp, float)
+            if type(time_stamp) == int:
+                time_stamp = float(time_stamp)
+            assert isinstance(time_stamp, float), 'time_stamp=%r, type(time_stamp)=%r'%(time_stamp,
+                                                                                        type(time_stamp))
             self.__time_stamp = time_stamp
 
         if time_unit is None:
@@ -109,6 +112,7 @@ class PhaseNew:
             self.__species = deepcopy(species)
         else:
             self.__species = None
+
         # A new object held by a Phase() object
         if quantities is not None:
             self.__quantities = deepcopy(quantities)
@@ -124,7 +128,9 @@ class PhaseNew:
         if quantities is not None:
             for quant in self.__quantities:
                 names.append(quant.name)
-                quant.value = 0.0    # clear these values
+                # quant can be a numpy array for example...
+                # rethink this...
+                #quant.value = 0.0    # clear these values
                                      # todo: eliminate them from Quantity in the future
 
         # Table data phase without data type assigned; this is left to the user
@@ -136,6 +142,7 @@ class PhaseNew:
             for spc in species:
                 self.__df.loc[time_stamp, spc.name] = 0.0
 
+        # The value of the quantity could be any type
         if quantities is not None:
             for quant in quantities:
                 self.__df.loc[time_stamp, quant.name] = quant.value
@@ -212,14 +219,13 @@ class PhaseNew:
     quantities = property(__get_quantities, None, None, None)
 
     def __get_actors(self):
-        '''
-        Returns a list of names of all the actors in the phase history.
+        """Returns a list of names of all actors in the phase history.
 
         Returns
         -------
         list(self.__df.colums): list
 
-        '''
+        """
 
         return list(self.__df.columns)  # return all names in order
     actors = property(__get_actors, None, None, None)
@@ -291,8 +297,7 @@ class PhaseNew:
                 return
 
     def get_quantity(self, name):
-        '''
-        Get the quantity with `name`.
+        """Get the quantity with `name`.
 
         Parameters
         ----------
@@ -301,10 +306,9 @@ class PhaseNew:
         Returns
         -------
         Quantity or None
-        '''
+        """
 
-        assert name in self.__df.columns, 'name %r not in %r'%\
-                (name,self.__df.columns)
+        assert name in self.__df.columns, 'name %r not in %r'%(name,self.__df.columns)
 
         if self.__quantities:
             for quant in self.__quantities:
@@ -313,10 +317,10 @@ class PhaseNew:
         return None
 
     def get_quantity_value(self, name, try_time_stamp=None):
-        '''
-        Get the quantity value with given `name` at a point in time closest to
-        `try_time_stamp` up to a tolerance. If no time stamp is passed,
-        the value at the last time stamp is returned.
+        """Get the quantity value with given `name` at time closest to `try_time_stamp`.
+
+        This is up to a time tolerance. If no time stamp is passed, the value at the last time stamp is
+        returned.
 
         Parameters
         ----------
@@ -328,18 +332,18 @@ class PhaseNew:
         Returns
         -------
         quant.value: type of Quantity.value
-        '''
+        """
 
-        assert name in self.__df.columns, 'name %r not in %r'%\
-                (name,self.__df.columns)
+        assert name in self.__df.columns, 'name %r not in %r'%(name,self.__df.columns)
 
         time_stamp = self.__get_time_stamp(try_time_stamp)
 
         if self.__quantities:
             for quant in self.__quantities:
                 if quant.name == name:
+                    # Update value in quantity with history value
                     quant.value = self.__df.loc[time_stamp, name] # labels' access mode
-                    return quant  # return quantity syncronized with the phase
+                    return quant.value  # return quantity value syncronized with the phase
 
     def get_quantity_history(self, name):
         '''
@@ -601,21 +605,23 @@ class PhaseNew:
 
         """
         assert isinstance(actor, str)
-        assert actor in self.__df.columns, 'actor %r not in %r'% \
-                   (actor,self.__df.columns)
+        assert actor in self.__df.columns, 'actor %r not in %r'%(actor,self.__df.columns)
 
         if try_time_stamp is not None:
            assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float)
 
-        time_stamp = self.__get_time_stamp( try_time_stamp )
+        time_stamp = self.__get_time_stamp(try_time_stamp)
         assert time_stamp is not None, 'missing try_time_stamp: %r'%(try_time_stamp)
 
         return self.__df.loc[time_stamp, actor]
 
     def set_value(self, actor, value, try_time_stamp=None):
-        '''
+        """Set value of actor in the data frame at a give time stamp.
 
-        '''
+        Note
+        ----
+        The value in the original species or quantity container is not modified.
+        """
         assert isinstance(actor, str)
         assert actor in self.__df.columns
 
@@ -627,7 +633,7 @@ class PhaseNew:
 
         # Note: user value could have a different type than other column values.
         # If there is a type change, this will not be checked; user has been advised.
-        self.__df.loc[time_stamp, actor] = value
+        self.__df.loc[time_stamp, actor] = deepcopy(value)
 
         return
 
@@ -673,7 +679,7 @@ class PhaseNew:
             '\n\t *species*: %s;' + \
             '\n' + \
             '\n\t *history* # time_stamps=%s;' + \
-            '\n\t *history end* @%s;' + \
+            '\n\t *history end* @ %s;' + \
             '\n%s'
         return s % (self.name,
                 self.__time_unit,
@@ -681,7 +687,7 @@ class PhaseNew:
                 self.__species,
                 len(self.__df.index),
                 self.__df.index[-1],
-                self.__df.loc[self.__df.index[-1], :] )
+                self.__df.loc[self.__df.index[-1], :])
 
     def __repr__(self):
         s = '\n\t **Phase()**: name=%s;' + \
@@ -692,7 +698,7 @@ class PhaseNew:
             '\n\t *species*: %s;' + \
             '\n' + \
             '\n\t *history* # time_stamps=%s;' + \
-            '\n\t *history end* @%s;' + \
+            '\n\t *history end* @ %s;' + \
             '\n%s'
         return s % (self.name,
                 self.__time_unit,
@@ -700,7 +706,7 @@ class PhaseNew:
                 self.__species,
                 len(self.__df.index),
                 self.__df.index[-1],
-                self.__df.loc[self.__df.index[-1], :] )
+                self.__df.loc[self.__df.index[-1], :])
 
     def __get_time_stamp(self, try_time_stamp=None):
         """ Helper method for finding the closest time stamp to `try_time_stamp` in the phase history.

@@ -92,8 +92,7 @@ def main():
 
         # Network port connectivity (connect modules through their ports)
         swirl.network.connect( [droplet,'external-flow'],
-                               [vortex,vortex.get_port('fluid-flow:{}'.format(i))],
-                               'bidirectional' )
+                               [vortex,vortex.get_port('fluid-flow:{}'.format(i))])
 
     if swirl.use_multiprocessing or swirl.rank == 0:
        swirl.network.draw(engine='neato')

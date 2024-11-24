@@ -8,7 +8,7 @@ import scipy.constants as unit
 from scipy.integrate import odeint
 
 from cortix import Module
-from cortix import Phase
+from cortix.support.phase_new import PhaseNew as Phase
 from cortix import Quantity
 
 class Adjudication(Module):
@@ -108,7 +108,7 @@ class Adjudication(Module):
         self.population_phase = Phase(self.initial_time, time_unit='s',
                 quantities=quantities)
 
-        self.population_phase.SetValue('fag', fag_0, self.initial_time)
+        self.population_phase.set_value('fag', fag_0, self.initial_time)
 
         # Initialize inflows to zero
         self.ode_params['arrested-inflow-rates'] = np.zeros(self.n_groups)
@@ -116,6 +116,11 @@ class Adjudication(Module):
         return
 
     def run(self, *args):
+
+        # Some logic for logging time stamps
+        # Leave this here: rebuild logger
+        logger_name = args[0][0].name
+        self.rebuild_logger(logger_name)
 
         self.__zero_ode_parameters()
 
@@ -227,7 +232,7 @@ class Adjudication(Module):
 
         '''
 
-        u_vec_0 = self.population_phase.GetValue('fag', time)
+        u_vec_0 = self.population_phase.get_value('fag', time)
         t_interval_sec = np.linspace(0.0, self.time_step, num=2)
 
         (u_vec_hist, info_dict) = odeint(self.__rhs_fn,
@@ -239,20 +244,20 @@ class Adjudication(Module):
         assert info_dict['message'] =='Integration successful.', info_dict['message']
 
         u_vec = u_vec_hist[1,:]  # solution vector at final time step
-        values = self.population_phase.GetRow(time) # values at previous time
+        values = self.population_phase.get_row(time) # values at previous time
 
         time += self.time_step
 
-        self.population_phase.AddRow(time, values)
+        self.population_phase.add_row(time, values)
 
         # Update current values
-        self.population_phase.SetValue('fag', u_vec, time)
+        self.population_phase.set_value('fag', u_vec, time)
 
         return time
 
     def __compute_outflow_rates(self, time, name):
 
-        fag = self.population_phase.GetValue('fag',time)
+        fag = self.population_phase.get_value('fag',time)
 
         assert np.all(fag>=0.0), 'values: %r'%fag
 

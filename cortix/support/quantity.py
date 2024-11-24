@@ -40,15 +40,12 @@ class Quantity:
         assert isinstance(latex_name, str), 'not a string.'
         self.__latex_name = latex_name
 
-        self.__value = value
-
         assert isinstance(name, str), 'not a string.'
         self.__unit = unit
 
         self.__name = name
         self.__value = value
         self.__unit = unit
-
         self.__info = info # info text such as technical name or other properties info
 
         return
@@ -75,24 +72,22 @@ class Quantity:
     name = property(get_name, SetName, None, None)
 
     def SetValue(self, v):
-        '''
-        Sets the numerical value of the quantity to v.
+        """Sets the numerical value of the quantity to v.
 
         Parameters
         ----------
         v: float
 
-        '''
+        """
         self.__value = v
     def GetValue(self):
-        '''
-        Gets the numerical value of the quantity.
+        """Gets the numerical value of the quantity.
 
         Returns
         -------
         value: any type
 
-        '''
+        """
         return self.__value
     value = property(GetValue, SetValue, None, None)
 
@@ -343,27 +338,31 @@ class Quantity:
         return
 
     def __str__(self):
-        '''
-        Used to print the data stored by the quantity class. Will print out
-        name, formal name, the value of the quantity and its unit.
+        """Used to print the data stored by the quantity class.
+
+        Will print out name, formal name, the value of the quantity its unit, and type.
 
         Returns
         -------
         s: str
-        '''
+        """
 
-        s = '\n\t Quantity(): \n\t name=%s; formal name=%s; latex name=%s; info=%s; value=%s[%s]'
-        return s % (self.name, self.formal_name, self.latex_name, self.info, self.value, self.unit)
+        s = '\n\t Quantity(): \n\t name=%s; formal name=%s; latex name=%s; info=%s; value=%s[%s];'+\
+            ' type(value)=%s'
+        return s % (self.name, self.formal_name, self.latex_name, self.info, self.value, self.unit,
+                    type(self.value))
 
     def __repr__(self):
-        '''
-        Used to print the data stored by the quantity class. Will print out
-        name, formal name, the value of the quantity and its unit.
+        """Used to print the data stored by the quantity class.
+
+        Will print out name, formal name, the value of the quantity and its unit.
 
         Returns
         -------
         s: str
-        '''
+        """
 
-        s = '\n\t Quantity(): \n\t name=%s; formal name=%s; latex name=%s; info=%s; value=%s[%s]'
-        return s % (self.name, self.formal_name, self.latex_name, self.info, self.value, self.unit)
+        s = '\n\t Quantity(): \n\t name=%s; formal name=%s; latex name=%s; info=%s; value=%s[%s];'+\
+            ' type(value)=%s'
+        return s % (self.name, self.formal_name, self.latex_name, self.info, self.value, self.unit,
+                    type(self.value))
