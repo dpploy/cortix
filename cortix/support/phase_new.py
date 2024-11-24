@@ -915,17 +915,18 @@ class PhaseNew:
                 var_unit = quantity.unit
                 info_str = quantity.info
 
-            # sanity check
+            # Sanity check assumes all species come before all quantities in the data frame.
             if species:
                 if i_var <= len(self.__species):
                     assert self.__species[i_var].name == self.__df.columns[i_var]
             if quantity and species:
                 if i_var > len(self.__species):
                     assert self.__quantities[i_var].name == self.__df.columns[i_var]
-            elif quantity:
-                if i_var > len(self.__species):
-                    assert self.__quantities[i_var].name == self.__df.columns[i_var], \
-                       'ivar=%r; __quant[i]=%r; __df.col[i]=%r; __quant=%r; __df.col=%r'%(i_var, self.__quantities[i_var].name, self.__df.columns[i_var], self.__quantities, self.__df.columns)
+            elif quantity: # only quantities exist and species is empty
+                assert self.__quantities[i_var].name == self.__df.columns[i_var], \
+                   'ivar=%r; __quant[i]=%r; __df.col[i]=%r; __quant=%r; __df.col=%r'%(i_var,
+                       self.__quantities[i_var].name, self.__df.columns[i_var], self.__quantities,
+                       self.__df.columns)
 
             '''
             if varUnit == 'gram':

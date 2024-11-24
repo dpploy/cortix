@@ -50,6 +50,7 @@ class Network:
 
         self.use_mpi = None
         self.use_multiprocessing = None
+        self.is_multiproc_start_method_set = False
 
         self.rank = None
         self.size = None
@@ -257,7 +258,9 @@ class Network:
         else:
 
             # Parallel run all modules in Python multiprocessing
-            multiproc.set_start_method('spawn') # fresh interpreter for child processes
+            if not self.is_multiproc_start_method_set:
+                multiproc.set_start_method('spawn') # fresh interpreter for child processes
+                self.is_multiproc_start_method_set = True
             processes = list()
 
             for mod in self.modules:
