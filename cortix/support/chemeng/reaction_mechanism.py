@@ -143,6 +143,8 @@ class ReactionMechanism:
         --------
        """
 
+        self.file_name = file_name
+
         assert file_name is not None or mechanism is not None
         assert isinstance(header, str)
         self.header = header
@@ -3152,31 +3154,31 @@ class ReactionMechanism:
     power_law_exponents = property(__get_power_law_exponents, __set_power_law_exponents, None, None)
 
     def full_rank_sub_mechanisms(self, n_sub_mec = 1000):
-        '''Construct sub-mechanisms with full-rank stoichiometric matrix.
+        """Construct sub-mechanisms with full-rank stoichiometric matrix.
 
         Returns
         -------
         sub_mechanisms: list([ReactionMechanism, gidxs, score])
 
-        '''
+        """
 
-        s_rank=np.linalg.matrix_rank(self.stoic_mtrx)
+        s_rank = np.linalg.matrix_rank(self.stoic_mtrx)
 
         if s_rank == min(self.stoic_mtrx.shape):
             return self
 
         m_reactions=self.stoic_mtrx.shape[0]
 
-        n_mechanisms=math.factorial(m_reactions) /\
+        n_mechanisms = math.factorial(m_reactions) /\
                        math.factorial(m_reactions - s_rank) /\
                        math.factorial(s_rank)
         # print('# of all possible sub_mechanisms = %i'%n_mechanisms)
 
-        tmp=combinations(range(m_reactions), s_rank)
-        reaction_sets=[i for i in tmp]
+        tmp = combinations(range(m_reactions), s_rank)
+        reaction_sets = [i for i in tmp]
         random.shuffle(reaction_sets)  # this may be time consuming
 
-        sub_mechanisms=list()  # list of list
+        sub_mechanisms = list()  # list of list
 
         for idxs in reaction_sets:
 
@@ -3186,7 +3188,7 @@ class ReactionMechanism:
 
             if rank == s_rank:
 
-                mechanism=list()
+                mechanism = list()
                 for idx in idxs:
                     mechanism.append(self.__original_mechanism[idx])
 
@@ -3202,7 +3204,7 @@ class ReactionMechanism:
         # Count number of times a global reaction appear in a sub-mechanism
         reactions_hits=np.zeros(m_reactions)
         for sm in sub_mechanisms:
-            gidxs=list(sm[1])
+            gidxs = list(sm[1])
             reactions_hits[gidxs] += 1
 
         # Score the global reactions
@@ -3213,7 +3215,7 @@ class ReactionMechanism:
                 score += reactions_hits[gid]
             sub_mech_reactions_score.append(score)
 
-        sub_mech_reactions_score=np.array(sub_mech_reactions_score)
+        sub_mech_reactions_score = np.array(sub_mech_reactions_score)
         sub_mech_reactions_score /= sub_mech_reactions_score.max()
         sub_mech_reactions_score *= 10.0
 
@@ -3232,20 +3234,28 @@ class ReactionMechanism:
         return sub_mechanisms
 
     def print_data(self):
-        '''Helper to print the reaction data line by line.
-        '''
+        """Helper to print the reaction data line by line.
+
+        Examples
+        --------
+        rxn_mech.print_data()
+        """
 
         for idx, data in enumerate(self.data):
             print(self.reactions[idx])
             print(data,'\n')
 
     def print_species(self):
-        '''Helper to print species data line by line.
-        '''
+        """Helper to print species data line by line.
+
+        Examples
+        --------
+        rxn_mech.print_species()
+        """
 
         for spc in self.species:
             print(spc)
-            print('')
+            #print('')
 
     def md_print(self, group='all'):
         """Markdown cell printout of LaTex reactions and species.
@@ -3374,6 +3384,7 @@ class ReactionMechanism:
                     self.species_names,
                     self.species,
                     str(self.max_mass_balance_residual()))
+
     def __repr__(self):
         s = '\n\t **ReactionMechanism()**:' + \
             '\n\t header: %s;' + \
@@ -3389,9 +3400,21 @@ class ReactionMechanism:
                     self.species,
                     str(self.max_mass_balance_residual()))
 
+    def cat_input(self):
+
+        if self.file_name is not None:
+            assert isinstance(self.file_name, str)
+
+            finput = open(self.file_name, 'rt')
+
+            for line in finput:
+                stripped_line = line.strip()
+                print(stripped_line)
+
+            finput.close()
+
 def print_reaction_sub_mechanisms(sub_mechanisms, mode=None, n_sub_mech=None):
-    '''
-    Nice printout of a scored reaction sub-mechanism list
+    """Nice printout of a scored reaction sub-mechanism list
 
     Once the sub-mechanisms have been computed this function makes a printout.
     Note: This is not a class method; just a helper function to the ReactionMechanism class.
@@ -3411,7 +3434,7 @@ def print_reaction_sub_mechanisms(sub_mechanisms, mode=None, n_sub_mech=None):
     Examples
     --------
 
-    '''
+    """
     assert mode is None or n_sub_mech is None
     assert mode =='top' or mode =='all' or mode==None
     assert isinstance(n_sub_mech, int) or n_sub_mech is None
