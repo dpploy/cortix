@@ -669,6 +669,9 @@ class ReactionMechanism:
         # If k_eq and tau are present, override reaction rate with mass transfer relaxation
         # Complexation case
         # Very careful here...experimental coding
+        # Only implemented for A(a) <-> A(b)
+        # The convention here is that k_eq multiplies the reactant to obtain the product.
+        # A(b)_eq = k_eq * A(a)
         for (idx, rxn_data) in enumerate(self.data):
             alpha_mtrx = alpha_lst[idx]
             beta_mtrx = beta_lst[idx]
@@ -697,22 +700,15 @@ class ReactionMechanism:
 
                 products_molar_cc = spc_molar_cc_vec[products_ids] # must be oredered as in rxn_mech
 
-                complex_former_molar_cc = reactants_molar_cc[-1]
-                complex_molar_cc        = products_molar_cc[0]
-                complex_molar_cc_eq     = k_eq * complex_former_molar_cc
+                a_left_molar_cc  = reactants_molar_cc[-1]
+                a_right_molar_cc = products_molar_cc[0]
+                a_right_molar_cc_eq = k_eq * a_left_molar_cc
 
-                r_vec[idx] = - 1/tau * (complex_molar_cc - complex_molar_cc_eq)
+                #print('k_eq=', k_eq)
+                #print('a_right_molar_cc=', a_right_molar_cc)
+                #print('a_right_molar_cc_eq=', a_right_molar_cc_eq)
 
-        # Phase partition case
-        # don't remember this...working on it...
-        #for (idx, rxn_data) in enumerate(self.data):
-        #    if 'tau' in rxn_data:
-        #        tau = rxn_data['tau']
-        #    if 'k_eq' in rxn_data:
-        #        k_eq = rxn_data['k_eq']
-        #    else:
-        #        k_eq_func = rxn_data['k_eq_func']
-        #        k_eq      = k_eq_func(spc_molar_cc_vec, temperature, self.species)
+                r_vec[idx] = - 1/tau * (a_right_molar_cc - a_right_molar_cc_eq)
 
         return r_vec
 
@@ -3293,6 +3289,26 @@ class ReactionMechanism:
                 print('WARNING: display may not be able to handle more than 25 reactions')
             display(Markdown(string))
 
+    def cat_input(self):
+        """A helper function to print on std output the original rxn mechanism.
+
+        Note
+        ----
+        This is typically used with Jupyter notebooks to avoid the use of `!cat filename` which does
+        not work on Windows.
+        """
+
+        if self.file_name is not None:
+            assert isinstance(self.file_name, str)
+
+            finput = open(self.file_name, 'rt')
+
+            for line in finput:
+                stripped_line = line.strip()
+                print(stripped_line)
+
+            finput.close()
+
     def __latex(self):
         """Internal helper for LaTeX typesetting.
 
@@ -3400,18 +3416,7 @@ class ReactionMechanism:
                     self.species,
                     str(self.max_mass_balance_residual()))
 
-    def cat_input(self):
-
-        if self.file_name is not None:
-            assert isinstance(self.file_name, str)
-
-            finput = open(self.file_name, 'rt')
-
-            for line in finput:
-                stripped_line = line.strip()
-                print(stripped_line)
-
-            finput.close()
+# Non-member methods
 
 def print_reaction_sub_mechanisms(sub_mechanisms, mode=None, n_sub_mech=None):
     """Nice printout of a scored reaction sub-mechanism list
