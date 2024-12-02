@@ -903,6 +903,7 @@ class PhaseNew:
             axId += 1
 
             species = self.get_species(col_name)
+
             if species:
                 #latex_name = species.latex_name  # not working
                 latex_name = species.name
@@ -910,6 +911,7 @@ class PhaseNew:
                 info_str = species.info
 
             quantity = self.get_quantity(col_name)
+
             if quantity:
                 latex_name = quantity.latex_name
                 var_unit = quantity.unit
@@ -923,8 +925,9 @@ class PhaseNew:
                 if i_var > len(self.__species):
                     assert self.__quantities[i_var].name == self.__df.columns[i_var]
             elif quantity: # only quantities exist and species is empty
-                assert self.__quantities[i_var].name == self.__df.columns[i_var], \
-                   'ivar=%r; __quant[i]=%r; __df.col[i]=%r; __quant=%r; __df.col=%r'%(i_var,
+                if i_var > len(self.__species):
+                    assert self.__quantities[i_var].name == self.__df.columns[i_var], \
+                       'ivar=%r; __quant[i]=%r; __df.col[i]=%r; __quant=%r; __df.col=%r'%(i_var,
                        self.__quantities[i_var].name, self.__df.columns[i_var], self.__quantities,
                        self.__df.columns)
 
