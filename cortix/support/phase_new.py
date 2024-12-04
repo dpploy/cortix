@@ -623,7 +623,7 @@ class PhaseNew:
         The value in the original species or quantity container is not modified.
         """
         assert isinstance(actor, str)
-        assert actor in self.__df.columns
+        assert actor in self.__df.columns, 'actor = %r not in data frame'%actor
 
         if try_time_stamp is not None:
             assert isinstance(try_time_stamp, int) or isinstance(try_time_stamp, float)

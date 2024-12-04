@@ -667,11 +667,13 @@ class ReactionMechanism:
             r_vec[idx] -= kb_vec[idx] * np.prod(products_molar_cc**beta_mtrx[1, :])
 
         # If k_eq and tau are present, override reaction rate with mass transfer relaxation
-        # Complexation case
         # Very careful here...experimental coding
-        # Only implemented for A(a) <-> A(b)
+        # Implemented for A(a) <-> A(b)
         # The convention here is that k_eq multiplies the reactant to obtain the product.
         # A(b)_eq = k_eq * A(a)
+        # Implemented for x A(a) + y B(a) <-> Ax*By(b)
+        # The convention here is that k_eq multiplies the reactant to obtain the product.
+        # AxBy(b)_eq = k_eq * A(a)
         for (idx, rxn_data) in enumerate(self.data):
             alpha_mtrx = alpha_lst[idx]
             beta_mtrx = beta_lst[idx]
@@ -687,21 +689,17 @@ class ReactionMechanism:
                     assert False, 'rxn_data = %r'%rxn_data
 
                 reactants_ids = alpha_mtrx[0, :].astype(int)
-                assert len(reactants_ids) == 1
-                #if len(reactants_ids) != 1:
-                #    continue
+                assert len(reactants_ids) <= 2
 
                 reactants_molar_cc = spc_molar_cc_vec[reactants_ids] # must be ordered as in rxn_mech
 
                 products_ids = beta_mtrx[0, :].astype(int)
                 assert len(products_ids) == 1
-                #if len(reactants_ids) != 1:
-                #    continue
 
                 products_molar_cc = spc_molar_cc_vec[products_ids] # must be oredered as in rxn_mech
 
-                a_left_molar_cc  = reactants_molar_cc[-1]
-                a_right_molar_cc = products_molar_cc[0]
+                a_left_molar_cc  = reactants_molar_cc[0] # first reactant
+                a_right_molar_cc = products_molar_cc[0]  # first product
                 a_right_molar_cc_eq = k_eq * a_left_molar_cc
 
                 #print('k_eq=', k_eq)
