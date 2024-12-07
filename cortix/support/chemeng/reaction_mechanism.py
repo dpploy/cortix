@@ -63,7 +63,7 @@ class ReactionMechanism:
     """
 
     def __init__(self, header='no-header', file_name=None, mechanism=None, order_species=True,
-                 reparam=False, bounds=None):
+                 reparam=False, bounds=None, args_dict=None):
         """Module class constructor.
 
         Build data structures for a reaction mechanism. Namely, species list,
@@ -171,7 +171,6 @@ class ReactionMechanism:
 
         self.reparam = reparam
 
-
         try:
             self.kf_bnds = bounds['kf']
         except:
@@ -191,6 +190,13 @@ class ReactionMechanism:
             self.beta_bnds = bounds['beta']
         except:
             self.beta_bnds = None
+
+        if args_dict is not None:
+            assert isinstance(args_dict, dict)
+        else:
+            args_dict = dict()
+
+        self.args_dict = args_dict
 
         self.reactions = list()
         self.data = list()
@@ -264,7 +270,7 @@ class ReactionMechanism:
             if 'k_eq' in tmp_dict:
                 assert 'tau' in tmp_dict
             if 'tau' in tmp_dict and 'k_eq' not in tmp_dict:
-                print('WARNING: user must provide a k_eq_func(rxn_mech, temperature, spc_molar_cc) for %s'%(data[0]))
+                print('WARNING: user must implement a k_eq_func(rxn_mech, temperature, spc_molar_cc, arg_dict=None) for %s'%(data[0]))
 
             self.data.append(tmp_dict)
 
@@ -684,29 +690,29 @@ class ReactionMechanism:
                     k_eq = rxn_data['k_eq']
                 elif 'k_eq_func' in rxn_data:
                     k_eq_func = rxn_data['k_eq_func']
-                    k_eq      = k_eq_func(self, temperature, spc_molar_cc_vec)
+                    k_eq      = k_eq_func(self, temperature, spc_molar_cc_vec, self.args_dict)
                 else:
                     assert False, 'rxn_data = %r'%rxn_data
 
                 reactants_ids = alpha_mtrx[0, :].astype(int)
-                assert len(reactants_ids) <= 2
 
                 reactants_molar_cc = spc_molar_cc_vec[reactants_ids] # must be ordered as in rxn_mech
 
                 products_ids = beta_mtrx[0, :].astype(int)
-                assert len(products_ids) == 1
 
                 products_molar_cc = spc_molar_cc_vec[products_ids] # must be oredered as in rxn_mech
 
-                a_left_molar_cc  = reactants_molar_cc[0] # first reactant
-                a_right_molar_cc = products_molar_cc[0]  # first product
-                a_right_molar_cc_eq = k_eq * a_left_molar_cc
+                reactant_molar_cc  = reactants_molar_cc[0] # first reactant
+                product_molar_cc = products_molar_cc[0]  # first product
+                product_eq_molar_cc = k_eq * reactant_molar_cc
 
+                #print('')
                 #print('k_eq=', k_eq)
-                #print('a_right_molar_cc=', a_right_molar_cc)
-                #print('a_right_molar_cc_eq=', a_right_molar_cc_eq)
+                #print('reactant_molar_cc=', reactant_molar_cc)
+                #print('product_molar_cc=', product_molar_cc)
+                #print('product_eq_molar_cc=', product_eq_molar_cc)
 
-                r_vec[idx] = - 1/tau * (a_right_molar_cc - a_right_molar_cc_eq)
+                r_vec[idx] = - 1/tau * (product_molar_cc - product_eq_molar_cc)
 
         return r_vec
 
