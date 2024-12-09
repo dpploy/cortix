@@ -2966,7 +2966,7 @@ class ReactionMechanism:
     alpha = property(__get_alpha, __set_alpha, None, None)
 
     def __get_beta(self):
-        '''Utility for packing beta exponents into a list of matrices.
+        """Utility for packing beta exponents into a list of matrices.
 
         The return from this method is a list of compressed unstructured data since each reaction
         typically has a different number of active species, hence different number of associated
@@ -2977,7 +2977,7 @@ class ReactionMechanism:
         Returns
         -------
         beta_lst: list(numpy.ndarray)
-        '''
+        """
 
         beta_lst = list()   # list of matrices
 
@@ -3238,6 +3238,7 @@ class ReactionMechanism:
 
         Examples
         --------
+        rxn_mech = ReactionMechanism(file_name='some_mech.txt')
         rxn_mech.print_data()
         """
 
@@ -3245,11 +3246,24 @@ class ReactionMechanism:
             print(self.reactions[idx])
             print(data,'\n')
 
-    def print_species(self):
-        """Helper to print species data line by line.
+    def print_reactions(self):
+        """Helper to print reactions line by line.
 
         Examples
         --------
+        rxn_mech = ReactionMechanism(file_name='some_mech.txt')
+        rxn_mech.print_reactions()
+        """
+
+        for idx, rxn in enumerate(self.reactions):
+            print('R%i '%idx, ': ', self.reactions[idx])
+
+    def print_species(self):
+        """Helper to print the whole species data line by line.
+
+        Examples
+        --------
+        rxn_mech = ReactionMechanism(file_name='some_mech.txt')
         rxn_mech.print_species()
         """
 
@@ -3260,20 +3274,16 @@ class ReactionMechanism:
     def md_print(self, group='all'):
         """Markdown cell printout of LaTex reactions and species.
 
-        Use with Jupyter Notebooks in a code cell.
+        Use with Jupyter Notebooks in a "code" cell.
 
         Parameters
         ----------
         group: str
+            Flag to print groups of quantities as follows:
             'all', 'species', or 'reactions'.
-
-        Returns
-        -------
-        None:
 
         Examples
         --------
-
         rxn_mech = ReactionMechanism(file_name='some_mech.txt')
         rxn_mech.md_print()
         """
@@ -3300,6 +3310,11 @@ class ReactionMechanism:
         ----
         This is typically used with Jupyter notebooks to avoid the use of `!cat filename` which does
         not work on Windows.
+
+        Examples
+        --------
+        rxn_mech = ReactionMechanism(file_name='some_mech.txt')
+        rxn_mech.cat_input()
         """
 
         if self.file_name is not None:
@@ -3317,11 +3332,15 @@ class ReactionMechanism:
         """Internal helper for LaTeX typesetting.
 
         See attributes description and usage with the Python print() function.
-        notebook.
+
+        Returns
+        -------
+        (species_str, rxn_str): (str, str)
+            Tuple with strings containing the species LaTex names one after the other separated by commas,
+            and the reactions string typeset into a LaTex align environment.
 
         Examples
         --------
-
         rxn_mech = ReactionMechanism(file_name='some_mech.txt')
         print(rxn_mech.species_str)
         print(rxn_mech.rxn_str)
