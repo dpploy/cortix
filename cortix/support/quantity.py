@@ -206,6 +206,7 @@ class Quantity:
         plt.close()
 
         if not isinstance(self.__value, pandas.core.series.Series):
+            print('Quantity::plot: not a Pandas type self.__value')
             return
         if len(self.__value) == 1:
             return
