@@ -637,25 +637,29 @@ class PhaseNew:
 
         return
 
-    def write_html(self, fileName):
+    def write_html(self, filename):
         """Convert the `Phase` container into an HTML file.
 
         Parameters
         ----------
-        fileName: str
+        filename: str
 
         """
-        assert isinstance(fileName, str)
+        assert isinstance(filename, str)
+
         tmp = pandas.DataFrame(self.__df)
         column_names = tmp.columns
+
         if self.__species:
             species_names = [species.name for species in self.__species]
         else:
             species_names = list()
+
         if self.__quantities:
             quantity_names = [quantity.name for quantity in self.__quantities]
         else:
             quantity_names = list()
+
         for col in column_names:
             if col in species_names:
                 idx = species_names.index(col)
@@ -664,11 +668,11 @@ class PhaseNew:
             elif col in quantity_names:
                 idx = quantity_names.index(col)
                 quant = self.__quantities[idx]
-                tmp.rename(columns={ col: col + '[' + quant.unit + ']'}, inplace=True)
+                tmp.rename(columns={col: col + '[' + quant.unit + ']'}, inplace=True)
             else:
                 assert False, 'oops fatal.'
 
-        tmp.to_html(fileName)
+        tmp.to_html(filename)
 
     def __str__(self):
         s = '\n\t **Phase()**: name=%s;' + \
