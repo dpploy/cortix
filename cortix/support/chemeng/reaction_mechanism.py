@@ -3293,8 +3293,9 @@ class ReactionMechanism:
         from IPython.display import Markdown, display
 
         if group in ['all', 'species']:
-            tmp = self.latex_species.replace(',',' \\quad ')
-            string = '%i **Species:** \n $%s$'%(len(self.species_names), tmp)
+            tmp = self.latex_species.replace(',', ' \\quad ')
+            tmp = tmp.replace(r'\\', r'\\ ')
+            string = '%i **Species:** \n %s'%(len(self.species_names), tmp)
             display(Markdown(string))
 
         if group in ['all', 'reactions']:
@@ -3350,11 +3351,16 @@ class ReactionMechanism:
         """
 
         # Latex species
-        species_str = str()
-        for spc in self.species[:-1]:
-            species_str += spc.latex_name + ', '
+        species_str = '\\begin{align*} \n &'
+        for idx, spc in enumerate(self.species[:-1]):
+            if idx > 0 and idx%7 == 0: # add a new line after every 8 species
+                species_str += spc.latex_name + ', \\\\ \n '
+                species_str += '& '
+            else:
+                species_str += spc.latex_name + ', '
 
         species_str += self.species[-1].latex_name
+        species_str += '\\end{align*}'
 
         # Latex reactions into align environment
         # No header
