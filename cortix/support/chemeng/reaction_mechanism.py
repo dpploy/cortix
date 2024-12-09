@@ -3329,7 +3329,7 @@ class ReactionMechanism:
 
             finput.close()
 
-    def __latex(self):
+    def __latex(self, n_species_line=8):
         """Internal helper for LaTeX typesetting.
 
         See attributes description and usage with the Python print() function.
@@ -3353,7 +3353,7 @@ class ReactionMechanism:
         # Latex species
         species_str = '\\begin{align*} \n &'
         for idx, spc in enumerate(self.species[:-1]):
-            if idx > 0 and idx%7 == 0: # add a new line after every 8 species
+            if idx > 0 and idx%(n_species_line-1) == 0: # add a new line after every 8 species
                 species_str += spc.latex_name + ', \\\\ \n '
                 species_str += '& '
             else:
