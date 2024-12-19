@@ -808,6 +808,7 @@ class PhaseNew:
 
     def plot(self, actors=None, name='phase-plot-null-name',
              var_unit=None,
+             x_scaling=1,
              legend=None, nrows=2, ncols=2, figsize=[6,5], show=False, dpi=300):
         """Plot assistant for all phase container actors.
 
@@ -963,14 +964,20 @@ class PhaseNew:
                 time_unit = 'min'
 
             x = np.array([i for i in self.__df.index])
+            #x *= x_scaling
 
             if (varScale == 'linear' or varScale == 'linear-linear' or \
                 varScale == 'linear-log') and x.max() >= 60.0:
-                x /= 60.0
-                if time_unit == 'min':
-                    time_unit = 'h'
-                if time_unit == 'second' or time_unit=='s':
-                    time_unit = 'min'
+                if x.max() >= 60.0 * 60.0:
+                    x /= 60*60
+                    if time_unit == 's' or time_unit == 'second':
+                        time_unit = 'h'
+                elif x.max() >= 60.0:
+                    x /= 60.0
+                    if time_unit == 'min':
+                        time_unit = 'h'
+                    if time_unit == 'second' or time_unit=='s':
+                        time_unit = 'min'
 
             y = np.array(self.__df[col_name]) # convert to numpy ndarray
 
