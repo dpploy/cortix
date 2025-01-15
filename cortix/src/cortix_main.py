@@ -24,7 +24,8 @@ class Cortix:
 
     """
 
-    def __init__(self, use_mpi=False, splash=False, log_filename_stem='cortix'):
+    def __init__(self, use_mpi=False, splash=False, log_filename_stem='cortix',
+                 save_dir_name_stem='ctx-saved'):
         """Construct a Cortix simulation object.
 
         Parameters
@@ -33,6 +34,10 @@ class Cortix:
             True for MPI, False for multiprocessing.
         splash: bool
             Show the Cortix splash image.
+        log_filename_stem: str
+            The log file will be named log_filename_stem+'.log'
+        save_dir_name_stem: str
+            The directory for saving pickled Cortix modules will be named '.'+'save_dir_name_stem'
 
         Attributes
         ----------
@@ -63,6 +68,9 @@ class Cortix:
         self.__network = None
         self.log_filename_stem = log_filename_stem
         self.logger_name = self.log_filename_stem
+
+        self.save_dir_name_stem = save_dir_name_stem
+
         # Fall back to multiprocessing if mpi4py is not available
         if self.use_mpi:
             try:
@@ -90,7 +98,9 @@ class Cortix:
             self.end_run_date = datetime.datetime.today().strftime('%d%b%y %H:%M:%S')
 
             # Delete any existing .ctx-saved/*
-            shutil.rmtree('.ctx-saved', ignore_errors=True)
+            # Delete any existing '.'+self.save_dir_name_stem+'/*'
+            #shutil.rmtree('.ctx-saved', ignore_errors=True)
+            shutil.rmtree('.'+self.save_dir_name_stem, ignore_errors=True)
 
     def __set_network(self, n):
         assert isinstance(n, Network)
@@ -109,7 +119,7 @@ class Cortix:
         """Run the Cortix network simulation.
         """
 
-        self.__network._Network__run(save)
+        self.__network._Network__run(save=save, save_dir_name='.'+self.save_dir_name_stem)
 
         if self.rank == 0 or self.use_multiprocessing:
             self.wall_clock_time_end = time.time()
