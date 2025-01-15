@@ -222,7 +222,9 @@ class Module:
         self.run(args)
 
         if self.save:
-            file_name = os.path.join('.ctx-saved', '{}_'.format(self.__class__.__name__))
+            #file_name = os.path.join('.ctx-saved', '{}_'.format(self.__class__.__name__))
+            save_dir_name = args[1]
+            file_name = os.path.join(save_dir_name, '{}_'.format(self.__class__.__name__))
             # Import where needed for no broken dependencies
             if self.use_mpi:
                 from mpi4py import MPI

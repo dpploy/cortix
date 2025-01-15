@@ -194,14 +194,14 @@ class Network:
 
         return
 
-    def __run(self, save=False):
+    def __run(self, save=False, save_dir_name=None):
         """
         Internal method to run the network simulation. Do not use this method, it is
         intended for Cortix to run it.
 
         This function concurrently executes the `cortix.src.module.run` function
         for each module in the network. Modules are run using either MPI or
-        Python Multiprocessing, depending on the user configuration. This is `not` a multi-threaded 
+        Python Multiprocessing, depending on the user configuration. This is `not` a multi-threaded
         application, it will always start multiple processes, either in MPI or Python Multiprocessing.
 
         Note
@@ -213,8 +213,10 @@ class Network:
 
         # Create directory for saving modules states
         if self.rank == 0 or self.use_multiprocessing:
-            shutil.rmtree('.ctx-saved', ignore_errors=True)
-            os.makedirs('.ctx-saved')
+            #shutil.rmtree('.ctx-saved', ignore_errors=True)
+            shutil.rmtree(save_dir_name, ignore_errors=True)
+            #os.makedirs('.ctx-saved')
+            os.makedirs(save_dir_name)
 
         # Running under MPI
         #------------------
@@ -248,7 +250,7 @@ class Network:
             if self.rank != 0:
                 mod = self.modules[self.rank-1]
                 self.log.info('Launching Module {}'.format(mod))
-                mod.run_and_save()
+                mod.run_and_save(save, save_dir_name)
 
             # Sync here at the end
             self.comm.Barrier()
@@ -266,7 +268,8 @@ class Network:
             for mod in self.modules:
                 self.log.info('Launching Module {}'.format(mod))
                 # Note: on the other end, args will arrive as a doubly tuple: ((self.log,),)
-                proc = multiproc.Process(target=mod.run_and_save, args=(self.log,))
+                proc = multiproc.Process(target=mod.run_and_save, args=(self.log, save_dir_name))
+                #proc = multiproc.Process(target=mod.run_and_save, args=(self.log,))
                 #proc = multiproc.Process(target=mod.run_and_save, args=(self.log,), kwargs={'logger':self.log})
                 processes.append(proc)
                 proc.start()
@@ -282,13 +285,15 @@ class Network:
             self.comm.Barrier()
 
         num_files = 0
-        for file_name in os.listdir('.ctx-saved'):
+        #for file_name in os.listdir('.ctx-saved'):
+        for file_name in os.listdir(save_dir_name):
 
             self.gv_edges = list() # re-initialize since ports were not pickled
 
             if file_name.endswith('.pkl'):
                 num_files += 1
-                file_name = os.path.join('.ctx-saved', file_name)
+                #file_name = os.path.join('.ctx-saved', file_name)
+                file_name = os.path.join(save_dir_name, file_name)
                 with open(file_name, 'rb') as fin:
                     module = pickle.load(fin)
                     # Reintroduce logging
