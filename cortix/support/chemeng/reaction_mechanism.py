@@ -702,8 +702,10 @@ class ReactionMechanism:
 
                 products_molar_cc = spc_molar_cc_vec[products_ids] # must be oredered as in rxn_mech
 
+                # Note: based on first reactanct and first product
                 reactant_molar_cc  = reactants_molar_cc[0] # first reactant
                 product_molar_cc = products_molar_cc[0]  # first product
+
                 product_eq_molar_cc = k_eq * reactant_molar_cc
 
                 #print('')
