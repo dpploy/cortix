@@ -16,6 +16,8 @@ class Quantity:
     well not so fast. This can be used to build a quantity with anything as a
     value. For instance a history of the quantity as a time series.
 
+    As of now quantity value can be a vector-valued quantity; see plot()
+
     """
     def __init__(self,
                  name = 'null-quantity-name',
@@ -187,8 +189,9 @@ class Quantity:
     unit = property(GetUnit, SetUnit, None, None)
 
     def plot(self, x_scaling=1, y_scaling=1, y_shift=0, title=None, x_label='x', y_label=None,
-            file_name=None, same_axis=True, complex_form='polar', figsize=[6,5], show=False, dpi=300):
-        '''
+             file_name=None, same_axis=True, complex_form='polar', error_data=False, 
+             figsize=[6,5], show=False, dpi=300):
+        """
         This will support a few possibities for data storage in the self.__value
         member.
 
@@ -199,7 +202,7 @@ class Quantity:
         entry in the series. A plot of all elements in the type against the index of
         the series will be made. The plot may have all elements in one axis or
         each element in its own axis.
-        '''
+        """
 
         plt.clf()
         plt.cla()
@@ -233,14 +236,16 @@ class Quantity:
 
         complex_data = False
 
+        # Build plot values
+
         if isinstance(self.__value[0], (float, int, bool)):
             n_dim = 1
             # Turn series of values into a series of a list of one value to allow for
             # the indexing below
             plot_values = list()
-            for i in range (len(self.__value[:])):
+            for i in range (len(self.__value)):
                 #self.__value.iat[i] = [self.__value.iat[i]]  # list of one element
-                plot_values.append([self.__value.iat[i]])  # list of one element
+                plot_values.append([self.__value.iat[i]]) # common list of one value
         elif isinstance(self.__value[0], complex):
             n_dim = 1
             complex_data = True
@@ -253,7 +258,7 @@ class Quantity:
             else:
                 assert False
             plot_values = list()
-            for i in range(len(self.__value[:])):
+            for i in range(len(self.__value)):
                 z = self.__value.iat[i]
                 if complex_form == 'polar':
                     (mag, angle) = cmath.polar(z)
@@ -265,9 +270,12 @@ class Quantity:
         elif len(self.__value[0]) >= 1:
             n_dim = len(self.__value[0])
             plot_values = list()
-            for container in self.__value:
-                assert len(container) == n_dim
-                plot_values.append(container)
+            for vector in self.__value:
+                assert len(vector) == n_dim
+                plot_values.append(vector)
+            if error_data:
+                assert n_dim == 2
+                n_dim = 1
         else:
             assert False, 'not a valid data container in self.__value'
 
@@ -280,7 +288,7 @@ class Quantity:
             fig = plt.figure(self.__formal_name, figsize=figsize)
 
         if complex_data:
-            fig,ax1 = plt.subplots()
+            fig, ax1 = plt.subplots()
             ax2 = ax1.twinx()
 
         for i in range(n_dim):
@@ -305,6 +313,14 @@ class Quantity:
 
                 y2 = [(k-y_shift)*y_scaling for k in y2]
 
+            if error_data:
+                error = list()
+
+                for j in range(len(x)):
+                    error.append(plot_values[j][i+1])
+
+                error = [(k-y_shift)*y_scaling for k in error]
+
             plt.title(title)
 
             if complex_data:
@@ -318,6 +334,8 @@ class Quantity:
                 ax1.set_ylabel(y_label, color='blue')
                 ax2.set_ylabel(r'$\phi$ [degree]', color='red')
                 plt.legend([l1, l2], legend)
+            elif error_data:
+                plt.errorbar(x, y, error, capsize=3, capthick=0.5, ecolor='gray', elinewidth=0.5)
             else:
                 plt.plot(x, y)
 
@@ -326,13 +344,16 @@ class Quantity:
                 plt.ylabel(y_label)
 
             if not same_axis and file_name:
-                plt.savefig(file_name+str(i)+'.png', dpi=dpi)
+                plt.grid()
+                plt.savefig(file_name+'-'+str(i)+'.png', dpi=dpi, bbox_inches="tight")
 
         if show:
+            plt.grid()
             plt.show()
 
         if same_axis and file_name:
-            plt.savefig(file_name+'.png',dpi=dpi)
+            plt.grid()
+            plt.savefig(file_name+'.png',dpi=dpi, bbox_inches="tight")
 
         plt.grid()
 
