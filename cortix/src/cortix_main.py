@@ -25,7 +25,7 @@ class Cortix:
     """
 
     def __init__(self, use_mpi=False, splash=False, log_filename_stem='cortix',
-                 save_dir_name_stem='ctx-saved'):
+                 save_dir_name_stem='ctx-saved', loglevel_console='debug'):
         """Construct a Cortix simulation object.
 
         Parameters
@@ -70,6 +70,9 @@ class Cortix:
         self.log = None
         self.log_filename_stem = log_filename_stem
         self.logger_name = self.log_filename_stem
+
+        assert loglevel_console in ['debug', 'info', 'warn', 'error', 'critical']
+        self.loglevel_console = loglevel_console
 
         self.save_dir_name_stem = save_dir_name_stem
 
@@ -166,6 +169,9 @@ class Cortix:
 
         Note: help(logging). Levels: 0 = NOTSET, 10 = DEBUG, 20 = INFO, 30 = WARNING,
               40 = ERROR, 50 = FATAL
+
+        Cortix sets level to DEBUG to stdout and file output, hence all messages at this level and above
+        will be printed to terminal and log file.
         """
 
         # File removal
@@ -180,6 +186,7 @@ class Cortix:
         self.log = logging.getLogger(self.logger_name)
         self.log.setLevel(logging.DEBUG)
 
+
         # Create handlers
         if not self.log.hasHandlers():
             file_handler = logging.FileHandler(self.log_filename_stem+'.log')
@@ -188,6 +195,15 @@ class Cortix:
             console_handler = logging.StreamHandler()
             console_handler.setLevel(logging.DEBUG)
             console_handler.setStream(sys.stdout)
+
+            if self.loglevel_console == 'info':
+                console_handler.setLevel(logging.INFO)
+            elif self.loglevel_console == 'warn':
+                console_handler.setLevel(logging.WARN)
+            elif self.loglevel_console == 'error':
+                console_handler.setLevel(logging.ERROR)
+            elif self.loglevel_console == 'critical':
+                console_handler.setLevel(logging.CRITICAL)
 
             # Formatter added to handlers
             if self.use_mpi:
@@ -203,7 +219,7 @@ class Cortix:
             self.log.addHandler(file_handler)
             self.log.addHandler(console_handler)
         else:
-            self.log.warn('Cortix logger already exists; overridiing...')
+            self.log.warn('Cortix logger already exists; overriding...')
 
     def __get_splash(self, begin=None, end=None):
         '''Returns the Cortix splash logo.
