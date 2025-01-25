@@ -261,8 +261,13 @@ class Network:
 
             # Parallel run all modules in Python multiprocessing
             if not self.is_multiproc_start_method_set:
-                multiproc.set_start_method('spawn') # fresh interpreter for child processes
+                try:
+                    multiproc.set_start_method('spawn') # fresh interpreter for child processes
+                except RuntimeError:
+                    multiproc.set_start_method('spawn', force=True) # fresh interpreter for child processes
+                    self.log.warn('Multiproc start with spawn force=True; overriding context already set.')
                 self.is_multiproc_start_method_set = True
+
             processes = list()
 
             for mod in self.modules:
