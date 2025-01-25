@@ -126,7 +126,7 @@ class Cortix:
         if self.rank == 0 or self.use_multiprocessing:
             self.wall_clock_time_end = time.time()
             self.log.info('run()::Elapsed wall clock time [s]: '+
-                          str(round(self.wall_clock_time_end-self.wall_clock_time_start, 2)))
+                          str(round(self.wall_clock_time_end - self.wall_clock_time_start, 2)))
 
     def close(self):
         """Closes the cortix object properly before destruction.
@@ -152,7 +152,7 @@ class Cortix:
                           str(round(self.wall_clock_time_end-self.wall_clock_time_start, 2)))
             logging.shutdown()
 
-            self.log = None
+            #self.log = None # do not eliminate the logger in case user cortix continues to run afte closing
 
     def __create_logger(self):
         """A helper function to setup the logging facility.
