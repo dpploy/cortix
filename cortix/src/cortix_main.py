@@ -66,6 +66,8 @@ class Cortix:
         self.splash = splash
 
         self.__network = None
+
+        self.log = None
         self.log_filename_stem = log_filename_stem
         self.logger_name = self.log_filename_stem
 
@@ -150,7 +152,7 @@ class Cortix:
                           str(round(self.wall_clock_time_end-self.wall_clock_time_start, 2)))
             logging.shutdown()
 
-        return
+            self.log = None
 
     def __create_logger(self):
         """A helper function to setup the logging facility.
@@ -201,9 +203,7 @@ class Cortix:
             self.log.addHandler(file_handler)
             self.log.addHandler(console_handler)
         else:
-            assert False, 'Fatal: Logger exists.'
-
-        return
+            self.log.warn('Cortix logger already exists; overridiing...')
 
     def __get_splash(self, begin=None, end=None):
         '''Returns the Cortix splash logo.
