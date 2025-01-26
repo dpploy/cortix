@@ -234,7 +234,8 @@ class Module:
             file_name += '.pkl'
 
             self.ports = list() # reset ports since they can't be pickled
-            self.log = None
+
+            self.log = None # no harm in closing the logger after a run is finished
 
             try:
                 with open(file_name, 'wb') as fout:

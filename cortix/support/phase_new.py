@@ -806,7 +806,7 @@ class PhaseNew:
 
         return
 
-    def plot(self, actors=None, name='phase-plot-null-name',
+    def plot(self, actors=None, title=None, name='phase-plot-null-name',
              var_unit=None,
              x_scaling=1,
              legend=None, nrows=2, ncols=2, figsize=[6,5], show=False, dpi=300):
@@ -818,6 +818,9 @@ class PhaseNew:
         ----------
         actors: list(str)
             List of names of quantities or species in the phase. Defaults to all actors being plotted.
+
+        title: str
+            Title of the dashboard.
 
         name: str
             Stem of the filename of the plots saved to file.
@@ -837,6 +840,9 @@ class PhaseNew:
             actors = self.__df.columns
         else:
             assert isinstance(actors, list)
+
+        if title is not None:
+            assert isinstance(title, str)
 
         if var_unit is not None:
             assert isinstance(var_unit, str)
@@ -891,7 +897,10 @@ class PhaseNew:
 
                 axes = np.array(axlst)
 
-                text = today + ': Cortix.Phase.Plot'
+                if title is None:
+                    text = today + ': Cortix.Phase.Plot'
+                else:
+                    text = title
                 fig.text(.5, .95, text, horizontalalignment='center', fontsize=14)
 
                 axs = axes.flat

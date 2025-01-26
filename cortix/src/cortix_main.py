@@ -25,7 +25,7 @@ class Cortix:
     """
 
     def __init__(self, use_mpi=False, splash=False, log_filename_stem='cortix',
-                 save_dir_name_stem='ctx-saved'):
+                 save_dir_name_stem='ctx-saved', loglevel_console='debug'):
         """Construct a Cortix simulation object.
 
         Parameters
@@ -66,8 +66,13 @@ class Cortix:
         self.splash = splash
 
         self.__network = None
+
+        self.log = None
         self.log_filename_stem = log_filename_stem
         self.logger_name = self.log_filename_stem
+
+        assert loglevel_console in ['debug', 'info', 'warn', 'error', 'critical']
+        self.loglevel_console = loglevel_console
 
         self.save_dir_name_stem = save_dir_name_stem
 
@@ -124,7 +129,7 @@ class Cortix:
         if self.rank == 0 or self.use_multiprocessing:
             self.wall_clock_time_end = time.time()
             self.log.info('run()::Elapsed wall clock time [s]: '+
-                          str(round(self.wall_clock_time_end-self.wall_clock_time_start, 2)))
+                          str(round(self.wall_clock_time_end - self.wall_clock_time_start, 2)))
 
     def close(self):
         """Closes the cortix object properly before destruction.
@@ -150,7 +155,7 @@ class Cortix:
                           str(round(self.wall_clock_time_end-self.wall_clock_time_start, 2)))
             logging.shutdown()
 
-        return
+            #self.log = None # do not eliminate the logger in case user cortix continues to run afte closing
 
     def __create_logger(self):
         """A helper function to setup the logging facility.
@@ -164,6 +169,9 @@ class Cortix:
 
         Note: help(logging). Levels: 0 = NOTSET, 10 = DEBUG, 20 = INFO, 30 = WARNING,
               40 = ERROR, 50 = FATAL
+
+        Cortix sets level to DEBUG to stdout and file output, hence all messages at this level and above
+        will be printed to terminal and log file.
         """
 
         # File removal
@@ -178,6 +186,7 @@ class Cortix:
         self.log = logging.getLogger(self.logger_name)
         self.log.setLevel(logging.DEBUG)
 
+
         # Create handlers
         if not self.log.hasHandlers():
             file_handler = logging.FileHandler(self.log_filename_stem+'.log')
@@ -186,6 +195,15 @@ class Cortix:
             console_handler = logging.StreamHandler()
             console_handler.setLevel(logging.DEBUG)
             console_handler.setStream(sys.stdout)
+
+            if self.loglevel_console == 'info':
+                console_handler.setLevel(logging.INFO)
+            elif self.loglevel_console == 'warn':
+                console_handler.setLevel(logging.WARN)
+            elif self.loglevel_console == 'error':
+                console_handler.setLevel(logging.ERROR)
+            elif self.loglevel_console == 'critical':
+                console_handler.setLevel(logging.CRITICAL)
 
             # Formatter added to handlers
             if self.use_mpi:
@@ -201,9 +219,7 @@ class Cortix:
             self.log.addHandler(file_handler)
             self.log.addHandler(console_handler)
         else:
-            assert False, 'Fatal: Logger exists.'
-
-        return
+            self.log.warn('Cortix logger already exists; overriding...')
 
     def __get_splash(self, begin=None, end=None):
         '''Returns the Cortix splash logo.

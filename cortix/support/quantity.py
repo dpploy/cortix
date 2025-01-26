@@ -5,6 +5,7 @@
 import math
 import cmath
 import pandas
+import numpy
 #import matplotlib
 #matplotlib.use('Agg', warn=False)
 import matplotlib.pyplot as plt
@@ -189,7 +190,7 @@ class Quantity:
     unit = property(GetUnit, SetUnit, None, None)
 
     def plot(self, x_scaling=1, y_scaling=1, y_shift=0, title=None, x_label='x', y_label=None,
-             file_name=None, same_axis=True, complex_form='polar', error_data=False, 
+             file_name=None, same_axis=True, complex_form='polar', error_data=False, error_fill=False,
              figsize=[6,5], show=False, dpi=300):
         """
         This will support a few possibities for data storage in the self.__value
@@ -334,8 +335,12 @@ class Quantity:
                 ax1.set_ylabel(y_label, color='blue')
                 ax2.set_ylabel(r'$\phi$ [degree]', color='red')
                 plt.legend([l1, l2], legend)
-            elif error_data:
+            elif error_data and not error_fill:
                 plt.errorbar(x, y, error, capsize=3, capthick=0.5, ecolor='gray', elinewidth=0.5)
+            elif error_data and error_fill:
+                plt.plot(x, y)
+                plt.fill_between(x, numpy.array(y) - numpy.array(error),
+                                 numpy.array(y) + numpy.array(error), alpha=0.15)
             else:
                 plt.plot(x, y)
 
