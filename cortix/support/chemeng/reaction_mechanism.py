@@ -272,9 +272,9 @@ class ReactionMechanism:
             if 'k_eq' in tmp_dict:
                 assert 'tau' in tmp_dict
             if 'tau' in tmp_dict and 'k_eq' not in tmp_dict:
+                s1 = 'ReactionMechanism: user must implement a k_eq_func(rxn_mech, temperature, '
+                s2 = 'spc_molar_cc, arg_dict=None) for '
                 if self.log:
-                    s1 = 'ReactionMechanism: user must implement a k_eq_func(rxn_mech, temperature, '
-                    s2 = 'spc_molar_cc, arg_dict=None) for '
                     self.log.warn(s1+s2+'%s'%(data[0]))
                 else:
                     print('WARNING: '+s1+s2+'%s'%(data[0]))
