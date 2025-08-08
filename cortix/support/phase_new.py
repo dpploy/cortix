@@ -877,7 +877,7 @@ class PhaseNew:
                     i_dash += 1
 
                 fig_num = str(np.random.random()) + '.' + str(i_dash)
-                fig = plt.figure(num=fig_num, figsize=figsize)
+                fig = plt.figure(num=fig_num, figsize=figsize, dpi=dpi)
 
                 gs = gridspec.GridSpec(nrows, ncols)
                 #gs.update(left=0.08, right=0.98, wspace=0.4, hspace=0.4)

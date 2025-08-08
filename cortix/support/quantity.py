@@ -286,7 +286,7 @@ class Quantity:
         # Warning: code needs review; complex valued data was introduced without testing
 
         if same_axis and not complex_data:
-            fig = plt.figure(self.__formal_name, figsize=figsize)
+            fig = plt.figure(self.__formal_name, figsize=figsize, dpi=dpi)
 
         if complex_data:
             fig, ax1 = plt.subplots()
@@ -295,7 +295,7 @@ class Quantity:
         for i in range(n_dim):
 
             if not same_axis and not complex_data:
-                fig = plt.figure(self.__formal_name+str(i), figsize=figsize)
+                fig = plt.figure(self.__formal_name+str(i), figsize=figsize, dpi=dpi)
 
             y = list()
 
